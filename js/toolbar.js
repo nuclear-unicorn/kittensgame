@@ -185,6 +185,10 @@ dojo.declare("classes.ui.toolbar.ToolbarEnergy", classes.ui.ToolbarIcon, {
 
         var delta = this.game.resPool.getEnergyDelta();
 		var penalty = energy >= 0 ? "" :"<br><br>Production bonuses cuts: <span style='color:red;'>-" + Math.floor( (1-delta) * 100) + "%</span>";
+		if (!this.game.challenges.getChallenge("energy").on && this.game.challenges.getChallenge("energy").researched && !this.game.challenges.getCondition("disableRewards").on && energy > 0)
+		{
+			penalty = "<br><br>Production bonuses gains: <span style='color:green;'>+" + Math.floor( (delta-1) * 100) + "%</span>";
+		}
 
 		return "Production: <span style='color:green;'>" +  this.game.getDisplayValueExt(resPool.energyProd, true, false) + "Wt</span>" +
 			   "<br>Consumption: <span style='color:#D00000;'>-" +  this.game.getDisplayValueExt(resPool.energyCons) + "Wt</span>" + penalty;

@@ -26,7 +26,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
            flux: this.flux,
            heat: this.heat,
            cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "isAutomationEnabled"]),
-           vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"])
+           vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on", "reserve"])
        };
     },
 
@@ -101,6 +101,13 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     },
 
     update: function(){
+        if (!this.game.challenges.getCondition("disableChrono").on && this.getVSU("usedCryochambers").reserve)
+        {
+           var cryochambers = this.getVSU("usedCryochambers");
+           cryochambers.val += cryochambers.reserve;
+           cryochambers.reserve = 0;
+        }
+        
         if (this.isAccelerated && this.game.resPool.get("temporalFlux").value > 0){
             this.game.resPool.addResEvent("temporalFlux", -1);
         }
@@ -165,8 +172,6 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.game.resPool.update();
         this.game.updateResources();
         // Since workshop requires some resource and we don't want exhaust all resources during workshop so we need a way to consume them.
-        // Idea: relax resource limits temporaraly, load the resource and do workshop, after that enforce limits again.
-        var currentLimits = {};
 
         var i, res;
         // calculate resource offsets
@@ -177,13 +182,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             }
             //NB: don't forget to update resources before calling in redshift
             if (res.perTickCached) {
-                if (res.maxValue) {
-                    currentLimits[res.name] = Math.max(res.value, res.maxValue);
-                }
-
                 //console.log("Adjusting resource", res.name, "delta",res.perTickCached, "max value", res.maxValue, "days offset", daysOffset);
                 //console.log("resource before adjustment:", res.value);
-                this.game.resPool.addRes(res, res.perTickCached * this.game.rate * daysOffset, false/*event?*/, true/*preventLimitCheck*/);
+                this.game.resPool.addRes(res, res.perTickCached * this.game.rate * daysOffset, false/*event?*/);
                 //console.log("resource after adjustment:", res.value);
 
             }
@@ -196,19 +197,6 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.game.village.fastforward(this.game.rate * daysOffset);
         this.game.space.fastforward(this.game.rate * daysOffset);
         this.game.religion.fastforward(this.game.rate * daysOffset);
-
-        // enforce limits
-        for (i in this.game.resPool.resources){
-            res = this.game.resPool.resources[i];
-            if (!res.maxValue) {
-                continue;
-            }
-            var limit = currentLimits[res.name];
-            if (!limit){
-                continue;
-            }
-            res.value = Math.min(limit, res.value);
-        }
 
         if (daysOffset > 3) {
             this.game.msg($I("time.redshift", [daysOffset]) + (numberEvents ? $I("time.redshift.ext",[numberEvents]) : ""));
@@ -387,9 +375,6 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 				"temporalParadoxDay": 1 + game.getEffect("temporalParadoxDayBonus")
 			};
 			effects["energyConsumption"] = 15;
-			if (game.challenges.currentChallenge == "energy") {
-				effects["energyConsumption"] *= 2;
-			}
 			self.effects = effects;
 		},
 		unlocks: {
@@ -484,9 +469,6 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         game.time.flux += amt;
 
         game.challenges.getChallenge("1000Years").unlocked = true;
-        if (game.challenges.currentChallenge == "1000Years" && cal.year >= 1000) {
-            game.challenges.researchChallenge("1000Years");
-        }
     },
 
     unlockAll: function(){
@@ -635,6 +617,8 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
                 if (this.game.time.heat > heatMax) {
                     price["val"] *= (1 + (this.game.time.heat - heatMax) * 0.01);  //1% per excessive heat unit
                 }
+                
+                price["val"] *= this.game.challenges.getChallengePenalty("1000Years") * this.game.challenges.getChallengeReward("1000Years");
 			}
 		}
 
@@ -648,7 +632,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         var impedance = this.game.getEffect("timeImpedance") * (1+ this.game.getEffect("timeRatio"));
         var heatMax = this.game.getEffect("heatMax");
 
-        var heatFactor = this.game.challenges.getChallenge("1000Years").researched ? 5 : 10;
+        var heatFactor = (this.game.challenges.getChallenge("1000Years").researched && !this.game.challenges.getCondition("disableRewards").on) ? 5 : 10;
 
 		for (var k = 0; k < amt; k++) {
 			for (var i = 0; i < prices_cloned.length; i++) {
@@ -662,6 +646,8 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 	                if ((this.game.time.heat + k * heatFactor) > heatMax) {
 	                    priceLoop *= (1 + (this.game.time.heat + k * heatFactor - heatMax) * 0.01);  //1% per excessive heat unit
 	                }
+	                
+	                price["val"] *= this.game.challenges.getChallengePenalty("1000Years") * this.game.challenges.getChallengeReward("1000Years");
 					pricesTotal += priceLoop;
 				}
 			}
@@ -702,7 +688,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 
     doShatter: function(model, amt){
 
-	var factor = this.game.challenges.getChallenge("1000Years").researched ? 5 : 10;
+	var factor = (this.game.challenges.getChallenge("1000Years").researched && !this.game.challenges.getCondition("disableRewards").on) ? 5 : 10;
         this.game.time.heat += amt*factor;
         this.game.time.shatter(amt);
 

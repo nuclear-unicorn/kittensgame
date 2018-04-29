@@ -179,8 +179,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 
 				//probably not the best place to handle this mechanics
 				//----------- move to separate part? -----------
-				if ((effectName == "productionRatio" || effectName == "magnetoRatio")
-					&& (game.resPool.energyCons > game.resPool.energyProd)){
+				if (effectName == "productionRatio" || effectName == "magnetoRatio"){
 					effect *= game.resPool.getEnergyDelta();
 				}
 
@@ -356,9 +355,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
                 };
                 effects.energyProduction *= 1 + game.getEffect("solarFarmRatio");
 				if (game.calendar.season == 3) {
-					effects.energyProduction *= 0.75;
+					effects.energyProduction *= (1 - (0.25 / this.game.challenges.getChallengeReward("winterIsComing")));
 				} else if (game.calendar.season == 1) {
-					effects.energyProduction /= 0.75;
+					effects.energyProduction /= (1 - (0.25 / this.game.challenges.getChallengeReward("winterIsComing")));
 				}
                 stageMeta.effects = effects;
 			}
@@ -576,9 +575,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			var energyCons = 0;
 			if (game.workshop.get("biofuel").researched){
 				energyCons = 1;
-				if (game.challenges.currentChallenge == "energy") {
-					energyCons *= 2;
-				}
 				self.togglable = true;
 			}
 			self.effects["energyConsumption"] = energyCons;
@@ -878,9 +874,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game) {
 			self.effects["energyConsumption"] = 1;
-			if (game.challenges.currentChallenge == "energy") {
-				self.effects["energyConsumption"] *= 2;
-			}
 		},
 		lackResConvert: false,
 		action: function(self, game){
@@ -1136,9 +1129,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 
 			if (game.workshop.get("pumpjack").researched){
 				effects["energyConsumption"] = 1;
-				if (game.challenges.currentChallenge == "energy") {
-					effects["energyConsumption"] *= 2;
-				}
 				self.togglable = true;
 			}
 
@@ -1189,9 +1179,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}
 
 			effects["energyConsumption"] = 2;
-			if (game.challenges.currentChallenge == "energy") {
-				effects["energyConsumption"] *= 2;
-			}
 			if (game.workshop.get("neuralNetworks").researched){
 
 			}
@@ -1267,9 +1254,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game){
 			self.effects["energyConsumption"] = 2;
-			if (game.challenges.currentChallenge == "energy") {
-				self.effects["energyConsumption"] *= 2;
-			}
 
 			self.effects["scienceMax"] = 0;
 			if (game.workshop.get("lhc").researched){
@@ -1474,7 +1458,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"cultureMax" : 0
 		},
 		calculateEffects: function(self, game) {
-			if (game.challenges.currentChallenge != "atheism") {
+			if (!game.challenges.getChallenge("atheism")) {
 				var effects = {
 					"culturePerTickBase" : 0.05,
 					"faithPerTickBase" : 0.005,
@@ -1510,7 +1494,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"faithMax": 0
 		},
 		calculateEffects: function(self, game){
-			if (game.challenges.currentChallenge != "atheism") {
+			if (!game.challenges.getChallenge("atheism").on) {
 				var effects = {
 					"culturePerTickBase" : 0.1,
 					"faithPerTickBase" : 0,
@@ -1627,9 +1611,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game) {
 			self.effects["energyConsumption"] = 20;
-			if (game.challenges.currentChallenge == "energy") {
-				self.effects["energyConsumption"] *= 2;
-			}
 			self.effects["temporalFluxProduction"] = game.getEffect("temporalFluxProductionChronosphere");
 		}
 	},{
@@ -1651,10 +1632,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		action: function(self, game){
 			self.effects["energyConsumption"] = 2 * ( 1 + 0.75 * self.on);
-
-			if (game.challenges.currentChallenge == "energy") {
-				self.effects["energyConsumption"] *= 2;
-			}
 
 			var gflops = game.resPool.get("gflops");
 			gflops.value += self.effects["gflopsPerTickBase"] * self.on;

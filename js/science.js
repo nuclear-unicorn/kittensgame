@@ -982,30 +982,21 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Library", com.nuclearunicorn.game.u
 			this.metaphysicsPanel = metaphysicsPanel;
 		}
 
-        //---------- challenges ------------
-		this.challengesPanel = null;
-
-        //TODO: use better update/render logic like in Time tab
-		var showChallenges = this.game.prestige.getPerk("adjustmentBureau").researched;
-		if (showChallenges){
-			var challengesPanel = new classes.ui.ChallengePanel($I("challendge.panel.label"), this.game.challenges);
-			challengesPanel.game = this.game;
-
-			var content = challengesPanel.render(tabContainer);
-			this.challengesPanel = challengesPanel;
-		}
-
 		this.update();
 	},
 
 	update: function(){
 		this.inherited(arguments);
 
+		if (!this.game.science.get("chronophysics").researched && this.game.prestige.getPerk("anachronomancy").researched && !this.game.challenges.getCondition("disableChrono").on)
+		{
+			var chronophysics = this.game.science.get("chronophysics");
+			chronophysics.researched = true;
+			this.game.unlock(chronophysics.unlocks);
+		}
+
 		if (this.metaphysicsPanel){
 			this.metaphysicsPanel.update();
-		}
-        if (this.challengesPanel){
-			this.challengesPanel.update();
 		}
 	},
 

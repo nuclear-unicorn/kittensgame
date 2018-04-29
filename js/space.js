@@ -263,9 +263,6 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				}
 				else {
 					self.effects["energyConsumption"] = 1;
-					if (game.challenges.currentChallenge == "energy") {
-						self.effects["energyConsumption"] *= 2;
-					}
 				}
 			}
 		},{
@@ -292,9 +289,6 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					"scienceRatio": 0.5
 				};
 				effects["energyConsumption"] = 10;
-				if (game.challenges.currentChallenge == "energy") {
-					effects["energyConsumption"] *= 2;
-				}
 				self.effects = effects;
 			},
 			breakIronWill: true
@@ -328,9 +322,6 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					"unobtainiumPerTickSpace": 0.007 * (1+ game.getEffect("lunarOutpostRatio"))
 				};
 				effects["energyConsumption"] = 5;
-				if (game.challenges.currentChallenge == "energy") {
-					effects["energyConsumption"] *= 2;
-				}
 				self.effects = effects;
 			},
 			lackResConvert: false,
@@ -384,9 +375,6 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					"energyConsumption" : 0
 				};
 				effects["energyConsumption"] = game.workshop.get("amBases").researched ? 5 : 10;
-				if (game.challenges.currentChallenge == "energy") {
-					effects["energyConsumption"] *= 2;
-				}
 
 				if (game.workshop.get("aiBases").researched){
 					for (var key in effects){
@@ -511,9 +499,6 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					"spaceRatio": 0.02
 				};
 				effects["energyConsumption"] = 20;
-				if (game.challenges.currentChallenge == "energy") {
-					effects["energyConsumption"] *= 2;
-				}
 				self.effects = effects;
             }
         }]
@@ -562,9 +547,6 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					"energyConsumption" : 50 * (1+ game.space.getBuilding("heatsink").val * 0.01)
 				};
 
-				if (game.challenges.currentChallenge == "energy") {
-					effects["energyConsumption"] *= 2;
-				}
 				self.effects = effects;
 			}
 		},{
@@ -872,7 +854,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				if (!building.effects){
 					return 0;
 				} else {
-					var spaceRatio = (effectName == "spaceRatio" && game.resPool.energyCons > game.resPool.energyProd) ? game.resPool.getEnergyDelta() : 1;
+					var spaceRatio = (effectName == "spaceRatio") ? game.resPool.getEnergyDelta() : 1;
 					return building.effects[effectName] * building.on * spaceRatio;
 				}
 			}});

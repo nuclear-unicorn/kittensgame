@@ -152,7 +152,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		title: $I("resources.zebras.title"),
 		type : "common",
 		transient: true,
-		visible: true
+		visible: true,
+		hideReserve: true
 	},{
 		name : "starchart",
 		title: $I("resources.starchart.title"),
@@ -248,21 +249,32 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		name : "karma",
 		title: $I("resources.karma.title"),
 		type : "rare",
-		visible: true
+		visible: true,
+		hideReserve: true
 	},{
 		name : "paragon",
 		title: $I("resources.paragon.title"),
 		type : "common",
 		visible: true,
 		color: "#6141CD",
-		persists: true
+		persists: true,
+		hideReserve: true
 	},{
 		name : "burnedParagon",
 		title : $I("resources.burnedParagon.title"),
 		type : "common",
 		visible: true,
 		color: "#493099",
-		persists: true
+		persists: true,
+		hideReserve: true
+	},{
+		name : "apotheosis",
+		title : $I("resources.apotheosis.title"),
+		type : "common",
+		visible: true,
+		color: "#7950FF",
+		persists: true,
+		hideReserve: true
 	},{
 		name : "timeCrystal",
 		title: $I("resources.timeCrystal.title"),
@@ -471,6 +483,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		for (var i = 0; i< this.resourceData.length; i++){
 			var res = dojo.clone(this.resourceData[i]);
 			res.value = 0;
+			res.reserveValue = 0;
 			res.unlocked = false;
 			if (res.name == "oil" ||
 				res.name == "kerosene" ||
@@ -501,6 +514,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		var res = {
 			name: name,
 			value: 0,
+			reserveValue: 0,
 
 			//whether resource was marked by user as hidden or visible
 			isHidden: false,
@@ -510,29 +524,40 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		return res;
 	},
 
-	addRes: function(res, addedValue, event, preventLimitCheck) {
-		if (this.game.calendar.day < 0 && !event || addedValue == 0) {
+	addRes: function(res, addedValue, event) {
+		if (this.game.calendar.day < 0 && !event) {
 			return 0;
 		}
 
 		var prevValue = res.value || 0;
 
-		if(res.maxValue) {
-			//if already overcap, allow to remain that way unless removing resources.
-			if(res.value > res.maxValue) {
-				if(addedValue < 0 ) {
-					res.value += addedValue;
-				}
-			} else {
-				res.value += addedValue;
-				if(res.value > res.maxValue && !preventLimitCheck) {
+		res.value += addedValue;
+		if(res.maxValue && res.value > res.maxValue) {
+			res.value = res.maxValue;
+		}
+		
+		if (res.name == "karma" || res.name == "paragon" || res.name == "burnedParagon" || res.name == "apotheosis")
+		{
+			if (!this.game.challenges.getCondition("disableMetaResources").on && res.reserveValue)
+			{
+				res.value += res.reserveValue;
+				res.reserveValue = 0;
+			}
+		}
+		else
+		{
+			if (!this.game.challenges.getCondition("disableChrono").on && res.reserveValue && (!res.maxValue || res.value < res.maxValue)) {
+				if (res.maxValue && res.reserveValue > res.maxValue) {
+					res.reserveValue -= (res.maxValue - res.value);
 					res.value = res.maxValue;
 				}
+				else {
+					res.value += res.reserveValue;
+					res.reserveValue = 0;
+				}
 			}
-		} else {
-			res.value += addedValue;
 		}
-
+		
 		if (res.name == "void") { // Always an integer
 			res.value = Math.floor(res.value);
 		}
@@ -597,12 +622,17 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	 * Iterates resources and updates their values with per tick increment
 	 */
 	update: function(){
-
 		var game = this.game;
 
 		for (var i in this.resources){
 			var res = this.resources[i];
 			if (res.name == "sorrow"){
+				if (!this.game.challenges.getCondition("disableMisc").on)
+				{
+					res.value += res.reserveValue;
+					res.reserveValue = 0;
+				}
+				
 				res.maxValue = 12 + (game.getEffect("blsLimit") || 0);
 				res.value = res.value > res.maxValue ? res.maxValue : res.value;
 				continue;
@@ -636,7 +666,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 		//--------
 		this.energyProd = game.getEffect("energyProduction") * (1 + game.getEffect("energyProductionRatio"));
-		this.energyCons = game.getEffect("energyConsumption");
+		this.energyCons = game.getEffect("energyConsumption") * this.game.challenges.getChallengePenalty("energy") / this.game.challenges.getChallengeReward("energy");
 
 	},
 
@@ -730,6 +760,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		for (var i = 0; i < this.resources.length; i++){
 			var res = this.resources[i];
 			res.value = 0;
+			res.reserveValue = 0;
 			res.maxValue = 0;
 			res.perTickCached = 0;
 			res.unlocked = false;
@@ -816,18 +847,20 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	},
 
     getEnergyDelta: function(){
-		if (this.energyCons == 0) {
-			return 0;
-		} else {
-			var delta = this.energyProd / this.energyCons;
-			if (delta < 0.25){
-				delta = 0.25;
-			}
-			if (this.game.challenges.getChallenge("energy").researched == true) {
-				delta = 1 - (1 - delta) / 2;
-			}
-		return delta;
+    		if (this.energyProd == 0 && this.energyCons == 0){
+    			return 1;
+    		}
+		var delta = this.energyProd / (this.energyCons ? this.energyCons : 1);
+		if (delta < 0.25){
+			delta = 0.25;
 		}
+		if (delta > 4){
+			delta = 4;
+		}
+		if ((this.game.challenges.getChallenge("energy").on || !this.game.challenges.getChallenge("energy") || this.game.challenges.getCondition("disableRewards").on) && delta > 1) {
+			delta = 1;
+		}
+		return delta;
     },
 
     getVoidQuantity: function() {
@@ -957,6 +990,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GenericResourceTable", null, {
 			var tdAmt = dojo.create("td", {className: "resAmount"}, tr);
 			tdAmt.textContent = this.game.getDisplayValueExt(res.value);
 
+			//	---------------- reserve ----------------------
+			var tdReserve = dojo.create("td", {className: "resAmountReserve"}, tr);
+			tdReserve.textContent = !this.game.challenges.getCondition("disableChrono").on && !res.hideReserve && res.reserveValue ? "+" + this.game.getDisplayValueExt(res.reserveValue) : "";
+
 			//	---------------- max ----------------------
 			var tdMax = dojo.create("td", { className: "maxRes" }, tr);
 			tdMax.textContent = this.game.getDisplayValueExt(res.maxValueUI);
@@ -972,6 +1009,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GenericResourceTable", null, {
 				resRef: res,
 				rowRef: tr,
 				resAmt : tdAmt,
+				resReserve: tdReserve,
 				resMax : tdMax,
 				resTick: tdPerTick,
 				resWMod: tdWeatherMod
@@ -1036,6 +1074,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GenericResourceTable", null, {
 				row.resAmt.className = className;
 			}
 
+			row.resReserve.textContent = !this.game.challenges.getCondition("disableChrono").on && !res.hideReserve && res.reserveValue ? "+" + this.game.getDisplayValueExt(res.reserveValue) : "";
+
 
 			var maxResValue = res.maxValue ? "/" + this.game.getDisplayValueExt(res.maxValue) : "";
 			row.resMax.textContent  = maxResValue;
@@ -1057,7 +1097,23 @@ dojo.declare("com.nuclearunicorn.game.ui.GenericResourceTable", null, {
 			var season = this.game.calendar.getCurSeason();
 			if (season.modifiers[res.name] && perTick != 0 ){
 
-				var modifier = (season.modifiers[res.name] + this.game.calendar.getWeatherMod() - 1)*100;
+				if (this.game.challenges.getChallenge("winterIsComing").on)
+				{
+					var modifier = (this.game.challenges.getChallengePenalty("winterIsComing"), (this.game.calendar.weather || "normal") + "Mod");
+				}
+				else
+				{
+					var reward = 1;
+					if (this.game.calendar.weather == "warm")
+					{
+						reward = this.game.challenges.getChallengeReward("winterIsComing");
+					}
+					if (this.game.calendar.weather == "cold")
+					{
+						reward = 1 / this.game.challenges.getChallengeReward("winterIsComing");
+					}
+					var modifier = Math.floor(((season.modifiers[res.name] - 1) * reward + this.game.calendar.getWeatherMod())*100);
+				}
 				row.resWMod.textContent = modifier ? "[" + (modifier > 0 ? "+" : "") + modifier.toFixed() + "%]" : "";
 
 				if (modifier > 0){

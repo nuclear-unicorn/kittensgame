@@ -429,7 +429,7 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 
 	save: function(saveData){
 		saveData.prestige = {
-			perks: this.filterMetadata(this.perks, ["name", "unlocked", "researched"])
+			perks: this.filterMetadata(this.perks, ["name", "unlocked", "researched", "reserve"])
 		};
 	},
 
@@ -451,7 +451,27 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 	},
 
 	update: function(){
-
+		if (!this.game.challenges.getCondition("disableMetaTechs").on)
+		{
+			for (var i = 0; i < this.perks.length; i++)
+			{
+				if (this.perks[i].reserve)
+				{
+					if (this.perks[i].researched)
+					{
+						for (var j = 0; j < this.perks[i].prices.length; j++)
+						{
+							this.game.resPool.addResEvent(this.perks[i].prices[j].name, this.perks[i].prices[j].val);
+						}
+					}
+					
+					this.perks[i].unlocked = true;
+					this.perks[i].researched = true;
+					this.game.unlock(this.perks[i].unlocks);
+					this.perks[i].reserve = false;
+				}
+			}
+		}
 	},
 
 	getPerk: function(name){
