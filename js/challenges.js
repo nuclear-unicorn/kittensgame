@@ -432,7 +432,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 	},
 	
 	getParagonBonus: function(){
-		return this.game.resPool.get("apotheosis").value / 10;
+		return this.game.resPool.get("apotheosis").value / 100;
 	}
 });
 
