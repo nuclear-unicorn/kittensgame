@@ -408,6 +408,31 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		{
 			return 1 - this.game.getHyperbolicEffect(researched * 0.1, 1);
 		}
+	},
+	
+	getWeatherMod: function(season, res){
+		if (this.getChallenge("winterIsComing").on)
+		{
+			return this.getChallengePenalty("winterIsComing", (this.game.calendar.weather || "normal") + "Mod");
+		}
+		else
+		{
+			var reward = 1;
+			if (this.game.calendar.weather == "warm")
+			{
+				reward = this.getChallengeReward("winterIsComing");
+			}
+			if (this.game.calendar.weather == "cold")
+			{
+				reward = 1 / this.getChallengeReward("winterIsComing");
+			}
+			var weatherMod = this.game.calendar.getWeatherMod();
+			return Math.floor((((season.modifiers[res.name] - 1) * reward + 1) + weatherMod) * 100) / 100;
+		}
+	},
+	
+	getParagonBonus: function(){
+		return this.game.resPool.get("apotheosis").value / 10;
 	}
 });
 

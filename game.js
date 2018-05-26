@@ -2087,24 +2087,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		if (!season){
 			var season = this.calendar.getCurSeason();
 		}
-		if (this.challenges.getChallenge("winterIsComing").on)
-		{
-			var weatherMod = (this.challenges.getChallengePenalty("winterIsComing"), (this.calendar.weather || "normal") + "Mod");
-		}
-		else
-		{
-			var reward = 1;
-			if (this.calendar.weather == "warm")
-			{
-				reward = this.challenges.getChallengeReward("winterIsComing");
-			}
-			if (this.calendar.weather == "cold")
-			{
-				reward = 1 / this.challenges.getChallengeReward("winterIsComing");
-			}
-			var weatherMod = this.calendar.getWeatherMod();
-			    weatherMod = Math.floor((((season.modifiers[res.name] - 1) * reward + 1) + weatherMod) * 100) / 100;
-		}
+		
+		var weatherMod = this.challenges.getWeatherMod(season, res);
+		
 		if (weatherMod < -0.95){
 			weatherMod = -0.95;
 		}
@@ -2292,24 +2277,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		if (!season){
 			var season = this.calendar.getCurSeason();
 		}
-		if (this.challenges.getChallenge("winterIsComing").on)
-		{
-			var weatherMod = (this.challenges.getChallengePenalty("winterIsComing"), (this.calendar.weather || "normal") + "Mod");
-		}
-		else
-		{
-			var reward = 1;
-			if (this.calendar.weather == "warm")
-			{
-				reward = this.challenges.getChallengeReward("winterIsComing");
-			}
-			if (this.calendar.weather == "cold")
-			{
-				reward = 1 / this.challenges.getChallengeReward("winterIsComing");
-			}
-			var weatherMod = this.calendar.getWeatherMod();
-			    weatherMod = Math.floor((((season.modifiers[res.name] - 1) * reward + 1) + weatherMod) * 100) / 100;
-		}
+		
+		var weatherMod = this.challenges.getWeatherMod(season, res);
+		
 		if (weatherMod < -0.95){
 			weatherMod = -0.95;
 		}
@@ -3306,7 +3276,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		var paragonPoints = 0;
 		if (kittens > 70){
-			paragonPoints = (kittens - 70) * (1 + this.resPool.get("apotheosis").value / 10);
+			paragonPoints = (kittens - 70) * (1 + this.challenges.getParagonBonus());
 		}
 
 		var addRes = {
