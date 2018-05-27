@@ -1502,6 +1502,8 @@
     "village.happiness.overpopulation":"Overpopulation",
     "btn.all":"All",
     "btn.all.minor":"all",
+    "btn.all.assign": "[+all]",
+    "btn.all.unassign": "[-all]",
     "btn.feed":"Feed",
     "btn.trade":"Trade",
     "calendar.weather.warm":"warm",

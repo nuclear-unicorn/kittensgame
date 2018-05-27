@@ -1824,7 +1824,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 		//var sellLinkAdded = false;
 		if (this.model.showSellLink){
 			if (!this.sellHref){
-				this.sellHref = this.addLink("sell",
+				this.sellHref = this.addLink($I("btn.sell"),
 					function(event){
 						this.sell(event);
 					});
