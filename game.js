@@ -1528,6 +1528,14 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.challengesTab.visible = this.prestige.getPerk("adjustmentBureau").researched;
 
 		this.ui.load();
+		this.render();
+		
+		//hack
+		if (this.migrateRes)
+		{
+			this.challenges.getCondition("disableChrono").on = 1;
+			this.challenges.getCondition("disableChrono").rewardable = true;
+		}
 
 		return success;
 	},
@@ -1665,15 +1673,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
     		this.load();
     		this.msg($I("save.import.msg"));
-
-    		this.render();
-    		
-    		//hack
-    		if (this.migrateRes)
-    		{
-    			this.challenges.getCondition("disableChrono").on = 1;
-    			this.challenges.getCondition("disableChrono").rewardable = true;
-    		}
 
             callback();
         } catch (e) {
