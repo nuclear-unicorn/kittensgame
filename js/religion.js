@@ -98,8 +98,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 			for (var i = 0; i < this.transcendenceUpgrades.length; i++)
 			{
-				this.transcendenceUpgrades[i].val += this.transcendenceUpgrades[i].reserve;
-				this.transcendenceUpgrades[i].on += this.transcendenceUpgrades[i].reserve;
+				this.transcendenceUpgrades[i].val += this.transcendenceUpgrades[i].reserve || 0;
+				this.transcendenceUpgrades[i].on += this.transcendenceUpgrades[i].reserve || 0;
 				this.transcendenceUpgrades[i].reserve = 0;
 			}
 		}
