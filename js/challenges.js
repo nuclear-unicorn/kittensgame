@@ -156,7 +156,12 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 	resetState: function(){
 		for (var i = 0; i < this.challenges.length; i++){
 			var challenge = this.challenges[i];
-			challenge.enabled = false;
+			challenge.on = 0;
+		}
+		
+		for (var i = 0; i < this.conditions.length; i++){
+			var condition = this.conditions[i];
+			condition.on = 0;
 		}
 	},
 
@@ -291,7 +296,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				}
 				
 				if (challenge == "atheism"){
-					this.game.resPool.get("faith").reserveValue += 1000000;
+					this.game.religion.faithRatio += 1;
 				}
 				
 				if (challenge == "1000Years"){
@@ -473,6 +478,15 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 	},
 
 	buyItem: function(model, event, callback) {
+	},
+	
+	handleTogglableOnOffClick: function(model) {
+		this.inherited(arguments);
+		
+		if (model.metadata.name == "atheism")
+		{
+			this.game.upgrade({buildings: ["temple"]});
+		}
 	}
 });
 
