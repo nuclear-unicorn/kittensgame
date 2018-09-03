@@ -1297,7 +1297,7 @@
     "time.vsu.voidRift.label": "Void Rift",
     "time.vsu.chronocontrol.desc": "Increase the duration of Temporal Paradox",
     "time.vsu.chronocontrol.label": "Chronocontrol",
-    "time.AccelerateTimeBtn.desc": "Accelerate and slow time at your whim (+50% acceleration)",
+    "time.AccelerateTimeBtn.desc": "Accelerate and slow time at your whim (+50% speed up)",
     "time.AccelerateTimeBtn.label.normal": "Tempus Fugit",
     "time.AccelerateTimeBtn.label.accelerated": "Tempus Stasit",
 
@@ -1479,7 +1479,7 @@
     "calendar.year":"Year",
     "calendar.year.ext":"Year {0} - {1}",
     "calendar.year.full":"Year {0} - {1}, day {2}",
-    "calendar.trueYear": "True years elapsed",
+    "calendar.trueYear": "Real year:",
     "res.notify.unavailable":"This building will not be available for construction because you don't have enough storage for required resources. Try again later.",
     "res.notify.unavailableTime":"The building will be available to far ({0}+ days) in the future. Try again later.",
     "res.notify.msg":"You will be notified when {0} will be available.",
@@ -1583,5 +1583,11 @@
     "trade.sell.ecoin.desc": "Sell your blackcoins and get relics back",
 
     "space.planet.helios.sunforge.label":"Sunforge",
-    "space.planet.helios.sunforge.desc":"Uses the heat of the sun to smelt materials into supercondensed plasma. Every level of sunforge improves the storage space of your base metals by 1%"
+    "space.planet.helios.sunforge.desc":"Uses the heat of the sun to smelt materials into supercondensed plasma. Every level of sunforge improves the storage space of your base metals by 1%",
+
+    "village.happiness.festival":"Festival",
+
+    "religion.tu.blackRadiance.label" : "Black Radiance",
+    "religion.tu.blackRadiance.desc" : "Every % of BLS meter will very slightly increase alicorn corruption rate",
+    "religion.tu.blackRadiance.flavor": "Like a rainbow in the dark"
 }

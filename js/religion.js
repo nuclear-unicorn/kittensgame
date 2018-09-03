@@ -113,10 +113,19 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			this.faith = 0;
 		}
 
+		//30% bls * 20 Radiance should yield ~ 50-75% boost rate which is laughable but we can always buff it
+		var sorrow = this.game.resPool.get("sorrow").value * 0.1;
+
 		var alicorns = this.game.resPool.get("alicorn");
 		if (alicorns.value > 0){
-			this.corruption += this.game.getEffect("corruptionRatio")
-                * (this.game.resPool.get("necrocorn").value > 0 ?
+			this.corruption +=
+				(
+					this.game.getEffect("corruptionRatio") *
+					(
+						1 + Math.sqrt( sorrow * this.game.getEffect("blsCorruptionRatio") )
+					)
+				)
+				* (this.game.resPool.get("necrocorn").value > 0 ?
 					0.25 * (1 + this.game.getEffect("corruptionBoostRatio")) :	 //75% penalty
 					1);
 
@@ -146,7 +155,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 		var alicorns = this.game.resPool.get("alicorn");
 		if (alicorns.value > 0){
-			var corIncrement = times * this.game.getEffect("corruptionRatio") * (this.game.resPool.get("necrocorn").value > 0 ? 0.25 : 1);  //75% penalty
+			var corIncrement = times * this.game.getEffect("corruptionRatio") * (this.game.resPool.get("necrocorn").value > 0 ? 0.25 * (1 + this.game.getEffect("corruptionBoostRatio")) : 1);  //75% penalty
 			var nextGreatestAlicornVal = Math.floor(alicorns.value + 0.999999);
 			this.corruption = Math.max(this.corruption, Math.min(this.corruption + corIncrement, nextGreatestAlicornVal));
 			var cor = Math.floor(Math.min(this.corruption, alicorns.value));
@@ -632,6 +641,20 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		},
 		unlocked: false,
 		flavor: $I("religion.tu.singularity.flavor")
+	},{
+		name: "blackRadiance",
+		label: $I("religion.tu.blackRadiance.label"),
+		description: $I("religion.tu.blackRadiance.desc"),
+		prices: [
+			{ name : "relic", val: 37500 }
+		],
+		tier: 12,
+		priceRatio: 1.15,
+		effects: {
+			"blsCorruptionRatio" : 0.012
+		},
+		unlocked: false,
+		flavor: $I("religion.tu.blackRadiance.flavor")
 	},{
 		name: "blazar",
 		label: $I("religion.tu.blazar.label"),

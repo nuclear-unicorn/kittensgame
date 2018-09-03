@@ -9,6 +9,8 @@
 
 		<!-- I only use jquery ironically -->
 
+		<script src="lib/react.min.js"></script>   <!--todo: use min version -->
+
 		<!-- Local versions of libs will be hosted so our Chinese players wont be forced to use VPN -->
 		<script src="lib/jQuery.js"></script>
 		<script src="lib/dojo.xd.js"></script>
@@ -30,7 +32,7 @@
 			ga('send', 'pageview');
 		</script>
 
-		<link rel="stylesheet" href="res/default.css" type="text/css">
+		<link rel="stylesheet" href="res/default.css?v=1b" type="text/css">
 		<link rel="stylesheet" href="res/theme_dark.css" type="text/css">
         <link rel="stylesheet" href="res/theme_grassy.css" type="text/css">
 		<link rel="stylesheet" href="res/theme_sleek.css" type="text/css">
@@ -49,16 +51,47 @@
 
 		<script type="text/javascript">
 
-			var version = "_1447g";
+			var version = "1449c";
+
+			var loadingProgress = 0,
+				progressMax = 0;
+
+			var loadingMessages = [
+				"Feeding zebras",
+				"Calibrating ziggurats",
+				"Seeding catnip",
+				"Taming unicorns",
+				"Polishing railguns",
+				"Restarting steam engines",
+				"Opening temporal rifts",
+				"Gathering lizards",
+				"Deploying satellites",
+				"Tweaking Yarn precession",
+				"Praising the sun",
+				"Cooling off the chronoforge",
+				"Burning paragon",
+				"Petting sharks",
+				"Minting blackcoins",
+				"Fixing time paradoxes"
+			];
+
+			function loadModule(module){
+				loadingProgress++;
+				console.log("loading module " + module + "...");
+				var progress = (loadingProgress / progressMax ) * 100;
+				$("#loadingProgressBar").attr("value", progress);
+
+				var i = (Math.floor(Math.random() * loadingMessages.length));
+				$("#loadingProgressInfo").html(loadingMessages[i] + "...&nbsp(" + progress.toFixed() + "%)");
+				return System.import(module + ".js?v=_" + version);
+			}
 
 			function _import(module, def){
 				if (!def){
-					console.log("loading module " + module + "...");
-					return System.import(module + ".js?v=" + version);
+					return loadModule(module);
 				} else {
 					return def.then(function(){
-						console.log("loading module " + module + "...");
-						return System.import(module + ".js?v=" + version);
+						return loadModule(module);
 					}).catch(function(err){
 						console.error(err);
 					});
@@ -67,6 +100,7 @@
 
 			dojo.addOnLoad(function(){
 				$("#tooltip").hide();
+				$("#versionLink").html(version.split('').join('.'));
 
 				SystemJS.config({
 					baseURL: ''
@@ -89,10 +123,13 @@
 					"js/challenges",
 					"js/void",
 					"game",
+
+					"js/jsx/left.jsx",
+
 					"js/ui",
 					"js/toolbar"
 				];
-
+				progressMax = modules.length + 2;
 				console.log("Loading...");
 
 				var def = _import("config");
@@ -116,6 +153,9 @@
 
 			function initGame() {
 				console.log("About to initialize the game");
+				$("#loadingContainer").hide();
+				$("#game").show();
+
 				try {
 					gamePage = game = new com.nuclearunicorn.game.ui.GamePage();
 					gamePage.setUI(new classes.ui.DesktopUI("gameContainerId"));
@@ -211,7 +251,7 @@
 
 			<div id="topBar">
 				<div style="padding-left: 10px;">
-					Kittens Game <span style="font-size: small;">by <a href="http://bloodrizer.ru/" target="_blank">bloodrizer</a></span>
+					Kittens Game <span style="font-size: small;">by <a href="http://bloodrizer.ru/" class="copyright" target="_blank">bloodrizer</a></span>
 					<!--- a Dark Souls of incremental gaming -->
 
 					<a href="#" style="color: red">
@@ -253,7 +293,7 @@
 						<a href="#" onclick="wipe();">Wipe</a> |
 						<a href="#" onclick="gamePage.ui.displayAppDialog();" style="font-weight: bold; color:#666;">Get the app</a> |
 
-						<a href="#" onclick="$('#changelogDiv').toggle();">Ver 1.4.4.7</a>
+						<a href="#" onclick="$('#changelogDiv').toggle();">Ver <span id="versionLink">?.?.?.?</span></a>
 					</div>
 				</div>
 			</div>
@@ -275,21 +315,33 @@
 						Heatsink
 						Entangler
 
-					Rev: 7
-						Sunforge
+					Rev: 8
+						New loading screen
+						Black Radiance
 
 				</pre>
 				<a href="changelog.txt" target="_blank" style="position: relative; top: -15px;">full changelog</a>
 			</div>
 
-			<div id="game" class="pure-g">
+			<div id="loadingContainer">
+				<div class="content">
+					<span style="font-size:18px;"><img src="res/ajax-loader.gif">&nbsp;Loading...<br></span>
+					<br>
+					<progress id="loadingProgressBar" value="0" max="100"></progress>
+					<div id="loadingProgressInfo">Setting up game engine...</div>
+				</div>
+			</div>
+
+			<div id="game" style="display:none;" class="pure-g">
 				<div id="tooltip" class="tooltipExt button_tooltip"></div>
 
 				<!-- LEFT -->
 				<div id="leftColumn" class="column" style="vertical-align: top;">
-					<div style="float:left;"><a href="#" style="padding-left:2px;" onclick="gamePage.resPool.setDisplayAll();">Show All</a></div>
+					<div id="leftColumnViewport">#nothing interesting here</div>
+					<!--div style="float:left;"><a href="#" style="padding-left:2px;" onclick="gamePage.resPool.setDisplayAll();">Show All</a></div>
 					<div style="float:left;"><a href="#" style="padding-left:8px;" onclick="gamePage.resPool.toggleLock();">Lock/Unlock</a></div>
-					<div style="float:right; margin-right:-13px;"><a href="#" style="padding-right:2px;" onclick="gamePage.ui.zoomDown();">&ndash;</a>/<a href="#" onclick="gamePage.ui.zoomUp();">+</a></div>
+					<div style="float:right; margin-right:-13px;"><a href="#" style="padding-right:2px;" onclick="gamePage.ui.zoomDown();">&ndash;</a>/<a href="#" onclick="gamePage.ui.zoomUp();">+</a>
+					</div-->
 
 					<div id="resContainer" style="padding-top: 15px; width: 100%">
 					</div>
@@ -314,14 +366,13 @@
 				<!-- MID -->
 				<div id="midColumn" style="vertical-align: top;" class="column">
 					<div id="gameContainerId" style="border: 1px solid gray;">
-						<span style="font-size:18px;"><img src="res/ajax-loader.gif">&nbsp;Loading...<br></span>
-						<br>
-						<div style="font-size:12px; color: gray;">
-							If this takes too much time, most likely it is not working. But don't worry.<br>
+						<span>Oops!</span>
+						<div id="gameContainerHelp" style="font-size:12px; color: gray; display:none;">
+							Looks like the game is not working. But don't worry.<br>
 							<ul>
+								<li>Check if JavaScript is enabled or Ad-Blockers are turned off.</li>
 								<li>Try to refresh the game by pressing Ctrl+F5.</li>
 								<li>Try to reload the game in about 10-15 minutes.</li>
-								<li>Export your save, wipe your save, and try to import the save.</li>
 								<li>If none of these work, kindly contact me via the Reddit link below.</li>
 							</ul>
 						</div>

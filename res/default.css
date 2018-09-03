@@ -32,7 +32,7 @@ body {
     min-width: 1180px;
 }
 
-#game {
+#game, #loadingContainer {
     position:absolute;
     bottom: 0;
     top: 26px;
@@ -44,6 +44,18 @@ body {
     height: auto;
 
     white-space: nowrap;	/* to prevent log column from wrapping */
+}
+
+#loadingContainer .content{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 100vh;
+
+    margin-left: 30%;
+    margin-right: 30%;
 }
 
 #game * {
@@ -298,11 +310,11 @@ select>option {
   }
 }
 
-td.resLimitNotice {
+td.resLimitNotice, .res-cell.resLimitNotice {
     color: orange;
 }
 
-td.resLimitWarn {
+td.resLimitWarn, .res-cell.resLimitWarn  {
     color: coral;
     opacity: 0.75;
 }
@@ -645,4 +657,120 @@ a:hover {
     display: inline-block !important;
     margin-right: 10px;
     width: 45%;
+}
+
+progress[value] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 2px;
+    display: block;
+    width: 100%;
+    margin-bottom: -1px;
+}
+
+progress[value]::-webkit-progress-bar {
+    background-color: rgb(206, 206, 195);
+}
+
+progress[value]::-webkit-progress-value {
+    background-color: rgb(100,200,100);
+}
+
+#loadingProgressInfo {
+    padding-top: 5px;
+}
+
+/*======================================================================*/
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-button {
+    width: 0px;
+    height: 0px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #d0d0d0;
+    border-radius: 40px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 50px;
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/*======================================================================*/
+
+.copyright {
+    text-decoration: none;
+}
+
+.copyright:hover {
+    text-decoration: underline;
+}
+
+.link {
+    cursor: pointer;
+    padding-right: 10px;
+}
+
+a.link.collapse {
+    opacity: 0.2;
+}
+
+a.link.collapse:hover {
+    opacity: 0.9;
+}
+
+.res-toolbar {
+    display: inline-block;
+}
+
+.res-toolbar.right {
+    text-align: right;
+    margin-right:-18px;
+    float: right;
+}
+
+.res-toolbar.left {
+    padding-left:5px;
+}
+
+.res-table {
+    max-width: 340px;
+    display: table;
+    border-collapse: separate;
+    border-spacing: 2px;
+}
+
+.res-row {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    display:table-row;
+}
+
+.res-cell {
+    padding-left: 2px;
+    padding-right: 2px;
+    display:table-cell;
+}
+
+.res-cell.resource-name {
+    width: 60px;
+}
+
+.res-cell.resPerTick {
+    cursor: pointer;
 }

@@ -959,6 +959,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	//in ticks
 	autosaveFrequency: 400,
 
+	//ctrl-click batch size
+	batchSize: 10,
+
 	//current building selected in the Building tab by a mouse cursor, should affect resource table rendering
 	selectedBuilding: null,
 	setSelectedObject: function(object) {
@@ -1007,17 +1010,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	pauseTimestamp: 0, //time of last pause
 
-	//resource table
-	resTable: null,
-
 	effectsMgr: null,
 
     managers: null,
-
-    keyStates: {
-		shiftKey: false,
-		ctrlKey: false
-	},
 
     //TODO: this can potentially be an array
     undoChange: null,
@@ -1157,8 +1152,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.timer.addEvent(dojo.hitch(this, function(){
 			this.updateCaches();
 		}), 5);		//once per 5 ticks
-
-		this.resTable = new com.nuclearunicorn.game.ui.GenericResourceTable(this, "resContainer");
 
 		this.craftTable = new com.nuclearunicorn.game.ui.CraftResourceTable(this, "craftContainer");
 		this.timer.addEvent(dojo.hitch(this, function(){ this.craftTable.update(); }), 3);	//once per 3 tick
@@ -1645,9 +1638,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 						reader.readAsText(blob);
 					}).catch(function (error) {
 						callback("Unable to load file:" + JSON.stringify(error));
-					})
+					});
 				}
-		},false)
+		},false);
 	},
 
     saveImportDropboxFileRead: function(callback){
@@ -3068,6 +3061,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return !dojo.isIE && window.Worker;
 	},
 
+	timestamp: function() {
+		return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
+	},
+
 	start: function(){
 		if (this.isWebWorkerSupported() && this.useWorkers){	//IE10 has a nasty security issue with running blob workers
 			console.log("starting web worker...");
@@ -3091,10 +3088,32 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			// In both cases it will result to drop of number of ticks.
 			// One way is to handle it on UI by queuing the update requests.
 
+			/*
+				Would still work bad during the scroll
+			 */
 			clearInterval(this._mainTimer);
 			this._mainTimer = setInterval(dojo.hitch(this, this.tick), (1000 / this.rate));
+
+			this._lastFrameTimestamp = this.timestamp();
 		}
 	},
+
+	/**
+	 * Here is a magic
+	 * Don't even try to understand it, madness lies here
+	 */
+	frame: function(){
+		var now = this.timestamp(),
+			delta = now - this._lastFrameTimestamp;
+
+		if (delta > (1000/this.rate)){
+			/*dojo.hitch(this, this.tick)();*/
+			console.log("tick!");
+			this.tick();
+		}
+		requestAnimationFrame(this.frame);
+	},
+
 
 	tick: function(){
 		/**

@@ -1,3 +1,23 @@
+v 1.4.4.9 (27 aug 2018)
+
+Resource table QOL tweaks
+Fixed rendering perfromance in some places
+Added OSX meta key shortcut
+
+v 1.4.4.8 (19 aug 2018)
+
+Dropbox integration is finally working
+Changed loading screen to something that will not scare everyone to death
+Black Radiance
+
+changes by coderpatsy:
+- Apply unicorn necropolis bonus during redshift
+- Fix keyboard shortcuts
+- Misc code cleanup and fixes
+- Display special no trait message in languages other than en
+- Fix keyboard shortcuts opening locked tabs Also guards against shortcuts opening non-existent tabs
+- Add festival to happiness tooltip
+
 v 1.4.4.7
 changes by Chris:
 
