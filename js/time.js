@@ -164,7 +164,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         //populate cached per tickValues
         this.game.resPool.update();
         this.game.updateResources();
-        var resourceLimits = this.game.resPool.fastforward(daysOffset);
+        this.game.resPool.fastforward(daysOffset);
 
         var numberEvents = this.game.calendar.fastForward(daysOffset);
         this.game.bld.fastforward(daysOffset);

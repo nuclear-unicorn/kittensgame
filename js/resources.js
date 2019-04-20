@@ -695,7 +695,6 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 				//console.log("resource after adjustment:", res.value);
 			}
 		}
-		return limits;
 	},
 
 	//Hack to reach the maxValue in resTable
