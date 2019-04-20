@@ -1004,6 +1004,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	saveVersion: 16,
 	loading: false,
+	migrating: false,
 
 	//FINALLY
 	opts: null,
@@ -1559,11 +1560,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.ui.load();
 		this.render();
 
+                this.loading = false;
                 for (var i in this.resPool.resources) {
                         var res = this.resPool.resources[i];
                         this.resPool.handleLimits(res);
                 }
-                this.loading = false;
+                this.migrating = false;
 		
 		return success;
 	},
@@ -2015,6 +2017,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 			
 			save.saveVersion = 16;
+			this.migrating = true;
 		}
 
 		return save;
