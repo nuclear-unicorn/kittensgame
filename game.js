@@ -1003,7 +1003,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	ironWill: true,		//true if player has no kittens or housing buildings
 
 	saveVersion: 16,
-	migrateRes: false,
+	loading: false,
 
 	//FINALLY
 	opts: null,
@@ -1465,6 +1465,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			this.updateOptionsUI();
 			return;
 		}
+
+		this.loading = true;
+
 		var success = true;
 
 		try {
@@ -1555,14 +1558,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		this.ui.load();
 		this.render();
-		
-		//hack
-		if (this.migrateRes)
-		{
-			this.challenges.getCondition("disableChrono").on = 1;
-			this.challenges.getCondition("disableChrono").rewardable = true;
-		}
 
+                for (var i in this.resPool.resources) {
+                        var res = this.resPool.resources[i];
+                        this.resPool.handleLimits(res);
+                }
+                this.loading = false;
+		
 		return success;
 	},
 
@@ -2007,20 +2009,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				}
 				
 				if (save.challenges.currentChallenge) {
-					//hack; Can't turn on disableChrono here because it messes up overcap resource migration
-					this.migrateRes = true;
+					this.challenges.getCondition("disableChrono").on = 1;
+					this.challenges.getCondition("disableChrono").rewardable = true;
 				}
 			}
 			
-			if (save.resources) {
-				for (var i = 0; i < save.resources.length; i++)
-				{
-					// Give the benefit of the doubt
-					save.resources[i].reserveValue = save.resources[i].value;
-					save.resources[i].value = 0;
-				}
-			}
-
 			save.saveVersion = 16;
 		}
 

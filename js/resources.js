@@ -537,6 +537,38 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		return res;
 	},
 
+	handleLimits: function(res) {
+                if(res.maxValue && res.value > res.maxValue) {
+                        if (this.game.loading) {
+                                // Give the benefit of the doubt
+                                res.reserveValue = res.value - res.maxValue;
+                        }
+                        res.value = res.maxValue;
+                }
+
+                if (res.name == "karma" || res.name == "paragon" || res.name == "burnedParagon" || res.name == "apotheosis")
+                {
+                        if ((this.game.loading || !this.game.challenges.getCondition("disableMetaResources").on) && res.reserveValue)
+                        {
+                                res.value += res.reserveValue;
+                                res.reserveValue = 0;
+                        }
+                }
+                else
+                {
+                        if ((this.game.loading || !this.game.challenges.getCondition("disableChrono").on) && res.reserveValue && (!res.maxValue || res.value < res.maxValue)) {
+                                if (res.maxValue && res.reserveValue > res.maxValue) {
+                                        res.reserveValue -= (res.maxValue - res.value);
+                                        res.value = res.maxValue;
+                                }
+                                else {
+                                        res.value += res.reserveValue;
+                                        res.reserveValue = 0;
+                                }
+                        }
+                }
+	},
+
 	addRes: function(res, addedValue, event) {
 		if (this.game.calendar.day < 0 && !event) {
 			return 0;
@@ -545,32 +577,11 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		var prevValue = res.value || 0;
 
 		res.value += addedValue;
-		if(res.maxValue && res.value > res.maxValue) {
-			res.value = res.maxValue;
+
+		if(this.game.loading) {
+			this.handleLimits(res);
 		}
-		
-		if (res.name == "karma" || res.name == "paragon" || res.name == "burnedParagon" || res.name == "apotheosis")
-		{
-			if (!this.game.challenges.getCondition("disableMetaResources").on && res.reserveValue)
-			{
-				res.value += res.reserveValue;
-				res.reserveValue = 0;
-			}
-		}
-		else
-		{
-			if (!this.game.challenges.getCondition("disableChrono").on && res.reserveValue && (!res.maxValue || res.value < res.maxValue)) {
-				if (res.maxValue && res.reserveValue > res.maxValue) {
-					res.reserveValue -= (res.maxValue - res.value);
-					res.value = res.maxValue;
-				}
-				else {
-					res.value += res.reserveValue;
-					res.reserveValue = 0;
-				}
-			}
-		}
-		
+
 		if (res.name == "void") { // Always an integer
 			res.value = Math.floor(res.value);
 		}
@@ -686,16 +697,34 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	//NB: don't forget to update resources before calling in redshift
 	fastforward: function(daysOffset) {
 		// Since workshop requires some resource and we don't want exhaust all resources during workshop so we need a way to consume them.
+		// Idea: relax resource limits temporarily, load the resource and do workshop, after that enforce limits again.
+		var limits = {};
 		for (var i in this.resources) {
 			var res = this.resources[i];
 			if (res.perTickCached && !(res.name == "catnip" && res.perTickCached < 0)) {
+				if (res.maxValue) {
+					limits[res.name] = Math.max(res.value, res.maxValue);
+				}
 				//console.log("Adjusting resource", res.name, "delta",res.perTickCached, "max value", res.maxValue, "days offset", daysOffset);
 				//console.log("resource before adjustment:", res.value);
-				this.addRes(res, res.perTickCached * daysOffset * this.game.calendar.ticksPerDay, false/*event?*/);
+				this.addRes(res, res.perTickCached * daysOffset * this.game.calendar.ticksPerDay, false/*event?*/, true/*preventLimitCheck*/);
 				//console.log("resource after adjustment:", res.value);
 			}
 		}
+		return limits;
 	},
+
+	enforceLimits: function(limits) {
+		for (var i in this.resources) {
+			var res = this.resources[i];
+			if (res.maxValue) {
+				var limit = limits[res.name];
+				if (limit) {
+					res.value = Math.min(res.value, limit);
+				}
+			}
+		}
+ 	},
 
 	//Hack to reach the maxValue in resTable
 	//AB: Questionable

@@ -68,6 +68,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
 		// Update temporalFluxMax from values loaded
         this.game.updateCaches();
+        this.game.resPool.update();
 
 		var temporalAccelerator = this.getCFU("temporalAccelerator");
 		var energyRatio = 1 + (temporalAccelerator.val * temporalAccelerator.effects["timeRatio"]);
@@ -164,7 +165,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         //populate cached per tickValues
         this.game.resPool.update();
         this.game.updateResources();
-        this.game.resPool.fastforward(daysOffset);
+        var resourceLimits = this.game.resPool.fastforward(daysOffset);
 
         var numberEvents = this.game.calendar.fastForward(daysOffset);
         this.game.bld.fastforward(daysOffset);
@@ -172,6 +173,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.game.village.fastforward(daysOffset);
         this.game.space.fastforward(daysOffset);
         this.game.religion.fastforward(daysOffset);
+
+        this.game.resPool.enforceLimits(resourceLimits);
 
         if (daysOffset > 3) {
             this.game.msg($I("time.redshift", [daysOffset]) + (numberEvents ? $I("time.redshift.ext",[numberEvents]) : ""));
