@@ -259,6 +259,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 
 				if (game.workshop.get("solarSatellites").researched) {
 					self.effects["energyProduction"] = 1;
+					self.on = self.val;
 					self.togglable = false;
 				}
 				else {
@@ -464,7 +465,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
             unlocked: false,
             priceRatio: 1.15,
             prices: [
-                {name: "starchart", val: 500},
+                {name: "starchart", val: 100},
                 {name: "alloy",  val: 2500},
                 {name: "titanium", val: 12500},
                 {name: "kerosene", val: 250}
@@ -486,6 +487,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
             unlocked: false,
             priceRatio: 1.15,
             prices: [
+				{name: "starchart", val: 2000},
                 {name: "eludium",  val: 100},
                 {name: "science", val: 250000},
                 {name: "kerosene", val: 500}
@@ -742,7 +744,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				effects: {
 					"energyProduction": 1
 				},
-				calculateEffects: function(self, game){
+				calculateEffects: function(self, game) {
 					var yearBonus = game.calendar.darkFutureYears();
 					if (yearBonus < 0){
 						yearBonus = 0;
@@ -781,12 +783,11 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					if (game.resPool.get("gflops").value < gflopsPerTick && game.resPool.get("gflops").value > 0){
 						gflopsPerTick = game.resPool.get("gflops").value;
 					}
-					else if(game.resPool.get("gflops").value == 0){
-						return;
-					}
 
-					game.resPool.addResEvent("gflops", -gflopsPerTick);
-					game.resPool.addResEvent("hashrates", gflopsPerTick);
+					if (game.resPool.get("gflops").value != 0) {
+						game.resPool.addResEvent("gflops", -gflopsPerTick);
+						game.resPool.addResEvent("hashrates", gflopsPerTick);
+					}
 
 					var hr = game.resPool.get("hashrates").value,
 						difficulty = 1000,
@@ -816,7 +817,6 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				unlocked: false,
 				priceRatio: 1.25,
 				prices: [
-					{name: "science", val: 600000 },
 					{name: "antimatter", val: 500 },
 					{name: "thorium", val: 75000 }
 				],
@@ -826,8 +826,25 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				},
 				calculateEffects: function(self, game){
 					self.effects = {
-						"energyProduction": 25
+						"energyProduction": 25 * (1 + game.getEffect("tectonicBonus"))
 					};
+				}
+			}, {
+				name: "moltenCore",
+				label: $I("space.planet.centaurusSystem.moltenCore.label"),
+				description: $I("space.planet.centaurusSystem.moltenCore.desc"),
+				unlocked: false,
+				priceRatio: 1.25,
+				prices: [
+					{name: "science", val: 250000000 },
+					{name: "uranium", val: 5000000 }
+				],
+				effects: {
+					"tectonicBonus": 0.05
+				},
+				requiredTech: ["exogeophysics"],
+				upgrades: {
+					spaceBuilding: ["tectonic"]
 				}
 			}
 		]
@@ -883,7 +900,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 			program.unlocked = (program.name == "orbitalLaunch") ? true : false;
 			program.noStackable = true;
 
-			this.resetStateStackable(program, program.isAutomationEnabled, program.lackResConvert, program.effects);
+			this.resetStateStackable(program);
 		}
 
 		for (i = 0; i < this.planets.length; i++){
@@ -897,7 +914,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					var program = planet.buildings[j];
 					program.unlocked = false;
 
-					this.resetStateStackable(program, program.isAutomationEnabled, program.lackResConvert, program.effects);
+					this.resetStateStackable(program);
 				}
 			}
 		}
@@ -928,8 +945,6 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 			return;
 		}
 
-		var self = this;
-
 		this.hideResearched = saveData.space.hideResearched || false;
 		this.loadMetadata(this.programs, saveData.space.programs);
 		this.loadMetadata(this.planets, saveData.space.planets);
@@ -951,7 +966,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 			if (!planet.reached && planet.unlocked) {
 				if (planet.routeDays > 0) {
 					var routeSpeed = this.game.getEffect("routeSpeed") != 0 ? this.game.getEffect("routeSpeed") : 1;
-					planet.routeDays -= this.game.calendar.dayPerTick * routeSpeed;
+					planet.routeDays -= routeSpeed / this.game.calendar.ticksPerDay;
 				} else {
 					planet.routeDays = 0;
 					planet.reached = true;
@@ -1003,14 +1018,15 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 		}
 	},
 
-	fastforward: function(times) {
+	fastforward: function(daysOffset) {
+		var times = daysOffset * this.game.calendar.ticksPerDay;
 		for (var i in this.planets){
 			var planet = this.planets[i];
 
 			if (!planet.reached && planet.unlocked) {
 				if (planet.routeDays > 0) {
 					var routeSpeed = this.game.getEffect("routeSpeed") != 0 ? this.game.getEffect("routeSpeed") : 1;
-					planet.routeDays -= this.game.calendar.dayPerTick * routeSpeed * times;
+					planet.routeDays -= times * routeSpeed / this.game.calendar.ticksPerDay;
 				}
 			}
 		}
@@ -1198,7 +1214,7 @@ dojo.declare("classes.ui.space.PlanetPanel", com.nuclearunicorn.game.ui.Panel, {
 
 		var self = this;
 
-		var controller = new classes.ui.space.PlanetBuildingBtnController(self.game);
+		var controller = new classes.ui.space.PlanetBuildingBtnController(this.game);
 		dojo.forEach(this.planet.buildings, function(building, i){
 			var button = new com.nuclearunicorn.game.ui.BuildingStackableBtn({id: building.name, planet: self.planet, controller: controller}, self.game);
 
@@ -1262,7 +1278,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.SpaceTab", com.nuclearunicorn.game.
 
 		this.GCPanel = new com.nuclearunicorn.game.ui.Panel($I("space.ground.control.label"), this.game.space);
 		var content = this.GCPanel.render(container);
-		var controller = new com.nuclearunicorn.game.ui.SpaceProgramBtnController(self.game);
+		var controller = new com.nuclearunicorn.game.ui.SpaceProgramBtnController(this.game);
 		dojo.forEach(this.game.space.programs, function(program, i){
 			var button = new com.nuclearunicorn.game.ui.BuildingStackableBtn({id: program.name, controller: controller}, self.game);
 			button.render(content);

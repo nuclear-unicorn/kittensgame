@@ -36,7 +36,7 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		unlocked: false,
 		researched: false,
 		unlocks: {
-			"perks": ["codexAgrum"]
+			"perks": ["codexAgrum", "codexLeviathanianus"]
 		},
 		effects:{
 			"compediumCraftRatio" : 0.25,
@@ -77,6 +77,15 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		researched: false,
 		unlocks: {
 			"zigguratUpgrades": ["unicornGraveyard"]
+		}
+	},{
+		name: "codexLeviathanianus",
+		label: $I("prestige.codexLeviathanianus.label"),
+		description: $I("prestige.codexLeviathanianus.desc"),
+		prices: [{ name: "paragon", val: 75 }],
+		unlocked: false,
+		researched: false,
+		unlocks: {
 		}
 	},{
 		name: "goldenRatio",
@@ -437,8 +446,6 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		if (!saveData.prestige){
 			return;
 		}
-
-		var self = this;
 
 		this.loadMetadata(this.perks, saveData.prestige.perks);
 

@@ -199,7 +199,7 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
                 return this.game.stats.getStat("totalYears").val >= 40000;
             },
             starCondition: function () {
-                return (this.game.calendar.year >= 40000 + this.game.time.flux);
+                return (this.game.calendar.trueYear() >= 40000);
             },
             hasStar: true
     }],
@@ -559,12 +559,14 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.AchTab", com.nuclearunicorn.game.ui
     },
 
 	render: function(content){
-		var div = dojo.create("div", { }, content);
+		var div = dojo.create("div", {}, content);
 
 		div.innerHTML = "";
-        var divHeader = dojo.create("div", {}, div);
+        var divHeader = dojo.create("div", {className: "achievement-header"}, div);
         var totalAchievements = 0;
         var completedAchievements = 0;
+        var completedStars = 0;
+        var uncompletedStars = 0;
 		for (var i in this.game.achievements.achievements){
 			var ach = this.game.achievements.achievements[i];
             if (!ach.unlocked && ach.hidden){
@@ -588,13 +590,29 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.AchTab", com.nuclearunicorn.game.ui
 				continue;
 			}
 
+			if (ach.starUnlocked) {
+				completedStars++;
+			} else {
+				uncompletedStars++;
+			}
 			var star = dojo.create("div", {
-                className: 'star',
+				className: "star",
 				innerHTML: ach.starUnlocked ? "&#9733;" : "&#9734;",
 				title: ach.starUnlocked ? ach.starDescription : "???"
 			}, span);
 		}
-        divHeader.innerHTML = $I("achievements.header", [completedAchievements, totalAchievements]);
+		divHeader.innerHTML = $I("achievements.header", [completedAchievements, totalAchievements]);
+		var stars = "";
+		for (var i = completedStars; i > 0; --i) {
+			stars += "&#9733;";
+		}
+		for (var i = uncompletedStars; i > 0; --i) {
+			stars += "&#9734;";
+		}
+		dojo.create("span", {
+			className: "star",
+			innerHTML: stars
+		}, divHeader);
 
         //---------------------------
         //         Blah

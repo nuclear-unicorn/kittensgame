@@ -178,8 +178,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			return;
 		}
 
-		var self = this;
-
 		this.rewarded = saveData.challenges.rewarded;
 
 		this.loadMetadata(this.challenges, saveData.challenges.challenges);

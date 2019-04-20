@@ -1,5 +1,5 @@
 {
-	"buildings.field.label": "Campo de erva de gato",
+    "buildings.field.label": "Campo de erva de gato",
     "buildings.field.desc": "Plante um pouco de erva de gato na vila. Os campos têm +50% de produção na Primavera e -75% no Inverno",
     "buildings.field.flavor": "'Ervas até onde os olhos alcançam.",
     "buildings.pasture.label": "Pasto",
@@ -1059,7 +1059,6 @@
     "effectsMgr.statics.temporalParadoxVoid.title": "Vácuo Máximo",
     "effectsMgr.statics.temporalParadoxDay.title": "Dia em um paradoxo temporal",
     "effectsMgr.statics.temporalParadoxDayBonus.title": "Dia em um paradoxo temporal",
-    "effectsMgr.statics.goldMaxRatio.title": "Bônus máximo de ouro",
     "effectsMgr.statics.unicornsRatioReligion.title": "Bônus de unicórnio",
     "effectsMgr.statics.riftChance.title": "Chance de fenda de unicórnios",
     "effectsMgr.statics.ivoryMeteorChance.title": "Chance de meteoro de marfim",

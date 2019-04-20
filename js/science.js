@@ -1,3 +1,4 @@
+
 /**
  * Weird cat science
  */
@@ -40,6 +41,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		prices: [{name : "science", val: 300}],
 		unlocks: {
 			tech: ["animal"],
+			buildings: ["zebraOutpost", "zebraWorkshop", "zebraForge"],
 			jobs: ["hunter"]
 		},
 		flavor: $I("science.archery.flavor")
@@ -167,10 +169,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		flavor: $I("science.philosophy.flavor")
 	},{
 		name: "machinery",
-		label: "Machinery",
-		description: "Previous advances in metal working and science give birth to the concept of a machine, a device with multiple moving parts. " +
-			"Machinery introduces a concept of automation which reduces routine operations",
-		effectDesc: "Unlocks Steamworks, Crossbows, Printing Press and Factory Automation.",
+		label: $I("science.machinery.label"),
+		description: $I("science.machinery.desc"),
+		effectDesc: $I("science.machinery.effectDesc"),
 		prices: [{name : "science", val: 15000}],
 		unlocks: {
 			buildings: ["steamworks"],
@@ -416,7 +417,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: 	"blueprint", val: 60}
 		],
 		unlocks: {
-			upgrades: ["electrolyticSmelting", "oxidation", "retorting", "miningDrill"]
+			upgrades: ["electrolyticSmelting", "oxidation", "miningDrill"]
 		}
 	},{
 		name: "combustion",
@@ -442,7 +443,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: 	"blueprint", val: 55}
 		],
 		unlocks: {
-			stages: [{bld:"pasture",stage:1}] // Solar Farm
+			stages: [{bld:"pasture",stage:1}] 	// Solar Farm
 		}
 	},
 	{
@@ -455,9 +456,23 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: 	"blueprint", val: 70}
 		],
 		unlocks: {
-			stages: [{bld:"amphitheatre",stage:1}], // Broadcast Tower
-			tech: ["nuclearFission", "rocketry", "robotics"],
-			upgrades: ["cadSystems", "refrigeration", "seti", "factoryLogistics", "factoryOptimization", "internet"]
+			stages: [
+				{bld:"amphitheatre",stage:1},	// Broadcast Tower
+				{bld:"library",stage:1}			// Data Center
+			], 
+			tech: [
+				"nuclearFission", 
+				"rocketry", 
+				"robotics"
+			],
+			upgrades: [
+				"cadSystems", 
+				"refrigeration", 
+				"seti", 
+				"factoryLogistics", 
+				"factoryOptimization", 
+				"internet"
+			]
 		}
 	},{
 		name: "robotics",
@@ -484,7 +499,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: 	"blueprint", val: 150}
 		],
 		unlocks: {
-			upgrades: ["neuralNetworks", "aiEngineers"],
+			upgrades: ["neuralNetworks", "aiEngineers", "machineLearning"],
 			buildings: ["aiCore"],
 			tech: ["quantumCryptography"]
 		}
@@ -563,7 +578,11 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         ],
         unlocks: {
             tech: ["orbitalEngineering" ],
-            upgrades: [ "photolithography" ]
+            upgrades: [ 
+				"photolithography", 
+				"orbitalGeodesy",
+				"uplink" 
+			]
         },
         flavor: $I("science.sattelites.flavor")
     },{
@@ -577,7 +596,14 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		],
 		unlocks: {
 			tech: ["exogeology", "thorium"],
-			upgrades: ["hubbleTelescope", "satelliteRadio", "astrophysicists", "solarSatellites", "spaceEngineers"]
+			upgrades: [
+				"hubbleTelescope", 
+				"satelliteRadio", 
+				"astrophysicists", 
+				"solarSatellites", 
+				"spaceEngineers", 
+				"starlink" 
+			]
 		}
 	},{
 		name: "thorium",
@@ -642,7 +668,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: 	"blueprint", val: 175}
 		],
 		unlocks: {
-            upgrades: ["coldFusion", "spaceManufacturing"],
+            upgrades: ["coldFusion", "spaceManufacturing", "cryocomputing"],
 			tech: ["antimatter"]
 		}
 	},{
@@ -678,8 +704,21 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		prices: [
 			{name : "science", val: 1000000},
 			{name : "relic",   val: 25}
-		]
+		],
+		unlocks: {
+			tech: ["exogeophysics"]
+		}
 	},{
+		name: "exogeophysics",
+		label: $I("science.exogeophysics.label"),
+		description: $I("science.exogeophysics.desc"),
+		effectDesc: $I("science.exogeophysics.effectDesc"),
+		prices: [
+			{name : "science", val: 25000000},
+			{name : "relic",   val: 500}
+		]
+	},
+	{
 		name: "particlePhysics",
 		label: $I("science.particlePhysics.label"),
 		description: $I("science.particlePhysics.desc"),
@@ -1001,12 +1040,10 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Library", com.nuclearunicorn.game.u
 	},
 
 	constructor: function(tabName, game){
-		var self = this;
 		this.game = game;
 	},
 
 	createTechBtn: function(tech){
-		var self = this;
 		var controller = new com.nuclearunicorn.game.ui.TechButtonController(this.game);
 		var btn = new com.nuclearunicorn.game.ui.BuildingResearchBtn({id: tech.name, controller: controller}, this.game);
 		return btn;

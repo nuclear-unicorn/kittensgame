@@ -40,7 +40,16 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			modifiers:{
 				"catnip" : 0.25
 			}
-		}],
+		}
+	],
+
+	cycleYearColors: [
+		"#A00000",
+		"#DBA901",
+		"#14CD61",
+		"#01A9DB",
+		"#9A2EFE"
+	],
 
 	//Charon, Umbra (black hole), Yarn (terraformable?), Helios (Sun), Cath, Redmoon (Cath satellite), Dune, Piscine, Terminus (ice giant), Kairo (dwarf planet)
 	cycles: [
@@ -204,15 +213,19 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		}
 	],
 
+	// Conversion constants (null values are calculated in the constructor)
+	ticksPerDay: 10,
+	daysPerSeason: 100,
+	seasonsPerYear: null,
+	yearsPerCycle: null,
+	cyclesPerEra: null,
+
 	season: 0,
 	cycle: 0,
 	cycleYear: 0,
-	yearsPerCycle: 5,
 
-	daysPerSeason: 100,
 	day: 0,
 	year: 0,
-	dayPerTick: 0.1,
 
 	eventChance: 0,
 
@@ -289,21 +302,25 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 	constructor: function(game, displayElement) {
 		this.game = game;
 		this.displayElement = displayElement;
+
+		this.seasonsPerYear = this.seasons.length;
+		this.yearsPerCycle = this.cycleYearColors.length;
+		this.cyclesPerEra = this.cycles.length;
+
+		// TODO Temporarily kept for compatibility with scripts, WILL BE REMOVED in next minor version (1.4.6.0)
+		this.dayPerTick = 1 / this.ticksPerDay;
 	},
 
 	render: function() {
 
 	},
 
-	/* Return the whole number of days elapsed in the season, correcting for
-	 possible floating-point errors.
-	 */
-	integerDay: function () {
-		return Math.floor(this.day + 0.5 * this.dayPerTick);
-	},
-
 	update: function() {
 
+	},
+
+	cycleYearColor: function() {
+		return this.cycleYearColors[this.cycleYear];
 	},
 
 	cycleEffectsBasics: function(effects, building_name) {
@@ -337,24 +354,16 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		return effects;
 	},
 
+	trueYear: function() {
+		return (this.day / this.daysPerSeason + this.season) / this.seasonsPerYear + this.year - this.game.time.flux;
+	},
+
 	darkFutureYears: function(withImpedance) {
-		var impedance = 0;
-                if (withImpedance)
-			impedance = this.game.getEffect("timeImpedance") * (1+ this.game.getEffect("timeRatio"));
+		var impedance = withImpedance ? this.game.getEffect("timeImpedance") : 0;
 		return this.year - (40000 + impedance);
 	},
 
-	tick: function(){
-
-		/* The behavior is not correct, maybe due to possible float-point. */
-		//TODO: clarify what is exactly wrong
-
-		if (this.game.time.isAccelerated) {
-			this.day += Math.round(this.dayPerTick * ((this.game.getRateUI() - this.game.rate) / this.game.rate) * 10) / 10;	// *.x float point
-		} else {
-			this.day += this.dayPerTick;
-		}
-
+	tick: function() {
 		if(this.observeRemainingTime > 0){
 			this.observeRemainingTime--;
 			if(this.observeRemainingTime == 0){
@@ -362,45 +371,57 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			}
 		}
 
-		//this.day += this.dayPerTick;
+		var previousIntDay = Math.floor(this.day);
+		var timeAccelerationRatio = this.game.timeAccelerationRatio();
+		this.day += (1 + timeAccelerationRatio) / this.ticksPerDay;
+		this._roundToCentiday();
 
-		var intday = this.integerDay(),
-			newseason = false,
-			newyear = false;
-
-		if (Math.abs(this.day - intday) < 0.5 * this.dayPerTick) {
-			this.day = intday; /* minimize floating point error */
-
-			if (this.day >= this.daysPerSeason) {
-				this.day = 0;
-				this.season += 1;
-				newseason = true;
-
-				if (this.season >= this.seasons.length) {
-					this.season = 0;
-					if (!(this.game.challenges.getChallenge("1000Years").on && this.year >= 500)) {
-						this.year += 1;
-					}
-					newyear = true;
-				}
-			}
-
-			/*The new date must be fully computed before any of the individual onNew functions are called
-			 to ensure the onNew functions have a consistent view of what the current date is.
-			 */
-			this.onNewDay();
-			if (newseason) {
-				this.onNewSeason();
-				if (newyear) {
-					this.onNewYear(true);
-				}
-			}
-
-			/* The update function must be called after the onNew functions, which may make changes
-			 that need to be visible (e.g. showing events in the document title)
-			 */
-			this.update();
+		var ticksPerYear = this.ticksPerDay * this.daysPerSeason * this.seasonsPerYear;
+		if (this.day < 0){
+			this.game.time.flux -= (1 + timeAccelerationRatio) / ticksPerYear;
+		} else {
+			this.game.time.flux += timeAccelerationRatio / ticksPerYear;
 		}
+
+		if (Math.floor(this.day) == previousIntDay) {
+			return;
+		}
+
+		var newSeason = false;
+		var newYear = false;
+		if (this.day >= this.daysPerSeason) {
+			this.day -= this.daysPerSeason;
+			this._roundToCentiday();
+			this.season += 1;
+			newSeason = true;
+
+			if (this.season >= this.seasonsPerYear) {
+				this.season = 0;
+				this.year += this.game.challenges.getChallenge("1000Years").on && this.year >= 500 ? 0 : 1;
+				newYear = true;
+			}
+		}
+
+		/*The new date must be fully computed before any of the individual onNew functions are called
+		 to ensure the onNew functions have a consistent view of what the current date is.
+		 */
+		this.onNewDay();
+		if (newSeason) {
+			this.onNewSeason();
+			if (newYear) {
+				this.onNewYear(true);
+			}
+		}
+
+		/* The update function must be called after the onNew functions, which may make changes
+		 that need to be visible (e.g. showing events in the document title)
+		 */
+		this.update();
+	},
+
+	// minimize floating point error
+	_roundToCentiday: function () {
+		this.day = Math.round(this.day * 100) / 100;
 	},
 
 	/*
@@ -427,10 +448,8 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		if (this.day < 0){
 			//------------------------- void -------------------------
 			this.game.resPool.addResEvent("void", this.game.resPool.getVoidQuantity()); // addResEvent because during Temporal Paradox
-			this.game.time.flux-=0.0025;
-		}
-		//------------------------- relic -------------------------
-		else {
+		} else {
+			//------------------------- relic -------------------------
 			this.game.resPool.addResPerTick("relic", this.game.getEffect("relicPerDay"));
 		}
 
@@ -720,7 +739,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		}
 		totalNumberOfEvents+=numberEvents;
 
-		var yearsOffset = Math.floor(daysOffset / 400);
+		var yearsOffset = Math.floor(daysOffset / (this.daysPerSeason * this.seasonsPerYear));
 
 		//antimatter
 		var resPool = this.game.resPool;
@@ -850,11 +869,9 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			}
 		}
 
-		this.cycleYear++;
-		if (this.cycleYear > this.yearsPerCycle){
+		if (++this.cycleYear >= this.yearsPerCycle) {
 			this.cycleYear = 0;
-			this.cycle++;
-			if (this.cycle >= this.cycles.length){
+			if (++this.cycle >= this.cyclesPerEra) {
 				this.cycle = 0;
 			}
 		}
@@ -883,31 +900,12 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			}
 		}
 
-		//----------------------------------------------------------
-		if (this.game.prestige.getPerk("voidOrder").researched){
-			var resonance = this.game.getEffect("voidResonance");
-			var orderBonus = this.game.calcResourcePerTick("faith") * (0.1 + resonance);	//10% of faith transfer per priest
-			this.game.religion.faith += 400 * orderBonus * (1 + this.game.religion.getFaithBonus() * 0.25);	//25% of the apocypha bonus
-
-			if (resonance) {
-				var resAmt = 400 * this.game.calcResourcePerTick("faith") * (resonance);
-				this.game.resPool.addResEvent("faith", -resAmt );
-				//console.log("resonance feedback:", resAmt);
-			}
-		}
-
-		//this.adjustCryptoPrices(400);
-
 		if (updateUI) {
 			this.game.ui.render();
 		}
 	},
 
-	/* Use 400 ratio for 1 day, 1 ratio for 1 year*/
-	adjustCryptoPrices: function(ratio){
-
-		ratio = ratio || 1;
-
+	adjustCryptoPrices: function() {
 		if (this.game.science.get("antimatter").researched) {
 			var marketFluctuation = this.game.rand(100000);
 
@@ -1014,12 +1012,13 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		};
 	},
 
+	// TODO Use loadMetadata
 	load: function(saveData){
 		if (saveData.calendar){
-			this.year  = saveData.calendar.year;
-			this.day  = saveData.calendar.day;
-			this.season  = saveData.calendar.season;
-			this.weather = saveData.calendar.weather;
+			this.year  = saveData.calendar.year || 0;
+			this.day  = saveData.calendar.day || 0;
+			this.season  = saveData.calendar.season || 0;
+			this.weather = saveData.calendar.weather || null;
 			this.festivalDays = saveData.calendar.festivalDays || 0;
 			this.cycle = saveData.calendar.cycle || 0;
 			this.cycleYear = saveData.calendar.cycleYear || 0;

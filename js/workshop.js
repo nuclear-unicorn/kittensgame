@@ -969,7 +969,21 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "uranium", val: 250 },
 			{ name : "science",  val: 165000 }
 		]
-	},
+	},{
+        name: "orbitalGeodesy",
+        label: $I("workshop.orbitalGeodesy.label"),
+        description: $I("workshop.orbitalGeodesy.desc"),
+        effects: {
+		},
+		upgrades: {
+			buildings: ["quarry"]
+		},
+        prices:[
+            { name : "alloy", 	 val: 1000 },
+			{ name : "oil", 	 val: 35000 },
+            { name : "science",  val: 150000 }
+        ]
+    },
 	//--------------------- automation upgrades ----------------------
 	{
 		name: "printingPress",
@@ -1015,6 +1029,65 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			buildings: ["steamworks"]
 		}
 	},{
+		name: "uplink",
+		label: $I("workshop.uplink.label"),
+		description: $I("workshop.uplink.desc"),
+		effects: {
+			"uplinkDCRatio": 0.01,
+			"uplinkLabRatio": 0.01
+		},
+		prices:[
+			{ name : "alloy", 	 val: 1750 },
+			{ name : "science",  val: 75000 }
+		],
+		upgrades: {
+			buildings: ["library", "biolab"]
+		}
+	},{
+		name: "starlink",
+		label: $I("workshop.starlink.label"),
+		description: $I("workshop.starlink.desc"),
+		effects: {
+			"uplinkLabRatio": 0.01
+		},
+		prices:[
+			{ name : "alloy", 	 val: 5000 },
+			{ name : "oil", 	 val: 25000 },
+			{ name : "science",  val: 175000 }
+		],
+		upgrades: {
+			buildings: ["library","biolab"]
+		}
+	},{
+		name: "cryocomputing",
+		label: $I("workshop.cryocomputing.label"),
+		description: $I("workshop.cryocomputing.desc"),
+		effects: {
+		},
+		prices:[
+			{ name : "eludium",  val: 15 },
+			{ name : "science",  val: 125000 }
+		],
+		upgrades: {
+			buildings: ["library"]
+		}
+	},{
+		name: "machineLearning",
+		label: $I("workshop.machineLearning.label"),
+		description: $I("workshop.machineLearning.desc"),
+		effects: {
+			"dataCenterAIRatio": 0.1
+		},
+		prices:[
+			{ name : "science",     val: 175000 },
+			{ name : "eludium",  	val: 25 },
+			{ name : "antimatter",  val: 125 }
+		],
+		upgrades: {
+			buildings: ["library"]
+		}
+	},
+	{
 		name: "factoryAutomation",
 		label: $I("workshop.factoryAutomation.label"),
 		description: $I("workshop.factoryAutomation.desc"),
@@ -1958,6 +2031,16 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		progressHandicap: 5,
 		tier: 3
+	},{
+		name: "bloodstone",
+		label: $I("workshop.crafts.bloodstone.label"),
+		description: $I("workshop.crafts.bloodstone.desc"),
+		prices:[
+			{ name: "timeCrystal", val: 5000 },
+			{ name: "relic", val: 10000 }
+		],
+		progressHandicap: 7500,
+		tier: 5
 	}],
 
 	effectsBase: {
@@ -2092,15 +2175,13 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		return prices;
 	},
 
-	craft: function (res, amt, suppressUndo, forceAll){
-
+	craft: function (res, amt, suppressUndo, forceAll, bypassResourceCheck) {
 		var craft = this.getCraft(res);
 		var craftRatio = this.game.getResCraftRatio({name:res});
-
 		var craftAmt = amt * (1 + craftRatio);
 
 		//prevent undo giving free res
-		if (amt < 0 && this.game.resPool.get(res).value < Math.abs(craftAmt)){
+		if (amt < 0 && this.game.resPool.get(res).value < Math.abs(craftAmt)) {
 			return false;
 		}
 
@@ -2110,31 +2191,33 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			prices[i].val *= amt;
 		}
 
-
-		if (this.game.resPool.hasRes(prices)){
+		if (bypassResourceCheck || this.game.resPool.hasRes(prices)) {
 			this.game.resPool.payPrices(prices);
 			this.game.resPool.addResEvent(res,craftAmt);
 			if (craft.upgrades){
 				this.game.upgrade(craft.upgrades);
 			}
 
-			this.game.stats.getStat("totalCrafts").val += 1;
-			this.game.stats.getStatCurrent("totalCrafts").val += 1;
+			this.game.stats.getStat("totalCrafts").val++;
+			this.game.stats.getStatCurrent("totalCrafts").val++;
 
             if (!suppressUndo) {
                 var undo = this.game.registerUndoChange();
                 undo.addEvent("workshop", /* TODO: use manager.id and pass it in proper way as manager constructor*/
-                    res, amt);
+                    {
+						metaId:res,
+						val: amt
+					}
+				);
             }
 
             return true;
-
-		}else{
-			//console.log("not enough resources for", prices);
-			if (forceAll){
-				this.craftAll(res);
-				return true;
-			}
+		} else if (forceAll) {
+			//console.log("not enough resources for ", prices, ", crafting as much as possible");
+			this.craftAll(res);
+			return true;
+		} else {
+			//console.log("not enough resources for ", prices, ", aborting craft");
 			return false;
 		}
 	},
@@ -2157,13 +2240,16 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			}
 
 			// (One * bonus / handicap) crafts per engineer per 10 minutes
-			var effectPerTick = ( 1 / (600 * this.game.rate)) * (kittenResProduction * tierCraftRatio) / craft.progressHandicap;
+			var effectPerTick = ( 1 / (600 * this.game.ticksPerSecond)) * (kittenResProduction * tierCraftRatio) / craft.progressHandicap;
 
 			return afterCraft ? effectPerTick * this.game.getResCraftRatio({name:resName}) : effectPerTick;
 		}
 	},
 
-    undo: function(metaId, val){
+    undo: function(data){
+		var metaId = data.metaId,
+			val = data.val;
+			 
 		if (this.craft(metaId, -val, true /*do not create cyclic undo*/)){
 			var res = this.game.resPool.get(metaId);
 			var craftRatio = this.game.getResCraftRatio(res);
@@ -2192,15 +2278,16 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 	},
 
 	//Crafts maximum possible amount for given recipe name
-	craftAll: function(craftName){
+	craftAll: function(craftName) {
 		var minAmt = this.getCraftAllCount(craftName);
-		if (minAmt > 0 && minAmt < Number.MAX_VALUE){
+		if (minAmt > 0 && minAmt < Number.MAX_VALUE) {
 			var craftRatio = this.game.getResCraftRatio({name:craftName});
 			var bonus = minAmt * craftRatio;
 
 			var res = this.game.resPool.get(craftName);
-			this.game.msg( $I("workshop.crafted.msg", [this.game.getDisplayValueExt(minAmt + bonus), (res.title || craftName)]), null, "craft");
-			this.craft(craftName, minAmt);
+			if (this.craft(craftName, minAmt, false /* allow undo */, false /* don't force all */, true /* bypass resource check */)) {
+				this.game.msg( $I("workshop.crafted.msg", [this.game.getDisplayValueExt(minAmt + bonus), (res.title || craftName)]), null, "craft");
+			}
 		}
 	},
 
@@ -2211,11 +2298,32 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		this.game.village.sim.clearCraftJobs();
 	},
 
-	update: function(times){
-		if (!times) {
-			times = 1;
+	update: function(){
+		this.fastforward(1 / this.game.calendar.ticksPerDay);
+	},
+
+	fastforward: function(daysOffset) {
+		var times = daysOffset * this.game.calendar.ticksPerDay;
+
+		//-------------	 this is a poor place for this kind of functionality ------------
+		var scienceMaxBuilding = this.game.bld.getEffect("scienceMax"),
+			scienceMaxCompendiaCap =  this.game.bld.getEffect("scienceMaxCompendia"),
+			compendiaScienceMax = Math.floor(this.game.resPool.get("compedium").value * 10);
+
+		//iw compedia cap is set to 1000% instead of 100%	
+		var iwScienceCapRatio = this.game.ironWill ? 10 : 1;
+		
+		if (this.game.prestige.getPerk("codexLeviathanianus").researched){
+			var ttBoostRatio = (0.05 * (1 + game.getEffect("compendiaTTBoostRatio")));
+			iwScienceCapRatio *= (1 + ttBoostRatio * game.religion.getTranscendenceLevel());
 		}
-		this.effectsBase["scienceMax"] = Math.floor(this.game.resPool.get("compedium").value * 10);
+
+		if (compendiaScienceMax > (scienceMaxBuilding * iwScienceCapRatio + scienceMaxCompendiaCap)){
+			compendiaScienceMax = (scienceMaxBuilding * iwScienceCapRatio + scienceMaxCompendiaCap);
+		}
+		//-------------	todo: move somewhere to bld? ------------------------------------
+
+		this.effectsBase["scienceMax"] = compendiaScienceMax;
 		var cultureBonusRaw = Math.floor(this.game.resPool.get("manuscript").value);
 		this.effectsBase["cultureMax"] = this.game.getTriValue(cultureBonusRaw, 0.01);
 		this.effectsBase["oilMax"] = Math.floor(this.game.resPool.get("tanker").value * 500);
@@ -2587,7 +2695,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 	resTd: null,
 
 	constructor: function(tabName, game){
-		var self = this;
 		this.game = game;
 
 		this.craftBtns = [];
@@ -2599,7 +2706,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 		this.buttons = [];
 
 		var div = dojo.create("div", { style: { float: "left"}}, tabContainer);
-		dojo.create("span", { innerHTML: $I("workshop.craft.effectiveness", [(this.game.getCraftRatio() * 100).toFixed(0)]) }, div);
+		dojo.create("span", { innerHTML: $I("workshop.craft.effectiveness", [this.game.getDisplayValueExt(this.game.getCraftRatio() * 100, false, false, 0)]) }, div);
 
 		//--------------------------------------------------------------------
 		var divCombobox = dojo.create("div", {style: { height: "20px"}} , tabContainer);
@@ -2654,7 +2761,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 			return $I("workshop.craftPanel.header.tooltip");
 		});
 
-		var self = this;
 		var crafts = this.game.workshop.crafts;
 		var controller = new com.nuclearunicorn.game.ui.CraftButtonController(this.game);
 		for (var i = 0; i < crafts.length; i++ ){
@@ -2709,7 +2815,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 	},
 
 	createBtn: function(upgrade){
-		var self = this;
 		var controller = new com.nuclearunicorn.game.ui.UpgradeButtonController(this.game);
 		var btn = new com.nuclearunicorn.game.ui.UpgradeButton({id: upgrade.name, controller: controller}, this.game);
 		return btn;

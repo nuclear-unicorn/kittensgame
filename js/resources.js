@@ -110,6 +110,14 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	//			   TRANSIENT
 	//=========================================
 	{
+		name : "antimatter",
+		title: $I("resources.antimatter.title"),
+		type : "common",
+		transient: true,
+		visible: true,
+		color: "#5A0EDE"/*,
+		aiCanDestroy: true*/
+	},{
 		name : "manpower",
 		title: $I("resources.manpower.title"),
 		type : "common",
@@ -162,14 +170,6 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		visible: true,
 		color: "#9A2EFE",
 		calculatePerTick: true
-	},{
-		name : "antimatter",
-		title: $I("resources.antimatter.title"),
-		type : "common",
-		transient: true,
-		visible: true,
-		color: "#5A0EDE"/*,
-		aiCanDestroy: true*/
 	},{
 		name : "temporalFlux",
 		title: $I("resources.temporalFlux.title"),
@@ -346,6 +346,19 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		color: "gold",
 		persists: false
 	},
+	{
+		name: "bloodstone",
+		title: $I("resources.bloodstone.title"),
+		type : "exotic",
+		craftable: true,
+		visible: true,
+		color: "red",
+		style: {
+			textShadow: "1px 0px 10px red",
+			animation: "neon1 1.5s ease-in-out infinite alternate"
+		},
+		persists: false
+	},
 	//=========================================
 	// 				    CRAFT
 	//=========================================
@@ -408,7 +421,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		title: $I("resources.ship.title"),
 		type : "common",
 		craftable: true,
-		color: "#FF7F50"
+		color: "#FF571A"
 	},{
 		name : "tanker",
 		title: $I("resources.tanker.title"),
@@ -670,6 +683,21 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 	},
 
+	//NB: don't forget to update resources before calling in redshift
+	fastforward: function(daysOffset) {
+		// Since workshop requires some resource and we don't want exhaust all resources during workshop so we need a way to consume them.
+		for (var i in this.resources) {
+			var res = this.resources[i];
+			if (res.perTickCached && !(res.name == "catnip" && res.perTickCached < 0)) {
+				//console.log("Adjusting resource", res.name, "delta",res.perTickCached, "max value", res.maxValue, "days offset", daysOffset);
+				//console.log("resource before adjustment:", res.value);
+				this.addRes(res, res.perTickCached * daysOffset * this.game.calendar.ticksPerDay, false/*event?*/);
+				//console.log("resource after adjustment:", res.value);
+			}
+		}
+		return limits;
+	},
+
 	//Hack to reach the maxValue in resTable
 	//AB: Questionable
 	resConsHackForResTable: function() {
@@ -896,537 +924,4 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	}
 
 });
-
-
-/**
- * Generic resource table for res/craft panels in the game.
- *
- * Instead of re-creating the DOM tree every tick they are capable of rendering
- * outline table and then updating related cells
- * 
- * @Deprecated
- */
-
-dojo.declare("com.nuclearunicorn.game.ui.GenericResourceTable", null, {
-
-	game: null,
-	containerId: null,
-
-	resRows: null,
-
-	constructor: function(game, containerId){
-		this.game = game;
-		this.containerId = containerId;
-
-		this.resRows = [];
-
-	},
-
-	render: function(){
-		if (!this.containerId) { throw "Container id is undefined for res table"; }
-		dojo.empty(this.containerId);
-
-		this.resRows = [];
-
-		var resTable = dojo.create("table", { className: "table resTable", style: { width: "100%"} }, this.containerId);
-
-		for (var i = 0; i < this.game.resPool.resources.length; i++){
-			var res = this.game.resPool.resources[i];
-
-			if (!res.visible){
-				continue;
-			}
-			//migrate dual resources (e.g. blueprint) to lower table once craft recipe is unlocked
-			if (this.game.resPool.isNormalCraftableResource(res) && this.game.workshop.getCraft(res.name).unlocked){
-				continue;
-			}
-
-			var tr = dojo.create("tr", { class: "resourceRow" }, resTable);
-
-
-			var isVisible = (res.unlocked || (res.name == "kittens" && res.maxValue));
-			dojo.style(tr, "display", isVisible ? "" : "none");
-			//	---------------- name ----------------------
-
-			var tdResName = dojo.create("td", {
-				class: "resource-name",
-				innerHTML: ( res.title || res.name )  + ":", style: { width: "60px"}
-			}, tr);
-
-			dojo.connect(tdResName, "onclick", this, dojo.partial(function(res){
-				res.isHidden = !res.isHidden;
-			}, res));
-			dojo.connect(tdResName, "onmouseover", this, function(){
-				if (this.game.resPool.isLocked){
-					return;
-				}
-				this.game.ui.isDisplayOver = true;
-			});
-			dojo.connect(tdResName, "onmouseout", this, function(){
-				if (this.game.resPool.isLocked){
-					return;
-				}
-				this.game.ui.isDisplayOver = false;
-			});
-
-			UIUtils.attachTooltip(this.game, tdResName, 0, 320, dojo.hitch(this, function(res){
-				return res.description || "";
-			}, res));
-
-			if (res.type == "uncommon"){
-				dojo.style(tdResName, "color", "Coral");
-			}
-			if (res.type == "rare"){
-				dojo.style(tdResName, "color", "orange");
-				dojo.style(tdResName, "textShadow", "1px 0px 10px Coral");
-			}
-			if (res.color){
-				dojo.style(tdResName, "color", res.color);
-			}
-			if (res.style){
-				for (var styleKey in res.style){
-					dojo.style(tdResName, styleKey, res.style[styleKey]);
-				}
-			}
-
-			//	---------------- amt ----------------------
-			var tdAmt = dojo.create("td", {className: "resAmount"}, tr);
-			tdAmt.textContent = this.game.getDisplayValueExt(res.value);
-
-			//	---------------- reserve ----------------------
-			var tdReserve = dojo.create("td", {className: "resAmountReserve"}, tr);
-			tdReserve.textContent = !this.game.challenges.getCondition("disableChrono").on && !res.hideReserve && res.reserveValue ? "+" + this.game.getDisplayValueExt(res.reserveValue) : "";
-
-			//	---------------- max ----------------------
-			var tdMax = dojo.create("td", { className: "maxRes" }, tr);
-			tdMax.textContent = this.game.getDisplayValueExt(res.maxValueUI);
-
-			//	---------------- +tick ----------------------
-			var tdPerTick = dojo.create("td", {className: "resPerTick"}, tr);
-
-			this.game.attachResourceTooltip(tdPerTick, res);
-
-			var tdWeatherMod = dojo.create("td", null, tr);
-
-			this.resRows.push({
-				resRef: res,
-				rowRef: tr,
-				resAmt : tdAmt,
-				resReserve: tdReserve,
-				resMax : tdMax,
-				resTick: tdPerTick,
-				resWMod: tdWeatherMod
-			});
-		}
-
-		this.update();
-	},
-
-	/**
-	 * This section is performance-critical. Using non vanilla js here is a very *BAD* idea.
-	 */
-	update: function(){
-		var reqRes = this.game.getRequiredResources(this.game.selectedBuilding);
-		for (var i = 0; i < this.resRows.length; i++){
-			var row = this.resRows[i];
-			var res = row.resRef;
-
-			// Game display
-			var isVisible = (res.unlocked || (res.name == "kittens" && res.maxValue));
-			var isHidden = (row.rowRef.style.display === "none");
-			if (isHidden && !isVisible){
-				continue;
-			}else if(isHidden && isVisible){
-				row.rowRef.style.display = "";
-			}
-			// Gamer display
-			if (!res.isHidden) {
-				row.rowRef.style.display = "";
-				row.rowRef.style.opacity = 1;
-			} else {
-				row.rowRef.style.display = "none";
-				row.rowRef.style.opacity = 0.3;
-			}
-			if (this.game.ui.isDisplayOver) {
-				row.rowRef.style.display = "";
-			}
-
-			var className;
-			//  highlight resources for selected building
-			//--------------------------------------------
-			if (reqRes.indexOf(res.name) >= 0){
-				className = "resourceRow highlited";
-			} else {
-				className = "resourceRow";
-			}
-			if (row.rowRef.className != className){	//surprisingly, this check makes setClass ~50% faster
-				row.rowRef.className = className;
-			}
-
-			//---------------------------------------------
-
-			row.resAmt.textContent = this.game.getDisplayValueExt(res.value);
-
-			className = "resAmount";
-			if (res.value > res.maxValue * 0.95 && res.maxValue > 0){
-				className = "resAmount resLimitNotice";
-			} else if (res.value > res.maxValue * 0.75 && res.maxValue > 0){
-				className = "resAmount resLimitWarn";
-			}
-			if (row.resAmt.className != className){
-				row.resAmt.className = className;
-			}
-
-			row.resReserve.textContent = !this.game.challenges.getCondition("disableChrono").on && !res.hideReserve && res.reserveValue ? "+" + this.game.getDisplayValueExt(res.reserveValue) : "";
-
-
-			var maxResValue = res.maxValue ? "/" + this.game.getDisplayValueExt(res.maxValue) : "";
-			row.resMax.textContent  = maxResValue;
-
-			var perTick = this.game.calendar.day < 0 ? 0 : this.game.getResourcePerTick(res.name, true);
-			perTick = this.game.opts.usePerSecondValues ? perTick * this.game.getRateUI() : perTick;
-			var postfix = this.game.opts.usePerSecondValues ? "/sec" : "";
-			if (this.game.opts.usePercentageResourceValues && res.maxValue){
-				perTick = (perTick / res.maxValue * 100).toFixed(2);
-				postfix = "%" + postfix;
-			}
-
-			var perTickValue = this.game.getResourcePerTick(res.name, false) || this.game.getResourcePerTickConvertion(res.name) ? "(" + this.game.getDisplayValueExt(perTick, true, false) + postfix + ")" : "";
-			row.resTick.textContent = perTickValue;
-
-			row.resTick.style.cursor = perTick ? "pointer" : "default";
-
-			//weather mod
-			var season = this.game.calendar.getCurSeason();
-			if (season.modifiers[res.name] && perTick != 0 ){
-
-				if (this.game.challenges.getChallenge("winterIsComing").on)
-				{
-					var modifier = (this.game.challenges.getChallengePenalty("winterIsComing"), (this.game.calendar.weather || "normal") + "Mod");
-				}
-				else
-				{
-					var reward = 1;
-					if (this.game.calendar.weather == "warm")
-					{
-						reward = this.game.challenges.getChallengeReward("winterIsComing");
-					}
-					if (this.game.calendar.weather == "cold")
-					{
-						reward = 1 / this.game.challenges.getChallengeReward("winterIsComing");
-					}
-					var modifier = Math.floor(((season.modifiers[res.name] - 1) * reward + this.game.calendar.getWeatherMod())*100);
-				}
-				row.resWMod.textContent = modifier ? "[" + (modifier > 0 ? "+" : "") + modifier.toFixed() + "%]" : "";
-
-				if (modifier > 0){
-					dojo.style(row.resWMod, "color", "green");
-				}else if (modifier < 0){
-					dojo.style(row.resWMod, "color", "red");
-				} else {
-					if (row.resWMod.style.color != "black"){
-						row.resWMod.style.color = "black";
-					}
-				}
-			}
-		}
-	},
-
-	attachTooltip: function(container, htmlProvider){
-		var tooltip = dojo.byId("tooltip");
-		dojo.empty(tooltip);
-
-		dojo.connect(container, "onmouseover", this, dojo.partial(function(tooltip, htmlProvider, event){
-			 tooltip.innerHTML = dojo.hitch(this, htmlProvider)();
-
-			 var target = event.originalTarget || event.toElement;	//fucking chrome
-			 var pos = $(target).position();
-			 if (!pos){
-				 return;
-			 }
-
-			 dojo.style(tooltip, "left", pos.left + 60 + "px");
-			 dojo.style(tooltip, "top",  pos.top + "px");
-
-			 dojo.style(tooltip, "display", "");
-			 dojo.style(container, "fontWeight", "bold");
-
-	    }, tooltip, htmlProvider));
-
-		dojo.connect(container, "onmouseout", this, dojo.partial(function(tooltip, container){
-			 dojo.style(tooltip, "display", "none");
-			 dojo.style(container, "fontWeight", "normal");
-		}, tooltip, container));
-	}
-});
-
-/**
- * Same as resources, but no per tick values
- * 
- * @Deprecated
- */
-dojo.declare("com.nuclearunicorn.game.ui.CraftResourceTable", com.nuclearunicorn.game.ui.GenericResourceTable, {
-
-	workshop: null,
-
-	constructor: function(game){
-		this.workshop = game.bld.get("workshop");
-	},
-
-
-	//TODO: merge with workshop?
-	getResourceCraftRatio: function(res){
-		return this.game.getResCraftRatio(res);
-	},
-
-	/**
-	 *
-	 * min amount to craft
-	 * %to craft
-	 **/
-	createCraftButton: function(tr, recipe, craftRatio, res, num, ratio){
-		var td = dojo.create("td", { style: {width: "20px"}}, tr);
-		var a = dojo.create("a", {
-				href: "#",
-				innerHTML : "+" + (num * (1+craftRatio)).toFixed(),
-				style: {
-					display: this.game.resPool.hasRes(recipe.prices, num) ? "" : "none"
-				}
-			}, td);
-
-		dojo.connect(a, "onclick", this, dojo.partial(function(res, event){
-				var allCount = this.game.workshop.getCraftAllCount(res.name);
-				var ratioCount = Math.floor(allCount*ratio);
-				if (num < ratioCount){
-					num = ratioCount;
-				}
-				this.game.craft(res.name, num);
-				event.preventDefault();
-			}, res));
-
-		this.attachTooltip(td, dojo.partial( function(recipe){
-				var tooltip = dojo.create("div", { className: "button_tooltip" }, null);
-				var prices = this.game.workshop.getCraftPrice(recipe);
-
-				var allCount = this.game.workshop.getCraftAllCount(recipe.name);
-				var ratioCount = Math.floor(allCount*ratio);
-				if (num < ratioCount){
-					num = ratioCount;
-				}
-
-				for (var i = 0; i < prices.length; i++){
-					var price = prices[i];
-
-					var priceItemNode = dojo.create("div", {style: {clear: "both"}}, tooltip);
-					var res = this.game.resPool.get(price.name);
-
-					var nameSpan = dojo.create("span", {
-							innerHTML: res.title || res.name,
-							style: { float: "left"}
-						}, priceItemNode );
-
-					var priceSpan = dojo.create("span", {
-							innerHTML: this.game.getDisplayValueExt(price.val * num),
-							style: {float: "right", paddingLeft: "6px" }
-						}, priceItemNode );
-				}
-				return tooltip.outerHTML;
-			}, recipe));
-
-		return a;
-	},
-
-	render: function(){
-		if (!this.containerId) { throw "container id is undefined for res table"; }
-		dojo.empty(this.containerId);
-
-		this.resRows = [];
-
-		var resTable = dojo.create("table", { className: "table resTable craftTable", style: { width: "100%"} }, this.containerId);
-
-		for (var i = 0; i < this.game.resPool.resources.length; i++){
-			var res = this.game.resPool.resources[i];
-
-			if (!res.craftable){
-				continue;
-			}
-
-			var craftRatio = this.getResourceCraftRatio(res);
-
-			//sort of hack to override regeneration bug
-			var recipe = this.game.workshop.getCraft(res.name);
-
-			//self-recovery hack to discard removed resources
-			//TODO: remove the reference from the res pool
-			if (!recipe){
-				res.value = 0;
-				continue;
-			}
-
-			var tr = dojo.create("tr", { class: "resourceRow" }, resTable);
-
-			var isVisible = (recipe.unlocked && res.value > 0 && this.workshop.on > 0);
-			dojo.style(tr, "display", isVisible ? "" : "none");
-			//	---------------- name ----------------------
-
-			var tdResName = dojo.create("td", {
-					innerHTML: (res.title || res.name) + ":",
-					style: {
-						width: "75px"
-					}
-				}, tr);
-			if (res.color){
-				dojo.style(tdResName, "color", res.color);
-			}
-
-			dojo.connect(tdResName, "onclick", this, dojo.partial(function(res){
-				res.isHidden = !res.isHidden;
-			}, res));
-			dojo.connect(tdResName, "onmouseover", this, function(){
-				if (this.game.resPool.isLocked){
-					return;
-				}
-				this.game.ui.isDisplayOver = true;
-			});
-			dojo.connect(tdResName, "onmouseout", this, function(){
-				if (this.game.resPool.isLocked){
-					return;
-				}
-				this.game.ui.isDisplayOver = false;
-			});
-
-			//	---------------- amt ----------------------
-			var tdAmt = dojo.create("td", null, tr);
-			tdAmt.textContent = this.game.getDisplayValueExt(res.value);
-
-			this.game.attachResourceTooltip(tdAmt, res);
-
-			//	---------------- + ----------------------
-
-			var a1 = this.createCraftButton(tr, recipe, craftRatio, res, 1, 0.01);
-			var a25 = this.createCraftButton(tr, recipe, craftRatio, res, 25, 0.05);
-			var a100 = this.createCraftButton(tr, recipe, craftRatio, res, 100, 0.1);
-
-			//	---------------- +all ----------------------
-			var td = dojo.create("td", { }, tr);
-
-
-			var aAll = dojo.create("a", {
-				href: "#",
-				innerHTML : $I("resources.craftTable.all"),
-				style: {
-					display: this.hasMinAmt(recipe) ? "" : "none"
-				}
-			}, td);
-
-			dojo.connect(aAll, "onclick", this, dojo.partial(function(res, event){
-				this.game.craftAll(res.name);
-				event.preventDefault();
-			}, res));
-
-			this.resRows.push({
-				resRef: res,
-				recipeRef: recipe,
-				rowRef: tr,
-				resAmt : tdAmt,
-				a1 : a1,
-				a25: a25,
-				a100: a100,
-				aAll: aAll
-			});
-		}
-
-		this.update();
-	},
-
-	hasMinAmt: function(recipe){
-		var minAmt = Number.MAX_VALUE;
-		for (var j = 0; j < recipe.prices.length; j++){
-			var totalRes = this.game.resPool.get(recipe.prices[j].name).value;
-			var allAmt = Math.floor(totalRes / recipe.prices[j].val);
-			if (allAmt < minAmt){
-				minAmt = allAmt;
-			}
-		}
-
-		return minAmt > 0 && minAmt < Number.MAX_VALUE;
-	},
-
-	update: function(){
-		var reqRes = this.game.getRequiredResources(this.game.selectedBuilding);
-		for (var i = 0; i < this.resRows.length; i++){
-			var row = this.resRows[i];
-			var res = row.resRef;
-
-			//---------------------------------------------
-			var recipe = this.game.workshop.getCraft(res.name);
-			// Game display
-			var isVisible = (res.unlocked && recipe.unlocked && this.workshop.on > 0);
-			var isHidden = (row.rowRef.style.display === "none");
-			if (isHidden && !isVisible){
-				continue;
-			} else if(isHidden && isVisible){
-				row.rowRef.style.display = "";
-			}
-			// Gamer display
-			if (!res.isHidden) {
-				row.rowRef.style.display = "";
-				row.rowRef.style.opacity = 1;
-			} else {
-				row.rowRef.style.display = "none";
-				row.rowRef.style.opacity = 0.3;
-			}
-			if (this.game.ui.isDisplayOver) {
-				row.rowRef.style.display = "";
-			}
-
-			//  highlight resources for selected building
-			//--------------------------------------------
-			var className;
-
-			if (reqRes.indexOf(res.name) >= 0){
-				className = "resourceRow highlited";
-			} else {
-				className = "resourceRow";
-			}
-			if (row.rowRef.className != className){
-				row.rowRef.className = className;
-			}
-
-			row.resAmt.textContent = this.game.getDisplayValueExt(res.value);
-
-			//==================== super confusing % craft logic ===================
-			var allCount = this.game.workshop.getCraftAllCount(res.name);
-			var craftRatio = this.getResourceCraftRatio(res);
-			var craftPrices = (res.name == "ship") ? this.game.workshop.getCraftPrice(recipe) : row.recipeRef.prices;
-			// 1/1%
-			var craftRowAmt = 1;
-			if (1 < allCount * 0.01 ){
-				craftRowAmt = Math.floor(allCount * 0.01);
-			}
-			dojo.style(row.a1, "display", this.game.resPool.hasRes(craftPrices, craftRowAmt) ? "" : "none");
-			row.a1.innerHTML = "+" + this.game.getDisplayValueExt(craftRowAmt * (1 + craftRatio), null, null, 0);
-
-			// 25/5%
-			var craftRowAmt = 25;
-			if (25 < allCount * 0.05 ){
-				craftRowAmt = Math.floor(allCount * 0.05);
-			}
-			dojo.style(row.a25, "display", this.game.resPool.hasRes(craftPrices, craftRowAmt) ? "" : "none");
-			row.a25.innerHTML = "+" + this.game.getDisplayValueExt(craftRowAmt * (1 + craftRatio), null, null, 0);
-
-			// 100/10%
-			var craftRowAmt = 100;
-			if (100 < allCount * 0.1 ){
-				craftRowAmt = Math.floor(allCount * 0.1);
-			}
-
-			dojo.style(row.a100, "display", this.game.resPool.hasRes(craftPrices, craftRowAmt) ? "" : "none");
-			row.a100.innerHTML = "+" + this.game.getDisplayValueExt(craftRowAmt * (1 + craftRatio), null, null, 0);
-			//=======================================================================
-			dojo.style(row.aAll, "display", this.hasMinAmt(row.recipeRef) ? "" : "none");
-		}
-	}
-});
-
 

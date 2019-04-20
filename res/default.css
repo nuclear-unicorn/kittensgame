@@ -62,6 +62,11 @@ body {
     white-space: normal;
 }
 
+#game.centered {
+    display: flex;
+    justify-content: center;
+}
+
 .column {
     min-height: 100%;
     height: 100%;
@@ -194,6 +199,13 @@ select>option {
     border: 1px solid #FF3030;
 }
 
+.btn .btnContent a {
+    max-width: 50px;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+
 .btn.small-text span {
     font-size: 90%;
 }
@@ -205,6 +217,10 @@ select>option {
 
 .btn .noRes {
     color: #FF3030;
+}
+
+.dropdown-link {
+    cursor: pointer;
 }
 
 .spacer {
@@ -420,6 +436,12 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
     border: 1px solid gray;
 }
 
+.toggleCenter {
+    opacity: 0.2;
+    cursor:pointer;
+    width:200px;
+}
+
 table.craftTable tr:hover td {
     background-color: rgba(155, 200, 155, 0.8);
 }
@@ -524,6 +546,13 @@ input[type="checkbox"]:checked + label:before {
     cursor: default;
 }
 
+.achievement-header .star {
+    padding-left: 6px;
+    margin-top: -4px;
+    font-size: 18px;
+    color: orange;
+}
+
 .achievement .star {
     float: right;
     padding-right: 0px;
@@ -573,6 +602,10 @@ h1 {
 
 .right-tab-header a {
     padding: 5px;
+}
+
+.right-tab-header a.active {
+    text-decoration: none;
 }
 
 #sorrowTooltip {
@@ -713,6 +746,21 @@ progress[value]::-webkit-progress-value {
 
 /*======================================================================*/
 
+.tooltip-block, .tooltip-block div {
+    z-index: 9999;
+    display: inline-block;
+    cursor: pointer;
+    padding-left: 3px;
+}
+
+.tooltip-content {
+    background-color: rgb(239, 239, 244);
+    border: 1px solid #a8a7ac;
+    position: absolute;
+    margin-left: 20px;
+    padding-right: 10px;
+}
+
 .copyright {
     text-decoration: none;
 }
@@ -750,15 +798,19 @@ a.link.collapse:hover {
 
 .res-table {
     max-width: 340px;
+    width: 100%;
     display: table;
     border-collapse: separate;
-    border-spacing: 2px;
+    border-spacing: 3px;
 }
 
 .res-row {
-    padding-top: 2px;
-    padding-bottom: 2px;
+    padding-bottom: 4px;
     display:table-row;
+}
+
+.res-row.craft:hover {
+    background-color: rgba(155, 200, 155, 0.3);
 }
 
 .res-cell {
@@ -771,6 +823,192 @@ a.link.collapse:hover {
     width: 60px;
 }
 
+.res-cell.resource-value {
+    width: 75px;
+}
+
 .res-cell.resPerTick {
     cursor: pointer;
+}
+
+.res-cell.craft-link {
+    cursor: pointer;
+    width: 20px;
+}
+
+.res-cell.craft-link:hover {
+    text-decoration: underline;
+    text-shadow: -0.06ex 0 black, 0.06ex 0 black;
+}
+
+.res-cell.craft-link:active {
+    animation: pulseShort 0.5s;
+    user-select: none;
+}
+
+@keyframes pulseShort {
+    100% {
+        transform: scale(1.1);
+    }
+  }
+
+.map-viewport {
+    border: 1px solid lightgray;
+    height: 250px;
+    padding: 20px;
+}
+
+/*--------------------------------------
+                Map
+--------------------------------------*/
+
+.map-container {
+    overflow: hidden;
+}
+
+.map-viewport {
+    max-width: 250px;
+    overflow: hidden;
+}
+
+.map-row {
+    white-space: nowrap !important;
+}
+
+.map-cell {
+    border: 1px solid lightgray;
+    width: 35px;
+    height: 35px;
+    display: inline-block;
+    margin: 2px;
+    cursor: pointer;
+
+    fill: lightgray;
+    user-select: none;
+}
+
+.map-cell.focused {
+    border: 1px solid lightskyblue;
+}
+
+.map-cell.selected {
+    border: 1px solid darkorange;
+}
+
+.map-cell.active {
+    animation: border-pulse 4s infinite;
+}
+
+.map-cell.locked {
+    visibility: hidden;
+}
+
+@keyframes border-pulse{
+    0% {border: 1px solid lightgray}		50% {border: 1px solid red}		100%{border: 1px solid lightgray}
+}
+
+.map-cell .coord {
+    font-size: 10px;
+    color: lightgray;
+}
+.map-cell .label {
+    position: relative;
+    float:left;
+}
+
+.map-cell progress {
+    height: 2px;
+    display: block;
+    width: 100%;
+    margin-bottom: -1px;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.map-cell .tooltip-content {
+    margin-left: 50px;
+    position: relative;
+    float:left;
+    z-index: 99999;
+}
+
+.map-cell .tooltip-content div {
+    white-space: nowrap !important;
+}
+
+.map-viewport, .map-dashboard {
+    display: inline-block;
+    vertical-align: top;
+    border: 1px solid lightgray;
+    height: 250px;
+    margin-right: 10px;
+}
+
+.map-dashboard {
+    width: 150px;
+    padding: 5px;
+}
+
+.map-dashboard .btn {
+    width: 120px;
+}
+
+
+div.blaze {
+    animation: rainbow 2.5s linear;
+	animation-iteration-count: infinite;
+}
+
+div.hail {
+    animation: redrainbow 1.5s linear;
+	animation-iteration-count: infinite;
+}
+
+@keyframes rainbow{
+    100%,0%{
+        color: rgb(255,0,0);
+    }
+    8%{
+        color: rgb(255,127,0);
+    }
+    16%{
+        color: rgb(255,255,0);
+    }
+    25%{
+        color: rgb(127,255,0);
+    }
+    33%{
+        color: rgb(0,255,0);
+    }
+    41%{
+        color: rgb(0,255,127);
+    }
+    50%{
+        color: rgb(0,255,255);
+    }
+    58%{
+        color: rgb(0,127,255);
+    }
+    66%{
+        color: rgb(0,0,255);
+    }
+    75%{
+        color: rgb(127,0,255);
+    }
+    83%{
+        color: rgb(255,0,255);
+    }
+    91%{
+        color: rgb(255,0,127);
+    }
+}
+
+
+@keyframes redrainbow{
+    100%,0%{
+        color: rgb(255,0,0);
+    }
+    50%{
+        color: rgb(0,0,0);
+    }
 }

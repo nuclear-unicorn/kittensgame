@@ -31,9 +31,9 @@
 			}
 
 			function date_from_cal(cal) {
-				var d = Math.floor(cal.day + 0.5 * cal.dayPerTick);
+				var d = Math.floor(cal.day + 0.5 / cal.ticksPerDay);
 				return date_from_obj(cal, {
-					tick: Math.round((cal.day - d) / cal.dayPerTick),
+					tick: Math.round((cal.day - d) * cal.ticksPerDay),
 					day: d,
 					season: cal.season,
 					year: cal.year
@@ -132,7 +132,7 @@
 						switch (e.event) {
 						case "newDay":
 							v = mydate.tick + 1;
-							if (v !== Math.round(1 / cal.dayPerTick)) {
+							if (v !== Math.round(cal.ticksPerDay)) {
 								 event_error(e.event, "wrong number of ticks in the day: " + v);
 							}
 							break;
@@ -144,7 +144,7 @@
 							break;
 						case "newYear":
 							v = mydate.season + 1;
-							if (v !== cal.seasons.length) {
+							if (v !== cal.seasonsPerYear) {
 								event_error(e.event, "wrong number of seasons in the year: " + v);
 							}
 							break;

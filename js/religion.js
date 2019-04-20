@@ -33,18 +33,18 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		for (var i = 0; i < this.zigguratUpgrades.length; i++){
 			var zu = this.zigguratUpgrades[i];
 			zu.unlocked = zu.defaultUnlocked || false;
-			this.resetStateStackable(zu, zu.isAutomationEnabled, zu.lackResConvert, zu.effects);
+			this.resetStateStackable(zu);
 		}
 
 		for (i = 0; i < this.religionUpgrades.length; i++){
 			var ru = this.religionUpgrades[i];
-			this.resetStateStackable(ru, ru.isAutomationEnabled, ru.lackResConvert, ru.effects);
+			this.resetStateStackable(ru);
 		}
 
 		for (i = 0; i < this.transcendenceUpgrades.length; i++){
 			var tu = this.transcendenceUpgrades[i];
 			tu.unlocked = false;
-			this.resetStateStackable(tu, tu.isAutomationEnabled, tu.lackResConvert, tu.effects);
+			this.resetStateStackable(tu);
 		}
 	},
 
@@ -113,68 +113,80 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			this.faith = 0;
 		}
 
-		//30% bls * 20 Radiance should yield ~ 50-75% boost rate which is laughable but we can always buff it
-		var sorrow = this.game.resPool.get("sorrow").value * 0.1;
-
 		var alicorns = this.game.resPool.get("alicorn");
-		if (alicorns.value > 0){
-			this.corruption +=
-				(
-					this.game.getEffect("corruptionRatio") *
-					(
-						1 + Math.sqrt( sorrow * this.game.getEffect("blsCorruptionRatio") )
-					)
-				)
-				* (this.game.resPool.get("necrocorn").value > 0 ?
-					0.25 * (1 + this.game.getEffect("corruptionBoostRatio")) :	 //75% penalty
-					1);
+		if (alicorns.value > 0) {
+			//30% bls * 20 Radiance should yield ~ 50-75% boost rate which is laughable but we can always buff it
+			var blsBoost = 1 + Math.sqrt(this.game.resPool.get("sorrow").value * this.game.getEffect("blsCorruptionRatio"));
+			var corruptionBoost = this.game.resPool.get("necrocorn").value > 0
+				? 0.25 * (1 + this.game.getEffect("corruptionBoostRatio")) // 75% penalty
+				: 1;
+			this.corruption += this.game.getEffect("corruptionRatio") * blsBoost * corruptionBoost;
+		} else {
+			this.corruption = 0;
+		}
 
-			if (this.game.rand(100) < 25 && this.corruption > 1){
-				this.corruption = 0;
+		if (this.corruption >= 1) {
+			if (alicorns.value > 1) {
+				this.corruption--;
 				alicorns.value--;
 				this.game.resPool.get("necrocorn").value++;
 				this.game.upgrade({
 					zigguratUpgrades: ["skyPalace", "unicornUtopia", "sunspire"]
 				});
 				this.game.msg($I("religion.msg.corruption"), "important");
+			} else {
+				this.corruption = 1;
 			}
-		} else {
-			this.corruption = 0;
 		}
 
-		if (this.game.prestige.getPerk("voidOrder").researched){
-			var orderBonus = this.game.calcResourcePerTick("faith") * 0.1;	//10% of faith transfer per priest
-			this.faith += orderBonus * (1 + this.getFaithBonus() * 0.25);	//25% of the apocypha bonus
+		if (this.game.prestige.getPerk("voidOrder").researched) {
+			var orderBonus = this.game.calcResourcePerTick("faith") * 0.1 * (1 + this.game.getEffect("voidResonance"));	//10% of faith transfer per priest
+			this.faith += orderBonus * (1 + this.getFaithBonus() * 0.25);	//25% of the apocrypha bonus
+			this.game.resPool.addResEvent("faith", -orderBonus);
 		}
 	},
 
-	fastforward: function(times) {
+	fastforward: function(daysOffset) {
+		var times = daysOffset * this.game.calendar.ticksPerDay;
 		//safe switch for a certain type of pesky bugs with conversion
 		if (isNaN(this.faith)){
 			this.faith = 0;
 		}
 		var alicorns = this.game.resPool.get("alicorn");
-		if (alicorns.value > 0){
-			var corIncrement = times * this.game.getEffect("corruptionRatio") * (this.game.resPool.get("necrocorn").value > 0 ? 0.25 * (1 + this.game.getEffect("corruptionBoostRatio")) : 1);  //75% penalty
-			var nextGreatestAlicornVal = Math.floor(alicorns.value + 0.999999);
-			this.corruption = Math.max(this.corruption, Math.min(this.corruption + corIncrement, nextGreatestAlicornVal));
-			var cor = Math.floor(Math.min(this.corruption, alicorns.value));
-
-			if (cor) {
-				this.corruption-=cor;
-				alicorns.value-=cor;
-				this.game.resPool.get("necrocorn").value+=cor;
-				this.game.upgrade({
-					zigguratUpgrades: ["skyPalace", "unicornUtopia", "sunspire"]
-				});
-			}
+		if (alicorns.value > 0) {
+			//30% bls * 20 Radiance should yield ~ 50-75% boost rate which is laughable but we can always buff it
+			var blsBoost = 1 + Math.sqrt(this.game.resPool.get("sorrow").value * this.game.getEffect("blsCorruptionRatio"));
+			var corruptionPerTickBeforeFirstNecrocorn = this.game.getEffect("corruptionRatio") * blsBoost;
+			var ticksBeforeFirstNecrocorn = this.game.resPool.get("necrocorn").value < 1
+				// this.corruption is <= 1 at this point, no need to check if 1-this.corruption is negative
+				? Math.min(Math.ceil((1 - this.corruption) / corruptionPerTickBeforeFirstNecrocorn), times)
+				: 0;
+			var ticksAfterFirstNecrocorn = times - ticksBeforeFirstNecrocorn;
+			var corruptionBoost = 0.25 * (1 + this.game.getEffect("corruptionBoostRatio")); // 75% penalty
+			this.corruption += corruptionPerTickBeforeFirstNecrocorn * (ticksBeforeFirstNecrocorn + ticksAfterFirstNecrocorn * corruptionBoost);
 		} else {
 			this.corruption = 0;
 		}
-		if (this.game.prestige.getPerk("voidOrder").researched){
-			var resonance = this.game.getEffect("voidResonance");
-			var orderBonus = this.game.calcResourcePerTick("faith") * (0.1 + resonance);	//10% of faith transfer per priest
-			this.faith += times * orderBonus * (1 + this.getFaithBonus() * 0.25);	//25% of the apocypha bonus
+
+		// Prevents alicorn count to fall to 0, which would stop the per-tick generation
+		var maxAlicornsToCorrupt = Math.ceil(alicorns.value) - 1;
+		var alicornsToCorrupt = Math.floor(Math.min(this.corruption, maxAlicornsToCorrupt));
+		if (alicornsToCorrupt) {
+			this.corruption -= alicornsToCorrupt;
+			alicorns.value -= alicornsToCorrupt;
+			this.game.resPool.get("necrocorn").value += alicornsToCorrupt;
+			this.game.upgrade({
+				zigguratUpgrades: ["skyPalace", "unicornUtopia", "sunspire"]
+			});
+		}
+		if (this.corruption >= 1) {
+			this.corruption = 1;
+		}
+
+		if (this.game.prestige.getPerk("voidOrder").researched) {
+			var orderBonus = times * this.game.calcResourcePerTick("faith") * 0.1 * (1 + this.game.getEffect("voidResonance"));	//10% of faith transfer per priest
+			this.faith += orderBonus * (1 + this.getFaithBonus() * 0.25);	//25% of the apocrypha bonus
+			this.game.resPool.addResEvent("faith", -orderBonus);
 		}
 	},
 
@@ -375,7 +387,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		description: $I("religion.zu.unicornNecropolis.desc"),
 		prices: [
 			{ name : "void", val: 5 },
-			{ name : "necrocorn", val: 25 },
+			{ name : "necrocorn", val: 15 },
+			{ name : "alicorn", val: 100 },
 			{ name : "megalith", val: 2500 }
 		],
 		priceRatio: 1.15,
@@ -642,6 +655,20 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		unlocked: false,
 		flavor: $I("religion.tu.singularity.flavor")
 	},{
+		name: "blackLibrary",
+		label: $I("religion.tu.blackLibrary.label"),
+		description: $I("religion.tu.blackLibrary.desc"),
+		prices: [
+			{ name : "relic", val: 30000 }
+		],
+		tier: 9,
+		priceRatio: 1.15,
+		effects: {
+			"compendiaTTBoostRatio" : 0.02
+		},
+		unlocked: false,
+		flavor: $I("religion.tu.singularity.flavor")
+	},{
 		name: "blackRadiance",
 		label: $I("religion.tu.blackRadiance.label"),
 		description: $I("religion.tu.blackRadiance.desc"),
@@ -651,7 +678,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		tier: 12,
 		priceRatio: 1.15,
 		effects: {
-			"blsCorruptionRatio" : 0.012
+			"blsCorruptionRatio" : 0.0012
 		},
 		unlocked: false,
 		flavor: $I("religion.tu.blackRadiance.flavor")
@@ -668,6 +695,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//Should at least improve impedance scaling by some value (5%? 10%). Probably something else
 			"timeRatio" : 0.10,
 			"rrRatio" : 0.02
+		},
+		upgrades: {
+			chronoforge: ["temporalImpedance"]
 		},
 		unlocked: false,
 		flavor: $I("religion.tu.blazar.flavor")
@@ -904,7 +934,7 @@ dojo.declare("classes.ui.TranscendenceBtnController", com.nuclearunicorn.game.ui
 dojo.declare("com.nuclearunicorn.game.ui.PraiseBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	getName: function(model) {
 		if (this.game.religion.faithRatio > 0){
-			return model.options.name + " [" + this.game.getDisplayValueExt(this.game.religion.getFaithBonus()*100, true, false, 1) + "%]";
+			return model.options.name + " [" + this.game.getDisplayValueExt(this.game.religion.getFaithBonus()*100, true, false, 3) + "%]";
 		} else {
 			return model.options.name;
 		}
@@ -1012,10 +1042,7 @@ dojo.declare("classes.ui.religion.SacrificeBtn", com.nuclearunicorn.game.ui.Butt
 	 * Render button links like off/on and sell
 	 */
 	renderLinks: function(){
-		var self = this;
-
 		this.all = this.addLink(this.model.allLink.title, this.model.allLink.handler, false, true);
-
 		this.x10 = this.addLink(this.model.x10Link.title, this.model.x10Link.handler, false, true);
 	},
 
@@ -1034,8 +1061,6 @@ dojo.declare("classes.ui.religion.RefineTCBBtn", com.nuclearunicorn.game.ui.Butt
 	 * Render button links like off/on and sell
 	 */
 	renderLinks: function(){
-		var self = this;
-
 		this.all = this.addLink(this.model.allLink.title, this.model.allLink.handler, false, true);
 		this.x25 = this.addLink(this.model.x25Link.title, this.model.x25Link.handler, false, true);
 	},

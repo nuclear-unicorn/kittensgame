@@ -32,10 +32,10 @@
 			ga('send', 'pageview');
 		</script>
 
-		<link rel="stylesheet" href="res/default.css?v=1b" type="text/css">
-		<link rel="stylesheet" href="res/theme_dark.css" type="text/css">
-        <link rel="stylesheet" href="res/theme_grassy.css" type="text/css">
-		<link rel="stylesheet" href="res/theme_sleek.css" type="text/css">
+		<link rel="stylesheet" href="res/default.css?v=5" type="text/css">
+		<link rel="stylesheet" href="res/theme_dark.css?v=5" type="text/css">
+        <link rel="stylesheet" href="res/theme_grassy.css?v=5" type="text/css">
+		<link rel="stylesheet" href="res/theme_sleek.css?v=5" type="text/css">
 
 		<script src="https://www.gstatic.com/firebasejs/3.6.4/firebase.js"></script>
 		<script>
@@ -51,7 +51,7 @@
 
 		<script type="text/javascript">
 
-			var version = "1449c";
+			var version = "1453o";
 
 			var loadingProgress = 0,
 				progressMax = 0;
@@ -122,9 +122,11 @@
 					"js/stats",
 					"js/challenges",
 					"js/void",
+					"js/math",
 					"game",
 
 					"js/jsx/left.jsx",
+					"js/jsx/map.jsx",
 
 					"js/ui",
 					"js/toolbar"
@@ -170,10 +172,11 @@
 
 					gamePage.render();
 					gamePage.ui.renderFilters();
+					gamePage.ui.onLoad();
 					gamePage.start();
 
 					var config = new classes.KGConfig();
-					if (config.statics.isEldermass){
+					if (gamePage.isEldermass()){
 						if (gamePage.resPool.get("elderBox").value == 0){
 							gamePage.resPool.get("elderBox").value++;
 							gamePage.msg("XOXOXO! Elder Gods have send you a gift box!", "important");
@@ -220,7 +223,9 @@
 				}
 			}
 
-			function dev_boostCalendar(){
+			function dev_boostCalendar() {
+				gamePage.calendar.ticksPerDay = 1/3;
+				// TODO Temporarily kept
 				gamePage.calendar.dayPerTick = 3;
 			}
 
@@ -233,11 +238,6 @@
 			}
 			$(resetGameLogHeight);
 			$(window).resize(resetGameLogHeight);
-
-			/*$(document).on('keyup keydown', function(e){
-				gamePage.keyStates.shiftKey = e.shiftKey;
-				gamePage.keyStates.ctrlKey = e.ctrlKey;
-			} );*/
 
 		</script>
 
@@ -310,14 +310,11 @@
 						Chronofurnace
 						Time Impedance
 
-					Minor 4:
-						Umbra / Charon
-						Heatsink
-						Entangler
+					Minor 5:
+						Exploration
 
-					Rev: 8
-						New loading screen
-						Black Radiance
+					Rev: 3
+						QoL
 
 				</pre>
 				<a href="changelog.txt" target="_blank" style="position: relative; top: -15px;">full changelog</a>
@@ -332,35 +329,12 @@
 				</div>
 			</div>
 
-			<div id="game" style="display:none;" class="pure-g">
+			<div id="game" style="display:none;">
 				<div id="tooltip" class="tooltipExt button_tooltip"></div>
 
 				<!-- LEFT -->
 				<div id="leftColumn" class="column" style="vertical-align: top;">
 					<div id="leftColumnViewport">#nothing interesting here</div>
-					<!--div style="float:left;"><a href="#" style="padding-left:2px;" onclick="gamePage.resPool.setDisplayAll();">Show All</a></div>
-					<div style="float:left;"><a href="#" style="padding-left:8px;" onclick="gamePage.resPool.toggleLock();">Lock/Unlock</a></div>
-					<div style="float:right; margin-right:-13px;"><a href="#" style="padding-right:2px;" onclick="gamePage.ui.zoomDown();">&ndash;</a>/<a href="#" onclick="gamePage.ui.zoomUp();">+</a>
-					</div-->
-
-					<div id="resContainer" style="padding-top: 15px; width: 100%">
-					</div>
-
-					<!-- Advisers -->
-
-					<div id="advisorsContainer" style=" padding-top: 10px;">
-					</div>
-
-					<div id="fastHuntContainer" style="padding-left: 5px; visibility: hidden;">
-						<a href="#" onclick="gamePage.huntAll(event);">Send hunters (<span id="fastHuntContainerCount"></span>)</a>
-					</div>
-
-					<div id="fastPraiseContainer" style="padding-left: 5px; visibility: hidden;">
-						<a href="#" onclick="gamePage.praise(event);">Praise the sun!</a>
-					</div>
-
-					<div id="craftContainer" style="padding-top: 10px; width: 100%">
-					</div>
 				</div>
 
 				<!-- MID -->
@@ -385,8 +359,8 @@
 						<a id="dev_boostCalendar" href="#" onclick="dev_boostCalendar();" style="display: none; text-decoration: none; position: relative; left: 5px;">&gt;&gt;&gt;</a>
 					</div>
 					<div class="right-tab-header">
-						<a href="#" onclick="gamePage.ui.hideChat();">Log</a>&nbsp;|
-						<a class="chatLink" href="#" onclick="gamePage.ui.loadChat();">Chat</a>
+						<a id="logLink" href="#" class="active" onclick="gamePage.ui.hideChat();">Log</a>&nbsp;|
+						<a id="chatLink" class="chatLink" href="#" onclick="gamePage.ui.loadChat();">Chat</a>
 					</div>
 					<div id="observeButton" style="text-align: center; margin-top: 5px; height: 30px;"></div>
 					<div class="right-tab" id="rightTabLog">
@@ -419,23 +393,7 @@
 						</div>
 					</div>
 				</div>
-			</div>
-
-			<div id="helpDiv" style="display: none" class="dialog help">
-				<a href="#" onclick="$('#helpDiv').hide();" style="position: absolute; top: 10px; right: 15px;">close</a>
-				<ul>
-					<li>Q: The game is not working!</li>
-					<li>A: Press Ctrl+F5. Wiping and re-importing the save may also help.</li>
-					<br>
-					<li>Q: Wood is useless. It's more effective to refine catnip! [formula follows]</li>
-					<li>A: Catnip/wood mechanics are much more complicated.</li>
-					<br>
-					<li>Q: What are unicorns for?</li>
-					<li>A: It's a mystery.</li>
-					<br>
-					<li>Q: This game is too slow!</li>
-					<li>A: Things will be better. Just try to think creatively and prioritise goals.</li>
-				</ul>
+				<div id="toggleCenter" onClick="gamePage.ui.toggleCenter();" class="column"><span class="toggleCenter">&gt;</span></div>
 			</div>
 
 			<div id="creditsDiv" style="display: none" class="dialog credits">
@@ -455,6 +413,7 @@
 					<li>ArcanisCz</li>
 					<li>Kida</li>
 					<li>freeroot</li>
+					<li>Ethaniel_Kavelaars</li>
 
 				</ul>
 
@@ -537,10 +496,12 @@
 					<input id="enableRedshift" type="checkbox" onclick="gamePage.opts.enableRedshift = $('#enableRedshift')[0].checked;">
 					<label for="enableRedshift" style="font-size: 8px;">Enable offline progression (Experimental)</label>
 					<br>
+					<input id="forceLZ" type="checkbox" onclick="gamePage.opts.forceLZ = $('#forceLZ')[0].checked;">
+					<label for="forceLZ" style="font-size: 8px;">Always compress save files (Experimental)</label>
 				</div>
 
 				<br>
-				<br>
+
 				<input type="button" value="Export" onclick="gamePage.saveExport();">
 
 				<input type="button" value="Import" onclick="$('#importData').val(''); $('#importDiv').show();" style="margin-top: 10px;">
@@ -591,7 +552,7 @@
 				<a href="http://bloodrizer.ru/games/kittens/wiki/" target="_blank">wiki</a> |
 				<a href="https://discord.gg/2arBf9K" target="_blank">discord</a> |
 				<!-- <a href="http://kittensgame.tumblr.com" target="_blank">tumblr</a> | -->
-				<a href="#" onclick="$('#helpDiv').toggle();">help</a> |
+				<!-- <a href="#" onclick="$('#helpDiv').toggle();">help</a> | -->
 				<a href="#" onclick="$('#creditsDiv').toggle();">credits</a> |
 				<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=82FJX5M8M3GVN" target="_blank">donate</a> <!-- |
 				<a href="classic/" target="_blank">classic</a> -->

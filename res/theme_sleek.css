@@ -38,11 +38,11 @@
     background-color: #403F3D;
 }
 
-.scheme_sleek a {
+.scheme_sleek a, .scheme_sleek .craft-link {
     color: #868685;
 }
 
-.scheme_sleek a:hover {
+.scheme_sleek a:hover, .scheme_sleek .craft-link:hover {
     color: #969696;
     opacity: 1.0;
 }
@@ -462,7 +462,7 @@ body.scheme_sleek  {
     color: #A2482E;
 }
 
-.scheme_sleek tr.highlited {
+.scheme_sleek .highlited {
     background-color: #333745 !important;
     border-color: #333745 !important;
 }
@@ -475,7 +475,7 @@ body.scheme_sleek  {
 }
 
 
-.scheme_sleek table.craftTable tr:hover td {
+.scheme_sleek table.craftTable tr:hover td, .scheme_sleek .res-row .res-cell:hover{
     background-color: #333745;
 }
 
@@ -484,11 +484,11 @@ body.scheme_sleek  {
     border-color: #333745 !important;
 }
 
-.scheme_sleek .resTable td {
+.scheme_sleek .resTable td, .scheme_sleek .res-cell {
     padding: 2px 5px 4px 5px;
 }
 
-.scheme_sleek tr.resourceRow:hover {
+.scheme_sleek tr.resourceRow:hover, .scheme_sleek .res-row:hover {
     background-color: rgba(0, 0, 0, 0.11);
 }
 
@@ -496,33 +496,33 @@ body.scheme_sleek  {
     line-height: 20px;
 }
 
-.scheme_sleek td.resAmount {
+.scheme_sleek .resAmount {
     color: #386c91;
 }
 
-.scheme_sleek td.resLimitWarn {
+.scheme_sleek .resLimitWarn {
     color: #4aabdd;
 }
 
-.scheme_sleek td.resLimitNotice {
+.scheme_sleek .resLimitNotice {
     color: #4aabdd;
 }
 
-.scheme_sleek td.resLimitNotice:after {
+.scheme_sleek .resLimitNotice:after {
     content: "!";
     color: #731b22;
     font-weight: bold;
     text-shadow: rgb(255, 127, 144) 1px 0px 1px;
 }
 
-.scheme_sleek td.resLimitWarn:after {
+.scheme_sleek .resLimitWarn:after {
     content: "!";
     color: #88894e;
     font-weight: bold;
     /*text-shadow: rgb(255, 254, 149) 1px 0px 1px;*/
 }
 
-.scheme_sleek td.resPerTick {
+.scheme_sleek .resPerTick {
     font-size: 90%;
     color: rgba(248, 255, 253, 0.5);
 }
@@ -531,11 +531,11 @@ body.scheme_sleek  {
     border: none;
 }
 
-.scheme_sleek a {
+.scheme_sleek a, .scheme_sleek .craft-link {
     text-decoration: none;
 }
 
-.scheme_sleek a:hover {
+.scheme_sleek a:hover, .scheme_sleek .craft-link:hover {
     color: white;
 }
 

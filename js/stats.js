@@ -63,8 +63,7 @@ dojo.declare("classes.managers.StatsManager", com.nuclearunicorn.core.TabManager
             title:  $I("stats.kittens.avg"),
             val: 0,
             calculate: function(game){
-				var result = game.stats.getStat("totalYears").val != 0 ? game.stats.getStat("totalKittens").val / Math.ceil(game.stats.getStat("totalYears").val / 100) : 0;
-				return result;
+                return game.stats.getStat("totalYears").val != 0 ? game.stats.getStat("totalKittens").val / Math.ceil(game.stats.getStat("totalYears").val / 100) : 0;
             },
             unlocked: false
         }
@@ -85,15 +84,13 @@ dojo.declare("classes.managers.StatsManager", com.nuclearunicorn.core.TabManager
         title:  $I("stats.kittens.current"),
         val: 0,
         calculate: function(game){
-        	var result = game.calendar.year != 0 ? game.resPool.get("kittens").value / Math.ceil(game.calendar.year / 100) : 0;
-        	return result;
+            return game.calendar.year != 0 ? game.resPool.get("kittens").value / Math.ceil(game.calendar.year / 100) : 0;
         }},{
         name: "timePlayed",
         title: $I("stats.time.current"),
         val: 0,
         calculate: function (game) {
-            var cDay = ((game.calendar.year * 400) + ((game.calendar.season - 1) * 100) + game.calendar.day);
-            return Math.round(cDay / 1800 * 10) / 10;
+            return game.toDisplaySeconds(game.calendar.trueYear() * game.calendar.seasonsPerYear * game.calendar.daysPerSeason * game.calendar.ticksPerDay / game.ticksPerSecond);
         },
         unlocked: false
     }
@@ -203,7 +200,7 @@ dojo.declare("classes.tab.StatsTab", com.nuclearunicorn.game.ui.tab, {
                     stat.val = stat.calculate(this.game);
                 }
 
-                if (stat.val > 0) {
+                if (stat.val != 0) {
                     stat.unlocked = true;
                 }
 
@@ -212,7 +209,9 @@ dojo.declare("classes.tab.StatsTab", com.nuclearunicorn.game.ui.tab, {
                     innerHTML: stat.unlocked ? stat.title : "???"
                 }, tr);
                 dojo.create("td", {
-                    innerHTML: stat.unlocked ? this.game.getDisplayValueExt(stat.val) : ""
+                    innerHTML: stat.unlocked
+                        ? typeof stat.val == "number" ? this.game.getDisplayValueExt(stat.val) : stat.val
+                        : ""
                 }, tr);
             }
         }

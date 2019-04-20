@@ -116,7 +116,7 @@ dojo.declare("classes.ui.ToolbarIcon", null, {
 		return {
 			needUpdate: true,
 			hasTooltip: true
-		}
+		};
 	}
 });
 
@@ -249,6 +249,6 @@ dojo.declare("classes.ui.toolbar.ToolbarDonations", classes.ui.ToolbarIcon, {
 		return {
 			needUpdate: false,
 			hasTooltip: false
-		}
+		};
 	}
 });

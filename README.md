@@ -5,6 +5,13 @@
 * https://www.reddit.com/r/kittensgame
 * https://dojotoolkit.org/reference-guide/1.7/dojo/index.html#dojo-index (I'm using mostly pre-1.7 dojo functionality)
 
+### No ES6 please ###
+
+KG ecosystem have to support about 20.000 different android devices, iOS, os and browser versions dating 1980, chrome/FF/IE/Edge/webkit of all possible releases.
+We support IE6. We support browsers that does not know how to work with local storage or web workers. I'm not sure but it might acutally work on Netscape, Links or Mosaic.
+
+Please, no ()=>{}, const, require, webpackers, etc.
+
 ### Roadmap ###
 
 Most recent roadmap: https://trello.com/b/cecIwqp2/kittens-game-roadmap
