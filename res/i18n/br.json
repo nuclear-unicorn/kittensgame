@@ -1426,7 +1426,6 @@
     "res.stack.time":"Tempo",
     "res.effect":"Efeito",
     "res.effects":"Efeitos",
-    "res.per.sec":"/seg",
     "reset.prompt":"Tem certeza que quer recomeçar?",
     "reset.prompt.base":"Você vai ganhar bônus de felicidade. Você continua com todas as suas estatísticas e conquistas",
     "reset.prompt.70":"Você vai ganhar felicidade extra e bônus de produção",
@@ -1450,7 +1449,7 @@
     "res.notify.msg":"Você será notificado quando {0} estará disponível.",
     "res.notify.ready":"{0} está pronto",
     "res.notify.ready.title":"Recursos suficientes para comprar",
-"console.intro":"Você é um gatinho numa floresta de erva de gato.",
+    "console.intro":"Você é um gatinho numa floresta de erva de gato.",
 
     "trade.buys": "Compra",
     "trade.sells": "Vende",

@@ -2249,7 +2249,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
     undo: function(data){
 		var metaId = data.metaId,
 			val = data.val;
-			 
+
 		if (this.craft(metaId, -val, true /*do not create cyclic undo*/)){
 			var res = this.game.resPool.get(metaId);
 			var craftRatio = this.game.getResCraftRatio(res);
@@ -2310,12 +2310,20 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			scienceMaxCompendiaCap =  this.game.bld.getEffect("scienceMaxCompendia"),
 			compendiaScienceMax = Math.floor(this.game.resPool.get("compedium").value * 10);
 
-		//iw compedia cap is set to 1000% instead of 100%	
+		//iw compedia cap is set to 1000% instead of 100%
 		var iwScienceCapRatio = this.game.ironWill ? 10 : 1;
-		
+
+		var blackLibrary = this.game.religion.getTU("blackLibrary");
 		if (this.game.prestige.getPerk("codexLeviathanianus").researched){
-			var ttBoostRatio = (0.05 * (1 + game.getEffect("compendiaTTBoostRatio")));
-			iwScienceCapRatio *= (1 + ttBoostRatio * game.religion.getTranscendenceLevel());
+			var ttBoostRatio = (
+				0.05 * (
+					1 + 
+					blackLibrary.val * (
+						blackLibrary.effects["compendiaTTBoostRatio"] + 
+						this.game.getEffect("blackLibraryBonus") )
+				)
+			);
+			iwScienceCapRatio *= (1 + ttBoostRatio * this.game.religion.getTranscendenceLevel());
 		}
 
 		if (compendiaScienceMax > (scienceMaxBuilding * iwScienceCapRatio + scienceMaxCompendiaCap)){

@@ -913,7 +913,7 @@
     "workshop.crafts.parchment.label": "Parchment",
     "workshop.crafts.manuscript.desc": "Written document required for technological advancement. Every manuscript will give a minor bonus to a maximum culture (this effect has a diminishing return)",
     "workshop.crafts.manuscript.label": "Manuscript",
-    "workshop.crafts.compedium.desc": "A sum of all modern knowledge of catkind. Every compendium will give +10 to max science",
+    "workshop.crafts.compedium.desc": "A sum of all modern knowledge of catkind. Every compendium will give +10 to max science. (This bonus can't be greater that max science from your buildings)",
     "workshop.crafts.compedium.label": "Compendium",
     "workshop.crafts.blueprint.desc": "Strange piece of paper with blue lines.",
     "workshop.crafts.blueprint.label": "Blueprint",

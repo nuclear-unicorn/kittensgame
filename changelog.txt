@@ -1,3 +1,27 @@
+v 1.4.6.0 (22 apr 2019)
+
+Compedium science cap will now be limited by 100% of building science
+Buildings
+- Data Center
+
+Upgrades:
+- Cryocomputing
+- Uplink
+- Starlink
+- Orbital Geodesy
+- Machine Learning
+
+Metaphysics
+- Codex Levi
+
+Cryptotheology
+- Black Library
+
+Translations (beta)
+- Spanish
+- Chinease
+
+
 v 1.4.5.3 (9 apr 2019)
 
 changes by Ethaniel_Kavelaars:

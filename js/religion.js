@@ -171,7 +171,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		// Prevents alicorn count to fall to 0, which would stop the per-tick generation
 		var maxAlicornsToCorrupt = Math.ceil(alicorns.value) - 1;
 		var alicornsToCorrupt = Math.floor(Math.min(this.corruption, maxAlicornsToCorrupt));
-		if (alicornsToCorrupt) {
+		if (alicornsToCorrupt > 0) {
 			this.corruption -= alicornsToCorrupt;
 			alicorns.value -= alicornsToCorrupt;
 			this.game.resPool.get("necrocorn").value += alicornsToCorrupt;
@@ -372,7 +372,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		],
 		priceRatio: 1.15,
 		effects: {
-			"cultureMaxRatioBonus" : 0.01
+			"cultureMaxRatioBonus" : 0.01,
+			"blackLibraryBonus": 0.02
 		},
 		upgrades: {
 			buildings: ["ziggurat"]
