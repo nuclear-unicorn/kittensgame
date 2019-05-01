@@ -1557,8 +1557,18 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.timeTab.visible = (this.science.get("calendar").researched || this.time.getVSU("usedCryochambers").val > 0);
 		this.challengesTab.visible = this.prestige.getPerk("adjustmentBureau").researched;
 
-		this.ui.load();
-		this.render();
+                for (var i in this.resPool.resources) {
+                        var res = this.resPool.resources[i];
+                        var maxValue = this.getEffect(res.name + "Max") || 0;
+
+                        maxValue = this.resPool.addResMaxRatios(res, maxValue);
+
+                        if (maxValue < 0 ){
+                                maxValue = 0;
+                        }
+
+                        res.maxValue = maxValue;
+                }
 
                 this.loading = false;
                 for (var i in this.resPool.resources) {
@@ -1566,7 +1576,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
                         this.resPool.handleLimits(res);
                 }
                 this.migrating = false;
-		
+
+                this.ui.load();
+                this.render();
+
 		return success;
 	},
 
