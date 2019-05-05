@@ -554,7 +554,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 		saveData.village = {
 			kittens : kittens,
-			reserveKittens: reserveKittens,
+			reserveKittens: this.sim.reserveKittens,
 			maxKittens: this.maxKittens,
 			jobs: this.filterMetadata(this.jobs, ["name", "unlocked", "value"]),
 			map : this.map.villageData
