@@ -319,7 +319,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			apotheosis += 1;
 			this.rewarded = true;
 		}
-		var conditionTotal = 0;
+		var conditionTotal = 1;
 		for (var i = 0; i < this.conditions.length; i++) {
 			if (this.conditions[i].on && this.conditions[i].bonus) {
 				conditionTotal += Math.pow(this.conditions[i].bonus * (1 - this.game.getHyperBolicEffect(this.conditions[i].resets / 10, 1)), 2);
@@ -330,7 +330,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		
 		if (apotheosis)
 		{
-			this.game.resPool.addRes("apotheosis", Math.floor(apotheosis), true);
+			this.game.resPool.addRes(this.game.resPool.get("apotheosis"), Math.floor(apotheosis), true);
 		}
 	},
 	
