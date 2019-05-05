@@ -219,6 +219,10 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         isAutomationEnabled: true,
         action: function(self, game){
 
+            if (self.isAutomationEnabled == null) {
+                self.isAutomationEnabled = true;
+            }
+
             if (self.on < self.val){
                 self.on = self.val;
             }
@@ -544,12 +548,12 @@ dojo.declare("classes.ui.TimeControlWgt", [mixin.IChildrenAware, mixin.IGameAwar
         if (this.game.workshop.get("chronoforge").researched) {
             var heatMax = this.game.getEffect("heatMax");
             if(this.game.time.heat > heatMax){
-                this.timeSpan.innerHTML += "<br>Heat: <span style='color:red;'>" + 
+                this.timeSpan.innerHTML += "<br>Heat: <span style='color:red;'>" +
                 this.game.getDisplayValueExt(this.game.time.heat)
                  + "</span>/" + heatMax;
             } else {
-                this.timeSpan.innerHTML += "<br>Heat: " + 
-                    this.game.getDisplayValueExt(this.game.time.heat) 
+                this.timeSpan.innerHTML += "<br>Heat: " +
+                    this.game.getDisplayValueExt(this.game.time.heat)
                 + "/" + heatMax;
             }
         }

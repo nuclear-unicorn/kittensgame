@@ -357,11 +357,11 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
                 var effects = {
                     "energyProduction": 2
                 };
-                effects.energyProduction *= 1 + game.getEffect("solarFarmRatio");
+                effects["energyProduction"] *= 1 + game.getEffect("solarFarmRatio");
 				if (game.calendar.season == 3) {
-					effects.energyProduction *= (1 - (0.25 / this.game.challenges.getChallengeReward("winterIsComing")));
+					effects["energyProduction"] *= (1 - (0.25 / this.game.challenges.getChallengeReward("winterIsComing")));
 				} else if (game.calendar.season == 1) {
-					effects.energyProduction /= (1 - (0.25 / this.game.challenges.getChallengeReward("winterIsComing")));
+					effects["energyProduction"] /= (1 - (0.25 / this.game.challenges.getChallengeReward("winterIsComing")));
 				}
                 stageMeta.effects = effects;
 			}
@@ -409,7 +409,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
                 var effects = {
                     "energyProduction": 5
                 };
-                effects.energyProduction *= 1 + game.getEffect("hydroPlantRatio");
+                effects["energyProduction"] *= 1 + game.getEffect("hydroPlantRatio");
                 stageMeta.effects = effects;
             }
         }
@@ -518,15 +518,15 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				"scienceMax": 250,
 				"cultureMax": 10,
 			};
-			
+
 			var libraryRatio = game.getEffect("libraryRatio");
 			effects["scienceMax"] *= (1 + game.bld.get("observatory").on * libraryRatio);
-			
+
 			if (self.stage == 1){
 				effects["scienceMax"] *= 3;	//250->750 base science boos for data centers
 				effects["cultureMax"] = 250;
 				effects["scienceMaxCompendia"] = 1000;
-				
+
 				var biolabBonus = game.bld.get("biolab").on * game.getEffect("uplinkDCRatio");
 				if (game.workshop.get("uplink").researched){
 					effects["scienceMaxCompendia"] *= (1+biolabBonus);
@@ -1644,7 +1644,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		],
 		priceRatio: 1.25,
 		effects: {
-			cultureMaxRatio: 0.08
+			"cultureMaxRatio": 0.08
 		},
 		calculateEffects: function(self, game) {
 			var effects = {
@@ -1917,7 +1917,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		for (var i = 0; i < this.meta.length; i++){
 			var effectMeta = this.getMetaEffect(effectName, this.meta[i]);
 			effect += effectMeta;
-			
+
 		}
 		return effect;
 	},
@@ -2089,9 +2089,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		amt = data.val;
 
 		var bldMetaRaw = this.get(metaId),
-			bld = new classes.BuildingMeta(bldMetaRaw).getMeta();	
+			bld = new classes.BuildingMeta(bldMetaRaw).getMeta();
 
-		//This is probably the most up-to-date and problemless way to manage building models due to the layers and layers 
+		//This is probably the most up-to-date and problemless way to manage building models due to the layers and layers
 		//and layes	of legacy abstractions. I am not happy with it, but c'est la vie.
 		if (data.action == "build"){
 			var props = {
@@ -2110,7 +2110,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 
 			//Whoever came with reverse amt notation was probably high. (Was it me?)
 			props.controller.sellInternal(model, model.metadata.val - amt);
-			
+
 		} else if (data.action == "sell"){
 			//tbd
 			console.warn("Not implemented yet");
@@ -2120,7 +2120,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			console.warn("Not implemented yet");
 		}
 	}/*,
-	
+
 	refund: function(bldId, amt, refundPercentage){
 		refundPercentage = refundPercentage || 0.5;
 

@@ -812,7 +812,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		callback(false);
 	},
 
-	refund: function(model){		
+	refund: function(model){
 		if (!model.prices.length){
 			console.warn("unable to refund building, no prices specifed in metadata :O");
 			return;
@@ -1293,7 +1293,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 
 		//-----------------------------------------
 		var isEffectMultiplierEnabled = this.game.ui.isEffectMultiplierEnabled();
-		var valMultiplier = isEffectMultiplierEnabled ? model.on : 1;
+		var valMultiplier = isEffectMultiplierEnabled && model.metadata ? model.metadata.on : 1;
 		for (var effectName in effectsList) {
 			var effectMeta = this.game.getEffectMeta(effectName);
 			var effectValue = effectMeta.calculation === "constant"
@@ -1307,7 +1307,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 				if (!isEffectMultiplierEnabled && effectMeta.calculation === "nonProportional") {
 					var nextEffectValue = this.getNextEffectValue(model, effectName);
 					if (nextEffectValue) {
-						effectValue = nextEffectValue * (model.on + 1) - effectValue * model.on;
+						effectValue = nextEffectValue * (model.metadata.on + 1) - effectValue * model.metadata.on;
 					}
 				}
 
@@ -1986,7 +1986,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 			/*if (meta.val >= 1000){
 				return meta.label + " (" +
 					(meta.on < 10000 ? ((meta.on/1000).toFixed(1) + "K") : this.game.getDisplayValueExt(meta.on)) + "/" +
-					(meta.val < 10000 ? ((meta.val/1000).toFixed(1) + "K") : this.game.getDisplayValueExt(meta.val)) + 
+					(meta.val < 10000 ? ((meta.val/1000).toFixed(1) + "K") : this.game.getDisplayValueExt(meta.val)) +
 				")";
 			}*/
 			return meta.label + " ("+ meta.on + "/" + meta.val + ")";
@@ -2031,7 +2031,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 		if (model.enabled && this.hasResources(model) || this.game.devMode ){
 			var meta = model.metadata;
 
-			if (this.game.ironWill && meta.effects && meta.effects.maxKittens > 0 && this.game.science.get("archery").researched){
+			if (this.game.ironWill && meta.effects && meta.effects["maxKittens"] > 0 && this.game.science.get("archery").researched){
 				this.game.ui.confirm("", "This will end iron will. Are you sure?", function(confirmed) {
 					if(!confirmed) {
 						callback(false);

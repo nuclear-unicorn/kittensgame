@@ -1608,5 +1608,6 @@
     "workshop.orbitalGeodesy.label":"Orbital Geodesy",
     "workshop.orbitalGeodesy.desc":"Qarries will now provide a small amount of uranium",
     "religion.tu.blackLibrary.label":"Black Library",
-    "religion.tu.blackLibrary.desc":"Every Black Library improves Codex Leviathanianus scaling by 2%"
+    "religion.tu.blackLibrary.desc":"Every Black Library improves Codex Leviathanianus scaling by 2%. This value is further improved by Unicorn Graveyards.",
+    "workshop.craftBtn.desc.effectivenessBonus": "Craft effectiveness bonus: +{0}%"
 }

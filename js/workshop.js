@@ -2498,6 +2498,15 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 		var craft = model.craft;
 		var desc = craft.description;
 
+		var craftBonus = this.game.getResCraftRatio(craft);
+		if (craft.name != "wood"){
+			craftBonus -= this.game.getCraftRatio();
+		}
+
+		if (craftBonus > 0){
+			desc += "<br><br>" + $I("workshop.craftBtn.desc.effectivenessBonus", [this.game.getDisplayValueExt(craftBonus * 100, false, false, 0)]);
+		}
+
 		if (this.game.science.get("mechanization").researched){
 			desc += "<br><br>" + $I("workshop.craftBtn.desc.tier") + ": " + craft.tier;
 

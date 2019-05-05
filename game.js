@@ -321,7 +321,8 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"coalRatioGlobal" : {
 				title: $I("effectsMgr.statics.coalRatioGlobal.title"),
 				resName: "coal",
-				type: "ratio"
+				type: "ratio",
+				calculation: "constant"
 			},
 
 			"coalRatioGlobalReduction" : {
@@ -892,7 +893,8 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
             },
 			"hrProgress": {
 				title: $I("effectsMgr.statics.entangler-hrProgress.title"),
-				type: "ratio"
+				type: "ratio",
+				calculation: "constant"
 			},
 
 			"aiLevel" :  {
@@ -908,17 +910,20 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 
 			"hashrate" :  {
 				title: $I("effectsMgr.statics.hashrate.title"),
-				type: "fixed"
+				type: "fixed",
+				calculation: "constant"
 			},
 
 			"nextHashLevelAt" :  {
 				title: $I("effectsMgr.statics.nextHashLevelAt.title"),
-				type: "fixed"
+				type: "fixed",
+				calculation: "constant"
 			},
 
 			"hashRateLevel" :  {
 				title: $I("effectsMgr.statics.hashrateLevel.title"),
-				type: "fixed"
+				type: "fixed",
+				calculation: "constant"
 			}
 		}
 	}
@@ -1384,7 +1389,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			console.log("compressing the save file...");
 			saveDataString = LZString.compressToBase64(saveDataString);
 		}
-		
+
 		LCstorage["com.nuclearunicorn.kittengame.savedata"] = saveDataString;
 		console.log("Game saved");
 
@@ -3105,7 +3110,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				return this.getDisplayValueExt(value / p.divisor, prefix, usePerTickHack, precision, postfix + p.postfix[0]);
 			}
 		}
-		
+
 		var _value = this.getDisplayValue(value, prefix, precision);
 		return _value + postfix + (usePerTickHack ? $I("res.per.sec") : "");
 	},

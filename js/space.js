@@ -776,10 +776,13 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				effects: {
 					"energyConsumption": 25,
 					"gflopsConsumption": 0.1,
-					hashRateLevel: 0
+					"hashrate": 0,
+					"hashRateLevel": 0,
+					"nextHashLevelAt": 0,
+					"hrProgress": 0
 				},
 				action: function(self, game){
-					var gflopsPerTick = self.effects.gflopsConsumption * self.on;
+					var gflopsPerTick = self.effects["gflopsConsumption"] * self.on;
 					if (game.resPool.get("gflops").value < gflopsPerTick && game.resPool.get("gflops").value > 0){
 						gflopsPerTick = game.resPool.get("gflops").value;
 					}
@@ -793,15 +796,15 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 						difficulty = 1000,
 						rate = 1.6;
 
-					self.effects.hashrate = hr;
-					self.effects.nextHashLevelAt = difficulty * Math.pow(rate, self.effects.hashRateLevel + 1);
-					self.effects.hrProgress = hr / (difficulty * Math.pow(rate, self.effects.hashRateLevel + 1));
+					self.effects["hashrate"] = hr;
+					self.effects["nextHashLevelAt"] = difficulty * Math.pow(rate, self.effects["hashRateLevel"] + 1);
+					self.effects["hrProgress"] = hr / (difficulty * Math.pow(rate, self.effects["hashRateLevel"] + 1));
 					if (hr > difficulty){
-						self.effects.hashRateLevel = Math.floor(Math.log(hr/difficulty) / Math.log(rate));
+						self.effects["hashRateLevel"] = Math.floor(Math.log(hr/difficulty) / Math.log(rate));
 					} else {
-						self.effects.hashRateLevel = 0;
+						self.effects["hashRateLevel"] = 0;
 					}
-					self.effects.gflopsConsumption = 0.1;
+					self.effects["gflopsConsumption"] = 0.1;
 				}
 			}
 		]
