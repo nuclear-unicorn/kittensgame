@@ -322,7 +322,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		var conditionTotal = 1;
 		for (var i = 0; i < this.conditions.length; i++) {
 			if (this.conditions[i].on && this.conditions[i].bonus) {
-				conditionTotal += Math.pow(this.conditions[i].bonus * (1 - this.game.getHyperBolicEffect(this.conditions[i].resets / 10, 1)), 2);
+				conditionTotal += Math.pow(this.conditions[i].bonus * (1 - this.game.getHyperbolicEffect(this.conditions[i].resets / 10, 1)), 2);
 			}
 		}
 		

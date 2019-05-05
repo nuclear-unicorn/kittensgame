@@ -1560,7 +1560,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.religionTab.visible = (this.resPool.get("faith").value > 0 || this.challenges.getChallenge("atheism").on && this.bld.get("ziggurat").val > 0);
 		this.spaceTab.visible = (this.science.get("rocketry").researched);
 		this.timeTab.visible = (this.science.get("calendar").researched || this.time.getVSU("usedCryochambers").val > 0);
-		this.challengesTab.visible = this.prestige.getPerk("adjustmentBureau").researched;
+		this.challengesTab.visible = this.prestige.getPerk("adjustmentBureau").researched || this.prestige.getPerk("adjustmentBureau").reserve;
 
                 //copied from workshop.js, very bad
                 //when that code gets moved somewhere better call it here
