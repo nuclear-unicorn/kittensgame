@@ -15,6 +15,7 @@ WResourceRow = React.createClass({
 
         var isEqual = 
             oldRes.value == newRes.value &&
+            oldRes.reserveValue == newRes.value &&
             oldRes.maxValue == newRes.maxValue &&
             oldRes.perTickCached == newRes.perTickCached &&
             this.props.isEditMode == nextProp.isEditMode &&
@@ -165,7 +166,7 @@ WResourceRow = React.createClass({
                 res.title || res.name
             ),
             $r("div", {className:"res-cell " + resAmtClassName + specialClass}, game.getDisplayValueExt(res.value)),
-            $r("div", {className:"res-cell " + resAmtClassName + specialClass + " reserve"}, game.challenges.getCondition("disableChrono").on && !res.hideReserve && res.reserveValue ? "+" + game.getDisplayValueExt(res.reserveValue) : ""),
+            $r("div", {className:"res-cell " + resAmtClassName + specialClass + " reserve"}, !game.challenges.getCondition("disableChrono").on && !res.hideReserve && res.reserveValue ? "+" + game.getDisplayValueExt(res.reserveValue) : ""),
             $r("div", {className:"res-cell maxRes"}, 
                 res.maxValue ? "/" + game.getDisplayValueExt(res.maxValue) : ""
             ),

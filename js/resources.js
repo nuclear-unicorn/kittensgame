@@ -545,7 +545,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
                         }
                         res.value = res.maxValue;
                 }
-
+	},
+	handleReserve: function(res) {
                 if (res.name == "karma" || res.name == "paragon" || res.name == "burnedParagon" || res.name == "apotheosis")
                 {
                         if ((this.game.loading || !this.game.challenges.getCondition("disableMetaResources").on) && res.reserveValue)
@@ -557,7 +558,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
                 else
                 {
                         if ((this.game.loading || !this.game.challenges.getCondition("disableChrono").on) && res.reserveValue && (!res.maxValue || res.value < res.maxValue)) {
-                                if (res.maxValue && res.reserveValue > res.maxValue) {
+                                if (res.maxValue && res.value + res.reserveValue > res.maxValue) {
                                         res.reserveValue -= (res.maxValue - res.value);
                                         res.value = res.maxValue;
                                 }
@@ -684,6 +685,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 			var resPerTick = game.getResourcePerTick(res.name, false);
 			this.addResPerTick(res.name, resPerTick);
+                        this.handleReserve(res);
 
 		}
 		game.updateKarma();
