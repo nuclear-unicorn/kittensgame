@@ -68,7 +68,15 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
 		// Update temporalFluxMax from values loaded
         this.game.updateCaches();
-        this.game.resPool.update();
+        var res = this.game.resPool.get("temporalFlux");
+        var maxValue = this.game.getEffect("temporalFluxMax") || 0;
+            maxValue = this.game.resPool.addResMaxRatios(res, maxValue);
+
+        if (maxValue < 0 ) {
+            maxValue = 0;
+        }
+
+        res.maxValue = maxValue;
 
 		var temporalAccelerator = this.getCFU("temporalAccelerator");
 		var energyRatio = 1 + (temporalAccelerator.val * temporalAccelerator.effects["timeRatio"]);

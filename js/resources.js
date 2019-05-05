@@ -578,7 +578,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 		res.value += addedValue;
 
-		if(!this.game.loading) {
+		if(!this.game.loading || res.name == "temporalFlux") {
 			this.handleLimits(res);
 		}
 
