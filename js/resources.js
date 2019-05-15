@@ -571,7 +571,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	},
 
 	addRes: function(res, addedValue, event) {
-		if (this.game.calendar.day < 0 && !event) {
+		if (this.game.calendar.day < 0 && !event || addedValue == 0) {
 			return 0;
 		}
 
@@ -916,7 +916,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		if (delta > 4){
 			delta = 4;
 		}
-		if ((this.game.challenges.getChallenge("energy").on || !this.game.challenges.getChallenge("energy") || this.game.challenges.getCondition("disableRewards").on) && delta > 1) {
+		if ((this.game.challenges.getChallenge("energy").on || !this.game.challenges.getChallenge("energy").researched || this.game.challenges.getCondition("disableRewards").on) && delta > 1) {
 			delta = 1;
 		}
 		return delta;
