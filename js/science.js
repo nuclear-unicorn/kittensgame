@@ -581,7 +581,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             upgrades: [ 
 				"photolithography", 
 				"orbitalGeodesy",
-				"uplink" 
+				"uplink",
+				"thinFilm"
 			]
         },
         flavor: $I("science.sattelites.flavor")
@@ -616,7 +617,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		],
 		unlocks: {
 			crafts: ["thorium"],
-			upgrades: ["thoriumReactors", "thoriumEngine"]
+			upgrades: ["thoriumReactors", "thoriumEngine", "qdot"]
 		}
 	},{
 		name: "exogeology",

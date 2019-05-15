@@ -363,6 +363,12 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				} else if (game.calendar.season == 1) {
 					effects["energyProduction"] /= (1 - (0.25 / game.challenges.getChallengeReward("winterIsComing")));
 				}
+
+				var seasonRatio = game.getEffect("solarFarmSeasonRatio");
+				if ((game.calendar.season == 3 && seasonRatio == 1) || (game.calendar.season != 1 && seasonRatio == 2)){
+					effects["energyProduction"] *= (1 + 0.15 * seasonRatio);
+				}
+
                 stageMeta.effects = effects;
 			}
 		}
@@ -1484,26 +1490,28 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}
 		],
         action: function(self, game){
-           //very ugly and crappy stuff
-            var btower = self.stages[1];
+			//very ugly and crappy stuff
+			if (self.stage == 1){
+				var btower = self.stages[1];
 
-            btower.effects["cultureMax"] = 300;
-            btower.effects["culturePerTickBase"] = 1;
+				btower.effects["cultureMax"] = 300;
+				btower.effects["culturePerTickBase"] = 1;
 
-            var energyRatio = (game.resPool.energyProd / game.resPool.energyCons);
-            if (energyRatio > 1){
-                if (energyRatio > 1.75){
-                    energyRatio = 1.75;
-                }
-                btower.effects["cultureMax"] = Math.floor( (300 * energyRatio) * 1000) / 1000;
-                btower.effects["culturePerTickBase"] = Math.floor( (1 * energyRatio) * 1000) / 1000;
-            }
+				var energyRatio = (game.resPool.energyProd / game.resPool.energyCons);
+				if (energyRatio > 1){
+					if (energyRatio > 1.75){
+						energyRatio = 1.75;
+					}
+					btower.effects["cultureMax"] = Math.floor( (300 * energyRatio) * 1000) / 1000;
+					btower.effects["culturePerTickBase"] = Math.floor( (1 * energyRatio) * 1000) / 1000;
+				}
 
-            var broadcastTowerRatio = game.getEffect("broadcastTowerRatio");
-            var totalRatio = game.space.getBuilding("sattelite").on * broadcastTowerRatio;
+				var broadcastTowerRatio = game.getEffect("broadcastTowerRatio");
+				var totalRatio = game.space.getBuilding("sattelite").on * broadcastTowerRatio;
 
-            btower.effects["cultureMax"] *= ( 1 + totalRatio);
-            btower.effects["culturePerTickBase"] *= ( 1 + totalRatio);
+				btower.effects["cultureMax"] *= ( 1 + totalRatio);
+				btower.effects["culturePerTickBase"] *= ( 1 + totalRatio);
+			}
         }
 	},
 	{
@@ -2283,6 +2291,15 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 
 
 		return model;
+	},
+
+	getEffects: function(model){
+		var effects = model.metadata.effects;
+		var currentStage = model.metadata.stages[model.metadata.stage];
+		if (currentStage && currentStage.effects){
+			effects = currentStage.effects;
+		}
+		return effects;
 	},
 
 	getStageLinks: function(model){
