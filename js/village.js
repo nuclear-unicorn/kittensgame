@@ -1902,7 +1902,7 @@ dojo.declare("classes.ui.village.Census", null, {
 				}
 			}, linksDiv);
 
-			/*if (this.game.challenges.getChallenge("anarchy").on) {
+			/*if (!this.game.challenges.getChallenge("anarchy").on) {
 				var senatorHref = dojo.create("a", {
 					href: "#", innerHTML: $I("village.btn.senator"),
 					style: {
@@ -1937,7 +1937,7 @@ dojo.declare("classes.ui.village.Census", null, {
 			}
 			//rankExp
 
-			/*if (this.game.challenges.getChallenge("anarchy").on) {
+			/*if (!this.game.challenges.getChallenge("anarchy").on) {
 				dojo.connect(senatorHref, "onclick", this, dojo.partial(function(census, i, event){
 					event.preventDefault();
 
@@ -2156,7 +2156,7 @@ dojo.declare("classes.ui.village.Census", null, {
             } else {
                 dojo.style(record.unassignHref, "display", "none");
             }
-			/*if (this.game.challenges.getChallenge("anarchy").on) {
+			/*if (!this.game.challenges.getChallenge("anarchy").on) {
 				dojo.style(record.senatorHref, "display", "none");
 			}*/
 
@@ -2453,7 +2453,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 			}),
             controller: new classes.village.ui.VillageButtonController(this.game, {
 				updateVisible: function (model) {
-					model.visible = this.game.village.leader !== undefined && this.game.workshop.get("register").researched && this.game.challenges.getChallenge("anarchy").on;
+					model.visible = this.game.village.leader !== undefined && this.game.workshop.get("register").researched && !this.game.challenges.getChallenge("anarchy").on;
 				}
 			})
 		}, this.game);
