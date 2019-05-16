@@ -27,6 +27,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		togglableOnOff: true,
 		val: 1,
 		on: 0,
+		pending: false,
 		rewardable: false,
 		rewarded: false
 	},{
@@ -40,6 +41,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		togglableOnOff: true,
 		val: 1,
 		on: 0,
+		pending: false,
 		rewardable: false,
 		rewarded: false
 	},{
@@ -53,6 +55,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		togglableOnOff: true,
 		val: 1,
 		on: 0,
+		pending: false,
 		rewardable: false,
 		rewarded: false
 	},{
@@ -66,6 +69,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
         togglableOnOff: true,
         val: 1,
         on: 0,
+        pending: false,
         rewardable: false,
         rewarded: false
 	},{
@@ -79,6 +83,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
         togglableOnOff: true,
         val: 1,
         on: 0,
+        pending: false,
         rewardable: false,
         rewarded: false
 	}],
@@ -92,6 +97,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		togglableOnOff: true,
 		val: 1,
 		on: 0,
+		pending: false,
 		rewardable: false,
 		resets: 0
 	},{
@@ -103,6 +109,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		togglableOnOff: true,
 		val: 1,
 		on: 0,
+		pending: false,
 		rewardable: false,
 		resets: 0
 	},{
@@ -114,6 +121,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		togglableOnOff: true,
 		val: 1,
 		on: 0,
+		pending: false,
 		rewardable: false,
 		resets: 0
 	},{
@@ -125,6 +133,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		togglableOnOff: true,
 		val: 1,
 		on: 0,
+		pending: false,
 		rewardable: false,
 		resets: 0
 	},{
@@ -136,6 +145,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		togglableOnOff: true,
 		val: 1,
 		on: 0,
+		pending: false,
 		rewardable: false,
 		resets: 0
 	},{
@@ -146,6 +156,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		togglableOnOff: true,
 		val: 1,
 		on: 0,
+		pending: false,
 		rewardable: false,
 		resets: 0
 	}],
@@ -168,8 +179,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 	save: function(saveData){
 		saveData.challenges = {
 			rewarded: this.rewarded,
-			challenges: this.filterMetadata(this.challenges, ["name", "researched", "unlocked", "on", "rewardable", "rewarded"]),
-			conditions: this.filterMetadata(this.conditions, ["name", "on", "rewardable", "resets"])
+			challenges: this.filterMetadata(this.challenges, ["name", "researched", "unlocked", "on", "pending", "rewardable", "rewarded"]),
+			conditions: this.filterMetadata(this.conditions, ["name", "on", "pending", "rewardable", "resets"])
 		};
 	},
 
@@ -412,6 +423,125 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			return 1 - this.game.getHyperbolicEffect(researched * 0.1, 1);
 		}
 	},
+
+	handleChallengeToggle: function(name, on) {
+		if (name == "atheism")
+		{
+			this.game.upgrade({buildings: ["temple"]});
+		}
+	},
+
+	handleConditionToggle: function(name, on) {
+		if (on)
+		{
+			if (name == "disableMetaResources")
+			{
+				var metaRes = ["karma", "paragon", "burnedParagon", "apotheosis"]
+				for (var i = 0; i < metaRes.length; i++)
+				{
+					var res = this.game.resPool.get(metaRes[i]);
+					res.reserveValue = res.value;
+					res.value = 0;
+				}
+				
+				if (getCondition("disableMetaTechs").on)
+				{
+					for (var i = 0; i < this.game.prestige.perks.length; i++)
+					{
+						var perk = this.game.prestige.perks[i];
+					
+						if (perk.defaultUnlocked)
+						{
+							perk.unlocked = true;
+						}
+					}
+				}
+			}
+			
+			if (name == "disableMetaTechs")
+			{
+				for (var i = 0; i < this.game.prestige.perks.length; i++)
+				{
+					var perk = this.game.prestige.perks[i];
+					perk.reserve = perk.researched;
+					perk.unlocked = false;
+					perk.researched = false;
+					
+					if (getCondition("disableMetaResources").on && perk.defaultUnlocked)
+					{
+						perk.unlocked = true;
+					}
+				}
+			}
+			
+			if (name == "disableApo")
+			{
+				this.game.religion.faithRatioReserve = this.game.religion.faithRatio;
+				this.game.religion.faithRatio = 0;
+				this.game.religion.tcratioReserve = this.game.religion.tcratio;
+				this.game.religion.tcratio = 0;
+				this.game.religion.tclevel = this.game.religion.getTranscendenceLevel();
+
+				for (var i = 0; i < this.game.religion.transcendenceUpgrades.length; i++)
+				{
+					this.game.religion.transcendenceUpgrades[i].reserve += this.game.religion.transcendenceUpgrades[i].val;
+					this.game.religion.transcendenceUpgrades[i].val = 0;
+					this.game.religion.transcendenceUpgrades[i].on = 0;
+				}
+			}
+			
+			if (name == "disableMisc")
+			{
+				var bls = this.game.resPool.get("sorrow");
+				bls.reserveValue = bls.value;
+				bls.value = 0;
+				
+				this.game.karmaZebrasReserve = this.game.karmaZebras;
+				this.game.karmaZebras = 0;
+				this.game.resPool.get("zebras").maxValue = 0;
+				this.game.resPool.get("zebras").reserveValue = this.game.resPool.get("zebras").value;
+				this.game.resPool.get("zebras").value = 0;
+			}
+		}
+		else
+		{
+			if (name == "disableMetaResources")
+			{
+				if (getCondition("disableMetaTechs").on)
+				{
+					for (var i = 0; i < this.game.prestige.perks.length; i++)
+					{
+						var perk = this.game.prestige.perks[i];
+					
+						if (perk.defaultUnlocked)
+						{
+							perk.unlocked = false;
+						}
+					}
+				}
+			}
+		}
+	},
+
+	applyPending: function(){
+		for (var i = 0; i < this.challenges.length; i++){
+			var challenge = this.challenges[i];
+			if (challenge.pending){
+				challenge.pending = false;
+				challenge.on = 1;
+				this.handleChallengeToggle(challenge.name, true);
+			}
+		}
+
+		for (var i = 0; i < this.conditions.length; i++){
+			var condition = this.conditions[i];
+			if (condition.pending){
+				condition.pending = false;
+				condition.on = 1;
+				this.handleConditionToggle(condition.name, true);
+			}
+		}
+	},
 	
 	getWeatherMod: function(season, res){
 		if (this.getChallenge("winterIsComing").on)
@@ -460,11 +590,15 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 	getName: function(model){
 
 		var meta = model.metadata;
+		name = meta.label
 		if (meta.researched){
-			return meta.label + "(" + meta.researched + ")";
-		} else {
-			return meta.label;
+			name += "(" + meta.researched + ")";
 		}
+		if (meta.pending){
+			name += " (" + $I("challendge.pending") + ")";
+		}
+
+		return name;
 	},
 
 	updateVisible: function(model){
@@ -479,13 +613,22 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 	},
 	
 	handleTogglableOnOffClick: function(model) {
+		var on = model.metadata.on;
+
 		this.inherited(arguments);
-		
-		if (model.metadata.name == "atheism")
+
+		if (!on && model.metadata.on)
 		{
-			this.game.upgrade({buildings: ["temple"]});
+			model.metadata.on = 0;
+			model.metadata.pending = !model.metadata.pending;
 		}
-	}
+
+		if (on && !model.metadata.on)
+		{
+			this.game.challenges.handleChallengeToggle(model.metadata.name, false);
+		}
+        }
+
 });
 
 dojo.declare("classes.ui.ConditionBtnController", com.nuclearunicorn.game.ui.BuildingBtnController, {
@@ -502,6 +645,10 @@ dojo.declare("classes.ui.ConditionBtnController", com.nuclearunicorn.game.ui.Bui
 	},
 
 	getName: function(model){
+		if (model.metadata.pending){
+			return model.metadata.label + " (" + $I("challendge.pending") + ")";
+		}
+
 		return model.metadata.label;
 	},
 
@@ -523,95 +670,15 @@ dojo.declare("classes.ui.ConditionBtnController", com.nuclearunicorn.game.ui.Bui
 		
 		if (!on && model.metadata.on)
 		{
-			if (model.metadata.name == "disableMetaResources")
-			{
-				var metaRes = ["karma", "paragon", "burnedParagon", "apotheosis"]
-				for (var i = 0; i < metaRes.length; i++)
-				{
-					var res = this.game.resPool.get(metaRes[i]);
-					res.reserveValue = res.value;
-					res.value = 0;
-				}
-				
-				if (this.game.challenges.getCondition("disableMetaTechs").on)
-				{
-					for (var i = 0; i < this.game.prestige.perks.length; i++)
-					{
-						var perk = this.game.prestige.perks[i];
-					
-						if (perk.defaultUnlocked)
-						{
-							perk.unlocked = true;
-						}
-					}
-				}
-			}
-			
-			if (model.metadata.name == "disableMetaTechs")
-			{
-				for (var i = 0; i < this.game.prestige.perks.length; i++)
-				{
-					var perk = this.game.prestige.perks[i];
-					perk.reserve = perk.researched;
-					perk.unlocked = false;
-					perk.researched = false;
-					
-					if (this.game.challenges.getCondition("disableMetaResources").on && perk.defaultUnlocked)
-					{
-						perk.unlocked = true;
-					}
-				}
-			}
-			
-			if (model.metadata.name == "disableApo")
-			{
-				this.game.religion.faithRatioReserve = this.game.religion.faithRatio;
-				this.game.religion.faithRatio = 0;
-				this.game.religion.tcratioReserve = this.game.religion.tcratio;
-				this.game.religion.tcratio = 0;
-				this.game.religion.tclevel = this.game.religion.getTranscendenceLevel();
-
-				for (var i = 0; i < this.game.religion.transcendenceUpgrades.length; i++)
-				{
-					this.game.religion.transcendenceUpgrades[i].reserve += this.game.religion.transcendenceUpgrades[i].val;
-					this.game.religion.transcendenceUpgrades[i].val = 0;
-					this.game.religion.transcendenceUpgrades[i].on = 0;
-				}
-			}
-			
-			if (model.metadata.name == "disableMisc")
-			{
-				var bls = this.game.resPool.get("sorrow");
-				bls.reserveValue = bls.value;
-				bls.value = 0;
-				
-				this.game.karmaZebrasReserve = this.game.karmaZebras;
-				this.game.karmaZebras = 0;
-				this.game.resPool.get("zebras").maxValue = 0;
-				this.game.resPool.get("zebras").reserveValue = this.game.resPool.get("zebras").value;
-				this.game.resPool.get("zebras").value = 0;
-			}
+			model.metadata.on = 0;
+			model.metadata.pending = !model.metadata.pending;
 		}
-		
+
 		if (on && !model.metadata.on)
 		{
-			if (model.metadata.name == "disableMetaResources")
-			{
-				if (this.game.challenges.getCondition("disableMetaTechs").on)
-				{
-					for (var i = 0; i < this.game.prestige.perks.length; i++)
-					{
-						var perk = this.game.prestige.perks[i];
-					
-						if (perk.defaultUnlocked)
-						{
-							perk.unlocked = false;
-						}
-					}
-				}
-			}
+			this.game.challenges.handleConditionToggle(model.metadata.name, false);
 		}
-	},
+	}
 });
 
 dojo.declare("classes.ui.ChallengePanel", com.nuclearunicorn.game.ui.Panel, {
@@ -665,10 +732,39 @@ dojo.declare("classes.tab.ChallengesTab", com.nuclearunicorn.game.ui.tab, {
 		this.conditionsPanel = new classes.ui.ConditionPanel($I("challendge.condition.panel.label"), this.game.challenges);
 		this.conditionsPanel.game = this.game;
 		this.conditionsPanel.render(container);
+
+		var applyPendingBtn = new com.nuclearunicorn.game.ui.ButtonModern({
+			name: $I("challendge.applyPending.label"),
+			description: $I("challendge.applyPending.desc"),
+			handler: dojo.hitch(this, function(){
+				this.game.challenges.applyPending();
+			}),
+			controller: new com.nuclearunicorn.game.ui.ButtonController(this.game, {
+				updateVisible: function (model) {
+					var visible = false;
+					for (var i = 0; i < this.game.challenges.challenges.length; i++){
+						if (this.game.challenges.challenges[i].pending){
+							visible = true
+						}
+					}
+
+					for (var i = 0; i < this.game.challenges.conditions.length; i++){
+						if (this.game.challenges.conditions[i].pending){
+							visible = true;
+						}
+					}
+
+					model.visible = visible;
+				}
+			})
+		}, this.game);
+		applyPendingBtn.render(container);
+		this.applyPendingBtn = applyPendingBtn;
     },
 	
 	update: function(){
 		this.challengesPanel.update();
 		this.conditionsPanel.update();
+		this.applyPendingBtn.update();
 	}
 });

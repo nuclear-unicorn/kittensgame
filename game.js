@@ -3399,6 +3399,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	_resetInternal: function(){
+		this.challenges.applyPending();
+
 		var kittens = this.resPool.get("kittens").value;
 		var karmaKittens = this.karmaKittens;
 		if (kittens > 35){

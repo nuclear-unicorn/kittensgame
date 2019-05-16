@@ -276,6 +276,9 @@
     "challendge.condition.disableRewards.desc": "All Challenge Rewards effects will be disabled until this is re-enabled. Challenges still grant rewards. Increases challenge rewards.",
     "challendge.condition.disableMisc.label": "No Miscellaneous",
     "challendge.condition.disableMisc.desc": "BLS and Iron Will Zebras will be reset until this is re-enabled. Does NOT increase challenge rewards.",
+    "challendge.pending": "Pending",
+    "challendge.applyPending.label": "Apply Pending Changes",
+    "challendge.applyPending.desc": "Turn on Challenges/Conditions marked as Pending immediately",
 
     "space.centaurusSystemMission.desc": "Centaurus System is a warm faraway star system.",
     "space.centaurusSystemMission.label": "Centaurus System Mission",
