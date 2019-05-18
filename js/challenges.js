@@ -589,7 +589,7 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 
     getDescription: function(model) {
 		if (this.game.bld.get("chronosphere").val > 0) {
-			var msgChronosphere = model.metadata.name == "ironWill" ? $I("challendge.btn.chronosphere.with.ironWill.desc"): $I("challendge.btn.chronosphere.desc");
+			var msgChronosphere = model.metadata.name == "ironWill" ? $I("challendge.btn.chronosphere.with.ironWill.desc") : "";
 		} else {
 			var msgChronosphere = "";
 		}
