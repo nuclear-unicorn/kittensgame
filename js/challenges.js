@@ -208,6 +208,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 	},
 
 	update: function(){
+		this.getChallenge("ironWill").on = this.game.ironWill;
 		// energy
 		if (this.getChallenge("energy").unlocked == false) {
 			if (this.game.resPool.energyProd != 0 || this.game.resPool.energyCons != 0) {
@@ -611,6 +612,7 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 
 	updateVisible: function(model){
 		model.visible = model.metadata.unlocked;
+		model.enabled = model.metadata.name != "ironWill"; // hack
 	},
 
 	getPrices: function(model) {
