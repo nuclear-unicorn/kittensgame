@@ -168,11 +168,19 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		for (var i = 0; i < this.challenges.length; i++){
 			var challenge = this.challenges[i];
 			challenge.on = 0;
+			challenge.researched = 0;
+			challenge.unlocked = (challenge.name == "ironWill" || challenge.name == "winterIsComing" || challenge.name == "anarchy")
+			challenge.pending = false;
+			challenge.rewardable = false;
+			challenge.rewarded = false;
 		}
 		
 		for (var i = 0; i < this.conditions.length; i++){
 			var condition = this.conditions[i];
 			condition.on = 0;
+			condition.pending = false;
+			condition.rewardable = false;
+			condition.resets = 0;
 		}
 	},
 
