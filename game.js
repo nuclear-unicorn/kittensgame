@@ -1562,36 +1562,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.timeTab.visible = (this.science.get("calendar").researched || this.time.getVSU("usedCryochambers").val > 0);
 		this.challengesTab.visible = this.prestige.getPerk("adjustmentBureau").researched || this.prestige.getPerk("adjustmentBureau").reserve;
 
-                //copied from workshop.js, very bad
-                //when that code gets moved somewhere better call it here
-		var scienceMaxBuilding = this.bld.getEffect("scienceMax"),
-			scienceMaxCompendiaCap =  this.bld.getEffect("scienceMaxCompendia"),
-			compendiaScienceMax = Math.floor(this.resPool.get("compedium").value * 10);
-
-		//iw compedia cap is set to 1000% instead of 100%
-		var iwScienceCapRatio = this.ironWill ? 10 : 1;
-
-		var blackLibrary = this.religion.getTU("blackLibrary");
-		if (this.prestige.getPerk("codexLeviathanianus").researched){
-			var ttBoostRatio = (
-				0.05 * (
-					1 + 
-					blackLibrary.val * (
-						blackLibrary.effects["compendiaTTBoostRatio"] + 
-						this.getEffect("blackLibraryBonus") )
-				)
-			);
-			iwScienceCapRatio *= (1 + ttBoostRatio * this.religion.getTranscendenceLevel());
-		}
-
-		if (compendiaScienceMax > (scienceMaxBuilding * iwScienceCapRatio + scienceMaxCompendiaCap)){
-			compendiaScienceMax = (scienceMaxBuilding * iwScienceCapRatio + scienceMaxCompendiaCap);
-		}
-
-		this.workshop.effectsBase["scienceMax"] = compendiaScienceMax;
-		var cultureBonusRaw = Math.floor(this.resPool.get("manuscript").value);
-		this.workshop.effectsBase["cultureMax"] = this.getTriValue(cultureBonusRaw, 0.01);
-		this.workshop.effectsBase["oilMax"] = Math.floor(this.resPool.get("tanker").value * 500);
+		this.workshop.calculateMaxEffects();
 
                 this.updateCaches();
 

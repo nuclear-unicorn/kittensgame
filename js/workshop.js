@@ -2328,14 +2328,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		this.game.village.sim.clearCraftJobs();
 	},
 
-	update: function(){
-		this.fastforward(1 / this.game.calendar.ticksPerDay);
-	},
-
-	fastforward: function(daysOffset) {
-		var times = daysOffset * this.game.calendar.ticksPerDay;
-
-		//-------------	 this is a poor place for this kind of functionality ------------
+	calculateMaxEffects: function(){
 		var scienceMaxBuilding = this.game.bld.getEffect("scienceMax"),
 			scienceMaxCompendiaCap =  this.game.bld.getEffect("scienceMaxCompendia"),
 			compendiaScienceMax = Math.floor(this.game.resPool.get("compedium").value * 10);
@@ -2365,6 +2358,17 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		var cultureBonusRaw = Math.floor(this.game.resPool.get("manuscript").value);
 		this.effectsBase["cultureMax"] = this.game.getTriValue(cultureBonusRaw, 0.01);
 		this.effectsBase["oilMax"] = Math.floor(this.game.resPool.get("tanker").value * 500);
+	},
+
+	update: function(){
+		this.fastforward(1 / this.game.calendar.ticksPerDay);
+	},
+
+	fastforward: function(daysOffset) {
+		var times = daysOffset * this.game.calendar.ticksPerDay;
+
+		//-------------	 this is a poor place for this kind of functionality ------------
+		this.calculateMaxEffects();
 
 		//sanity check
 		if (this.game.village.getFreeEngineer() < 0){
