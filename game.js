@@ -3448,8 +3448,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		var saveRatio = this.bld.get("chronosphere").val > 0 ? this.getEffect("resStasisRatio") : 0; // resStasisRatio excepted when challenge
 		dojo.mixin(lsData.game, {
-			karmaKittens: 		karmaKittens,
-			karmaZebras: 		karmaZebras,
+			karmaKittens: 		(this.challenges.getCondition("disableMetaResources").on && this.challenges.getCondition("disableMetaResources").resets == 0) ? 0 : karmaKittens,
+			karmaZebras: 		(this.challenges.getCondition("disableMisc").on && this.challenges.getCondition("disableMisc").resets == 0) ? 0 : karmaZebras,
+			karmaZebrasReserve:	(this.challenges.getCondition("disableMisc").on && this.challenges.getCondition("disableMisc").resets == 0) ? karmaZebras : 0,
 			ironWill : 			saveRatio > 0 ? false : true,			//chronospheres will disable IW
 			deadKittens: 		0,
 			isCMBREnabled:		false
@@ -3499,11 +3500,20 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				if (res.maxValue || (this.challenges.getCondition("disableChrono").on && !res.persists)) {
 					newRes.reserveValue = (this.challenges.getCondition("disableChrono").on ? res.reserveValue : 0) + value;
 				}
+				else if ((res.name == "paragon" || res.name == "burnedParagon" || res.name == "apotheosis") && this.challenges.getCondition("disableMetaResources").on && this.challenges.getCondition("disableMetaResources").resets == 0) {
+					newRes.reserveValue = this.resPool.get(res.name).reserveValue + value;
+				}
 				else {
 					newRes.value = value;
 				}
 				newResources.push(newRes);
 			}
+		}
+
+		if (this.challenges.getCondition("disableMetaResources").on && this.challenges.getCondition("disableMetaResources").resets == 0) {
+			var newRes = this.resPool.createResource("karma");
+			newRes.reserveValue = this.getTriValue(Math.round(this.getTriValueOrigin(this.resPool.get("karma").reserveValue, 5)) + karmaKittens, 5);
+			newResources.push(newRes);
 		}
 
 		var newKittens= [];

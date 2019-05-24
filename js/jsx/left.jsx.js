@@ -111,7 +111,7 @@ WResourceRow = React.createClass({
 
             if (game.challenges.getChallenge("winterIsComing").on)
             {
-                var modifier = (game.challenges.getChallengePenalty("winterIsComing"), (game.calendar.weather || "normal") + "Mod");
+                var modifier = game.challenges.getChallengePenalty("winterIsComing", (game.calendar.weather || "normal") + "Mod");
             }
             else
             {

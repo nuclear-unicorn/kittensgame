@@ -553,6 +553,12 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
                         {
                                 res.value += res.reserveValue;
                                 res.reserveValue = 0;
+
+                                if (res.name == "karma")
+                                {
+                                        this.game.karmaKittens = Math.round(this.game.getTriValueOrigin(res.value, 5));
+                                        res.value = this.game.getTriValue(this.game.karmaKittens, 5);
+                                }
                         }
                 }
                 else
@@ -668,6 +674,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 			} else if (res.value == 0 && res.unlocked == true) {
 				if (res.name == "zebras" ||
 					res.name == "paragon" ||
+					res.name == "apotheosis" ||
 					res.name == "elderBox"){
 					res.unlocked = false;
 				}

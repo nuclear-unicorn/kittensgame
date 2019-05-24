@@ -162,9 +162,13 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 	}],
 
 	game: null,
+	rewardable: false,
 	rewarded: false,
 
 	resetState: function(){
+		this.rewardable = false;
+		this.rewarded = false;
+
 		for (var i = 0; i < this.challenges.length; i++){
 			var challenge = this.challenges[i];
 			challenge.on = 0;
@@ -186,6 +190,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 
 	save: function(saveData){
 		saveData.challenges = {
+			rewardable: this.rewardable,
 			rewarded: this.rewarded,
 			challenges: this.filterMetadata(this.challenges, ["name", "researched", "unlocked", "on", "pending", "rewardable", "rewarded"]),
 			conditions: this.filterMetadata(this.conditions, ["name", "on", "pending", "rewardable", "resets"])
@@ -197,6 +202,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			return;
 		}
 
+		this.rewardable = saveData.challenges.rewardable;
 		this.rewarded = saveData.challenges.rewarded;
 
 		this.loadMetadata(this.challenges, saveData.challenges.challenges);
@@ -334,7 +340,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			}
 		}
 		
-		if (!this.rewarded)
+		if (this.rewardable && !this.rewarded)
 		{
 			apotheosis += 1;
 			this.rewarded = true;
@@ -449,11 +455,13 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				for (var i = 0; i < metaRes.length; i++)
 				{
 					var res = this.game.resPool.get(metaRes[i]);
-					res.reserveValue = res.value;
+					res.reserveValue += res.value;
 					res.value = 0;
 				}
 				
-				if (getCondition("disableMetaTechs").on)
+				this.game.karmaKittens = 0;
+				
+				if (this.getCondition("disableMetaTechs").on)
 				{
 					for (var i = 0; i < this.game.prestige.perks.length; i++)
 					{
@@ -476,7 +484,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 					perk.unlocked = false;
 					perk.researched = false;
 					
-					if (getCondition("disableMetaResources").on && perk.defaultUnlocked)
+					if (this.getCondition("disableMetaResources").on && perk.defaultUnlocked)
 					{
 						perk.unlocked = true;
 					}
@@ -516,7 +524,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		{
 			if (name == "disableMetaResources")
 			{
-				if (getCondition("disableMetaTechs").on)
+				if (this.getCondition("disableMetaTechs").on)
 				{
 					for (var i = 0; i < this.game.prestige.perks.length; i++)
 					{
@@ -623,6 +631,11 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 	},
 	
 	handleTogglableOnOffClick: function(model) {
+		if (model.metadata.name == "ironWill")
+		{
+			return;
+		}
+
 		var on = model.metadata.on;
 
 		this.inherited(arguments);
