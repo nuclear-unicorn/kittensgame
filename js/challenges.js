@@ -518,6 +518,13 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				this.game.resPool.get("zebras").maxValue = 0;
 				this.game.resPool.get("zebras").reserveValue = this.game.resPool.get("zebras").value;
 				this.game.resPool.get("zebras").value = 0;
+				
+				var box = this.game.resPool.get("elderBox");
+				box.reserveValue = box.value;
+				box.value = 0;
+				var paper = this.game.resPool.get("wrappingPaper");
+				paper.reserveValue = paper.value;
+				paper.value = 0;
 			}
 		}
 		else

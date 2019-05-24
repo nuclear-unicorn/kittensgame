@@ -274,7 +274,7 @@
     "challendge.condition.disableRewards.label": "No Challenge Rewards",
     "challendge.condition.disableRewards.desc": "All Challenge Rewards effects will be disabled until this is re-enabled. Challenges still grant rewards. Increases challenge rewards.",
     "challendge.condition.disableMisc.label": "No Miscellaneous",
-    "challendge.condition.disableMisc.desc": "BLS and Iron Will Zebras will be reset until this is re-enabled. Does NOT increase challenge rewards.",
+    "challendge.condition.disableMisc.desc": "BLS, Iron Will Zebras, and Present Boxes/Wrapping Paper will be reset until this is re-enabled. Does NOT increase challenge rewards.",
     "challendge.pending": "Pending",
     "challendge.applyPending.label": "Apply Pending Changes",
     "challendge.applyPending.desc": "Turn on Challenges/Conditions marked as Pending immediately",

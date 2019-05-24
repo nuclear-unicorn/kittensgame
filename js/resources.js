@@ -561,6 +561,14 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
                                 }
                         }
                 }
+                else if (res.name == "elderBox" || res.name == "wrappingPaper")
+                {
+                        if ((this.game.loading || !this.game.challenges.getCondition("disableMisc").on) && res.reserveValue)
+                        {
+                                res.value += res.reserveValue;
+                                res.reserveValue = 0;
+                        }
+                }
                 else
                 {
                         if ((this.game.loading || !this.game.challenges.getCondition("disableChrono").on) && res.reserveValue && (!res.maxValue || res.value < res.maxValue)) {
@@ -675,7 +683,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 				if (res.name == "zebras" ||
 					res.name == "paragon" ||
 					res.name == "apotheosis" ||
-					res.name == "elderBox"){
+					res.name == "elderBox" ||
+					res.name == "wrappingPaper"){
 					res.unlocked = false;
 				}
 			}
