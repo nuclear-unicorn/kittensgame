@@ -617,7 +617,7 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 		var meta = model.metadata;
 		name = meta.label
 		if (meta.researched){
-			name += "(" + meta.researched + ")";
+			name += " (" + meta.researched + ")";
 		}
 		if (meta.pending){
 			name += " (" + $I("challendge.pending") + ")";
