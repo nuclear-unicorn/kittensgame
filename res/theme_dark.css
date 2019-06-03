@@ -14,13 +14,38 @@
 
 .scheme_dark .btn {
 	color: #DCDCDC;
-	border: solid 1px #DE8D47;
+	border: solid 1px rgb(184, 117, 58);
 }
 
-.scheme_dark .btn:hover {
-	border: solid 1px orange;
-	background: inherit;
+.scheme_dark .btn.disabled {
+	color: #DCDCDC;
+	border: solid 1px rgb(104, 66, 33);
 }
+
+.scheme_dark .btn:hover{
+	border: solid 1px orange;
+	/*background: inherit;*/
+	background-color: #222222;
+	
+}
+
+.scheme_dark ::-webkit-scrollbar-thumb {
+    background: rgb(56, 54, 51);
+	border-radius: 40px;
+}
+
+.scheme_dark ::-webkit-scrollbar-track {
+    background: #201F1D;
+    border-radius: 50px;
+}
+
+/*.scheme_dark .btn:hover span {
+	text-shadow: -0.01ex 0 #DCDCDC, 0.01ex 0 #DCDCDC;
+}
+
+.scheme_dark .btn:hover span.limited {
+	text-shadow: -0.06ex 0 #b32222, 0.06ex 0 #b32222;
+}*/
 
 .scheme_dark .btn.disabled {
 	border: solid 1px #805326;

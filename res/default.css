@@ -116,8 +116,21 @@ div#gameLog {
     right: 5px;
 }
 
-.activeTab {
+.tab {
     text-decoration: none;
+}
+
+.bldTopContainer {
+    padding-bottom: 5px;
+	margin-bottom: 15px;
+}
+
+.bldTopContainer > a, .bldTopContainer > span {
+    opacity: 0.7;
+    text-decoration: none;
+}
+
+.activeTab {
     color: black;
 }
 
@@ -260,7 +273,7 @@ select>option {
 }
 
 .disabled {
-    color: #999
+    color: #999;
 }
 
 .tipr_content {

@@ -924,6 +924,60 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.hashrateLevel.title"),
 				type: "fixed",
 				calculation: "constant"
+			},
+
+			"corruptionBoostRatio": {
+				title: $I("effectsMgr.statics.corruptionBoostRatio.title"),
+				type: "ratio"
+			},
+
+			"blsCorruptionRatio": {
+				title: $I("effectsMgr.statics.blsCorruptionRatio.title"),
+				type: "ratio"
+			},
+
+			"baseMetalMaxRatio": {
+				title: $I("effectsMgr.statics.baseMetalMaxRatio.title"),
+				type: "ratio"
+			},
+
+			"scienceMaxCompendia": {
+				title: $I("effectsMgr.statics.scienceMaxCompendia.title"),
+				type: "fixed"
+			},
+
+			"uplinkDCRatio": {
+				title: $I("effectsMgr.statics.uplinkDCRatio.title"),
+				type: "ratio"
+			},
+
+			"uplinkLabRatio": {
+				title: $I("effectsMgr.statics.uplinkLabRatio.title"),
+				type: "ratio"
+			},
+
+			"dataCenterAIRatio": {
+				title: $I("effectsMgr.statics.dataCenterAIRatio.title"),
+			},
+
+			"compendiaTTBoostRatio": {
+				title: $I("effectsMgr.statics.compendiaTTBoostRatio.title"),
+				type: "ratio"
+			},
+
+			"blackLibraryBonus": {
+				title: $I("effectsMgr.statics.blackLibraryBonus.title"),
+				type: "ratio"
+			},
+
+			"solarFarmSeasonRatio": {
+				title: $I("effectsMgr.statics.solarFarmSeasonRatio.title"),
+				type: "fixed"
+			},
+
+			"tectonicBonus": {
+				title: $I("effectsMgr.statics.tectonicBonus.title"),
+				type: "ratio"
 			}
 		}
 	}
@@ -1608,9 +1662,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	//btw, ie11 is horrible crap and should not exist
 	saveExport: function(){
-		this.save();
+		var data = this.save();
+		data = JSON.stringify(data);
 
-		var data = LCstorage["com.nuclearunicorn.kittengame.savedata"];
         var encodedData;
         if (LZString.compressToBase64) {
             encodedData = LZString.compressToBase64(data);
@@ -1643,7 +1697,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	saveExportDropbox: function(){
 		this.save();
-		var data = LCstorage["com.nuclearunicorn.kittengame.savedata"];
+		var data = this.save();
+		data = JSON.stringify(data);
 		var lzdata = LZString.compressToBase64(data);
 
 
@@ -1660,7 +1715,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var authUrl = game.dropBoxClient.getAuthenticationUrl('https://' + window.location.host + '/games/kittens/dropboxauth_v2.html');
 
 		window.open(authUrl, 'DropboxAuthPopup', 'dialog=yes,dependent=yes,scrollbars=yes,location=yes');
-		window.addEventListener('message',function(e) {
+		var handler = function(e) {
+			window.removeEventListener('message', handler);
+
 			if (window.location.origin !== e.origin) {
 				callback("Unable to save file");
 			} else {
@@ -1676,7 +1733,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 					callback("Unable to save file:" + JSON.stringify(error));
 				});
 			}
-		},false);
+		};
+		window.addEventListener('message', handler ,false);
 	},
 
 	saveImportDropbox: function(){
@@ -1697,23 +1755,25 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var authUrl = game.dropBoxClient.getAuthenticationUrl('https://' + window.location.host + '/games/kittens/dropboxauth_v2.html');
 
 		window.open(authUrl, 'DropboxAuthPopup', 'dialog=yes,dependent=yes,scrollbars=yes,location=yes');
-		window.addEventListener('message',function(e) {
-				if (window.location.origin !== e.origin) {
-					callback("Unable to load file");
-				} else {
-					var dbxt = new Dropbox.Dropbox({accessToken: e.data["#access_token"]});
-					dbxt.filesDownload({path: "/kittens.save"}).then(function (response) {
-						var blob = response.fileBlob;
-						var reader = new FileReader();
-						reader.addEventListener("loadend", function() {
-							game.saveImportDropboxText(reader.result, callback);
-						});
-						reader.readAsText(blob);
-					}).catch(function (error) {
-						callback("Unable to load file:" + JSON.stringify(error));
+		var handler = function(e) {
+			window.removeEventListener('message', handler);
+			if (window.location.origin !== e.origin) {
+				callback("Unable to load file");
+			} else {
+				var dbxt = new Dropbox.Dropbox({accessToken: e.data["#access_token"]});
+				dbxt.filesDownload({path: "/kittens.save"}).then(function (response) {
+					var blob = response.fileBlob;
+					var reader = new FileReader();
+					reader.addEventListener("loadend", function() {
+						game.saveImportDropboxText(reader.result, callback);
 					});
-				}
-		},false);
+					reader.readAsText(blob);
+				}).catch(function (error) {
+					callback("Unable to load file:" + JSON.stringify(error));
+				});
+			}
+		}
+		window.addEventListener('message', handler ,false);
 	},
 
     saveImportDropboxFileRead: function(callback){
@@ -3177,6 +3237,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 			this._lastFrameTimestamp = this.timestamp();
 		}
+		this._publish("game/start");
 	},
 
 	/**

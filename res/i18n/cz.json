@@ -127,7 +127,7 @@
     "village.job.geologist": "Geolog",
     "village.job.geologist.desc": "+0.075 uhlí za sekundu (may be upgraded)",
     "village.job.engineer": "Inženýr",
-    "village.job.engineer.desc": "Inženýr pracuje v jedné továrně a automatizuje výrobu produktů.<br/>Přiřaď svoje inženýry v záložce Průmysl a oni automaticky vytvoří produkt každých 10 minut.",
+    "village.job.engineer.desc": "Inženýr pracuje v jedné továrně a automatizuje výrobu produktů.<br />Přiřaď svoje inženýry v záložce Průmysl a oni automaticky vytvoří produkt každých 10 minut.",
     "village.msg.kitten": "koťě",
     "village.msg.kittens": "koťat",
     "village.msg.starved": "umřelo hlady.",

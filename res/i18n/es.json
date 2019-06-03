@@ -138,7 +138,7 @@
     "village.msg.hunt.ivory": "marfil",
     "village.msg.hunt.gold": "oro",
     "village.census.filter.all": "Todos los trabajos",
-    "village.job.engineer.desc": "El ingeniero puede operar una fábrica para automatizar la producción de recursos. <br/> Asigne a sus ingenieros en la pestaña taller, que crearán automáticamente una vez cada 10 minutos.",
+    "village.job.engineer.desc": "El ingeniero puede operar una fábrica para automatizar la producción de recursos. <br /> Asigne a sus ingenieros en la pestaña taller, que crearán automáticamente una vez cada 10 minutos.",
     "village.bonus.desc.engineer": "Bonificación de elaboración",
     "village.bonus.desc.merchant": "bonificación comercial",
     "village.bonus.desc.manager": "Bonificación de caza",

@@ -138,7 +138,7 @@
     "village.msg.hunt.ivory": "marfim",
     "village.msg.hunt.gold": "ouro",
     "village.census.filter.all":"Qualquer profissão",
-    "village.job.engineer.desc": "Engenheiros podem operar uma fabrica para automatizar a produção de recursos.<br/>Atribua seus engenheiros na aba da oficina, e eles fabricarão automaticamente uma vez a cada 10 minutos.",
+    "village.job.engineer.desc": "Engenheiros podem operar uma fabrica para automatizar a produção de recursos.<br />Atribua seus engenheiros na aba da oficina, e eles fabricarão automaticamente uma vez a cada 10 minutos.",
     "village.bonus.desc.engineer": "Bônus de fabricação",
     "village.bonus.desc.merchant": "Bônus de comércio",
     "village.bonus.desc.manager": "Bônus de caçada",

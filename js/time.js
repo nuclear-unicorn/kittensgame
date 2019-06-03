@@ -184,6 +184,24 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
         this.game.resPool.enforceLimits(resourceLimits);
 
+         // Transfer chronoheat to the forge
+        if (this.heat > 0) {								//if we have spare chronoheat
+            var perTickHeatTransfer = Math.abs(this.game.getEffect("heatPerTick"));
+            var heatAttemptTransfer = daysOffset / this.game.calendar.ticksPerDay * perTickHeatTransfer;
+            var heatTransfer = Math.min(this.heat, heatAttemptTransfer);
+
+            var blastFurance = this.getCFU("blastFurnace");
+            blastFurance.heat += heatTransfer
+            this.heat -= heatTransfer;
+
+            // Shatter time crystals from the heated forge
+            if (blastFurance.on && blastFurance.isAutomationEnabled && blastFurance.heat >= 100){
+                var amt = Math.floor(blastFurance.heat / 100);
+                blastFurance.heat -= 100 * amt;
+                this.game.time.shatter(amt);
+            }
+        }
+
         if (daysOffset > 3) {
             this.game.msg($I("time.redshift", [daysOffset]) + (numberEvents ? $I("time.redshift.ext",[numberEvents]) : ""));
         }
@@ -724,7 +742,7 @@ dojo.declare("classes.ui.ChronoforgeWgt", [mixin.IChildrenAware, mixin.IGameAwar
     constructor: function(game){
         this.addChild(new classes.ui.time.ShatterTCBtn({
             name: "Combust TC",
-            description: "Shatter TC and unleash the stored temporal energy. (If you have a chrono furnace, this will fuel it instead.)<bt> You will jump one year in the future. The price can increase over time.",
+            description: $I("time.shatter.tc.desc"),
             prices: [{name: "timeCrystal", val: 1}],
             controller: new classes.ui.time.ShatterTCBtnController(game)
         }, game));
@@ -820,7 +838,7 @@ dojo.declare("classes.ui.VoidSpaceWgt", [mixin.IChildrenAware, mixin.IGameAware]
 
 		this.addChild(new com.nuclearunicorn.game.ui.ButtonModern({
             name: "Fix Cryochamber",
-            description: "Tear the space-time to get back a cryochamber before it was used.",
+            description: $I("time.fixCryochambers.desc"),
             prices: [
 				{name: "timeCrystal", val: 100},
 				{name: "void", val: 500},
@@ -856,7 +874,7 @@ dojo.declare("classes.ui.ResetWgt", [mixin.IChildrenAware, mixin.IGameAware], {
     constructor: function(game){
         this.addChild(new com.nuclearunicorn.game.ui.ButtonModern({
             name: "Reset",
-            description: "Reset current timeline.",
+            description: $I("time.reset.desc"),
             prices: [],
             handler: function(btn){
                 game.reset();
@@ -878,8 +896,7 @@ dojo.declare("classes.ui.ResetWgt", [mixin.IChildrenAware, mixin.IGameAware], {
     update: function(){
         this.inherited(arguments);
 
-        var msg = "Reseting the timeline will start the game from the scratch. You will keep all of your statistic and achievements. You may receive various game bonuses.<br>";
-        msg += "<br>Resetting at this point will give you:<br>";
+        var msg = $I("time.reset.instructional");
 
         var kittens = this.game.resPool.get("kittens").value;
         var stripe = 5;
@@ -892,11 +909,11 @@ dojo.declare("classes.ui.ResetWgt", [mixin.IChildrenAware, mixin.IGameAware], {
 			paragonPoints = (kittens - 70);
 		}
 
-        msg += "Karma points: " + karmaPoints;
-        msg += "<br>Paragon points: " + paragonPoints;
+        msg += "<br>" + $I("time.reset.karma") + ": " + karmaPoints;
+        msg += "<br>" + $I("time.reset.paragon") + ": " + paragonPoints;
 
         if (this.game.ironWill){
-            msg += "<br>Zebra hunters: " + this.game._getBonusZebras();
+            msg += "<br>" + $I("time.reset.zebra") + ": " + this.game._getBonusZebras();
         }
 
 

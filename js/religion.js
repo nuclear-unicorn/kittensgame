@@ -140,9 +140,13 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 
 		if (this.game.prestige.getPerk("voidOrder").researched) {
-			var orderBonus = this.game.calcResourcePerTick("faith") * 0.1 * (1 + this.game.getEffect("voidResonance"));	//10% of faith transfer per priest
-			this.faith += orderBonus * (1 + this.getFaithBonus() * 0.25);	//25% of the apocrypha bonus
-			this.game.resPool.addResEvent("faith", -orderBonus);
+			if (!(this.game.calendar.day < 0)){ //do not accumulate faith with active Temporal Paradox
+				var orderBonus = this.game.calcResourcePerTick("faith") * 0.1 * (1 + this.game.getEffect("voidResonance"));	//10% of faith transfer per priest
+				this.faith += orderBonus * (1 + this.getFaithBonus() * 0.25);	//25% of the apocrypha bonus
+				if (this.game.resPool.get("faith").value != this.game.resPool.get("faith").maxValue){ //do not drain faith if it is in cap value
+					this.game.resPool.addResEvent("faith", -orderBonus);
+				}
+			}
 		}
 	},
 

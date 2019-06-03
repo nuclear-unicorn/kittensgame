@@ -1,3 +1,24 @@
+v 1.4.6.2 (29 may 2019)
+Major: fixed typo in Orbital Geodesy description
+
+Minor:
+TF Cells / QDot Cells
+Esc is back + keypad numbers to change tabs
+Backported Redshift Heat
+40K Runner mode
+
+Minor ui tweaks for dark color theme
+
+__
+Changes by patsy:
+
+- Fix many buttons not highlighting resources on hover
+- Add resource highlight to trade buttons
+- Fix double compressed exports
+- Fix slightly malformed XHTML tags
+- Some text fixes
+- Fire an event when the game starts
+
 v 1.4.6.0 (22 apr 2019)
 
 Compedium science cap will now be limited by 100% of building science

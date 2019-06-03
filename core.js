@@ -1622,7 +1622,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 	},
 
 	getSelectedObject: function(){
-		return null;
+		return this.model;
 	}
 });
 
@@ -1849,9 +1849,6 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 	toggleHref: null,
 	hasResourceHover: true,
 
-	getSelectedObject: function(){
-		return this.model;
-	},
 	/**
 	 * Render button links like off/on and sell
 	 */

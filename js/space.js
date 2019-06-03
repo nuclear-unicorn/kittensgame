@@ -651,8 +651,8 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					{name: "kerosene", 		val: 7500   }
 				],
 				effects: {
-					"starchartPerTickBaseSpace": 0,
-					"scienceMax": 0,
+					"starchartPerTickBaseSpace": 0.125,
+					"scienceMax": 25000,
 					"relicPerDay": 0
 				},
 				action: function(self, game){

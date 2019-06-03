@@ -127,7 +127,7 @@
     "village.job.geologist": "Géologue",
     "village.job.geologist.desc": "+0,075 charbon par seconde (peut être amélioré)",
     "village.job.engineer": "Ingénieur",
-    "village.job.engineer.desc": "L'ingénieur peut exploiter une usine pour automatiser la production de ressources.<br/>Affectez vos ingénieurs depuis l'onglet Atelier, la vitesse de fabrication dépend de la complexité des matériaux",
+    "village.job.engineer.desc": "L'ingénieur peut exploiter une usine pour automatiser la production de ressources.<br />Affectez vos ingénieurs depuis l'onglet Atelier, la vitesse de fabrication dépend de la complexité des matériaux",
     "village.msg.kitten": "chaton",
     "village.msg.kittens": "chatons",
     "village.msg.starved": "meurt de faim.",

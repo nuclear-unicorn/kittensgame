@@ -86,7 +86,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             this.game.stats.getStat("totalClicks").val += 1;
         });
 
-        /*dojo.connect($("html")[0], "onkeyup", this, function (event) {
+        dojo.connect($("html")[0], "onkeyup", this, function (event) {
             // Allow user extensibility to keybindings in core events
             var keybinds = [
                 {
@@ -168,17 +168,40 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
                     action: function(){ $('div.dialog:visible').last().hide(); }
                 }
             ];
-            var allKeybinds = typeof userKeybinds != 'undefined' ? userKeybinds.concat(keybinds) : keybinds;
+
+            //babel someday
+
+            /*var allKeybinds = typeof userKeybinds != 'undefined' ? userKeybinds.concat(keybinds) : keybinds;
             var keybind = allKeybinds.find(function(x){
                 return x.key === event.key &&
                 x.shift == event.shiftKey &&
                 x.alt == event.altKey &&
-                x.control == event.ctrlKey; });
+                x.control == event.ctrlKey; });*/
+
+            var keybind = null;
+            for (var i in keybinds){
+                var k = keybinds[i];
+                if (k.key === event.key &&
+                    k.shift == event.shiftKey &&
+                    k.alt == event.altKey &&
+                    k.control == event.ctrlKey
+                ){
+                    keybind = k;
+                    break;
+                }
+            }
+
+            
+            var isTabNumber = (event.keyCode >= 48 && event.keyCode <= 57);
+            //console.log(isTabNumber, event.keyCode);
 
             if (keybind && keybind.action) {
                 // If a keybind is found and has a specific action
                 keybind.action();
-            } else if (keybind && keybind.name != this.game.ui.activeTabId) {
+            } else if (isTabNumber){
+                this.game.ui.activeTabId = this.game.tabs[event.keyCode == 48 ? 9 : event.keyCode - 49].tabId;
+                this.game.ui.render();
+            } else if (keybind && keybind.name != this.game.ui.activeTabId ) {
                 // If a keybound is found and the tab isn't current
                 for (var i = 0; i < this.game.tabs.length; i++){
                     if (this.game.tabs[i].tabId === keybind.name && this.game.tabs[i].visible){
@@ -188,7 +211,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
                     }
                 }
             }
-        });*/
+        });
     },
 
     setGame: function(game){

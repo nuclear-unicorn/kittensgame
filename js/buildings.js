@@ -2415,10 +2415,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 		this.bldGroups = [];
 
 		var topContainer = dojo.create("div", {
-			style: {
-				paddingBottom : "5px",
-				marginBottom: "15px"
-			}
+			className: "bldTopContainer"
 		}, content);
 
 		var groups = dojo.clone(this.game.bld.buildingGroups, true);
@@ -2468,7 +2465,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 			var separator = null;
 			if (i != 0){
 				separator = dojo.create("span", {
-					innerHTML: " | ",
+					innerHTML: " &#183; ",
 					style: {
 						display: hasVisibleBldngs ? "" : "none"
 					}
