@@ -2049,6 +2049,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				if (save.challenges.currentChallenge) {
 					this.challenges.getCondition("disableChrono").on = 1;
 					this.challenges.getCondition("disableChrono").rewardable = true;
+					this.challenges.rewardable = true;
 				}
 			}
 			

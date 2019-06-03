@@ -202,7 +202,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			return;
 		}
 
-		this.rewardable = saveData.challenges.rewardable;
+		if (saveData.challenges.rewardable)
+			this.rewardable = saveData.challenges.rewardable;
 		this.rewarded = saveData.challenges.rewarded;
 
 		this.loadMetadata(this.challenges, saveData.challenges.challenges);
