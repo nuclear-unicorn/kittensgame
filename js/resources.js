@@ -701,6 +701,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 			var resPerTick = game.getResourcePerTick(res.name, false);
 			this.addResPerTick(res.name, resPerTick);
+			this.handleLimits(res);
                         this.handleReserve(res);
 
 		}
