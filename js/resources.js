@@ -539,7 +539,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 	handleLimits: function(res) {
                 if(res.maxValue && res.value > res.maxValue) {
-                        if (this.game.migrating) {
+                        if (this.game.migrating && res.name != "temporalFlux") {
                                 // Give the benefit of the doubt
                                 res.reserveValue = res.value - res.maxValue;
                         }
