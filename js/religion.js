@@ -672,7 +672,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"compendiaTTBoostRatio" : 0.02
 		},
 		unlocked: false,
-		flavor: $I("religion.tu.singularity.flavor")
+		flavor: $I("religion.tu.blackLibary.flavor")
 	},{
 		name: "blackRadiance",
 		label: $I("religion.tu.blackRadiance.label"),
@@ -977,14 +977,14 @@ dojo.declare("classes.ui.religion.SacrificeBtnController", com.nuclearunicorn.ga
 			visible: true,
 			title: $I("religion.sacrificeBtn.all"),
 			handler: function(event, callback){
-				self.sacrificeAll(model, event, callback);
+				self.sacrificeAll(this.model, event, callback);
 			}
 		};
 		model.x10Link = {
-			visible: this._canAfford(model) >= 10,
+			visible: self._canAfford(model) >= 10,
 			title: "x10",
 			handler: function(event, callback){
-				self.sacrificeX10(model, event, callback);
+				self.sacrificeX10(this.model, event, callback);
 			}
 		};
 		return model;
@@ -1095,14 +1095,14 @@ dojo.declare("classes.ui.religion.SacrificeAlicornsBtnController", com.nuclearun
 			visible: true,
 			title: $I("religion.sacrificeBtn.all"),
 			handler: function(event, callback){
-				self.sacrificeAll(model, event, callback);
+				self.sacrificeAll(this.model, event, callback);
 			}
 		};
 		model.x10Link = {
-			visible: this._canAfford(model) >= 10,
+			visible: self._canAfford(model) >= 10,
 			title: "x10",
 			handler: function(event, callback){
-				self.sacrificeX10(model, event, callback);
+				self.sacrificeX10(this.model, event, callback);
 			}
 		};
 		return model;
@@ -1224,14 +1224,14 @@ dojo.declare("classes.ui.religion.RefineTCBtnController", com.nuclearunicorn.gam
 			visible: true,
 			title: $I("religion.sacrificeBtn.all"),
 			handler: function(event, callback){
-				self.refineAll(model, event, callback);
+				self.refineAll(this.model, event, callback);
 			}
 		};
 		model.x25Link = {
-			visible: this._canAfford(model) >= 25,
+			visible: self._canAfford(model) >= 25,
 			title: "x25",
 			handler: function(event, callback){
-				self.refineX25(model, event, callback);
+				self.refineX25(this.model, event, callback);
 			}
 		};
 		return model;

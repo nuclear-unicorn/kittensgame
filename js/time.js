@@ -187,11 +187,11 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
          // Transfer chronoheat to the forge
         if (this.heat > 0) {								//if we have spare chronoheat
             var perTickHeatTransfer = Math.abs(this.game.getEffect("heatPerTick"));
-            var heatAttemptTransfer = daysOffset / this.game.calendar.ticksPerDay * perTickHeatTransfer;
+            var heatAttemptTransfer = daysOffset * this.game.calendar.ticksPerDay * perTickHeatTransfer;
             var heatTransfer = Math.min(this.heat, heatAttemptTransfer);
 
             var blastFurance = this.getCFU("blastFurnace");
-            blastFurance.heat += heatTransfer
+            blastFurance.heat += heatTransfer;
             this.heat -= heatTransfer;
 
             // Shatter time crystals from the heated forge
@@ -592,6 +592,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         var model = this.inherited(arguments);
         model.nextCycleLink = this._newLink(model, this.game.calendar.yearsPerCycle);
         model.sameCycleRestartLink = this._newLink(model, this.game.calendar.yearsPerCycle * (this.game.calendar.cyclesPerEra - 1));
+        model.fiveErasLink = this._newLink(model, 5 * this.game.calendar.yearsPerCycle * this.game.calendar.cyclesPerEra);
         return model;
     },
 
@@ -601,7 +602,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
             visible: this.getPricesMultiple(model, shatteredQuantity) <= this.game.resPool.get("timeCrystal").value,
             title: "x" + shatteredQuantity,
             handler: function(event) {
-                self.doShatterAmt(model, shatteredQuantity);
+                self.doShatterAmt(this.model, shatteredQuantity);
             }
         };
     },
@@ -610,7 +611,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         var name = this.inherited(arguments);
 
         if (this.game.time.heat > this.game.getEffect("heatMax")){
-            name += " (Overheat)";
+            name += " " + $I("time.overheat");
         }
         return name;
     },
@@ -706,15 +707,17 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
      * TODO: this is a horrible pile of copypaste, can we fix it somehow?
      * => the whole button-controller-model stuff will be factorized in order to reduce copy&paste
      */
-    renderLinks: function(){
+    renderLinks: function() {
+        this.fiveEras = this.addLink(this.model.fiveErasLink.title, this.model.fiveErasLink.handler, false);
         this.sameCycleRestart = this.addLink(this.model.sameCycleRestartLink.title, this.model.sameCycleRestartLink.handler, false);
         this.nextCycle = this.addLink(this.model.nextCycleLink.title, this.model.nextCycleLink.handler, false);
     },
 
-    update: function(){
+    update: function() {
         this.inherited(arguments);
         dojo.style(this.nextCycle.link, "display", this.model.nextCycleLink.visible ? "" : "none");
         dojo.style(this.sameCycleRestart.link, "display", this.model.sameCycleRestartLink.visible ? "" : "none");
+        dojo.style(this.fiveEras.link, "display", this.model.fiveErasLink.visible ? "" : "none");
     }
 });
 

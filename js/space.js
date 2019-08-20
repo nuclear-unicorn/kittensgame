@@ -292,6 +292,9 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				effects["energyConsumption"] = 10;
 				self.effects = effects;
 			},
+			unlocks: {
+				tabs: ["village"]
+			},
 			breakIronWill: true
 		}]
 	},{
@@ -701,6 +704,9 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					self.effects = {
 						"maxKittens": 1
 					};
+				},
+				unlocks: {
+					tabs: ["village"]
 				},
 				breakIronWill: true
 			},

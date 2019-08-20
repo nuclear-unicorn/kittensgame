@@ -54,7 +54,9 @@ dojo.declare("com.nuclearunicorn.i18n.Lang", null, {
 			"br": "Portuguese",
 			"es": "Española",
 			"fr": "French",
-			"cz": "Česky"
+			"cz": "Česky",
+			"pl": "Polskie"
+			
 		};
 	},
 
@@ -2117,8 +2119,8 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 
         if (model.enabled && this.hasResources(model) || this.game.devMode ){
 	        while (this.hasResources(model) && maxBld > 0){
-				this.payPrice(model);
 				this.incrementValue(model);
+				this.payPrice(model);
 
 	            counter++;
 	            maxBld--;

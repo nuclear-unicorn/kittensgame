@@ -286,6 +286,12 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 					resname: resname,
 					type: "ratio"
 				};
+			case type == "GlobalCraftRatio":
+				return {
+					title: $I("effectsMgr.type.resGlobalCraftRatio", [restitle]),
+					resname: resname,
+					type: "ratio"
+				};
 			default:
 				return 0;
 		}
@@ -977,6 +983,31 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 
 			"tectonicBonus": {
 				title: $I("effectsMgr.statics.tectonicBonus.title"),
+				type: "ratio"
+			},
+
+			"umbraBoostRatio": {
+				title: $I("effectsMgr.statics.umbraBoostRatio.title"),
+				type: "ratio"
+			},
+
+			"eludiumAutomationBonus": {
+				title: $I("effectsMgr.statics.eludiumAutomationBonus.title"),
+				type: "ratio"
+			},
+
+			"heatMax": {
+				title: $I("effectsMgr.statics.heatMax.title"),
+				type: "fixed"
+			},
+
+			"heatPerTick": {
+				title: $I("effectsMgr.statics.heatPerTick.title"),
+				type: "perTick"
+			},
+
+			"voidResonance": {
+				title: $I("effectsMgr.statics.voidResonance.title"),
 				type: "ratio"
 			}
 		}
@@ -1772,7 +1803,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 					callback("Unable to load file:" + JSON.stringify(error));
 				});
 			}
-		}
+		};
 		window.addEventListener('message', handler ,false);
 	},
 

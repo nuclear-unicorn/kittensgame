@@ -102,6 +102,7 @@ body {
 
 .tabsContainer {
     padding-bottom: 15px;
+    padding-top: 2px;
     position:absolute;
     top: 5px;
 }
@@ -592,7 +593,6 @@ h1 {
 
 .expandAllBar {
     float: right;
-    margin-top: -15px;
 }
 
 #gameLog span.msg:not(.type_date)  {

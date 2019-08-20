@@ -1,7 +1,7 @@
 dojo.declare("classes.KGConfig", null, {
     statics: {
         disableWebWorkers: false,
-        locales: ["ru", "ja", "br", "es", "fr", "cz", "zh"],
+        locales: ["ru", "ja", "br", "es", "fr", "cz", "zh", "pl"],
         isEldermass: false
     }
 });
