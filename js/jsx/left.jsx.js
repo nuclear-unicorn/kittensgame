@@ -15,9 +15,10 @@ WResourceRow = React.createClass({
 
         var isEqual = 
             oldRes.value == newRes.value &&
-            oldRes.reserveValue == newRes.value &&
+            oldRes.reserve == newRes.reserve &&
             oldRes.maxValue == newRes.maxValue &&
             oldRes.perTickCached == newRes.perTickCached &&
+            oldRes.unlocked == newRes.unlocked &&
             this.props.isEditMode == nextProp.isEditMode &&
             this.props.isRequired == nextProp.isRequired &&
             this.state.visible == nextState.visible;
@@ -109,23 +110,7 @@ WResourceRow = React.createClass({
 
         if (season.modifiers[res.name] && perTick !== 0 ){
 
-            if (game.challenges.getChallenge("winterIsComing").on)
-            {
-                var modifier = game.challenges.getChallengePenalty("winterIsComing", (game.calendar.weather || "normal") + "Mod");
-            }
-            else
-            {
-                var reward = 1;
-                if (game.calendar.weather == "warm")
-                {
-                    reward = game.challenges.getChallengeReward("winterIsComing");
-                }
-                if (game.calendar.weather == "cold")
-                {
-                    reward = 1 / game.challenges.getChallengeReward("winterIsComing");
-                }
-                var modifier = Math.floor(((season.modifiers[res.name] - 1) * reward + game.calendar.getWeatherMod())*100);
-            }
+            var modifier = Math.floor(game.calendar.getWeatherMod(res) - 1) * 100;
             weatherModValue = modifier ? "[" + (modifier > 0 ? "+" : "") + modifier.toFixed() + "%]" : "";
 
             if (modifier > 0) {
@@ -166,7 +151,7 @@ WResourceRow = React.createClass({
                 res.title || res.name
             ),
             $r("div", {className:"res-cell " + resAmtClassName + specialClass}, game.getDisplayValueExt(res.value)),
-            $r("div", {className:"res-cell " + resAmtClassName + specialClass + " reserve"}, !game.challenges.getCondition("disableChrono").on && !res.hideReserve && res.reserveValue ? "+" + game.getDisplayValueExt(res.reserveValue) : ""),
+            $r("div", {className:"res-cell " + resAmtClassName + specialClass + " reserve"}, !game.challenges.getCondition("disableChrono").on && res.maxValue && res.reserve ? "+" + game.getDisplayValueExt(res.reserve) : ""),
             $r("div", {className:"res-cell maxRes"}, 
                 res.maxValue ? "/" + game.getDisplayValueExt(res.maxValue) : ""
             ),

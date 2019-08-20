@@ -359,10 +359,15 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
                     "energyProduction": 2
                 };
                 effects["energyProduction"] *= 1 + game.getEffect("solarFarmRatio");
-				if (game.calendar.season == 3) {
-					effects["energyProduction"] *= (1 - (0.25 / game.challenges.getChallengeReward("winterIsComing")));
-				} else if (game.calendar.season == 1) {
-					effects["energyProduction"] /= (1 - (0.25 / game.challenges.getChallengeReward("winterIsComing")));
+				if (game.challenges.getChallengeResearched("winterIsComing")) {
+					effects["energyProduction"] *= 2;
+				}
+
+				if (game.calendar.getCurSeason().name == "winter") {
+					effects["energyProduction"] *= 0.75;
+				} else if (game.calendar.getCurSeason().name == "summer") {
+					effects["energyProduction"] /= 0.75;
+					effects["energyProduction"] *= this.game.challenges.getChallengeReward("winterIsComing");
 				}
 
 				var seasonRatio = game.getEffect("solarFarmSeasonRatio");
@@ -551,9 +556,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				if (game.workshop.get("cryocomputing").researched){
 					effects["energyConsumption"] = 1;
 				}
-				if (game.challenges.currentChallenge == "energy") {
-					effects["energyConsumption"] *= 2;
-				}
+				effects["energyConsumption"] *= game.challenges.getEnergyMod();
 
 				if (game.workshop.get("machineLearning").researched){
 					var dataCenterAIRatio = game.getEffect("dataCenterAIRatio");
@@ -650,6 +653,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			var energyCons = 0;
 			if (game.workshop.get("biofuel").researched){
 				energyCons = 1;
+				energyCons *= game.challenges.getEnergyMod()
 				self.togglable = true;
 			}
 			self.effects["energyConsumption"] = energyCons;
@@ -964,6 +968,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game) {
 			self.effects["energyConsumption"] = 1;
+			self.effects["energyConsumption"] *= game.challenges.getEnergyMod();
 		},
 		lackResConvert: false,
 		action: function(self, game){
@@ -1206,7 +1211,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			self.effects["oilPerTickBase"] = 0.02 * oilRatio;
 
 			self.effects["energyConsumption"] = self.isAutomationEnabled
-				? 1
+				? game.challenges.getEnergyMod()
 				: 0;
 		},
 		flavor: $I("buildings.oilWell.flavor")
@@ -1254,6 +1259,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}
 
 			effects["energyConsumption"] = 2;
+			effects["energyConsumption"] *= game.challenges.getEnergyMod();
 
 			self.effects = effects;
 		}
@@ -1325,6 +1331,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game){
 			self.effects["energyConsumption"] = 2;
+			self.effects["energyConsumption"] *= game.challenges.getEnergyMod();
 
 			self.effects["scienceMax"] = 0;
 			if (game.workshop.get("lhc").researched){
@@ -1534,7 +1541,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"cultureMax" : 0
 		},
 		calculateEffects: function(self, game) {
-			if (!game.challenges.getChallenge("atheism")) {
+			if (!game.challenges.getChallenge("atheism").on) {
 				var effects = {
 					"culturePerTickBase" : 0.05,
 					"faithPerTickBase" : 0.005,
@@ -1686,6 +1693,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game) {
 			self.effects["energyConsumption"] = 20;
+			self.effects["energyConsumption"] *= game.challenges.getEnergyMod();
 			self.effects["temporalFluxProduction"] = game.getEffect("temporalFluxProductionChronosphere");
 		}
 	},{
@@ -1715,6 +1723,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			// Core #4: 6.5 ; Total: 17  ; Average: 4.25 = 17/4 = (3*4+5)/4
 			// etc.
 			self.effects["energyConsumption"] = (3 * self.on + 5) / 4;
+			self.effects["energyConsumption"] *= game.challenges.getEnergyMod();
 
 			self.effects["aiLevel"] = Math.round(Math.log(Math.max(game.resPool.get("gflops").value, 1)));
 		},

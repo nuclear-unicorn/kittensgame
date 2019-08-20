@@ -158,7 +158,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			var leaderTrait = this.leader.trait.name;
 			if (leaderTrait == trait) {
 				var burnedParagonRatio = 1 + this.game.prestige.getBurnedParagonRatio();
-				var reward = (this.game.challenges.getChallenge("anarchy").researched && !this.game.challenges.getCondition("disableRewards").on) ? Math.sqrt(this.leader.rank) : 1;
+				var reward = this.game.challenges.getChallengeResearched("anarchy") ? Math.sqrt(this.leader.rank) : 1;
 				// Modify the defautlObject depends on trait
 				switch (trait) {
 					case "engineer": // Crafting bonus
@@ -351,7 +351,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		}
 
 		var diligentKittens = this.game.challenges.getChallenge("anarchy").on
-			? Math.floor(this.getKittens() * this.game.challenges.getChallengePenalty("anarchy"))
+			? Math.ceil(this.getKittens() * this.game.challenges.getChallengeEffect("anarchy"))
 			: this.getKittens();
 
 		return diligentKittens - workingKittens;
@@ -552,9 +552,15 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			kittens.push(_kitten);
 		}
 
+		var reserve = [];
+		for (var i in this.sim.reserve){
+			var _kitten = this.sim.reserve[i].save();
+			reserve.push(_kitten);
+		}
+
 		saveData.village = {
 			kittens : kittens,
-			reserveKittens: this.sim.reserveKittens,
+			reserve : reserve,
 			maxKittens: this.maxKittens,
 			jobs: this.filterMetadata(this.jobs, ["name", "unlocked", "value"]),
 			map : this.map.villageData
@@ -564,17 +570,17 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 	load: function(saveData){
 		if (saveData.village){
 			var kittens = saveData.village.kittens;
-			var reserveKittens = saveData.village.reserveKittens;
+			var reserve = saveData.village.reserve;
 			//quick legacy hack, remove in future
 			if (!kittens.length) {
 				kittens = [];
 			}
-			if (!reserveKittens || !reserveKittens.length) {
-				reserveKittens = [];
+			if (!reserve) {
+				reserve = [];
 			}
 
 			this.sim.kittens = [];
-			this.sim.reserveKittens = [];
+			this.sim.reserve = [];
 			this.game.village.traits = [];
 
 			for (var i = kittens.length - 1; i >= 0; i--) {
@@ -596,14 +602,14 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 				this.sim.kittens.unshift(newKitten);
 			}
-			
-			for (var i = reserveKittens.length - 1; i >= 0; i--) {
-				var reserveKitten = reserveKittens[i];
+
+			for (var i = reserve.length - 1; i >= 0; i--) {
+				var reserve = reserve[i];
 
 				var newKitten = new com.nuclearunicorn.game.village.Kitten();
-				newKitten.load(reserveKitten);
+				newKitten.load(reserve);
 
-				this.sim.reserveKittens.unshift(newKitten);
+				this.sim.reserve.unshift(newKitten);
 			}
 
 			this.maxKittens  = saveData.village.maxKittens;
@@ -1202,7 +1208,7 @@ dojo.declare("classes.village.Map", null, {
 dojo.declare("classes.village.KittenSim", null, {
 
 	kittens: null,
-	reserveKittens: null,
+	reserve: null,
 
 	game: null,
 
@@ -1222,16 +1228,6 @@ dojo.declare("classes.village.KittenSim", null, {
 		var game = this.game;
 		if (!times) {
 			times = 1;
-		}
-		
-		if (!this.game.challenges.getCondition("disableChrono").on && this.reserveKittens)
-		{
-			for (var i = 0; i < this.reserveKittens.length; i++)
-			{
-				this.kittens.push(this.reserveKittens[i]);
-			}
-			
-			this.reserveKittens = [];
 		}
 
 		if (this.kittens.length < this.maxKittens) { //Don't do maths if Maxed.

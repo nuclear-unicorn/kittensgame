@@ -779,32 +779,27 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		this.eventChance = 0;
 
 		if (this.year > 3){
-			if (this.game.challenges.getChallenge("winterIsComing").on)
-			{
-				var warmChance = this.game.challenges.getChallengePenalty("winterIsComing", "warmRate");
-				var coldChance = this.game.challenges.getChallengePenalty("winterIsComing", "coldRate");
-			}
-			else
-			{
-				var warmChance = 175;
-				var coldChance = 175;
-				if (this.season == 3 && this.game.challenges.getChallenge("winterIsComing").researched && !this.game.challenges.getCondition("disableRewards").on){
-					coldChance = 0;
+			var coldChance = 175;
+			var warmChance = 175;
+
+			if (this.game.challenges.getChallenge("winterIsComing").on) {
+				effect = this.game.challenges.getChallengeEffect("winterIsComing", "frequency");
+				coldChance += effect;
+				warmChance -= effect;
+				if (warmChance < 0) {
+					warmChance = 0;
 				}
+			}
+			if (this.getCurSeason().name == "winter" && this.game.challenges.getChallengeResearched("winterIsComing")){
+				coldChance = 0;
 			}
 
 			var rand = this.game.rand(1000);
-			
-			if (rand < warmChance)
-			{
+			if (rand < warmChance){
 				this.weather = "warm"
-			}
-			else if (rand < warmChance + coldChance)
-			{
+			} else if (rand < warmChance + coldChance){
 				this.weather = "cold"
-			}
-			else
-			{
+			} else{
 				this.weather = null;
 			}
 		}else{
@@ -922,13 +917,27 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		}
 	},
 
-	getWeatherMod: function(){
-		var mod = 0;
-		if (this.weather == "warm"){
-			mod =  0.15;
-		} else if (this.weather == "cold"){
-			mod = -0.15;
+	getWeatherMod: function(res){
+		var mod = 1;
+
+		if (this.getCurSeason().modifiers[res.name]){
+			mod = this.getCurSeason().modifiers[res.name];
 		}
+
+		if (this.weather == "warm"){
+			mod += 0.15;
+		} else if (this.weather == "cold"){
+			mod -= 0.15;
+		}
+
+		if (this.game.challenges.getChallenge("winterIsComing").on && this.weather == "cold") {
+			mod = ((mod + 1) * this.game.challenges.getChallengeEffect("winterIsComing", "modifier")) - 1;
+		}
+
+		if (this.getCurSeason().name == "spring"){
+			mod *= this.game.challenges.getChallengeReward("winterIsComing");
+		}
+
 		return mod;
 	},
 

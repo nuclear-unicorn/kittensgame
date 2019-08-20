@@ -1028,13 +1028,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Library", com.nuclearunicorn.game.u
 	update: function(){
 		this.inherited(arguments);
 
-		if (!this.game.science.get("chronophysics").researched && this.game.prestige.getPerk("anachronomancy").researched && !this.game.challenges.getCondition("disableChrono").on)
-		{
-			var chronophysics = this.game.science.get("chronophysics");
-			chronophysics.researched = true;
-			this.game.unlock(chronophysics.unlocks);
-		}
-
 		if (this.metaphysicsPanel){
 			this.metaphysicsPanel.update();
 		}

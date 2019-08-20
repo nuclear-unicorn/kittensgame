@@ -520,7 +520,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             return;
         }
 
-        if (this.game.religion.faith > 0){
+        if (this.game.religion.faith > 0 && !this.game.challenges.getChallenge("atheism").on){
             if (this.fastPraiseContainer.style.visibility == "hidden"){
                 this.fastPraiseContainer.style.visibility = "visible";
             }

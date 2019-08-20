@@ -26,7 +26,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
            flux: this.flux,
            heat: this.heat,
            cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "isAutomationEnabled", "unlocked"]),
-           vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on", "reserve"])
+           vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"])
        };
     },
 
@@ -109,13 +109,6 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     },
 
     update: function(){
-        if (!this.game.challenges.getCondition("disableChrono").on && this.getVSU("usedCryochambers").reserve)
-        {
-           var cryochambers = this.getVSU("usedCryochambers");
-           cryochambers.val += cryochambers.reserve;
-           cryochambers.reserve = 0;
-        }
-        
         if (this.isAccelerated && this.game.resPool.get("temporalFlux").value > 0){
             this.game.resPool.addResEvent("temporalFlux", -1);
         }
@@ -255,7 +248,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     amt = 5; //limit calculations needed per tick
                 }
                 self.heat -= 100 * amt;
-                game.time.shatter(amt);
+                game.time.shatter(amt * (this.game.challenges.getChallengeResearched("1000Years") ? self.on : 1));
             }
         },
         unlocked: true
@@ -392,6 +385,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 				"temporalParadoxDay": 1 + game.getEffect("temporalParadoxDayBonus")
 			};
 			effects["energyConsumption"] = 15;
+			effects["energyConsumption"] *= game.challenges.getEnergyMod();
 			self.effects = effects;
 		},
 		unlocks: {
@@ -490,6 +484,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.flux += amt - 1 + remainingDaysInFirstYear / daysPerYear;
 
         game.challenges.getChallenge("1000Years").unlocked = true;
+        if (game.challenges.getChallenge("1000Years").on && cal.year >= 1000) {
+            game.challenges.researchChallenge("1000Years");
+        }
     },
 
     unlockAll: function(){
@@ -564,7 +561,7 @@ dojo.declare("classes.ui.TimeControlWgt", [mixin.IChildrenAware, mixin.IGameAwar
         }
 
         if (this.game.workshop.get("chronoforge").researched) {
-            var heatMax = this.game.getEffect("heatMax");
+            var heatMax = this.game.getEffect("heatMax") * (this.game.challenges.getChallengeResearched("1000Years") ? 2 : 1);
             if(this.game.time.heat > heatMax){
                 this.timeSpan.innerHTML += "<br>Heat: <span style='color:red;'>" +
                 this.game.getDisplayValueExt(this.game.time.heat)
@@ -610,7 +607,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
     getName: function(model) {
         var name = this.inherited(arguments);
 
-        if (this.game.time.heat > this.game.getEffect("heatMax")){
+        if (this.game.time.heat > this.game.getEffect("heatMax") * (this.game.challenges.getChallengeResearched("1000Years") ? 2 : 1)){
             name += " " + $I("time.overheat");
         }
         return name;
@@ -627,12 +624,12 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
                 if (darkYears > 0) {
                     price["val"] = 1 + ((darkYears) / 1000) * 0.01;
                 }
-                var heatMax = this.game.getEffect("heatMax");
+                var heatMax = this.game.getEffect("heatMax") * (this.game.challenges.getChallengeResearched("1000Years") ? 2 : 1);
                 if (this.game.time.heat > heatMax) {
                     price["val"] *= (1 + (this.game.time.heat - heatMax) * 0.01);  //1% per excessive heat unit
                 }
-                
-                price["val"] *= this.game.challenges.getChallengePenalty("1000Years") * this.game.challenges.getChallengeReward("1000Years");
+
+                price["val"] *= (game.challenges.getChallenge("1000Years").on ? this.game.challenges.getChallengeEffect("1000Years") : 1) * this.game.challenges.getChallengeReward("1000Years");
 			}
 		}
 
@@ -644,9 +641,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 
 		var prices_cloned = $.extend(true, [], model.options.prices);
         var impedance = this.game.getEffect("timeImpedance");
-        var heatMax = this.game.getEffect("heatMax");
-
-        var heatFactor = (this.game.challenges.getChallenge("1000Years").researched && !this.game.challenges.getCondition("disableRewards").on) ? 5 : 10;
+        var heatMax = this.game.getEffect("heatMax")  * (this.game.challenges.getChallengeResearched("1000Years") ? 2 : 1);
 
 		for (var k = 0; k < amt; k++) {
 			for (var i = 0; i < prices_cloned.length; i++) {
@@ -657,11 +652,11 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 	                if (darkYears > 0) {
 	                    priceLoop = 1 + ((darkYears) / 1000) * 0.01;
 	                }
-	                if ((this.game.time.heat + k * heatFactor) > heatMax) {
-	                    priceLoop *= (1 + (this.game.time.heat + k * heatFactor - heatMax) * 0.01);  //1% per excessive heat unit
+	                if ((this.game.time.heat + k * 10) > heatMax) {
+	                    priceLoop *= (1 + (this.game.time.heat + k * 10 - heatMax) * 0.01);  //1% per excessive heat unit
 	                }
-	                
-	                price["val"] *= this.game.challenges.getChallengePenalty("1000Years") * this.game.challenges.getChallengeReward("1000Years");
+
+	                priceLoop *= (game.challenges.getChallenge("1000Years").on ? this.game.challenges.getChallengeEffect("1000Years") : 1) * this.game.challenges.getChallengeReward("1000Years");
 					pricesTotal += priceLoop;
 				}
 			}
@@ -692,8 +687,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
     },
 
     doShatter: function(model, amt) {
-        var factor = (this.game.challenges.getChallenge("1000Years").researched && !this.game.challenges.getCondition("disableRewards").on) ? 5 : 10;
-        this.game.time.heat += amt*factor;
+        this.game.time.heat += amt*10;
         this.game.time.shatter(amt);
     },
 

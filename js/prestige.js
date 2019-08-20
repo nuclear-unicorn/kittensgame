@@ -433,6 +433,7 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			var perk = this.perks[i];
 			perk.unlocked = perk.defaultUnlocked || false;
 			perk.researched = false;
+			perk.reserve = false;
 		}
 	},
 
@@ -458,27 +459,7 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 	},
 
 	update: function(){
-		if (!this.game.challenges.getCondition("disableMetaTechs").on)
-		{
-			for (var i = 0; i < this.perks.length; i++)
-			{
-				if (this.perks[i].reserve)
-				{
-					if (this.perks[i].researched)
-					{
-						for (var j = 0; j < this.perks[i].prices.length; j++)
-						{
-							this.game.resPool.addResEvent(this.perks[i].prices[j].name, this.perks[i].prices[j].val);
-						}
-					}
-					
-					this.perks[i].unlocked = true;
-					this.perks[i].researched = true;
-					this.game.unlock(this.perks[i].unlocks);
-					this.perks[i].reserve = false;
-				}
-			}
-		}
+
 	},
 
 	getPerk: function(name){
@@ -526,6 +507,10 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			storageRatio += (this.game.resPool.get("burnedParagon").value / 2000) * paragonRatio;
 		}
 		return storageRatio;
+	},
+
+	getParagonBonus: function(includeReserve){
+		return (this.game.resPool.get("apotheosis").value + (includeReserve ? this.game.resPool.get("apotheosis").reserve : 0)) / 100;
 	},
 
 	unlockAll: function(){
