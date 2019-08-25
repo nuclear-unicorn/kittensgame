@@ -227,7 +227,7 @@ WCraftShortcut = React.createClass({
                 $r("div", {className:"res-cell craft-link", onClick: this.doCraftAll}, $I("resources.craftTable.all")) : 
                 $r("div", {className:"res-cell craft-link"});
         }else{
-            elem = game.resPool.hasRes(craftPrices, craftRowAmt) ?  
+            elem = game.resPool.hasRes(craftPrices, craftRowAmt, true) ?
             $r("div", {className:"res-cell craft-link", onClick: this.doCraft}, 
                 "+" + game.getDisplayValueExt(craftRowAmt * (1 + craftRatio), null, null, 0))
             : $r("div", {className:"res-cell craft-link"});
@@ -285,7 +285,7 @@ WCraftShortcut = React.createClass({
     hasMinAmt: function(recipe){
 		var minAmt = Number.MAX_VALUE;
 		for (var j = 0; j < recipe.prices.length; j++){
-			var totalRes = game.resPool.get(recipe.prices[j].name).value;
+			var totalRes = game.resPool.getTotal(recipe.prices[j].name);
 			var allAmt = Math.floor(totalRes / recipe.prices[j].val);
 			if (allAmt < minAmt){
 				minAmt = allAmt;

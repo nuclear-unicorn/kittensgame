@@ -2211,7 +2211,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		var craftAmt = amt * (1 + craftRatio);
 
 		//prevent undo giving free res
-		if (amt < 0 && this.game.resPool.get(res).value < Math.abs(craftAmt)) {
+		if (amt < 0 && this.game.resPool.getTotal(res) < Math.abs(craftAmt)) {
 			return false;
 		}
 
@@ -2221,7 +2221,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			prices[i].val *= amt;
 		}
 
-		if (bypassResourceCheck || this.game.resPool.hasRes(prices)) {
+		if (bypassResourceCheck || this.game.resPool.hasRes(prices, 1, true)) {
 			this.game.resPool.payPrices(prices);
 			this.game.resPool.addResEvent(res,craftAmt);
 			if (craft.upgrades){
@@ -2298,7 +2298,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 		var minAmt = Number.MAX_VALUE;
 		for (var j = prices.length - 1; j >= 0; j--) {
-			var totalRes = this.game.resPool.get(prices[j].name).value;
+			var totalRes = this.game.resPool.getTotal(prices[j].name);
 			var allAmt = totalRes / prices[j].val; // we need fraction here, do floor later
 			if (allAmt < minAmt){
 				minAmt = allAmt;

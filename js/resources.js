@@ -532,6 +532,15 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		return res;
 	},
 
+	getTotal: function(res) {
+		var res = this.get(res);
+		if (this.game.challenges.getCondition("disableChrono").on) {
+			return res.value;
+		} else {
+			return res.value + res.reserve;
+		}
+	},
+
 	addRes: function(res, addedValue, event, preventLimitCheck) {
 		if (this.game.calendar.day < 0 && !event) {
 			return 0;
@@ -816,7 +825,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	/**
 	 * Returns true if user has enough resources to construct AMT building with given price
 	 */
-	hasRes: function(prices, amt){
+	hasRes: function(prices, amt, includeReserve){
+		includeReserve = includeReserve && !this.game.challenges.getCondition("disableChrono").on;
 		if (!amt){
 			amt = 1;
 		}
@@ -827,7 +837,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 				var price = prices[i];
 
 				var res = this.get(price.name);
-				if (res.value < (price.val * amt)){
+				if (res.value + (includeReserve ? res.reserve : 0) < (price.val * amt)){
 					hasRes = false;
 					break;
 				}
@@ -863,6 +873,11 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		if (prices.length){
 			for( var i = 0; i < prices.length; i++){
 				var price = prices[i];
+				var res = this.get(price.name);
+				if (!this.game.challenges.getCondition("disableChrono").on && price.val > res.value) {
+					res.reserve -= (price.val - res.value);
+					res.value = price.val;
+				}
 				this.addResEvent(price.name, -price.val);
 			}
 		}
