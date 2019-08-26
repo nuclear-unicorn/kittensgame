@@ -36,6 +36,12 @@ dojo.declare("classes.game.Timer", null, {
 		}
 	},
 
+	resetState: function(){
+		for (var i=0; i < this.handlers.length; i++){
+			this.handlers[i].phase = 0;
+		}
+	},
+
 	scheduleEvent: function(handler){
 		this.scheduledHandlers.push(handler);
 	},
@@ -1087,11 +1093,14 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	//on a side note, I hate those flags. Could we use gamePage.opts = []/{}; ?
 	karmaKittens: 0,	//counter for karmic reincarnation
+	karmaKittensReserve: 0,
 	karmaZebras: 0,
+	karmaZebrasReserve: 0,
 	deadKittens: 0,
 	ironWill: true,		//true if player has no kittens or housing buildings
 
-	saveVersion: 15,
+	saveVersion: 16,
+	migrateResources: false,
 
 	//FINALLY
 	opts: null,
@@ -1224,6 +1233,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.timeTab = new classes.tab.TimeTab({name:$I("tab.name.time"), id:"Time"}, this);
 		this.timeTab.visible = false;
 		this.addTab(this.timeTab);
+
+		this.challengesTab = new classes.tab.ChallengesTab({name:$I("tab.name.challenges"), id:"Challenges"}, this);
+		this.challengesTab.visible = false;
+		this.addTab(this.challengesTab);
 
 		this.achievementTab = new com.nuclearunicorn.game.ui.tab.AchTab({name:$I("tab.name.achievements"), id:"Achievements"}, this);
 		this.achievementTab.visible = false;
@@ -1371,7 +1384,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.useWorkers = false;
 		this.colorScheme = "";
 		this.karmaKittens = 0;
+		this.karmaKittensReserve = 0;
 		this.karmaZebras = 0;
+		this.karmaZebrasReserve = 0;
 		this.ironWill = true;
 		this.deadKittens = 0;
 		this.cheatMode = false;
@@ -1399,6 +1414,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			forceLZ: false
 		};
 
+		this.timer.resetState();
 		this.resPool.resetState();
 		this.village.resetState();
 		this.calendar.resetState();
@@ -1431,7 +1447,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var saveData = {
 			saveVersion: this.saveVersion,
 			resources: this.resPool.filterMetadata(
-				this.resPool.resources, ["name", "value", "unlocked", "isHidden"]
+				this.resPool.resources, ["name", "value", "reserve", "unlocked", "isHidden"]
 			)
 		};
 
@@ -1451,7 +1467,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			useWorkers: this.useWorkers,
 			colorScheme: this.colorScheme,
 			karmaKittens: this.karmaKittens,
+			karmaKittensReserve: this.karmaKittensReserve,
 			karmaZebras: this.karmaZebras,
+			karmaZebrasReserve: this.karmaZebrasReserve,
 			ironWill : this.ironWill,
 			deadKittens: this.deadKittens,
 			cheatMode: this.cheatMode,
@@ -1598,7 +1616,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			this.colorScheme = data.colorScheme ? data.colorScheme : null;
 
 			this.karmaKittens = (data.karmaKittens !== undefined) ? data.karmaKittens : 0;
+			this.karmaKittensReserve = (data.karmaKittensReserve !== undefined) ? data.karmaKittensReserve : 0;
 			this.karmaZebras = (data.karmaZebras !== undefined) ? data.karmaZebras : 0;
+			this.karmaZebrasReserve = (data.karmaZebrasReserve !== undefined) ? data.karmaZebrasReserve : 0;
 			this.deadKittens = (data.deadKittens !== undefined) ? data.deadKittens : 0;
 			this.ironWill = (data.ironWill !== undefined) ? data.ironWill : true;
 			this.useWorkers = (data.useWorkers !== undefined) ? data.useWorkers : false;
@@ -1625,12 +1645,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.libraryTab.visible = (this.bld.get("library").on > 0);
 		this.workshopTab.visible = (this.bld.get("workshop").on > 0);
 		this.achievementTab.visible = (this.achievements.hasUnlocked());
-		this.statsTab.visible = (this.karmaKittens > 0 || this.science.get("math").researched);
+		this.statsTab.visible = (this.karmaKittens > 0 || this.karmaKittensReserve > 0 || this.science.get("math").researched);
 
 		this.diplomacyTab.visible = (this.diplomacy.hasUnlockedRaces());
-		this.religionTab.visible = (this.resPool.get("faith").value > 0 || this.challenges.currentChallenge == "atheism" && this.bld.get("ziggurat").val > 0);
+		this.religionTab.visible = (this.resPool.get("faith").value > 0 || this.challenges.getChallenge("atheism").on && this.bld.get("ziggurat").val > 0);
 		this.spaceTab.visible = (this.science.get("rocketry").researched);
 		this.timeTab.visible = (this.science.get("calendar").researched || this.time.getVSU("usedCryochambers").val > 0);
+		this.challengesTab.visible = (this.prestige.getPerk("adjustmentBureau").researched || this.prestige.getPerk("adjustmentBureau").reserve);
 
 		this.ui.load();
 
@@ -2074,6 +2095,27 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			save.saveVersion = 15;
 		}
 
+		if (save.saveVersion == 15) {
+			if (save.challenges && save.challenges.challenges) {
+				for (var i = 0; i < save.challenges.challenges.length; i++) {
+					var challenge = save.challenges.challenges[i];
+					if (challenge.name == save.challenges.currentChallenge) {
+						challenge.on = true;
+						challenge.rewardable = true;
+
+						save.challenges.conditions = [{name: "disableChrono", on: true}];
+						save.challenges.rewardable = true;
+					}
+
+					challenge.researched = challenge.researched ? 1 : 0;
+				}
+			}
+
+			this.migrateResources = true;
+
+			save.saveVersion = 16;
+		}
+
 		return save;
 
 	},
@@ -2163,18 +2205,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		perTick += perTickBaseSpace;
 
 		// *SEASON MODIFIERS
-		if (!season){
-			var season = this.calendar.getCurSeason();
-		}
-		var weatherMod = this.calendar.getWeatherMod();
-		    weatherMod = (season.modifiers[res.name] + weatherMod);
-		if (weatherMod < -0.95){
-			weatherMod = -0.95;
-		}
-
-		if (season.modifiers[res.name]){
-			perTick *= weatherMod;
-		}
+		perTick *= this.calendar.getWeatherMod(res);
 
 		// +VILLAGE JOB PRODUCTION
 		var resMapProduction = this.village.getResProduction();
@@ -2208,7 +2239,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		// *PARAGON BONUS
 		var paragonProductionRatio = this.prestige.getParagonProductionRatio();
-		if (resName == "catnip" && this.challenges.currentChallenge == "winterIsComing") {
+		if (resName == "catnip" && this.challenges.getChallenge("winterIsComing").on) {
 			paragonProductionRatio = 0; //winter has come
 		}
 
@@ -2246,7 +2277,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 
 		// +*FAITH BONUS
-		perTick *= 1 + (this.religion.getProductionBonus() / 100);
+		perTick *= 1 + (this.religion.getProductionBonus() * (res.name == "faith" ? this.challenges.getChallengeReward("atheism") : 1) / 100);
 
 		//+COSMIC RADIATION
 		if (!this.opts.disableCMBR && res.name != "coal") {
@@ -2284,7 +2315,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		resConsumption *= 1 + this.getEffect(res.name + "DemandRatio");
 		if (res.name == "catnip" && this.village.sim.kittens.length > 0 && this.village.happiness > 1) {
 			var hapinnessConsumption = Math.max(this.village.happiness - 1, 0);
-			if (this.challenges.currentChallenge == "anarchy") {
+			if (this.challenges.getChallenge("anarchy").on) {
 				resConsumption += resConsumption * hapinnessConsumption * (1 + this.getEffect(res.name + "DemandWorkerRatioGlobal"));
 			} else {
 				resConsumption += resConsumption * hapinnessConsumption * (1 + this.getEffect(res.name + "DemandWorkerRatioGlobal")) * (1 - this.village.getFreeKittens() / this.village.sim.kittens.length);
@@ -2351,19 +2382,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		stack.push(perTickBaseSpaceStack);
 
 		// *SEASON MODIFIERS
-		if (!season){
-			var season = this.calendar.getCurSeason();
-		}
-		var weatherMod = this.calendar.getWeatherMod();
-		    weatherMod = (season.modifiers[res.name] + weatherMod);
-		if (weatherMod < -0.95){
-			weatherMod = -0.95;
-		}
-
 		stack.push({
 			name: $I("res.stack.weather"),
 			type: "ratio",
-			value: weatherMod - 1
+			value: this.calendar.getWeatherMod(res) - 1
 		});
 
 		// +VILLAGE JOB PRODUCTION
@@ -2424,7 +2446,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		// *PARAGON BONUS
 		var paragonProductionRatio = this.prestige.getParagonProductionRatio();
-		if (resName == "catnip" && this.challenges.currentChallenge == "winterIsComing") {
+		if (resName == "catnip" && this.challenges.getChallenge("winterIsComing").on) {
 			paragonProductionRatio = 0; //winter has come
 		}
 
@@ -2487,7 +2509,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		stack.push({
 			name: $I("res.stack.faith"),
 			type: "ratio",
-			value: this.religion.getProductionBonus() / 100
+			value: this.religion.getProductionBonus() * (res.name == "faith" ? this.challenges.getChallengeReward("atheism") : 1) / 100
 		});
 
 		if (!this.opts.disableCMBR && res.name != "coal") {
@@ -2592,7 +2614,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		resConsumption *= 1 + this.getEffect(res.name + "DemandRatio");
 		if (res.name == "catnip" && this.village.sim.kittens.length > 0 && this.village.happiness > 1) {
 			var hapinnessConsumption = Math.max(this.village.happiness - 1, 0);
-			if (this.challenges.currentChallenge == "anarchy") {
+			if (this.challenges.getChallenge("anarchy").on) {
 				resConsumption += resConsumption * hapinnessConsumption * (1 + this.getEffect(res.name + "DemandWorkerRatioGlobal"));
 			} else {
 				resConsumption += resConsumption * hapinnessConsumption * (1 + this.getEffect(res.name + "DemandWorkerRatioGlobal")) * (1 - this.village.getFreeKittens() / this.village.sim.kittens.length);
@@ -2728,8 +2750,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 */
 	updateModel: function(){
 
-		this.resPool.update();
-
 		this.bld.update();
 
 		//business logic goes there
@@ -2753,14 +2773,16 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		 }
 		 }*/
 
+		this.timer.update();
+
+		this.resPool.update();
+
 		this.resPool.resConsHackForResTable();
 
 		//nah, kittens are not a resource anymore (?)
 		var kittens = this.resPool.get("kittens");
 		kittens.value = this.village.getKittens();	//just a simple way to display them
 		kittens.maxValue = this.village.maxKittens;
-
-		this.timer.update();
 	},
 
 	huntAll: function(event){
@@ -3270,18 +3292,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
             if (!confirmed) {
                 return;
             }
-            if (game.challenges.currentChallenge == "atheism" && game.time.getVSU("cryochambers").on > 0) {
-                game.challenges.getChallenge("atheism").researched = true;
 
-				if (game.ironWill){
-					game.achievements.unlockHat("ivoryTowerHat");
-				}
-            }
 			if (game.calendar.day < 0){
 				game.achievements.unlockHat("fezHat");
 			}
 
-            game.challenges.currentChallenge = null;
             game.resetAutomatic();
         });
 	},
@@ -3323,7 +3338,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
     _getKarmaKittens: function(kittens){
         var karmaKittens = 0;
 
-        if (this.challenges.getChallenge("anarchy").researched) {
+        if (this.challenges.getChallengeResearched("anarchy", true)) {
 		kittens = kittens * 2;
         }
 
@@ -3381,26 +3396,43 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	_resetInternal: function(){
+		//pre-reset faith so people who forgot to do it properly would not be screwed
+		if (this.religion.getRU("apocripha").on){
+			this.religion.faithRatio += this.religion.getApocryphaResetBonus(1);
+		}
+
+		for (var i = 0; i < this.challenges.conditions.length; i++) {
+			if (this.challenges.conditions[i].on && !this.challenges.conditions[i].rewardable && !this.challenges.conditions[i].name == "disableChrono") {
+				this.game.challenges.handleConditionToggle(this.challenges.conditions[i].name, false);
+				this.game.challenges.handleConditionToggle(this.challenges.conditions[i].name, true);
+			}
+		}
+		this.challenges.applyPending();
+
 		var kittens = this.resPool.get("kittens").value;
 		var karmaKittens = this.karmaKittens;
+		var karmaKittensReserve = this.karmaKittensReserve;
 		if (kittens > 35){
-			karmaKittens += this._getKarmaKittens(kittens);
+			if (this.challenges.getCondition("disableParagon").on && !this.challenges.getCondition("disableParagon").rewardable) {
+				karmaKittensReserve += this._getKarmaKittens(kittens);
+			} else {
+				karmaKittens += this._getKarmaKittens(kittens);
+			}
 		}
 
 		var paragonPoints = 0;
+		var paragonPointsReserve = 0;
 		if (kittens > 70){
-			paragonPoints = (kittens - 70);
+			paragonPoints = (kittens - 70) * (1 + this.prestige.getParagonBonus());
+			paragonPointsReserve = (kittens - 70) * (1 + this.prestige.getParagonBonus(true)) - paragonPoints;
 		}
 
-		var addRes = {
-			"paragon": paragonPoints
-		};
-
 		var karmaZebras = parseInt(this.karmaZebras);	//hack
+		var karmaZebrasReserve = parseInt(this.karmaZebrasReserve);	//hack
 		//that's all folks
 
 		var addStats = {
-			"totalParagon": paragonPoints,
+			"totalParagon": paragonPoints + paragonPointsReserve,
 			"totalResets": 1
 		};
 
@@ -3432,13 +3464,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		//-------------------------- very confusing and convoluted stuff related to karma zebras ---------------
 		var bonusZebras = this._getBonusZebras();
 		if (this.resPool.get("zebras").value > 0 && this.ironWill){
-			karmaZebras += bonusZebras;
-		}
-
-		var faithRatio = this.religion.faithRatio;
-		//pre-reset faith so people who forgot to do it properly would not be screwed
-		if (this.religion.getRU("apocripha").on){
-			faithRatio += this.religion.getApocryphaResetBonus(1);
+			if (this.challenges.getCondition("disableMisc").on && !this.challenges.getCondition("disableMisc").rewardable) {
+				karmaZebrasReserve += bonusZebras;
+			} else {
+				karmaZebras += bonusZebras;
+			}
 		}
 		//------------------------------------------------------------------------------------------------------
 
@@ -3458,8 +3488,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var saveRatio = this.bld.get("chronosphere").val > 0 ? this.getEffect("resStasisRatio") : 0; // resStasisRatio excepted when challenge
 		dojo.mixin(lsData.game, {
 			karmaKittens: 		karmaKittens,
+			karmaKittensReserve: 	karmaKittensReserve,
 			karmaZebras: 		karmaZebras,
-			ironWill : 			saveRatio > 0 ? false : true,			//chronospheres will disable IW
+			karmaZebrasReserve:	karmaZebrasReserve,
+			ironWill : 			!this.challenges.getCondition("disableChrono") && saveRatio > 0 ? false : true,			//chronospheres will disable IW
 			deadKittens: 		0,
 			isCMBREnabled:		false
 		});
@@ -3473,6 +3505,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		var anachronomancy = this.prestige.getPerk("anachronomancy");
 		var fluxCondensator = this.workshop.get("fluxCondensator");
+		var disableChrono = this.challenges.getCondition("disableChrono");
+		var disableParagon = this.challenges.getCondition("disableParagon");
 		for (var i in this.resPool.resources){
 			var res = this.resPool.resources[i];
 
@@ -3481,36 +3515,68 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				continue;	//>:
 			}
 			var value = 0;
+			var reserve = 0;
 
 			if (res.name == "timeCrystal"){
-				if (anachronomancy.researched){
-					value = res.value;
+				if (anachronomancy.researched || anachronomancy.reserve){
+					if (disableChrono.on) {
+						reserve = res.reserve + res.value;
+					} else {
+						value = res.value;
+					}
 				}
 			} else if (res.persists){
 				value = res.value;
+				reserve = res.reserve;
+
+				if (res.name == "paragon") {
+					reserve += paragonPointsReserve;
+
+					if (disableParagon.on && !disableParagon.rewardable) {
+						reserve += paragonPoints;
+					} else {
+						value += paragonPoints;
+					}
+				}
 			} else {
 				if (!res.craftable || res.name == "wood"){
-					value = res.value * saveRatio;
+					if (disableChrono.on) {
+						if (!disableChrono.rewardable) {
+							reserve = (res.value + res.reserve) * saveRatio;
+						} else {
+							reserve = res.reserve + res.value * saveRatio;
+						}
+					} else {
+						if (res.maxValue) {
+							reserve = (res.value + res.reserve) * saveRatio;
+						} else {
+							value = (res.value + res.reserve) * saveRatio;
+						}
+					}
+
 					if (res.name == "void") {
 						value = Math.floor(value);
+						reserve = Math.floor(reserve);
 					}
 				} else if (res.value > 0) {
-					value = Math.sqrt(res.value) * saveRatio * 100;
+					if (disableChrono.on) {
+						reserve = res.reserve + Math.sqrt(res.value) * saveRatio * 100;
+					} else {
+						value = Math.sqrt(res.value) * saveRatio * 100;
+					}
 				}
 			}
 
-			if (addRes[res.name] > 0){
-				value += addRes[res.name];
-			}
-
-			if (value > 0){
+			if (value > 0 || reserve > 0){
 				var newRes = this.resPool.createResource(res.name);
 				newRes.value = value;
+				newRes.reserve = reserve;
 				newResources.push(newRes);
 			}
 		}
 
 		var newKittens= [];
+		var reserveKittens= this.village.sim.reserve;
 		if (this.time.getVSU("cryochambers").on > 0) {
 			var kittens = this.village.sim.kittens;
 
@@ -3528,6 +3594,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 		}
 
+		if (disableChrono.on) {
+			for (var i = 0; i < newKittens.length; i++) {
+				reserveKittens.push(newKittens[i]);
+			}
+			newKittens = [];
+		}
+
 		if (newKittens.length > 0) {
 			var usedCryochambers_reset = this.time.filterMetadata([this.time.getVSU("usedCryochambers")], ["name", "val", "on"]);
 			usedCryochambers_reset[0]["val"] = newKittens.length;
@@ -3536,6 +3609,24 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			var usedCryochambers_reset = this.time.filterMetadata([this.time.getVSU("usedCryochambers")], ["name", "val", "on"]);
 			usedCryochambers_reset[0]["val"] = 0;
 			usedCryochambers_reset[0]["on"] = 0;
+		}
+
+		for (var i = 0; i < this.challenges.challenges.length; i++) {
+			if (this.challenges.challenges[i].on && disableChrono.on) {
+				this.challenges.challenges[i].rewardable = true;
+			}
+
+			this.challenges.challenges[i].rewarded = false;
+		}
+
+		for (var i = 0; i < this.challenges.conditions.length; i++) {
+			if (this.challenges.conditions[i].on) {
+				if (!this.challenges.conditions[i].rewardable) {
+					this.challenges.conditions[i].rewardable = true;
+				} else {
+					this.challenges.conditions[i].resets++;
+				}
+			}
 		}
 
 		var saveData = {
@@ -3548,7 +3639,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			},
 			challenges: {
 				challenges: this.challenges.challenges,
-				currentChallenge: this.challenges.currentChallenge
+				conditions: this.challenges.conditions,
+				rewardable: this.challenges.getCondition("disableChrono").on ? true : false,
+				rewarded: false
 			},
 			diplomacy: {
 				races: []
@@ -3557,11 +3650,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				perks: this.prestige.perks
 			},
 			religion: {
-				faithRatio: faithRatio,
+				faithRatio: this.religion.faithRatio,
+				faithRatioReserve: this.religion.faithRatioReserve,
 				tcratio: this.religion.tcratio,
+				tcratioReserve: this.religion.tcratioReserve,
 				zu: [],
 				ru: [],
-				tu: this.religion.filterMetadata(this.religion.transcendenceUpgrades, ["name", "val", "on", "unlocked"])
+				tu: this.religion.filterMetadata(this.religion.transcendenceUpgrades, ["name", "val", "on", "reserve", "unlocked"])
 			},
 			science: {
 				hideResearched: false,
@@ -3578,6 +3673,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			},
 			village :{
 				kittens: newKittens,
+				reserve: reserveKittens,
 				jobs: [],
 				traits: [],
 			},
@@ -3586,7 +3682,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			statsCurrent: statsCurrent
 		};
 
-		if (anachronomancy.researched){
+		if (!disableChrono.on && anachronomancy.researched){
 			saveData.science.techs.push(this.science.get("chronophysics"));
 		}
 		LCstorage["com.nuclearunicorn.kittengame.savedata"] = JSON.stringify(saveData);
@@ -3634,6 +3730,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				return this.statsTab;
 			case "time":
 				return this.timeTab;
+			case "challenges":
+				return this.challengesTab;
 		}
 	},
 
@@ -3711,7 +3809,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 					newUnlock.unlockable = true;
 				} else if (type == "stages") {
 					newUnlock.stages[unlockId.stage].stageUnlocked = true;
-				} else if (type == "jobs" && unlockId == "priest" && this.challenges.currentChallenge == "atheism") {
+				} else if (type == "jobs" && unlockId == "priest" && this.challenges.getChallenge("atheism").on) {
 					// do nothing
 				} else {
 					if (!newUnlock){

@@ -264,6 +264,13 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		color: "#493099",
 		persists: true
 	},{
+		name : "apotheosis",
+		title : $I("resources.apotheosis.title"),
+		type : "common",
+		visible: true,
+		color: "#7950FF",
+		persists: true
+	},{
 		name : "timeCrystal",
 		title: $I("resources.timeCrystal.title"),
 		type : "common",
@@ -484,6 +491,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		for (var i = 0; i< this.resourceData.length; i++){
 			var res = dojo.clone(this.resourceData[i]);
 			res.value = 0;
+			res.reserve = 0;
 			res.unlocked = false;
 			if (res.name == "oil" ||
 				res.name == "kerosene" ||
@@ -514,6 +522,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		var res = {
 			name: name,
 			value: 0,
+			reserve: 0,
 
 			//whether resource was marked by user as hidden or visible
 			isHidden: false,
@@ -523,27 +532,39 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		return res;
 	},
 
+	getTotal: function(res) {
+		var res = this.get(res);
+		if (this.game.challenges.getCondition("disableChrono").on) {
+			return res.value;
+		} else {
+			return res.value + res.reserve;
+		}
+	},
+
 	addRes: function(res, addedValue, event, preventLimitCheck) {
-		if (this.game.calendar.day < 0 && !event || addedValue == 0) {
+		if (this.game.calendar.day < 0 && !event) {
 			return 0;
 		}
 
 		var prevValue = res.value || 0;
 
-		if(res.maxValue) {
-			//if already overcap, allow to remain that way unless removing resources.
-			if(res.value > res.maxValue) {
-				if(addedValue < 0 ) {
-					res.value += addedValue;
-				}
-			} else {
-				res.value += addedValue;
-				if(res.value > res.maxValue && !preventLimitCheck) {
-					res.value = res.maxValue;
-				}
+		res.value = res.value + addedValue;
+		if (res.maxValue && res.value > res.maxValue && !preventLimitCheck){
+			if (this.game.migrateResources && res.name != "temporalFlux"){
+				// Give the benefit of the doubt
+				res.reserve = res.value - res.maxValue;
 			}
-		} else {
-			res.value += addedValue;
+			res.value = res.maxValue;
+		}
+
+		if (res.maxValue && res.value < res.maxValue && res.reserve && !this.game.challenges.getCondition("disableChrono").on){
+			if (res.reserve > res.maxValue - res.value){
+				res.reserve -= (res.maxValue - res.value);
+				res.value = res.maxValue;
+			} else {
+				res.value += res.reserve;
+				res.reserve = 0;
+			}
 		}
 
 		if (res.name == "void") { // Always an integer
@@ -645,6 +666,9 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 			this.addResPerTick(res.name, resPerTick);
 
 		}
+
+		this.game.migrateResources = false;
+
 		game.updateKarma();
 
 		//--------
@@ -776,6 +800,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		for (var i = 0; i < this.resources.length; i++){
 			var res = this.resources[i];
 			res.value = 0;
+			res.reserve = 0;
 			res.maxValue = 0;
 			res.perTickCached = 0;
 			res.unlocked = false;
@@ -800,7 +825,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	/**
 	 * Returns true if user has enough resources to construct AMT building with given price
 	 */
-	hasRes: function(prices, amt){
+	hasRes: function(prices, amt, includeReserve){
+		includeReserve = includeReserve && !this.game.challenges.getCondition("disableChrono").on;
 		if (!amt){
 			amt = 1;
 		}
@@ -811,7 +837,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 				var price = prices[i];
 
 				var res = this.get(price.name);
-				if (res.value < (price.val * amt)){
+				if (res.value + (includeReserve ? res.reserve : 0) < (price.val * amt)){
 					hasRes = false;
 					break;
 				}
@@ -847,6 +873,11 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		if (prices.length){
 			for( var i = 0; i < prices.length; i++){
 				var price = prices[i];
+				var res = this.get(price.name);
+				if (!this.game.challenges.getCondition("disableChrono").on && price.val > res.value) {
+					res.reserve -= (price.val - res.value);
+					res.value = price.val;
+				}
 				this.addResEvent(price.name, -price.val);
 			}
 		}
@@ -862,16 +893,22 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	},
 
     getEnergyDelta: function(){
-		if (this.energyCons == 0) {
-			return 0;
+		if (this.energyProd == 0 && this.energyCons == 0) {
+			return 1;
 		} else {
-			var delta = this.energyProd / this.energyCons;
+			var delta = this.energyProd / (this.energyCons ? this.energyCons : 1);
 			if (delta < 0.25){
 				delta = 0.25;
 			}
-			if (this.game.challenges.getChallenge("energy").researched == true) {
-				delta = 1 - (1 - delta) / 2;
+			if (delta > 4){
+				delta = 4;
 			}
+			if (this.game.challenges.getChallengeResearched("energy") && delta < 1) {
+				delta = 1 - (1 - delta) / 2;
+			} else if (delta > 1) {
+				delta = 1;
+			}
+
 		return delta;
 		}
     },

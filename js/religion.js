@@ -7,7 +7,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 	faith: 0,
 	faithRatio : 0,
+	faithRatioReserve: 0,
 	tcratio: 0,
+	tcratioReserve: 0,
 	corruption: 0,
 
 	alicornCounter: 0,
@@ -24,7 +26,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		this.faith = 0;
 		this.corruption = 0;
 		this.faithRatio = 0;
+		this.faithRatioReserve = 0;
 		this.tcratio = 0;
+		this.tcratioReserve = 0;
 
 		for (var i = 0; i < this.zigguratUpgrades.length; i++){
 			var zu = this.zigguratUpgrades[i];
@@ -49,10 +53,12 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			faith: this.faith,
 			corruption: this.corruption,
 			faithRatio: this.faithRatio,
+			faithRatioReserve: this.faithRatioReserve,
 			tcratio: this.tcratio,
+			tcratioReserve: this.tcratioReserve,
 			zu: this.filterMetadata(this.zigguratUpgrades, ["name", "val", "on", "unlocked"]),
 			ru: this.filterMetadata(this.religionUpgrades, ["name", "val", "on"]),
-			tu: this.filterMetadata(this.transcendenceUpgrades, ["name", "val", "on", "unlocked"])
+			tu: this.filterMetadata(this.transcendenceUpgrades, ["name", "val", "on", "reserve", "unlocked"])
 		};
 	},
 
@@ -64,7 +70,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		this.faith = saveData.religion.faith || 0;
 		this.corruption = saveData.religion.corruption || 0;
 		this.faithRatio = saveData.religion.faithRatio || 0;
+		this.faithRatioReserve = saveData.religion.faithRatioReserve || 0;
 		this.tcratio = saveData.religion.tcratio || 0;
+		this.tcratioReserve = saveData.religion.tcratioReserve || 0;
 		this.loadMetadata(this.zigguratUpgrades, saveData.religion.zu);
 		this.loadMetadata(this.religionUpgrades, saveData.religion.ru);
 		this.loadMetadata(this.transcendenceUpgrades, saveData.religion.tu);
@@ -80,7 +88,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	},
 
 	update: function(){
-		if (this.game.resPool.get("faith").value > 0 || this.game.challenges.currentChallenge == "atheism" && this.game.bld.get("ziggurat").val > 0){
+		if (this.game.resPool.get("faith").value > 0 || this.game.challenges.getChallenge("atheism").on && this.game.bld.get("ziggurat").val > 0){
 			this.game.religionTab.visible = true;
 		}
 
@@ -730,7 +738,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	getProductionBonus: function(){
 		var rate = this.getRU("solarRevolution").on ? this.game.getTriValue(this.faith, 1000) : 0;
 		//Solar Revolution capped to 1000% so it doesn't become game-breaking
-		var atheismBonus = this.game.challenges.getChallenge("atheism").researched ? this.getTranscendenceLevel() * 0.1 : 0;
+		var atheismBonus = this.game.challenges.getChallengeResearched("atheism") ? this.getTranscendenceLevel() * 0.1 : 0;
 		var blackObeliskBonus = this.getTranscendenceLevel() * this.getTU("blackObelisk").val * 0.005;
 		rate = this.game.getHyperbolicEffect(rate, 1000) * (1 + atheismBonus + blackObeliskBonus);
 		return rate;
@@ -1003,6 +1011,7 @@ dojo.declare("classes.ui.religion.SacrificeBtnController", com.nuclearunicorn.ga
 		}
 
 		var tearCount = this.game.bld.get("ziggurat").on * amt;
+		tearCount *= (this.game.challenges.getChallenge("atheism").on ? this.game.challenges.getChallengeEffect("atheism") : 1);
 
 		this.game.resPool.addResEvent("unicorns", -unicornCount);
 		this.game.resPool.addResEvent("tears", tearCount);
@@ -1384,7 +1393,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 			}
 		}	//eo zg upgrades
 
-		if (game.challenges.currentChallenge != "atheism") {
+		if (!game.challenges.getChallenge("atheism").on) {
 			//------------------- religion -------------------
 			var religionPanel = new com.nuclearunicorn.game.ui.Panel($I("religion.panel.orderOfTheSun.label"), game.religion);
 			var content = religionPanel.render(container);
@@ -1477,7 +1486,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 			this.refineTCBtn.update();
 		}
 
-		if (this.game.challenges.currentChallenge != "atheism") {
+		if (!this.game.challenges.getChallenge("atheism").on) {
 			if (this.praiseBtn){
 				this.praiseBtn.update();
 			}

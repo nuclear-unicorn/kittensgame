@@ -15,8 +15,10 @@ WResourceRow = React.createClass({
 
         var isEqual = 
             oldRes.value == newRes.value &&
+            oldRes.reserve == newRes.reserve &&
             oldRes.maxValue == newRes.maxValue &&
             oldRes.perTickCached == newRes.perTickCached &&
+            oldRes.unlocked == newRes.unlocked &&
             this.props.isEditMode == nextProp.isEditMode &&
             this.props.isRequired == nextProp.isRequired &&
             this.state.visible == nextState.visible;
@@ -108,7 +110,7 @@ WResourceRow = React.createClass({
 
         if (season.modifiers[res.name] && perTick !== 0 ){
 
-            var modifier = (season.modifiers[res.name] + game.calendar.getWeatherMod() - 1) * 100;
+            var modifier = Math.floor((game.calendar.getWeatherMod(res) - 1) * 100);
             weatherModValue = modifier ? "[" + (modifier > 0 ? "+" : "") + modifier.toFixed() + "%]" : "";
 
             if (modifier > 0) {
@@ -149,6 +151,7 @@ WResourceRow = React.createClass({
                 res.title || res.name
             ),
             $r("div", {className:"res-cell " + resAmtClassName + specialClass}, game.getDisplayValueExt(res.value)),
+            $r("div", {className:"res-cell " + resAmtClassName + specialClass + " reserve"}, !game.challenges.getCondition("disableChrono").on && res.maxValue && res.reserve ? "+" + game.getDisplayValueExt(res.reserve) : ""),
             $r("div", {className:"res-cell maxRes"}, 
                 res.maxValue ? "/" + game.getDisplayValueExt(res.maxValue) : ""
             ),
@@ -224,7 +227,7 @@ WCraftShortcut = React.createClass({
                 $r("div", {className:"res-cell craft-link", onClick: this.doCraftAll}, $I("resources.craftTable.all")) : 
                 $r("div", {className:"res-cell craft-link"});
         }else{
-            elem = game.resPool.hasRes(craftPrices, craftRowAmt) ?  
+            elem = game.resPool.hasRes(craftPrices, craftRowAmt, true) ?
             $r("div", {className:"res-cell craft-link", onClick: this.doCraft}, 
                 "+" + game.getDisplayValueExt(craftRowAmt * (1 + craftRatio), null, null, 0))
             : $r("div", {className:"res-cell craft-link"});
@@ -282,7 +285,7 @@ WCraftShortcut = React.createClass({
     hasMinAmt: function(recipe){
 		var minAmt = Number.MAX_VALUE;
 		for (var j = 0; j < recipe.prices.length; j++){
-			var totalRes = game.resPool.get(recipe.prices[j].name).value;
+			var totalRes = game.resPool.getTotal(recipe.prices[j].name);
 			var allAmt = Math.floor(totalRes / recipe.prices[j].val);
 			if (allAmt < minAmt){
 				minAmt = allAmt;

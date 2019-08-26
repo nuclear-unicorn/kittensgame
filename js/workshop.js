@@ -2211,7 +2211,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		var craftAmt = amt * (1 + craftRatio);
 
 		//prevent undo giving free res
-		if (amt < 0 && this.game.resPool.get(res).value < Math.abs(craftAmt)) {
+		if (amt < 0 && this.game.resPool.getTotal(res) < Math.abs(craftAmt)) {
 			return false;
 		}
 
@@ -2221,7 +2221,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			prices[i].val *= amt;
 		}
 
-		if (bypassResourceCheck || this.game.resPool.hasRes(prices)) {
+		if (bypassResourceCheck || this.game.resPool.hasRes(prices, 1, true)) {
 			this.game.resPool.payPrices(prices);
 			this.game.resPool.addResEvent(res,craftAmt);
 			if (craft.upgrades){
@@ -2298,7 +2298,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 		var minAmt = Number.MAX_VALUE;
 		for (var j = prices.length - 1; j >= 0; j--) {
-			var totalRes = this.game.resPool.get(prices[j].name).value;
+			var totalRes = this.game.resPool.getTotal(prices[j].name);
 			var allAmt = totalRes / prices[j].val; // we need fraction here, do floor later
 			if (allAmt < minAmt){
 				minAmt = allAmt;
@@ -2328,14 +2328,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		this.game.village.sim.clearCraftJobs();
 	},
 
-	update: function(){
-		this.fastforward(1 / this.game.calendar.ticksPerDay);
-	},
-
-	fastforward: function(daysOffset) {
-		var times = daysOffset * this.game.calendar.ticksPerDay;
-
-		//-------------	 this is a poor place for this kind of functionality ------------
+	calculateMaxEffects: function(){
 		var scienceMaxBuilding = this.game.bld.getEffect("scienceMax"),
 			scienceMaxCompendiaCap =  this.game.bld.getEffect("scienceMaxCompendia"),
 			compendiaScienceMax = Math.floor(this.game.resPool.get("compedium").value * 10);
@@ -2365,6 +2358,17 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		var cultureBonusRaw = Math.floor(this.game.resPool.get("manuscript").value);
 		this.effectsBase["cultureMax"] = this.game.getTriValue(cultureBonusRaw, 0.01);
 		this.effectsBase["oilMax"] = Math.floor(this.game.resPool.get("tanker").value * 500);
+	},
+
+	update: function(){
+		this.fastforward(1 / this.game.calendar.ticksPerDay);
+	},
+
+	fastforward: function(daysOffset) {
+		var times = daysOffset * this.game.calendar.ticksPerDay;
+
+		//-------------	 this is a poor place for this kind of functionality ------------
+		this.calculateMaxEffects();
 
 		//sanity check
 		if (this.game.village.getFreeEngineer() < 0){

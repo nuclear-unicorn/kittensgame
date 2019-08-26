@@ -397,7 +397,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 			if (this.season >= this.seasonsPerYear) {
 				this.season = 0;
-				this.year += this.game.challenges.currentChallenge == "1000Years" && this.year >= 500 ? 0 : 1;
+				this.year += this.game.challenges.getChallenge("1000Years").on && this.year >= 500 ? 0 : 1;
 				newYear = true;
 			}
 		}
@@ -759,7 +759,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 		//==================== other calendar stuff ========================
 		//cap years skipped in 1000 years
-		if (this.game.challenges.currentChallenge == "1000Years" && this.year + yearsOffset > 500){
+		if (this.game.challenges.getChallenge("1000Years").on && this.year + yearsOffset > 500){
 			yearsOffset = Math.max(500 - this.year, 0);
 		}
 
@@ -778,16 +778,29 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 	onNewSeason: function(){
 		this.eventChance = 0;
 
-		if (this.game.rand(100) < 35 && this.year > 3){
-			var warmChance = 50;
-			if (this.game.challenges.getChallenge("winterIsComing").researched){
-				warmChance += 15;
+		if (this.year > 3){
+			var coldChance = 175;
+			var warmChance = 175;
+
+			if (this.game.challenges.getChallenge("winterIsComing").on) {
+				effect = this.game.challenges.getChallengeEffect("winterIsComing", "frequency");
+				coldChance += effect;
+				warmChance -= effect;
+				if (warmChance < 0) {
+					warmChance = 0;
+				}
+			}
+			if (this.getCurSeason().name == "winter" && this.game.challenges.getChallengeResearched("winterIsComing")){
+				coldChance = 0;
 			}
 
-			if (this.game.rand(100) < warmChance){
-				this.weather = "warm";
-			} else {
-				this.weather = "cold";
+			var rand = this.game.rand(1000);
+			if (rand < warmChance){
+				this.weather = "warm"
+			} else if (rand < warmChance + coldChance){
+				this.weather = "cold"
+			} else{
+				this.weather = null;
 			}
 		}else{
 			this.weather = null;
@@ -904,18 +917,32 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		}
 	},
 
-	getWeatherMod: function(){
-		var mod = 0;
-		if (this.weather == "warm"){
-			mod =  0.15;
-		} else if (this.weather == "cold"){
-			mod = -0.15;
+	getWeatherMod: function(res){
+		var mod = 1;
+
+		if (this.getCurSeason().modifiers[res.name]){
+			mod = this.getCurSeason().modifiers[res.name];
 		}
+
+		if (this.weather == "warm"){
+			mod += 0.15;
+		} else if (this.weather == "cold"){
+			mod -= 0.15;
+		}
+
+		if (this.game.challenges.getChallenge("winterIsComing").on && this.weather == "cold") {
+			mod = ((mod + 1) * this.game.challenges.getChallengeEffect("winterIsComing", "modifier")) - 1;
+		}
+
+		if (this.getCurSeason().name == "spring"){
+			mod *= this.game.challenges.getChallengeReward("winterIsComing");
+		}
+
 		return mod;
 	},
 
 	getCurSeason: function(){
-		if (this.game.challenges.currentChallenge == "winterIsComing"){
+		if (this.game.challenges.getChallenge("winterIsComing").on){
 			return this.seasons[3];	//eternal winter
 		}
 		return this.seasons[this.season];
@@ -923,7 +950,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 	getCurSeasonTitle: function(){
 		var title = this.getCurSeason().title;
-		if (this.game.challenges.currentChallenge == "winterIsComing"){
+		if (this.game.challenges.getChallenge("winterIsComing").on){
 			var numeral = '';
 			switch(this.season){
 				case 0:
@@ -946,7 +973,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 	getCurSeasonTitleShorten: function(){
 		var title = this.getCurSeason().shortTitle;
-		if (this.game.challenges.currentChallenge == "winterIsComing"){
+		if (this.game.challenges.getChallenge("winterIsComing").on){
 			var numeral = '';
 			switch(this.season){
 				case 0:

@@ -158,28 +158,29 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			var leaderTrait = this.leader.trait.name;
 			if (leaderTrait == trait) {
 				var burnedParagonRatio = 1 + this.game.prestige.getBurnedParagonRatio();
+				var reward = this.game.challenges.getChallengeResearched("anarchy") ? Math.sqrt(this.leader.rank) : 1;
 				// Modify the defautlObject depends on trait
 				switch (trait) {
 					case "engineer": // Crafting bonus
-						defaultObject = 0.05 * burnedParagonRatio;
+						defaultObject = 0.05 * burnedParagonRatio * reward;
 						break;
 					case "merchant": // Trading bonus
-						defaultObject = 0.030 * burnedParagonRatio;
+						defaultObject = 0.030 * burnedParagonRatio * reward;
 						break;
 					case "manager": // Hunting bonus
-						defaultObject = 0.5 * burnedParagonRatio;
+						defaultObject = 0.5 * burnedParagonRatio * reward;
 						break;
 					case "scientist": // Science prices bonus
 						for (var i = 0; i < defaultObject.length; i++) {
 							if (defaultObject[i].name == "science") {
-								defaultObject[i].val -= defaultObject[i].val * this.game.getHyperbolicEffect(0.05 * burnedParagonRatio, 1.0); //5% before BP
+								defaultObject[i].val -= defaultObject[i].val * this.game.getHyperbolicEffect(0.05 * burnedParagonRatio * reward, 1.0); //5% before BP
 							}
 						}
 						break;
 					case "wise": // Religion bonus
 						for (var i = 0; i < defaultObject.length; i++) {
 							if (defaultObject[i].name == "faith" || defaultObject[i].name == "gold") {
-								defaultObject[i].val -= defaultObject[i].val * this.game.getHyperbolicEffect(0.09 + 0.01 * burnedParagonRatio, 1.0); //10% before BP
+								defaultObject[i].val -= defaultObject[i].val * this.game.getHyperbolicEffect(0.09 + 0.01 * burnedParagonRatio * reward, 1.0); //10% before BP
 							}
 						}
 						break;
@@ -277,7 +278,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		var resDiff = catnipVal + catnipPerTick;
 
 		if (this.sim.getKittens() > 0){
-			if (resDiff < 0 || this.game.challenges.currentChallenge == "winterIsComing" && this.sim.getKittens() > this.sim.maxKittens && this.game.calendar.weather == "cold") {
+			if (resDiff < 0 || this.game.challenges.getChallenge("winterIsComing").on && this.sim.getKittens() > this.sim.maxKittens && this.game.calendar.weather == "cold") {
 
 				var starvedKittens = Math.abs(Math.round(resDiff));
 				if (starvedKittens > 1){
@@ -349,8 +350,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			workingKittens += this.jobs[i].value;
 		}
 
-		var diligentKittens = this.game.challenges.currentChallenge == "anarchy"
-			? Math.floor(this.getKittens() / 2)
+		var diligentKittens = this.game.challenges.getChallenge("anarchy").on
+			? Math.ceil(this.getKittens() * this.game.challenges.getChallengeEffect("anarchy"))
 			: this.getKittens();
 
 		return diligentKittens - workingKittens;
@@ -551,8 +552,15 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			kittens.push(_kitten);
 		}
 
+		var reserve = [];
+		for (var i in this.sim.reserve){
+			var _kitten = this.sim.reserve[i].save();
+			reserve.push(_kitten);
+		}
+
 		saveData.village = {
 			kittens : kittens,
+			reserve : reserve,
 			maxKittens: this.maxKittens,
 			jobs: this.filterMetadata(this.jobs, ["name", "unlocked", "value"]),
 			map : this.map.villageData
@@ -562,12 +570,17 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 	load: function(saveData){
 		if (saveData.village){
 			var kittens = saveData.village.kittens;
+			var reserve = saveData.village.reserve;
 			//quick legacy hack, remove in future
 			if (!kittens.length) {
 				kittens = [];
 			}
+			if (!reserve) {
+				reserve = [];
+			}
 
 			this.sim.kittens = [];
+			this.sim.reserve = [];
 			this.game.village.traits = [];
 
 			for (var i = kittens.length - 1; i >= 0; i--) {
@@ -588,6 +601,15 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 				}*/
 
 				this.sim.kittens.unshift(newKitten);
+			}
+
+			for (var i = reserve.length - 1; i >= 0; i--) {
+				var reserve = reserve[i];
+
+				var newKitten = new com.nuclearunicorn.game.village.Kitten();
+				newKitten.load(reserve);
+
+				this.sim.reserve.unshift(newKitten);
 			}
 
 			this.maxKittens  = saveData.village.maxKittens;
@@ -1186,6 +1208,7 @@ dojo.declare("classes.village.Map", null, {
 dojo.declare("classes.village.KittenSim", null, {
 
 	kittens: null,
+	reserve: null,
 
 	game: null,
 
@@ -1249,7 +1272,7 @@ dojo.declare("classes.village.KittenSim", null, {
 				kitten.trait = kitten.traits[kitten.rand(kitten.traits.length)];
 			}
 
-			if (kitten.job && game.calendar.day >= 0 && game.challenges.currentChallenge != "anarchy"){
+			if (kitten.job && game.calendar.day >= 0 && !game.challenges.getChallenge("anarchy").on){
 				//Initialisation of job's skill
 				if (!kitten.skills[kitten.job]){
 					kitten.skills[kitten.job] = 0;
@@ -1766,7 +1789,7 @@ dojo.declare("classes.ui.village.Census", null, {
 
 		//--------------------------------------------------------------------------------------
 		this.governmentDiv = null;
-		if (this.game.challenges.currentChallenge != "anarchy") {
+		if (!this.game.challenges.getChallenge("anarchy").on) {
 			this.renderGovernment(container);
 		}
 		//--------------------------------------------
@@ -1857,7 +1880,7 @@ dojo.declare("classes.ui.village.Census", null, {
 				}
 			}, div);
 
-			if (this.game.challenges.currentChallenge != "anarchy") {
+			if (!this.game.challenges.getChallenge("anarchy").on) {
 				var leaderHref = dojo.create("a", {
 					href: "#", innerHTML: "",
 					style: {
@@ -1875,7 +1898,7 @@ dojo.declare("classes.ui.village.Census", null, {
 				}
 			}, linksDiv);
 
-			/*if (this.game.challenges.currentChallenge != "anarchy") {
+			/*if (!this.game.challenges.getChallenge("anarchy").on) {
 				var senatorHref = dojo.create("a", {
 					href: "#", innerHTML: $I("village.btn.senator"),
 					style: {
@@ -1892,7 +1915,7 @@ dojo.declare("classes.ui.village.Census", null, {
 
 			}, this.game, i));
 
-			if (this.game.challenges.currentChallenge != "anarchy") {
+			if (!this.game.challenges.getChallenge("anarchy").on) {
 				dojo.connect(leaderHref, "onclick", this, dojo.partial(function(census, i, event){
 					event.preventDefault();
 					var game = census.game;
@@ -1910,7 +1933,7 @@ dojo.declare("classes.ui.village.Census", null, {
 			}
 			//rankExp
 
-			/*if (this.game.challenges.currentChallenge != "anarchy") {
+			/*if (!this.game.challenges.getChallenge("anarchy").on) {
 				dojo.connect(senatorHref, "onclick", this, dojo.partial(function(census, i, event){
 					event.preventDefault();
 
@@ -2112,7 +2135,7 @@ dojo.declare("classes.ui.village.Census", null, {
 		//TODO: promote leader link
 		var govInfo = this.getGovernmentInfo();
 
-		if (this.game.challenges.currentChallenge != "anarchy") {
+		if (!this.game.challenges.getChallenge("anarchy").on) {
 			this.leaderDiv.innerHTML = "<strong>" + $I("village.census.lbl.leader") + ":</strong> " + govInfo.leaderInfo;
 		}
 
@@ -2129,7 +2152,7 @@ dojo.declare("classes.ui.village.Census", null, {
             } else {
                 dojo.style(record.unassignHref, "display", "none");
             }
-			/*if (this.game.challenges.currentChallenge != "anarchy") {
+			/*if (!this.game.challenges.getChallenge("anarchy").on) {
 				dojo.style(record.senatorHref, "display", "none");
 			}*/
 
@@ -2146,7 +2169,7 @@ dojo.declare("classes.ui.village.Census", null, {
             var skillInfo = this.getSkillInfo(kitten);
 			record.content.innerHTML += skillInfo;
 
-			if (this.game.challenges.currentChallenge != "anarchy") {
+			if (!this.game.challenges.getChallenge("anarchy").on) {
 				record.leaderHref.innerHTML = kitten.isLeader ? "&#9733;" : "&#9734;"; //star-shaped link to reduce visual noise
 			}
 
@@ -2410,7 +2433,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 			}),
 			controller: new classes.village.ui.VillageButtonController(this.game, {
 				updateVisible: function (model) {
-					model.visible = this.game.village.leader != undefined && this.game.workshop.get("register").researched && this.game.challenges.currentChallenge != "anarchy";
+					model.visible = this.game.village.leader != undefined && this.game.workshop.get("register").researched && !this.game.challenges.getChallenge("anarchy").on;
 				}
 			})
 		}, this.game);
@@ -2426,7 +2449,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 			}),
             controller: new classes.village.ui.VillageButtonController(this.game, {
 				updateVisible: function (model) {
-					model.visible = this.game.village.leader !== undefined && this.game.workshop.get("register").researched && this.game.challenges.currentChallenge != "anarchy";
+					model.visible = this.game.village.leader !== undefined && this.game.workshop.get("register").researched && !this.game.challenges.getChallenge("anarchy").on;
 				}
 			})
 		}, this.game);
@@ -2634,7 +2657,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		case value < 9000:
 			return 1.50;
 		default:
-			return 1.75;
+			return 1.75 * this.game.challenges.getChallengeReward("anarchy");
 		}
 	},
 

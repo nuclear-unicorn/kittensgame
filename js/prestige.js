@@ -433,12 +433,13 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			var perk = this.perks[i];
 			perk.unlocked = perk.defaultUnlocked || false;
 			perk.researched = false;
+			perk.reserve = false;
 		}
 	},
 
 	save: function(saveData){
 		saveData.prestige = {
-			perks: this.filterMetadata(this.perks, ["name", "unlocked", "researched"])
+			perks: this.filterMetadata(this.perks, ["name", "unlocked", "researched", "reserve"])
 		};
 	},
 
@@ -506,6 +507,10 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			storageRatio += (this.game.resPool.get("burnedParagon").value / 2000) * paragonRatio;
 		}
 		return storageRatio;
+	},
+
+	getParagonBonus: function(includeReserve){
+		return (this.game.resPool.get("apotheosis").value + (includeReserve ? this.game.resPool.get("apotheosis").reserve : 0)) / 100;
 	},
 
 	unlockAll: function(){
