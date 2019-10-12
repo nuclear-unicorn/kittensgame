@@ -595,11 +595,8 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				"baseMetalMaxRatio": 0.01
 			},
 			calculateEffects: function(self, game){
-				//todo use secondary booster structure
-			}/*,
-			upgrades: {
-				spaceBuilding: ["containmentChamber"]
-			}*/
+				//todo: use secondary booster structure
+			}
 		}]
 	},{
 		name: "terminus",
@@ -851,7 +848,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				unlocked: false,
 				priceRatio: 1.25,
 				prices: [
-					{name: "science", val: 250000000 },
+					{name: "science", val: 25000000 },
 					{name: "uranium", val: 5000000 }
 				],
 				effects: {

@@ -56,7 +56,6 @@ dojo.declare("com.nuclearunicorn.i18n.Lang", null, {
 			"fr": "French",
 			"cz": "Česky",
 			"pl": "Polskie"
-			
 		};
 	},
 
@@ -383,7 +382,9 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 	loadMetadata: function(meta, saveMeta){
 		if (!saveMeta){
 			console.trace(saveMeta);
-			throw "Unable to load save metadata, meta is empty";
+			console.error("Unable to load save metadata, meta is empty");
+			
+			return;
 		}
 
 		for(var i = 0; i< saveMeta.length; i++){
@@ -2202,26 +2203,30 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingResearchBtnController", com.nuc
 		if ((!model.metadata.researched && this.hasResources(model)) || this.game.devMode){
 			this.payPrice(model);
 
-			var meta = model.metadata;
-
-			meta.researched = true;
-
-			if (meta.handler){
-				meta.handler(this.game, meta);
-			}
-
-			if (meta.unlocks) {
-				this.game.unlock(meta.unlocks);
-			}
-
-			if (meta.upgrades) {
-				this.game.upgrade(meta.upgrades);
-			}
+			this.onPurchase(model);
+			
 			callback(true);
 			this.game.render();
 			return;
 		}
 		callback(false);
+	},
+
+	onPurchase: function(model){
+		var meta = model.metadata;
+		meta.researched = true;
+
+		if (meta.handler){
+			meta.handler(this.game, meta);
+		}
+
+		if (meta.unlocks) {
+			this.game.unlock(meta.unlocks);
+		}
+
+		if (meta.upgrades) {
+			this.game.upgrade(meta.upgrades);
+		}
 	}
 });
 
