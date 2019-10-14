@@ -127,7 +127,7 @@
     "village.job.geologist": "Geologist",
     "village.job.geologist.desc": "+0.075 coal per second (may be upgraded)",
     "village.job.engineer": "Engineer",
-    "village.job.engineer.desc": "Engineer can operate one factory to automate resource production.<br />Assign your engineers in workshop tab, they will craft automatically one time every 10 minutes.",
+    "village.job.engineer.desc": "Engineers can automate resource crafting (once per 10 minute). Every factory unlocks one engineer slot",
     "village.msg.kitten": "kitten",
     "village.msg.kittens": "kittens",
     "village.msg.starved": "starved to death.",
@@ -1639,5 +1639,9 @@
     "effectsMgr.statics.heatPerTick.title": "Heat transfer",
     "effectsMgr.statics.voidResonance.title": "Order of the Void bonus",
     "effectsMgr.type.resGlobalCraftRatio": "{0} craft effectiveness bonus",
+    "trade.embassy.open": "Open embassy",
+    "trade.embassy":"Embassy level ({0})",
+    "trade.embassy.desc": "Improve your diplomatic relationships by establishing an embassy",
+    "btn.locked.capital": "(Locked)",
     "time.overheat": "!"
 }

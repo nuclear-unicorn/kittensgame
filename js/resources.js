@@ -428,7 +428,10 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
         title: $I("resources.kerosene.title"),
         type: "common",
         craftable: true,
-        color: "darkYellow"
+		color: "darkYellow",
+		tags:{
+			compound: true
+		}
 	},{
 		name : "parchment",
 		title: $I("resources.parchment.title"),
@@ -463,7 +466,10 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		visible: true,
 		craftable: true,
 		color: "#4EA24E",
-		calculatePerTick: true
+		calculatePerTick: true,
+		tags:{
+			compound: true
+		}
 	},{
 		name : "megalith",
 		title: $I("resources.megalith.title"),

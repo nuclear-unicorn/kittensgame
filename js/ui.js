@@ -559,7 +559,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             var calendarSignSpan = dojo.byId("calendarSign");
             var cycle = calendar.cycles[calendar.cycle];
             if (cycle && this.game.science.get("astronomy").researched) {
-            	calendarSignSpan.style = "color: " + calendar.cycleYearColor();
+            	calendarSignSpan.style.color = calendar.cycleYearColor();
                 calendarSignSpan.innerHTML = cycle.glyph + " ";
             }
         } else {

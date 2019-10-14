@@ -160,10 +160,9 @@ dojo.declare("classes.ui.toolbar.ToolbarHappiness", classes.ui.ToolbarIcon, {
 			tooltip += $I("village.happiness.festival") + ": +30%<br>";
 		}
 
-        var unhappiness = ( this.game.village.getKittens()-5 ) * 2;
-        var unhappiness = unhappiness;
-
-		var unhappinessReduction = unhappiness * this.game.getEffect("unhappinessRatio", true);
+        var unhappiness = this.game.village.getUnhappiness(),
+			unhappinessReduction = unhappiness * this.game.getEffect("unhappinessRatio", true);
+			
 		tooltip += $I("village.happiness.penalty") + ": -" + this.game.getDisplayValueExt(unhappiness+unhappinessReduction, false, false, 0) + "%<br>";
 
         tooltip += "* " + $I("village.happiness.penalty.base") + ": -" + this.game.getDisplayValueExt(unhappiness, false, false, 0) + "%<br>";
