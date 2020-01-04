@@ -1129,13 +1129,10 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 		this.updateTab();
 	},
 
-	updateTab: function(){
-		//-------- update tab title -------
-		var elders = this.game.diplomacy.get("leviathans");
-		if (elders.unlocked){
-			this.tabName = $I("tab.name.trade") + " (!)";
-		} else {
-			this.tabName = $I("tab.name.trade");
+	updateTab: function() {
+		this.tabName = $I("tab.name.trade");
+		if (this.game.diplomacy.get("leviathans").unlocked) {
+			this.tabName += $I("common.warning");
 		}
 		if (this.domNode) {
 			this.domNode.innerHTML = this.tabName;

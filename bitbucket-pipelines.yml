@@ -1,0 +1,14 @@
+image: node:10.15.3
+
+pipelines:
+  default:
+    - step:
+        caches:
+          - node
+        script: 
+            - pipe: atlassian/ssh-run:0.2.3
+              variables:
+                SSH_USER: 'bloodrizer'
+                SERVER: '104.248.76.129'
+                MODE: 'command'
+                COMMAND: '/var/www/kittensgame.com/html/deploy.sh'

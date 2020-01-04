@@ -214,7 +214,7 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
         {   id: 2,
             name: "lotusHat",
             title: "Lotus Hat",
-            description: "Hat in the shape of louts",
+            description: "Hat in the shape of a lotus",
             difficulty: "A",
             condition: function(){
                 return this.game.stats.getStat("totalResets").val >= 50;

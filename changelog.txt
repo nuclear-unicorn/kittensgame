@@ -1,7 +1,29 @@
-v 1.4.6.2 (29 may 2019)
-Major: fixed typo in Orbital Geodesy description
+v 1.4.7.0
+Major:
+* Fix Biofuel Processing (Data Center <-> Biolab synergy now works regardless of powered state)
+* Add Time Boiler, a new building increasing heat capacity of Chrono Furnace
+* Allow to get karma or paragon from present box after getting Anachronomancy
+* Export save content directly in text file
 
 Minor:
+* Fix a lot of typos, texts and translations (especially Russian and Chinese)
+* Fix kittens preserved by Cryochambers (sort by rank, not by remaining XP)
+* Allow to shatter ×500
+* Allow to hold festivals ×100
+* Allow to sacrifice/refine 20/50 % of unicorns/alicorns/TCs (similarly to trades)
+* Fix Tempus Fugit (make an explicit on/off button like Steamworks, save status of Tempus Fugit for refresh (but not for reset))
+* Improve log rendering performance
+* Don't save activation state of Chrono Furnace
+* Display temporal flux total time and heat dissipation remaining/total time
+* Fix workshop automation cap
+* Replace “Resets Made” with “Run Number”
+* Add links to preview versions
+* Highlight ‘+’ link of buildings not fully activated
+
+v 1.4.6.2 (29 may 2019)
+Minor: fixed typo in Orbital Geodesy description
+
+Major:
 TF Cells / QDot Cells
 Esc is back + keypad numbers to change tabs
 Backported Redshift Heat

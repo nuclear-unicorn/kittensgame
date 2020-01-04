@@ -170,13 +170,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					effect = effectValue * bld.on;
 				}
 
-				// Previously, catnip demand (or other buildings that both effected the same resource)
-				// could have theoretically had more than 100% reduction because they diminished separately,
-				// this takes the total effect and diminishes it as a whole.
-				if(game.isHyperbolic(effectName) && effect < 0) {
-				  effect = game.getHyperbolicEffect(effect, 1.0);
-				}
-
 				//probably not the best place to handle this mechanics
 				//----------- move to separate part? -----------
 				if (effectName == "productionRatio" || effectName == "magnetoRatio"){
@@ -545,7 +538,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				effects["cultureMax"] = 250;
 				effects["scienceMaxCompendia"] = 1000;
 
-				var biolabBonus = game.bld.get("biolab").on * game.getEffect("uplinkDCRatio");
+				var biolabBonus = game.bld.get("biolab").val * game.getEffect("uplinkDCRatio");
 				if (game.workshop.get("uplink").researched){
 					effects["scienceMaxCompendia"] *= (1+biolabBonus);
 					effects["scienceMax"] *= (1+biolabBonus);
@@ -657,7 +650,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				self.togglable = true;
 			}
 			self.effects["energyConsumption"] = energyCons;
-			var datacenterBonus = game.bld.get("library").on * game.getEffect("uplinkLabRatio");
+			var datacenterBonus = game.bld.get("library").val * game.getEffect("uplinkLabRatio");
 			if (game.workshop.get("uplink").researched && game.bld.get("library").stage == 1){
 				self.effects["scienceMax"] *= (1 + datacenterBonus);
 			}
@@ -1095,7 +1088,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 
 			var baseAutomationRate = 0.02;
 			// Cap automation at 90% of resource cap to prevent trying to craft more than you have
-			var automationRate = Math.min(baseAutomationRate * self.on, 0.9);
+			var automationRate = Math.min(baseAutomationRate * (self.on + 1), 0.9);
 
 			function newCrafter(consumedResource, craftedResourceName, isAllowed) {
 				var consumedQuantity = consumedResource.value * automationRate;
@@ -1715,12 +1708,12 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			buildings: ["library"]
 		},
 		// TODO Actually "action" is almost always just updating effects (unclear from the name), better separate the 2 concerns: update effects (can be done several times per tick) and perform specific action (only once per tick!)
-		// TODO Separation of concerns currently done only for AI Core, will be systematized later
+		// TODO Separation of concerns currently done only for AI Core and Time Boilers (REQUIRED by non-proportional effect!), will be systematized later
 		updateEffects: function(self, game) {
-			// Core #1: 2   ; Total:  2  ; Average: 2    =  8/4 = (3*1+5)/4
-			// Core #2: 3.5 ; Total:  5.5; Average: 2.75 = 11/4 = (3*2+5)/4
-			// Core #3: 5   ; Total: 10.5; Average: 3.5  = 14/4 = (3*3+5)/4
-			// Core #4: 6.5 ; Total: 17  ; Average: 4.25 = 17/4 = (3*4+5)/4
+			// Core #1: 2  ; Total:  2  ; Average: 2    =  8/4 = (3*1+5)/4
+			// Core #2: 3.5; Total:  5.5; Average: 2.75 = 11/4 = (3*2+5)/4
+			// Core #3: 5  ; Total: 10.5; Average: 3.5  = 14/4 = (3*3+5)/4
+			// Core #4: 6.5; Total: 17  ; Average: 4.25 = 17/4 = (3*4+5)/4
 			// etc.
 			self.effects["energyConsumption"] = (3 * self.on + 5) / 4;
 			self.effects["energyConsumption"] *= game.challenges.getEnergyMod();
@@ -2061,7 +2054,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 
 		var baseAutomationRate = 0.02;
 		// Cap automation at 90% of resource cap to prevent trying to craft more than you have
-		var automationRate = Math.min(baseAutomationRate * steamworks.on, 0.9);
+		var automationRate = Math.min(baseAutomationRate * (steamworks.on + 1), 0.9);
 
 		var automationDelay = this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear / (this.game.workshop.get("advancedAutomation").researched ? 2 : 1);
 		var numberOfAutomations = Math.floor(daysOffset / automationDelay);

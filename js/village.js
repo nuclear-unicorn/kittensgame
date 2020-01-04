@@ -250,6 +250,9 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		if ( this.hasFreeKittens(amt) && this.getWorkerKittens(job.name) + amt <= this.getJobLimit(job.name) ) {
 			this.sim.assignJob(job.name, amt);
 			jobRef.value += amt;
+			if (job.name == "engineer") {
+				this.game.workshopTab.updateTab();
+			}
 		}
 	},
 
@@ -372,14 +375,12 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 	},
 
 	getWorkerKittens: function(jobName) {
-		var engineer = 0;
 		for (var i = this.jobs.length - 1; i >= 0; i--) {
 			if (this.jobs[i].name == jobName) {
-				engineer = this.jobs[i].value;
+				return this.jobs[i].value;
 			}
 		}
-
-		return engineer;
+		return 0;
 	},
 
 	getFreeEngineer: function() {
@@ -1380,6 +1381,13 @@ dojo.declare("classes.village.KittenSim", null, {
 		return killed.length;
 	},
 
+	sortKittensByExp: function() {
+		this.kittens.sort(function(a,b) {
+			var rankDiff = a.rank - b.rank;
+			return rankDiff != 0 ? rankDiff : a.exp - b.exp;
+		});
+	},
+
 	getKittens: function(){
 		return this.kittens.length;
 	},
@@ -1416,7 +1424,7 @@ dojo.declare("classes.village.KittenSim", null, {
 	 */
 	assignJob: function(job, amt){
 		var freeKittens = [];
-		var optimizeJobs = (this.game.workshop.get("register").researched && this.game.village.leader) ? true : false;
+		var optimizeJobs = this.game.workshop.get("register").researched && this.game.village.leader;
 
 
 		for (var i = this.kittens.length - 1; i >= 0; i--) {
@@ -1426,7 +1434,7 @@ dojo.declare("classes.village.KittenSim", null, {
 					freeKittens.push({"id": i});
 					continue;
 				}
-				var val = kitten.skills[job] ? kitten.skills[job] : 0;
+				var val = kitten.skills[job] || 0;
 				freeKittens.push({"id": i, "val": val});
 			}
 		}
@@ -1854,7 +1862,7 @@ dojo.declare("classes.ui.village.Census", null, {
 		var kittensLimit = 0;
 
 		var sim = this.game.village.sim;
-		this.sortKittensByExp(sim.kittens);
+		sim.sortKittensByExp();
 
 		for (var i = sim.kittens.length - 1; i >= 0 && kittensLimit < 10; i--) {
 
@@ -1979,19 +1987,6 @@ dojo.declare("classes.ui.village.Census", null, {
                 leaderHref: leaderHref
 			});
 		}
-	},
-
-	sortKittensByExp: function(kittens){
-		var v = this.game.village;
-		kittens.sort(function(a,b){
-		        if (a.rank > b.rank){
-				 return 1;
-			} else if (a.rank < b.rank){
-				 return -1;
-			} else {
-				 return a.exp - b.exp;
-			}
-		});
 	},
 
 	makeLeader: function(kitten){
@@ -2221,35 +2216,25 @@ dojo.declare("classes.village.ui.VillageButtonController", com.nuclearunicorn.ga
 dojo.declare("classes.village.ui.FestivalButtonController", classes.village.ui.VillageButtonController, {
 	fetchModel: function(options) {
 		var model = this.inherited(arguments);
-
-		var catnipVal = this.game.resPool.get("catnip").value;
-		var catnipCost = model.prices[0].val;
-
-		var isVisible = false;
-		if (this.game.prestige.getPerk("carnivals").researched){
-			isVisible = true;
-			if (!this.hasMultipleResources(10)){
-				isVisible = false;
-			}
-		}
-		else {
-			isVisible = false;
-		}
-		var self = this;
-
-		model.x10Link = {
-			title: "x10",
-			visible: isVisible,
-			handler: function(btn, callback){
-				self.game.villageTab.holdFestival(10);
-				self.game.resPool.addResEvent("manpower", -1500 * 10);
-				self.game.resPool.addResEvent("culture", -5000 * 10);
-				self.game.resPool.addResEvent("parchment", -2500  *10);
-				callback(true);
-			}
-		};
+		model.x10Link = this._newLink(10);
+		model.x100Link = this._newLink(100);
 		return model;
 	},
+
+    _newLink: function(holdQuantity) {
+        var self = this;
+        return {
+        	title: "x" + holdQuantity,
+            visible: this.game.prestige.getPerk("carnivals").researched && this.hasMultipleResources(holdQuantity),
+            handler: function(btn, callback){
+				self.game.villageTab.holdFestival(holdQuantity);
+				self.game.resPool.addResEvent("manpower", -1500 * holdQuantity);
+				self.game.resPool.addResEvent("culture", -5000 * holdQuantity);
+				self.game.resPool.addResEvent("parchment", -2500 * holdQuantity);
+				callback(true);
+			}
+        };
+    },
 
 	updateVisible: function (model) {
 		model.visible = this.game.science.get("drama").researched;
@@ -2265,23 +2250,16 @@ dojo.declare("classes.village.ui.FestivalButtonController", classes.village.ui.V
 });
 
 dojo.declare("classes.village.ui.FestivalButton", com.nuclearunicorn.game.ui.ButtonModern, {
-	x10: null,
-
-	renderLinks: function(){
-		this.x10 = this.addLink(this.model.x10Link.title,
-			this.model.x10Link.handler, false
-		);
+	renderLinks: function() {
+		this.x100 = this.addLink(this.model.x100Link.title, this.model.x100Link.handler, false);
+		this.x10 = this.addLink(this.model.x10Link.title, this.model.x10Link.handler, false);
 	},
 
-	update: function(){
+	update: function() {
 		this.inherited(arguments);
-
-
-		if (this.x10){
-			dojo.style(this.x10.link, "display", this.model.x10Link.visible ? "" : "none");
-		}
+		dojo.style(this.x10.link, "display", this.model.x10Link.visible ? "" : "none");
+		dojo.style(this.x100.link, "display", this.model.x100Link.visible ? "" : "none");
 	}
-
 });
 
 /**

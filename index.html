@@ -51,7 +51,15 @@
 
 		<script type="text/javascript">
 
-			var version = "1470";
+			var version = "1470a";
+
+			// Warning: As the URL of gamma is contained in URLs of alpha and beta, gamma MUST be declared before them
+			var branches = {
+				"mainline": "http://bloodrizer.ru/games/kittens/",
+				"gamma": "http://kittensgame.com/web/",
+				"beta": "http://kittensgame.com/web/beta/",
+				"alpha": "http://kittensgame.com/web/alpha/"
+			};
 
 			var loadingProgress = 0,
 				progressMax = 0;
@@ -98,9 +106,25 @@
 				}
 			}
 
-			dojo.addOnLoad(function(){
+			dojo.addOnLoad(function() {
+				var currentBranch = "mainline";
+				for (var branch in branches) {
+					var linkID = "#" + branch + "Branch";
+					$(linkID).attr("target", "_blank");
+					var branchURL = branches[branch];
+					$(linkID).attr("href", branchURL);
+					if (window.location.href.indexOf(branchURL) === 0) {
+						currentBranch = branch;
+					}
+				}
+
+				var displayedVersion = version.split('').join('.');
+				if (currentBranch != "mainline") {
+					displayedVersion += '-&' + currentBranch + ';';
+				}
+				$("#versionLink").html(displayedVersion);
+
 				$("#tooltip").hide();
-				$("#versionLink").html(version.split('').join('.'));
 
 				SystemJS.config({
 					baseURL: ''
@@ -254,6 +278,13 @@
 					Kittens Game <span style="font-size: small;">by <a href="http://bloodrizer.ru/" class="copyright" target="_blank">bloodrizer</a></span>
 					<!--- a Dark Souls of incremental gaming -->
 
+					<span style="font-size: small;">
+						<a id="alphaBranch" title="experimental, unstable">&alpha;</a>
+						<a id="betaBranch" title="experimental, stable">&beta;</a>
+						<a id="gammaBranch" title="stable, nighty build">&gamma;</a>
+						<a id="mainlineBranch" title="stable official mainline">ML</a>
+					</span>
+
 					<a href="#" style="color: red">
 						<!-- nothing exceptional there so far -->
 					</a>
@@ -307,11 +338,11 @@
 						Space
 
 					Major: 4
-						Chronofurnace
+						Chrono Furnace
 						Time Impedance
 
-					Minor 6:
-						Science rework
+					Minor 7:
+						Time Boiler
 
 					Rev: 0
 						-
@@ -511,6 +542,9 @@
 			<div id="exportDiv" style="display: none" class="dialog help">
 				<h1>Export To:</h1>
 				<input type="button" onclick="gamePage.saveExportDropbox();" value="Dropbox (Beta)">
+				<input type="button" onclick="gamePage.saveToFile(false);" value="File (simple name)">
+				<input type="button" onclick="gamePage.saveToFile(true);" value="File (full name)">
+				<a id="download-link" target="_blank" style="display: none"></a>
 				<br>
 				<h1>Text Export:</h1>
 				<br>
@@ -550,12 +584,13 @@
 			<div id="footerLinks" class="links-block">
 				<a href="http://www.reddit.com/r/kittensgame/" target="_blank">reddit</a> |
 				<a href="http://bloodrizer.ru/games/kittens/wiki/" target="_blank">wiki</a> |
-				<a href="https://discord.gg/2arBf9K" target="_blank">discord</a> |
+				<a href="https://discord.gg/2arBf9K" target="_blank">Discord</a> |
 				<!-- <a href="http://kittensgame.tumblr.com" target="_blank">tumblr</a> | -->
 				<!-- <a href="#" onclick="$('#helpDiv').toggle();">help</a> | -->
 				<a href="#" onclick="$('#creditsDiv').toggle();">credits</a> |
-				<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=82FJX5M8M3GVN" target="_blank">donate</a> <!-- |
-				<a href="classic/" target="_blank">classic</a> -->
+				<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=82FJX5M8M3GVN" target="_blank">donate</a> |
+				<a href="https://www.patreon.com/bloodrizer" target="_blank">Patreon</a>
+				<!--  | <a href="classic/" target="_blank">classic</a> -->
 			</div>
 		</div>
 

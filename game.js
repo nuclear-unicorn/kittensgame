@@ -1012,6 +1012,12 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "perTick"
 			},
 
+			"heatMaxExpansion": {
+				title: $I("effectsMgr.statics.heatMaxExpansion.title"),
+				type: "fixed",
+				calculation: "nonProportional"
+			},
+
 			"voidResonance": {
 				title: $I("effectsMgr.statics.voidResonance.title"),
 				type: "ratio"
@@ -1116,6 +1122,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	totalUpdateTimeCurrent : 0,
 
 	pauseTimestamp: 0, //time of last pause
+	
+	lastDateMessage: null,  //Stores the most recent date message to prevent header spam
 
 	effectsMgr: null,
 
@@ -1352,18 +1360,35 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * Display a message in the console. Returns a <span> node of a text container
 	 */
 	msg: function(message, type, tag, noBullet){
-		var hasCalendarTech = this.science.get("calendar").researched;
-		var messageLine = this.console.msg(message, type, tag, noBullet);
 
-		if (messageLine && hasCalendarTech){
-			this.console.msg($I("calendar.year.ext", [this.calendar.year.toLocaleString(), this.calendar.getCurSeasonTitle()]), "date", null, false);
+		var filters = dojo.clone(game.console.filters);
+		if (tag && filters[tag]){
+			var filter = filters[tag];
+
+			if (!filter.enabled) {
+				return;
+			}
 		}
+
+		var hasCalendarTech = this.science.get("calendar").researched;
+
+		if (hasCalendarTech){
+			var currentDateMessage = $I("calendar.year.ext", [this.calendar.year.toLocaleString(), this.calendar.getCurSeasonTitle()]);
+			if (this.lastDateMessage !== currentDateMessage) {
+				this.console.msg(currentDateMessage, "date", null, false);
+				this.lastDateMessage = currentDateMessage;
+			}
+		}
+
+		var messageLine = this.console.msg(message, type, tag, noBullet);
 
 		return messageLine;
 	},
 
 	clearLog: function(){
+		dojo.empty('gameLog');
 		this.console.clear();
+		this.lastDateMessage = null;
 	},
 
 	saveUI: function(){
@@ -1691,6 +1716,24 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
         };
 
 		this.saveImportDropboxText(data, callback);
+	},
+
+    saveToFile: function(withFullName) {
+        var $link = $('#download-link');
+
+        var data = JSON.stringify(this.save());
+        var lzdata = LZString.compressToBase64(data);
+        var blob = new Blob([lzdata], {type: 'text/plain'});
+        $link.attr('href', window.URL.createObjectURL(blob));
+
+        var filename = 'Kittens Game';
+        if (withFullName) {
+            filename += ' - Run ' + (this.stats.getStat('totalResets').val + 1)
+                + ' - ' + $I('calendar.year.full', [this.calendar.year, this.calendar.getCurSeasonTitle(), Math.floor(this.calendar.day)]);
+        }
+        $link.attr('download', filename + '.txt');
+
+        $link.get(0).dispatchEvent(new MouseEvent('click'));
 	},
 
 	saveExportDropbox: function(){
@@ -3294,11 +3337,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var msg = $I("reset.prompt") + "\n\n";
 			msg += $I("reset.prompt.base");
 		if (this.resPool.get("kittens").value > 70){
-			msg += $I("reset.prompt.70");
+			msg += " " + $I("reset.prompt.70");
 		}else if (this.resPool.get("kittens").value > 60){
-			msg += $I("reset.prompt.60");
+			msg += " " + $I("reset.prompt.60");
 		}else if (this.resPool.get("kittens").value <= 35){
-			msg += $I("reset.prompt.35");
+			msg += " " + $I("reset.prompt.35");
 		}
         var game = this;
 
@@ -3589,25 +3632,17 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 		}
 
-		var newKittens= [];
-		var reserveKittens= this.village.sim.reserve;
-		if (this.time.getVSU("cryochambers").on > 0) {
-			var kittens = this.village.sim.kittens;
-
-			var newKittensSort = [];
-			for (i = 0; i < kittens.length; i++) {
-				newKittensSort.push({"id": i, "sort": kittens[i].exp}); // Sorted by exp
-			}
-			newKittensSort.sort(function(a, b){return b.sort-a.sort;});
-
-			for (var j = 0; j < this.time.getVSU("cryochambers").on; j++) {
-				if (j < newKittensSort.length){
-					delete kittens[newKittensSort[j].id].job;
-					newKittens.push(kittens[newKittensSort[j].id]);
-				}
+		var newKittens = [];
+		var cryochambers = this.time.getVSU("cryochambers").on;
+		if (cryochambers > 0) {
+			this.village.sim.sortKittensByExp();
+			newKittens = this.village.sim.kittens.slice(-cryochambers);
+			for (var i in newKittens) {
+				delete newKittens[i].job;
 			}
 		}
 
+		var reserveKittens= this.village.sim.reserve;
 		if (disableChrono.on) {
 			for (var i = 0; i < newKittens.length; i++) {
 				reserveKittens.push(newKittens[i]);
@@ -3673,8 +3708,14 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				tu: this.religion.filterMetadata(this.religion.transcendenceUpgrades, ["name", "val", "on", "reserve", "unlocked"])
 			},
 			science: {
-				hideResearched: false,
-				techs: []
+				hideResearched: this.science.hideResearched,
+				techs: [],
+				policies: []
+			},
+			space: {
+				hideResearched: this.space.hideResearched,
+				programs: [],
+				planets: []
 			},
 			time: {
 				cfu: [{
@@ -3690,6 +3731,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				reserve: reserveKittens,
 				jobs: [],
 				traits: [],
+			},
+			workshop: {
+				hideResearched: this.workshop.hideResearched,
+				upgrades: [],
+				crafts: []
 			},
 			achievements: lsData.achievements,
 			stats: stats,
@@ -3924,7 +3970,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		if(this.resPool.get("paragon").value >= 100) {
 			gift = "Paragon";
 		}
-		if(this.resPool.get("timeCrystal").value && this.prestige.getPerk("anachronomancy").researched) {
+		if(this.resPool.get("timeCrystal").value && this.prestige.getPerk("anachronomancy").researched && this.workshop.get("stasisChambers").researched) {
 			gift = "TimeCrystal";
 		}
 		if(this.resPool.get("sorrow").value / this.resPool.get("sorrow").maxValue < 0.25 && this.prestige.getPerk("megalomania").researched && this.religion.getZU("blackPyramid").val < 3) {

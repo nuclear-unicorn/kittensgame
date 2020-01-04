@@ -74,6 +74,14 @@ body.scheme_grassy {
 	color: #cc4100;
 }
 
+.scheme_grassy .btn.modern a {
+	color: #930;
+}
+
+.scheme_grassy .btn.modern a.enabled {
+	color: initial;
+}
+
 .scheme_grassy #gameLog {
 	margin-bottom: 20px;
 }

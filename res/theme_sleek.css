@@ -39,7 +39,7 @@
 }
 
 .scheme_sleek a, .scheme_sleek .craft-link {
-    color: #868685;
+    color: #868686;
 }
 
 .scheme_sleek a:hover, .scheme_sleek .craft-link:hover {
@@ -52,7 +52,7 @@
 }
 
 .scheme_sleek .disabled div {
-    color: #565655;
+    color: #565656;
 }
 
 .scheme_sleek .button_tooltip div {
@@ -81,8 +81,12 @@
 }
 
 .scheme_sleek .btn.modern a {
-    color: gray;
+    color: #565656;
     background-color: #212121;
+}
+
+.scheme_sleek .btn.modern a.enabled {
+    color: #DCDCDC;
 }
 
 .scheme_sleek  #gamePageContainer,

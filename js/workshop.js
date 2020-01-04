@@ -2899,5 +2899,17 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 		} else {
 			this.tdTop.innerHTML = "";
 		}
+
+		this.updateTab();
+	},
+
+	updateTab: function() {
+		this.tabName = $I("tab.name.workshop");
+		if (this.game.village.getFreeEngineer() > 0) {
+			this.tabName += $I("common.warning");
+		}
+		if (this.domNode) {
+			this.domNode.innerHTML = this.tabName;
+		}
 	}
 });

@@ -304,6 +304,13 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 				effect += effectMeta;
 			}
 
+			// Previously, catnip demand (or other buildings that both affect the same resource)
+			// could have theoretically had more than 100% reduction because they diminished separately,
+			// this takes the total effect and diminishes it as a whole.
+			if (this.game.isHyperbolic(name) && effect !== 0) {
+				effect = this.game.getHyperbolicEffect(effect, 1.0);
+			}
+
 			// Add effect from effectsBase
 			if (effectsBase && effectsBase[name]) {
 				effect += effectsBase[name];
@@ -561,14 +568,6 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
             }
         }
 
-		/**
-		 * This code snippet groups the messages under a single date header based on a date stamp.
-		 * The logic is not straightforward and a bit hacky. Maybe there is a better way to handle it like tracking the reference to a date node
-		 */
-		if (this.messages.length>1 && type == 'date' && message==this.messages[this.messages.length - 2].text) {
-			this.messages.splice(this.messages.length - 2, 1);
-		}
-
 		var hasCalendarTech = this.game.science.get("calendar").researched;
 
 		var logmsg = {
@@ -587,9 +586,6 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 
 
 		if (this.messages.length > this.maxMessages){
-			this.messages.shift();
-		}
-		if (this.messages[0].type == "date"){
 			this.messages.shift();
 		}
 
@@ -1300,63 +1296,62 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 		var valMultiplier = isEffectMultiplierEnabled && model.metadata ? model.metadata.on : 1;
 		for (var effectName in effectsList) {
 			var effectMeta = this.game.getEffectMeta(effectName);
-			var effectValue = effectMeta.calculation === "constant"
-				? effectsList[effectName]
-				: effectsList[effectName] * valMultiplier;
-			if (effectValue) {
-				if (effectMeta.resName && !this.game.resPool.get(effectMeta.resName).unlocked){
-					continue;	//hide resource-related effects if we did not unlocked this effect yet
-				}
-
-				if (!isEffectMultiplierEnabled && effectMeta.calculation === "nonProportional") {
-					var nextEffectValue = this.getNextEffectValue(model, effectName);
-					if (nextEffectValue) {
-						effectValue = nextEffectValue * (model.metadata.on + 1) - effectValue * model.metadata.on;
-					}
-				}
-
-				var displayEffectName = effectMeta.title;
-
-				var displayEffectValue = "";
-
-				//display resMax values with global ratios like Refrigeration and Paragon
-				if (effectName.substr(-3) === "Max") {
-					var res = this.game.resPool.get(effectMeta.resName || effectName.slice(0, -3));
-					if (res != false) { // If res is a resource and not just a variable
-						effectValue = this.game.resPool.addResMaxRatios(res, effectValue);
-					}
-				}
-
-				if (effectMeta.type === "perTick" && this.game.opts.usePerSecondValues) {
-					// avoid mantisa if we can, later on this can be changed to show scaled up values, e.g. minutes, hours
-					var tempVal = Math.abs(effectValue * this.game.ticksPerSecond), precision;
-					if (tempVal >= 0.001) {
-						precision = tempVal < 0.01? 3: 2;
-						displayEffectValue = this.game.getDisplayValueExt(
-							effectValue * this.game.ticksPerSecond, false, false, precision) + "/sec";
-					} else {
-						displayEffectValue = this.game.getDisplayValueExt(
-							effectValue * this.game.ticksPerSecond * 3600, false, false, 2) + "/h";
-					}
-				} else if (effectMeta.type === "perDay"){
-					displayEffectValue = this.game.getDisplayValueExt(effectValue) + "/day";
-				} else if (effectMeta.type === "perYear"){
-					displayEffectValue = this.game.getDisplayValueExt(effectValue) + "/year";
-				} else if ( effectMeta.type === "ratio" ) {
-					displayEffectValue = this.game.toDisplayPercentage(effectValue, 2 , false) + "%";
-				} else if ( effectMeta.type === "integerRatio" ){
-					displayEffectValue = this.game.getDisplayValueExt(effectValue) + "%";
-				} else if ( effectMeta.type === "energy" ){
-					displayEffectValue = this.game.getDisplayValueExt(effectValue) + "Wt";
-				} else {
-					displayEffectValue = this.game.getDisplayValueExt(effectValue);
-				}
-
-				model.effectModels.push({
-					displayEffectName: displayEffectName,
-					displayEffectValue: displayEffectValue
-				});
+			if (effectMeta.resName && !this.game.resPool.get(effectMeta.resName).unlocked) {
+				continue;	//hide resource-related effects if we did not unlocked this effect yet
 			}
+
+			var effectValue = effectsList[effectName] * (effectMeta.calculation === "constant" ? 1 : valMultiplier);
+			if (!isEffectMultiplierEnabled && effectMeta.calculation === "nonProportional") {
+				var nextEffectValue = this.getNextEffectValue(model, effectName);
+				if (nextEffectValue) {
+					effectValue = nextEffectValue * (model.metadata.on + 1) - effectValue * model.metadata.on;
+				}
+			}
+			if (!effectValue) {
+				continue;
+			}
+
+			var displayEffectName = effectMeta.title;
+
+			var displayEffectValue = "";
+
+			//display resMax values with global ratios like Refrigeration and Paragon
+			if (effectName.substr(-3) === "Max") {
+				var res = this.game.resPool.get(effectMeta.resName || effectName.slice(0, -3));
+				if (res != false) { // If res is a resource and not just a variable
+					effectValue = this.game.resPool.addResMaxRatios(res, effectValue);
+				}
+			}
+
+			if (effectMeta.type === "perTick" && this.game.opts.usePerSecondValues) {
+				// avoid mantisa if we can, later on this can be changed to show scaled up values, e.g. minutes, hours
+				var tempVal = Math.abs(effectValue * this.game.ticksPerSecond), precision;
+				if (tempVal >= 0.001) {
+					precision = tempVal < 0.01? 3: 2;
+					displayEffectValue = this.game.getDisplayValueExt(
+						effectValue * this.game.ticksPerSecond, false, false, precision) + "/sec";
+				} else {
+					displayEffectValue = this.game.getDisplayValueExt(
+						effectValue * this.game.ticksPerSecond * 3600, false, false, 2) + "/h";
+				}
+			} else if (effectMeta.type === "perDay"){
+				displayEffectValue = this.game.getDisplayValueExt(effectValue) + "/day";
+			} else if (effectMeta.type === "perYear"){
+				displayEffectValue = this.game.getDisplayValueExt(effectValue) + "/year";
+			} else if ( effectMeta.type === "ratio" ) {
+				displayEffectValue = this.game.toDisplayPercentage(effectValue, 2 , false) + "%";
+			} else if ( effectMeta.type === "integerRatio" ){
+				displayEffectValue = this.game.getDisplayValueExt(effectValue) + "%";
+			} else if ( effectMeta.type === "energy" ){
+				displayEffectValue = this.game.getDisplayValueExt(effectValue) + "Wt";
+			} else {
+				displayEffectValue = this.game.getDisplayValueExt(effectValue);
+			}
+
+			model.effectModels.push({
+				displayEffectName: displayEffectName,
+				displayEffectValue: displayEffectValue
+			});
 		}
 	},
 
@@ -1970,21 +1965,16 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 				dojo.removeClass(this.domNode, "bldEnabled");
 				dojo.removeClass(this.domNode, "bldlackResConvert");
 				if (building.lackResConvert) {
-					dojo.toggleClass(this.domNode, "bldlackResConvert", (building.on > 0 ? true : false));
+					dojo.toggleClass(this.domNode, "bldlackResConvert", building.on > 0);
 				} else {
-					dojo.toggleClass(this.domNode, "bldEnabled", (building.on > 0 ? true : false));
+					dojo.toggleClass(this.domNode, "bldEnabled", building.on > 0);
 				}
 			}
 
 			//--------------- toggle ------------
-			/* Always display link, else, when the link disappears, the player can click on the button unintentionally
-			if (this.remove){
-				dojo.style(this.remove["off1"].link, "display", (building.on > 0) ? "" : "none");
+			if (this.add) {
+				dojo.toggleClass(this.add["add1"].link, "enabled", building.on < building.val);
 			}
-			if (this.add){
-				dojo.style(this.add["add1"].link, "display", (building.on < building.val) ? "" : "none");
-			}
-			*/
 
 			if (this.toggle){
 				this.toggle.link.textContent = this.model.togglableOnOffLink.title;
@@ -2140,6 +2130,9 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 			}
 
 			if (meta.upgrades) {
+				if (meta.updateEffects) {
+					meta.updateEffects(meta, this.game);
+				}
 				this.game.upgrade(meta.upgrades);
 			}
         }

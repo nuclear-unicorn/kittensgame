@@ -65,7 +65,7 @@
 }
 
 .scheme_dark a {
-	color: #868685;
+	color: #868686;
 }
 
 .scheme_dark a:hover {
@@ -77,7 +77,7 @@
 	color: #DCDCDC;
 }
 .scheme_dark .disabled div {
-	color: #565655;
+	color: #565656;
 }
 
 .scheme_dark .button_tooltip div {
@@ -110,8 +110,12 @@
 }
 
 .scheme_dark .btn.modern a {
-	color: gray;
+	color: #565656;
 	background-color: #212121;
+}
+
+.scheme_dark .btn.modern a.enabled {
+	color: #DCDCDC;
 }
 
 .scheme_dark table.craftTable tr:hover td {

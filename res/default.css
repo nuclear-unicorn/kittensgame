@@ -421,13 +421,19 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
 .modern .btnContent {
     padding: 10px 0 10px 10px;
 }
+
 .btn.modern a {
+    color: gray;
     background-color: #EEE;
     border-left: 1px solid #888;
     padding: 10px 6px 10px 6px !important;
     margin: -10px 0;
     min-width: 20px;
     text-decoration: none;
+}
+
+.btn.modern a.enabled {
+    color: initial;
 }
 
 .btn.bldEnabled.modern div.btnContent,

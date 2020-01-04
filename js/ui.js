@@ -775,27 +775,33 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             messages = _console.messages;
 
         var gameLog = dojo.byId("gameLog");
-        dojo.empty(gameLog);
         if (!messages.length) { // micro optimization
             return;
         }
 
-        for (var i = 0; i < messages.length; i++) {
-            var msg = messages[i];
-            if (!msg.span) {
-                var span = dojo.create("span", {className: "msg" }, gameLog);
+        var msg = messages[messages.length-1];
 
-                if (msg.type){
-                    dojo.addClass(span, "type_"+msg.type);
-                }
-                if (msg.noBullet) {
-                    dojo.addClass(span, "noBullet");
-                }
-                msg.span = span;
+        if (!msg.span) {
+            var span = dojo.create("span", {className: "msg" }, gameLog);
+
+            if (msg.type) {
+                dojo.addClass(span, "type_"+msg.type);
             }
-            dojo.place(msg.span, gameLog, "first");
-            dojo.attr(msg.span, {innerHTML: msg.text});
+            if (msg.noBullet) {
+                dojo.addClass(span, "noBullet");
+            }
+            msg.span = span;
         }
+        //Place date headers above actual log events.
+        if (msg.type === 'date') {
+            dojo.place(msg.span, gameLog, "first");
+        } else {
+            dojo.place(msg.span, gameLog, 1);
+        }
+        dojo.attr(msg.span, {innerHTML: msg.text});
+        //Destroy child nodes if there are too many.
+        var logLength = dojo.byId('gameLog').childNodes.length;
+        if (logLength > _console.maxMessages) {dojo.destroy(dojo.byId('gameLog').childNodes[logLength-1])}
 
         //fade message spans as they get closer to being removed and replaced
         var spans = dojo.query("span", gameLog);
