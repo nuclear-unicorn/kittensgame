@@ -360,7 +360,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					effects["energyProduction"] *= 0.75;
 				} else if (game.calendar.getCurSeason().name == "summer") {
 					effects["energyProduction"] /= 0.75;
-					effects["energyProduction"] *= this.game.challenges.getChallengeReward("winterIsComing");
+					effects["energyProduction"] *= game.challenges.getChallengeReward("winterIsComing");
 				}
 
 				var seasonRatio = game.getEffect("solarFarmSeasonRatio");
