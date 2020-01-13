@@ -611,10 +611,10 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			}
 
 			for (var i = reserve.length - 1; i >= 0; i--) {
-				var reserve = reserve[i];
+				var reserveKitten = reserve[i];
 
 				var newKitten = new com.nuclearunicorn.game.village.Kitten();
-				newKitten.load(reserve);
+				newKitten.load(reserveKitten);
 
 				this.sim.reserve.unshift(newKitten);
 			}
