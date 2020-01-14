@@ -311,10 +311,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			if (type == "frequency") {
 				return this.game.getHyperbolicEffect(challenge.researched * 50, 825);
 			} else {
-				return 1 - this.game.getHyperbolicEffect(researched * 0.1, 1);
+				return 1 - this.game.getHyperbolicEffect(challenge.researched * 0.1, 1);
 			}
 		} else if (name == "anarchy") {
-			return 0.5 - this.game.getHyperbolicEffect(researched * 0.05, 0.4);
+			return 0.5 - this.game.getHyperbolicEffect(challenge.researched * 0.05, 0.4);
 		} else if (name == "energy") {
 			return 2 + 0.1 * challenge.researched;
 		} else if (name == "atheism") {
@@ -390,6 +390,16 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			}
 
 			this.rewardable = false;
+
+                        var uncappedRes = ["starchart", "relic", "void", "blackcoin", "bloodstone"];
+                        for (var i = 0; i < this.game.resPool.resources.length; i++) {
+                          var res = this.game.resPool.resources[i];
+
+                          if (res.craftable || uncappedRes.indexOf(res.name) >= 0) {
+                            res.value += res.reserve;
+                            res.reserve = 0;
+                          }
+                        }
 
 			if (this.game.prestige.getPerk("anachronomancy").researched) {
 				var chronophysics = this.game.science.get("chronophysics");
