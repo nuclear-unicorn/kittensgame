@@ -1430,7 +1430,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			self.effects["goldPerTickCon"] = -0.005; //~5 smelters
 
 			var manpower = game.resPool.get("manpower");
-			var mpratio = (manpower.maxValue * 0.007) / 100;
+			var manpowerMax = game.getEffect("manpowerMax") || 0;
+			manpowerMax = game.resPool.addResMaxRatios(manpower, manpowerMax);
+			var mpratio = (manpowerMax * 0.007) / 100;
 
 			//hidden 1% boost to mints from village level
 			mpratio *= (1 + game.village.map.villageLevel * 0.005);
