@@ -190,7 +190,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			) {
 				this.researchChallenge("energy");
 			}
-		} else if (this.getChallenge("anarchy").on) {
+		}
+		if (this.getChallenge("anarchy").on) {
 			if (this.game.bld.get("aiCore").val > 0){
 				this.researchChallenge("anarchy");
 			}
