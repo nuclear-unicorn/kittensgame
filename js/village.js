@@ -284,6 +284,10 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 		var catnipPerTick = this.game.getResourcePerTick("catnip", true);
 		var catnipVal = this.game.resPool.get("catnip").value;
+		// hack
+		// Starved kittens check should really happen after resPool.update()
+		if (!this.game.challenges.getCondition("disableChrono").on)
+			catnipVal += this.game.resPool.get("catnip").reserve;
 		var resDiff = catnipVal + catnipPerTick;
 
 		if (this.sim.getKittens() > 0){
