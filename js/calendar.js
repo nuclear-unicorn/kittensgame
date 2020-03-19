@@ -922,20 +922,20 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 		if (this.getCurSeason().modifiers[res.name]){
 			mod = this.getCurSeason().modifiers[res.name];
-		}
 
-		if (this.weather == "warm"){
-			mod += 0.15;
-		} else if (this.weather == "cold"){
-			mod -= 0.15;
-		}
+			if (this.weather == "warm"){
+				mod += 0.15;
+			} else if (this.weather == "cold"){
+				mod -= 0.15;
+			}
 
-		if (this.game.challenges.getChallenge("winterIsComing").on && this.weather == "cold") {
-			mod = ((mod + 1) * this.game.challenges.getChallengeEffect("winterIsComing", "modifier")) - 1;
-		}
+			if (this.game.challenges.getChallenge("winterIsComing").on && this.weather == "cold") {
+				mod = ((mod + 1) * this.game.challenges.getChallengeEffect("winterIsComing", "modifier")) - 1;
+			}
 
-		if (this.getCurSeason().name == "spring"){
-			mod *= this.game.challenges.getChallengeReward("winterIsComing");
+			if (this.getCurSeason().name == "spring"){
+				mod *= this.game.challenges.getChallengeReward("winterIsComing");
+			}
 		}
 
 		return mod;
