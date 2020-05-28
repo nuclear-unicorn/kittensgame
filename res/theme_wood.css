@@ -1,0 +1,658 @@
+/**
+ *			Wood 1.0.1 Theme © Volkeyrn
+ */
+
+ @import url(https://fonts.googleapis.com/css?family=Sansita:ital,wght@400,700,800,900,400italic,700italic,800italic,900italic&display=swap); 
+
+/**********************************************/
+/******************** GAME ********************/
+/**********************************************/
+body.scheme_wood {
+	background-color: #F5F3EB;	
+}
+.scheme_wood #gamePageContainer,
+.scheme_wood select,
+.scheme_wood .btn,
+.scheme_wood .modern,
+.scheme_wood .btn.modern,
+.scheme_wood input[type='button'] {
+       font-family: 'Sansita', sans-serif;  
+}
+.scheme_wood .btn { 
+	color: #888888;
+	margin-bottom:6px;
+	max-height: 36px;
+	background-color: #888888; 
+	border: solid 1px rgba(97, 56, 36, 0.4); /* color #613824 */
+}
+.scheme_wood .btn.disabled {
+	color: #888888;
+	background-color: #DCD5C9;
+	border: solid 1px rgba(88, 88, 88, 0.2); 
+	/* shadow with 3D effect pressed */
+	box-shadow: 1px 1px 3px #54473B inset, 
+                 0 1px 0 rgba(239, 235, 219, 0.4); /* color #EFEBDB */ 
+}
+.scheme_wood .btn.disabled:hover {
+	background-color: #DCD5C9;
+	border: solid 1px rgba(88, 88, 88, 0.7); 
+	cursor: inherit;
+}
+.scheme_wood .btn:not(.disabled){
+	box-shadow: 0 0 2px rgba(97, 56, 36,0.3), /* color #613824 */
+                 0 -1px 0 rgba(239, 235, 219, 0.4); /* color #EFEBDB */
+}
+.scheme_wood .btn:hover{
+	border: solid 1px #EFEBDB; 
+	color: gray;	
+}
+.scheme_wood .btn:not(.disabled):hover span.btnTitle { 
+	color: rgba(239, 235, 219, 0.8) !important; /* color #EFEBDB */
+	text-shadow: 0px 1px 0px rgba(62, 48, 42,0.8); /* color #3E302A */
+	font-weight: bold;
+}
+.scheme_wood .btn:not(.disabled):hover a{ 
+	color: rgba(239, 235, 219, 0.3) !important; /* color #EFEBDB */
+}
+.scheme_wood .highlited { /* higlighting ressources when hover button on center windows */
+	background-color: rgba(237, 206, 158, 0.3); /* color #EDCE9E */
+}
+.scheme_wood a {
+	color: #613824;
+}
+.scheme_wood a,
+.scheme_wood .craft-link {
+	text-decoration: none;
+}
+.scheme_wood a:hover {
+	color: #F7A144; 
+	opacity: 1.0;
+}
+.scheme_wood div {
+	color: #4D291E;
+}
+.scheme_wood .disabled div { /* color text for disabled */
+	color: #D8D8D8;
+}
+.scheme_wood .btn:not(.disabled) div{ /* color text for all buttons not disabled */
+	color: #4D291E; 
+}
+.scheme_wood .btn.disabled div { /* color text for buttons disabled */
+	color: #666666;
+}
+.scheme_wood h1 {
+	font-size: 100%;
+	color: #D79E4D; 
+	text-shadow: 1px 1px 1px rgba(56, 32, 21,1); /* color #382015 */
+	font-weight: bold;
+}
+.scheme_wood h1:first-child {
+	margin-top: 0px;
+}
+/* if not use line bottom : '.btn.small-text span' then green light color do not change ! why ??*/
+.scheme_wood .btn.small-text span { /* text size for multiple buttons */ 
+    font-size: 90%;
+} 
+/*** green and red light for machine on/off ***/
+.scheme_wood .btn.bldlackResConvert div.btnContent {
+    padding: 4px;
+    border: 1px solid #9C1D32; /* color for lack resources convertion */
+}
+.scheme_wood .btn.bldEnabled div.btnContent { 
+    padding: 4px;
+    border: 1px solid #3E8234; 
+}
+.scheme_wood .btn.bldEnabled.modern div.btnContent,
+.scheme_wood .btn.bldlackResConvert.modern div.btnContent{
+    border-width: 0 0 0 8px;
+	border-radius: 3px; /* for align with border buttons */
+    padding: 10px 0px 10px 10px;
+}
+/*** end of green light for machine on ***/
+.scheme_wood,
+.scheme_wood .help { /* window options and version */
+	color: #222222;	
+	background-color: #D9CBAD;
+	overflow: hidden;
+}
+.scheme_wood .help,
+.scheme_wood .dialog {
+    /*box-shadow: 4px 4px 4px rgb(11, 11, 11); not use for this theme */
+	box-shadow: 0 2px 5px 0 rgb(13, 13, 13), 0 2px 10px 0 rgb(24, 24, 24), 0 0 0 9999px rgba(0, 0, 0, 0.8);
+    height: auto !important;
+    top: 40% !important;
+    border: solid 2px #613824; 
+}
+.scheme_wood .help a,
+.scheme_wood .dialog a{
+    font-weight: bold;	
+}
+.scheme_wood .help a:hover,
+.scheme_wood .dialog a:hover{
+	text-shadow: 0px 1px 2px rgba(56, 32, 21,0.9); /* color #382015 */
+}
+.scheme_wood select { /* dropdown list on settlement tab and options windows */
+    background-color: #EFEBDB;
+    color: #884F33;
+    padding-bottom: 4px;
+	border-color : rgba(97, 56, 36,0.3); /* color #613824 */
+	font-size: 85%;
+	border-radius: 3px;
+}
+.scheme_wood select>option {
+    background-color: #EFEBDB;
+    color: #884F33;
+	padding: 2px 10px; /* -2 pixel vertical */
+}
+
+/*************************************************/
+/******************** TOP BAR ********************/
+/*************************************************/
+.scheme_wood #topBar {
+	background-color: #F5F3EB;
+	background-image: url('img/theme-wood.jpg'); /* source: http://thepatternlibrary.com/#white-wood */
+	background-repeat: repeat;
+	background-attachment: fixed;
+	background-position: top left;
+    border-bottom: 1px solid rgba(217, 203, 173,0.7); /* color #D9CBAD */
+    box-shadow: none; 
+	top: 0px; /* no space when background-color of top bar different from game */
+}
+.scheme_wood #topBar a:hover {
+	text-shadow: none;
+}
+.scheme_wood #topBar div {	
+	color: #4D291E;
+}
+.scheme_wood #headerLinks div { /* for color text of MOTD on top bar */
+	color: #884F33;
+}
+.scheme_wood #headerLinks>div:first-child:before {
+    color: #D79E4D; 
+    content: 'Theme by Volkeyrn  ';
+    text-decoration: none;
+	font-weight: 400;	/* thin if possible with font sizes */
+}
+.scheme_wood #sorrowTooltip { /* counter of BLS (Black Liquid Sorrow) */
+	color: #EFEDE8;
+}
+.scheme_wood #autosaveTooltip { 
+	color: #3E8234;
+}
+.scheme_wood #headerLinks a[onclick="gamePage.ui.displayAppDialog();"]{ /* Get the app */
+	color: #884F33 !important;
+}
+.scheme_wood #headerLinks a[onclick="gamePage.ui.displayAppDialog();"]:hover{
+	color: #F7A144 !important;
+}
+
+/************************************************/
+/******************** FOOTER ********************/
+/************************************************/
+.scheme_wood #footerLinks {
+	font-size: 90%;
+	bottom: 6px;
+	background: rgba(239, 235, 219, 0.7); /* color #EFEBDB */ 
+	-webkit-box-shadow: 0 0 4px 4px rgba(239, 235, 219, 0.5); /* color #EFEBDB */ 
+			box-shadow: 0 0 4px 4px rgba(239, 235, 219, 0.5); /* color #EFEBDB */ 
+}
+.scheme_wood #footerLinks a:hover {
+	text-shadow: none;
+}
+.scheme_wood .links-block { /* a link separator : | on header and footer links*/
+	color: rgba(217, 203, 173,0.7) !important; /* color #D9CBAD */
+}
+
+/*************************************************/
+/******************** TOOLTIP ********************/
+/*************************************************/
+.scheme_wood #tooltip,
+.scheme_wood .tooltip-block div {    
+    border: 1px solid rgba(234, 179, 110, 0.7); /* color #EAB36E */
+	/*box-shadow: 4px 4px 4px rgb(22, 22, 22); not use for this theme */
+}
+.scheme_wood .button_tooltip div { /* tooltip window == left column: right text | center column :highlighting text */
+	color: #4D291E;
+	font-size: 95%;
+}
+.scheme_wood .button_tooltip { /* tooltip windows == left column : left text */
+	color: #884F33; 
+	background-color: #FDF5E0;
+	font-size: 90%;
+}
+.scheme_wood .tooltip-inner .desc { /* Tooltip Window : title text */ 
+    color: #884F33; 
+	font-size: 100%;
+	border-bottom : 1px solid #D9CBAD !important; /* border line under title */
+}
+.scheme_wood .tooltip-divider { /* border line before effects text */
+	border-bottom : 1px solid #D9CBAD !important;	
+}
+.scheme_wood .effectName { /* Tooltip Window : effects text */
+    color: #3E8234 !important;
+	font-size: 90% !important;
+}
+.scheme_wood .rawRes { /* Tooltip Window == text for all missing resources for primary resource */
+    color: #8D7B6F;
+	font-style: italic;
+	padding-left: 12px;
+}
+.scheme_wood .button_tooltip .noRes,
+.scheme_wood .limited { /* on ressource limited or not attainable */
+    color: #9C1D32;
+}
+.scheme_wood #tooltip .flavor { /* Tooltip Window : last bottom text on center column tooltip window */
+    color: #F7A144;
+}
+.scheme_wood .tooltip-block div{ /* tooltip windows == icon ? on left column near tools icons */
+	color: #884F33;
+	background-color: #FDF5E0;
+}
+
+/*******************************************************/
+/******************** CENTER COLUMN ********************/
+/*******************************************************/
+.scheme_wood .tab { 
+    font-size: 90%;
+}
+.scheme_wood .tabsContainer { /* separator | for tab */
+	color: rgba(217, 203, 173,0.7); /* color #D9CBAD */
+}
+.scheme_wood .activeTab { 
+	color: #884F33;
+	font-weight: bold;
+	text-shadow: 0px 1px 1px rgba(97, 56, 36,0.3); /* color #613824 */
+}
+.scheme_wood a.activeTab {
+    border-bottom: solid 2px #FFE082 ! important; 
+}
+.scheme_wood a.activeTab:hover {
+    color: #884F33; /* no color change on hover because already selected */
+}
+.scheme_wood .bldTopContainer { /* under tab */
+    font-size: 90%;
+}
+.scheme_wood .bldGroupContainer { /* container for all buttons on center column */
+    padding-top: 10px;
+    border-top: 1px solid rgba(217, 203, 173,0.7); /* color #D9CBAD */
+    margin-top: 10px;
+}
+.scheme_wood .btn.modern {
+	border-radius: 5px; /* more rounded buttons for this theme */
+}
+.scheme_wood .btn.modern:not(.disabled) {
+   	background-color: #EFEBDB; /* color for all button not disabled*/	
+    cursor: pointer !important;
+}
+.scheme_wood .btn.modern:not(.disabled):hover { /* hover on all button in center column */
+	background-color: #86593B !important;
+	box-shadow: 0 0 5px rgba(97, 56, 36,0.5), /* color #613824 */
+                 0 -1px 0 rgba(239, 235, 219, 0.9) !important; /* color #EFEBDB */
+    cursor: pointer !important;
+}
+.scheme_wood input[type='button'] {
+	background-color: rgba(253, 245, 224, 1); /* color #FDF5E0 */
+    cursor: pointer !important;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.3), 0 2px 10px 0 rgba(0, 0, 0, 0.3) !important;
+    outline: 0 !important;
+	border: solid 1px rgba(97, 56, 36,0.5) !important; /* color #613824 */
+    border-radius: 3px !important; 
+    color: #4D291E;
+    padding: 5px 20px;
+}
+.scheme_wood input[type='button']:hover {
+	background-color: #EFEBDB !important; 
+	border: solid 1px rgba(97, 56, 36,0.9) !important; /* color #613824 */
+	color: #884F33 !important;
+	cursor: pointer !important;
+	font-weight: bold;
+	text-shadow: 0px 1px 1px rgba(97, 56, 36,0.9); /* color #613824 */
+}
+.scheme_wood .modern .btnContent {
+    padding: 10px 0 9px 10px !important; /* -1 pixel on vertical for correct align left border */
+}
+.scheme_wood .btn.modern a {
+	color: #816867;
+	background-color: transparent; 
+	padding: 10px 6px 9px 6px !important; /* -1 pixel on vertical for correct align left border */
+}
+.scheme_wood .btn.modern:not(.disabled) a {
+	border-color: rgba(129, 104, 103,0.2); /* color #816867 */
+}
+.scheme_wood .btn.modern.disabled a {
+	border-color: rgba(129, 104, 103,0.2) !important; /* color #816867 */
+}
+.scheme_wood .btn.modern a:hover { 
+	color: #504037;
+	font-weight: bold;
+	text-shadow: none;
+}
+.scheme_wood .btn.modern:not(.disabled) a:hover { 
+	background-color: rgba(184, 144, 100, 0.3); /* color #B88F64 */
+	color: rgba(239, 235, 219, 0.5) !important; /* color #EFEBDB */
+}
+.scheme_wood .btn.modern.disabled a:hover { 
+	color: rgba(80, 64, 55, 0.7); /* color #504037 */
+	background-color: rgba(80, 64, 55, 0.2); /* color #504037 */
+}
+.scheme_wood .btn.modern:not(.disabled):active,
+.scheme_wood input[type='button']:active {
+    border-color: #FBFDF0 !important;
+} 
+.scheme_wood .tabInner {
+    border: none; /* border for all under tabs in center column */
+}
+.scheme_wood .linkContent { /* dropdown list on button */
+    margin-top: 24px !important; /* for correct vertical align dropdown list */
+    width: auto !important;
+	background-color: #86593B;
+}
+.scheme_wood .btn.modern.disabled .linkContent { /* dropdown list on button disabled*/
+ 	background-color: #DCD5C9; /* color pick from button disabled and hover */
+}
+.scheme_wood .linkContent a {
+    color: #081644;
+    width: 40px !important;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+.scheme_wood .panelContainer { 
+    background-color: rgba(217, 203, 173,0.5); /* color #D9CBAD */
+    border-color: rgba(217, 203, 173,0.7); /* color #D9CBAD */
+	border-radius: 5px;
+	box-shadow: 0 0 3px rgba(97, 56, 36,0.5), /* color #613824 */
+                 0 -1px 0 rgba(239, 235, 219, 0.9) !important; /* color #EFEBDB */
+}
+.scheme_wood .panelContainer div.title {
+	color: #D79E4D; 
+	text-shadow: 1px 1px 2px rgba(56, 32, 21,1); /* color #382015 */
+	font-weight: bold;
+	font-style: italic;
+}
+.scheme_wood .panelContainer .toggle {
+    border-color : rgba(217, 203, 173,0.7); /* color #D9CBAD */
+	border-radius: 5px;
+}
+.scheme_wood .trade-race .buys {
+    color: #974338;
+}
+.scheme_wood .trade-race .sells {
+    color: #3E8234;
+}
+.scheme_wood .trade-race .ammount {
+    color: #8D7B6F;
+}
+.scheme_wood .attitude { /* text for attitude races int trade tab */
+	color: #8D7B6F;
+	text-shadow: none !important;
+}
+/* for container 'Census' -> list of kittens in settlement tab */
+.scheme_wood .panelContainer div[style^='border: 1px solid gray;']{
+	border-color: rgba(97, 56, 36,0.3) !important; /* color #613824 */
+	font-size: 90%;
+	border-radius: 5px;
+}
+
+/**********************************************************/
+/******************** ACHIEVEMENTS TAB ********************/
+/**********************************************************/
+.scheme_wood .achievement {
+    display: block;
+    margin: 10px;
+    height: 40px;
+    background-color: rgba(134, 89, 59, 0.7); /* color #86593B */
+    color: #EFEBDB; 
+    text-shadow: 2px 0px 10px rgba(239, 235, 219); /* color #EFEBDB */
+	text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: default !important;
+	border-color : rgba(239, 235, 219, 0.5); /* color #EFEBDB */
+	border-radius: 5px;
+	box-shadow: 0 0 5px rgba(97, 56, 36,0.5), /* color #613824 */
+                 0 -1px 0 rgba(239, 235, 219, 0.9) !important; /* color #EFEBDB */
+}
+.scheme_wood .achievement-header {
+	color: #D79E4D; 
+	text-shadow: 1px 1px 2px rgba(56, 32, 21,1); /* color #382015 */
+}
+.scheme_wood .achievement.unethical {
+    text-shadow: rgb(255, 67, 91) 2px 0px 10px;
+	background-color: rgba(156, 29, 50, 0.7); /* color #9C1D32 */
+	border-color : rgba(146, 0, 23, 0.3); /* color #920017 */
+}
+.scheme_wood .achievement.unethical:hover {
+    background-color: rgba(156, 29, 50, 1); /* color #9C1D32 */
+}
+.scheme_wood .achievement:hover {
+    background-color: rgba(134, 89, 59, 1); /* color #86593B */
+	border-color : rgba(239, 235, 219, 1); /* color #EFEBDB */
+}
+.scheme_wood .achievement[title='???'] {
+    color: rgba(200, 200, 200, 0,4); /* color #C8C8C8 */	
+    text-shadow: none;
+	background-color: rgba(98,85,77, 0.7); /* color #62554D */
+	border-color : rgba(220, 220, 220, 0.3); /* color #DCDCDC */	
+}
+.scheme_wood .achievement[title='???']:hover {
+    background-color: rgba(98,85,77, 1); /* color #62554D */
+	border-color : rgba(220, 220, 220, 0.8); /* color #DCDCDC */
+}
+.scheme_wood .achievement:after {
+    display: block;
+    margin-top: 5px;
+    font-size: 90%;
+    color: rgba(237, 206, 158, 0.91); /* color #EDCE9E */
+    text-shadow: none;
+    text-transform: capitalize;
+    letter-spacing: normal;
+    font-weight: normal !important;
+}
+.scheme_wood .achievement.unethical:after {
+	color: #FFFFFF !important;
+}
+.scheme_wood .achievement-header .star {
+     color: #F7A144; /* orange or dominant color of the theme */
+	 text-shadow: 0px 1px rgba(0, 0, 0,0.7); /* color #000000 */
+}
+.scheme_wood .achievement .star {   
+	color : #BBBBBB; 	
+}
+.scheme_wood .achievement.unlocked .star {   
+	color : #F7A144; /* orange or dominant color of the theme */
+	font-weight: bold;
+	text-shadow: 1px 1px rgba(0, 0, 0,0.7); /* color #000000 */
+}
+
+/******************************************************/
+/******************** RIGHT COLUMN ********************/
+/******************************************************/
+.scheme_wood #rightColumn {
+	width: 25%;
+    max-width: 400px;
+    min-width: 250px;
+}
+.scheme_wood #calendarDiv {
+    color: #D79E4D; /*#3E8234;*/
+	padding-left: 5px;
+    margin-top: 5px;
+	text-shadow: 1px 1px 1px rgba(56, 32, 21,1); /* color #382015 */
+	font-weight: 700;
+	font-size: 90%;
+}
+.scheme_wood #calendarSign {
+   font-size: 120% ;
+}
+.scheme_wood #calendarSign:hover {
+   cursor: default ;
+}
+.scheme_wood .right-tab-header { /* Log | Chat link on right column for separator tab | */
+	color : rgba(217, 203, 173,0.7); /* color #D9CBAD */
+	font-size: 80%;
+ }
+.scheme_wood a[id='logLink'],
+.scheme_wood a[id='chatLink']{
+	font-weight: 400 !important; /* thin if possible with font sizes */
+}
+.scheme_wood .right-tab-header a.active {
+    color: #884F33; 
+	font-weight: bold !important;	
+}
+.scheme_wood div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
+	color: #8D7B6F;
+	font-size: 90%;
+	font-weight: 400; /* thin if possible with font sizes */
+	border-top: 1px solid rgba(217, 203, 173,0.7) !important; /* color #D9CBAD */ 
+	margin-top: 10px;
+}
+.scheme_wood #clearLogHref { /* Link in right column : Clear log */
+	font-size: 80%;
+}
+.scheme_wood #logFiltersBlock > a { /* Link in right column : [+]Log Filters */
+	font-size: 80%;
+	margin-left: 5px;
+}
+.scheme_wood #pauseBtn { /* Link in right column : pawse */
+	margin-left: 5px;
+}
+.scheme_wood .msg {
+	font-size: 85%;
+	font-weight: 400; /* thin if possible with font sizes */
+}
+.scheme_wood .msg.type_notice {
+    color: 2A518D; /* color default : #01A9DB; */
+}
+.scheme_wood .msg.type_important {
+    color: #F7A144; /* color default : coral; */
+}
+.scheme_wood .msg.type_alert {
+    color: #9C1D32; /* color default : red; */
+}
+.scheme_wood .msg.type_date {
+    color: #884F33;
+	font-style: italic;
+	font-weight: bold;
+    border-bottom: solid 1px #FFE082;
+}
+
+/*****************************************************/
+/******************** LEFT COLUMN ********************/
+/*****************************************************/
+ .scheme_wood .res-table { 
+    max-width: 352px; /* +12 pixel */ 
+    border-collapse: collapse; /* gain of 3 pixel by border -> no margin bottom after */ 	
+	margin-left: 2px; /* without : 0px margin left for all ressources */
+ } 
+ .scheme_wood .craftTable {
+	 margin-bottom: 50px !important; /* for correct margin bottom due of the line above with border-collapse: collapse on .res-Table !*/
+ }
+.scheme_wood .res-cell.craft-link {
+     min-width: 30px; /* for not adjust size of cell in live. Without column move horizontally */
+ } 
+.scheme_wood .res-cell.craft-link:hover { /* craft table left column */
+    color: #F7A144;
+	text-decoration: none; 
+    text-shadow: 1px 1px 1px rgba(56, 32, 21,0.9); /* color #382015 */
+}
+.scheme_wood tr.resourceRow:hover,
+.scheme_wood .res-row:hover {
+    background-color: rgba(237, 206, 158, 0.3); /* color #EDCE9E */
+	cursor: default;
+}
+.scheme_wood .res-row.craft:hover {
+    background-color: rgba(237, 206, 158, 0.3); /* color #EDCE9E */
+}
+.scheme_wood .res-cell.resPerTick:hover {
+	font-weight: normal !important;
+}
+.scheme_wood .maxRes,
+.scheme_wood select > option:disabled {
+	color: #8D7B6F;
+	font-size: 90%;
+}
+.scheme_wood .resAmount { 
+    color: #504037;
+}
+.scheme_wood .resLimitWarn {
+    color: #F7A144;
+	font-weight: bold;
+	font-style: italic;	
+}
+.scheme_wood .resLimitNotice {
+    color: #884F33;
+	font-weight: bold;	
+}
+.scheme_wood .resPerTick {
+    color: #4D291E;
+	font-size: 90%;
+}
+.scheme_wood .res-cell.resPerTick {
+    cursor: default;
+}
+.scheme_wood #fastHuntContainer > a{ /* Text left column : "Send hunters (xx times)" */
+	font-size: 100%;
+	font-weight: bold;
+}
+.scheme_wood #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+	color: #8D7B6F;	
+	text-shadow: none !important;
+}
+.scheme_wood #fastPraiseContainer > a{ /* Text left column : "Praise the sun!" */
+	font-size: 100%;
+	font-weight: bold;
+}
+.scheme_wood #fastPraiseContainer > a:hover{
+	text-shadow: 1px 1px 2px rgba(56, 32, 21,1); /* color #382015 */
+}
+.scheme_wood #fastHuntContainer > a:hover{ 
+	text-shadow: 1px 1px 2px rgba(56, 32, 21,1); /* color #382015 */
+}
+.scheme_wood .res-cell.positive-weather {
+	font-size: 80% !important;
+	max-width: 35px !important;
+	color: #3E8234 !important;	
+}
+.scheme_wood .res-cell.negative-weather {
+	font-size: 80% !important;
+	max-width: 35px !important;
+	color: #9C1D32 !important;	
+}
+.scheme_wood .resource_kittens .resource-name {
+	color: #8D7B6F !important; 
+}
+.scheme_wood .resource_faith .resource-name {
+	color: #8D7B6F !important;
+}
+.scheme_wood .resource_steel .resource-name {
+	color: #8D7B6F !important;
+}
+.scheme_wood .resource_gear .resource-name {
+	color: #8D7B6F !important;
+}
+.scheme_wood .resource_alloy .resource-name {
+	color: #8D7B6F !important;
+}
+.scheme_wood .resource_megalith .resource-name {
+	color: #8D7B6F !important;
+}
+
+/***************************************************/
+/******************** SCROLLBAR ********************/
+/***************************************************/
+.scheme_wood ::-webkit-scrollbar-thumb {
+    background: #EFEBDB;
+	border-radius: 40px;
+}
+.scheme_wood ::-webkit-scrollbar-track {
+    background: #F5F3EB;
+    border-radius: 50px;
+}
+/* Only FireFox */
+.scheme_wood #leftColumn,
+.scheme_wood #rightColumn,
+.scheme_wood #midColumn {
+   scrollbar-width: thin;
+   scrollbar-color: #EFEBDB #F5F3EB !important;
+}
+.scheme_wood select {
+   scrollbar-width: auto !important;
+}

@@ -185,13 +185,14 @@ dojo.declare("classes.ui.toolbar.ToolbarEnergy", classes.ui.ToolbarIcon, {
 		}
 
 		var resPool = this.game.resPool;
-		var energy = resPool.energyProd - resPool.energyCons;
-		this.container.innerHTML = "&#9889;&nbsp;" + this.game.getDisplayValueExt(energy) + "Wt";
+		this.container.innerHTML = "&#9889;&nbsp;" + this.game.getDisplayValueExt(resPool.energyProd - resPool.energyCons) + "Wt";
 
-		if (energy >= 0){
-			$(this.container).css("color", "green");
-		} else {
+		if (resPool.energyProd < resPool.energyCons) {
 			$(this.container).css("color", "red");
+		} else if (resPool.energyWinterProd < resPool.energyCons) {
+			$(this.container).css("color", "Coral");
+		} else {
+			$(this.container).css("color", "green");
 		}
 	},
 	getTooltip: function(){

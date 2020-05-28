@@ -266,6 +266,10 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					self.effects["energyConsumption"] = 1;
 					self.effects["energyConsumption"] *= game.challenges.getEnergyMod();
 				}
+			},
+			unlockScheme: {
+				name: "space",
+				threshold: 24
 			}
 		},{
 			name: "spaceStation",
@@ -439,6 +443,10 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				self.effects = {
 					"oilPerTickAutoprodSpace": 0.5
 				};
+			},
+			unlockScheme: {
+			name: "fluid",
+			threshold: 10
 			}
         },{
 			name: "spiceRefinery",
@@ -486,7 +494,11 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					"starchartPerTickBaseSpace": 0.01,
 					"scienceMax": 10000 * (1 + game.getEffect("spaceScienceRatio"))
 				};
-            }
+            },
+			unlockScheme: {
+				name: "vessel",
+				threshold: 20
+			}
         },{
             name: "orbitalArray",
             label: $I("space.planet.piscine.orbitalArray.label"),
@@ -657,7 +669,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					{name: "kerosene", 		val: 7500   }
 				],
 				effects: {
-					"starchartPerTickBaseSpace": 0.125,
+					"starchartPerTickBaseSpace": 0.025,
 					"scienceMax": 25000,
 					"relicPerDay": 0
 				},
@@ -701,12 +713,10 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				],
 				requiredTech: ["terraformation"],
 				effects: {
-					"maxKittens": 0
+					"maxKittens": 1
 				},
-				calculateEffects: function(self, game){
-					self.effects = {
-						"maxKittens": 1
-					};
+				action: function(self, game) {
+					self.effects["maxKittens"] = 1 + game.getEffect("terraformingMaxKittensRatio");
 				},
 				unlocks: {
 					tabs: ["village"]
@@ -720,18 +730,30 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				unlocked: false,
 				priceRatio: 1.15,
 				prices: [
-					{name: "kerosene", val: 500 }
+					{name: "kerosene", val: 500 },
+					{name: "unobtainium", val: 1 }
 				],
 				requiredTech: ["hydroponics"],
 				effects: {
-					"catnipMaxRatio" : 0,
-					"catnipRatio" : 0
+					"catnipMaxRatio": 0.1,
+					"catnipRatio": 0.025,
+					"terraformingMaxKittensRatio": 0
 				},
-				calculateEffects: function(self, game){
-					self.effects = {
-						"catnipMaxRatio" : 0.1,
-						"catnipRatio" : 0.025
-					};
+				upgrades: {
+					spaceBuilding: ["terraformingStation"]
+				},
+				// TODO Actually "action" is almost always just updating effects (unclear from the name), better separate the 2 concerns: update effects (can be done several times per tick) and perform specific action (only once per tick!)
+				// TODO Separation of concerns currently done only for AI Core, Time Boilers and Hydroponics (REQUIRED by non-proportional effect!), will be systematized later
+				updateEffects: function(self, game) {
+					// 0 HP = +0%
+					// 100 HP = +100%
+					// 300 HP = +200%
+					self.effects["terraformingMaxKittensRatio"] = game.getTriValue(self.on, 100) / self.on;
+					// Reset each tick because of cycle effect (from Yarn and Piscine) being applied continuously, due to presence of method "action"
+					self.effects["catnipRatio"] = 0.025;
+				},
+				action: function(self, game) {
+					self.updateEffects(self, game);
 				}
 			}
 		]

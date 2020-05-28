@@ -101,7 +101,6 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             starCondition: function () {
                 return ( this.game.ironWill && this.game.space.getProgram("moonMission").on && this.game.resPool.get("paragon").value < 10);
             },
-            hasStar: true
         }, {
             name: "jupiterAscending",
             title: $I("achievements.jupiterAscending.title"),
@@ -189,7 +188,6 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             starCondition: function () {
                 return (this.game.village.happiness >= 5 && this.game.resPool.get("kittens").value > 35);
             },
-            hasStar: true
         }, {
             name: "cathammer",
             title: $I("achievements.cathammer.title"),
@@ -201,7 +199,6 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             starCondition: function () {
                 return (this.game.calendar.trueYear() >= 40000);
             },
-            hasStar: true
     }],
 
     hats: [
@@ -421,7 +418,7 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
 
                 this.updateStatistics();
             }
-            if (ach.hasStar && !ach.starUnlocked && dojo.hitch(this, ach.starCondition)()) {
+            if (ach.starCondition != undefined && !ach.starUnlocked && dojo.hitch(this, ach.starCondition)()) {
                 ach.starUnlocked = true;
                 this.game.msg($I("achievements.msg.starUnlock", [ach.title]));
                 this.game.achievementTab.visible = true;
@@ -498,64 +495,9 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
     }
 });
 
-dojo.declare("classes.ui.Hat", [mixin.IGameAware], {
-    constructor: function(opts){
-        this.opts = opts;
-    },
-    render: function(container) {
-        var div = dojo.create("div", {
-            style:{display:"flex", marginRight:"5px", width: "30px", height: "30px", border: "1px solid gray", fontSize: "12px"}
-        }, container);
-        var span = dojo.create("span", {}, div);
-        span.innerHTML = "#" + this.opts.id;
-
-        UIUtils.attachTooltip(this.game, div, 0, 50, dojo.hitch(this, function(){
-            var tooltip = "<span style='font-style: italic;'>" + this.opts.title + "</span><br>" + this.opts.description + "<br>" + "Difficulty: " + this.opts.difficulty;
-            return tooltip;
-        }));
-
-        this.body = div;
-    },
-    update: function(){
-        //render a rainbow colors if foiled
-        dojo.style(this.body, "display", this.opts.unlocked ? "inline-flex" : "none");
-    }
-});
-
-dojo.declare("classes.ui.HatWgt", [mixin.IChildrenAware, mixin.IGameAware], {
-    constructor: function(game){
-
-        for (var i in game.achievements.hats){
-            var hatMeta = game.achievements.hats[i];
-            var hat = new classes.ui.Hat(hatMeta);
-            hat.setGame(game);
-            this.addChild(hat);
-        }
-    },
-
-    render: function(container){
-        var div = dojo.create("div", null, container);
-
-        var btnsContainer = dojo.create("div", {style:{paddingTop:"20px"}}, div);
-        this.inherited(arguments, [btnsContainer]);
-    },
-
-    update: function(){
-        this.inherited(arguments);
-    }
-});
-
 dojo.declare("com.nuclearunicorn.game.ui.tab.AchTab", com.nuclearunicorn.game.ui.tab, {
 
     constructor: function(){
-        this.hatsPanel = new com.nuclearunicorn.game.ui.Panel("A Secret Council of Hats");
-        //this.hatsPanel.setVisible(this.game.achievements.councilUnlocked);
-        this.hatsPanel.setVisible(this.game.prestige.getPerk("ascoh").researched && this.game.achievements.councilUnlocked);
-
-        var hatsWgt = new classes.ui.HatWgt(this.game);
-        this.hatsPanel.addChild(hatsWgt);
-
-        this.addChild(this.hatsPanel);
     },
 
 	render: function(content){
@@ -586,7 +528,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.AchTab", com.nuclearunicorn.game.ui
 				innerHTML : ach.unlocked ? ach.title : "???"
 			}, div);
 
-			if (!ach.hasStar) {
+			if (ach.starCondition == undefined) {
 				continue;
 			}
 
@@ -626,6 +568,5 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.AchTab", com.nuclearunicorn.game.ui
 
     update: function() {
         this.inherited(arguments);
-        this.hatsPanel.setVisible(this.game.prestige.getPerk("ascoh").researched && this.game.achievements.councilUnlocked);
     }
 });

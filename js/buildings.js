@@ -333,42 +333,40 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					{ name : "titanium", val: 250 }
 				],
 				priceRatio: 1.15,
-				effects: {
-					"energyProduction": 2
+				action: function(self, game) {
+					self.effects = {
+						"energyProduction": self.calculateEnergyProduction(game, game.calendar.season)
+					};
+				},
+				calculateEnergyProduction: function(game, season) {
+					var energyProduction = 2 * (1 + game.getEffect("solarFarmRatio"));
+					if (game.challenges.getChallengeResearched("winterIsComing")) {
+						energyProduction *= 2;
+					}
+
+					if (game.calendar.getCurSeason().name == "winter") {
+						energyProduction *= 0.75;
+					} else if (game.calendar.getCurSeason().name == "summer") {
+						energyProduction /= 0.75;
+						energyProduction *= game.challenges.getChallengeReward("winterIsComing");
+					}
+
+					var seasonRatio = game.getEffect("solarFarmSeasonRatio");
+					if ((game.calendar.getCurSeason().name == "winter" && seasonRatio == 1) || (game.calendar.getCurSeason().name != "summer" && seasonRatio == 2)){
+						energyProduction *= (1 + 0.15 * seasonRatio);
+					}
+
+					return energyProduction;
 				},
 				stageUnlocked : false
 			}
 		],
 		effects: {
-			"catnipDemandRatio": 0,
-			"energyProduction": 0
 		},
-		action: function(self, game){
+		action: function(self, game) {
 			var stageMeta = self.stages[self.stage];
-			if (self.stage == 0){
-				//do nothing
-			} else if (self.stage == 1){
-                var effects = {
-                    "energyProduction": 2
-                };
-                effects["energyProduction"] *= 1 + game.getEffect("solarFarmRatio");
-				if (game.challenges.getChallengeResearched("winterIsComing")) {
-					effects["energyProduction"] *= 2;
-				}
-
-				if (game.calendar.getCurSeason().name == "winter") {
-					effects["energyProduction"] *= 0.75;
-				} else if (game.calendar.getCurSeason().name == "summer") {
-					effects["energyProduction"] /= 0.75;
-					effects["energyProduction"] *= game.challenges.getChallengeReward("winterIsComing");
-				}
-
-				var seasonRatio = game.getEffect("solarFarmSeasonRatio");
-				if ((game.calendar.season == 3 && seasonRatio == 1) || (game.calendar.season != 1 && seasonRatio == 2)){
-					effects["energyProduction"] *= (1 + 0.15 * seasonRatio);
-				}
-
-                stageMeta.effects = effects;
+			if (stageMeta.action) {
+				stageMeta.action(stageMeta, game);
 			}
 		}
 	},{
@@ -575,11 +573,15 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		priceRatio: 1.15,
 		effects: {
 			"scienceRatio": 0.2,
-			"learnRatio": 0.05,
+			"skillXP": 0.0005,
 			"cultureMax": 25,
 			"scienceMax": 500
 		},
-		flavor: $I("buildings.academy.flavor")
+		flavor: $I("buildings.academy.flavor"),
+		unlockScheme: {
+			name: "school",
+			threshold: 68
+		}
 	},{
 		name: "observatory",
 		label: $I("buildings.observatory.label"),
@@ -595,28 +597,13 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			buildings: ["library"]
 		},
 		effects: {
-			"scienceRatio": 0.25,
 			"starEventChance": 0.002,
 			"starAutoSuccessChance": 0.01,
-			"scienceMax": 1000
 		},
-		action: function(self, game){
-			var effects = {
-				"scienceRatio": 0.25,
-				"starEventChance": 0.002,
-				"starAutoSuccessChance": 0.01,
-				"scienceMax": 1000
-			};
-
-			if (game.workshop.get("astrolabe").researched){
-				effects["scienceMax"] = 1500;
-			}
-
+		action: function(self, game) {
 			var ratio = 1 + game.getEffect("observatoryRatio");
-			effects["scienceMax"] *= ratio;
-			effects["scienceRatio"] *= ratio;
-
-			self.effects = effects;
+			self.effects["scienceMax"] = ratio * (game.workshop.get("astrolabe").researched ? 1500 : 1000);
+			self.effects["scienceRatio"] = ratio * 0.25;
 		},
 		flavor: $I("buildings.observatory.flavor")
 	},{
@@ -747,7 +734,11 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 
 			self.effects = game.resPool.addBarnWarehouseRatio(effects);
 		},
-		flavor: $I("buildings.warehouse.flavor")
+		flavor: $I("buildings.warehouse.flavor"),
+		unlockScheme: {
+			name: "minimalist",
+			threshold: 10
+		}
 	},
 	{
 		name: "harbor",
@@ -1024,7 +1015,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					);
 					self.effects["ironPerTickCon"]*=amt;
 					self.effects["coalPerTickCon"]*=amt;
-					self.effects["steelPerTickProd"]*=(amt*(1 + game.getCraftRatio() * game.getEffect("calcinerSteelCraftRatio") + game.bld.get("reactor").on * game.getEffect("calcinerSteelReactorBonus")));
+					// Automated production, metallurgist leader won't help here
+					self.effects["steelPerTickProd"] *= amt * (1 + game.getCraftRatio() * game.getEffect("calcinerSteelCraftRatio") + game.bld.get("reactor").on * game.getEffect("calcinerSteelReactorBonus"));
 
 					amtFinal = (amtFinal + amt) / 2;
 				}
@@ -1090,7 +1082,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			// Cap automation at 90% of resource cap to prevent trying to craft more than you have
 			var automationRate = Math.min(baseAutomationRate * (self.on + 1), 0.9);
 
-			function newCrafter(consumedResource, craftedResourceName, isAllowed) {
+			var newCrafter = function(consumedResource, craftedResourceName, isAllowed) {
 				var consumedQuantity = consumedResource.value * automationRate;
 				return {
 					numberOfCrafts: isAllowed && consumedResource.value >= consumedResource.maxValue * (1 - baseAutomationRate)
@@ -1099,6 +1091,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					craft: function() {
 						if (this.numberOfCrafts > 0) {
 							game.workshop.craft(craftedResourceName, this.numberOfCrafts);
+							// Automated production, metallurgist leader won't help here
 							game.msg($I("bld.msg.automation." + craftedResourceName + "s", [game.getDisplayValueExt(consumedQuantity), game.getDisplayValueExt(this.numberOfCrafts * (1 + game.getCraftRatio()))]), null, "workshopAutomation", true);
 						}
 					}
@@ -1172,7 +1165,11 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		calculateEffects: function(self, game){
 			self.effects["woodRatio"] = 0.1 + game.getEffect("lumberMillRatio") * 0.1;
 		},
-		flavor: $I("buildings.lumberMill.flavor")
+		flavor: $I("buildings.lumberMill.flavor"),
+		unlockScheme: {
+			name: "wood",
+			threshold: 100
+		}
 	},
 	{
 		name: "oilWell",
@@ -1207,7 +1204,11 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				? game.challenges.getEnergyMod()
 				: 0;
 		},
-		flavor: $I("buildings.oilWell.flavor")
+		flavor: $I("buildings.oilWell.flavor"),
+		unlockScheme: {
+			name: "oil",
+			threshold: 73
+		}
 	},
 	//----------------------------------- Other ----------------------------------------
 	{
@@ -1451,6 +1452,10 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			self.effects["ivoryPerTickProd"]*=amt;
 
 			return amt;
+		},
+		unlockScheme: {
+			name: "gold",
+			threshold: 24
 		}
 	},
 	//-------------------------- Culture -------------------------------
@@ -1710,7 +1715,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			buildings: ["library"]
 		},
 		// TODO Actually "action" is almost always just updating effects (unclear from the name), better separate the 2 concerns: update effects (can be done several times per tick) and perform specific action (only once per tick!)
-		// TODO Separation of concerns currently done only for AI Core and Time Boilers (REQUIRED by non-proportional effect!), will be systematized later
+		// TODO Separation of concerns currently done only for AI Core, Time Boilers and Hydroponics (REQUIRED by non-proportional effect!), will be systematized later
 		updateEffects: function(self, game) {
 			// Core #1: 2  ; Total:  2  ; Average: 2    =  8/4 = (3*1+5)/4
 			// Core #2: 3.5; Total:  5.5; Average: 2.75 = 11/4 = (3*2+5)/4
@@ -2028,9 +2033,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		this.game.resPool.get("catnip").value++;
 	},
 
-	refineCatnip: function(){
-		var craftRatio = this.game.getResCraftRatio({name: "wood"}) + 1;
-		this.game.resPool.addResEvent("wood", (1 * craftRatio));
+	refineCatnip: function() {
+		var craftRatio = this.game.getResCraftRatio("wood");
+		this.game.resPool.addResEvent("wood", 1 + craftRatio);
 	},
 
 	fastforward: function(daysOffset) {
@@ -2185,14 +2190,14 @@ dojo.declare("classes.game.ui.RefineCatnipButtonController", com.nuclearunicorn.
 		var catnipVal = this.game.resPool.get("catnip").value;
 		var catnipCost = model.prices[0].val;
 
-		if (catnipVal < (catnipCost * 100)){
+		if (catnipVal < 100 * catnipCost) {
 			this.game.msg("not enough catnip!");
 		}
 
-		this.game.resPool.addResEvent("catnip", -(catnipCost * 100));
+		this.game.resPool.addResEvent("catnip", -100 * catnipCost);
 
-		var craftRatio = this.game.getResCraftRatio({name: "wood"}) + 1;
-		this.game.resPool.addResEvent("wood", (100 * craftRatio));
+		var craftRatio = this.game.getResCraftRatio("wood");
+		this.game.resPool.addResEvent("wood", 100 * (1 + craftRatio));
 	}
 });
 
@@ -2204,8 +2209,7 @@ dojo.declare("classes.game.ui.RefineCatnipButton", com.nuclearunicorn.game.ui.Bu
 	    // -------------- x100 ----------------
 
 		if (!this.x100Href){
-			this.x100Href = this.addLink(this.model.x100Link.title, this.model.x100Link.handler
-				);
+			this.x100Href = this.addLink(this.model.x100Link);
 		} else {
 			dojo.style(this.x100Href.link, "display", !this.model.x100Link.visible ? "none" : "");
 		}
@@ -2344,51 +2348,35 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 	},
 
 	downgrade: function(model) {
-		this.game.ui.confirm('', $I('buildings.downgrade.confirmation'), {
-			handler: this.downgradeCallback,
-			ctx: this,
-			args: [model]
+		var self = this;
+		this.game.ui.confirm("", $I("buildings.downgrade.confirmation.msg"), function() {
+			var metadataRaw = self.getMetadataRaw(model);
+			metadataRaw.stage = metadataRaw.stage -1 || 0;
+			metadataRaw.val = 0;	//TODO: fix by using separate value flags
+			metadataRaw.on = 0;
+			if (metadataRaw.calculateEffects){
+				metadataRaw.calculateEffects(metadataRaw, self.game);
+			}
+			self.game.upgrade(metadataRaw.upgrades);
+			self.game.render();
 		});
-	},
-
-	downgradeCallback: function(model, result) {
-		if (!result) {
-			return;
-		}
-		var metadataRaw = this.getMetadataRaw(model);
-		metadataRaw.stage = metadataRaw.stage -1 || 0;
-		metadataRaw.val = 0;	//TODO: fix by using separate value flags
-		metadataRaw.on = 0;
-		if (metadataRaw.calculateEffects){
-			metadataRaw.calculateEffects(metadataRaw, this.game);
-		}
-        this.game.upgrade(metadataRaw.upgrades);
-		this.game.render();
 	},
 
 	upgrade: function(model) {
-		this.game.ui.confirm('', $I('buildings.upgrade.confirmation'), {
-			handler: this.upgradeCallback,
-			ctx: this,
-			args: [model]
+		var self = this;
+		this.game.ui.confirm("", $I("buildings.upgrade.confirmation.msg"), function() {
+			var metadataRaw = self.getMetadataRaw(model);
+			metadataRaw.stage = metadataRaw.stage || 0;
+			metadataRaw.stage++;
+
+			metadataRaw.val = 0;	//TODO: fix by using separate value flags
+			metadataRaw.on = 0;
+			if (metadataRaw.calculateEffects){
+				metadataRaw.calculateEffects(metadataRaw, self.game);
+			}
+			self.game.upgrade(metadataRaw.upgrades);
+			self.game.render();
 		});
-	},
-
-	upgradeCallback: function(model, result) {
-		if (!result) {
-			return;
-		}
-		var metadataRaw = this.getMetadataRaw(model);
-		metadataRaw.stage = metadataRaw.stage || 0;
-		metadataRaw.stage++;
-
-		metadataRaw.val = 0;	//TODO: fix by using separate value flags
-		metadataRaw.on = 0;
-		if (metadataRaw.calculateEffects){
-			metadataRaw.calculateEffects(metadataRaw, this.game);
-		}
-        this.game.upgrade(metadataRaw.upgrades);
-		this.game.render();
 	},
 
 	getMetadataRaw: function(model) {
@@ -2408,8 +2396,7 @@ dojo.declare("classes.ui.btn.StagingBldBtn", com.nuclearunicorn.game.ui.Building
 
 		for (var i = 0; i < this.model.stageLinks.length; i++){
 			var linkModel = this.model.stageLinks[i];
-			this.stageLinks.push(
-					this.addLink(linkModel.title, linkModel.handler));
+			this.stageLinks.push(this.addLink(linkModel));
 		}
 	}
 });

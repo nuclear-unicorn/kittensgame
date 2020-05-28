@@ -97,7 +97,8 @@
 	background-color: #201F1D;
 }
 
-.scheme_dark .maxRes {
+.scheme_dark .maxRes,
+.scheme_dark select > option:disabled {
 	color: #555;
 }
 
@@ -110,7 +111,7 @@
 }
 
 .scheme_dark .btn.modern a {
-	color: #565656;
+	color: gray;
 	background-color: #212121;
 }
 
@@ -131,7 +132,7 @@
     background-color: #201F1D !important;
     cursor: pointer !important;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.3), 0 2px 10px 0 rgba(0, 0, 0, 0.3) !important;
-    border: 1px solid grey !important;
+    border: 1px solid gray !important;
     border-radius: 1px !important;
     outline: 0 !important;
     color: white;
@@ -149,10 +150,19 @@
     text-shadow: -0.06ex 0 white, 0.06ex 0 white;
 }
 
-.scheme_dark .map-cell .label, .scheme_dark .map-cell .coord{
+.scheme_dark .map-cell .label,
+.scheme_dark .map-cell .coord{
 	color: #201F1D;
 }
 
 .scheme_dark .tooltip-content {
 	background-color: #201F1D;
+}
+
+.scheme_dark #tooltip .desc {
+	color: gray;
+}
+
+.scheme_dark #tooltip .effectName {
+	color: gray;
 }

@@ -36,7 +36,7 @@
 
 		<link rel="stylesheet" href="res/default.css" type="text/css">
 		<link rel="stylesheet" href="res/theme_dark.css" type="text/css">
-        <link rel="stylesheet" href="res/theme_grassy.css" type="text/css">
+		<link rel="stylesheet" href="res/theme_grassy.css" type="text/css">
 		<link rel="stylesheet" href="res/theme_sleek.css" type="text/css">
 
 		<script type="text/javascript">
@@ -296,7 +296,7 @@
 						<a id="dev_boostCalendar" href="#" onclick="dev_boostCalendar();" style="display: none; text-decoration: none; position: relative; left: 5px;">&gt;&gt;&gt;</a>
 					</div>
 					<div class="right-tab-header">
-						<a href="#" onclick="gamePage.ui.hideChat();">Log</a>&nbsp;|
+						<a href="#" onclick="gamePage.ui.hideChat();">Log</a>
 						<a href="#" onclick="gamePage.ui.loadChat();">Chat</a>
 					</div>
 					<div id="observeButton" style="text-align: center; margin-top: 5px; height: 30px;"></div>
@@ -364,48 +364,39 @@
 			<div id="creditsDiv" style="display: none" class="dialog credits">
 				<a href="#" onclick="$('#creditsDiv').hide();" style="position: absolute; top: 10px; right: 15px;">close</a>
 
-				Sleek CSS theme by Kida, Grassy CSS theme by <a href="http://www.reddit.com/user/shrx" target="_blank">shrx</a> <br />
-
-				<br>
-				Code contribution:
-				<br>
+				CSS themes: Grassy by <a href="http://www.reddit.com/user/shrx" target="_blank">shrx</a>, Sleek by Kida.<br />
+				<br />
+				Code contributions:
 				<ul>
 					<li><a href="http://www.reddit.com/user/Zusias" target="_blank">Zusias</a></li>
 					<li>Duke</li>
 					<li><a href="http://www.reddit.com/user/xranti" target="_blank">xranti</a></li>
-                    <li><a href="http://www.reddit.com/user/klusark" target="_blank">klusark</a></li>
+					<li><a href="http://www.reddit.com/user/klusark" target="_blank">klusark</a></li>
 					<li><a href="https://coderpatsy.bitbucket.io/" target="_blank">coderpatsy</a></li>
 					<li>ArcanisCz</li>
 					<li>Kida</li>
 					<li>freeroot</li>
-
 				</ul>
 
-				Thanks a lot to 4chan/igg for being such a nice guys.
-				<br>
-				Thanks a lot to /r/kittensgame community for all the feedback and testing
-				<br>
-				<br>
-
-				Warmest thanks to <a href="http://www.reddit.com/user/ainil" target="_blank">ainil</a> for the long months of support and feedback.
-				<br>
-				<br>
+				Thanks a lot to 4chan/igg for being such a nice guys.<br >
+				Thanks a lot to /r/kittensgame community for all the feedback and testing.<br />
+				tumblr icon by <a href="https://moonlight-pendent13.deviantart.com">Moonlight-pendent13</a><br />
+				<br />
+				Warmest thanks to <a href="http://www.reddit.com/user/ainil" target="_blank">ainil</a> for the long months of support and feedback.<br />
+				<br />
 				And finally, my undying gratitude to Waraiko.
-				<br>
-
 			</div>
 
 
-			<div id="optionsDiv" style="display: none; height: 360px; margin-top:-180px" class="dialog help">
+			<div id="optionsDiv" style="display: none;" class="dialog help">
 				<a href="#" onclick="gamePage.closeOptions()" style="position: absolute; top: 10px; right: 15px;">close</a>
 
 				<label for="schemeToggle">Color scheme:</label>
-				<!-- <input id="schemeToggle" type="checkbox" onclick="gamePage.toggleScheme()"> Inverted <br><br><br> -->
 				<select id="schemeToggle" onchange="gamePage.toggleScheme()">
 					<option value="">Classic</option>
 					<option value="dark">Inverted</option>
-					<option value="grassy">Grassy</option>
-					<option value="sleek">Sleek (By Kida)</option>
+					<option value="grassy">Grassy (by shrx)</option>
+					<option value="sleek">Sleek (by Kida)</option>
 				</select>
 				<br>
 				<br>

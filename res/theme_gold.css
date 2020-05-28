@@ -1,0 +1,722 @@
+/**
+ *			Gold 1.1.1 Theme © Volkeyrn
+ */
+
+@import url(https://fonts.googleapis.com/css?family=PT+Sans:ital,wght@400,400italic,700&display=swap);
+
+/**********************************************/
+/******************** GAME ********************/
+/**********************************************/
+body.scheme_gold {
+	background-color: #202020;
+}
+.scheme_gold  #gamePageContainer,
+.scheme_gold select,
+.scheme_gold .btn,
+.scheme_gold .modern,
+.scheme_gold .btn.modern,
+.scheme_gold input[type='button'] {
+    font-family: 'PT Sans', sans-serif;
+}
+.scheme_gold .btn {
+	color: gray;
+	margin-bottom:5px; /* default margin-bottom:10px; */
+	max-height: 36px;
+	background-color: transparent;
+    border: solid 1px transparent;
+}
+.scheme_gold .btn:hover{
+	border: solid 1px transparent;
+}
+.scheme_gold .btn.modern {
+	border-radius: 5px;
+    /* default font-size: 14px; */
+}
+.scheme_gold .btn.disabled {
+	color: #919084;
+	background-color: rgba(32, 32, 32, 0.4); /* color #202020 */
+	border: solid 1px rgba(160, 160, 160, 0.2); /* color #A0A0A0 */
+}
+.scheme_gold .btn.disabled:hover {
+	background-color: rgba(32, 32, 32, 0.4); /* color #202020 */
+	border: solid 1px rgba(160, 160, 160, 0.4); /* color #A0A0A0 */
+	cursor: inherit;
+}
+.scheme_gold .btn:not(.disabled) {
+    color: #dcdcdc;
+    border: solid 1px #696451;	
+	/* text-shadow: 1px 1px 1px #111217; */
+}
+.scheme_gold .btn.modern:not(.disabled) {
+    background-color: rgba(87, 78, 64, 0.1); /* color #574E40 */ /* color for all button not disabled*/	
+    cursor: pointer;
+}
+.scheme_gold .btn.modern:not(.disabled):hover /* hover on all button in center column */
+{
+    background-color: rgba(223, 206, 153, 0.3); /* color #DFCE99 */	
+    border: solid 1px #DFCE99;
+    cursor: pointer;
+    text-shadow: 0 1px 1px #000000;
+}
+.scheme_gold a {
+	color: #EFEDE8;
+}
+.scheme_gold a,
+.scheme_gold .craft-link {
+    text-decoration: none;
+}
+.scheme_gold a:hover {
+	color: #DFCE99;
+	opacity: 1.0; /* default opacity: 0.6 */
+}
+.scheme_gold div {
+	color: #d9d9d9;
+}
+.scheme_gold .disabled div { /* color text for disabled */
+	color: #706F64;
+}
+.scheme_gold .btn:not(.disabled) div { /* color text for all buttons not disabled */
+	color: #dcdcdc;
+}
+.scheme_gold .btn.disabled div { /* color text for all buttons disabled */
+	color: #706F64;
+}
+.scheme_gold h1 {
+    font-size: 100%;
+    color: #E7AF4F;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 1);
+}
+.scheme_gold h1:first-child {
+    margin-top: 0;
+}
+/*** green and red light for machine on/off ***/
+.scheme_gold .btn.bldEnabled div.btnContent,
+.scheme_gold .btn.bldlackResConvert div.btnContent {
+	border: none;
+}
+.scheme_gold .btn.disabled.bldlackResConvert { /* color #C83B00 */
+	/* color for lack resources convertion */
+	background: no-repeat border-box linear-gradient(90deg, #C83B00 0%, #C83B00 10px, rgba(32, 32, 32, 0.4) 12px, rgba(32, 32, 32, 0.4) 100%);
+}
+.scheme_gold .btn:not(.disabled).bldlackResConvert {
+	background: no-repeat border-box linear-gradient(90deg, #C83B00 0%, #C83B00 10px, rgba(87, 78, 64, 0.1) 12px, rgba(87, 78, 64, 0.1) 100%);
+}
+.scheme_gold .btn:not(.disabled).bldlackResConvert:hover {
+	background: no-repeat border-box linear-gradient(90deg, #C83B00 0%, #C83B00 10px, rgba(223, 206, 153, 0.3) 12px, rgba(223, 206, 153, 0.3) 100%);
+}
+.scheme_gold .btn.disabled.bldEnabled { /* color #7cb342 */	
+	background: no-repeat padding-box linear-gradient(90deg, #7CB342 0%, #7cb342 10px, rgba(32, 32, 32, 0.4) 12px, rgba(32, 32, 32, 0.4) 100%);
+}
+.scheme_gold .btn:not(.disabled).bldEnabled {	
+	background: no-repeat border-box linear-gradient(90deg, #7cb342 0%, #7cb342 10px, rgba(87, 78, 64, 0.1) 12px, rgba(87, 78, 64, 0.1) 100%);
+}
+.scheme_gold .btn:not(.disabled).bldEnabled:hover {
+	background: no-repeat border-box linear-gradient(90deg, #7cb342 0%, #7cb342 10px, rgba(223, 206, 153, 0.3) 12px, rgba(223, 206, 153, 0.3) 100%);
+}
+/*** end of green light for machine on/off ***/
+.scheme_gold,
+.scheme_gold .help { /* window options and version */
+	color: #B7B7B7;	
+	overflow: hidden;
+}
+.scheme_gold .help,
+.scheme_gold .dialog {
+    box-shadow:  3px 3px 9px rgba(0, 0, 0, 0.4) inset, 0 0 0 9999px rgba(0, 0, 0, 0.8);
+    background: rgb(56,56,56);
+    background: linear-gradient(135deg, rgba(56,56,56,1) 0%, rgba(16,16,16,1) 30%, rgba(56,56,56,1) 100%);
+    height: auto !important;
+    top: 40% !important;
+    border: 4px solid transparent;
+ 	border-image-source: url('img/theme_gold_light_frame.png'); /* source of images for graphic design : https://pngtree.com/freepng/golden-spot-line-border_4892134.html Volkeyrn: permanent premium member */
+	border-image-width: 86px 300px 86px 300px;
+	border-image-slice: 86 300 86 300;
+	border-image-outset: 0px 0px 0px 0px;
+    border-image-repeat: round;
+    border-radius: 0px;
+}
+.scheme_gold .help a:hover,
+.scheme_gold .dialog a:hover{    	
+	text-shadow: 1px 1px 1px #000000;
+}
+.scheme_gold select { /* dropdown list on settlement tab and options windows */
+    background-color: #202020;
+    color: #DFCE99;
+    padding-bottom: 2px;
+    margin-right: 5px;
+	border-color: rgba(223, 206, 153, 0.1); /* color #DFCE99 */
+    font-size: 13px;
+    box-shadow: -1px -1px 3px rgba(200, 200, 200,0.4),
+                2px 2px 5px #000000;
+}
+.scheme_gold select>option {
+    background-color: #262626;
+    color: #DFCE99;
+	padding: 2px 10px; /* -2 pixel vertical */
+}
+.scheme_gold select > option:disabled {
+	font-size: 90%;
+	color: #919084;
+}
+
+/*************************************************/
+/******************** TOP BAR ********************/
+/*************************************************/
+.scheme_gold #topBar {
+    border-bottom: 1px solid transparent;
+    border-image: repeating-linear-gradient(135deg,rgba(160, 110, 39, 0.7) 0%, rgba(247, 230, 163, 0.9) 20%, rgba(160, 110, 39, 0.7) 33%) 1;
+    font-size: 90%;
+    height: 22px;
+    box-shadow:none;
+    top: 0px;
+}
+.scheme_gold #topBar a:hover {
+	text-shadow: none;
+}
+.scheme_gold #topBar div {	
+	color: #E7AF4F;
+}
+.scheme_gold #headerLinks div { /* for color text of MOTD on top bar */
+	color: #EFEDE8;
+}
+.scheme_gold #headerLinks>div:first-child:before {
+    color: #DFCE99;
+    content: 'Theme by Volkeyrn  ';
+	text-shadow: none;
+    text-decoration: none;
+	font-size: 11px;
+}
+.scheme_gold #sorrowTooltip { /* counter of BLS (Black Liquid Sorrow) */
+	color: #EFEDE8;
+}
+.scheme_gold #autosaveTooltip {
+	color: #E7AF4F;
+}
+.scheme_gold #getTheApp-link { /* Get the app */
+    color: #DFCE99 !important;
+    font-weight: normal !important;
+}
+.scheme_gold #getTheApp-link:hover {
+	color: #E7AF4F !important;
+}
+
+/************************************************/
+/******************** FOOTER ********************/
+/************************************************/
+.scheme_gold #footerLinks {
+	font-size: 90%;
+	bottom: 6px;
+	background: rgba(32, 32, 32, 0.7); /* color #202020 */
+	-webkit-box-shadow: 0 0 4px 4px rgba(32, 32, 32, 0.7); /* color #202020 */
+	        box-shadow: 0 0 4px 4px rgba(32, 32, 32, 0.7); /* color #202020 */
+}
+.scheme_gold #footerLinks a:hover {
+	text-shadow: none;
+}
+.scheme_gold .links-block { /* a link separator : | on header and footer links*/
+	color: #404040 !important;
+}
+
+/*************************************************/
+/******************** TOOLTIP ********************/
+/*************************************************/
+.scheme_gold #tooltip,
+.scheme_gold .tooltip-block div {
+    background-color: #383838;
+    color: #9F9E94; /* tooltip windows == left column : left text */
+    border-color:  rgba(223, 206, 153, 0.8); /* color #DFCE99 */
+    font-size: 14px;
+    box-shadow: 1px 1px 3px #000000 inset,
+                 0px 1px 2px rgba(200, 200, 200,0.1);
+    text-shadow: 0px 1px 1px #181818;
+}
+.scheme_gold .button_tooltip {
+    background-color: transparent;
+}
+.scheme_gold .button_tooltip div { /* tooltip window == left column: right text | center column :highlighting text */
+	color: #c3c3c3;
+    font-size: 14px;
+    text-shadow: 0px 1px 1px #181818;
+}
+.scheme_gold .tooltip-inner .desc {   /* Tooltip Window : title text */
+    color: #9F9E94;
+    font-size: 14px; /* default font size = font-size: 15px; */
+	border-bottom : 1px solid #404040 !important;
+    margin-bottom: 5px;
+    text-shadow: 1px 1px 2px #000000;
+}
+.scheme_gold .tooltip-divider { /* border line before effects text */
+    border-bottom : 1px solid #404040 !important;
+}
+.scheme_gold .effectName { /* Tooltip Window : effects text */
+    color: #E7AF4F !important;
+    font-size: 13px !important; /* default font size = font-size: 14px; */
+}
+.scheme_gold .rawRes { /* Tooltip Window == text for all missing resources for primary resource */
+    color: #919084;
+	font-style: italic;
+	padding-left: 12px;
+}
+.scheme_gold .button_tooltip .noRes,
+.scheme_gold .limited { /* on ressource limited or not attainable */
+    color: #C83B00;
+}
+.scheme_gold #tooltip .flavor { /* Tooltip Window : last bottom text on center column tooltip window */
+    color: #DFCE99;
+    font-size: 12px;
+    text-shadow: none;
+}
+
+/*******************************************************/
+/******************** CENTER COLUMN ********************/
+/*******************************************************/
+.scheme_gold .tab {
+    font-size: 14px;
+}
+.scheme_gold .tabsContainer {
+    color: #404040 ; /* separator | for tab */
+    padding-bottom: 7px !important; /* default 15px */
+    padding-left: 7px; /* for leftColumn box-shadow */
+}
+.scheme_gold .activeTab {
+	color: #DFCE99;
+    text-shadow: 1px 1px 1px #000000;
+}
+.scheme_gold a.activeTab {
+    border-bottom: solid 1px transparent;
+    border-image: repeating-linear-gradient(90deg,rgba(201, 138, 49, 0.9) 0%, rgba(247, 230, 163, 0.9) 100%) 1;
+}
+.scheme_gold .bldTopContainer { /* under tab */
+    font-size: 13px;
+}
+.scheme_gold .bldTopContainer a.activeTab:hover {
+    color: #DFCE99;
+	opacity: 0.7; /* default opacity 0.7 on not hover */
+}
+.scheme_gold .tabInner {
+    padding-top: 7px; /* default padding: 15px; */
+    border: none;
+}
+.scheme_gold .bldGroupContainer { /* container for all buttons on center column */
+    padding-top: 7px; /* default 15px */
+    border-top: 1px solid #404040;
+    margin-top: 7px; /* default 15px */
+}
+.scheme_gold input[type='button'] {
+	background-color: rgba(87, 78, 64, 0.1) !important; /* color #574E40 */
+    cursor: pointer !important;
+    text-transform: uppercase !important;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.3), 0 2px 10px 0 rgba(0, 0, 0, 0.3) !important;
+    border: solid 1px transparent !important; /* for no offset when border on */
+    border-radius: 1px !important;
+    outline: 0 !important;
+    color: #B7B7B7;
+    padding: 5px 20px;
+}
+.scheme_gold input[type='button']:hover {
+    background-color: rgba(223, 206, 153, 0.3) !important; /* color #DFCE99 */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 1);
+    cursor: pointer !important;
+    border: solid 1px #DFCE99 !important;
+    box-shadow: 1px 1px 3px #202020 inset,
+                 0 1px 0 rgba(200, 200, 200,0.2) !important;
+}
+.scheme_gold .btn.modern:not(.disabled):active,
+.scheme_gold input[type='button']:active,
+.scheme_gold input[type='button']#observeBtn:active {
+    border-color: #f0e8cf !important;
+}
+.scheme_gold .modern .btnContent {
+    padding: 10px 0 10px 13px !important; /* 13px left for power background-image */
+}
+.scheme_gold .btn.modern a {
+    color: #EBE0BE;
+    font-weight: 300;
+    background-color: rgba(209, 184, 107, 0.01); /* color #D1B86B */
+    padding: 10px 5px 10px 5px !important; /* default padding: 10px 6px 10px 6px !important; */
+    border-color: #645F4F !important; /* color pick from button not disabled and hover */
+}
+.scheme_gold .btn.modern a:hover {
+	color: #E7AF4F;
+	background-color: rgba(223, 206, 153, 0.2); /* color #DFCE99 */
+	font-weight: bold;
+    text-shadow: none;
+    box-shadow: 1px 1px 3px #202020 inset,
+                 0 1px 0 rgba(200, 200, 200,0.2) !important;
+}
+.scheme_gold .linkContent { /* dropdown list on button */
+    margin-top: 25px !important; /* for correct vertical align dropdown list */
+	background-color: #595444; /* color pick from button not disabled and hover */
+    width: auto !important;
+}
+.scheme_gold .btn.modern.disabled .linkContent { /* dropdown list on button disabled */
+	background-color: #222222; /* color pick from button disabled and hover */
+}
+.scheme_gold .linkContent a {
+    color: #EFEDE8;
+    width: 40px !important;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+.scheme_gold .panelContainer {
+    margin-top: 6px; /* default margin-top: 8px; */
+    background-color: rgba(21, 17, 06, 0.16) !important; /* color #151106 */
+    border: 1px solid transparent;
+    border-image: repeating-linear-gradient(135deg,rgba(160, 110, 39, 0.2) 0%, rgba(247, 230, 163, 0.2) 100%) 1; /* colors A06E27 F7E6A3 */
+    box-shadow: 1px 1px 5px #000000 inset,
+                 0px 1px 2px rgba(200, 200, 200,0.1);
+}
+.scheme_gold .panelContainer div.title {
+    font-size: 16px !important;
+    color: #E7AF4F;
+    text-shadow: 1px 1px 2px #000000;
+}
+.scheme_gold .panelContainer .toggle {
+    border : 1px solid #696451;
+    color: #969696;
+    box-shadow: -1px -1px 3px rgba(200, 200, 200,0.4),
+                2px 2px 5px #000000;
+    margin: 6px 6px 6px 6px; /* default margin: 4px; */
+    border-radius: 3px;
+}
+.scheme_gold .attitude { /* text for attitude races in trade tab */
+	color: #919084 !important;
+}
+.scheme_gold .trade-race .buys {
+    color: #C83B00;
+    font-size: 90%;
+}
+.scheme_gold .trade-race .sells {
+    color: #7cb342; /* #DFCE99; */
+    font-size: 90%;
+}
+.scheme_gold .trade-race .ammount {
+    font-size: 85%;
+    color: rgba(145, 144, 132, 0.7); /* color: #919084; */
+}
+.scheme_gold table.statTable {
+    margin-left: 10px;
+    padding: 7px;
+    border: 2px solid transparent;
+    border-image: repeating-linear-gradient(135deg,rgba(160, 110, 39, 0.7) 0%, rgba(247, 230, 163, 0.9) 25%, rgba(160, 110, 39, 0.7) 50%) 1;
+    border-image-outset: 5px;
+    box-shadow: 2px 2px 7px #000000 inset,
+                 0px 1px 2px rgba(200, 200, 200,0.1) !important;
+}
+/* for container 'Census' -> list of kittens in settlement tab */
+.scheme_gold .panelContainer div[style^='border: 1px solid gray;']{
+	background-color : rgba(223, 206, 153, 0.05); /* color #DFCE99 */
+	border-color: #686351 !important;
+	font-size: 90%;
+	/* default padding: 5px; */
+    margin-bottom: 6px !important; /* default margin-bottom: 5px; */
+    box-shadow: -1px -1px 3px rgba(200, 200, 200,0.4),
+                2px 2px 5px #000000;
+}
+.scheme_gold .panelContainer div[style^='border: 1px solid gray;'] div { /* name of kitten */
+    color: #EFEDE8;
+    text-shadow: 0px 1px 1px #000000;
+}
+.scheme_gold .panelContainer div[style^='border: 1px solid gray;'] span { /* jobs unasigned */
+	color: #919084;
+}
+.scheme_gold .panelContainer div[style^='border: 1px solid gray;'] span[style='font-weight: bold' i] { /* job assigned */
+    color: #DFCE99;
+    font-weight: normal !important;
+}
+.scheme_gold .panelContainer div.title + .container > div[style^='height:']{
+	margin-bottom: 3px; /* for add a margin under the 2 lists (select) in the settlement tab */
+}
+.scheme_gold a.bld-off,
+.scheme_gold a.auto-off,
+.scheme_gold a.fugit-off {
+    color: #C83B00 !important;
+    font-weight: bold !important;
+    text-shadow: 1px -1px 3px #000000,
+                 0px 1px 2px rgba(200, 200, 200,0.1);
+}
+.scheme_gold a.bld-off:hover,
+.scheme_gold a.auto-off:hover,
+.scheme_gold a.fugit-off:hover {
+    /* font-weight: bolder !important; */
+    text-shadow: -1px 1px 3px #000000,
+    0px -1px 2px rgba(200, 200, 200,0.1) !important;
+}
+
+/**********************************************************/
+/******************** ACHIEVEMENTS TAB ********************/
+/**********************************************************/
+.scheme_gold .achievement-header {
+	color: #EFEDE8;
+	text-shadow: 1px 1px 2px #000000;
+	font-size: 16px;
+}
+.scheme_gold .achievement {
+    display: block;
+    margin: 10px;
+    height: 40px;
+    background-color: rgba(223, 206, 153, 0.1); /* color #DFCE99 */
+    border-color: rgba(223, 206, 153, 0.3);
+    color: #EFEDE8;
+    text-shadow: rgb(223, 206, 153) 2px 0px 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: default !important;
+}
+.scheme_gold .achievement:hover {
+    background-color: rgba(223, 206, 153, 0.4); /* color #DFCE99 */
+    border-color: rgba(223, 206, 153, 1);
+    box-shadow: -1px -1px 2px rgba(200, 200, 200,0.4),
+                2px 2px 4px #000000;
+    border-radius: 3px;
+}
+.scheme_gold .achievement.unethical {
+    text-shadow: rgba(200, 59, 0, 1) 2px 0px 10px,
+                    rgba(200, 59, 0, 1) -2px 0px 10px; /* color #C83B00 */
+    background-color: rgba(200, 59, 0, 0.08);
+    border-color: rgba(200, 59, 0, 0.3);
+}
+.scheme_gold .achievement.unethical:hover {
+    background-color: rgba(200, 59, 0, 0.3); /* color #C83B00 */
+    border-color: rgba(200, 59, 0, 1);
+}
+.scheme_gold .achievement:not(.unlocked) {
+    color: rgba(145, 144, 132, 0.9); /* color: #919084; */
+    background-color: rgba(145, 144, 132, 0.1);
+    border-color: rgba(145, 144, 132, 0.2);
+    text-shadow: none;
+}
+.scheme_gold .achievement:not(.unlocked):hover {
+    background-color: rgba(145, 144, 132, 0.3); /* color: #919084; */
+    border-color: rgba(145, 144, 132, 0.4);
+}
+.scheme_gold .achievement:after {
+    display: block;
+    margin-top: 5px;
+    font-size: 90%;
+    color: rgba(239, 237, 232, 0.8); /* color #EFEDE8 */
+    text-shadow: none;
+    text-transform: capitalize;
+    letter-spacing: normal;
+    font-weight: normal !important;
+}
+.scheme_gold .achievement.unethical:after {
+	color: rgba(239, 237, 232, 0.8); /* color #EFEDE8 */
+}
+.scheme_gold .achievement-header .star {
+    color: #DC7111; /* orange or dominant color of the theme */
+}
+.scheme_gold .achievement .star {
+	/* default font size = font-size: 18px; */
+	color : rgba(145, 144, 132, 0.7); /* color: #919084; */
+}
+.scheme_gold .achievement.unlocked .star {
+	color : #DC7111; /* orange or dominant color of the theme */
+	font-weight: bold;
+	text-shadow: 0px 1px rgba(0, 0, 0, 0.8);
+}
+
+/******************************************************/
+/******************** RIGHT COLUMN ********************/
+/******************************************************/
+.scheme_gold #rightColumn {
+	width: 25%;
+    max-width: 400px;
+    min-width: 250px;
+}
+.scheme_gold #calendarDiv {
+    color: #DFCE99;
+    padding-left: 5px;
+    margin-top: 5px;
+    font-size: 90%;
+    text-shadow: 1px 1px 2px #000000;
+}
+.scheme_gold #calendarSign {
+   font-size: 120% ;
+}
+.scheme_gold #calendarSign:hover {
+   cursor: default ;
+}
+.scheme_gold .right-tab-header { /* Log | Chat link on right column */
+    color : #404040; /* for separator tab | */
+	font-size: 80%;
+}
+.scheme_gold .right-tab-header a.active {
+    color: #DFCE99;
+}
+.scheme_gold div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
+	color: rgba(145, 144, 132, 0.7); /* color: #919084; */
+    font-size: 90%;
+    border-top: 1px solid #404040 !important;
+	margin-top: 10px;
+}
+.scheme_gold #clearLogHref { /* Link in right column : Clear log */
+	font-size: 80%;
+}
+.scheme_gold #logFiltersBlock > a { /* Link in right column : [+]Log Filters */
+    font-size: 80%;
+    margin-left: 5px;
+}
+.scheme_gold #pauseBtn { /* Link in right column : pawse */
+	margin-left: 5px;
+}
+.scheme_gold #gameLog {
+	margin-top: 6px;
+	box-shadow: 1px 1px 5px #000000 inset,
+                 0px 1px 2px rgba(200, 200, 200,0.1);
+	padding: 0px 5px 5px 5px;
+}
+.scheme_gold #gameLog span.msg:not(.type_date)  {
+    margin-left: 1.2em;
+	list-style-type: circle; /*'\25B8'; /* black right-pointing small triangle */
+	padding-left: 0.3em;
+}
+.scheme_gold #gameLog span.noBullet {
+	margin-left: 2em !important;
+	list-style-type: '\25AA' !important; /* black small square */
+}
+.scheme_gold .msg {
+    font-size: 90%;
+}
+.scheme_gold .msg.type_notice {
+    color: #99AADF; /* color default : #01A9DB; */
+}
+.scheme_gold .msg.type_important {
+    color: #E7AF4F; /* color default : coral; */
+}
+.scheme_gold .msg.type_alert {
+    color: #C83B00; /* color default : red; */
+}
+.scheme_gold .msg.type_date {
+    /* font-size: 13px; */
+    text-shadow: 1px 1px 2px #000000;
+    color: #E7AF4F;
+    padding-left: 7px;
+    border-bottom: solid 1px transparent;
+    border-image: repeating-linear-gradient(90deg,rgba(201, 138, 49, 0.9) 0%, rgba(247, 230, 163, 0.9) 100%) 1;
+}
+
+/*****************************************************/
+/******************** LEFT COLUMN ********************/
+/*****************************************************/
+.scheme_gold #leftColumn {
+    border : 1px solid transparent;
+    box-shadow: 3px 3px 7px #000000;
+    border-radius: 5px 0px 5px 0px;
+ }
+ .scheme_gold .res-table {
+    max-width: 352px;    /* +12 pixel */
+    border-collapse: collapse; /* gain of 3 pixel by border -> no margin bottom after */ 	
+	margin-left: 2px; /* without 0px margin left for all ressources */
+ }
+ .scheme_gold .craftTable {
+    margin-bottom: 50px !important; /* for correct margin bottom due of the line above with border-collapse: collapse on .res-Table !*/
+ }
+.scheme_gold .res-cell.craft-link {
+     color: #919084;
+ }
+.scheme_gold .res-cell.craft-link:hover { /* craft table left column */
+    color: #E7AF4F;
+	text-decoration: none;
+	font-weight: bold;
+    text-shadow: 1px 1px 1px #181818;
+}
+.scheme_gold .craft-link[data-reactid$='.6.0'] { /* 6th column of craft table : "all" */
+	color: #d9d9d9;
+ }
+.scheme_gold tr.resourceRow:hover,
+.scheme_gold .res-row:hover {
+    background-color: rgba(223, 206, 153, 0.15); /* color #DFCE99 */
+	cursor: default;
+}
+.scheme_gold .res-row.craft:hover {
+    background-color: rgba(223, 206, 153, 0.15); /* color #DFCE99 */
+}
+.scheme_gold .highlited { /* higlighting ressources when hover button on center windows */
+	background-color: rgba(223, 206, 153, 0.15); /* color #DFCE99 */
+}
+.scheme_gold .res-cell.resPerTick:hover {
+	font-weight: normal !important;
+}
+.scheme_gold .maxRes {
+    font-size: 95%;
+    color: #919084;
+}
+.scheme_gold .resAmount {
+    color: #d9d9d9;
+}
+.scheme_gold .resLimitWarn {
+    color: #E7AF4F;
+    opacity: 1; /* default = 0.75 */
+}
+.scheme_gold .resLimitNotice {
+    color: #DFCE99;
+}
+.scheme_gold .resPerTick {
+    font-size: 95%;
+    color: #CBCBCB;
+    cursor: default;
+}
+.scheme_gold #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+    font-size: 110%;
+}
+.scheme_gold #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+	color: #919084;
+}
+.scheme_gold #fastPraiseContainer > a { /* Text left column : "Praise the sun!" */
+    font-size: 110%;
+}
+.scheme_gold #fastPraiseContainer > a:hover{
+	text-shadow: 1px 0px 10px #EFEDE8;
+}
+.scheme_gold #fastHuntContainer > a:hover{
+	color: #E7AF4F;	
+	text-shadow: 1px 1px #404040;
+}
+.scheme_gold .res-cell.positive-weather { /* to change the color for bonus cell according to the season */
+	font-size: 85% !important;
+	color: #7CB342 !important;
+}
+.scheme_gold .res-cell.negative-weather { /* to change the color for penalty cell according to the season */
+	font-size: 85% !important;	
+	color: #C83B00 !important;
+}
+.scheme_gold .resource_kittens .resource-name {
+	color: #919084 !important;
+}
+.scheme_gold .resource_faith .resource-name {
+	color: #919084 !important;
+}
+.scheme_gold .resource_steel .resource-name {
+	color: #919084 !important;
+}
+.scheme_gold .resource_gear .resource-name {
+	color: #919084 !important;
+}
+.scheme_gold .resource_alloy .resource-name {
+	color: #919084 !important;
+}
+.scheme_gold .resource_megalith .resource-name {
+	color: #919084 !important;
+}
+
+/***************************************************/
+/******************** SCROLLBAR ********************/
+/***************************************************/
+.scheme_gold ::-webkit-scrollbar-thumb {
+    background: #383838;
+	border-radius: 40px;
+}
+.scheme_gold ::-webkit-scrollbar-track {
+    background: #202020;
+    border-radius: 50px;
+}
+/* Only FireFox */
+.scheme_gold #leftColumn,
+.scheme_gold #rightColumn,
+.scheme_gold #midColumn {
+   scrollbar-width: thin;
+   scrollbar-color: #383838 #202020 !important;
+}
+.scheme_gold select {
+   scrollbar-width: auto !important;
+}

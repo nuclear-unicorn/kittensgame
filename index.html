@@ -32,10 +32,10 @@
 			ga('send', 'pageview');
 		</script>
 
-		<link rel="stylesheet" href="res/default.css?v=5" type="text/css">
-		<link rel="stylesheet" href="res/theme_dark.css?v=5" type="text/css">
-        <link rel="stylesheet" href="res/theme_grassy.css?v=5" type="text/css">
-		<link rel="stylesheet" href="res/theme_sleek.css?v=5" type="text/css">
+		<script type="text/javascript">
+			var now = Date.now();
+			$("<link />").attr("rel", "stylesheet").attr("type", "text/css").attr("href", "res/default.css?_=" + now).appendTo($("head"));
+		</script>
 
 		<script src="https://www.gstatic.com/firebasejs/3.6.4/firebase.js"></script>
 		<script>
@@ -49,9 +49,25 @@
 			firebase.initializeApp(config);
 		</script>
 
+		<script>
+			/**
+			 * Workaround for IE9 local storage :V
+			 *
+			 * This fix is intended for IE in general and especially for IE9,
+			 * where localStorage is defined as system variable.
+			 *
+			 */
+
+			window.LCstorage = window.localStorage;
+			if (document.all && !window.localStorage) {
+				window.LCstorage = {};
+				window.LCstorage.removeItem = function () { };
+			}
+		</script>
+
 		<script type="text/javascript">
 
-			var version = "1470a";
+			var version = "1471";
 
 			// Warning: As the URL of gamma is contained in URLs of alpha and beta, gamma MUST be declared before them
 			var branches = {
@@ -91,7 +107,7 @@
 
 				var i = (Math.floor(Math.random() * loadingMessages.length));
 				$("#loadingProgressInfo").html(loadingMessages[i] + "...&nbsp(" + progress.toFixed() + "%)");
-				return System.import(module + ".js?v=_" + version);
+				return System.import(module + ".js?_=" + now);
 			}
 
 			function _import(module, def){
@@ -101,9 +117,18 @@
 					return def.then(function(){
 						return loadModule(module);
 					}).catch(function(err){
-						console.error(err);
+						console.error("_import#: unable to load module:", module);
+						console.trace(err);
 					});
 				}
+			}
+
+			function loadTheme(themeId, timestamp){
+				$("<link />")
+					.attr("rel", "stylesheet")
+					.attr("type", "text/css")
+					.attr("href", "res/theme_" + themeId + ".css?_=" + timestamp)
+					.appendTo($("head"));
 			}
 
 			dojo.addOnLoad(function() {
@@ -158,13 +183,31 @@
 				progressMax = modules.length + 2;
 				console.log("Loading...");
 
-				var def = _import("config");
-				def = _import("core", def);
-				var gameLang;
+				//------ preload theme id ---------
+				var uiData = LCstorage["com.nuclearunicorn.kittengame.ui"];
+				var uiSettings = uiData && JSON.parse(uiData);
+				if (uiSettings){
+					if (uiSettings.theme){
+						$("body").addClass("scheme_" + uiSettings.theme);
+						loadTheme(uiSettings.theme, now);
+					}
+				}
 
+				var def = _import("config");
+				def.then(function() {
+					var schemes = new classes.KGConfig().statics.schemes;
+					for (var i = 0; i < schemes.length; ++i) {
+						//todo: skip theme if preloaded
+						if (!uiSettings || uiSettings.theme != schemes[i]){
+							loadTheme(schemes[i], now);
+						}
+					}
+				});
+
+				def = _import("core", def);
 				def.then(function () {
 					console.log("Loading locale system");
-					var langPromise = i18nLang.init(version);
+					var langPromise = i18nLang.init(now);
 					langPromise.done(function() {
 						console.log("Loading game modules");
 						for (var i in modules){
@@ -301,6 +344,7 @@
 							<a href="#" onclick="gamePage.workshop.unlockAll();">All upgrades</a>
 							<a href="#" onclick="gamePage.resPool.maxAll();">All resources</a>
                             <a href="#" onclick="gamePage.bld.devAddStorage();">More storage</a>
+							<a href="#" onclick="gamePage.unlockedSchemes = gamePage.ui.allSchemes; gamePage.ui.updateOptions();">All themes</a>
 						</div>
 					</div>
 
@@ -316,13 +360,13 @@
 					<span id="saveTooltip" style="padding-right: 15px; font-size: 12px; opacity: 0;">Saved!</span>
 
 					<div class="links-block" style="padding-top:3px;display:inline-block;">
-						<a href="#" onclick="gamePage.saveUI();">Save</a> |
-						<a href="#" onclick="$('#optionsDiv').toggle();">Options</a> |
+						<a id="save-link" href="#" onclick="gamePage.saveUI();">Save</a> |
+						<a id="options-link" href="#" onclick="$('#optionsDiv').toggle();">Options</a> |
 
-						<a href="#" onclick="gamePage.reset();">Reset</a> |
+						<a id="reset-link" href="#" onclick="gamePage.reset();">Reset</a> |
 						<span id="devModeButton" style="display: none;"><a href="#" id="devBtn" onclick="dev();">DEV</a> |</span>
-						<a href="#" onclick="wipe();">Wipe</a> |
-						<a href="#" onclick="gamePage.ui.displayAppDialog();" style="font-weight: bold; color:#666;">Get the app</a> |
+						<a id="wipe-link" href="#" onclick="wipe();">Wipe</a> |
+						<a id="getTheApp-link" href="#" onclick="gamePage.ui.displayAppDialog();" style="font-weight: bold; color:#666;">Get the app</a> |
 
 						<a href="#" onclick="$('#changelogDiv').toggle();">Ver <span id="versionLink">?.?.?.?</span></a>
 					</div>
@@ -344,8 +388,8 @@
 					Minor 7:
 						Time Boiler
 
-					Rev: 0
-						-
+					Rev: 1
+						UI
 
 				</pre>
 				<a href="changelog.txt" target="_blank" style="position: relative; top: -15px;">full changelog</a>
@@ -353,7 +397,7 @@
 
 			<div id="loadingContainer">
 				<div class="content">
-					<span style="font-size:18px;"><img src="res/ajax-loader.gif">&nbsp;Loading...<br></span>
+					<span style="font-size:18px;"><img class="loader" width="16" height="16" src="res/ajax-loader.gif">&nbsp;Loading...<br></span>
 					<br>
 					<progress id="loadingProgressBar" value="0" max="100"></progress>
 					<div id="loadingProgressInfo">Setting up game engine...</div>
@@ -372,13 +416,20 @@
 				<div id="midColumn" style="vertical-align: top;" class="column">
 					<div id="gameContainerId" style="border: 1px solid gray;">
 						<span>Oops!</span>
-						<div id="gameContainerHelp" style="font-size:12px; color: gray; display:none;">
+						<div id="gameContainerHelp" style="font-size:150%;">
 							Looks like the game is not working. But don't worry.<br>
 							<ul>
 								<li>Check if JavaScript is enabled or Ad-Blockers are turned off.</li>
 								<li>Try to refresh the game by pressing Ctrl+F5.</li>
 								<li>Try to reload the game in about 10-15 minutes.</li>
-								<li>If none of these work, kindly contact me via the Reddit link below.</li>
+								<li>If none of these work:
+									<ul>
+										<li>open the web console by pressing F12,</li>
+										<li>go to the "Console" tab,</li>
+										<li>take screenshots of all errors (red texts),</li>
+										<li>post them on Discord.</li>
+									</ul>
+								</li>
 							</ul>
 						</div>
 					</div>
@@ -390,10 +441,10 @@
 						<a id="dev_boostCalendar" href="#" onclick="dev_boostCalendar();" style="display: none; text-decoration: none; position: relative; left: 5px;">&gt;&gt;&gt;</a>
 					</div>
 					<div class="right-tab-header">
-						<a id="logLink" href="#" class="active" onclick="gamePage.ui.hideChat();">Log</a>&nbsp;|
+						<a id="logLink" href="#" class="active" onclick="gamePage.ui.hideChat();">Log</a>
 						<a id="chatLink" class="chatLink" href="#" onclick="gamePage.ui.loadChat();">Chat</a>
 					</div>
-					<div id="observeButton" style="text-align: center; margin-top: 5px; height: 30px;"></div>
+					<div id="observeButton"></div>
 					<div class="right-tab" id="rightTabLog">
 						<div>
 							<div class="console-intro" style="padding-top: 10px; border-top: 1px solid gray;">
@@ -430,41 +481,32 @@
 			<div id="creditsDiv" style="display: none" class="dialog credits">
 				<a href="#" onclick="$('#creditsDiv').hide();" style="position: absolute; top: 10px; right: 15px;">close</a>
 
-				Sleek CSS theme by Kida, Grassy CSS theme by <a href="http://www.reddit.com/user/shrx" target="_blank">shrx</a> <br />
-
-				<br>
-				Code contribution:
-				<br>
+				CSS themes: shrx, Kida, Volkeyrn (see top bar of each theme).<br />
+				<br />
+				Code contributions:
 				<ul>
 					<li><a href="http://www.reddit.com/user/Zusias" target="_blank">Zusias</a></li>
 					<li>Duke</li>
 					<li><a href="http://www.reddit.com/user/xranti" target="_blank">xranti</a></li>
-                    <li><a href="http://www.reddit.com/user/klusark" target="_blank">klusark</a></li>
+					<li><a href="http://www.reddit.com/user/klusark" target="_blank">klusark</a></li>
 					<li><a href="https://coderpatsy.bitbucket.io/" target="_blank">coderpatsy</a></li>
 					<li>ArcanisCz</li>
 					<li>Kida</li>
 					<li>freeroot</li>
-					<li>Ethaniel_Kavelaars</li>
-
+					<li>Ethaniel</li>
 				</ul>
 
-				Thanks a lot to 4chan/igg for being such a nice guys.
-				<br>
-				Thanks a lot to /r/kittensgame community for all the feedback and testing
-				<br>
-				tumblr icon by <a href="https://moonlight-pendent13.deviantart.com">Moonlight-pendent13</a>
-				<br>
-
-				Warmest thanks to <a href="http://www.reddit.com/user/ainil" target="_blank">ainil</a> for the long months of support and feedback.
-				<br>
-				<br>
+				Thanks a lot to 4chan/igg for being such a nice guys.<br >
+				Thanks a lot to /r/kittensgame community for all the feedback and testing.<br />
+				tumblr icon by <a href="https://moonlight-pendent13.deviantart.com">Moonlight-pendent13</a><br />
+				<br />
+				Warmest thanks to <a href="http://www.reddit.com/user/ainil" target="_blank">ainil</a> for the long months of support and feedback.<br />
+				<br />
 				And finally, my undying gratitude to Waraiko.
-				<br>
-
 			</div>
 
 
-			<div id="optionsDiv" style="display: none; height: 380px; margin-top:-190px" class="dialog help">
+			<div id="optionsDiv" style="display: none;" class="dialog help">
 				<a href="#" class="close" onclick="gamePage.closeOptions()" style="position: absolute; top: 10px; right: 15px;">close</a>
 
 				<label for="languageSelector">Language:</label>
@@ -476,13 +518,10 @@
 				<br>
 
 				<label for="schemeToggle">Color scheme:</label>
-				<!-- <input id="schemeToggle" type="checkbox" onclick="gamePage.toggleScheme()"> Inverted <br><br><br> -->
-				<select id="schemeToggle" onchange="gamePage.toggleScheme()">
-					<option value="">Classic</option>
-					<option value="dark">Inverted</option>
-					<option value="grassy">Grassy</option>
-					<option value="sleek">Sleek (By Kida)</option>
+				<select id="schemeToggle" onchange="gamePage.toggleScheme($('#schemeToggle').val())">
 				</select>
+				&nbsp;<a href="#" onclick="gamePage.ui.relockSchemes()" style="font-size:14px;">Relock schemes</a>
+				<br><i><span style="font-size: 70%;">Schemes that you cannot select yet can be permanently unlocked by specific actions.</span></i>
 				<br>
 				<br>
 
@@ -510,6 +549,9 @@
 				<input id="hideSell" type="checkbox" onclick="gamePage.opts.hideSell = $('#hideSell')[0].checked;">
 				<label for="hideSell">Hide 'sell' buttons</label>
 				<br>
+				<input id="hideBGImage" type="checkbox" onclick="gamePage.opts.hideBGImage = $('#hideBGImage')[0].checked; gamePage.ui.updateOptions();">
+				<label for="hideBGImage">Hide background image (for color schemes where applicable)</label>
+				<br>
                 <br>
 
                 <a href="#" onclick="$('.optsExtra').toggle();">More...</a>
@@ -525,10 +567,14 @@
 					<label for="disableTelemetry">Disable game statistics.</label>
 					<br>
 					<input id="enableRedshift" type="checkbox" onclick="gamePage.opts.enableRedshift = $('#enableRedshift')[0].checked;">
-					<label for="enableRedshift" style="font-size: 8px;">Enable offline progression (Experimental)</label>
+					<label for="enableRedshift">Enable offline progression</label>
 					<br>
 					<input id="forceLZ" type="checkbox" onclick="gamePage.opts.forceLZ = $('#forceLZ')[0].checked;">
-					<label for="forceLZ" style="font-size: 8px;">Always compress save files (Experimental)</label>
+					<label for="forceLZ" style="font-size: 75%;">Always compress in-memory save <i>(experimental)</i></label>
+					<br>
+					<input id="compressSaveFile" type="checkbox" onclick="gamePage.opts.compressSaveFile = $('#compressSaveFile')[0].checked;">
+					<label for="compressSaveFile" style="font-size: 75%;">Compress exported save file <i>(experimental)<br>
+						WARNING: it generates save files that are NOT COMPATIBLE with older versions, like mobile versions.</i></label>
 				</div>
 
 				<br>

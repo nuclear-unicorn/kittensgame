@@ -522,7 +522,7 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 });
 
 
-dojo.declare("classes.ui.PrestigeBtnController", com.nuclearunicorn.game.ui.BuildingResearchBtnController, {
+dojo.declare("classes.ui.PrestigeBtnController", com.nuclearunicorn.game.ui.BuildingNotStackableBtnController, {
 	getMetadata: function(model){
         if (!model.metaCached){
             model.metaCached = this.game.prestige.getPerk(model.options.id);

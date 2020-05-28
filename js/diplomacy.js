@@ -524,29 +524,28 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	 * Prints a formatted output of a trade results based on a resource map
 	 */
 	gainTradeRes: function(yieldResTotal, amtTrade){
-		var output = false;
 		if (yieldResTotal) {
+			var output = false;
 			for (var res in yieldResTotal) {
 				var amt = this.game.resPool.addResEvent(res, yieldResTotal[res]);
 				if (amt > 0){
-					if (res == "blueprint"){
-						this.game.msg($I("trade.msg.resources", [this.game.getDisplayValueExt(amt), res]) + "!", "notice", "trade", true);
-					} else if (res == "titanium"){
-						this.game.msg($I("trade.msg.resources", [this.game.getDisplayValueExt(amt), res]) + "!", "notice", "trade", true);
-					} else {
-						var resPool = this.game.resPool.get(res);
-						var name = resPool.title || res;
-						this.game.msg($I("trade.msg.resources", [this.game.getDisplayValueExt(amt), name]), null, "trade", true);
+					var resPool = this.game.resPool.get(res);
+					var name = resPool.title || res;
+					var msg = $I("trade.msg.resources", [this.game.getDisplayValueExt(amt), name]);
+					var type = null;
+					if (res == "blueprint" || res == "titanium"){
+						msg += "!";
+						type = "notice";
 					}
+					this.game.msg(msg, type, "trade", true);
 					output = true;
 				}
 			}
-			//var orthographe = amtTrade > 1 ? "s" : "";
-			this.game.msg($I("trade.msg.trade.caravan", [amtTrade]), null, "trade");
-		}
 
-		if (yieldResTotal && !output){
-			this.game.msg($I("trade.msg.trade.empty"), null, "trade");
+			if (!output){
+				this.game.msg($I("trade.msg.trade.empty"), null, "trade", true);
+			}
+			this.game.msg($I("trade.msg.trade.caravan", [amtTrade]), null, "trade");
 		}
 	},
 
@@ -720,17 +719,18 @@ dojo.declare("com.nuclearunicorn.game.ui.TradeButton", com.nuclearunicorn.game.u
 	},
 
 	renderLinks: function(){
-		this.tradeAllHref = this.addLink($I("btn.all.minor"),
-			function(){
+		this.tradeAllHref = this.addLink({
+			title: $I("btn.all.minor"),
+			handler: function() {
 				this.game.diplomacy.tradeAll(this.race);
 			}
-		);
+		});
 
 		// 50% template
-		this.tradeHalfHref = this.addLink("","");
+		this.tradeHalfHref = this.addLink({title: "", handler: ""});
 
 		//20% template
-		this.tradeFifthHref = this.addLink("","");
+		this.tradeFifthHref = this.addLink({title: "", handler: ""});
 	},
 
 	update: function(){
@@ -928,9 +928,9 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 
 
 
-		var expandAll = dojo.create("a", { innerHTML: "Expand all", href: "#" }, expandDiv);
+		var expandAll = dojo.create("a", { innerHTML: $I("common.expand.all"), href: "#" }, expandDiv);
 		dojo.create("span", { innerHTML: " | " }, expandDiv );
-		var collapseAll = dojo.create("a", { innerHTML: "Collapse all", href: "#" }, expandDiv);
+		var collapseAll = dojo.create("a", { innerHTML: $I("common.collapse.all"), href: "#" }, expandDiv);
 
 		dojo.create("div", { class: "clear"}, tabContainer);
 

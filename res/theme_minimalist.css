@@ -1,0 +1,990 @@
+/**
+ *			Minimalist 1.00 Theme © Volkeyrn
+ */
+
+ @import url(https://fonts.googleapis.com/css?family=Open+Sans:ital,wght@300,400,700,300italic,400italic,700italic&display=swap);
+
+/**********************************************/
+/******************** GAME ********************/
+/**********************************************/
+body.scheme_minimalist {
+	background-color: #0C0D10;
+}
+body.scheme_minimalist.with_background_image,
+.scheme_minimalist .help,
+.scheme_minimalist .dialog {
+	background-color: #0C0D10;
+	background-image: linear-gradient(90deg, #0C0D10 0%, #0C0D10 20%, #101115 35%, #181920 55%, #252732 100%);
+}
+.scheme_minimalist #game,
+.scheme_minimalist #loadingContainer {
+    top: 18px;
+}
+.scheme_minimalist  #gamePageContainer,
+.scheme_minimalist select,
+.scheme_minimalist .btn,
+.scheme_minimalist  .modern,
+.scheme_minimalist .btn.modern,
+.scheme_minimalist input[type='button'] {
+	 font-family: 'Open Sans', sans-serif;
+}
+.scheme_minimalist .btn {
+	color: gray;
+	margin-bottom:3px; /* default 10px */
+	max-height: 36px;
+	background-color: transparent;
+	border: solid 1px transparent;
+}
+.scheme_minimalist .btn:hover {
+	border: solid 1px transparent;
+}
+.scheme_minimalist .btn.modern {
+	/* default font-size: 14px; */
+	border-radius: 7px;
+	width: 300px; /* +10px gained from left column +15px gained from padding default width: 264px; */
+}
+.scheme_minimalist .btn.disabled {
+	background-color: #21212B;
+	background: no-repeat border-box linear-gradient(90deg, #21212B 0%, #21212B 50%, #313140 95%, #313140 100%);
+	border: solid 1px #292935;
+}
+.scheme_minimalist .btn.disabled:hover {
+	background-color: #21212B;
+	border: solid 1px #8C8C8C;
+	cursor: inherit;
+	box-shadow: 1px 0 2px rgba(200, 200, 200, 0.3), /* color #C8C8C8 */
+                  -1px 0 2px #8C8C8C;
+	text-shadow: 1px 1px 1px rgba(12, 13, 16, 0.9); /* color #0C0D10 */
+}
+.scheme_minimalist .btn:not(.disabled) {
+	border: solid 1px #494955;
+}
+.scheme_minimalist .btn:not(.disabled):hover {
+	text-shadow: 1px 1px 1px rgba(12, 13, 16, 0.8); /* color #0C0D10 */
+}
+.scheme_minimalist .btn.modern:not(.disabled) {
+   	background-color: #41414C; /* color for all button not disabled*/
+	background: no-repeat border-box linear-gradient(90deg, #41414C 0%, #41414C 40%, #51515e 95%, #51515e 100%);
+    cursor: pointer;
+}
+.scheme_minimalist .btn.modern:not(.disabled):hover { /* hover on all button not disabled in center column */
+	background: none;
+	background-color: #41414C;
+	cursor: pointer;
+	border: solid 1px #DD836C;
+	box-shadow: 1px 0 2px #DD836C,
+                  -1px 0 2px #DD836C;
+}
+.scheme_minimalist .btn:not(.disabled):hover span.btnTitle { /* to change only the properties of the button name for buttons enabled */
+	color: #C8D4E4;
+}
+.scheme_minimalist a {
+	color: #636A7C;
+}
+.scheme_minimalist a,
+.scheme_minimalist .craft-link {
+    text-decoration: none;
+}
+.scheme_minimalist a:hover {
+	color: #acafbc;
+	opacity: 1.0; /* default opacity: 0.6 */
+}
+.scheme_minimalist div {
+	color: #A6A4B0;
+}
+.scheme_minimalist .disabled div { /* color text for disabled */
+	color: #888888;
+}
+.scheme_minimalist .btn:not(.disabled) div { /* color text for all buttons not disabled */
+	color: #A6A4B0;
+}
+.scheme_minimalist .btn.disabled div { /* color text for all buttons disabled */
+	color: #838493;
+}
+.scheme_minimalist h1 {
+    font-size: 16px; /* default font size = font-size: 12px; */
+    color: #DD836C;
+	text-shadow: 1px 1px 1px rgba(12, 13, 16, 0.9); /* color #0C0D10 */
+	padding-left: 30px;
+}
+.scheme_minimalist h1:first-child {
+    margin-top: 0p;
+}
+.scheme_minimalist .modern .btnContent {
+    padding: 10px 0 10px 1px !important; /* 1px left for buttons without power background-image */
+}
+/*** green and red light for machine on/off ***/
+.scheme_minimalist .btn.bldEnabled div.btnContent,
+.scheme_minimalist .btn.bldlackResConvert div.btnContent {
+	padding: 10px 0 10px 13px !important; /* 13px left for power background-image (linear-gradient) */
+	border: none;	
+}
+.scheme_minimalist .btn.disabled.bldlackResConvert { /* color #BE4151*/ /* color for lack resources convertion */	
+	background: no-repeat border-box linear-gradient(90deg, #BE4151 0%, #BE4151 10px, #21212B 12px, #21212B 50%, #313140 95%, #313140 100%);
+}
+.scheme_minimalist .btn.disabled.bldlackResConvert:hover {
+	background: no-repeat border-box linear-gradient(90deg, #BE4151 0%, #BE4151 10px, #21212B 12px, #21212B 100%);
+}
+.scheme_minimalist .btn:not(.disabled).bldlackResConvert {
+	background: no-repeat border-box linear-gradient(90deg, #BE4151 0%, #BE4151 10px, #41414C 12px, #41414C 50%, #51515E 95%, #51515E 100%);
+}
+.scheme_minimalist .btn:not(.disabled).bldlackResConvert:hover {
+	background: no-repeat border-box linear-gradient(90deg, #d0172a 0%, #d0172a 10px, #41414C 12px, #41414C 100%);
+}
+.scheme_minimalist .btn.disabled.bldEnabled { /* color #5D743A */
+	background: no-repeat border-box linear-gradient(90deg, #5D743A 0%, #5D743A 10px, #21212B 12px, #21212B 50%, #313140 95%, #313140 100%);
+}
+.scheme_minimalist .btn.disabled.bldEnabled:hover {
+	background: no-repeat border-box linear-gradient(90deg, #5D743A 0%, #5D743A 10px, #21212B 12px, #21212B 100%);
+}
+.scheme_minimalist .btn:not(.disabled).bldEnabled {
+	background: no-repeat border-box linear-gradient(90deg, #5D743A 0%, #5D743A 10px, #41414C 12px, #41414C 50%, #51515E 95%, #51515E 100%);
+}
+.scheme_minimalist .btn:not(.disabled).bldEnabled:hover {
+	background: no-repeat border-box linear-gradient(90deg, #90b23e 0%, #90b23e 10px, #41414C 12px, #41414C 100%);
+}
+/*** end of green light for machine on/off ***/
+.scheme_minimalist,
+.scheme_minimalist .help { /* window options and version */
+	color: #ABAEB7;
+	overflow: hidden;
+}
+.scheme_minimalist .help,
+.scheme_minimalist .dialog {
+    box-shadow: 3px 3px 9px rgba(0, 0, 0, 1), 0 0 0 9999px rgba(0, 0, 0, 0.8);
+	height: auto !important;
+    top: 40% !important;
+	border: solid 1px #DD836C;
+	border-radius: 19px;
+}
+.scheme_minimalist .help a,
+.scheme_minimalist .dialog a {
+    font-weight: bold;
+}
+.scheme_minimalist .help a:hover,
+.scheme_minimalist .dialog a:hover {
+	color: #5D56A9;
+	text-shadow: 1px 1px 2px rgba(12, 13, 16, 0.7); /* color #0C0D10 */
+}
+.scheme_minimalist label i { /* information text in option windows */
+    /* default font size = font-size: 90%; */
+    color: #707070;
+}
+.scheme_minimalist .dialog input[type="button"] {
+    font-size : 12px !important;
+}
+.scheme_minimalist select { /* dropdown list on settlement tab and options windows */
+    background-color: #51515E;
+    color: #ABAEB7;
+	border-color : rgba(200, 200, 200, 0.3); /* color #C8C8C8 */
+	font-size: 13px;
+	border-radius: 5px;
+	margin-left: 3px;
+}
+.scheme_minimalist select>option {
+    background-color: #33333C;
+    color: #A6A4B0;
+	padding: 2px 10px; /* -2 pixel vertical */
+}
+.scheme_minimalist select > option:disabled {
+	color: #838493;
+	font-size: 90%;
+}
+
+/*************************************************/
+/******************** TOP BAR ********************/
+/*************************************************/
+.scheme_minimalist #topBar {
+	background: rgb(24, 25, 32);
+	background: linear-gradient(90deg, rgba(16, 17, 21 , 1) 0%, rgba(45, 45, 59, 1) 50%, rgba(32, 33, 42, 1) 100%);
+	font-size: 90%;
+    height: 18px;
+	border-bottom: none;
+	box-shadow:none;
+	top: 0; /* for no shadow on top */
+}
+.scheme_minimalist #headerLinks .links-block { /* a link separator : | on header links*/
+	color: #333342;
+}
+.scheme_minimalist #headerLinks div { /* for color text of MOTD on top bar */
+	color: #A6A4B0;
+}
+.scheme_minimalist #headerLinks>div:first-child:before {
+    color: #DD836C;
+    content: 'Theme by Volkeyrn  ';
+	text-shadow: none;
+    text-decoration: none;
+	font-weight: normal;
+}
+.scheme_minimalist #sorrowTooltip { /* counter of BLS (Black Liquid Sorrow) */
+	color: #A6A4B0;
+}
+.scheme_minimalist #autosaveTooltip {
+	color: #DD836C;
+}
+.scheme_minimalist #getTheApp-link { /* Get the app */
+	color: #5d56a9 !important;
+}
+.scheme_minimalist #getTheApp-link:hover {
+	color: #acafbc !important;
+}
+.scheme_minimalist .links-block {
+	padding-top: 0 !important;
+}
+
+/************************************************/
+/******************** FOOTER ********************/
+/************************************************/
+.scheme_minimalist #footerLinks {
+	font-size: 90%;
+	bottom: 3px; /* default bottom: 10px; */
+	background: #1B1C24;
+	background: linear-gradient(90deg, #1e1f28 0%, #252732 100%);
+}
+.scheme_minimalist #footerLinks a:hover {
+	text-shadow: none;
+}
+.scheme_minimalist #footerLinks { /* a link separator : | on footer links*/
+	color: #333342;
+}
+
+/*************************************************/
+/******************** TOOLTIP ********************/
+/*************************************************/
+.scheme_minimalist #tooltip,
+.scheme_minimalist .tooltip-block div {
+	background-color: #101115;
+	font-size: 14px;
+	color: #828790; /* tooltip windows == left column : left text */
+	border-style: solid;
+	border-color: rgba(200, 200, 200, 0.85); /* color #C8C8C8 */
+	border-width: 1px 1px 1px 1px !important;
+	border-radius: 7px !important;
+	box-shadow: 4px 4px 9px #0A0A0D;
+	margin-left: 20px; /* for offset tooltip due to larger buttons .btn.modern */
+}
+.scheme_minimalist .button_tooltip {
+	background-color: transparent;
+}
+.scheme_minimalist .button_tooltip div { /* tooltip window == left column: right text | center column :highlighting text */
+	color: #ABAEB7;
+	font-size: 14px;
+}
+.scheme_minimalist .tooltip-inner .desc { /* Tooltip Window : title text */
+    color: #70788C;
+	font-size: 14px; /* default font size = font-size: 15px; */
+	border-bottom : 1px solid #333342 !important;
+	padding-top: 2px; /* default padding-top: 4px; */
+	padding-bottom: 3px !important;
+	border-radius: 17px 7px 0 0;
+}
+.scheme_minimalist .tooltip-inner .desc.small {
+	font-size: 75%; /* default font-size: 60%; */
+	opacity: 1; /* default opacity: 0.8; */
+}
+.scheme_minimalist .tooltip-inner .desc.small.auto-off {
+	color: #BE4151;
+}
+.scheme_minimalist .tooltip-inner .desc.small.auto-on {
+	color: #5D743A;
+}
+.scheme_minimalist .tooltip-divider { /* border line before effects text */
+	border-bottom : 1px solid #333342 !important;
+}
+.scheme_minimalist .effectName { /* Tooltip Window : effects text */
+	color: #5D56A9 !important;
+	font-size: 13px !important; /* default font size = font-size: 14px; */
+}
+.scheme_minimalist .rawRes { /* Tooltip Window == text for all missing resources for primary resource */
+    color: #707070;
+	font-style: italic;
+	padding-left: 12px;
+}
+.scheme_minimalist .button_tooltip .noRes,
+.scheme_minimalist .limited { /* on ressource limited or not attainable */
+	color: #BE4151;
+}
+.scheme_minimalist #tooltip .flavor { /* Tooltip Window : last bottom text on center column tooltip window */
+    color: #DD836C;
+	font-size: 12px !important;
+	padding-right: 7px;
+}
+.scheme_minimalist .btn.tooltip {
+	left: 50px !important;
+}
+
+/*******************************************************/
+/******************** CENTER COLUMN ********************/
+/*******************************************************/
+.scheme_minimalist #midColumn {
+	width: 650px; /* +20px gained from left column. default width: 630px */
+}
+.scheme_minimalist .tab { 
+    font-size: 13px;
+}
+.scheme_minimalist .tabInner {
+    border: none; /* border for all under tabs in center column */
+	padding: 2px 5px 5px 5px !important; /* 20px gained for buttons width. default padding: 15px; */
+	margin-bottom: 30px;
+}
+.scheme_minimalist .tabInner label[for='toggleResearched'],
+.scheme_minimalist .tabInner .expandAllBar a:last-child {
+	margin-right: 15px !important;
+}
+.scheme_minimalist .tabsContainer { /* separator | for tab */
+	color: #333342;
+	padding-bottom: 2px; /* default padding-bottom: 15px; */
+	padding-top: 0; /* default padding-top: 2px; */
+}
+.scheme_minimalist .activeTab {
+	color: #b7b9c4;
+	text-shadow: 1px 1px 1px rgba(12, 13, 16, 0.8); /* color #0C0D10 */
+	border-bottom: solid 1px #5D56A9;
+}
+.scheme_minimalist a.activeTab:hover {
+    color: #b7b9c4;
+}
+.scheme_minimalist .tab.traitLeaderBonus::before {
+	content: "\2605"; /* BLACK STAR */
+	color: #5D56A9;
+}
+.scheme_minimalist .bldTopContainer { /* under tab */
+    font-size: 90%;
+}
+.scheme_minimalist .bldTopContainer a.activeTab:hover {
+    color: #b7b9c4;
+	opacity: 0.7; /* default opacity 0.7 on not hover */
+}
+.scheme_minimalist .bldGroupContainer { /* container for all buttons on center column */
+    padding-top: 4px; /* default 15px */
+    border-top: 1px solid #333342;
+    margin-top: 4px; /* default 10px */
+}
+.scheme_minimalist input[type='button'] {
+	font-size: 15px !important;
+	background-color: #C2C2C2 !important;
+    cursor: pointer !important;
+	box-shadow: 0 1px 5px rgba(0, 0, 1),
+                 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+    border: solid 1px transparent !important; /* for no offset when border on */
+    border-radius: 7px !important;
+    outline: 0 !important;
+	color: #212121;
+	padding: 5px 20px;
+	font-weight: normal !important;
+}
+.scheme_minimalist input[type='button']:hover {
+	background-color: #DD836C !important;
+	border: solid 1px #313140 !important;
+	color: #21212B !important;
+	cursor: pointer !important;
+	font-weight: bold !important;
+	box-shadow: 1px 1px 3px #21212B inset,
+                 0 1px 0 rgba(202, 184, 207, 0.2) !important; /* color #CAB8CF */
+}
+/* button observer different from other input buttons  */
+.scheme_minimalist input[type='button']#observeBtn {
+	text-shadow: 1px 1px 1px rgba(12, 13, 16, 0.7); /* color #0C0D10 */
+	background-color: #41414C !important;
+	color: #DFE6EF !important;
+	border: solid 1px #DD836C !important;
+	border-radius: 16px 8px;
+	box-shadow: 0 2px 4px rgba(221, 131, 108, 0.8), /* color #DD836C; */
+                 0 1px 0 rgba(221, 131, 108, 0.8) !important;	/* color #DD836C; */
+}
+.scheme_minimalist input[type='button']#observeBtn:hover {
+	font-weight: normal !important;
+	text-shadow: 1px 1px 3px rgba(12, 13, 16, 0.7); /* color #0C0D10 */
+	background-color: #5d56a9 !important;
+	color: #EEEEEE;
+	border: solid 1px rgba(17, 138, 194, 1) !important; /* color #118AC2; */
+	box-shadow: 2px 3px 6px rgba(17, 138, 194, 1), /* color #118AC2; */
+                 0 1px 0 #118AC2 !important;
+}
+.scheme_minimalist .btn .btnContent a {
+    max-width: 90px; /* default max-width: 50px; */
+    /* default overflow-x: hidden; */
+    /* default text-overflow: ellipsis; */
+}
+.scheme_minimalist .btn.modern a {
+	color: #808799;
+	font-size: 12px;
+	font-weight: 300;
+	background-color: transparent;
+	padding: 10px 2px 10px 2px !important; /* default :  padding: 10px 6px 10px 6px !important; */
+	text-shadow: none;	
+}
+.scheme_minimalist .btn.modern:not(.disabled) a {
+	color: #808799;
+	border-color: rgba(164, 164, 164, 0.2); /* color #A4A4A4 */
+}
+.scheme_minimalist .btn.modern.disabled a {
+	border-color: rgba(85, 85, 85, 0.4) !important; /* color #555555 */
+}
+.scheme_minimalist .btn.modern a:hover {
+	color: #E4E4E4;
+	text-shadow: 1px 1px 1px rgba(12, 13, 16, 0.9); /* color #0C0D10 */
+}
+.scheme_minimalist .btn.modern:not(.disabled) a:hover {
+	color: #E4E4E4;
+	background-color: rgba(255, 255, 255, 0.2);
+}
+.scheme_minimalist .btn.modern.disabled a:hover {
+	background-color: rgba(180, 180, 180, 0.1); /* color #B4B4B4 */
+}
+.scheme_minimalist .btn.modern:not(.disabled):active,
+.scheme_minimalist input[type='button']:active,
+.scheme_minimalist input[type='button']#observeBtn:active {
+    border-color: #FFFFFF !important;
+}
+.scheme_minimalist .linkContent { /* dropdown list on button*/
+    margin-top: 26px !important; /* for correct vertical align dropdown list */
+    width: auto !important;
+	background-color: #41414C; /* color pick from button not disabled and hover */
+	border-radius: 0 5px 5px 5px;
+	border-style: solid;
+	border-width: 1px 1px 1px 1px;
+	border-color: #DD836C !important;
+}
+.scheme_minimalist .linkContent a {
+    color: #B5BAC4;
+    width: 36px !important;
+    margin-top: 0 !important;
+	margin-bottom: 0 !important;
+	border-left: none; /* default border-left: 1px solid #888; */
+}
+.scheme_minimalist .container .btn.modern:not(.disabled) .linkContent { /* dropdown list on button not disabled in container */
+	margin-top: 26px !important;
+}
+.scheme_minimalist .btn:not(.disabled).bldEnabled .linkContent,
+.scheme_minimalist .btn:not(.disabled).bldlackResConvert .linkContent { /* dropdown list on button not disabled with on/off link */
+	margin-top: 26px !important;
+}
+.scheme_minimalist .container .btn:not(.disabled).bldEnabled .linkContent,
+.scheme_minimalist .container .btn:not(.disabled).bldlackResConvert .linkContent { /* dropdown list on button not disabled with on/off link in container*/
+	margin-top: 26px !important;
+}
+.scheme_minimalist .btn.modern.disabled .linkContent { /* dropdown list on button disabled */
+	margin-top: 26px !important;
+	background-color: #21212B; /* color pick from button disabled and hover */
+	border-color: #8C8C8C !important;
+}
+.scheme_minimalist .container .btn.modern.disabled .linkContent { /* dropdown list on button disabled in container */
+	margin-top: 26px !important;
+}
+.scheme_minimalist .btn.disabled.bldEnabled .linkContent,
+.scheme_minimalist .btn.disabled.bldlackResConvert .linkContent { /* dropdown list on button disabled with on/off link */
+	margin-top: 26px !important;
+}
+.scheme_minimalist .container .btn.disabled.bldEnabled .linkContent,
+.scheme_minimalist .container .btn.disabled.bldlackResConvert .linkContent { /* dropdown list on button disabled with on/off link in container */
+	margin-top: 26px !important;
+}
+.scheme_minimalist .linkContent a:first-child,
+.scheme_minimalist .linkContent a:first-child:hover {
+	border-radius: 0 5px 0 0;
+}
+.scheme_minimalist .linkContent a:last-child,
+.scheme_minimalist .linkContent a:last-child:hover {
+	border-radius: 0 0 5px 5px;
+}
+/* Apply the right border radius of the button to the rightmost link */
+.scheme_minimalist .btn.modern span.btnTitle + a,
+.scheme_minimalist .btn.modern:not(.hasSellLink) a.off1Link, /* link minus on buildings buttons */
+.scheme_minimalist .btn.modern:not(.hasSellLink) a.unassignLink { /* link minus on kittens jobs buttons */
+	/* buttons border-radius: 7px; */
+	border-radius: 0 7px 7px 0;
+}
+.scheme_minimalist .btn.modern .btnContent a.rightestLink { /* for Combust TC button in Time tab and Hold Festival in Settlement tab*/
+	border-radius: 0 7px 7px 0;
+}
+.scheme_minimalist .btn.modern.hasSellLink span.btnTitle + a { /* font larger for sell link */
+	font-size: 0.9em; /* default font-size: 0.7em; */
+	/* default line-height: 16px; */
+}
+.scheme_minimalist .panelContainer {
+	margin-top: 4px;
+}
+.scheme_minimalist .panelContainer,
+.scheme_minimalist table.statTable {
+    border: 1px solid rgba(200, 200, 200, 0.5); /* color #C8C8C8 */
+	background: transparent;
+	border-radius: 11px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 1);
+}
+.scheme_minimalist table.statTable {
+	background: #181920;
+	margin-top: 6px;
+	margin-left: 12px;
+	box-shadow: 4px 4px 7px rgba(0, 0, 0, 1);
+	padding: 9px;
+}
+.scheme_minimalist .panelContainer .title {
+	padding: 3px 3px 0 20px; /* default padding: 4px; */ /* default padding-left: 10px; */
+	margin-bottom: 3px;
+}
+.scheme_minimalist .panelContainer div.title {
+    color: #DD836C;
+	font-size: 16px !important;
+	text-shadow: 1px 1px 2px rgba(12, 13, 16, 0.9); /* color #0C0D10 */
+}
+.scheme_minimalist .panelContainer .toggle {
+	font-size: 10px;
+	margin: 7px 7px 0 0; /* default margin: 4px; */
+	padding-left:  5px; /* default padding-left 6px */
+    padding-right: 5px; /* default padding-right 6px */
+	border: 1px solid rgba(200, 200, 200, 0.8); /* color #C8C8C8 */
+	background: rgba(24, 25, 32, 1);
+	background: padding-box radial-gradient(circle, #101115 0%,#101115 50%, #51515E 80%,#646474 90%,#646474 100%);
+	border-radius: 11px;
+	box-shadow: 0 2px 3px rgba(0, 0, 0, 1);
+}
+.scheme_minimalist .container {
+	padding: 5px; /* default padding: 10px; */
+}
+.scheme_minimalist .container div.currentGovernment { /* for padding-bottom too height */
+	padding-bottom: 3px !important;
+}
+.scheme_minimalist .trade-race .buys {
+	color: #BE4151;
+	font-size: smaller;
+}
+.scheme_minimalist .trade-race .sells {
+	color: #5D743A;
+	font-size: smaller;
+}
+.scheme_minimalist .trade-race .ammount {
+	color: #777777;
+	font-size: smaller;
+}
+.scheme_minimalist .attitude { /* text for attitude races int trade tab */
+	/* default font size = font-size: 90%; */
+	color: #636A7C !important;
+	text-shadow: none !important;
+}
+.scheme_minimalist .panelContainer div.censusFilters {
+	margin-bottom: 3px; /* for add a margin under the 2 lists (select) in the settlement tab */
+}
+/* ---------- Village ----------*/
+/* container 'Census' -> list of kittens in settlement tab */
+.scheme_minimalist .census-block {
+	background-color : rgba(61, 61, 80, 0.3); /* color #3D3D50 */
+	border-radius: 7px;
+	border-color: #33333C !important;
+	font-size: 90%;
+	padding: 3px !important; /* default padding: 5px; */
+	margin-bottom: 3px !important; /* default margin-bottom: 5px; */
+}
+.scheme_minimalist .census-block.simLeader {
+	background-color : rgba(93, 86, 169, 0.3); /* color #5D56A9; */
+}
+.scheme_minimalist .census-block.simLeader a.leaderHref {
+	color: #5D56A9;
+}
+.scheme_minimalist .census-block .info { /* info of kitten */
+	color: #B6B4BE;
+}
+.scheme_minimalist .census-block .skill { /* jobs unasigned */
+	color: #808080;
+}
+.scheme_minimalist .census-block .skill:first-of-type { /* job assigned */
+	color: #5D56A9;
+	font-weight: normal !important;
+}
+.scheme_minimalist .census-block.simLeader .skill:first-of-type { /* Leader job assigned */
+	font-size: 1em; /* default font-size: 0.8em; */
+}
+.scheme_minimalist .census-block .color-none { /* name of kitten */
+    color: #B6B4BE;
+}
+.scheme_minimalist .census-block .color-brown {
+    color: #955628;
+}
+.scheme_minimalist .census-block .color-cream {
+    color: #c8ad7f;
+}
+.scheme_minimalist .census-block .color-black {
+    color: #614b3a;
+}
+.scheme_minimalist .census-block .color-fawn {
+    color: #ad4f09;
+}
+.scheme_minimalist .census-block .color-white {
+    color: #EEEEEE;
+}
+.scheme_minimalist .btn.modern a.bld-on,
+.scheme_minimalist .btn.modern a.auto-on,
+.scheme_minimalist .btn.modern a.fugit-on {
+	color: #5D743A;
+}
+.scheme_minimalist .btn.modern:hover a.bld-on,
+.scheme_minimalist .btn.modern:hover a.auto-on,
+.scheme_minimalist .btn.modern:hover a.fugit-on {
+	color: #90b23e;
+}
+.scheme_minimalist .btn.modern a.bld-off,
+.scheme_minimalist .btn.modern a.auto-off,
+.scheme_minimalist .btn.modern a.fugit-off {
+	color: #BE4151;
+}
+.scheme_minimalist .btn.modern:hover a.bld-off,
+.scheme_minimalist .btn.modern:hover a.auto-off,
+.scheme_minimalist .btn.modern:hover a.fugit-off {
+	color: #d0172a;
+}
+.scheme_minimalist .btn.modern.craftOn .btnTitle { /* all buttons with engineer(s) in workshop tab */
+	color: #749148;	
+}
+.scheme_minimalist .btn.modern.craftOn:hover .btnTitle {
+	color: #90b23e;
+	text-shadow: 1px 1px 1px #181920;
+}
+.scheme_minimalist td.craftStuffPanel > span { /* title of craft stuff panel */
+	color: #DD836C;
+}
+.scheme_minimalist td.craftStuffPanel > table { /* craft stuff panel */
+	background-color : rgba(61, 61, 80, 0.3); /* color #3D3D50 */
+	border-radius: 7px;
+	border: solid 1px #33333C;
+	margin-top: 10px;
+	padding: 10px 20px; /* default padding-top: 20px; */
+}
+
+/**********************************************************/
+/******************** ACHIEVEMENTS TAB ********************/
+/**********************************************************/
+.scheme_minimalist .achievement-header {
+	color: #5D56A9;
+	text-shadow: 1px 1px 1px rgba(12, 13, 16, 0.9); /* color #0C0D10 */
+	font-size: 16px;
+	margin-bottom: 3px;
+	padding-left: 20px;
+}
+.scheme_minimalist .achievement {
+	font-size: 15px;
+    margin: 3px 5px;
+    height: 18px;
+    background-color: rgba(93, 86, 169, 0.1); /* color #5D56A9; */
+    color: #D8D8D8;
+    text-shadow: rgba(187, 192, 202) 2px 0 10px; /* color #BBC0CA */
+    letter-spacing: 1px;
+	border-color : rgba(93, 86, 169, 0.3); /* color #5D56A9; */
+	border-radius: 5px;
+}
+.scheme_minimalist .achievement:hover {
+    background-color: rgba(93, 86, 169, 0.3); /* color #5D56A9; */
+	border-color : rgba(93, 86, 169, 1); /* color #5D56A9; */
+}
+.scheme_minimalist .achievement.unethical {
+    text-shadow: rgb(255, 67, 91) 2px 0 10px;
+	background-color: rgba(190, 65, 81, 0.1); /* color #BE4151 */
+	border-color : rgba(190, 65, 81, 0.5); /* color #BE4151 */
+}
+.scheme_minimalist .achievement.unethical:hover {
+    background-color: rgba(184, 72, 87, 0.4); /* color #b84857 */
+	border-color : rgba(190, 65, 81); /* color #BE4151 */
+}
+.scheme_minimalist .achievement:not(.unlocked) {
+    color: rgba(220, 220, 220, 0.5);
+	background-color: rgba(140, 140, 140, 0.1);
+    text-shadow: none;
+	border-color : rgba(140, 140, 140, 0.4);
+}
+.scheme_minimalist .achievement:not(.unlocked):hover {
+    background-color: rgba(255, 255, 255, 0.1);
+	border-color : rgba(140, 140, 140, 0.7);
+}
+.scheme_minimalist .achievement:after {
+    font-size: 85%;
+    color: #CCCCCC;
+    text-shadow: none;
+}
+.scheme_minimalist .achievement.unethical:after {
+	color: #CCCCCC;
+}
+.scheme_minimalist .achievement-header .star {
+	/* default font size = font-size: 18px; */
+    color: #DC7111; /* orange or dominant color of the theme */
+}
+.scheme_minimalist .achievement .star {
+	/* default font size = font-size: 18px; */
+	color : #888888;
+}
+.scheme_minimalist .achievement.unlocked .star {
+	color : #DC7111; /* orange or dominant color of the theme */
+	font-weight: bold;
+	text-shadow: 0 1px rgba(12, 13, 16, 0.9); /* color #0C0D10 */
+}
+
+/******************************************************/
+/******************** RIGHT COLUMN ********************/
+/******************************************************/
+.scheme_minimalist #rightColumn {
+	width: 25%;
+    max-width: 400px;
+    min-width: 250px;
+	top: 0;
+	margin-top: 16px;
+}
+.scheme_minimalist .toggleCenter {
+    opacity: 0.3; /* default opacity: 0.2; */
+}
+.scheme_minimalist #calendarDiv {
+    color: #838592;
+	padding-left: 5px;
+    margin-top: 5px;
+	text-shadow: 1px 1px 1px rgba(12, 13, 16, 0.7); /* color #0C0D10 */
+	font-weight: bold;
+	font-size: 90%;
+}
+.scheme_minimalist #calendarSign {
+   font-size: 120% ;
+}
+.scheme_minimalist #calendarSign:hover {
+   cursor: default ;
+}
+.scheme_minimalist .right-tab-header { /* Log | Chat link on right column */
+	color: #333342; /* for separator tab | */
+	font-size: 80%;
+ }
+.scheme_minimalist a#logLink,
+.scheme_minimalist a#chatLink {
+	font-weight: normal !important; /* thin if possible with font sizes */
+}
+.scheme_minimalist .right-tab-header a.active {
+    color: #B5BAC4;
+	font-weight: bold !important;
+}
+.scheme_minimalist div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
+	color: #3b3b4c;
+	font-size: 90%;
+	font-weight: normal; /* thin if possible with font sizes */
+	border-top: 1px solid #333342 !important;
+	margin-top: 10px;
+}
+.scheme_minimalist #clearLogHref { /* Link in right column : Clear log */
+	font-size: 80%;
+}
+.scheme_minimalist #logFiltersBlock > a { /* Link in right column : [+]Log Filters */
+	font-size: 80%;
+	margin-left: 5px;
+}
+.scheme_minimalist #pauseBtn { /* Link in right column : pawse */
+	margin-left: 5px;
+}
+.scheme_minimalist div#gameLog {
+	/* default overflow-y: auto !important; */
+	margin: 6px 5px 5px 0;
+	border: 1px solid rgba(200, 200, 200, 0.5); /* color #C8C8C8 */
+	background: rgba (24, 25, 32, 0.8); /* color #181920 */
+	border-radius: 11px;
+	box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
+	padding: 0 4px 4px 4px;
+	min-height: 5% !important; 
+	height: unset !important;
+	max-height: calc(100% -80px) !important;
+}
+.scheme_minimalist #gameLog span.msg:not(.type_date)  {
+	font-size: 80%;
+	margin-left: 1.2em;
+	list-style-type: disc;
+	padding-left: 0.3em;
+}
+.scheme_minimalist #gameLog span.noBullet {
+	margin-left: 2.3em !important;
+	list-style-type: '\25AA' !important; /* black small square */
+}
+.scheme_minimalist .msg {
+	font-weight: 400; /* thin if possible with font sizes */
+	color: #B0B0B0;
+}
+.scheme_minimalist .msg.type_notice {
+    color: #5D56A9; /* color default : #01A9DB; */
+}
+.scheme_minimalist .msg.type_important {
+    color: #DD836C; /* color default : coral; */
+}
+.scheme_minimalist .msg.type_alert {
+    color: #BE4151; /* color default : red; */
+}
+.scheme_minimalist .msg.type_date {
+	color: #DD836C;
+	/* default font size = font-size: 90%; */
+	text-transform: none;
+	text-shadow: 0 1px 0 rgba(12, 13, 16, 0.7); /* color #0C0D10 */
+	border-bottom: solid 1px #636A7C;
+	padding-left: 10px;
+}
+
+/*****************************************************/
+/******************** LEFT COLUMN ********************/
+/*****************************************************/
+.scheme_minimalist #leftColumn {
+	margin-top: 0;
+	max-width: 380px; /* -20px gained on res-table (12px) with border collapse and padding-right (8px). default max-width: 400px; */
+	padding-right: 12px; /* -8px gained on res-toolbar.right padding-right default padding right : 20px */
+}
+.scheme_minimalist a.link.collapse {
+    opacity: 0.5; /* default opacity: 0.2; */
+}
+.scheme_minimalist .res-table {
+	/* default max-width: 340px; */
+    border-collapse: collapse; /* gain of 3 pixel by border -> no margin bottom after */
+	margin-left: 2px; /* without 0px margin left for all ressources */
+ }
+.scheme_minimalist .res-toolbar {
+    font-size: 90%;
+}
+.scheme_minimalist .res-toolbar.right {
+	padding-right: 20px;
+}
+.scheme_minimalist .res-cell {
+	padding-left: 1px; /* default padding-left: 2px; */
+    padding-right: 1px; /* default padding-right: 2px; */
+}
+ .scheme_minimalist .craftTable {
+	 margin-bottom: 10px !important; /* for correct margin bottom due of the line above with border-collapse: collapse on .res-Table ! */
+ }
+.scheme_minimalist .res-cell.craft-link {
+	color: #636A7C;
+	/* default width: 20px; */
+	/* default max-width: 60px; */
+ }
+.scheme_minimalist .res-cell.craft-link:hover,
+.scheme_minimalist .res-cell.craft-link.all:hover { /* craft table left column */
+    color: #acafbc;
+	text-decoration: none;
+}
+.scheme_minimalist tr.resourceRow,
+.scheme_minimalist .res-row {
+	border-left: solid 1px transparent; /* to avoid shifts on the hover */
+	padding-bottom: 3px; /* default padding-bottom: 4px; */
+}
+.scheme_minimalist tr.resourceRow:hover,
+.scheme_minimalist .res-row:hover {
+    background-color: rgba(200, 200, 200, 0.1); /* color #C8C8C8 */
+	cursor: default;
+	border-left: solid 1px #DD836C;
+}
+.scheme_minimalist .res-row.craft:hover {
+    background-color: rgba(200, 200, 200, 0.1); /* color #C8C8C8 */
+}
+.scheme_minimalist .highlited { /* higlighting ressources when hover button on center windows */
+	background-color: rgba(200, 200, 200, 0.1); /* color #C8C8C8 */
+	border-left: solid 1px #DD836C;
+}
+.scheme_minimalist .resource-name {
+	width: 72px; /* default width: 60px; */
+	max-width: 72px; /* default max-width: 60px; */
+}
+.scheme_minimalist .resource_kittens .resource-name {
+	color: #707070;
+}
+.scheme_minimalist .resource_faith .resource-name {
+	color: #707070;
+}
+.scheme_minimalist .resource_steel .resource-name { 
+	color: #707070;
+}
+.scheme_minimalist .resource_gear .resource-name {
+	color: #707070;
+}
+.scheme_minimalist .resource_alloy .resource-name {
+	color: #707070;
+}
+.scheme_minimalist .resource_megalith .resource-name {
+	color: #707070;
+}
+.scheme_minimalist .resource-name,
+.scheme_minimalist .maxRes,
+.scheme_minimalist .resAmount,
+.scheme_minimalist .resLimitWarn,
+.scheme_minimalist .resLimitNotice,
+.scheme_minimalist .resPerTick,
+.scheme_minimalist .res-cell.resource-value,
+.scheme_minimalist .res-cell.craft-link {
+	font-size: 14px;
+}
+.scheme_minimalist .maxRes {
+	color: #838493;
+}
+.scheme_minimalist .resAmount {
+    color: #A6A4B0;
+}
+.scheme_minimalist .resLimitWarn {
+    color: #DD836C;
+	opacity: 1; /* default = 0.75 */
+}
+.scheme_minimalist .resLimitNotice {
+    color: #BE4151;
+}
+.scheme_minimalist .resPerTick {
+	cursor: default;
+	color: #A6A4B0;
+}
+.scheme_minimalist .resPerTick:hover {
+	font-weight: normal !important;
+}
+.scheme_minimalist .res-row.resLeaderBonus .resPerTick {
+	color: #5D56A9;
+}
+.scheme_minimalist .res-row.craftEngineer .res-cell.resource-value {
+	color: #5D743A;
+}
+.scheme_minimalist .res-cell.resource-value {
+	/* default width: 75px; */
+	/* default max-width: 90px; */
+	font-weight: normal !important;
+}
+.scheme_minimalist .res-cell.resource-value:hover {
+	font-weight: normal !important;
+}
+.scheme_minimalist #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+	text-shadow: -1px -1px 2px rgba(12, 13, 16, 0.9); /* color #0C0D10 */
+}
+.scheme_minimalist #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+	color: #DD836C;
+	text-shadow: none !important;
+	font-size: smaller;
+}
+.scheme_minimalist #fastPraiseContainer > a { /* Text left column : "Praise the sun!" */
+	text-shadow: -1px -1px 2px rgba(12, 13, 16, 0.9); /* color #0C0D10 */
+}
+.scheme_minimalist #fastPraiseContainer >a:hover {
+	color: #DFE6EF;
+}
+.scheme_minimalist .res-cell.positive-weather { /* to change the color for bonus cell according to the season */
+	font-size: 85%;
+	color: #5D743A;
+}
+.scheme_minimalist .res-cell.negative-weather { /* to change the color for penalty cell according to the season */
+	font-size: 85%;
+	color: #BE4151;
+}
+.scheme_minimalist .res-cell.craft-link.all {
+	font-size: 90%; /* default font-size: 80%; */
+	opacity: 1; /* default opacity: 0.4; */
+	color: #DD836C;
+}
+
+/***************************************************/
+/******************** SCROLLBAR ********************/
+/***************************************************/
+.scheme_minimalist ::-webkit-scrollbar-thumb {
+    background: #14141B;
+	border-radius: 40px;
+}
+.scheme_minimalist ::-webkit-scrollbar-track {
+    background: #23242E;
+    border-radius: 50px;
+}
+/* Only FireFox */
+.scheme_minimalist #leftColumn,
+.scheme_minimalist #rightColumn,
+.scheme_minimalist #midColumn {
+   scrollbar-width: thin;
+   scrollbar-color: #14141B #23242E !important;
+}
+.scheme_minimalist select {
+   scrollbar-width: auto !important;
+}

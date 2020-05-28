@@ -51,9 +51,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		visible: true,
 		calculatePerTick: true,
 		aiCanDestroy: true,
-		tags:{
-			baseMetal: true
-		}
+		tag: "baseMetal"
 	},{
 		name : "titanium",
 		title: $I("resources.titanium.title"),
@@ -61,9 +59,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		visible: true,
 		calculatePerTick: true,
 		aiCanDestroy: true,
-		tags:{
-			baseMetal: true
-		}
+		tag: "baseMetal"
 	},{
 		name : "gold",
 		title: $I("resources.gold.title"),
@@ -71,16 +67,15 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		visible: true,
 		calculatePerTick: true,
 		aiCanDestroy: true,
-		tags:{
-			baseMetal: true
-		}
+		tag: "baseMetal"
 	},{
 		name : "oil",
 		title: $I("resources.oil.title"),
 		type : "common",
 		visible: true,
 		calculatePerTick: true,
-		aiCanDestroy: true
+		aiCanDestroy: true,
+		isNotRefundable: true
 	},{
 		name : "uranium",
 		title: $I("resources.uranium.title"),
@@ -89,9 +84,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		color: "#4EA24E",
 		calculatePerTick: true,
 		aiCanDestroy: true,
-		tags:{
-			baseMetal: true
-		}
+		tag: "baseMetal"
 	},{
 		name : "unobtainium",
 		title: $I("resources.unobtainium.title"),
@@ -101,9 +94,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		color: "#A00000",
 		calculatePerTick: true,
 		aiCanDestroy: true,
-		tags:{
-			baseMetal: true
-		}
+		tag: "baseMetal"
 	},
 
 	//=========================================
@@ -115,8 +106,10 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		type : "common",
 		transient: true,
 		visible: true,
-		color: "#5A0EDE"/*,
-		aiCanDestroy: true*/
+		color: "#5A0EDE",
+		isRefundable: function(game) {
+			return game.resPool.energyProd >= game.resPool.energyCons;
+		}
 	},{
 		name : "manpower",
 		title: $I("resources.manpower.title"),
@@ -292,8 +285,10 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		visible: true,
 		color: "#5A0EDE",
 		style: {
-			textShadow: "1px 0px 10px #9A2EFE",
-			animation: "neon1 1.5s ease-in-out infinite alternate"
+			         animation : "neon-purple 1.5s ease-in-out infinite alternate",
+			"-webkit-animation": "neon-purple 1.5s ease-in-out infinite alternate",
+			   "-moz-animation": "neon-purple 1.5s ease-in-out infinite alternate",
+			     "-o-animation": "neon-purple 1.5s ease-in-out infinite alternate"
 		}/*,
 		aiCanDestroy: true*/
 	},{
@@ -304,8 +299,10 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		visible: true,
 		color: "#5A0EDE",
 		style: {
-			textShadow: "1px 0px 10px #9A2EFE",
-			animation: "neon1 1.5s ease-in-out infinite alternate"
+			         animation : "neon-purple 1.5s ease-in-out infinite alternate",
+			"-webkit-animation": "neon-purple 1.5s ease-in-out infinite alternate",
+			   "-moz-animation": "neon-purple 1.5s ease-in-out infinite alternate",
+			     "-o-animation": "neon-purple 1.5s ease-in-out infinite alternate"
 		}
 	},{
 		name : "elderBox",
@@ -316,8 +313,10 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		visible: true,
 		color: "#FA0EDE",
 		style: {
-			textShadow: "1px 0px 10px #FA2E9E",
-			animation: "neon1 1.5s ease-in-out infinite alternate"
+			         animation : "neon-pink 1.5s ease-in-out infinite alternate",
+			"-webkit-animation": "neon-pink 1.5s ease-in-out infinite alternate",
+			   "-moz-animation": "neon-pink 1.5s ease-in-out infinite alternate",
+			     "-o-animation": "neon-pink 1.5s ease-in-out infinite alternate"
 		},
 		persists: true
 	},{
@@ -328,8 +327,10 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		visible: true,
 		color: "#FA0EDE",
 		style: {
-			textShadow: "1px 0px 10px #FA2E9E",
-			animation: "neon1 1.5s ease-in-out infinite alternate"
+			         animation : "neon-pink 1.5s ease-in-out infinite alternate",
+			"-webkit-animation": "neon-pink 1.5s ease-in-out infinite alternate",
+			   "-moz-animation": "neon-pink 1.5s ease-in-out infinite alternate",
+			     "-o-animation": "neon-pink 1.5s ease-in-out infinite alternate"
 		},
 		persists: true
 	},{
@@ -339,6 +340,12 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		craftable: false,
 		visible: true,
 		color: "gold",
+		style: {
+			         animation : "neon-gold 1.5s ease-in-out infinite alternate",
+			"-webkit-animation": "neon-gold 1.5s ease-in-out infinite alternate",
+			   "-moz-animation": "neon-gold 1.5s ease-in-out infinite alternate",
+			     "-o-animation": "neon-gold 1.5s ease-in-out infinite alternate"
+},
 		persists: false
 	},
 	{
@@ -349,8 +356,10 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		visible: true,
 		color: "red",
 		style: {
-			textShadow: "1px 0px 10px red",
-			animation: "neon1 1.5s ease-in-out infinite alternate"
+			         animation : "neon-red 1.5s ease-in-out infinite alternate",
+			"-webkit-animation": "neon-red 1.5s ease-in-out infinite alternate",
+			   "-moz-animation": "neon-red 1.5s ease-in-out infinite alternate",
+			     "-o-animation": "neon-red 1.5s ease-in-out infinite alternate"
 		},
 		persists: false
 	},
@@ -371,7 +380,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		name : "plate",
 		title: $I("resources.plate.title"),
 		type : "common",
-		craftable: true
+		craftable: true,
+		tag: "metallurgist"
 	},{
 		name : "steel",
 		title: $I("resources.steel.title"),
@@ -379,32 +389,37 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		craftable: true,
 		visible: false,
 		color: "gray",
-		calculatePerTick: true
+		calculatePerTick: true,
+		tag: "metallurgist"
 	},{
 		name : "concrate",
 		title: $I("resources.concrate.title"),
 		type : "common",
-		craftable: true
+		craftable: true,
+		tag: "chemist"
 	},{
 		name : "gear",
 		title: $I("resources.gear.title"),
 		type : "common",
 		craftable: true,
-		color: "gray"
+		color: "gray",
+		tag: "metallurgist"
 	},{
 		name : "alloy",
 		title: $I("resources.alloy.title"),
 		type : "common",
 		craftable: true,
 		visible: false,
-		color: "gray"
+		color: "gray",
+		tag: "metallurgist"
 	},{
 		name : "eludium",
 		title: $I("resources.eludium.title"),
 		type : "common",
 		craftable: true,
 		visible: false,
-		color: "darkViolet"
+		color: "darkViolet",
+		tag: "chemist"
 	},{
 		name : "scaffold",
 		title: $I("resources.scaffold.title"),
@@ -428,10 +443,9 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
         title: $I("resources.kerosene.title"),
         type: "common",
         craftable: true,
-		color: "darkYellow",
-		tags:{
-			compound: true
-		}
+        color: "darkYellow",
+		isNotRefundable: true,
+		tag: "chemist"
 	},{
 		name : "parchment",
 		title: $I("resources.parchment.title"),
@@ -467,9 +481,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		craftable: true,
 		color: "#4EA24E",
 		calculatePerTick: true,
-		tags:{
-			compound: true
-		}
+		isNotRefundable: true,
+		tag: "chemist"
 	},{
 		name : "megalith",
 		title: $I("resources.megalith.title"),
@@ -484,6 +497,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	game: null,
 
 	energyProd: 0,
+	energyWinterProd: 0,
 	energyCons: 0,
 
 	isLocked: false,
@@ -499,12 +513,10 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 			res.value = 0;
 			res.reserve = 0;
 			res.unlocked = false;
-			if (res.name == "oil" ||
-				res.name == "kerosene" ||
-				res.name == "thorium") {
-				res.refundable = false;
-			} else {
-				res.refundable = true;
+			if (!res.isRefundable) {
+				res.isRefundable = function(game) {
+					return !this.isNotRefundable;
+				};
 			}
 			this.resources.push(res);
 			this.resourceMap[res.name] = res;
@@ -678,9 +690,18 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		game.updateKarma();
 
 		//--------
-		this.energyProd = game.getEffect("energyProduction") * (1 + game.getEffect("energyProductionRatio"));
+		var energyRatio = 1 + game.getEffect("energyProductionRatio");
+		this.energyProd = game.getEffect("energyProduction") * energyRatio;
+		this.energyWinterProd = this.energyProd;
 		this.energyCons = game.getEffect("energyConsumption");
 
+		var currentSeason = game.calendar.season;
+		var solarFarm = game.bld.getBuildingExt("pasture");
+		var calculateEnergyProduction = solarFarm.get("calculateEnergyProduction");
+		if (currentSeason != 3 && calculateEnergyProduction) {
+			var energyLoss = calculateEnergyProduction(game, currentSeason) - calculateEnergyProduction(game, 3);
+			this.energyWinterProd -= solarFarm.get("on") * energyLoss * energyRatio;
+		}
 	},
 
 	//NB: don't forget to update resources before calling in redshift
@@ -765,29 +786,27 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	 * Multiplies maxValue by global ratios
 	 * Called in tooltips for more accurate per-building resMax increases
 	 */
-	addResMaxRatios: function(res, maxValue){
-		if (res && res.name == "temporalFlux") {
+	addResMaxRatios: function(res, maxValue) {
+		if (res.name == "temporalFlux") {
 			return maxValue;
 		}
 
-		maxValue += maxValue * this.game.prestige.getParagonStorageRatio();
+		maxValue *= 1 + this.game.prestige.getParagonStorageRatio();
 
 		//+COSMIC RADIATION
 		if (!this.game.opts.disableCMBR) {
-			maxValue *= (1 + this.game.getCMBRBonus());
+			maxValue *= 1 + this.game.getCMBRBonus();
 		}
 
-		if (res){
-			//Stuff for Refrigiration and (potentially) similar effects
-			maxValue *= ( 1 + this.game.getEffect(res.name + "MaxRatio") );
+		//Stuff for Refrigiration and (potentially) similar effects
+		maxValue *= 1 + this.game.getEffect(res.name + "MaxRatio");
 
-			if (!this.isNormalCraftableResource(res) && !res.transient){
-				maxValue *= (1 + this.game.getEffect("globalResourceRatio"));
-			}
+		if (!this.isNormalCraftableResource(res) && !res.transient) {
+			maxValue *= 1 + this.game.getEffect("globalResourceRatio");
 		}
 
-		if (res.tags && res.tags.baseMetal){
-			maxValue *= ( 1 + this.game.getEffect("baseMetalMaxRatio") );
+		if (res.tag == "baseMetal") {
+			maxValue *= 1 + this.game.getEffect("baseMetalMaxRatio");
 		}
 
 		return maxValue;

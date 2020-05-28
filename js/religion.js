@@ -123,14 +123,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			}
 		}
 
-		if (this.game.prestige.getPerk("voidOrder").researched) {
-			if (!(this.game.calendar.day < 0)){ //do not accumulate faith with active Temporal Paradox
-				var orderBonus = this.game.calcResourcePerTick("faith") * 0.1 * (1 + this.game.getEffect("voidResonance"));	//10% of faith transfer per priest
-				this.faith += orderBonus * (1 + this.getFaithBonus() * 0.25);	//25% of the apocrypha bonus
-				if (this.game.resPool.get("faith").value != this.game.resPool.get("faith").maxValue){ //do not drain faith if it is in cap value
-					this.game.resPool.addResEvent("faith", -orderBonus);
-				}
-			}
+		if (this.game.calendar.day >= 0) {
+			this.triggerOrderOfTheVoid(1);
 		}
 	},
 
@@ -171,10 +165,14 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			this.corruption = 1;
 		}
 
+		this.triggerOrderOfTheVoid(times);
+	},
+
+	// Accumulates the equivalent of 10 % (improved by Void Resonators) of produced faith, but with only a quarter of apocrypha bonus
+	triggerOrderOfTheVoid: function(numberOfTicks) {
 		if (this.game.prestige.getPerk("voidOrder").researched) {
-			var orderBonus = times * this.game.calcResourcePerTick("faith") * 0.1 * (1 + this.game.getEffect("voidResonance"));	//10% of faith transfer per priest
-			this.faith += orderBonus * (1 + this.getFaithBonus() * 0.25);	//25% of the apocrypha bonus
-			this.game.resPool.addResEvent("faith", -orderBonus);
+			var convertedFaith = numberOfTicks * this.game.calcResourcePerTick("faith") * 0.1 * (1 + this.game.getEffect("voidResonance"));
+			this.faith += convertedFaith * (1 + this.getApocryphaBonus() / 4);
 		}
 	},
 
@@ -744,7 +742,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		return rate;
 	},
 
-	getFaithBonus: function(){
+	getApocryphaBonus: function(){
 		return this.getTriValueReligion(this.faithRatio);
 	},
 
@@ -754,7 +752,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 	praise: function(){
 		var faith = this.game.resPool.get("faith");
-		this.faith += faith.value * (1 + this.getFaithBonus()); //starting up from 100% ratio will work surprisingly bad
+		this.faith += faith.value * (1 + this.getApocryphaBonus()); //starting up from 100% ratio will work surprisingly bad
 		this.game.msg($I("religion.praise.msg", [this.game.getDisplayValueExt(faith.value, false, false, 0)]), "", "faith");
 		faith.value = 0.0001;	//have a nice autoclicking
 
@@ -769,39 +767,31 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	},
 
 	transcend: function(){
-
 		var religion = this.game.religion;
-
-		if (!religion.getRU("transcendence").on){
-			return;	//:3
+		if (!religion.getRU("transcendence").on) {
+			return; // :3
 		}
-		var self = this;
-		this.game.ui.confirm($I("religion.transcend.confirm.title"), $I("religion.transcend.confirm.msg"), function(result) {
-			if (!result) {
-				return;
-			}
+
+		var game = this.game;
+		game.ui.confirm($I("religion.transcend.confirmation.title"), $I("religion.transcend.confirmation.msg"), function() {
 			var tclevel = religion.getTranscendenceLevel();
 			//Transcend one Level at a time
 			var needNextLevel = religion.getTranscendenceRatio(tclevel+1) - religion.getTranscendenceRatio(tclevel);
 			if (religion.faithRatio > needNextLevel) {
-
 				religion.faithRatio -= needNextLevel;
 				religion.tcratio += needNextLevel;
 				religion.tclevel += 1;
-
-				self.game.msg($I("religion.transcend.msg.success", [religion.tclevel]));
+				game.msg($I("religion.transcend.msg.success", [religion.tclevel]));
 			} else {
-				var progressPercentage = self.game.toDisplayPercentage(religion.faithRatio / needNextLevel, 2, true);
+				var progressPercentage = game.toDisplayPercentage(religion.faithRatio / needNextLevel, 2, true);
 				var leftNumber = (religion.faithRatio / needNextLevel) * (religion.tclevel + 1) - 1;
 				if (leftNumber < 0) {
 					leftNumber = 0;
 				}
 				var progressNumber = leftNumber.toFixed(0) + " / " + (religion.tclevel + 1);
-				self.game.msg($I("religion.transcend.msg.failure", [progressNumber, progressPercentage]));
+				game.msg($I("religion.transcend.msg.failure", [progressNumber, progressPercentage]));
 			}
 		});
-
-
 	},
 
 	getTranscendenceLevel: function(){
@@ -898,7 +888,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ReligionBtnController", com.nuclearunic
 	},
 
 	updateVisible: function(model){
-		model.visible = this.game.religion.faith >= model.metadata.faith;
+		model.visible = model.metadata.on > 0 || this.game.religion.faith >= model.metadata.faith;
 	}
 });
 
@@ -923,7 +913,7 @@ dojo.declare("classes.ui.TranscendenceBtnController", com.nuclearunicorn.game.ui
 dojo.declare("com.nuclearunicorn.game.ui.PraiseBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	getName: function(model) {
 		if (this.game.religion.faithRatio > 0){
-			return model.options.name + " [" + this.game.getDisplayValueExt(this.game.religion.getFaithBonus()*100, true, false, 3) + "%]";
+			return model.options.name + " [" + this.game.getDisplayValueExt(this.game.religion.getApocryphaBonus()*100, true, false, 3) + "%]";
 		} else {
 			return model.options.name;
 		}
@@ -1014,21 +1004,16 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 
 dojo.declare("classes.ui.religion.MultiLinkBtn", com.nuclearunicorn.game.ui.ButtonModern, {
 	renderLinks: function() {
-		this.all = this.addLink(this.model.allLink.title, this.model.allLink.handler, false, true);
-		this.half = this.addLink(this.model.halfLink.title, this.model.halfLink.handler, false, true);
-		this.fifth = this.addLink(this.model.fifthLink.title, this.model.fifthLink.handler, false, true);
+		this.all = this.addLink(this.model.allLink);
+		this.half = this.addLink(this.model.halfLink);
+		this.fifth = this.addLink(this.model.fifthLink);
 	},
 
 	update: function() {
 		this.inherited(arguments);
-		this._updateLink(this.fifth, this.model.fifthLink);
-		this._updateLink(this.half, this.model.halfLink);
-		this._updateLink(this.all, this.model.allLink);
-	},
-
-	_updateLink: function(buttonLink, modelLink) {
-		buttonLink.link.textContent = modelLink.title;
-		dojo.style(buttonLink.link, "display", modelLink.visible ? "" : "none");
+		this.updateLink(this.fifth, this.model.fifthLink);
+		this.updateLink(this.half, this.model.halfLink);
+		this.updateLink(this.all, this.model.allLink);
 	}
 });
 
@@ -1349,18 +1334,12 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 
 	resetFaith: function(event){
 		event.preventDefault();
-
-		if (!this.game.religion.getRU("apocripha").on){
-			return;	//trust no one
-		}
-		var self = this;
-		this.game.ui.confirm("", $I("religion.resetFaith.confirm.msg"), function(confirmed){
-				if (confirmed) {
-					self.resetFaithInternal(1.01);
-				}
+		if (this.game.religion.getRU("apocripha").on) { // trust no one
+			var self = this;
+			this.game.ui.confirm("", $I("religion.resetFaith.confirmation.msg"), function() {
+				self.resetFaithInternal(1.01);
 			});
-
-
+		}
 	},
 
     resetFaithInternal: function(bonusRatio){
