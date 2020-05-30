@@ -1,5 +1,6 @@
 /**
-    class that provides an abstraction layer for UI/model communication
+ * Class that provides an abstraction layer for UI/model communication
+ * Extended in web version and in mobile version, so change signatures below only if you can change them in mobile too!
  */
 dojo.declare("classes.ui.UISystem", null, {
     game: null,
@@ -15,6 +16,24 @@ dojo.declare("classes.ui.UISystem", null, {
     },
 
     updateOptions: function(){
+    },
+
+	unlockScheme: function(name) {
+	},
+
+	relockSchemes: function() {
+	},
+
+    notifyLogEvent: function(logmsg) {
+    },
+
+    confirm: function(title, msg, callbackOk, callbackCancel) {
+    },
+
+    openPopupPage: function(pageName) {
+    },
+
+    pulse: function(node){
     },
 
     displayAutosave: function(){
@@ -36,6 +55,9 @@ dojo.declare("classes.ui.UISystem", null, {
     },
 
     observeClear: function(){
+    },
+
+    updateCalendar: function(){
     },
 
     updateLanguage: function() {
@@ -78,6 +100,9 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
     isDisplayOver: false,
     isChatActive: false,
     isChatVisited: false,
+
+    defaultSchemes: ["default", "dark", "grassy", "sleek"],
+    allSchemes: ["default"].concat(new classes.KGConfig().statics.schemes),
 
     constructor: function(containerId){
         this.containerId = containerId;
@@ -261,13 +286,13 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             var tabLink = dojo.create("a", {
                 href:"#",
                 innerHTML: tab.tabName,
-                className: "tab",
+                className: "tab " + tab.tabId,
                 style : {
                     whiteSpace: "nowrap"
                 }
             }, tabNavigationDiv);
             tab.domNode = tabLink;
-
+            
             if (this.activeTabId == tab.tabId){
                 dojo.addClass(tabLink, "activeTab");
             }
@@ -288,14 +313,13 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             }
         }
 
-
         for (var i = 0; i < game.tabs.length; i++){
             var tab = game.tabs[i];
 
             if (this.activeTabId == tab.tabId){
 
                 var divContainer = dojo.create("div", {
-                    className: "tabInner"
+                    className: "tabInner " + tab.tabId
                 }, container);
 
                 tab.render(divContainer);
@@ -352,7 +376,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
 					dojo.style(cycleSpan, "paddingBottom", "4px");
 
 					var cycleSpan = dojo.create("div", {
-						innerHTML: "Cycle Effects:",
+						innerHTML: $I("cycle.effects.title") + ":",
 						style: { textAlign: "center", paddingTop: "4px"}
 					}, tooltip );
 
@@ -441,7 +465,12 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         this.update();
 
         //-------------------------
-        $(".console-intro").html($I("console.intro"));
+        var now = new Date();
+        if (now.getDate() == 1 && now.getMonth() == 3) {
+            $(".console-intro").css("font-size", "300%").addClass("blaze").text("You are a zebra in a savanna full of titanium mines.");
+        } else {
+            $(".console-intro").text($I("console.intro"));
+        }
 
         React.render($r(WLeftPanel, {
             game: this.game
@@ -464,7 +493,8 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             this.game.tooltipUpdateFunc();
         }
 
-        $(".chatLink").css("font-weight", this.isChatVisited ? "normal" : "bold");
+        //not relevant anymore
+        //$(".chatLink").css("font-weight", this.isChatVisited ? "normal" : "bold");
 
         //wat
         /*React.render($r(WLeftPanel, {
@@ -481,7 +511,29 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
 			if (tab.tabId == this.activeTabId){
 				tab.update();
 			}
-		}
+        }
+        if (this.game.village.leader) {
+            dojo.query("a.tab.traitLeaderBonus").removeClass("traitLeaderBonus");		
+            switch (this.game.village.leader.trait.name) {
+                case "engineer": // Crafting bonuses
+                case "metallurgist":
+                case "chemist":
+                    dojo.query("a.tab.Workshop").addClass("traitLeaderBonus");
+                    break;
+                case "merchant": // Trading bonus
+                    dojo.query("a.tab.Trade").addClass("traitLeaderBonus");
+                    break;
+                case "manager": // Hunting bonus
+                    dojo.query("a.tab.Village").addClass("traitLeaderBonus");
+                    break;
+                case "scientist": // Science prices bonus
+                    dojo.query("a.tab.Science").addClass("traitLeaderBonus");
+                    break;
+                case "wise": // Religion bonus
+                    dojo.query("a.tab.Religion").addClass("traitLeaderBonus");
+                    break;
+                }	
+        }
 	},
 
     updateFastHunt: function(){
@@ -617,8 +669,16 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
     updateOptions: function() {
         var game = this.game;
 
-        $("#schemeToggle").val(game.colorScheme);
-        $("body").attr("class", "scheme_" + game.colorScheme);
+        if (game.unlockedSchemes.indexOf(game.colorScheme) < 0) {
+            game.colorScheme = "default";
+        }
+        $("body").removeClass();
+        if (game.colorScheme != "default") {
+            $("body").addClass("scheme_" + game.colorScheme);
+            if (!game.opts.hideBGImage) {
+                $("body").addClass("with_background_image");
+            }
+        }
 
         $("#workersToggle")[0].checked = game.useWorkers;
         $("#forceHighPrecision")[0].checked = game.opts.forceHighPrecision;
@@ -626,7 +686,10 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#usePercentageResourceValues")[0].checked = game.opts.usePercentageResourceValues;
         $("#highlightUnavailable")[0].checked = game.opts.highlightUnavailable;
         $("#hideSell")[0].checked = game.opts.hideSell;
+        $("#hideBGImage")[0].checked = game.opts.hideBGImage;
         $("#enableRedshift")[0].checked = game.opts.enableRedshift;
+        $("#forceLZ")[0].checked = game.opts.forceLZ;
+        $("#compressSaveFile")[0].checked = game.opts.compressSaveFile;
         $("#disableTelemetry")[0].checked = game.opts.disableTelemetry;
         $("#noConfirm")[0].checked = game.opts.noConfirm;
         $("#IWSmelter")[0].checked = game.opts.IWSmelter;
@@ -634,16 +697,42 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         var selectedLang = i18nLang.getLanguage();
         var locales = i18nLang.getAvailableLocales();
         var labels = i18nLang.getAvailableLocaleLabels();
-        var $langSelector = $("#languageSelector");
-        $langSelector.empty();
+        var langSelector = $("#languageSelector");
+        langSelector.empty();
         for (var i = 0; i < locales.length; i++) {
-            $('<option />', {
-                value: locales[i],
-                text:labels[locales[i]]
-            }).appendTo($langSelector);
+            $("<option />").attr("value", locales[i]).text(labels[locales[i]]).appendTo(langSelector);
         }
-        $langSelector.val(selectedLang);
+        langSelector.val(selectedLang);
+
+        var schemeSelect = $("#schemeToggle");
+        schemeSelect.empty();
+        for (var i = 0; i < this.allSchemes.length; ++i) {
+            var scheme = this.allSchemes[i];
+            var option = $("<option />").attr("value", scheme).text($I("opts.theme." + scheme));
+            if (game.unlockedSchemes.indexOf(scheme) < 0) {
+                if (this.defaultSchemes.indexOf(scheme) >= 0) {
+                    game.unlockedSchemes.push(scheme);
+                } else {
+                    option.html("&nbsp;&nbsp;" + $I("opts.theme." + scheme)).attr("disabled", "disabled");
+                }
+            }
+            option.appendTo(schemeSelect);
+        }
+        schemeSelect.val(game.colorScheme);
     },
+
+	unlockScheme: function(name) {
+		if (this.game.unlockedSchemes.indexOf(name) < 0) {
+			$("#schemeToggle > option[value=" + name + "]").removeAttr("disabled");
+			this.game.msg($I("opts.theme.unlocked") + $I("opts.theme." + name), "important");
+			this.game.unlockedSchemes.push(name);
+		}
+	},
+
+	relockSchemes: function() {
+		this.game.unlockedSchemes = this.defaultSchemes;
+		this.updateOptions();
+	},
 
     displayAutosave: function(){
         dojo.style(dojo.byId("autosaveTooltip"), "opacity", "1");
@@ -709,7 +798,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         //swfobject.embedSWF("lib/lightirc/lightIRC.swf", $chat[0], 600, height - 150, 10, "lib/lightirc/expressInstall.swf", params);
         /*<iframe src="https://kiwiirc.com/client/irc.canternet.org/?nick=kitten_?#kittensgame" style="border:0; width:100%; height:450px;"></iframe>*/
         this.isChatActive = true;
-        this.isChatVisited = true;
+        //this.isChatVisited = true;
     },
 
     resetConsole: function(){
@@ -747,6 +836,16 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
                 altKey: e.altKey
             };
         });
+
+        this.updateLinksBlockLanguage();
+    },
+
+    updateLinksBlockLanguage: function() {
+        $("#save-link").text($I("menu.save"));
+        $("#options-link").text($I("menu.options"));
+        $("#reset-link").text($I("menu.reset"));
+        $("#wipe-link").text($I("menu.wipe"));
+        $("#getTheApp-link").text($I("menu.getTheApp"));
     },
 
     _createFilter: function(filter, fId, filtersDiv){
@@ -801,7 +900,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         dojo.attr(msg.span, {innerHTML: msg.text});
         //Destroy child nodes if there are too many.
         var logLength = dojo.byId('gameLog').childNodes.length;
-        if (logLength > _console.maxMessages) {dojo.destroy(dojo.byId('gameLog').childNodes[logLength-1])}
+        if (logLength > _console.maxMessages) {dojo.destroy(dojo.byId('gameLog').childNodes[logLength-1]);}
 
         //fade message spans as they get closer to being removed and replaced
         var spans = dojo.query("span", gameLog);
@@ -809,7 +908,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         var fadeStart = _console.maxMessages - fadeCount;
         var fadeInterval = 1 / fadeCount;
 
-        for (i = fadeStart + 1; i < spans.length; i++) {
+        for (var i = fadeStart + 1; i < spans.length; i++) {
             dojo.style(spans[i], "opacity", (1 - (i-fadeStart) * fadeInterval));
         }
     },
@@ -829,9 +928,12 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         }
     },
 
-
-    confirm: function(title, msg, callback) {
-        invokeCallback(callback, [window.confirm(msg)]);
+    confirm: function(title, msg, callbackOk, callbackCancel) {
+        if (window.confirm(msg)) {
+            callbackOk.apply(window);
+        } else if (callbackCancel != undefined) {
+        	callbackCancel.apply(window);
+        }
     },
 
     //TODO: add dialog and close/bind events
@@ -877,7 +979,8 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
     save: function(){
         LCstorage["com.nuclearunicorn.kittengame.ui"] = JSON.stringify({
            fontSize: this.fontSize,
-           isChatVisited: this.isChatVisited
+           isChatVisited: this.isChatVisited,
+           theme: this.game.colorScheme
         });
     },
 

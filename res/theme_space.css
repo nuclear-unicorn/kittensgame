@@ -1,0 +1,611 @@
+/**
+ *			Space 1.1.0 Theme © Volkeyrn
+ */
+
+@import url(https://fonts.googleapis.com/css?family=Oxanium:wght@200,300,400,500,600,700,800&display=swap);
+@import url(https://fonts.googleapis.com/css?family=Roboto+Slab:wght@300,400,500,600,700,800&display=swap);
+
+/**********************************************/
+/******************** GAME ********************/
+/**********************************************/
+body.scheme_space {
+	 background-color: rgb(2,5,14); /* color #02050E */	
+}
+body.scheme_space.with_background_image {
+	background: repeat fixed top left url('img/theme_space_stars_background.png'), /* source: https://pngtree.com/freebackground/blue-starry-night-sky-background_925273.html */
+	linear-gradient(90deg, rgba(2,5,14,1) 0%, rgba(8,22,68,1) 25%, rgba(2,5,14,1) 100%);	
+}
+.scheme_space  #gamePageContainer,
+.scheme_space select,
+.scheme_space .btn,
+.scheme_space .modern,
+.scheme_space .btn.modern,
+.scheme_space input[type='button'] {   
+	 font-family: 'Oxanium', cursive;
+}
+.scheme_space .btn { 
+	color: #9FA5D6;
+	margin-bottom:6px;
+	max-height: 36px;
+	background-color: #1F2F65; 
+	border: solid 1px rgba(34, 34, 34, 0.4); /* color #222222 */
+}
+.scheme_space .btn.disabled {
+	color: #9FA5D6;
+	background-color: #110F31; 
+	border: solid 1px rgba(160, 160, 160, 0.2); /* color #A0A0A0 */
+}
+.scheme_space .btn.disabled:hover {
+	background-color: #110F31; 
+	border: solid 1px rgba(160, 160, 160, 0.4); /* color #A0A0A0 */
+	cursor: inherit;
+}
+.scheme_space .btn:hover{
+	border: solid 1px #0E8B94;
+	color: gray;	
+}
+.scheme_space .btn:not(.disabled):hover span.btnTitle {
+	color: #081644 !important;
+	font-weight: 800;
+}
+.scheme_space .highlited { /* higlighting ressources when hover button on center windows */
+	background-color: rgba(20, 240, 216, 0.2); /* color #14F0D8 */
+}
+.scheme_space a {
+	color: #89A4CD;
+}
+.scheme_space a,
+.scheme_space .craft-link {
+    text-decoration: none;
+}
+.scheme_space a:hover {
+	color: #12E7D1;
+	opacity: 1.0;
+}
+.scheme_space div {
+	color: #DDDDDD;
+}
+.scheme_space .disabled div { /* color text on button disabled */
+	color: #9FA5D6;
+}
+.scheme_space h1 {
+    font-size: 100%;
+    color: #C23574; 
+	text-shadow: 1px 1px rgba(4, 10, 32); /* color #040A20 */
+	font-weight: 400;
+}
+.scheme_space h1:first-child {
+    margin-top: 0px;
+}
+/* if not use line bottom : '.btn.small-text span' then green light color do not change ! why ??*/
+.scheme_space .btn.small-text span { /* text size for multiple buttons */ 
+    font-size: 90%;
+} 
+/*** green and red light for machine on/off ***/
+.scheme_space .btn.bldlackResConvert div.btnContent {
+    padding: 4px;
+    border: 1px solid #EA152C; /* color for lack resources convertion */
+}
+.scheme_space .btn.bldEnabled div.btnContent { 
+    padding: 4px;
+    border: 1px solid #418D79; 
+}
+.scheme_space .btn.bldEnabled.modern div.btnContent,
+.scheme_space .btn.bldlackResConvert.modern div.btnContent{
+    border-width: 0 0 0 8px;
+	border-radius: 3px; /* for align with border buttons */
+    padding: 10px 0px 10px 10px;
+}
+/*** end of green light for machine on ***/
+.scheme_space,
+.scheme_space .help { /* window options and version */
+	color: #CCCCCC;	
+	background-color: #061030;
+	overflow: hidden;
+}
+.scheme_space .help,
+.scheme_space .dialog {
+	box-shadow: 0 2px 5px 0 rgb(13, 13, 13), 0 2px 10px 0 rgb(24, 24, 24), 0 0 0 9999px rgba(0, 0, 0, 0.8);
+    height: auto !important;
+    top: 40% !important;
+    border: solid 1px #14F0D8; 
+}
+.scheme_space select { /* dropdown list on settlement tab and options windows */
+    background-color: #0A1A4E;
+	font-family: 'Roboto Slab', serif;
+    color: #0FC3B1;
+    padding-bottom: 2px;
+	border-color : rgba(13,35,110,0.9); /* color #0D236E */
+	font-size: 14px;
+}
+.scheme_space select>option {
+    background-color: #0A1A4E;
+    color: #0FC3B1;
+	padding: 2px 10px; /* -2 pixel vertical */
+}
+
+/*************************************************/
+/******************** TOP BAR ********************/
+/*************************************************/
+.scheme_space #topBar {
+	background-color: rgb(10,26,78); /* color #0A1A4E */
+	background: radial-gradient(circle, rgba(10,26,78,1) 0%, rgba(2,5,14,1) 100%);
+	font-size: 90%;
+    height: 22px;
+    border-bottom: 1px solid #0A2450;
+    box-shadow: none; 
+	top: 0px; /* no space when background-color of top bar different from game */
+}
+.scheme_space #topBar a:hover {
+	text-shadow: none;
+}
+.scheme_space #topBar div {	
+	color: #DDDDDD;
+}
+.scheme_space #headerLinks div { /* for color text of MOTD on top bar */
+	color: #DDDDDD;
+}
+.scheme_space #headerLinks>div:first-child:before {
+    color: #12E7D1;
+    content: 'Theme by Volkeyrn  ';
+	text-shadow: none;
+    text-decoration: none;
+	font-size : 90%;	
+}
+.scheme_space #sorrowTooltip { /* counter of BLS (Black Liquid Sorrow) */
+	color: #EFEDE8;
+}
+.scheme_space #autosaveTooltip { 
+	color: #0FC3B1;
+}
+.scheme_space #getTheApp-link { /* Get the app */
+	color: #167E9D !important;
+}
+.scheme_space #getTheApp-link:hover { 
+	color: #12E7D1 !important;
+}
+
+/************************************************/
+/******************** FOOTER ********************/
+/************************************************/
+.scheme_space #footerLinks {
+	font-size: 90%;
+	bottom: 6px;
+	background: rgba(3, 10, 29, 0.8); /* color #030A1D */ 
+	-webkit-box-shadow: 0 0 4px 4px rgba(3, 10, 29, 0.6); /* color #030A1D */ 
+	        box-shadow: 0 0 4px 4px rgba(3, 10, 29, 0.6); /* color #030A1D */ 
+}
+.scheme_space #footerLinks a:hover {
+	text-shadow: none;
+}
+.scheme_space .links-block { /* a link separator : | on header and footer links*/
+	color: #0A2450 !important; 
+}
+
+/*************************************************/
+/******************** TOOLTIP ********************/
+/*************************************************/
+.scheme_space #tooltip,
+.scheme_space .tooltip-block div {    
+    color: #167E9D; /* tooltip windows == left column : left text */
+	background-color: #061336;
+	font-size: 95%;
+	border: 1px solid rgba(11, 74, 104, 0.8); /* color #0B4A68 */
+	border-radius: 5px !important;
+}
+.scheme_space .button_tooltip {
+	background-color: transparent;
+}
+.scheme_space .button_tooltip div { /* tooltip window == left column: right text | center column :highlighting text */
+	color: #DDDDDD;
+	font-size: 95%;
+}
+.scheme_space .tooltip-inner .desc {   /* Tooltip Window : title text */ 
+    color: #167E9D; 
+	font-size: 95%;
+	border-bottom : 1px solid #0A2450 !important; /* border line under title */
+	margin-bottom: 5px;
+}
+.scheme_space .tooltip-divider { /* border line before effects text */
+	border-bottom : 1px solid #0A2450 !important;	
+}
+.scheme_space .effectName { /* Tooltip Window : effects text */    
+    color: #F4691A !important;
+	font-size: 90% !important;
+}
+.scheme_space #tooltip .flavor { /* Tooltip Window : last bottom text on center column tooltip window */
+    color: #0FC3B1;
+}
+.scheme_space .rawRes { /* Tooltip Window == text for all missing resources for primary resource */
+    color: #888888;
+	font-style: italic;
+	padding-left: 10px;
+}
+.scheme_space .button_tooltip .noRes,
+.scheme_space .limited { /* on ressource limited or not attainable */
+    color: #EA152C;
+}
+
+/*******************************************************/
+/******************** CENTER COLUMN ********************/
+/*******************************************************/
+.scheme_space .tab { 
+    font-size: 90%;
+}
+.scheme_space .tabsContainer { /* separator | for tab */
+	color: #0A2450 ;
+	padding-bottom: 10px !important; /* default 15px */
+}
+.scheme_space .activeTab { 
+	color: #12E7D1; 
+	font-weight: bold;
+	text-shadow: 1px 1px rgba(4, 10, 32); /* color #040A20 */
+}
+.scheme_space a.activeTab {
+    border-bottom: solid 2px #0B4A68 ! important; 
+}
+.scheme_space a.activeTab:hover {
+    color: #12E7D1; 
+}
+.scheme_space .bldTopContainer { /* under tab */
+    font-size: 90%;
+}
+.scheme_space .bldTopContainer a.activeTab:hover { 
+    color: #12E7D1;
+	opacity: 0.7; /* default opacity 0.7 on not hover */ 
+}
+.scheme_space .bldGroupContainer { /* container for all buttons on center column */
+    padding-top: 10px; /* default 15px */
+    border-top: 1px solid #0A2450;
+}
+.scheme_space .btn.modern:not(.disabled) {
+   	background-color: #1F2F65; /* color for all button not disabled*/	
+    cursor: pointer !important;
+}
+.scheme_space .btn.modern:not(.disabled):hover, /* hover on all button in center column */
+.scheme_space input[type='button']:hover {
+	background-color: #14F0D8; 
+    cursor: pointer !important;
+}
+.scheme_space input[type='button']:hover {
+	border: solid 1px #12E7D1 !important;
+	font-weight: 600;
+}
+.scheme_space input[type='button'] {
+	background-color: #1F2F65 !important; 
+    cursor: pointer !important;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.3), 0 2px 10px 0 rgba(0, 0, 0, 0.3) !important;
+    border: solid 1px transparent !important; /* for no offset when border on */
+    border-radius: 3px !important;
+    outline: 0 !important;
+    color: #EEEEEE;
+    padding: 5px 20px;
+}
+.scheme_space .modern .btnContent {
+    padding: 10px 0 9px 10px !important; /* -1 pixel on vertical for correct align left border */
+}
+.scheme_space .btn.modern a {
+	color: #167E9D;
+	background-color: transparent; 
+	padding: 10px 6px 9px 6px !important; /* -1 pixel on vertical for correct align left border */
+}
+.scheme_space .btn.modern:not(.disabled) a {
+	border-color: rgba(20, 240, 216, 0.2); /* color #14F0D8 */
+}
+.scheme_space .btn.modern.disabled a {
+	border-color: #171441 !important; 
+}
+.scheme_space .btn.modern a:hover { 
+	color: #FFFFFF;	
+	font-weight: bold;
+	text-shadow: none;
+}
+.scheme_space .btn.modern:not(.disabled) a:hover { 
+	background-color: rgba(31, 47, 101, 0.3); /* color #1F2F65 */
+}
+.scheme_space .btn.modern.disabled a:hover { 
+	background-color: rgba(31, 47, 101, 0.3); /* color #1F2F65 */
+}
+.scheme_space .tabInner {
+    border: none; /* border for all under tabs in center column */
+}
+.scheme_space .linkContent { /* dropdown list on button */
+    margin-top: 24px !important; /* for correct vertical align dropdown list */    
+    width: auto !important;
+	background-color: #14F0D8; 
+}
+.scheme_space .btn.modern.disabled .linkContent { /* dropdown list on button disabled*/
+ 	background-color: #110F31; /* color pick from button disabled and hover */
+}
+.scheme_space .linkContent a {
+    color: #081644;
+    width: 40px !important;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+.scheme_space .panelContainer { 
+    background-color: rgba(4, 10, 32, 0.2) !important; /* color #040A20 */
+    border-color: #0A2450;
+	border-radius: 5px;
+}
+.scheme_space .panelContainer div.title {
+    color: #C23574;
+	text-shadow: 1px 1px rgba(4, 10, 32); /* color #040A20 */
+	font-weight: 400;
+}
+.scheme_space .panelContainer .toggle {
+    border-color : #0A2450;
+	border-radius: 3px;
+}
+.scheme_space .trade-race .buys {
+    color: #F4691A;
+}
+.scheme_space .trade-race .sells {
+    color: #14F0D8;   
+}
+.scheme_space .trade-race .ammount {
+    color: #7F7F7F;
+}
+/* for container 'Census' -> list of kittens in settlement tab */
+.scheme_space .panelContainer div[style^='border: 1px solid gray;']{
+	border-color: #0D236E !important;
+	font-size: 90%;
+	border-radius: 5px;
+	background-color : rgba(22, 126, 157, 0.2); /* color #167E9D */
+}
+.scheme_space .panelContainer div[style^='border: 1px solid gray;'] span{ /* jobs unasigned */
+	color: #777777;
+}
+.scheme_space .panelContainer div[style^='border: 1px solid gray;'] span[style='font-weight: bold' i]{ /* job assigned */
+	color: #0FC3B1;
+}
+.scheme_space .panelContainer div.title + .container > div[style^='height:']{
+	margin-bottom: 4px; /* for add a margin under the 2 lists (select) in the settlement tab */ 
+}
+
+/**********************************************************/
+/******************** ACHIEVEMENTS TAB ********************/
+/**********************************************************/
+.scheme_space .achievement {
+    display: block;
+    margin: 10px;
+    height: 40px;
+    background-color: rgba(18, 231, 209, 0.1); /* color #12E7D1 */
+    color: white;
+    text-shadow: rgba(18, 231, 209) 2px 0px 10px; /* color #12E7D1 */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: default !important;
+	border-color : #14F0D8;
+	border-radius: 5px;
+}
+.scheme_space .achievement-header {
+	color: #C23574;
+	text-shadow: 1px 1px rgba(4, 10, 32); /* color #040A20 */
+	font-size: 18px; 
+}
+.scheme_space .achievement.unethical {
+    text-shadow: rgb(255, 67, 91) 2px 0px 10px;
+	background-color: rgba(146, 0, 23, 0.1); /* color #920017 */
+	border-color : rgba(146, 0, 23, 0.5); /* color #920017 */
+}
+.scheme_space .achievement.unethical:hover {
+    background-color: rgba(222, 0, 35, 0.4); /* color #DE0023 */
+}
+.scheme_space .achievement:hover {
+    background-color: rgba(22, 126, 157, 0.6); /* color #167E9D */
+}
+.scheme_space .achievement:not(.unlocked) {
+    color: rgba(220, 220, 220, 0.5);
+	background-color: rgba(140, 140, 140, 0.1);
+    text-shadow: none;
+	border-color : rgba(140, 140, 140, 0.4);
+}
+.scheme_space .achievement:not(.unlocked):hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.scheme_space .achievement:after {
+    display: block;
+    margin-top: 5px;
+    font-size: 90%;
+    color: rgba(20, 240, 216, 0.91); /* color #14F0D8 */
+    text-shadow: none;
+    text-transform: capitalize;
+    letter-spacing: normal;
+    font-weight: normal !important;
+}
+.scheme_space .achievement.unethical:after {    
+	color: #FFFFFF !important;
+}
+.scheme_space .achievement-header .star {
+	/* default font size = font-size: 18px; */
+    color: #F4691A; /* orange or dominant color of the theme */
+}
+.scheme_space .achievement .star { 
+	/* default font size = font-size: 18px; */  
+	color : #888888;
+}
+.scheme_space .achievement.unlocked .star {   
+	color : #F4691A; /* orange or dominant color of the theme */
+	font-weight: bold;
+	text-shadow: 0px 1px rgba(1, 4, 15,1); /* color #01040F */
+}
+
+/******************************************************/
+/******************** RIGHT COLUMN ********************/
+/******************************************************/
+.scheme_space #rightColumn {
+	width: 25%;
+    max-width: 400px;
+    min-width: 250px;
+}
+.scheme_space #calendarDiv {
+    color: #C23574;
+	padding-left: 5px;
+    margin-top: 5px;
+	text-shadow: 1px 1px 1px rgba(1, 4, 15,1); /* color #01040F */
+	font-weight: normal;
+}
+.scheme_space #calendarSign {
+   font-size: 120% ;
+}
+.scheme_space #calendarSign:hover {
+   cursor: default ;
+}
+.scheme_space .right-tab-header { /* Log | Chat link on right column */
+    color : #0A2450; /* for separator tab | */
+	font-size: 70%;	
+}
+.scheme_space .right-tab-header a.active {
+    color: #14F0D8;
+	font-weight: bold !important;	
+}
+.scheme_space div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
+	color: #167E9D;
+	font-size: 90%;
+	border-top: 1px solid #0A2450 !important;
+	margin-top: 10px;
+}
+.scheme_space #clearLogHref { /* Link in right column : Clear log */
+	font-size: 80%;
+}
+.scheme_space #logFiltersBlock > a { /* Link in right column : [+]Log Filters */
+	font-size: 80%;
+	margin-left: 5px;
+}
+.scheme_space #pauseBtn { /* Link in right column : pawse */
+	margin-left: 5px;
+}
+.scheme_space .msg {
+	font-size: 90%;
+}
+.scheme_space .msg.type_notice {
+    color: #1B9CC2; /* color default : #01A9DB; */
+}
+.scheme_space .msg.type_important {
+    color: #F4691A; /* color default : coral; */
+}
+.scheme_space .msg.type_alert {
+    color: #EA152C; /* color default : red; */
+}
+.scheme_space .msg.type_date {
+    color: #14F0D8; 
+    border-bottom: solid 1px #0B4A68;
+}
+
+/*****************************************************/
+/******************** LEFT COLUMN ********************/
+/*****************************************************/
+ .scheme_space .res-table { 
+    max-width: 352px;    /* +12 pixel */ 
+    border-collapse: collapse; /* gain of 3 pixel by border -> no margin bottom after */ 	
+	margin-left: 2px; /* without 0px margin left for all ressources */
+ } 
+ .scheme_space .craftTable {
+	 margin-bottom: 20px !important; /* for correct margin bottom due of the line above with border-collapse: collapse on .res-Table !*/
+ }
+.scheme_space .res-cell.craft-link {  
+     min-width: 30px; /* for not adjust size of cell in live. Without column move horizontally */
+ } 
+.scheme_space .res-cell.craft-link:hover { /* craft table left column */
+    color: #C23574;
+	text-decoration: none; 
+	font-weight: 800;
+    text-shadow: 1px 1px #040A20;
+}
+.scheme_space tr.resourceRow:hover,
+.scheme_space .res-row:hover {
+    background-color: rgba(20, 240, 216, 0.2); /* color #14F0D8 */
+	cursor: default;
+}
+.scheme_space .res-row.craft:hover {
+    background-color: rgba(20, 240, 216, 0.2); /* color #14F0D8 */
+}
+.scheme_space .res-cell.resPerTick:hover {
+	font-weight: normal !important;
+}
+.scheme_space .maxRes,
+.scheme_space select > option:disabled {
+	color: #999999;
+}
+.scheme_space .resAmount { 
+    color: #DDDDDD;
+}
+.scheme_space .resLimitWarn {
+    color: #F4691A;
+	font-weight : 500;
+	font-style: italic;
+}
+.scheme_space .resLimitNotice {
+    color: #0FC3B1; 
+}
+.scheme_space .resPerTick {
+    font-size: 90%;
+    color: #DDDDDD;
+}
+.scheme_space .res-cell.resPerTick {
+    cursor: default;
+}
+.scheme_space #fastHuntContainer > a{ /* Text left column : "Send hunters (xx times)" */
+	font-size: 110%;
+}
+.scheme_space #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+	color: #F4691A;
+}
+.scheme_space #fastPraiseContainer > a{ /* Text left column : "Praise the sun!" */
+	font-size: 110%;
+}
+.scheme_space #fastPraiseContainer > a:hover{ 
+	text-shadow: 2px 0px 10px rgba(255, 255, 255, 0.75); /* color #FFFFFF */
+}
+.scheme_space #fastHuntContainer > a:hover{ 
+	text-shadow: 1px 1px #333333;
+}
+.scheme_space .res-cell.positive-weather { /* to change the color for bonus cell according to the season */
+	font-size: 90% !important;
+	color: #418D79 !important;
+}
+.scheme_space .res-cell.negative-weather { /* to change the color for penalty cell according to the season */
+	font-size: 90% !important;	
+	color: #EA152C !important;
+}
+.scheme_space .resource_kittens .resource-name { /* change for resource-name = kittens */
+	color: white !important; 
+}
+.scheme_space .resource_faith .resource-name { /* change for resource-name = Faith */
+	color: gray !important;
+}
+.scheme_space .resource_steel .resource-name { /* change for resource-name = Steel */
+	color: gray !important;
+}
+.scheme_space .resource_gear .resource-name { /* change for resource-name = Gear */
+	color: gray !important;
+}
+.scheme_space .resource_alloy .resource-name { /* change for resource-name = Alloy */
+	color: gray !important;
+}
+.scheme_space .resource_megalith .resource-name { /* change for resource-name = Megalith */
+	color: gray !important;
+}
+
+/***************************************************/
+/******************** SCROLLBAR ********************/
+/***************************************************/
+.scheme_space ::-webkit-scrollbar-thumb {
+    background: #081644;
+	border-radius: 40px;
+}
+.scheme_space ::-webkit-scrollbar-track {
+    background: #061030;
+    border-radius: 50px;
+}
+/* Only FireFox */
+.scheme_space #leftColumn,
+.scheme_space #rightColumn,
+.scheme_space #midColumn {
+   scrollbar-width: thin;
+   scrollbar-color: #081644 #061030 !important; 
+}
+.scheme_space select {
+   scrollbar-width: auto !important;
+}

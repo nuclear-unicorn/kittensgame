@@ -38,11 +38,13 @@
     background-color: #403F3D;
 }
 
-.scheme_sleek a, .scheme_sleek .craft-link {
+.scheme_sleek a,
+.scheme_sleek .craft-link {
     color: #868686;
 }
 
-.scheme_sleek a:hover, .scheme_sleek .craft-link:hover {
+.scheme_sleek a:hover,
+.scheme_sleek .craft-link:hover {
     color: #969696;
     opacity: 1.0;
 }
@@ -72,7 +74,8 @@
     background-color: #201F1D;
 }
 
-.scheme_sleek .maxRes {
+.scheme_sleek .maxRes,
+.scheme_sleek select > option:disabled {
     color: #555;
 }
 
@@ -81,7 +84,7 @@
 }
 
 .scheme_sleek .btn.modern a {
-    color: #565656;
+    color: gray;
     background-color: #212121;
 }
 
@@ -108,7 +111,8 @@
     overflow: hidden;
 }
 
-.scheme_sleek .help, .scheme_sleek .dialog {
+.scheme_sleek .help,
+.scheme_sleek .dialog {
     box-shadow: 0 2px 5px 0 rgb(13, 13, 13), 0 2px 10px 0 rgb(24, 24, 24), 0 0 0 9999px rgba(0, 0, 0, 0.9);
     height: auto !important;
     top: 40% !important;
@@ -339,7 +343,8 @@ body.scheme_sleek  {
 }
 
 
-.scheme_sleek #calendarDiv, .scheme_sleek #calendarSign {
+.scheme_sleek #calendarDiv,
+.scheme_sleek #calendarSign {
     color: #00b7ff;
 }
 
@@ -379,6 +384,14 @@ body.scheme_sleek  {
     padding: 20px !important;
     border-top: solid 20px rgba(55, 79, 115, 0.75);
     border-color: rgba(55, 79, 115, 0.8);
+}
+
+.scheme_sleek #tooltip .desc {
+	color: gray;
+}
+
+.scheme_sleek #tooltip .effectName {
+	color: gray;
 }
 
 .scheme_sleek #tooltip .flavor {
@@ -479,7 +492,8 @@ body.scheme_sleek  {
 }
 
 
-.scheme_sleek table.craftTable tr:hover td, .scheme_sleek .res-row .res-cell:hover{
+.scheme_sleek table.craftTable tr:hover td,
+.scheme_sleek .res-row .res-cell:hover{
     background-color: #333745;
 }
 
@@ -488,11 +502,13 @@ body.scheme_sleek  {
     border-color: #333745 !important;
 }
 
-.scheme_sleek .resTable td, .scheme_sleek .res-cell {
+.scheme_sleek .resTable td,
+.scheme_sleek .res-cell {
     padding: 2px 5px 4px 5px;
 }
 
-.scheme_sleek tr.resourceRow:hover, .scheme_sleek .res-row:hover {
+.scheme_sleek tr.resourceRow:hover,
+.scheme_sleek .res-row:hover {
     background-color: rgba(0, 0, 0, 0.11);
 }
 
@@ -535,11 +551,13 @@ body.scheme_sleek  {
     border: none;
 }
 
-.scheme_sleek a, .scheme_sleek .craft-link {
+.scheme_sleek a,
+.scheme_sleek .craft-link {
     text-decoration: none;
 }
 
-.scheme_sleek a:hover, .scheme_sleek .craft-link:hover {
+.scheme_sleek a:hover,
+.scheme_sleek .craft-link:hover {
     color: white;
 }
 

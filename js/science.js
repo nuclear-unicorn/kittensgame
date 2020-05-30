@@ -6,7 +6,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 
 	game: null,
 
-	hideResearched: false,	//hide researched techs
+	hideResearched: false,
 
 	//list of technologies
 	techs:[{
@@ -553,7 +553,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			tech: ["sattelites", "oilProcessing"],
 			tabs: ["space"],
-            upgrades: ["oilDistillation"]
+			upgrades: ["oilDistillation"]
 		}
 	}, {
         name: "oilProcessing",
@@ -972,7 +972,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 
 //-------- Policy ----------
 
-dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.BuildingResearchBtnController, {
+dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.BuildingNotStackableBtnController, {
 	getMetadata: function(model){
         if (!model.metaCached){
             model.metaCached = this.game.science.getPolicy(model.options.id);
@@ -1043,7 +1043,7 @@ dojo.declare("classes.ui.PolicyPanel", com.nuclearunicorn.game.ui.Panel, {
 	}
 });
 
-dojo.declare("com.nuclearunicorn.game.ui.TechButtonController", com.nuclearunicorn.game.ui.BuildingResearchBtnController, {
+dojo.declare("com.nuclearunicorn.game.ui.TechButtonController", com.nuclearunicorn.game.ui.BuildingNotStackableBtnController, {
 
 	defaults: function() {
 		var result = this.inherited(arguments);

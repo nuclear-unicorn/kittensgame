@@ -9,6 +9,12 @@ body {
     background-color: #FFFFFF;
 }
 
+img.loader {
+    -ms-interpolation-mode: bicubic;
+    width: 16px;
+    height: 16px;
+}
+
 #gamePageContainer {
     border: 0 none;
     font: inherit;
@@ -93,7 +99,8 @@ body {
 }
 
 #rightColumn {
-    width: 250px;
+    min-width: 250px;
+    max-width: 400px;
     vertical-align: top;
     padding-left: 8px;
     top: 20px;
@@ -220,6 +227,15 @@ select>option {
     display: inline-block;
 }
 
+.btn .btnContent a.small {
+    font-size: 0.7em;
+    line-height: 16px;
+}
+
+/*.btn .btnContent .btnTitle {
+
+}*/
+
 .btn.small-text span {
     font-size: 90%;
 }
@@ -231,6 +247,10 @@ select>option {
 
 .btn .noRes {
     color: #FF3030;
+}
+
+.rawRes {
+    color: gray;
 }
 
 .dropdown-link {
@@ -313,8 +333,13 @@ select>option {
     padding: 10px;
 }
 
-.maxRes {
+.maxRes,
+select > option:disabled {
     color: #AAA;
+}
+
+select > option:disabled {
+    font-style: italic !important;
 }
 
 .achievement {
@@ -423,7 +448,7 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
 }
 
 .btn.modern a {
-    color: gray;
+    color: #555;
     background-color: #EEE;
     border-left: 1px solid #888;
     padding: 10px 6px 10px 6px !important;
@@ -434,16 +459,13 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
 
 .btn.modern a.enabled {
     color: initial;
+	font-weight: bold;
 }
 
 .btn.bldEnabled.modern div.btnContent,
 .btn.bldlackResConvert.modern div.btnContent{
     border-width: 0 0 0 8px;
     padding: 10px 0px 10px 10px;
-}
-
-.btn.modern .linkBreak{
-    display: none;
 }
 
 .button_tooltip .noRes, .limited {
@@ -538,26 +560,31 @@ label {
 
 label i {
     font-size: 90%;
-    color: grey;
+    color: gray;
 }
 
 label:hover {
     opacity: 0.7;
 }
 
-input[type="checkbox"] {
+#optionsDiv {
+    height: auto;
+    margin-top:-170px; 
+}
+
+#optionsDiv input[type="checkbox"] {
 	display: none;
 }
 
-input[type="checkbox"] + label:before {
-	content: "x";
+#optionsDiv input[type="checkbox"] + label:before {
+    content: "·";
 	display: inline-block;
 	font: 16px sans-serif;
 	margin: 0px 6px 0px 2px;
 }
 
-input[type="checkbox"]:checked + label:before {
-	content: "\2713";
+#optionsDiv input[type="checkbox"]:checked + label:before {
+	content: "v";
 	font: 12px sans-serif;
 }
 
@@ -616,15 +643,38 @@ h1 {
 }
 
 .right-tab-header {
-    padding: 5px;
+    margin-top: 10px;
 }
 
 .right-tab-header a {
     padding: 5px;
+    padding-left: 30px;
+    padding-right: 30px;
 }
 
 .right-tab-header a.active {
     text-decoration: none;
+    border-top: 1px solid rgba(128,128,128, 0.4);
+
+    /*Looks a bit visually noisy - vvv*/
+
+    /*border-right: 1px solid rgba(128,128,128, 0.4);
+    border-left: 1px solid rgba(128,128,128, 0.4);*/
+}
+.right-tab-header a:not(.active) {
+    text-decoration: none;
+    /*border-bottom: 1px solid lightgray;*/
+}
+
+#observeButton {
+    text-align: center; 
+    margin-top: 15px; 
+    height: 30px;
+}
+
+.right-tab {
+    height: calc(100% - 150px);
+    overflow-y: hidden;
 }
 
 #sorrowTooltip {
@@ -657,23 +707,27 @@ a:hover {
 }
 
 .freshMessage {
-  animation: pulse 5s infinite;
+          animation: pulse 5s infinite;
   -webkit-animation: pulse 5s infinite;
-  -moz-animation: pulse 5s infinite;
-  -o-animation: pulse 5s infinite;
+     -moz-animation: pulse 5s infinite;
+       -o-animation: pulse 5s infinite;
 }
 
-@keyframes pulse{
-  0% {color: #001F3F;}		50% {color: #FF4136;}		100%{color: #001F3F;}
+@keyframes pulse {
+  0%,100% {color: #001F3F;}
+      50% {color: #FF4136;}
 }
 @-webkit-keyframes pulse {
-  0% {color: #001F3F;}		50% {color: #FF4136;}		100%{color: #001F3F;}
+  0%,100% {color: #001F3F;}
+      50% {color: #FF4136;}
 }
 @-moz-keyframes pulse {
-  0% {color: #001F3F;}		50% {color: #FF4136;}		100%{color: #001F3F;}
+  0%,100% {color: #001F3F;}
+      50% {color: #FF4136;}
 }
 @-o-keyframes pulse {
-  0% {color: #001F3F;}		50% {color: #FF4136;}		100%{color: #001F3F;}
+  0%,100% {color: #001F3F;}
+      50% {color: #FF4136;}
 }
 
 .flavor {
@@ -684,6 +738,8 @@ a:hover {
 .effectName {
     float: left;
     clear: both;
+    font-size: 14px;
+    color: gray;
 }
 
 /*------------------------------*/
@@ -693,6 +749,16 @@ a:hover {
 
 .tooltip-inner .desc {
     max-width: 280px;
+    text-align: center;
+    width: 100%;
+    padding-top: 4px;
+    font-size: 15px;
+    color: gray;
+}
+
+.tooltip-inner .desc.small {
+    font-size: 60%;
+    opacity: 0.8;
 }
 
 .links-block a{
@@ -803,12 +869,17 @@ a.link.collapse:hover {
 
 .res-toolbar {
     display: inline-block;
+    user-select: none;
 }
 
 .res-toolbar.right {
     text-align: right;
     margin-right:-18px;
     float: right;
+}
+
+.res-toolbar .link.toggled {
+    color: darkred;
 }
 
 .res-toolbar.left {
@@ -836,23 +907,47 @@ a.link.collapse:hover {
     padding-left: 2px;
     padding-right: 2px;
     display:table-cell;
+    white-space: nowrap !important;
+
+    overflow-x: hidden;
+    text-overflow: ellipsis;
 }
 
 .res-cell.resource-name {
     width: 60px;
+    max-width: 85px;
 }
 
 .res-cell.resource-value {
     width: 75px;
+    max-width: 90px;
 }
 
 .res-cell.resPerTick {
     cursor: pointer;
 }
 
+.res-cell.positive-weather {
+    color: green;
+}
+
+.res-cell.negative-weather {
+    color: red;
+}
+
 .res-cell.craft-link {
     cursor: pointer;
     width: 20px;
+    max-width: 60px;
+}
+
+.res-cell.craft-link .plusPrefix {
+    font-size: 80%;
+}
+
+.res-cell.craft-link.all{
+    font-size: 85%;
+    opacity: 0.4;
 }
 
 .res-cell.craft-link:hover {
@@ -861,21 +956,68 @@ a.link.collapse:hover {
 }
 
 .res-cell.craft-link:active {
-    animation: pulseShort 0.5s;
+            animation: pulseShort 0.5s;
+    -webkit-animation: pulseShort 0.5s;
+       -moz-animation: pulseShort 0.5s;
+         -o-animation: pulseShort 0.5s;
     user-select: none;
 }
 
 @keyframes pulseShort {
-    100% {
-        transform: scale(1.1);
-    }
-  }
+    100% {transform: scale(1.1);}
+}
+@-webkit-keyframes pulseShort {
+    100% {transform: scale(1.1);}
+}
+@-moz-keyframes pulseShort {
+    100% {transform: scale(1.1);}
+}
+@-o-keyframes pulseShort {
+    100% {transform: scale(1.1);}
+}
 
 .map-viewport {
     border: 1px solid lightgray;
     height: 250px;
     padding: 20px;
 }
+
+/*--------------------------------------
+                Village
+---------------------------------------*/
+
+.census-block {
+    border: 1px solid gray;
+	margin-bottom: 5px;
+	padding: 5px;
+	min-height: 80px;
+}
+
+
+.census-block .info {
+    padding-bottom: 5px;
+}
+
+.census-block .skill{
+    font-size: 0.8em;
+}
+   
+.name.color-brown {
+    color:#856341;
+}
+.name.color-cream {
+    color:lightcoral;
+}
+.name.color-black {
+    color:darkgrey;
+}
+.name.color-fawn {
+    color:gainsboro;
+}
+.name.color-white {
+    color:floralwhite
+}
+
 
 /*--------------------------------------
                 Map
@@ -915,15 +1057,31 @@ a.link.collapse:hover {
 }
 
 .map-cell.active {
-    animation: border-pulse 4s infinite;
+            animation: border-pulse 4s infinite;
+    -webkit-animation: border-pulse 4s infinite;
+       -moz-animation: border-pulse 4s infinite;
+         -o-animation: border-pulse 4s infinite;
 }
 
 .map-cell.locked {
     visibility: hidden;
 }
 
-@keyframes border-pulse{
-    0% {border: 1px solid lightgray}		50% {border: 1px solid red}		100%{border: 1px solid lightgray}
+@keyframes border-pulse {
+    0%,100% {border: 1px solid lightgray;}
+        50% {border: 1px solid red;}
+}
+@-webkit-keyframes border-pulse {
+    0%,100% {border: 1px solid lightgray;}
+        50% {border: 1px solid red;}
+}
+@-moz-keyframes border-pulse {
+    0%,100% {border: 1px solid lightgray;}
+        50% {border: 1px solid red;}
+}
+@-o-keyframes border-pulse {
+    0%,100% {border: 1px solid lightgray;}
+        50% {border: 1px solid red;}
 }
 
 .map-cell .coord {
@@ -974,60 +1132,324 @@ a.link.collapse:hover {
 
 
 div.blaze {
-    animation: rainbow 2.5s linear;
-	animation-iteration-count: infinite;
+            animation: blaze-rainbow 3s linear infinite;
+    -webkit-animation: blaze-rainbow 3s linear infinite;
+       -moz-animation: blaze-rainbow 3s linear infinite;
+         -o-animation: blaze-rainbow 3s linear infinite;
 }
 
 div.hail {
-    animation: redrainbow 1.5s linear;
-	animation-iteration-count: infinite;
+            animation: hail-rainbow 1.5s linear infinite;
+    -webkit-animation: hail-rainbow 1.5s linear infinite;
+       -moz-animation: hail-rainbow 1.5s linear infinite;
+         -o-animation: hail-rainbow 1.5s linear infinite;
 }
 
-@keyframes rainbow{
-    100%,0%{
-        color: rgb(255,0,0);
-    }
-    8%{
-        color: rgb(255,127,0);
-    }
-    16%{
-        color: rgb(255,255,0);
-    }
-    25%{
-        color: rgb(127,255,0);
-    }
-    33%{
-        color: rgb(0,255,0);
-    }
-    41%{
-        color: rgb(0,255,127);
-    }
-    50%{
-        color: rgb(0,255,255);
-    }
-    58%{
-        color: rgb(0,127,255);
-    }
-    66%{
-        color: rgb(0,0,255);
-    }
-    75%{
-        color: rgb(127,0,255);
-    }
-    83%{
-        color: rgb(255,0,255);
-    }
-    91%{
-        color: rgb(255,0,127);
-    }
+div.pray {
+            animation: pray-rainbow 1.5s linear infinite;
+    -webkit-animation: pray-rainbow 1.5s linear infinite;
+       -moz-animation: pray-rainbow 1.5s linear infinite;
+         -o-animation: pray-rainbow 1.5s linear infinite;
 }
 
+div.leet {
+    font-family: "Lucida Console", Monaco, monospace !important;
+    text-align: right                                !important;
+    color: #33FF00                                   !important;
+    background-color: #282828                        !important;
+}
 
-@keyframes redrainbow{
-    100%,0%{
-        color: rgb(255,0,0);
-    }
-    50%{
-        color: rgb(0,0,0);
-    }
+@keyframes blaze-rainbow {
+    0%,100% {color: #F00;}
+        17% {color: #FF0;}
+        33% {color: #0F0;}
+        50% {color: #0FF;}
+        67% {color: #00F;}
+        83% {color: #F0F;}
+}
+@-webkit-keyframes blaze-rainbow {
+    0%,100% {color: #F00;}
+        17% {color: #FF0;}
+        33% {color: #0F0;}
+        50% {color: #0FF;}
+        67% {color: #00F;}
+        83% {color: #F0F;}
+}
+@-moz-keyframes blaze-rainbow {
+    0%,100% {color: #F00;}
+        17% {color: #FF0;}
+        33% {color: #0F0;}
+        50% {color: #0FF;}
+        67% {color: #00F;}
+        83% {color: #F0F;}
+}
+@-o-keyframes blaze-rainbow {
+    0%,100% {color: #F00;}
+        17% {color: #FF0;}
+        33% {color: #0F0;}
+        50% {color: #0FF;}
+        67% {color: #00F;}
+        83% {color: #F0F;}
+}
+
+@keyframes hail-rainbow {
+    0%,100% {color: red; text-shadow: 0 0 10px red;}
+        50% {color: black; text-shadow: none;}
+}
+@-webkit-keyframes hail-rainbow {
+    0%,100% {color: red; text-shadow: 0 0 10px red;}
+        50% {color: black; text-shadow: none;}
+}
+@-moz-keyframes hail-rainbow {
+    0%,100% {color: red; text-shadow: 0 0 10px red;}
+        50% {color: black; text-shadow: none;}
+}
+@-o-keyframes hail-rainbow {
+    0%,100% {color: red; text-shadow: 0 0 10px red;}
+        50% {color: black; text-shadow: none;}
+}
+
+@keyframes pray-rainbow {
+    0%,100% {color: gold; text-shadow: 0 0 10px gold;}
+        50% {color: silver; text-shadow: none;}
+}
+@-webkit-keyframes pray-rainbow {
+    0%,100% {color: gold; text-shadow: 0 0 10px gold;}
+        50% {color: silver; text-shadow: none;}
+}
+@-moz-keyframes pray-rainbow {
+    0%,100% {color: gold; text-shadow: 0 0 10px gold;}
+        50% {color: silver; text-shadow: none;}
+}
+@-o-keyframes pray-rainbow {
+    0%,100% {color: gold; text-shadow: 0 0 10px gold;}
+        50% {color: silver; text-shadow: none;}
+}
+
+@keyframes neon-purple {
+  from {text-shadow:
+    0 0 10px #FFFFFF,
+    0 0 20px #FFFFFF,
+    0 0 30px #9A2EFE,
+    0 0 40px #9A2EFE,
+    0 0 50px #9A2EFE;}
+  to {text-shadow:
+    0 0  5px #FFFFFF,
+    0 0 10px #FFFFFF,
+    0 0 15px #9A2EFE,
+    0 0 20px #9A2EFE,
+    0 0 25px #9A2EFE;}
+}
+@-webkit-keyframes neon-purple {
+  from {text-shadow:
+    0 0 10px #FFFFFF,
+    0 0 20px #FFFFFF,
+    0 0 30px #9A2EFE,
+    0 0 40px #9A2EFE,
+    0 0 50px #9A2EFE;}
+  to {text-shadow:
+    0 0  5px #FFFFFF,
+    0 0 10px #FFFFFF,
+    0 0 15px #9A2EFE,
+    0 0 20px #9A2EFE,
+    0 0 25px #9A2EFE;}
+}
+@-moz-keyframes neon-purple {
+  from {text-shadow:
+    0 0 10px #FFFFFF,
+    0 0 20px #FFFFFF,
+    0 0 30px #9A2EFE,
+    0 0 40px #9A2EFE,
+    0 0 50px #9A2EFE;}
+  to {text-shadow:
+    0 0  5px #FFFFFF,
+    0 0 10px #FFFFFF,
+    0 0 15px #9A2EFE,
+    0 0 20px #9A2EFE,
+    0 0 25px #9A2EFE;}
+}
+@-o-keyframes neon-purple {
+  from {text-shadow:
+    0 0 10px #FFFFFF,
+    0 0 20px #FFFFFF,
+    0 0 30px #9A2EFE,
+    0 0 40px #9A2EFE,
+    0 0 50px #9A2EFE;}
+  to {text-shadow:
+    0 0  5px #FFFFFF,
+    0 0 10px #FFFFFF,
+    0 0 15px #9A2EFE,
+    0 0 20px #9A2EFE,
+    0 0 25px #9A2EFE;}
+}
+
+@keyframes neon-pink {
+  from {text-shadow:
+    0 0 10px #FFFFFF,
+    0 0 20px #FFFFFF,
+    0 0 30px #FA2E9E,
+    0 0 40px #FA2E9E,
+    0 0 50px #FA2E9E;}
+  to {text-shadow:
+    0 0  5px #FFFFFF,
+    0 0 10px #FFFFFF,
+    0 0 15px #FA2E9E,
+    0 0 20px #FA2E9E,
+    0 0 25px #FA2E9E;}
+}
+@-webkit-keyframes neon-pink {
+  from {text-shadow:
+    0 0 10px #FFFFFF,
+    0 0 20px #FFFFFF,
+    0 0 30px #FA2E9E,
+    0 0 40px #FA2E9E,
+    0 0 50px #FA2E9E;}
+  to {text-shadow:
+    0 0  5px #FFFFFF,
+    0 0 10px #FFFFFF,
+    0 0 15px #FA2E9E,
+    0 0 20px #FA2E9E,
+    0 0 25px #FA2E9E;}
+}
+@-moz-keyframes neon-pink {
+  from {text-shadow:
+    0 0 10px #FFFFFF,
+    0 0 20px #FFFFFF,
+    0 0 30px #FA2E9E,
+    0 0 40px #FA2E9E,
+    0 0 50px #FA2E9E;}
+  to {text-shadow:
+    0 0  5px #FFFFFF,
+    0 0 10px #FFFFFF,
+    0 0 15px #FA2E9E,
+    0 0 20px #FA2E9E,
+    0 0 25px #FA2E9E;}
+}
+@-o-keyframes neon-pink {
+  from {text-shadow:
+    0 0 10px #FFFFFF,
+    0 0 20px #FFFFFF,
+    0 0 30px #FA2E9E,
+    0 0 40px #FA2E9E,
+    0 0 50px #FA2E9E;}
+  to {text-shadow:
+    0 0  5px #FFFFFF,
+    0 0 10px #FFFFFF,
+    0 0 15px #FA2E9E,
+    0 0 20px #FA2E9E,
+    0 0 25px #FA2E9E;}
+}
+
+@keyframes neon-gold {
+  from {text-shadow:
+    0 0 10px white,
+    0 0 20px white,
+    0 0 30px gold,
+    0 0 40px gold,
+    0 0 50px gold;}
+  to {text-shadow:
+    0 0  5px white,
+    0 0 10px white,
+    0 0 15px gold,
+    0 0 20px gold,
+    0 0 25px gold;}
+}
+@-webkit-keyframes neon-gold {
+  from {text-shadow:
+    0 0 10px white,
+    0 0 20px white,
+    0 0 30px gold,
+    0 0 40px gold,
+    0 0 50px gold;}
+  to {text-shadow:
+    0 0  5px white,
+    0 0 10px white,
+    0 0 15px gold,
+    0 0 20px gold,
+    0 0 25px gold;}
+}
+@-moz-keyframes neon-gold {
+  from {text-shadow:
+    0 0 10px white,
+    0 0 20px white,
+    0 0 30px gold,
+    0 0 40px gold,
+    0 0 50px gold;}
+  to {text-shadow:
+    0 0  5px white,
+    0 0 10px white,
+    0 0 15px gold,
+    0 0 20px gold,
+    0 0 25px gold;}
+}
+@-o-keyframes neon-gold {
+  from {text-shadow:
+    0 0 10px white,
+    0 0 20px white,
+    0 0 30px gold,
+    0 0 40px gold,
+    0 0 50px gold;}
+  to {text-shadow:
+    0 0  5px white,
+    0 0 10px white,
+    0 0 15px gold,
+    0 0 20px gold,
+    0 0 25px gold;}
+}
+
+@keyframes neon-red {
+  from {text-shadow:
+    0 0 10px white,
+    0 0 20px white,
+    0 0 30px red,
+    0 0 40px red,
+    0 0 50px red;}
+  to {text-shadow:
+    0 0  5px white,
+    0 0 10px white,
+    0 0 15px red,
+    0 0 20px red,
+    0 0 25px red;}
+}
+@-webkit-keyframes neon-red {
+  from {text-shadow:
+    0 0 10px white,
+    0 0 20px white,
+    0 0 30px red,
+    0 0 40px red,
+    0 0 50px red;}
+  to {text-shadow:
+    0 0  5px white,
+    0 0 10px white,
+    0 0 15px red,
+    0 0 20px red,
+    0 0 25px red;}
+}
+@-moz-keyframes neon-red {
+  from {text-shadow:
+    0 0 10px white,
+    0 0 20px white,
+    0 0 30px red,
+    0 0 40px red,
+    0 0 50px red;}
+  to {text-shadow:
+    0 0  5px white,
+    0 0 10px white,
+    0 0 15px red,
+    0 0 20px red,
+    0 0 25px red;}
+}
+@-o-keyframes neon-red {
+  from {text-shadow:
+    0 0 10px white,
+    0 0 20px white,
+    0 0 30px red,
+    0 0 40px red,
+    0 0 50px red;}
+  to {text-shadow:
+    0 0  5px white,
+    0 0 10px white,
+    0 0 15px red,
+    0 0 20px red,
+    0 0 25px red;}
 }

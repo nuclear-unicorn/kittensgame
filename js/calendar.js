@@ -251,31 +251,33 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		this.observeClear();
 		this.game.stats.getStat("eventsObserved").val++;
 
-		var isSilent = false;
-		if (this.game.workshop.get("seti").researched){
-			isSilent = true;
-		}
+		var celestialBonus = this.game.workshop.get("celestialMechanics").researched
+			? this.game.ironWill ? 1.6 : 1.2
+			: 1;
 
-		var celestialBonus = 0;
-		if (this.game.workshop.get("celestialMechanics").researched){
-			celestialBonus = 5;	//20% bonus in the normal mode
-			if (this.game.ironWill){
-				celestialBonus = 15;	//60% in the IW
-			}
-		}
-
-		var sciBonus = (25 + celestialBonus) * ( 1 + this.game.getEffect("scienceRatio"));
+		var sciBonus = 25 * celestialBonus * (1 + this.game.getEffect("scienceRatio"));
 		var sciGain = this.game.resPool.addResEvent("science", sciBonus);
 
+		var isSilent = this.game.workshop.get("seti").researched;
 		if (sciGain > 0 && !isSilent){
 			this.game.msg(this.game.getDisplayValueExt(sciGain, true) + " science!", "", "astronomicalEvent", true);
 		}
 
-		if (this.game.science.get("astronomy").researched){
-			if (!isSilent){
-				this.game.msg($I("calendar.msg.starchart"), "", "astronomicalEvent");
+		if (this.game.science.get("astronomy").researched) {
+			var timeRatioBonus = 1 + this.game.getEffect("timeRatio") * 0.25;
+			var chanceRatio = (this.game.prestige.getPerk("chronomancy").researched ? 1.1 : 1) * timeRatioBonus;
+			var eventChance = (0.0025 + this.game.getEffect("starEventChance")) * chanceRatio;
+			if (this.game.prestige.getPerk("astromancy").researched) {
+				eventChance *= 2;
 			}
-			this.game.resPool.addResEvent("starchart", 1);
+			var starcharts = eventChance <= 1
+				? 1
+				: Math.floor(eventChance) + (this.game.rand(10000) < (eventChance - Math.floor(eventChance)) * 10000 ? 1 : 0);
+
+			if (!isSilent) {
+				this.game.msg($I("calendar.msg.starchart", [starcharts]), "", "astronomicalEvent");
+			}
+			this.game.resPool.addResEvent("starchart", starcharts);
 		}
 	},//this.observeHandler
 
@@ -283,17 +285,14 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 		this.observeClear();
 
-		var autoChance = (this.game.getEffect("starAutoSuccessChance") * 100);	//in %
+		var autoChance = this.game.getEffect("starAutoSuccessChance");
 		if (this.game.prestige.getPerk("astromancy").researched){
 			autoChance *= 2;
 		}
 
 		var rand = this.game.rand(100);
-
-		if(
-			(this.game.ironWill && (this.game.rand(100) <= 25)) ||
-			(rand <= autoChance)
-		){
+		if (this.game.ironWill && rand <= 25
+		 || rand <= autoChance * 100) {
 			this.observeHandler();
 		}
 
@@ -432,18 +431,9 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			this.festivalDays--;
 		}
 
-		var chanceRatio = 1;
-		var unicornChanceRatio = 1;
-
-		if (this.game.prestige.getPerk("chronomancy").researched){
-			chanceRatio = 1.1;
-		}
-		if (this.game.prestige.getPerk("unicornmancy").researched){
-			unicornChanceRatio = 1.1;
-		}
-
-		chanceRatio *= (1 + this.game.getEffect("timeRatio") * 0.25);
-		unicornChanceRatio *= (1 + this.game.getEffect("timeRatio") * 0.25);
+		var timeRatioBonus = 1 + this.game.getEffect("timeRatio") * 0.25;
+		var chanceRatio = (this.game.prestige.getPerk("chronomancy").researched ? 1.1 : 1) * timeRatioBonus;
+		var unicornChanceRatio = (this.game.prestige.getPerk("unicornmancy").researched ? 1.1 : 1) * timeRatioBonus;
 
 		if (this.day < 0){
 			//------------------------- void -------------------------
@@ -454,42 +444,39 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		}
 
 		//------------------------- astronomical events -------------------------
-		var chance = 25;									//25 OPTK of event per day	(0.25%)
-		chance += (this.game.getEffect("starEventChance") * 10000);
-		chance *= chanceRatio;
-
-		if (this.game.prestige.getPerk("astromancy").researched){
-			chance *= 2;
-		}
-
-		if (this.game.rand(10000) < chance &&
-			this.game.bld.get("library").on > 0){
-			if (this.observeRemainingTime){
-				this.observeTimeout();
+		if (this.game.bld.get("library").on > 0) {
+			var eventChance = (0.0025 + this.game.getEffect("starEventChance")) * chanceRatio;
+			if (this.game.prestige.getPerk("astromancy").researched) {
+				eventChance *= 2;
 			}
-			this.observeClear();
 
-			//---------------- SETI hack-------------------
-			if (this.game.workshop.get("seti").researched){
-				this.observeHandler();
-			}else{
-				this.game.msg($I("calendar.msg.event"), "", "astronomicalEvent");
-				var node = dojo.byId("observeButton");
+			if (this.game.rand(10000) < eventChance * 10000) {
+				if (this.observeRemainingTime > 0) {
+					this.observeTimeout();
+				}
 
-				this.observeBtn = dojo.create("input", {
-					id: "observeBtn",
-					type: "button",
-					value: $I("navbar.observe")
-				}, node);
+				//---------------- SETI hack-------------------
+				if (this.game.workshop.get("seti").researched) {
+					this.observeHandler();
+				} else {
+					this.observeClear();
+					this.game.msg($I("calendar.msg.event"), "", "astronomicalEvent");
+					var node = dojo.byId("observeButton");
 
-				dojo.connect(this.observeBtn, "onclick", this, this.observeHandler);
+					this.observeBtn = dojo.create("input", {
+						id: "observeBtn",
+						type: "button",
+						value: $I("navbar.observe")
+					}, node);
 
-				this.observeRemainingTime = 300;
+					dojo.connect(this.observeBtn, "onclick", this, this.observeHandler);
 
-				this.game.ui.observeCallback(this.observeHandler);
+					this.observeRemainingTime = 300;
+
+					this.game.ui.observeCallback(this.observeHandler);
+				}
 			}
 		}
-
 
 		//------------------------- meteors -------------------------
 		var iwChance = 0;
@@ -510,8 +497,8 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			var mineralsGain = this.game.resPool.addResEvent("minerals", mineralsAmt);
 
 			var sciGain = 0;
-			if (this.game.workshop.get("celestialMechanics").researched){
-				var sciBonus = 15 * ( 1 + this.game.getEffect("scienceRatio"));
+			if (this.game.workshop.get("celestialMechanics").researched) {
+				var sciBonus = 15 * (1 + this.game.getEffect("scienceRatio"));
 				sciGain = this.game.resPool.addResEvent("science", sciBonus);
 			}
 
@@ -606,31 +593,20 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 	},
 
 	fastForward: function(daysOffset){
-        var chanceRatio = 1;
-        if (this.game.prestige.getPerk("chronomancy").researched){
-            chanceRatio = 1.1;
-        }
-        var unicornChanceRatio = 1;
-        if (this.game.prestige.getPerk("unicornmancy").researched){
-            unicornChanceRatio = 1.1;
-        }
-
-        chanceRatio *= (1 + this.game.getEffect("timeRatio") * 0.25);
-        unicornChanceRatio *= (1 + this.game.getEffect("timeRatio") * 0.25);
+        var timeRatioBonus = 1 + this.game.getEffect("timeRatio") * 0.25;
+        var chanceRatio = (this.game.prestige.getPerk("chronomancy").researched ? 1.1 : 1) * timeRatioBonus;
+        var unicornChanceRatio = (this.game.prestige.getPerk("unicornmancy").researched ? 1.1 : 1) * timeRatioBonus;
 
 		// Auto observable events
         var numberEvents = 0, totalNumberOfEvents = 0;
         if (this.game.bld.get("library").on > 0) {
-            var chance = 25;                                    //25 OPTK of event per day  (0.25%)
-            chance += (this.game.getEffect("starEventChance") * 10000);
-            chance *= chanceRatio;
-
-            if (this.game.prestige.getPerk("astromancy").researched){
-                chance *= 2;
+            var eventChance = (0.0025 + this.game.getEffect("starEventChance")) * chanceRatio;
+            if (this.game.prestige.getPerk("astromancy").researched) {
+                eventChance *= 2;
             }
 
             var autoChance = this.game.getEffect("starAutoSuccessChance");
-            if (this.game.prestige.getPerk("astromancy").researched){
+            if (this.game.prestige.getPerk("astromancy").researched) {
                 autoChance *= 2;
             }
 
@@ -638,27 +614,22 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
                 autoChance = 1;
             }
             autoChance = Math.min(autoChance, 1);
-            //console.log("chance="+chance+", autoChance="+autoChance);
-            numberEvents = Math.round(daysOffset * chance * autoChance / 10000);
-            //console.log("number of startcharts="+count);
+            //console.log("eventChance="+eventChance+", autoChance="+autoChance);
+            numberEvents = Math.round(daysOffset * eventChance * autoChance);
+            //console.log("number of startcharts="+numberEvents);
             if (numberEvents) {
                 this.game.resPool.addResEvent("starchart", numberEvents);
             }
 
-            var celestialBonus = 0;
-            if (this.game.workshop.get("celestialMechanics").researched){
-                celestialBonus = 5; //20% bonus in the normal mode
-                if (this.game.ironWill){
-                    celestialBonus = 15;    //60% in the IW
-                }
-            }
+            var celestialBonus = this.game.workshop.get("celestialMechanics").researched
+                ? this.game.ironWill ? 1.6 : 1.2
+                : 1;
 
-            var sciBonus = numberEvents * ((25 + celestialBonus) * ( 1 + this.game.getEffect("scienceRatio")));
+            var sciBonus = numberEvents * 25 * celestialBonus * (1 + this.game.getEffect("scienceRatio"));
             this.game.resPool.addResEvent("science", sciBonus);
 
+            totalNumberOfEvents+=numberEvents;
         }
-
-        totalNumberOfEvents+=numberEvents;
 
         //------------------------- meteors -------------------------
 		var iwChance = 0;
@@ -679,8 +650,8 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 			var mineralsGain = this.game.resPool.addResEvent("minerals", numberEvents * mineralsAmt);
 
-			if (this.game.workshop.get("celestialMechanics").researched){
-				var sciBonus = 15 * ( 1 + this.game.getEffect("scienceRatio"));
+			if (this.game.workshop.get("celestialMechanics").researched) {
+				var sciBonus = 15 * (1 + this.game.getEffect("scienceRatio"));
 				var sciGain = this.game.resPool.addResEvent("science", numberEvents * sciBonus);
 			}
 
@@ -746,6 +717,10 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		if (resPool.energyProd >= resPool.energyCons) {
 			resPool.addResEvent("antimatter", this.game.getEffect("antimatterProduction") * yearsOffset);
 		}
+
+		var beacons = game.space.getBuilding("spaceBeacon");
+		beacons.action(beacons, this.game);
+		this.game.updateCaches();
 		this.game.resPool.addResPerTick("relic", this.game.getEffect("relicPerDay") * daysOffset);
 
 		//not sure if it is a good idea
@@ -831,7 +806,6 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 				this.futureSeasonTemporalParadox = futureSeasonTemporalParadox;
 			}
 		}
-
 	},
 
 	onNewYear: function(updateUI){

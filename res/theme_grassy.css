@@ -7,10 +7,16 @@ body.scheme_grassy {
 	font-size: 11pt;
 
 	background-color: #C6EBA1;
-	background-image: url("http://northwaygames.com/wp-content/uploads/band.png");
+	background-image: url("img/grass_band.png"); /* source: http://northwaygames.com/wp-content/uploads/band.png */
 	background-repeat: repeat-x;
 	background-attachment: fixed;
 	background-position: center bottom -50px;
+}
+
+.scheme_grassy #topBar > div:first-child > span:first-child:after {
+    content: ' Theme by shrx.';
+    text-decoration: none;
+    text-underline: none;
 }
 
 .scheme_grassy #optionsDiv,
