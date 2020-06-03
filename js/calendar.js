@@ -904,7 +904,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			}
 
 			if (this.game.challenges.getChallenge("winterIsComing").on && this.weather == "cold") {
-				mod = ((mod + 1) * this.game.challenges.getChallengeEffect("winterIsComing", "modifier")) - 1;
+				mod = mod * this.game.challenges.getChallengeEffect("winterIsComing", "modifier");
 			}
 
 			if (this.getCurSeason().name == "spring"){

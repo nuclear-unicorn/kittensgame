@@ -280,7 +280,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 
 		if (res) {
 			if (res.maxValue && res.value + resAmt > res.maxValue) {
-				res.reserve = res.value - res.maxValue;
+				res.reserve = res.value + resAmt - res.maxValue;
 				res.value = res.maxValue;
 			} else {
 				res.value += resAmt;
@@ -545,9 +545,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 					res.value = 0;
 				}
 			} else {
-				this.karmaZebras += this.karmaZebrasReserve;
-				this.karmaZebrasReserve = 0;
-				this.game.resPool.get("zebras").maxValue = this.karmaZebras ? this.karmaZebras + 1 : 0;
+				this.game.karmaZebras += this.game.karmaZebrasReserve;
+				this.game.karmaZebrasReserve = 0;
+				this.game.resPool.get("zebras").maxValue = this.game.karmaZebras ? this.game.karmaZebras + 1 : 0;
 
 				var miscRes = ["zebras", "sorrow", "elderBox", "wrappingPaper", "temporalFlux"];
 				for (var i = 0; i < miscRes.length; i++) {

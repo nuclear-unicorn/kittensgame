@@ -110,7 +110,7 @@ WResourceRow = React.createClass({
 
         if (season.modifiers[res.name] && perTick !== 0 ){
 
-            var modifier = Math.floor((game.calendar.getWeatherMod(res) - 1) * 100);
+            var modifier = Math.max(Math.round((game.calendar.getWeatherMod(res) - 1) * 100), -99);
             weatherModValue = modifier ? "[" + (modifier > 0 ? "+" : "") + modifier.toFixed() + "%]" : "";
 
             if (modifier > 0) {
