@@ -168,7 +168,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		if (this.game.ironWill && this.game.bld.get("library").on > 0) {
 			this.getChallenge("ironWill").on = true;
 			this.getChallenge("ironWill").rewardable = true;
-		} else {
+		} else if (!this.game.ironWill) {
 			this.getChallenge("ironWill").on = false;
 			this.getChallenge("ironWill").rewardable = false;
 		}
