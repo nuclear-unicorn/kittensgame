@@ -167,8 +167,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 	update: function(){
 		if (this.game.ironWill && this.game.bld.get("library").on > 0) {
 			this.getChallenge("ironWill").on = true;
-		} else if (!this.game.ironWill) {
+			this.getChallenge("ironWill").rewardable = true;
+		} else {
 			this.getChallenge("ironWill").on = false;
+			this.getChallenge("ironWill").rewardable = false;
 		}
 
 		// energy
@@ -208,15 +210,15 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			if (this.game.time.getVSU("cryochambers").on > 0){
 				this.researchChallenge("atheism");
 
-				if (game.ironWill){
-					game.achievements.unlockHat("ivoryTowerHat");
+				if (this.game.ironWill){
+					this.game.achievements.unlockHat("ivoryTowerHat");
 				}
 			}
 		}
 
 		var noChallenge = true;
 		for (var i = 0; i < this.challenges.length; i++) {
-			if (this.challenges[i].on) {
+			if (this.challenges[i].on && this.challenges[i].name != "ironWill") {
 				noChallenge = false;
 			}
 		}
@@ -252,15 +254,22 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				for (var i = 0; i < this.challenges.length; i++) {
 					if (this.challenges[i].rewardable) {
 						challengeTotal += Math.pow(this.challenges[i].difficulty, 2);
-						challengeNumber++;
+						if (this.challenges[i].name != "ironWill")
+							challengeNumber++;
 					}
 				}
 
-				apotheosis += Math.floor(Math.sqrt(challengeTotal) / challengeNumber);
+				apotheosis += Math.sqrt(challengeTotal) / challengeNumber;
 			}
 		}
-		if (this.rewardable && !this.rewarded) {
-			apotheosis += 1;
+		else if (this.rewardable && !this.rewarded) {
+			if (this.getChallenge("ironWill").rewardable && !this.getChallenge("ironWill").rewarded) {
+				apotheosis = 100;
+				this.getChallenge("ironWill").rewarded = true;
+			}
+			else {
+				apotheosis = 1;
+			}
 			this.rewarded = true;
 		}
 
@@ -268,15 +277,17 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			return;
 		}
 
-		var conditionTotal = 1;
+		var conditionTotal = 0;
 		for (var i = 0; i < this.conditions.length; i++) {
 			if (this.conditions[i].on && this.conditions[i].bonus) {
 				conditionTotal += Math.pow(this.conditions[i].bonus * (1 - this.game.getHyperbolicEffect(this.conditions[i].resets / 10, 1)), 2);
 			}
 		}
 
-		resAmt *= Math.sqrt(conditionTotal);
-		apotheosis *= Math.sqrt(conditionTotal);
+		if (conditionTotal != 0) {
+			resAmt *= Math.sqrt(conditionTotal);
+			apotheosis *= Math.sqrt(conditionTotal);
+		}
 
 		if (res) {
 			if (res.maxValue && res.value + resAmt > res.maxValue) {
@@ -287,12 +298,12 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			}
 		}
 
-		this.game.resPool.addRes(this.game.resPool.get("apotheosis"), apotheosis, true);
+		this.game.resPool.addRes(this.game.resPool.get("apotheosis"), Math.floor(apotheosis), true);
 
 		if (challenge) {
 			challenge.researched++;
 			challenge.rewarded = true;
-			this.game.msg($I("challendge.btn.log.message.on.complete", [challenge.label, resAmt, res.title, apotheosis]));
+			this.game.msg($I("challendge.btn.log.message.on.complete", [challenge.label, resAmt, res.title, Math.floor(apotheosis)]));
 		} else {
 			this.game.msg($I("challendge.btn.log.message.on.complete.noChallenge", [apotheosis]));
 		}
@@ -386,6 +397,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		}
 
 		if (name == "disableChrono" && !on) {
+			this.game.ironWill = false;
+
 			for (var i = 0; i < this.challenges.length; i++) {
 				this.challenges[i].rewardable = false;
 			}

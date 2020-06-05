@@ -2085,6 +2085,10 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 			}
 
 			if (meta.breakIronWill) {
+				// Research atheism before breaking iron will
+				// so bonus apotheosis is rewarded.
+				// Should find a better solution.
+				this.game.challenges.update();
 				this.game.ironWill = false;
 			}
 

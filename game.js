@@ -3536,7 +3536,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			karmaKittensReserve: 	karmaKittensReserve,
 			karmaZebras: 		karmaZebras,
 			karmaZebrasReserve:	karmaZebrasReserve,
-			ironWill : 			!this.challenges.getCondition("disableChrono") && saveRatio > 0 ? false : true,			//chronospheres will disable IW
+			ironWill : 			!this.challenges.getCondition("disableChrono").on && saveRatio > 0 ? false : true,			//chronospheres will disable IW
 			deadKittens: 		0,
 			isCMBREnabled:		false
 		});
