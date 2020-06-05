@@ -752,9 +752,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 	praise: function(){
 		var faith = this.game.resPool.get("faith");
-		this.faith += faith.value * (1 + this.getApocryphaBonus()); //starting up from 100% ratio will work surprisingly bad
-		this.game.msg($I("religion.praise.msg", [this.game.getDisplayValueExt(faith.value, false, false, 0)]), "", "faith");
+		this.faith += this.game.resPool.getTotal("faith") * (1 + this.getApocryphaBonus()); //starting up from 100% ratio will work surprisingly bad
+		this.game.msg($I("religion.praise.msg", [this.game.getDisplayValueExt(this.game.resPool.getTotal("faith"), false, false, 0)]), "", "faith");
 		faith.value = 0.0001;	//have a nice autoclicking
+		faith.reserve = 0;
 
 	},
 

@@ -707,14 +707,14 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 	},
 
 	huntAll: function() {
-		var mpower = this.game.resPool.get("manpower");
-		var squads = Math.floor(mpower.value / 100);
+		var mpower = this.game.resPool.getTotal("manpower");
+		var squads = Math.floor(mpower / 100);
 		this.huntMultiple(squads);
 	},
 
 	huntMultiple: function (squads){
-		var mpower = this.game.resPool.get("manpower");
-		squads = Math.min(squads, Math.floor(mpower.value / 100));
+		var mpower = this.game.resPool.getTotal("manpower");
+		squads = Math.min(squads, Math.floor(mpower / 100));
 
 		if (squads < 1){
 			return;
