@@ -685,7 +685,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
                     price["val"] *= (1 + (this.game.time.heat - heatMax) * 0.01);  //1% per excessive heat unit
                 }
 
-                price["val"] *= (game.challenges.getChallenge("1000Years").on ? this.game.challenges.getChallengeEffect("1000Years") : 1) * this.game.challenges.getChallengeReward("1000Years");
+                price["val"] *= (this.game.challenges.getChallenge("1000Years").on ? this.game.challenges.getChallengeEffect("1000Years") : 1) * this.game.challenges.getChallengeReward("1000Years");
 			}
 		}
 
@@ -712,7 +712,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 	                    priceLoop *= (1 + (this.game.time.heat + k * 10 - heatMax) * 0.01);  //1% per excessive heat unit
 	                }
 
-	                priceLoop *= (game.challenges.getChallenge("1000Years").on ? this.game.challenges.getChallengeEffect("1000Years") : 1) * this.game.challenges.getChallengeReward("1000Years");
+	                priceLoop *= (this.game.challenges.getChallenge("1000Years").on ? this.game.challenges.getChallengeEffect("1000Years") : 1) * this.game.challenges.getChallengeReward("1000Years");
 					pricesTotal += priceLoop;
 				}
 			}
@@ -968,7 +968,7 @@ dojo.declare("classes.ui.ResetWgt", [mixin.IChildrenAware, mixin.IGameAware], {
         var paragonPoints = 0;
 
         if (kittens > 70){
-			paragonPoints = (kittens - 70);
+			paragonPoints = (kittens - 70) * (1 + this.game.prestige.getParagonBonus());
 		}
 
         msg += "<br>" + $I("time.reset.karma") + ": " + karmaPoints;

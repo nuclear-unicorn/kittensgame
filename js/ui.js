@@ -553,7 +553,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             if (this.fastHuntContainer.style.visibility == "hidden"){
                 this.fastHuntContainer.style.visibility = "visible";
             }
-            var huntCount = Math.floor(catpower.value / 100);
+            var huntCount = Math.floor(this.game.resPool.getTotal("manpower") / 100);
             $("#fastHuntContainerCount")[0].innerHTML = this.game.getDisplayValueExt(huntCount, false, false, 0)
                 + (huntCount === 1 ? " time" : " times");
         } else {
