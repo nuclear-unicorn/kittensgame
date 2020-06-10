@@ -151,7 +151,7 @@ body.scheme_minimalist.with_background_image,
 }
 .scheme_minimalist .help,
 .scheme_minimalist .dialog {
-    box-shadow: 3px 3px 9px rgba(0, 0, 0, 1), 0 0 0 9999px rgba(0, 0, 0, 0.8);
+    box-shadow: 3px 3px 9px rgba(0, 0, 0, 1);
 	height: auto !important;
     top: 40% !important;
 	border: solid 1px #DD836C;
@@ -202,6 +202,7 @@ body.scheme_minimalist.with_background_image,
 	border-bottom: none;
 	box-shadow:none;
 	top: 0; /* for no shadow on top */
+	padding-bottom: 3px;
 }
 .scheme_minimalist #headerLinks .links-block { /* a link separator : | on header links*/
 	color: #333342;
@@ -720,10 +721,9 @@ body.scheme_minimalist.with_background_image,
 /******************** RIGHT COLUMN ********************/
 /******************************************************/
 .scheme_minimalist #rightColumn {
-	width: 25%;
-    max-width: 400px;
-    min-width: 250px;
-	top: 0;
+	width: calc(50 - 345px);
+	max-width: 440px;
+	top: 5px;
 	margin-top: 16px;
 }
 .scheme_minimalist .toggleCenter {

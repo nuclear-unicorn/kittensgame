@@ -112,6 +112,11 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         });
 
         dojo.connect($("html")[0], "onkeyup", this, function (event) {
+			// ignore hotkeys when focused in a textarea or a text/number input element
+			if (event.target.tagName === "TEXTAREA" || (event.target.tagName === "INPUT" && (event.target.type === "text" || event.target.type === "number"))) {
+				return;
+			}
+
             // Allow user extensibility to keybindings in core events
             var keybinds = [
                 {
@@ -292,7 +297,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
                 }
             }, tabNavigationDiv);
             tab.domNode = tabLink;
-            
+
             if (this.activeTabId == tab.tabId){
                 dojo.addClass(tabLink, "activeTab");
             }
@@ -513,7 +518,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
 			}
         }
         if (this.game.village.leader) {
-            dojo.query("a.tab.traitLeaderBonus").removeClass("traitLeaderBonus");		
+            dojo.query("a.tab.traitLeaderBonus").removeClass("traitLeaderBonus");
             switch (this.game.village.leader.trait.name) {
                 case "engineer": // Crafting bonuses
                 case "metallurgist":
@@ -532,7 +537,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
                 case "wise": // Religion bonus
                     dojo.query("a.tab.Religion").addClass("traitLeaderBonus");
                     break;
-                }	
+                }
         }
 	},
 
@@ -680,14 +685,25 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             }
         }
 
+        if (game.opts.tooltipsInRightColumn) {
+            $("#tooltip").detach().appendTo("#rightColumn").addClass("tooltip-in-right-column");
+        } else {
+            $("#tooltip").detach().appendTo("#game").removeClass("tooltip-in-right-column");
+        }
+
         $("#workersToggle")[0].checked = game.useWorkers;
         $("#forceHighPrecision")[0].checked = game.opts.forceHighPrecision;
         $("#usePerSecondValues")[0].checked = game.opts.usePerSecondValues;
         $("#usePercentageResourceValues")[0].checked = game.opts.usePercentageResourceValues;
+        $("#showNonApplicableButtons")[0].checked = game.opts.showNonApplicableButtons;
+        $("#usePercentageConsumptionValues")[0].checked = game.opts.usePercentageConsumptionValues;
         $("#highlightUnavailable")[0].checked = game.opts.highlightUnavailable;
         $("#hideSell")[0].checked = game.opts.hideSell;
+        $("#hideDowngrade")[0].checked = game.opts.hideDowngrade;
         $("#hideBGImage")[0].checked = game.opts.hideBGImage;
+        $("#tooltipsInRightColumn")[0].checked = game.opts.tooltipsInRightColumn;
         $("#enableRedshift")[0].checked = game.opts.enableRedshift;
+        $("#batchSize")[0].value = game.opts.batchSize;
         $("#forceLZ")[0].checked = game.opts.forceLZ;
         $("#compressSaveFile")[0].checked = game.opts.compressSaveFile;
         $("#disableTelemetry")[0].checked = game.opts.disableTelemetry;

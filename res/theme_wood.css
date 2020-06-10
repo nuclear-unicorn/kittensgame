@@ -118,7 +118,7 @@ body.scheme_wood {
 .scheme_wood .help,
 .scheme_wood .dialog {
     /*box-shadow: 4px 4px 4px rgb(11, 11, 11); not use for this theme */
-	box-shadow: 0 2px 5px 0 rgb(13, 13, 13), 0 2px 10px 0 rgb(24, 24, 24), 0 0 0 9999px rgba(0, 0, 0, 0.8);
+	box-shadow: 0 2px 5px 0 rgb(13, 13, 13), 0 2px 10px 0 rgb(24, 24, 24);
     height: auto !important;
     top: 40% !important;
     border: solid 2px #613824; 
@@ -467,9 +467,8 @@ body.scheme_wood {
 /******************** RIGHT COLUMN ********************/
 /******************************************************/
 .scheme_wood #rightColumn {
-	width: 25%;
-    max-width: 400px;
-    min-width: 250px;
+	width: calc(50 - 355px);
+	max-width: 440px;
 }
 .scheme_wood #calendarDiv {
     color: #D79E4D; /*#3E8234;*/

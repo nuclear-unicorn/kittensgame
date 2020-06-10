@@ -406,7 +406,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["electronics"],
 			crafts: ["concrate"],
 			upgrades: ["pumpjack", "strenghtenBuild"],
-			jobs: ["engineer"]
+			jobs: ["engineer"],
+			policies: ["liberalism", "communism", "fascism"]
 		}
 	},{
 		name: "metalurgy",
@@ -460,18 +461,18 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			stages: [
 				{bld:"amphitheatre",stage:1},	// Broadcast Tower
 				{bld:"library",stage:1}			// Data Center
-			], 
+			],
 			tech: [
-				"nuclearFission", 
-				"rocketry", 
+				"nuclearFission",
+				"rocketry",
 				"robotics"
 			],
 			upgrades: [
-				"cadSystems", 
-				"refrigeration", 
-				"seti", 
-				"factoryLogistics", 
-				"factoryOptimization", 
+				"cadSystems",
+				"refrigeration",
+				"seti",
+				"factoryLogistics",
+				"factoryOptimization",
 				"internet"
 			]
 		}
@@ -579,8 +580,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         ],
         unlocks: {
             tech: ["orbitalEngineering" ],
-            upgrades: [ 
-				"photolithography", 
+            upgrades: [
+				"photolithography",
 				"orbitalGeodesy",
 				"uplink",
 				"thinFilm"
@@ -599,12 +600,12 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			tech: ["exogeology", "thorium"],
 			upgrades: [
-				"hubbleTelescope", 
-				"satelliteRadio", 
-				"astrophysicists", 
-				"solarSatellites", 
-				"spaceEngineers", 
-				"starlink" 
+				"hubbleTelescope",
+				"satelliteRadio",
+				"astrophysicists",
+				"solarSatellites",
+				"spaceEngineers",
+				"starlink"
 			]
 		}
 	},{
@@ -822,7 +823,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 	 * If policy is locked, it means some conflicting policy was researched first
 	 * Once policy is locked, there is no way to unlock it other than reset
 	 */
-	policies:[{
+	policies:[
+	{
 		name: "liberty",
 		label: "Liberty",
 		description:"Good for large, expansive societies. Halves population penalties. Cancels Tradition.",
@@ -848,37 +850,112 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks:{
 			policies:["authocracy", "monarchy"]
 		}
-	},{
+	},
+	//----------------	classical age --------------------
+	{
 		name: "monarchy",
 		label: "Monarchy",
-		description:"Cancels Authocracy and Republic.",
+		description:"Best for societies benefitting from past universes. Makes the leader's trait twice as powerful. Cancels Authocracy and Republic.",
 		prices: [
 			{name : "culture", val: 1500}
 		],
 		unlocked: false,
 		locked: false,
-		locks:["authocracy", "republic"]
+		locks:["authocracy", "republic", "communism"]
 	},{
 		name: "authocracy",
-		label: "Authocracy",
-		description:"Cancels Monarchy and Republic.",
+		label: "Autocracy",
+		description:"Best for societies with highly promoted kittens. Makes the leader twice as good at their job. Cancels Monarchy and Republic.",
 		prices: [
 			{name : "culture", val: 1500}
 		],
 		unlocked: false,
 		locked: false,
-		locks:["monarchy", "republic"]
+		locks:["monarchy", "republic", "liberalism"],
+		unlocks:{
+			policies:["socialism"]
+		}
 	},{
 		name: "republic",
 		label: "Republic",
-		description:"Cancels Monarchy and Authocracy.",
+		description:"Best for large societies. Highly promoted leaders will provide a small bonus to the production of all kittens. Cancels Monarchy and Authocracy.",
 		prices: [
 			{name : "culture", val: 1500}
 		],
 		unlocked: false,
 		locked: false,
-		locks:["monarchy", "authocracy"]
-	}],
+		locks:["monarchy", "authocracy", "fascism"],
+		unlocks:{
+			policies:["socialism"]
+		}
+	},
+	//----------------	meme --------------------
+	{
+		name: "socialism",
+		label: "Socialism",
+		description:"Has no effect",
+		prices: [
+			{name : "culture", val: 7500}
+		],
+		unlocked: false,
+		locked: false,
+	},
+	//----------------	industrial age --------------------
+	{
+		name: "liberalism",
+		label: "Liberalism",
+		description:"A peaceful and open society. Gains better relations with all trade partners and makes buildings require less gold.",
+		prices: [
+			{name : "culture", val: 15000}
+		],
+		unlocked: false,
+		locked: false,
+		locks:["communism", "fascism"]
+	},{
+		name: "communism",
+		label: "Communism",
+		description:"Industrialization at all costs. Increases production of iron, coal, and titanium, and makes factories cheaper.",
+		prices: [
+			{name : "culture", val: 15000}
+		],
+		unlocked: false,
+		locked: false,
+		locks:["liberalism", "fascism"]
+	},{
+		name: "fascism",
+		label: "Fascism",
+		description:"Lebensraum! Population penalties to happiness are eliminated, and log cabins cost half as much.",
+		prices: [
+			{name : "culture", val: 15000}
+		],
+		unlocked: false,
+		locked: false,
+		locks:["liberalism", "communism"]
+	},
+	//----------------	information age --------------------
+	{
+		name: "technocracy",
+		label: "Technocracy",
+		description:"",
+		prices: [
+			{name : "culture", val: 150000}
+		],
+	},{
+		name: "theocracy",
+		label: "Theocracy",
+		description:"",
+		prices: [
+			{name : "culture", val: 150000}
+		],
+	},{
+		name: "expansionism",
+		label: "Expansionism",
+		description:"",
+		prices: [
+			{name : "culture", val: 150000}
+		],
+	}
+],
 
 	metaCache: null,
 

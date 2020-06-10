@@ -157,7 +157,6 @@ div#gameLog {
 }
 
 .dialog input[type="button"] {
-    cursor: pointer;
     background-color: #fff !important;
     cursor: pointer !important;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.3), 0 2px 10px 0 rgba(0, 0, 0, 0.3) !important;
@@ -374,11 +373,24 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
     opacity: 0.75;
 }
 
-.tooltipExt {
-    position: absolute;
+#tooltip {
+    position: absolute !important;
     border: 1px solid gray;
     padding: 5px;
     pointer-events: none;
+}
+
+#tooltip.tooltip-in-right-column {
+    min-height: initial !important;
+    max-height: initial !important;
+    height: auto !important;
+    min-width: initial !important;
+    max-width: initial !important;
+    width: auto !important;
+    top: 30px !important;
+    right: 20px !important;
+    bottom: auto !important;
+    left: auto !important;
 }
 
 .msg {
@@ -500,6 +512,26 @@ table.craftTable tr:hover td {
     padding-right: 15px;
     font-size: 12px;
     cursor: default;
+}
+
+.toolbarIcon.happiness {
+    color: coral;
+}
+
+.toolbarIcon.energy,
+.button_tooltip .energyProduction,
+.button_tooltip .energyBonus {
+    color: green;
+}
+
+.toolbarIcon.energy.warningWinter {
+    color: coral;
+}
+
+.toolbarIcon.energy.warning,
+.button_tooltip .energyConsumption,
+.button_tooltip .energyPenalty {
+    color: red;
 }
 
 .attitude {
@@ -679,6 +711,10 @@ h1 {
 
 #sorrowTooltip {
 	color: black;
+}
+
+#sorrowTooltip.max {
+    color: red !important;
 }
 
 #adsColumn {

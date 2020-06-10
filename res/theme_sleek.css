@@ -356,25 +356,10 @@ body.scheme_sleek  {
     font-size: 12px;
 }
 
-
-
-
-
 .scheme_sleek #tooltip {
-    /*position: inherit !important;*/
-    position: absolute !important;
     /*margin: 0px;*/
     /*padding: 0px 10px;*/
-    min-height: initial !important;
-    max-height: initial !important;
-    min-width: initial !important;
-    max-width: initial !important;
-    height: auto !important;
     overflow: visible !important;
-    left: auto !important;
-    bottom: auto !important;
-    top: 50px !important;
-    right: 20px !important;
     background-color: #0e0d0b;
     background: -moz-linear-gradient(top, rgba(3, 2, 1, 0.91) 0%, #0e0d0b 100%); /* FF3.6-15 */
     background: -webkit-linear-gradient(top, #030201 0%, #0e0d0b 100%); /* Chrome10-25,Safari5.1-6 */

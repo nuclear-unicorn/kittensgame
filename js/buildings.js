@@ -1096,7 +1096,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 						}
 					}
 				};
-			}
+			};
 
 			var beamCrafter = newCrafter(wood, "beam", true);
 			var slabCrafter = newCrafter(minerals, "slab", true);
@@ -1887,7 +1887,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				name: bldPrices[i].name
 			});
 		}
-	    return prices;
+		return prices;
 	 },
 
 
@@ -2334,7 +2334,9 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 		for (var i = 1; i < stages.length; i++){
 			if (i <= stage){
 				//downgrade
-				stageLinks.push( {title: "v", handler: downgradeHandler, enabled: true});
+				if (!this.game.opts.hideDowngrade) {
+					stageLinks.push( {title: "v", handler: downgradeHandler, enabled: true});
+				}
 			} else {
 				//upgrade
 				if (!stages[i].stageUnlocked){

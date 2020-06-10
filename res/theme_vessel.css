@@ -141,7 +141,7 @@ body.scheme_vessel.with_background_image {
 .scheme_vessel .help,
 .scheme_vessel .dialog {
     box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.4), 
-                 0 1px 0 rgba(187, 192, 202,0.4), 0 0 0 9999px rgba(0, 0, 0, 0.9);
+                 0 1px 0 rgba(187, 192, 202,0.4);
 	height: auto !important;
     top: 40% !important;
     border: solid 2px #292929;
@@ -330,7 +330,7 @@ body.scheme_vessel.with_background_image {
 /*******************************************************/
 .scheme_vessel .tabInner {
 	border: none; /* border for all under tabs in center column */
-	padding: 10px; /* default padding: 15px; */
+	padding: 5px 10px 10px 10px; /* default padding: 15px; */
 	margin-bottom: 50px; /* for image midColumn bottom - default margin-bottom: 20px; */
 }
 .scheme_vessel .tabInner.Workshop {
@@ -352,7 +352,7 @@ body.scheme_vessel.with_background_image {
 }
 .scheme_vessel .tabsContainer { /* separator | for tab */
 	color: rgba(90, 90, 90, 0.5); /* color #5A5A5A */
-	padding-bottom: 6px !important; /* default 15px */
+	padding-bottom: 5px; /* default 15px */
 	font-size: 10px; /* for reduce space between tabs name */
 }
 .scheme_vessel .activeTab { 
@@ -369,16 +369,17 @@ body.scheme_vessel.with_background_image {
 	color: #0181B1;
 }
 .scheme_vessel .bldTopContainer { /* under tab */
-    font-size: 90%;
+	font-size: 90%;
+	margin-bottom: 5px;/* default margin-bottom: 15px; */
 }
 .scheme_vessel .bldTopContainer a.activeTab:hover { 
     color: #A0A0A0;
 	opacity: 0.7; /* default opacity 0.7 on not hover */ 
 }
 .scheme_vessel .bldGroupContainer { /* container for all buttons on center column */
-    padding-top: 6px; /* default 15px */
+    padding-top: 5px; /* default 15px */
     border-top: none;
-    margin-top: 8px; /* default 10px */
+    margin-top: 5px; /* default 10px */
 }
 .scheme_vessel input[type='button'] {
 	font-size: 15px !important;
@@ -411,7 +412,9 @@ body.scheme_vessel.with_background_image {
 	color: #DDDDDD !important;
 	border: solid 1px rgba(1, 129, 177,0.8) !important; /* color #0181B1; */	
 	box-shadow: 0 2px 4px rgba(1, 129, 177,0.8), /* color #0181B1; */ 
-                 0 1px 0 rgba(1, 129, 177,0.8) !important;	/* color #0181B1; */	
+				 0 1px 0 rgba(1, 129, 177,0.8) !important;	/* color #0181B1; */
+	position: absolute;
+	left: 60px;
 	
 }
 .scheme_vessel input[type='button']#observeBtn:hover {
@@ -494,6 +497,9 @@ body.scheme_vessel.with_background_image {
     background-color: transparent;
     border: 0 solid transparent;
 }
+.scheme_vessel .tabInner.Trade .panelContainer {
+	margin-top: 5px; /* default margin-top: 8px */
+}
 .scheme_vessel .panelContainer .container:not(.trade-race) {
 	margin-top: 5px;
 	border: 9px solid transparent;
@@ -507,6 +513,7 @@ body.scheme_vessel.with_background_image {
     color: #D66400;
 	font-size: 20px !important;
 	font-style: italic;
+	padding-top: 2px; /* default padding: 4px */
 }
 .scheme_vessel .panelContainer .toggle {
     border : 1px solid transparent;
@@ -529,6 +536,8 @@ body.scheme_vessel.with_background_image {
 	border-radius: 11px;
 	margin-left: 20px;
 	margin-right: 20px;
+	padding-top: 8px; /* default padding: 0 10px 10px 10px; */
+	padding-bottom: 8px;
 }
 .scheme_vessel .panelContainer .container.trade-race div.left {
 	width: 230px;
@@ -740,10 +749,9 @@ body.scheme_vessel.with_background_image {
 /******************** RIGHT COLUMN ********************/
 /******************************************************/
 .scheme_vessel #rightColumn {
-	width: 25%;
-    max-width: 400px;
-    min-width: 250px;
-	top: 10px;
+	width: calc(50 - 355px);
+	max-width: 440px;
+	top: 13px;
 	margin-top: 10px;
 }
 .scheme_vessel #toggleCenter,
@@ -792,6 +800,7 @@ body.scheme_vessel.with_background_image {
 .scheme_vessel .right-tab {
 	height: calc(100% - 160px); /* default height: calc(100% - 150px); */
 }
+	
 .scheme_vessel #rightTabChat {
 	margin-top: 30px;
 }

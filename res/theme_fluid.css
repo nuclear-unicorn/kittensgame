@@ -153,7 +153,7 @@ body.scheme_fluid,
 .scheme_fluid .help,
 .scheme_fluid .dialog {
     box-shadow: 3px 3px 9px rgba(0, 0, 0, 1) inset,
-                 0 1px 0 rgba(187, 192, 202, 0.4), 0 0 0 9999px rgba(0, 0, 0, 0.8); /* color #BBC0CA */
+                 0 1px 0 rgba(187, 192, 202, 0.4); /* color #BBC0CA */
 	height: auto !important;
     top: 40% !important;
     border: solid 2px #292929;
@@ -585,19 +585,19 @@ body.scheme_fluid,
 /******************** RIGHT COLUMN ********************/
 /******************************************************/
 .scheme_fluid #rightColumn {
-	width: 25%;
-    max-width: 400px;
-    min-width: 250px;
+	width: calc(50 - 355px);
+	max-width: 440px;
 	background-image: url('img/theme_fluid_border_left_background.png');
 	background-repeat: repeat-y;	
 	background-attachment: scroll,local;
 	background-position: left;
+	padding-left: 20px; /* default padding-left: 8px; */
 }
 .scheme_fluid #calendarDiv {
     color: #118AC2;
 	padding-left: 5px;
     margin-top: 5px;
-	text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.7);
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
 	font-weight: bold;
 	font-size: 90%;
 }
@@ -663,7 +663,7 @@ body.scheme_fluid,
     color: #D2D2D2; 
 	font-weight: bold; /* default font size = font-size: 90%; */
 	text-transform: none;
-	text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.7);
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
     border-bottom: solid 1px rgba(187, 192, 202, 0.5); /* color #BBC0CA */
 }
 

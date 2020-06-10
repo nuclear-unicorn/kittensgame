@@ -197,8 +197,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			if (this.game.bld.get("aiCore").val > 0){
 				this.researchChallenge("anarchy");
 			}
-
 		}
+
 		// winterIsComing
 		if (this.getChallenge("winterIsComing").on) {
 			if (this.game.space.getPlanet("helios").reached){
