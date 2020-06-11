@@ -145,8 +145,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				"autumn": 1.05,
 				"winter": 1.25
 			}},
-			{name: "titanium", value: 1, chance: 0, delta: 0},
-			{name: "alloy", value: 1, chance: 5, delta: 0.05, minLevel: 5}
+			{name: "titanium", value: 0.25, chance: 0, delta: 0},
+			{name: "alloy", value: 0.25, chance: 5, delta: 0.05, minLevel: 5}
 		],
 		collapsed: false
 	},{
@@ -422,6 +422,10 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			raceRatio = race.name === "leviathans" ? (1 + 0.02 * race.energy) : 1,
 			currentSeason = this.game.calendar.getCurSeason().name;
 
+		var iwEmbassyPenalty = 1;
+		if (this.game.ironWill){
+			iwEmbassyPenalty = 0.25;
+		}
 		for( var i = 0; i < race.sells.length; i++ ){
 			var sellResource = race.sells[i];
 			//you must be this tall to trade this rare resource
@@ -431,8 +435,9 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 			//can trade chance be grater than 1?
 			//-- X% chance to get regular trade resources + 1% per embaasy, uncapped, can be 100%+ 
+			
 			var tradeChance = (race.embassyPrices) ? sellResource.chance 
-				* (1 + this.game.getHyperbolicEffect(0.01 * race.embassyLevel, 0.75)) : sellResource.chance;
+				* (1 + this.game.getHyperbolicEffect(0.01 * race.embassyLevel * iwEmbassyPenalty, 0.75)) : sellResource.chance;
 
 			var resourcePassedBonusTradeAmount = this.game.math.binominalRandomInteger(bonusTradeAmount, tradeChance / 100),
 				resourcePassedNormalTradeAmount = this.game.math.binominalRandomInteger(normalTradeAmount, tradeChance / 100);
@@ -459,7 +464,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 
 		//-------------------- 35% chance to get spice + 1% per embassy lvl ------------------
-		var spiceChance = (race.embassyPrices) ? 0.35 * (1 + 0.01 * race.embassyLevel) : 0.35;
+		var spiceChance = (race.embassyPrices) ? 0.35 * (1 + 0.01 * race.embassyLevel * iwEmbassyPenalty) : 0.35;
 		var spiceTradeAmount = this.game.math.binominalRandomInteger(successfullTradeAmount, spiceChance);
 		boughtResourceCollection["spice"] = 25 * spiceTradeAmount +
 			50 * this.game.math.irwinHallRandom(spiceTradeAmount) * tradeRatio;
@@ -616,8 +621,22 @@ dojo.declare("classes.diplomacy.ui.RacePanel", com.nuclearunicorn.game.ui.Panel,
 	tradeBtn: null,
 	embassyButton: null,
 
+	constructor: function(race) {
+		this.race = race;
+		this.name = race.title;
+	},
+
 	onToggle: function(isToggled){
 		this.race.collapsed = isToggled;
+	},
+
+	render: function(container) {
+		var attitude = this.race.attitude;
+		if (attitude == "hostile" && 100 * (1 - this.race.standing) < this.game.getEffect("standingRatio") + (this.game.prestige.getPerk("diplomacy").researched ? 10 : 0)) {
+			attitude = "not longer hostile, now neutral";
+		}
+		this.name = this.race.title + " <span class='attitude'>" + attitude + "</span>";
+		return this.inherited(arguments);
 	},
 
 	update: function(){
@@ -738,10 +757,14 @@ dojo.declare("com.nuclearunicorn.game.ui.TradeButton", com.nuclearunicorn.game.u
 
 		var tradeMax = this.game.diplomacy.getMaxTradeAmt(this.race);
 
+		// Change button content
+		this.tradeAllHref.link.title = "x" + this.game.getDisplayValueExt(tradeMax, null, false, 0);
+
 		// Update tradeHalfHref Link
 		var tradeHalf = Math.floor(tradeMax / 2);
-		// Change button innerHTML
-		this.tradeHalfHref.link.innerHTML = "x" + this.game.getDisplayValueExt(tradeHalf, null, false, 0);
+		// Change button content
+		this.tradeHalfHref.link.textContent = this.game.opts.usePercentageConsumptionValues ? "50%" : "x" + this.game.getDisplayValueExt(tradeHalf, null, false, 0);
+		this.tradeHalfHref.link.title = this.game.opts.usePercentageConsumptionValues ? "x" + this.game.getDisplayValueExt(tradeHalf, null, false, 0) : "50%";
 		// Change handler
 		dojo.disconnect(this.tradeHalfHref.linkHandler);
 		this.tradeHalfHref.linkHandler = dojo.connect(this.tradeHalfHref.link, "onclick", this, dojo.partial(function(event){
@@ -757,12 +780,13 @@ dojo.declare("com.nuclearunicorn.game.ui.TradeButton", com.nuclearunicorn.game.u
 			this.update();
 		}));
 		// Change display
-		dojo.style(this.tradeHalfHref.link, "display", this.game.diplomacy.hasMultipleResources(this.race, 50) ? "" : "none");
+		dojo.style(this.tradeHalfHref.link, "display", this.game.opts.showNonApplicableButtons || this.game.diplomacy.hasMultipleResources(this.race, 50) ? "" : "none");
 
 		// Update tradeFifthHref Link
 		var tradeFifth = Math.floor(tradeMax / 5);
-		// Change button innerHTML
-		this.tradeFifthHref.link.innerHTML = "x" + this.game.getDisplayValueExt(tradeFifth, null, false, 0);
+		// Change button content
+		this.tradeFifthHref.link.textContent = this.game.opts.usePercentageConsumptionValues ? "20%" : "x" + this.game.getDisplayValueExt(tradeFifth, null, false, 0);
+		this.tradeFifthHref.link.title = this.game.opts.usePercentageConsumptionValues ? "x" + this.game.getDisplayValueExt(tradeFifth, null, false, 0) : "20%";
 		// Change handler
 		dojo.disconnect(this.tradeFifthHref.linkHandler);
 		this.tradeFifthHref.linkHandler = dojo.connect(this.tradeFifthHref.link, "onclick", this, dojo.partial(function(event){
@@ -778,7 +802,7 @@ dojo.declare("com.nuclearunicorn.game.ui.TradeButton", com.nuclearunicorn.game.u
 			this.update();
 		}));
 		// Change display
-		dojo.style(this.tradeFifthHref.link, "display", this.game.diplomacy.hasMultipleResources(this.race, 25) ? "" : "none");
+		dojo.style(this.tradeFifthHref.link, "display", this.game.opts.showNonApplicableButtons || this.game.diplomacy.hasMultipleResources(this.race, 25) ? "" : "none");
 
 	}
 });
@@ -941,17 +965,9 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 			}
 
 			var racePanel = this.racePanels[i];
-			if (!racePanel){
-				if (race.name == "leviathans") {
-					racePanel = new classes.diplomacy.ui.EldersPanel(
-						race.title + " <span class='attitude'>" + race.attitude + "</span>"
-					);
-					racePanel.setGame(this.game);
-				} else {
-					racePanel = new classes.diplomacy.ui.RacePanel(
-						race.title + " <span class='attitude'>" + race.attitude + "</span>"
-					);
-				}
+			if (!racePanel) {
+				racePanel = race.name === "leviathans" ? new classes.diplomacy.ui.EldersPanel(race) : new classes.diplomacy.ui.RacePanel(race);
+				racePanel.setGame(this.game);
 				this.racePanels.push(racePanel);
 			}
 			var content = racePanel.render(tabContainer);

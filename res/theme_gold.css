@@ -121,7 +121,7 @@ body.scheme_gold {
 }
 .scheme_gold .help,
 .scheme_gold .dialog {
-    box-shadow:  3px 3px 9px rgba(0, 0, 0, 0.4) inset, 0 0 0 9999px rgba(0, 0, 0, 0.8);
+    box-shadow:  3px 3px 9px rgba(0, 0, 0, 0.4) inset;
     background: rgb(56,56,56);
     background: linear-gradient(135deg, rgba(56,56,56,1) 0%, rgba(16,16,16,1) 30%, rgba(56,56,56,1) 100%);
     height: auto !important;
@@ -519,9 +519,8 @@ body.scheme_gold {
 /******************** RIGHT COLUMN ********************/
 /******************************************************/
 .scheme_gold #rightColumn {
-	width: 25%;
-    max-width: 400px;
-    min-width: 250px;
+	width: calc(50 - 355px);
+	max-width: 440px;
 }
 .scheme_gold #calendarDiv {
     color: #DFCE99;
@@ -547,7 +546,7 @@ body.scheme_gold {
 	color: rgba(145, 144, 132, 0.7); /* color: #919084; */
     font-size: 90%;
     border-top: 1px solid #404040 !important;
-	margin-top: 10px;
+    margin-top: 10px;
 }
 .scheme_gold #clearLogHref { /* Link in right column : Clear log */
 	font-size: 80%;
@@ -562,8 +561,8 @@ body.scheme_gold {
 .scheme_gold #gameLog {
 	margin-top: 6px;
 	box-shadow: 1px 1px 5px #000000 inset,
-                 0px 1px 2px rgba(200, 200, 200,0.1);
-	padding: 0px 5px 5px 5px;
+                 0 1px 2px rgba(200, 200, 200,0.1);
+    padding: 0 5px 5px 5px;
 }
 .scheme_gold #gameLog span.msg:not(.type_date)  {
     margin-left: 1.2em;

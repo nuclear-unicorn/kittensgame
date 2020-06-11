@@ -653,7 +653,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
     _newLink: function(model, shatteredQuantity) {
         var self = this;
         return {
-            visible: this.getPricesMultiple(model, shatteredQuantity) <= this.game.resPool.get("timeCrystal").value,
+            visible: this.game.opts.showNonApplicableButtons || this.getPricesMultiple(model, shatteredQuantity) <= this.game.resPool.get("timeCrystal").value,
             title: "x" + shatteredQuantity,
             handler: function(event) {
                 self.doShatterAmt(model, shatteredQuantity);

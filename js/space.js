@@ -489,7 +489,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				"starchartPerTickBaseSpace": 0,
 				"scienceMax": 0
 			},
-            calculateEffects: function(self, game){
+			calculateEffects: function(self, game){
 				self.effects = {
 					"starchartPerTickBaseSpace": 0.01,
 					"scienceMax": 10000 * (1 + game.getEffect("spaceScienceRatio"))
@@ -1153,11 +1153,11 @@ dojo.declare("com.nuclearunicorn.game.ui.SpaceProgramBtnController", com.nuclear
             if (prices[i].name == "oil"){
                 var reductionRatio = this.game.getHyperbolicEffect(this.game.getEffect("oilReductionRatio"), 0.75);
                 prices[i].val *= (1 - reductionRatio);
-            }
-        }
+			}
+		}
 
-        return prices;
-    },
+		return prices;
+	},
 
 	updateVisible: function(model){
 		var meta = model.metadata;
@@ -1234,10 +1234,10 @@ dojo.declare("classes.ui.space.PlanetBuildingBtnController", com.nuclearunicorn.
                 var reductionRatio = this.game.getHyperbolicEffect(this.game.getEffect("oilReductionRatio"), 0.75);
                 prices[i].val *= (1 - reductionRatio);
              }
-        }
+		}
 
-        return prices;
-    }
+		return prices;
+	}
 });
 
 dojo.declare("classes.ui.space.PlanetPanel", com.nuclearunicorn.game.ui.Panel, {

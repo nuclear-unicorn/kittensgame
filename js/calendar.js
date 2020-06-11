@@ -220,6 +220,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 	yearsPerCycle: null,
 	cyclesPerEra: null,
 
+	//seasons start with zero cause fuck you
 	season: 0,
 	cycle: 0,
 	cycleYear: 0,
@@ -718,7 +719,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			resPool.addResEvent("antimatter", this.game.getEffect("antimatterProduction") * yearsOffset);
 		}
 
-		var beacons = game.space.getBuilding("spaceBeacon");
+		var beacons = this.game.space.getBuilding("spaceBeacon");
 		beacons.action(beacons, this.game);
 		this.game.updateCaches();
 		this.game.resPool.addResPerTick("relic", this.game.getEffect("relicPerDay") * daysOffset);
@@ -832,6 +833,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 		var pyramidVal = this.game.religion.getZU("blackPyramid").val;
 		var markerVal = this.game.religion.getZU("marker").val;
+
 		if ( pyramidVal > 0 ){
 			if (this.game.rand(1000) < 35 * pyramidVal * (1 + 0.1 * markerVal)){   //3.5% per year per BP, x10% per marker
 				this.game.diplomacy.unlockElders();
@@ -892,6 +894,10 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 	},
 
 	getWeatherMod: function(res){
+		if (this.game.science.getPolicy("communism").researched && this.getCurSeason().name == "winter" && this.weather == "cold"){
+			return 0;
+		}
+
 		var mod = 1;
 
 		if (this.getCurSeason().modifiers[res.name]){

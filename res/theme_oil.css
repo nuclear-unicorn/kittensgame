@@ -117,7 +117,7 @@ body.scheme_oil,
 /*** end of green light for machine on ***/
 .scheme_oil .dialog {
 	box-shadow: inset 1px 1px 4px #fc8d00, inset -1px -1px 3px rgba(252, 141, 0, 0.5),
-	-1px -1px 3px #ffc900, 1px 1px 3px #292929, 0 0 0 9999px rgba(0, 0, 0, 0.9);
+	-1px -1px 3px #ffc900, 1px 1px 3px #292929;
 	border: solid 1px #ffc900;
 	border-right-color: rgba(255, 201, 0, 0.7);
 	border-bottom-color: rgba(255, 201, 0, 0.7);
@@ -699,10 +699,8 @@ body.scheme_oil,
 /******************** RIGHT COLUMN ********************/
 /******************************************************/
 .scheme_oil #rightColumn {
-	width: 25%;
-    max-width: 400px;
-    min-width: 250px;
-	top: 20px; /*default top: 20px; */
+	width: calc(50 - 355px);
+	max-width: 440px;
 }
 .scheme_oil #toggleCenter,
 .scheme_oil span.toggleCenter {
@@ -781,8 +779,7 @@ body.scheme_oil,
 	border-bottom-color: #393939;
 	border-radius: 15px 0 0 15px;
 	padding: 0 4px 4px 4px;
-	box-shadow: inset 1px 1px 3px #494949, inset -1px -1px 3px #292929,
-	-1px -1px 1px #393939, 1px 1px 1px #191919;
+	box-shadow: -1px -1px 1px #393939, 1px 1px 1px #191919;
 	min-height: 5% !important;
 	height: unset !important; 
 	max-height: calc(100% - 80px) !important;
@@ -920,7 +917,7 @@ body.scheme_oil,
 	font-size: smaller;
 }
 .scheme_oil #fastPraiseContainer >a:hover {
-	text-shadow: 0 0 5px #ffc900 !important;
+	text-shadow: 0 0 7px #ffc900 !important;
 }
 .scheme_oil .res-cell.positive-weather { /* to change the color for bonus cell according to the season */
 	font-size: 0.8em !important;

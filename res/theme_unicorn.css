@@ -1,0 +1,1088 @@
+/* ******************************************** */
+/*			Unicorn 1.00 Theme © Volkeyrn       */
+/* ******************************************** */
+
+ @import url(https://fonts.googleapis.com/css?family=Lato:ital,wght@300,400,700,300italic,400italic,700italic&display=swap);
+
+/* ******************************************** */
+/* ******************* GAME ******************* */
+/* ******************************************** */
+body.scheme_unicorn {
+	background-color: #e8dbc7;
+}
+body.scheme_unicorn.with_background_image {
+	background: no-repeat fixed bottom 3px right url('img/theme_unicorn_01.png'), #e8dbc7; /* source: https://pngtree.com/freepng/unicorn_3741926.html Volkeyrn: permanent premium member */
+}
+.scheme_unicorn #game,
+.scheme_unicorn #loadingContainer {
+	top: 22px; /* height of top-bar */
+}
+.scheme_unicorn #gamePageContainer,
+.scheme_unicorn select,
+.scheme_unicorn .btn,
+.scheme_unicorn .modern,
+.scheme_unicorn .btn.modern,
+.scheme_unicorn input[type='button'] {
+	font-family: 'Lato', sans-serif;
+}
+.scheme_unicorn .btn {
+	color: gray;
+	margin-bottom: 7px; /* default 10px */
+	max-height: 36px;
+	background-color: transparent;
+	border: solid 1px transparent;
+}
+.scheme_unicorn .btn.modern {
+	border-radius: 5px; /* default border-radius: 3px; */
+	width: 280px; /* +10px gained from left column +15px gained from padding default width: 264px; */
+}
+.scheme_unicorn .btn.modern.disabled {
+	background-color: #223244;
+	border: inset 1px #576270;
+	box-shadow: inset 1px 1px 3px #111922,
+                 0 1px 0 #99a4b0;
+}
+.scheme_unicorn .btn.modern.disabled:hover {
+	background-color: #2a3d54;
+	border: inset 1px #191c20;
+	box-shadow: inset 2px 2px 5px #111922,
+                 0 1px 0 #d7dbe0;
+}
+.scheme_unicorn .btn.modern.disabled span.btnTitle {
+	color: #6f7f90;
+}
+.scheme_unicorn .btn.modern.disabled span.btnTitle.limited {
+	color: #e43011;
+}
+.scheme_unicorn .btn.modern:not(.disabled) {
+   	background-color: #f0ebe1;
+	border: outset 1px #707f90;
+	box-shadow: 1px 1px 2px #111922;
+}
+.scheme_unicorn .btn.modern:not(.disabled):hover {
+	background-color: #f4f1e9;
+	border: outset 1px #ebedf0;
+	box-shadow: 3px 3px 5px #111922;
+}
+.scheme_unicorn .btn.modern:not(.disabled) span.btnTitle {
+	color: #191c20;
+}
+.scheme_unicorn a {
+	color: #4c6f99;
+}
+.scheme_unicorn a,
+.scheme_unicorn .craft-link {
+    text-decoration: none;
+}
+.scheme_unicorn a:hover {
+	color: #3c5779;
+	opacity: 1.0; /* default opacity: 0.6 */
+}
+.scheme_unicorn div {
+	color:#385170;
+}
+.scheme_unicorn .disabled div {
+	color: #9197a7;
+}
+.scheme_unicorn h1 {
+	font-size: 18px; /* default font size = font-size: 12px; */
+	text-transform: capitalize;
+	color: #f8f5f0;
+	text-shadow: 1px 1px 2px #111922;
+	padding-left: 20px;
+}
+.scheme_unicorn h1:first-child {
+    margin-top: 0p;
+}
+.scheme_unicorn .modern .btnContent {
+    padding: 10px 0 10px 1px !important; /* 1px left for buttons without power background-image */
+}
+/* *** green and red light for machine on/off *** */
+.scheme_unicorn .btn.bldEnabled div.btnContent,
+.scheme_unicorn .btn.bldlackResConvert div.btnContent {
+	padding: 10px 0 10px 13px !important; /* 13px left for power background-image (linear-gradient) */
+	border: none;	
+}
+.scheme_unicorn .btn.disabled.bldlackResConvert { /* color #e43011 */ /* color for lack resources convertion */	
+	background: no-repeat border-box linear-gradient(90deg, #e43011 0%, #e43011 11px, #223244 12px, #223244 100%);
+}
+.scheme_unicorn .btn.disabled.bldlackResConvert:hover {
+	background: no-repeat border-box linear-gradient(90deg, #e43011 0%, #e43011 11px, #223244 12px, #223244 100%);
+}
+.scheme_unicorn .btn:not(.disabled).bldlackResConvert {
+	background: no-repeat border-box linear-gradient(90deg, #e43011 0%, #e43011 11px, #f0ebe1 12px, #f0ebe1 100%);
+}
+.scheme_unicorn .btn:not(.disabled).bldlackResConvert:hover {
+	background: no-repeat border-box linear-gradient(90deg, #ee4022 0%, #ee4022 11px, #f4f1e9 12px, #f4f1e9 100%);
+}
+.scheme_unicorn .btn.disabled.bldEnabled { /* color #7AA738 */
+	background: no-repeat border-box linear-gradient(90deg, #7AA738 0%, #7AA738 11px, #223244 12px, #223244 100%);
+}
+.scheme_unicorn .btn.disabled.bldEnabled:hover {
+	background: no-repeat border-box linear-gradient(90deg, #7AA738 0%, #5D743A 11px, #223244 12px, #223244 100%);
+}
+.scheme_unicorn .btn:not(.disabled).bldEnabled {
+	background: no-repeat border-box linear-gradient(90deg, #7AA738 0%, #7AA738 11px, #f0ebe1 12px, #f0ebe1 100%);
+}
+.scheme_unicorn .btn:not(.disabled).bldEnabled:hover {
+	background: no-repeat border-box linear-gradient(90deg, #94dc23 0%, #94dc23 11px, #f4f1e9 12px, #f4f1e9 100%);
+}
+/* *** end of green light for machine on/off *** */
+.scheme_unicorn .dialog {
+	background-color: #e0cfb5;
+	background: no-repeat local bottom right -7px url('img/theme_unicorn_02.png'), #e0cfb5; /* source: https://pngtree.com/freepng/white-unicorn----lying_3770538.html Volkeyrn: permanent premium member */
+	box-shadow: inset 0 0 9px #111922;
+	border: outset 3px #4a6d94;
+	border-radius: 5px;
+}
+.scheme_unicorn .dialog.credits {
+	padding-right: 100px;
+}
+.scheme_unicorn .dialog a {
+    text-transform: capitalize;
+}
+.scheme_unicorn .dialog a:hover {
+	color: #f8f5f0;
+	text-shadow: 1px 1px 1px #111922;
+}
+.scheme_unicorn label i { /* information text in option windows */
+    color: #747c90;
+}
+.scheme_unicorn label:hover {
+	opacity: 1;/* default opacity: 0.7; */
+	color: #f8f5f0;
+	text-shadow: 1px 1px 1px #111922;
+}
+.scheme_unicorn label:hover i {
+	text-shadow: none;
+}
+.scheme_unicorn select { /* dropdown list on settlement tab and options windows */
+    background-color: #344c68;
+    color: #f8f5f0;
+	border: ridge 2px #8491a0;
+	border-radius: 3px;
+	font-size: 13px;
+	text-shadow: 1px 1px 1px #111922;
+	margin-left: 3px;
+}
+.scheme_unicorn select>option {
+    background-color: #446488;
+    color: #f8f5f0;
+	padding: 2px 10px; /* default padding: 4px 10px; */
+}
+.scheme_unicorn select > option:disabled {
+	color: #838493;
+	font-size: 90%;
+}
+.scheme_unicorn #optionsDiv input[type="checkbox"] + label:before {
+    content: "\26C9"; /* BALLOT BOX */
+	font: 12px sans-serif;
+	text-shadow: 1px 1px 1px #111922;
+	color: #e8dfd0;
+}
+.scheme_unicorn #optionsDiv input[type="checkbox"]:checked + label:before {
+	content: "\26CA"; /* BALLOT BOX WITH CHECK */
+	font: 12px sans-serif;
+	text-shadow: 1px 1px 1px #111922;
+	color: #f8f5f0;
+}
+.scheme_unicorn #appDiv {
+	background: no-repeat local bottom -44px right -7px url('img/theme_unicorn_02.png'), #e0cfb5; /* source: https://pngtree.com/freepng/white-unicorn----lying_3770538.html Volkeyrn: permanent premium member */
+}
+.scheme_unicorn textarea#importData,
+.scheme_unicorn textarea#exportData {
+	background-color: rgba(240, 235, 225, 0.4);
+	box-shadow: inset 0 0 3px 1px #111922;
+	border: groove 3px #567eab;
+	border-radius: 5px;
+	/* Only FireFox */
+	scrollbar-width: thin;
+   	scrollbar-color: #223244 #324964;
+}
+
+/* *********************************************** */
+/* ******************* TOP BAR ******************* */
+/* *********************************************** */
+.scheme_unicorn #topBar {
+	background: #223244;
+    height: 22px; /* default height: 26px; */
+	border-bottom: none;
+	box-shadow: 0 2px 5px #223244;
+	top: 0; /* for no shadow on top */
+	padding-top: 4px;
+}
+.scheme_unicorn #topBar a {
+	color: #b6bec7;
+}
+.scheme_unicorn #topBar a.copyright {
+	color: #7292b9;
+}
+.scheme_unicorn #topBar a:hover {
+	color: #eae2d4;
+}
+.scheme_unicorn #headerLinks .links-block { /* a link separator : | on header links */
+	color: transparent;
+}
+.scheme_unicorn #topBar div,
+.scheme_unicorn #topBar #sorrowTooltip { /* counter of BLS (Black Liquid Sorrow) */
+	color: #7d8497;
+}
+.scheme_unicorn #sorrowTooltip.max {
+    color: #e43011;
+}
+.scheme_unicorn #headerLinks>div:first-child:before {
+    color: #eae2d4;
+    content: 'Theme by Volkeyrn\00a0\00a0\00a0\00a0';
+	text-shadow: none;
+    text-decoration: none;
+	font-weight: normal;
+}
+.scheme_unicorn #autosaveTooltip {
+	color: #4F8FDD;
+}
+.scheme_unicorn #getTheApp-link { /* Get the app */
+	color: #7292b9 !important;
+}
+.scheme_unicorn #getTheApp-link:hover {
+	color: #eae2d4 !important;
+}
+.scheme_unicorn .links-block {
+	padding-top: 5px !important;
+}
+.scheme_unicorn .toolbarIcon.happiness {
+    color: #7292b9;
+}
+.scheme_unicorn .toolbarIcon.energy,
+.scheme_unicorn .button_tooltip .energyBonus,
+.scheme_unicorn .button_tooltip .energyProduction {
+    color: #7AA738;
+}
+.scheme_unicorn .toolbarIcon.energy.warningWinter {
+    color: #b97900;
+}
+.scheme_unicorn .toolbarIcon.energy.warning,
+.scheme_unicorn .button_tooltip .energyConsumption {
+	color: #e43011;
+}
+.scheme_unicorn .button_tooltip .energyPenalty {
+	color: #ee4022;
+}
+/* ********************************************** */
+/* ******************* FOOTER ******************* */
+/* ********************************************** */
+.scheme_unicorn #footerLinks {
+	font-size: 90%;
+	bottom: 3px; /* default bottom: 10px; */
+}
+.scheme_unicorn #footerLinks a:hover {
+	text-shadow: none;
+}
+.scheme_unicorn #footerLinks { /* a link separator : | on footer links */
+	color: transparent;
+}
+
+/* *********************************************** */
+/* ******************* TOOLTIP ******************* */
+/* *********************************************** */
+.scheme_unicorn #tooltip,
+.scheme_unicorn .tooltip-block div {
+	background-color: #223144;
+	color: #798797; /* tooltip windows == left column : left text */
+	border-style: groove;
+	border-color: #f8f5f0;
+	border-width: 2px;
+	border-radius: 5px !important;
+	box-shadow: 4px 4px 9px #111922;
+	margin-left: 5px; /* for offset tooltip due to larger buttons .btn.modern */
+}
+.scheme_unicorn .tooltip-block div { /* tooltip on ? top right column */
+	padding: 5px;
+}
+.scheme_unicorn .button_tooltip {
+	background-color: transparent;
+}
+.scheme_unicorn .button_tooltip div { /* tooltip window == left column: right text | center column :highlighting text */
+	color: #b6bec7;
+}
+.scheme_unicorn .tooltip-inner .desc { /* Tooltip Window : title text */
+    color: #e8dfd0;
+	border-bottom : 1px solid #3f4852 !important; /* in core.js !important needed */
+	margin-bottom: 5px;
+}
+.scheme_unicorn .tooltip-inner .desc.small {
+	font-size: 75%; /* default font-size: 60%; */
+	opacity: 1; /* default opacity: 0.8; */
+}
+.scheme_unicorn .tooltip-inner .desc.small.auto-off {
+	color: #e43011;
+}
+.scheme_unicorn .tooltip-inner .desc.small.auto-on {
+	color: #7AA738;
+}
+.scheme_unicorn .tooltip-divider { /* border line before effects text */
+	border-bottom : 1px solid #3f4852 !important; /* in core.js !important needed */
+}
+.scheme_unicorn .effectName { /* Tooltip Window : effects text */
+	color: #7292b9 !important;
+}
+.scheme_unicorn .rawRes { /* Tooltip Window == text for all missing resources for primary resource */
+    color: #707070;
+	font-style: italic;
+	padding-left: 12px;
+}
+.scheme_unicorn .button_tooltip .noRes,
+.scheme_unicorn .limited { /* on ressource limited or not attainable */
+	color: #e43011;
+}
+.scheme_unicorn #tooltip .flavor { /* Tooltip Window : last bottom text on center column tooltip window */
+    color: #f0ebe1;
+	font-size: 13px !important; /* in core.js !important needed */
+	padding-right: 7px;
+}
+
+/* ***************************************************** */
+/* ******************* CENTER COLUMN ******************* */
+/* ***************************************************** */
+.scheme_unicorn .tab {
+    font-size: 13px;
+}
+.scheme_unicorn .tabInner {
+    border: none; /* default border: 1px solid gray; */
+	padding: 8px; /* 16px gained for buttons width. default padding: 15px; */
+	padding-top: 5px;
+	margin-bottom: 30px; /* default margin-bottom: 20px; */
+}
+.scheme_unicorn .tabInner.Workshop div.panelContainer:last-child,
+.scheme_unicorn .tabInner.Space div.panelContainer:last-child,
+.scheme_unicorn .tabInner.Time div.panelContainer:last-child { /* last panelContainer on Workshop, Space and Time Tab */
+	margin-bottom: 54px; /* to view entire dropdownlink of last button */
+}
+.scheme_unicorn .tabInner.Bonfire {
+	margin-bottom: 0; /* default margin-bottom: 20px; */
+}
+.scheme_unicorn .tabInner label[for='toggleResearched'],
+.scheme_unicorn .tabInner .expandAllBar a:last-child {
+	margin-right: 15px !important;
+}
+.scheme_unicorn .tabsContainer { 		
+	padding-bottom: 5px; /* default padding-bottom: 15px; */
+	padding-top: 4px; /* default padding-top: 2px; */
+	padding-left: 3px;
+}
+.scheme_unicorn .tabsContainer a {
+	font-size: 14px;
+	color: #547aa9;
+	padding: 3px 4px 0 4px;
+	border: 1px solid transparent; /* for no offset when border on */
+}
+.scheme_unicorn .tabsContainer span { /* separator | for tab */
+	color: transparent;
+	font-size: 13px; /* to set width = 10px */
+	margin-left: -6px;
+	margin-right: -5px;
+}
+.scheme_unicorn .tabsContainer a:not(.activeTab) {
+	border-bottom: 1px solid #223244;
+}
+.scheme_unicorn .tabsContainer a:not(.activeTab):hover {
+	border: 1px solid #223244;
+	background-color: rgba(42, 61, 84, 0.2); /* color: #2a3d54; */
+	border-radius: 5px 5px 0 0;
+	color: #2a3e54;
+}
+.scheme_unicorn .tabsContainer a.activeTab {
+	background-color: #2a3d54;
+	border: 1px solid #223244;
+	border-radius: 5px 5px 0 0;
+	color: #eae2d4;
+	box-shadow: -1px -1px #c0c0c0, 2px 0 3px #111922;
+}
+.scheme_unicorn .tabsContainer a.activeTab:hover {
+    color: #eae2d4;
+}
+.scheme_unicorn .tab.traitLeaderBonus::before {
+	content: "\2605"; /* BLACK STAR */
+	color: #4f8fdd;
+}
+.scheme_unicorn div.bldTopContainer > a { /* under tab */
+	font-size: 90%;
+	font-style: italic;
+	margin-bottom: 5px;/* default margin-bottom: 15px; */
+}
+.scheme_unicorn div.bldTopContainer a.activeTab {
+	color: #3a5474;
+	opacity: 1;
+}
+.scheme_unicorn div.bldTopContainer a.activeTab:hover {
+    color: #3a5474;
+}
+.scheme_unicorn .bldGroupContainer { /* container for all buttons on center column */
+    padding-top: 5px; /* default 15px */
+    border-top: 1px solid transparent;
+    margin-top: 5px; /* default 10px */
+}
+.scheme_unicorn input[type='button'] {
+	background-color: #f0ebe1 !important; /* !important in default.css */
+	box-shadow: 2px 2px 5px #111922,
+                 0 -1px 0 #f8f6f1 !important; /* !important in default.css */
+    border: solid 1px #ece5d8 !important; /* for no offset when border on */ /* !important in default.css */
+    border-radius: 3px !important; /* !important in default.css */
+	color: #3a5474;
+	padding: 5px 20px;
+	margin-left: 10px;
+}
+.scheme_unicorn input[type='button']:hover {
+	background-color: #446488 !important; /* !important in default.css */
+	border: solid 1px #4c7098 !important; /* !important in default.css */
+	color: #f8f5f0;
+	text-shadow: 1px 1px 1px #111922;
+	box-shadow: inset 2px 2px 3px #223244,
+                 0 1px 0 #eae3d5 !important; /* !important in default.css */
+}
+/* button observer different from other input buttons */
+.scheme_unicorn input[type='button']#observeBtn {	
+	font-size: 15px;
+	border-radius: 7px !important; /* !important in default.css */
+	text-shadow: 1px 1px 3px #111922;
+	background-color: rgba(114, 146, 185, 1)!important; /* !important in default.css */
+	color: #f8f6f1;
+	border: ridge 2px #f8f6f1 !important; /* !important in default.css */
+	box-shadow: 3px 3px 5px #111922,
+				0 1px #7292B9,
+				0 0 4px 1px rgba(114, 146, 185, 1) !important; /* !important in default.css */	
+	position: absolute;
+	left: 60px;
+}
+.scheme_unicorn input[type='button']#observeBtn:hover {
+	cursor: pointer !important; /* !important in default.css */
+	text-shadow: 1px 1px 1px #111922;
+	background-color: rgba(114, 146, 185, 0.8) !important; /* !important in default.css */
+	color: #f0e8db;
+	border: groove 2px #f0e8db !important; /* !important in default.css */	
+	box-shadow: inset 1px 1px 2px #111922, 0 0 2px 2px rgba(114, 146, 185, 0.8) !important; /* !important in default.css */
+	
+}
+.scheme_unicorn .btn .btnContent a {
+    max-width: 60px; /* default max-width: 50px; */
+}
+.scheme_unicorn .btn.modern a {
+	font-size: 90%;
+	font-weight: normal;
+	background-color: transparent;
+	padding: 10px 3px 10px 3px !important; /* default :  padding: 10px 6px 10px 6px !important; */
+	text-shadow: none;
+	border-left: none; /* default border-left: 1px solid #888; */
+}
+.scheme_unicorn .btn.modern:not(.disabled) a {
+	color: #505050;
+}
+.scheme_unicorn .btn.modern.disabled a {
+	color: #808080
+}
+.scheme_unicorn .btn.modern:not(.disabled) a:hover {
+	color: #202020;
+	background-color: #eae3d5;
+}
+.scheme_unicorn .btn.modern.disabled a:hover {
+	color: #f0eae0;
+	background-color: #324964;
+	box-shadow: inset 0 2px 5px #111922;
+}
+.scheme_unicorn .btn.modern:not(.disabled):active,
+.scheme_unicorn input[type='button']:active,
+.scheme_unicorn input[type='button']#observeBtn:active {
+    border-color: #4F8FDD !important;
+}
+.scheme_unicorn .linkContent { /* dropdown list on button */
+    margin-top: 26px !important; /* for correct vertical align dropdown list */
+    width: auto !important;
+	background-color: #f4f1e9; /* color pick from button not disabled and hover */
+	border-radius: 0 3px 3px 3px;
+	border-style: solid;
+	border-width: 0;
+	box-shadow: 4px 4px 7px #111922;
+}
+.scheme_unicorn .linkContent a {
+    color: #B5BAC4;
+    width: 36px !important;
+    margin-top: 0 !important;
+	margin-bottom: 0 !important;
+	border-left: none; /* default border-left: 1px solid #888; */
+}
+.scheme_unicorn .btn.modern.disabled .linkContent { /* dropdown list on button disabled */
+	background-color: #2a3d54; /* color pick from button disabled and hover */
+	box-shadow: inset 2px 0 5px #111922,
+                 0 1px 0 #c0c0c0;
+}
+.scheme_unicorn .btn.modern.disabled .linkContent a:hover {
+	box-shadow: inset 2px 0 5px #111922;
+}
+.scheme_unicorn .linkContent a:first-child,
+.scheme_unicorn .linkContent a:first-child:hover {
+	border-radius: 0 3px 0 0;
+}
+.scheme_unicorn .linkContent a:last-child,
+.scheme_unicorn .linkContent a:last-child:hover {
+	border-radius: 0 0 3px 3px;
+}
+/* Apply the right border radius of the button to the rightmost link */
+.scheme_unicorn .btn.modern span.btnTitle + a,
+.scheme_unicorn .btn.modern:not(.hasSellLink) a.off1Link, /* link minus on buildings buttons */
+.scheme_unicorn .btn.modern:not(.hasSellLink) a.unassignLink { /* link minus on kittens jobs buttons */	
+	border-radius: 0 5px 5px 0; /* buttons border-radius: 5px; */
+}
+.scheme_unicorn .btn.modern .btnContent a.rightestLink { /* for Combust TC button in Time tab and Hold Festival in Settlement tab */
+	border-radius: 0 5px 5px 0;
+}
+.scheme_unicorn .btn .btnContent a.small {
+    font-size: 0.7em;
+    line-height: 16px;
+}
+.scheme_unicorn .panelContainer {
+	border: 3px ridge #f4eee4;
+	background: #adb6c0;
+	border-radius: 5px;
+	box-shadow: 2px 2px 3px #111922;
+}
+.scheme_unicorn table.statTable {
+	background-color: #223244;
+	margin-top: 6px;
+	margin-left: 12px;
+	padding: 9px;
+	border: 3px groove #f8f5f0;
+	border-radius: 5px;
+	box-shadow: 4px 4px 9px 1px #111922;
+	color: #b6bec7;
+}
+.scheme_unicorn .panelContainer div.title {
+	padding: 4px 4px 4px 20px; /* default padding: 4px; */ /* default padding-left: 10px; */
+	margin-bottom: 3px;
+	color: #f8f5f0;
+	font-size: 16px !important;
+	text-shadow: 1px 1px 1px #0b1016;
+}
+.scheme_unicorn .tabInner.Trade .panelContainer div.title {
+	padding: 3px 4px 0 20px;
+	margin-bottom: 0;
+}
+.scheme_unicorn .panelContainer .toggle {
+	font-size: 8px;
+	margin: 7px 7px 0 0; /* default margin: 4px; */
+	padding-left:  3px; /* default padding-left 6px */
+    padding-right: 3px; /* default padding-right 6px */
+	border: 2px outset #f8f6f1;
+	background-color: #8591a0;
+	border-radius: 7px;
+	box-shadow: 1px 1px 2px #111922;
+	color: #f8f6f1;
+}
+.scheme_unicorn .container {
+	padding: 5px; /* default padding: 10px; */
+}
+.scheme_unicorn .container div.currentGovernment { /* for padding-bottom too height */
+	padding-bottom: 3px !important;
+}
+.scheme_unicorn .trade-race .buys {
+	color: #e43011;
+	font-size: smaller;
+}
+.scheme_unicorn .trade-race .sells {
+	color: #63872d;
+	font-size: smaller;
+}
+.scheme_unicorn .trade-race .ammount {
+	color: #606060;
+	font-size: smaller;
+}
+.scheme_unicorn .attitude { /* text for attitude races int trade tab */
+	color: #4b5560 !important;
+	text-shadow: none !important;
+	text-transform: capitalize;
+}
+.scheme_unicorn .attitude:before {
+	content: "\00a0\27a0\00a0"; /* default content: "("; */ /* HEAVY DASHED TRIANGLE-HEADED RIGHTWARDS ARROW */
+	color: #385170;
+}
+.scheme_unicorn .attitude:after {
+    content: ""; /* default content: ")"; */
+}
+/* ---------- Village ---------- */
+/* container 'Census' -> list of kittens in settlement tab */
+.scheme_unicorn .census-block {
+	background-color: #e8dbc7;
+	border-radius: 3px;
+	border: groove 1px #8491a0;
+	box-shadow: inset 1px 1px 3px #111922, inset -1px -1px 1px #f0ebe1;
+	font-size: 90%;
+	padding: 3px; /* default padding: 5px; */
+	margin-bottom: 3px; /* default margin-bottom: 5px; */
+}
+.scheme_unicorn .census-block.simLeader {
+	background-color: #c0cee0;
+	box-shadow: 1px 1px 3px #111922, -1px -1px 1px #f0ebe1;
+	border: ridge 1px #8491a0;
+}
+.scheme_unicorn .census-block.simLeader a.leaderHref {
+	color: #4f8fdd;
+}
+.scheme_unicorn .census-block .info { /* info of kitten */
+	font-size: 0.9em;
+	color: #404040;
+}
+.scheme_unicorn .census-block .skill { /* jobs unasigned */
+	color: #606060;
+}
+.scheme_unicorn .census-block .skill:first-of-type { /* job assigned */
+	color: #4f8fdd;
+	font-weight: normal !important;
+}
+.scheme_unicorn .census-block.simLeader .info span.name {  /* Leader name */
+	font-size: 1.2em;
+}
+.scheme_unicorn .census-block.simLeader .skill:first-of-type { /* Leader job assigned */
+	font-size: 1em; /* default font-size: 0.8em; */
+}
+.scheme_unicorn .container .name.color-none { /* name of kitten */
+	color: #404040;
+}
+.scheme_unicorn .container .name.color-brown {
+	color: #824b23;
+}
+.scheme_unicorn .container .name.color-cream {
+	color: #ad884a;
+}
+.scheme_unicorn .container .name.color-black {
+	color: #000000;
+}
+.scheme_unicorn .container .name.color-fawn {
+	color: #713306;
+}
+.scheme_unicorn .container .name.color-white {
+	color: #808080;
+}
+.scheme_unicorn .container .name.variety-none {
+	border: 1px solid transparent;
+}
+.scheme_unicorn .container .name.variety-dual {
+	border: 1px solid black;
+}
+.scheme_unicorn .container .name.variety-tabby {
+	border: 1px dashed black;
+}
+.scheme_unicorn .container .name.variety-torbie {
+	border: 1px dashed black;
+	border-left: dotted;
+	border-right: dotted;
+}
+.scheme_unicorn .container .name.variety-calico {
+	border: 1px solid black;
+	border-top-color: gray;
+	border-bottom-color: gray;
+}
+.scheme_unicorn .container .name.variety-spots {
+	border: 1px dotted black;
+}
+.scheme_unicorn .btn.modern a.bld-on,
+.scheme_unicorn .btn.modern a.auto-on,
+.scheme_unicorn .btn.modern a.fugit-on {
+	color: #7AA738;
+}
+.scheme_unicorn .btn.modern:hover a.bld-on,
+.scheme_unicorn .btn.modern:hover a.auto-on,
+.scheme_unicorn .btn.modern:hover a.fugit-on {
+	color: #7AA738;
+}
+.scheme_unicorn .btn.modern a.bld-off,
+.scheme_unicorn .btn.modern a.auto-off,
+.scheme_unicorn .btn.modern a.fugit-off {
+	color: #e43011;
+}
+.scheme_unicorn .btn.modern:hover a.bld-off,
+.scheme_unicorn .btn.modern:hover a.auto-off,
+.scheme_unicorn .btn.modern:hover a.fugit-off {
+	color: #e43011;
+}
+.scheme_unicorn .btn.modern.craftOn span.btnTitle { /* all buttons with engineer(s) in workshop tab */
+	color: #63872d;
+}
+.scheme_unicorn td.craftStuffPanel > span { /* title of craft stuff panel */
+	color: #f8f5f1;
+	font-size: 15px;
+	text-shadow: 1px 1px 1px #111922;
+}
+.scheme_unicorn td.craftStuffPanel > table { /* craft stuff panel */
+	background-color: #e8dbc7;
+	border-radius: 3px;
+	border: groove 1px #8491a0;
+	margin-top: 2px;
+	box-shadow: inset 1px 1px 3px #111922, inset -1px -1px 1px #f0ebe1;
+	padding: 10px 20px; /* default padding-top: 20px; */
+}
+
+/* ******************************************************** */
+/* ******************* ACHIEVEMENTS TAB ******************* */
+/* ******************************************************** */
+.scheme_unicorn .achievement-header {
+	color: #f8f5f0;
+	text-shadow: 1px 1px 2px #111922;
+	font-size: 18px;
+	margin-bottom: 3px;
+	padding-left: 20px;
+}
+.scheme_unicorn .achievement {
+	display: block;
+	font-size: 15px;
+	margin: 10px; /* default margin-bottom: 10px; */
+	height: 34px;
+	background-color: rgba(114, 146, 185, 0.7);
+	color: #f0eae0;	
+	letter-spacing: 1px;
+	border : 3px ridge #e8dbc7;
+	border-radius: 5px;
+	box-shadow: 0 -1px #e8dfd0, 1px 1px 2px #111922;
+}
+.scheme_unicorn .achievement:hover {
+	color: #f8f6f1;
+	background-color: rgba(114, 146, 185, 0.9);
+	text-shadow: #f8f5f0 0 0 10px;
+	border-color : #f8f6f1;
+}
+.scheme_unicorn .achievement:not(.unethical).unlocked:hover {
+	box-shadow: 0 -1px #f0ebe1, 3px 3px 7px #111922;
+}
+.scheme_unicorn .achievement.unethical {
+	background-color: rgba(228, 48, 17, 0.5);
+	border-color : rgba(228, 48, 17, 0.6);
+}
+.scheme_unicorn .achievement.unethical:hover {
+	background-color: rgba(228, 48, 17, 0.9);
+	border-color : rgba(228, 48, 17, 1);
+	box-shadow: 0 -1px #f0ebe1, 3px 3px 7px #111922;
+}
+.scheme_unicorn .achievement:not(.unlocked) {
+	color: #515c68;
+	background-color: transparent;
+	text-shadow: none;
+	border: 3px ridge #e0cfb5;
+}
+.scheme_unicorn .achievement:not(.unlocked):hover {
+	box-shadow: 3px 3px 7px #111922;
+}
+.scheme_unicorn .achievement:after {
+	display: block;
+	letter-spacing: normal;
+	margin-top: 2px;
+	font-size: 90%;
+	color: #f4f1e9;
+	text-shadow: none;
+}
+.scheme_unicorn .achievement-header .star {
+	color: #e39400;
+}
+.scheme_unicorn .achievement .star {
+	color : #515c68;
+}
+.scheme_unicorn .achievement.unlocked .star {
+	color : #e39400;
+	font-weight: bold;
+	text-shadow: 1px 1px 1px #111922;
+}
+
+/* **************************************************** */
+/* ******************* RIGHT COLUMN ******************* */
+/* **************************************************** */
+.scheme_unicorn #rightColumn {
+	width: calc(50% - 355px);
+	max-width: 440px; /* max-width: 400px; */
+	top: 0; /* default top: 20px; */
+	margin-top: 16px;
+}
+.scheme_unicorn #toggleCenter,
+.scheme_unicorn span.toggleCenter {
+	color: #4c6f99;
+	opacity: 0.6; /* default opacity: 0.2; */
+	cursor: pointer;
+}
+.scheme_unicorn span.toggleCenter {
+	opacity: 1; /* for have #toggleCenter same color */
+}
+.scheme_unicorn #toggleCenter:hover,
+.scheme_unicorn div#toggleCenter:hover > span.toggleCenter {
+	color: #3c5779;
+	opacity: 1.0;
+}
+.scheme_unicorn #calendarDiv {
+    color: #f8f5f1;
+	padding-left: 5px;
+    margin-top: 5px;
+	text-shadow: 1px 1px 2px #111922;
+	font-weight: bold;
+}
+.scheme_unicorn #calendarSign {
+   font-size: 120% ;
+}
+.scheme_unicorn #calendarSign:hover {
+   cursor: default ;
+}
+.scheme_unicorn .right-tab-header { /* Log | Chat link on right column */
+	color: #333342; /* for separator tab | */
+	font-size: 80%;
+ }
+.scheme_unicorn .right-tab-header a {
+	border: 1px solid transparent; /* for no offset when border on */
+	margin-right: -5px;
+}
+.scheme_unicorn .right-tab-header a:not(.active) {
+	border-bottom: 1px solid #223244;
+}
+.scheme_unicorn .right-tab-header a:not(.active):hover {
+	border: 1px solid #223244;
+	background-color: rgba(42, 61, 84, 0.2); /* color: #2a3d54; */
+	border-radius: 5px 5px 0 0;
+	color: #2a3e54;
+}
+.scheme_unicorn .right-tab-header a.active {
+    background-color: #2a3d54;
+	border: 1px solid #223244;
+	border-radius: 5px 5px 0 0;
+	color: #eae2d4;
+	box-shadow: -1px -1px #c0c0c0, 2px 0 3px #111922;
+}
+.scheme_unicorn .right-tab-header a.active:hover {
+	color: #eae2d4;
+}
+.scheme_unicorn div#observeButton {
+	height: 35px; /* default height: 30px; */
+}
+.scheme_unicorn #rightTabChat {
+	margin-top: 14px;
+}
+.scheme_unicorn div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
+	color: #515c68;
+	font-size: 90%;
+	border-top: 1px solid transparent !important;
+}
+.scheme_unicorn #clearLogHref { /* Link in right column : Clear log */
+	font-size: 80%;
+}
+.scheme_unicorn #logFiltersBlock > a { /* Link in right column : [+]Log Filters */
+	font-size: 80%;
+	margin-left: 5px;
+}
+.scheme_unicorn #pauseBtn { /* Link in right column : pawse */
+	margin-left: 5px;
+}
+.scheme_unicorn div#gameLog {
+	margin: 6px 5px 5px 0;
+	background: transparent;
+	min-height: 5% !important;
+	height: unset !important;
+	max-height: calc(100% -80px) !important;
+}
+.scheme_unicorn #gameLog span.msg:not(.type_date) {
+	font-size: 80%;
+	margin-left: 1.2em;
+	list-style-type: '\25AA'; /* black small square */
+	padding-left: 0.3em;
+}
+.scheme_unicorn #gameLog span.noBullet {
+	margin-left: 2.3em !important;
+	list-style-type: '\25B8' !important; /* BLACK RIGHT-POINTING SMALL TRIANGLE */
+}
+.scheme_unicorn .msg {
+	font-weight: normal; /* thin if possible with font sizes */
+	color: #454e58;
+}
+.scheme_unicorn .msg.type_notice {
+    color: #4f8fdd; /* color default : #01A9DB; */
+}
+.scheme_unicorn .msg.type_important {
+    color: #b97900; /* color default : coral; */
+}
+.scheme_unicorn .msg.type_alert {
+    color: #e43011; /* color default : red; */
+}
+.scheme_unicorn .msg.type_date {
+	color: #385170;
+	font-size: 14px;/* default font size = font-size: 90%; */
+	font-weight: bold;
+	text-transform: none;
+	text-decoration: underline #7d8497;
+	border-bottom: none;
+	padding-left: 5px;
+}
+
+/* *************************************************** */
+/* ******************* LEFT COLUMN ******************* */
+/* *************************************************** */
+.scheme_unicorn #leftColumn {
+	padding-top: 5px;
+	padding-right: 10px; /* -10px gained on res-toolbar.right padding-right default padding right : 20px */
+	background-color: #223244;
+	box-shadow: 2px 0 5px #223244;
+}
+.scheme_unicorn #leftColumn a {
+	color: #a1acb7;
+}
+.scheme_unicorn #leftColumn a:hover {
+	color: #eae2d4;
+}
+.scheme_unicorn .res-row.resource_catnip .resource-name,
+.scheme_unicorn .res-row.resource_wood .resource-name,
+.scheme_unicorn .res-row.resource_minerals .resource-name,
+.scheme_unicorn .res-row.resource_coal .resource-name,
+.scheme_unicorn .res-row.resource_iron .resource-name,
+.scheme_unicorn .res-row.resource_titanium .resource-name,
+.scheme_unicorn .res-row.resource_gold .resource-name,
+.scheme_unicorn .res-row.resource_oil .resource-name,
+.scheme_unicorn .res-row.resource_beam .resource-name,
+.scheme_unicorn .res-row.resource_slab .resource-name,
+.scheme_unicorn .res-row.resource_plate .resource-name,
+.scheme_unicorn .res-row.resource_concrate .resource-name,
+.scheme_unicorn .res-row.resource_kerosene .resource-name {
+	color: #c3cad0;
+}
+.scheme_unicorn a.link.collapse {
+	opacity: 0.3; /* default opacity: 0.2; */
+}
+.scheme_unicorn a.link.collapse:hover {
+	opacity: 1;/* default opacity: 0.9; */
+	color: #eae2d4;
+}
+.scheme_unicorn #leftColumn .res-toolbar a.link.toggled {
+    color: #4f8fdd;
+}
+.scheme_unicorn div.tooltip-block:hover > span {
+	font-weight: bold;
+	color: #eae2d4;
+}
+.scheme_unicorn .res-table {
+	max-width: 352px;/* default max-width: 340px; */
+    border-collapse: collapse; /* gain of 3 pixel by border -> no margin bottom after */
+	margin-left: 2px; /* without 0px margin left for all ressources */
+ }
+.scheme_unicorn .res-toolbar {
+    font-size: 90%;
+}
+.scheme_unicorn .res-toolbar.right {
+	padding-right: 20px;
+}
+.scheme_unicorn .craftTable {
+	margin-bottom: 10px !important; /* for correct margin bottom due of the line above with border-collapse: collapse on .res-Table ! */
+}
+.scheme_unicorn .res-cell.craft-link {
+	color: #586470;
+}
+.scheme_unicorn .res-cell.craft-link.all {
+	font-size: 90%; /* default font-size: 85%; */
+	opacity: 1; /* default opacity: 0.4; */
+	color: #7292b9;
+}
+.scheme_unicorn .res-cell.craft-link:hover,
+.scheme_unicorn .res-cell.craft-link.all:hover { /* craft table left column */
+    color: #eae2d4;
+	text-decoration: none;
+	font-weight: bold;
+	text-shadow: 1px 1px 1px #111922;
+}
+.scheme_unicorn .res-row {
+	padding-bottom: 2px; /* default padding-bottom: 4px; */
+}
+.scheme_unicorn .res-row:hover {
+    background-color: rgba(240, 234, 224, 0.1);
+	cursor: default;
+}
+.scheme_unicorn .highlited { /* higlighting ressources when hover button on center windows */
+	background-color: rgba(240, 234, 224, 0.1);
+}
+.scheme_unicorn .res-toolbar {
+	white-space: nowrap;
+}
+.scheme_unicorn .resource_faith .resource-name,
+.scheme_unicorn .resource_kittens .resource-name,
+.scheme_unicorn .resource_steel .resource-name,
+.scheme_unicorn .resource_gear .resource-name,
+.scheme_unicorn .resource_alloy .resource-name,
+.scheme_unicorn .resource_megalith .resource-name {
+	color: #707070 !important;
+}
+.scheme_unicorn .maxRes {
+	color: #586470;
+}
+.scheme_unicorn .resAmount {
+    color: #718090;
+}
+.scheme_unicorn .resLimitWarn {
+    color: #b97900;
+	opacity: 1; /* default = 0.75 */
+	font-style: italic;
+}
+.scheme_unicorn .resLimitNotice {
+    color: #eae2d4;
+}
+.scheme_unicorn .resPerTick {
+	cursor: default;
+	color: #9aa5b0;
+	font-size: 90%;
+}
+.scheme_unicorn .res-row.resLeaderBonus .resPerTick {
+	color: #4f8fdd;
+	opacity: 0.7;
+}
+.scheme_unicorn .res-row.craftEngineer .res-cell.resource-value {
+	color: #7AA738;
+	opacity: 0.8;
+}
+.scheme_unicor div#advisorsContainer {
+	color: #e43011;
+}
+.scheme_unicorn .res-cell.resource-value {
+	color: #718090;
+}
+.scheme_unicorn #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+	text-shadow: 1px 1px 2px #111922;
+	font-size: 100%;
+}
+.scheme_unicorn #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+	color: #647180;
+	text-shadow: none !important;
+	font-size: smaller;
+}
+.scheme_unicorn #fastPraiseContainer > a { /* Text left column : "Praise the sun!" */
+	text-shadow: 1px 1px 2px #111922;
+	font-size: 100%;
+}
+.scheme_unicorn #fastPraiseContainer >a:hover {
+	color: #f8f5f0;
+	text-shadow: 0 0 4px #f8f5f0;
+}
+.scheme_unicorn .res-cell.positive-weather { /* to change the color for bonus cell according to the season */
+	font-size: 85%;
+	color: #7AA738;
+}
+.scheme_unicorn .res-cell.negative-weather { /* to change the color for penalty cell according to the season */
+	font-size: 85%;
+	color: #e43011;
+}
+
+/* ************************************************* */
+/* ******************* SCROLLBAR ******************* */
+/* ************************************************* */
+.scheme_unicorn ::-webkit-scrollbar-thumb {
+    background: #324964;
+	border-radius: 40px;
+}
+.scheme_unicorn ::-webkit-scrollbar-track {
+    background: #223244;
+    border-radius: 50px;
+}
+/* Only FireFox */
+.scheme_unicorn #leftColumn,
+.scheme_unicorn #rightColumn,
+.scheme_unicorn #midColumn {
+   scrollbar-width: thin;
+   scrollbar-color: #324964 #223244 !important;
+}
+.scheme_unicorn select {
+   scrollbar-width: auto !important;
+}

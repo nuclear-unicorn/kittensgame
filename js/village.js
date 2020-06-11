@@ -152,7 +152,14 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		return 500 * Math.pow(1.75, rank);
 	},
 
+	//---------------------------------------------------------
+	//please dont pass params by reference or I will murder you
+	//---------------------------------------------------------
 	getEffectLeader: function(trait, defaultObject){
+		var leaderRatio = 1;
+		if (this.game.science.getPolicy("monarchy").researched){
+			leaderRatio = 1.95;
+		}
 		if(this.leader) {
 			var leaderTrait = this.leader.trait.name;
 			if (leaderTrait == trait) {
@@ -161,31 +168,33 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 				// Modify the defautlObject depends on trait
 				switch (trait) {
 					case "engineer": // Crafting bonus
-						defaultObject = 0.05 * burnedParagonRatio * reward;
+						defaultObject = 0.05 * burnedParagonRatio * leaderRatio * reward;
 						break;
 					case "metallurgist": // Crafting bonus for non x-ium metallic stuff (plate, steel, gear, alloy)
-						defaultObject = 0.1 * burnedParagonRatio * reward;
+						defaultObject = 0.1 * burnedParagonRatio * leaderRatio * reward;
 						break;
 					case "chemist": // Crafting bonus for "chemical" stuff (concrete, eludium, kerosene, thorium)
-						defaultObject = 0.075 * burnedParagonRatio * reward;
+						defaultObject = 0.075 * burnedParagonRatio * leaderRatio * reward;
 						break;
 					case "merchant": // Trading bonus
-						defaultObject = 0.03 * burnedParagonRatio * reward;
+						defaultObject = 0.03 * burnedParagonRatio * leaderRatio * reward;
 						break;
 					case "manager": // Hunting bonus
-						defaultObject = 0.5 * burnedParagonRatio * reward;
+						defaultObject = 0.5 * burnedParagonRatio * leaderRatio * reward;
 						break;
 					case "scientist": // Science prices bonus
 						for (var i = 0; i < defaultObject.length; i++) {
 							if (defaultObject[i].name == "science") {
-								defaultObject[i].val -= defaultObject[i].val * this.game.getHyperbolicEffect(0.05 * burnedParagonRatio * reward, 1.0); //5% before BP
+								defaultObject[i].val -= defaultObject[i].val 
+									* this.game.getHyperbolicEffect(0.05 * burnedParagonRatio  * leaderRatio * reward, 1.0); //5% before BP
 							}
 						}
 						break;
 					case "wise": // Religion bonus
 						for (var i = 0; i < defaultObject.length; i++) {
 							if (defaultObject[i].name == "faith" || defaultObject[i].name == "gold") {
-								defaultObject[i].val -= defaultObject[i].val * this.game.getHyperbolicEffect(0.09 + 0.01 * burnedParagonRatio * reward, 1.0); //10% before BP
+								defaultObject[i].val -= defaultObject[i].val 
+									* this.game.getHyperbolicEffect(0.09 + 0.01 * burnedParagonRatio * leaderRatio * reward, 1.0); //10% before BP
 							}
 						}
 						break;
@@ -506,8 +515,13 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		this.traits = traits;
 	},
 
+	//leader production bonus in the assigned job
 	getLeaderBonus: function(rank){
-		return rank == 0 ? 1.0 : (rank + 1) / 1.4;
+		var bonus = rank == 0 ? 1.0 : (rank + 1) / 1.4;
+		if (this.game.science.getPolicy("authocracy").researched){
+			bonus *= 2;
+		}
+		return bonus;
 	},
 
 	/**
@@ -622,6 +636,9 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		var populationPenalty = 2;
 		if (this.game.science.getPolicy("liberty").researched){
 			populationPenalty = 1;
+		}
+		if (this.game.science.getPolicy("fascism").researched) {
+			return 0;
 		}
 		return ( this.getKittens()-5 ) * populationPenalty * (1 + this.game.getEffect("unhappinessRatio"));
 	},
@@ -870,11 +887,17 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 		SAVE_PACKET_OFFSET: 100
 	},
 
-	names: ["Angel", "Amber", "Bea", "Charlie", "Cassie", "Cleo", "Cedar", "Dali", "Ellie", "Fiona", "Hazel", "Iggi", "Jasmine", "Jasper",
-			 "Kali", "Luna", "Lily", "Molly", "Mittens", "Maddie", "Meeko", "Micha", "Oreo", "Oscar", 
-			 "Plato", "Rikka", "Ruby", "Reo", "Reilly", "Theo", "Timber", "Tami", "Tammy"],
-	surnames: ["Ash", "Bark", "Brass", "Bowl", "Chalk", "Clay", "Dust", "Dusk", "Fur", "Gaze", "Gleam", "Grass", "Moss", "Paws", "Plaid", "Puff", "Rain", 
-				"Shadow", "Sand", "Silk", "Smoke", "Speck", "Silver", "Stripes", "Tails", "Tingle", "Yarn", "Wool"],
+	// 100 names MAX!
+	// Add new names at the end of the list
+	names: ["Angel", "Charlie", "Mittens", "Oreo", "Lily", "Ellie", "Amber", "Molly", "Jasper",
+			"Oscar", "Theo", "Maddie", "Cassie", "Timber", "Meeko", "Micha", "Tami", "Plato",
+			"Bea", "Cedar", "Cleo", "Dali", "Fiona", "Hazel", "Iggi", "Jasmine", "Kali", "Luna",
+			"Reilly", "Reo", "Rikka", "Ruby", "Tammy"],
+	// 100 surnames MAX!
+	// Add new surnames at the end of the list
+	surnames: ["Smoke", "Dust", "Chalk", "Fur", "Clay", "Paws", "Tails", "Sand", "Scratch", "Berry", "Shadow",
+				"Ash", "Bark", "Bowl", "Brass", "Dusk", "Gaze", "Gleam", "Grass", "Moss", "Plaid", "Puff", "Rain", 
+				"Silk", "Silver", "Speck", "Stripes", "Tingle", "Wool", "Yarn"],
 
 	traits: [{
 		name: "scientist",
@@ -918,7 +941,7 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 		color: "lilac"
 	}],
 
-	variety: [{
+	varieties: [{
 		style: "dual"
 	},{
 		style: "tabby"
@@ -1009,21 +1032,22 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 		this.rank =		data.rank || 0;
 		this.isLeader = data.isLeader || false;
 		this.isSenator = false;
+		this.isAdopted = data.isAdopted || false;
 		this.color = 	data.color || 0;
 		this.variety = 	data.variety || 0;
 		this.rarity = data.rarity || 0;
 
-		for (var job in this.skills){
-			if (this.skills[job] > 20001){
+		for (var job in this.skills) {
+			if (this.skills[job] > 20001) {
 				this.skills[job] = 20001;
 			}
 		}
 	},
 
 	loadCompressed: function(data, jobNames) {
-		var ssn = this._splitValues(data.ssn, 7, this.statics.SAVE_PACKET_OFFSET);
-		this.name = this.names[ssn[0]];
-		this.surname = this.surnames[ssn[1]];
+		var ssn = this._splitSSN(data.ssn, 7);
+		this.name = data.name || this.names[ssn[0]];
+		this.surname = data.surname || this.surnames[ssn[1]];
 		this.age = ssn[2];
 		this.trait = this.traits[ssn[3]];
 		this.color = ssn[4];
@@ -1047,14 +1071,18 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 		this.rank = data.rank || 0;
 		this.isLeader = data.isLeader || false;
 		this.isSenator = false;
+		this.isAdopted = data.isAdopted || false;
 	},
 
-	_splitValues: function(mergedResult, numberOfValues, shift) {
+	/**
+	 * As the max possible integer in JS is 2^53 ~= 90.07*100^7, with a packet offset of 100 only 7 numbers in 0..99 can be compressed, and the 8th number is limited to 0..89
+	 */
+	_splitSSN: function(mergedResult, numberOfValues) {
 		var values = [];
 		for (var i = 0; i < numberOfValues; ++i) {
-			var value = mergedResult % shift;
+			var value = mergedResult % this.statics.SAVE_PACKET_OFFSET;
 			mergedResult -= value;
-			mergedResult /= shift;
+			mergedResult /= this.statics.SAVE_PACKET_OFFSET;
 			values.push(value);
 		}
 		return values;
@@ -1079,14 +1107,15 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 			age: this.age,
 			color: this.color || undefined,
 			variety: this.variety || undefined,
-			rariry: this.rarity || undefined,
+			rarity: this.rarity || undefined,
 			skills: saveSkills,
 			exp: this.exp || undefined,
 			trait: {name: this.trait.name},
 			job: this.job || undefined,
 			engineerSpeciality: this.engineerSpeciality || undefined,
 			rank: this.rank || undefined,
-			isLeader: this.isLeader || undefined
+			isLeader: this.isLeader || undefined,
+			isAdopted: this.isAdopted || undefined
 		};
 	},
 
@@ -1104,38 +1133,41 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 			skills = maxSkill;
 		}
 
+		var nameIndex = this.names.indexOf(this.name);
+		var surnameIndex = this.surnames.indexOf(this.surname);
 		// don't serialize falsy values
-		return {
-			ssn: this._mergeValues(
-				[
-					this.names.indexOf(this.name), 
-					this.surnames.indexOf(this.surname), 
-					this.age, 
-					this._getTraitIndex(this.trait.name),
-					this.color,
-					this.variety,
-					this.rarity
-				], 
-				this.statics.SAVE_PACKET_OFFSET
-			),
+		var compressedSave = {
+			ssn: this._mergeSSN([
+				nameIndex > -1 ? nameIndex : 0,
+				surnameIndex > -1 ? surnameIndex : 0,
+				this.age,
+				this._getTraitIndex(this.trait.name),
+				this.color,
+				this.variety,
+				this.rarity]),
 			skills: skills || undefined,
 			exp: this.exp || undefined,
 			job: this.job ? jobNames.indexOf(this.job) : undefined,
 			engineerSpeciality: this.engineerSpeciality || undefined,
 			rank: this.rank || undefined,
-			isLeader: this.isLeader || undefined
+			isLeader: this.isLeader || undefined,
+			isAdopted: this.isAdopted || undefined
 		};
+		// Custom sur/names
+		if (nameIndex <= 0 || surnameIndex <= 0) {
+			compressedSave.name = this.name;
+			compressedSave.surname = this.surname;
+		}
+		return compressedSave;
 	},
 
 	/**
-	 * 
-	 * @param {*} values 
-	 * @param {*} shift 
+	 * As the max possible integer in JS is 2^53 ~= 90.07*100^7, with a packet offset of 100 only 7 numbers in 0..99 can be compressed, and the 8th number is limited to 0..89
 	 */
-	_mergeValues: function(values, shift) {
+	_mergeSSN: function(values) {
 		var result = 0;
 		for (var i = values.length - 1; i >= 0; --i) {
-			result *= shift;
+			result *= this.statics.SAVE_PACKET_OFFSET;
 			result += values[i];
 		}
 		return result;
@@ -2152,7 +2184,7 @@ dojo.declare("classes.ui.village.Census", null, {
 				? $I("village.census.trait.none")
 				: leader.trait.title + " (" + $I("village.bonus.desc." + leader.trait.name) + ") [" + $I("village.census.rank") + " " + leader.rank + "]";
 			var nextRank = Math.floor(this.game.village.getRankExp(leader.rank));
-			leaderInfo = this.getStyledName(leader, true /*is leader*/) + ", " + title +
+			leaderInfo = this.getStyledName(leader, true /*is leader panel*/) + ", " + title +
 				"<br /> exp: " + this.game.getDisplayValueExt(leader.exp);
 
 			if (nextRank > leader.exp) {
@@ -2277,12 +2309,12 @@ dojo.declare("classes.ui.village.Census", null, {
 		}
 	},
 
-	getStyledName: function(kitten, isLeader){
-		return "<span class='name color-" + 
-			((kitten.color && kitten.colors[kitten.color+1]) ? kitten.colors[kitten.color+1].color : "none") + 
-			" variety-" + ((kitten.variety && kitten.variety[kitten.variety+1]) ? kitten.variety[kitten.variety+1].style : "none") + 
+	getStyledName: function(kitten, isLeaderPanel){
+		return "<span class='name color-" +
+			((kitten.color && kitten.colors[kitten.color+1]) ? kitten.colors[kitten.color+1].color : "none") +
+			" variety-" + ((kitten.variety && kitten.varieties[kitten.variety+1]) ? kitten.varieties[kitten.variety+1].style : "none") +
 			"'>" +
-			(isLeader ? "" : ":3 ") + kitten.name + " " + kitten.surname +
+			(isLeaderPanel ? ":3 " : "") + kitten.name + " " + kitten.surname +
 		"</span>";
 	},
 
@@ -2378,8 +2410,12 @@ dojo.declare("classes.village.ui.FestivalButtonController", classes.village.ui.V
         var self = this;
         return {
         	title: "x" + holdQuantity,
-            visible: this.game.prestige.getPerk("carnivals").researched && this.hasMultipleResources(holdQuantity),
+            visible: this.game.prestige.getPerk("carnivals").researched && (this.game.opts.showNonApplicableButtons || this.hasMultipleResources(holdQuantity)),
             handler: function(btn, callback){
+				if (!self.hasMultipleResources(holdQuantity)) {
+					callback(false);
+					return;
+				}
 				self.game.villageTab.holdFestival(holdQuantity);
 				self.game.resPool.addResEvent("manpower", -1500 * holdQuantity);
 				self.game.resPool.addResEvent("culture", -5000 * holdQuantity);
@@ -2412,7 +2448,7 @@ dojo.declare("classes.village.ui.FestivalButton", com.nuclearunicorn.game.ui.But
 		this.inherited(arguments);
 		dojo.style(this.x10.link, "display", this.model.x10Link.visible ? "" : "none");
 		dojo.style(this.x100.link, "display", this.model.x100Link.visible ? "" : "none");
-		
+
         if  (this.model.x100Link.visible) {
 			dojo.addClass(this.x100.link,"rightestLink");
 			dojo.removeClass(this.x10.link,"rightestLink");

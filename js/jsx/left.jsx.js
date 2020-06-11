@@ -242,14 +242,19 @@ WCraftShortcut = React.createClass({
         }
 
         var elem = null;
+        var cssClasses = "res-cell craft-link ";
         if (craftPercent == 1) {
+            cssClasses += "all";
             elem = this.hasMinAmt(recipe)
-                ? $r("div", {className:"res-cell craft-link all", onClick: this.doCraftAll}, $I("resources.craftTable.all"))
-                : $r("div", {className:"res-cell craft-link all"});
+                ? $r("div", {className: cssClasses, onClick: this.doCraftAll, title: "+" + game.getDisplayValueExt(allCount * (1 + craftRatio), null, null, 0)}, $I("resources.craftTable.all"))
+                : $r("div", {className: cssClasses});
         } else {
+            cssClasses += (craftPercent * 100) + "pc";
             elem = game.resPool.hasRes(craftPrices, craftRowAmt, true)
-                ? $r("div", {className:"res-cell craft-link", onClick: this.doCraft}, $r("span", {className:"plusPrefix"}, "+"), game.getDisplayValueExt(craftRowAmt * (1 + craftRatio), null, null, 0))
-                : $r("div", {className:"res-cell craft-link"});
+                ? game.opts.usePercentageConsumptionValues
+                    ? $r("div", {className: cssClasses, onClick: this.doCraft, title: "+" + game.getDisplayValueExt(craftRowAmt * (1 + craftRatio), null, null, 0)}, (craftPercent * 100) + "%")
+                    : $r("div", {className: cssClasses, onClick: this.doCraft, title: (craftPercent * 100) + "%"}, $r("span", {className:"plusPrefix"}, "+"), game.getDisplayValueExt(craftRowAmt * (1 + craftRatio), null, null, 0))
+                : $r("div", {className: cssClasses});
         }
 
         return $r("div", {ref:"linkBlock", style: {display:"contents"}}, elem);
