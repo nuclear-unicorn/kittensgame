@@ -2188,7 +2188,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 	},
 
 	getCraftPrice: function(craft) {
-		if (craft.name != "ship") {
+		if (craft.name != "ship" && craft.name != "manuscript") {
 			return craft.prices;
 		}
 
