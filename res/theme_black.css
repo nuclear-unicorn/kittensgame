@@ -1,0 +1,931 @@
+/* ******************************************************** */
+/* ***			Black 1.00 Theme © Volkeyrn             *** */
+/* ******************************************************** */
+
+@import url(https://fonts.googleapis.com/css?family=Asap:ital,wght@400,600,700,400italic,600italic,700italic&display=swap);
+
+/* ******************************************** */
+/* ******************* GAME ******************* */
+/* ******************************************** */
+body.scheme_black {
+	background-color: #000000;
+}
+.scheme_black  #gamePageContainer,
+.scheme_black select,
+.scheme_black .btn,
+.scheme_black  .modern,
+.scheme_black .btn.modern,
+.scheme_black input[type='button'] {
+	font-family: 'Asap', sans-serif;
+}
+.scheme_black .btn {
+	color: gray;
+	margin-bottom: 6px; /* default 10px */
+	background-color: transparent;
+	border: solid 1px transparent;
+}
+.scheme_black .btn.modern.disabled {
+	border: solid 1px #404040;
+}
+.scheme_black .btn.modern.disabled:hover {
+	border: solid 1px #606060;
+}
+.scheme_black .btn.modern.disabled span.btnTitle { /* color text for all buttons disabled */
+	color: #505050;
+}
+.scheme_black .btn.modern.disabled span.btnTitle.limited { /* color text for all buttons limited */
+	color: #f9002b;
+}
+.scheme_black .btn.modern:not(.disabled) {
+	border: solid 1px #1e0080;
+}
+.scheme_black .btn.modern:not(.disabled):hover { /* hover on all button not disabled in center column */
+	background-color: #101010;
+	border: solid 1px #6e42ff;
+}
+.scheme_black .btn.modern:not(.disabled) span.btnTitle { /* color text for all buttons not disabled */
+	color: #d0d0d0;
+}
+.scheme_black .btn:not(.disabled):hover span.btnTitle { /* to change only the properties of the button name for buttons enabled */
+	color: #f0f0f0;
+}
+.scheme_black a {
+	color: #909090;
+}
+.scheme_black a,
+.scheme_black .craft-link {
+    text-decoration: none;
+}
+.scheme_black a:hover {
+	color: #d0d0d0;
+	opacity: 1.0; /* default opacity: 0.6 */
+}
+.scheme_black div {
+	color:#b0b0b0;
+}
+.scheme_black .disabled div { /* color text for disabled */
+	color: #505050;
+}
+.scheme_black h1 {
+	font-size: 18px; /* default font size = font-size: 12px; */
+	text-transform: capitalize;
+	color: #6e42ff;
+	padding-left: 20px;
+}
+.scheme_black h1:first-child {
+    margin-top: 0p;
+}
+.scheme_black .modern .btnContent {
+    padding: 10px 0 10px 1px !important; /* 1px left for buttons without power background-image */
+}
+/*** green and red light for machine on/off ***/
+.scheme_black .btn.bldEnabled div.btnContent,
+.scheme_black .btn.bldlackResConvert div.btnContent {
+	padding: 10px 0 10px 14px !important; /* 14px left for power background-image (linear-gradient) */
+	border: none;	
+}
+.scheme_black .btn.disabled.bldlackResConvert { /* color #991A22 */ /* color for lack resources convertion */	
+	background: no-repeat border-box linear-gradient(90deg, #f9002b 0%, #f9002b 10px, transparent 12px, transparent 100%);
+}
+.scheme_black .btn.disabled.bldlackResConvert:hover {
+	background: no-repeat border-box linear-gradient(90deg, #f9002b 0%, #f9002b 10px, transparent 12px, transparent 100%);
+}
+.scheme_black .btn:not(.disabled).bldlackResConvert {
+	background: no-repeat border-box linear-gradient(90deg, #f9002b 0%, #f9002b 10px, transparent 12px, transparent 100%);
+}
+.scheme_black .btn:not(.disabled).bldlackResConvert:hover {
+	background: no-repeat border-box linear-gradient(90deg, #ff2047 0%, #ff2047 10px, #101010 12px, #101010 100%);
+}
+.scheme_black .btn.disabled.bldEnabled { /* color #7AA738 */
+	background: no-repeat border-box linear-gradient(90deg, #00801e 0%, #00801e 10px, transparent 12px, transparent 100%);
+}
+.scheme_black .btn.disabled.bldEnabled:hover {
+	background: no-repeat border-box linear-gradient(90deg, #00801e 0%, #00801e 10px, transparent 12px, transparent 100%);
+}
+.scheme_black .btn:not(.disabled).bldEnabled {
+	background: no-repeat border-box linear-gradient(90deg, #00801e 0%, #00801e 10px, transparent 12px, transparent 100%);
+}
+.scheme_black .btn:not(.disabled).bldEnabled:hover {
+	background: no-repeat border-box linear-gradient(90deg, #00b029 0%, #00b029 10px, #101010 12px, #101010 100%);
+}
+/*** end of green light for machine on/off ***/
+.scheme_black .dialog {
+    background-color:  #000000;
+    box-shadow: 0 0 5px 5px #000000;
+	border: solid 1px #404040;
+	border-radius: 5px;
+	top: 40%;
+}
+.scheme_black .dialog a {
+    text-transform: capitalize;
+}
+.scheme_black .dialog a:hover {
+	color: #6e42ff;
+}
+.scheme_black label i { /* information text in option windows */
+	color: #707070;
+	opacity: 0.7;
+}
+.scheme_black label:hover {
+	opacity: 1;/* default opacity: 0.7; */
+	color: #f0f0f0;
+}
+.scheme_black label:hover i {
+	text-shadow: none;
+}
+.scheme_black select { /* dropdown list on settlement tab and options windows */
+	background-color: #101010;
+    color: #b0b0b0;
+	border: solid 1px #181818;
+	border-radius: 3px;
+	font-size: 13px;
+	margin-left: 3px;
+}
+.scheme_black select>option {
+	background-color: #101010;
+    color: #a0a0a0;
+	padding: 2px 10px; /* -2 pixel vertical */
+}
+.scheme_black select > option:disabled {
+	color: #505050;
+	font-size: 90%;
+}
+.scheme_black #optionsDiv input[type="checkbox"] + label:before {
+    content: "\2610"; /* BALLOT BOX */
+	font: 14px sans-serif;
+	color: #505050;
+}
+.scheme_black #optionsDiv input[type="checkbox"]:checked + label:before {
+	content: "\2611"; /* BALLOT BOX WITH CHECK */
+	font: 14px sans-serif;
+	color: #a0a0a0;
+}
+.scheme_black textarea#importData,
+.scheme_black textarea#exportData {
+	background-color: rgba(240, 240, 240, 0.4);
+	box-shadow: inset 0 0 3px 2px #000000;
+	border: solid 1px #6e42ff;
+	padding: 5px;
+	border-radius: 5px;
+	/* Only FireFox */
+	scrollbar-width: thin;
+   	scrollbar-color: #a0a0a0 #202020;
+}
+
+/* *********************************************** */
+/* ******************* TOP BAR ******************* */
+/* *********************************************** */
+.scheme_black #topBar {
+	border-bottom: none;
+	box-shadow: 0 1px 1px #404040, inset 0 1px 1px #404040, 0 3px 5px #000000;
+	top: 0; /* for no shadow on top */
+	padding-top: 4px;
+}
+.scheme_black #topBar a.copyright {
+	color: #f9002b;
+}
+.scheme_black #topBar a.copyright:hover {
+	color: #d0d0d0;
+}
+.scheme_black #headerLinks .links-block { /* a link separator : | on header links */
+	color: transparent;
+}
+.scheme_black #topBar div,
+.scheme_black #topBar #sorrowTooltip { /* counter of BLS (Black Liquid Sorrow) */
+	color: #d0d0d0;
+}
+.scheme_black #sorrowTooltip.max {
+    color: #f9002b;
+}
+.scheme_black #headerLinks>div:first-child:before {
+    color: #6e42ff;
+    content: 'Theme by Volkeyrn\00a0\00a0\00a0';
+    text-decoration: none;
+	font-weight: normal;
+}
+.scheme_black #autosaveTooltip {
+	color: #6e42ff;
+}
+.scheme_black #getTheApp-link { /* Get the app */
+	color: #d0d0d0 !important;
+}
+.scheme_black #getTheApp-link:hover {
+	color: #909090 !important;
+}
+.scheme_black .links-block {
+	padding-top: 5px !important;
+}
+.scheme_black .toolbarIcon.happiness {
+    color: #ff6e42;
+}
+.scheme_black .toolbarIcon.energy,
+.scheme_black .button_tooltip .energyProduction {
+    color: #00b029;
+}
+.scheme_black .toolbarIcon.energy.warningWinter {
+    color: #ff6e42;
+}
+.scheme_black .toolbarIcon.energy.warning,
+.scheme_black .button_tooltip .energyConsumption,
+.scheme_black .button_tooltip .energyPenalty {
+	color: #f9002b;
+}
+
+/* ********************************************** */
+/* ******************* FOOTER ******************* */
+/* ********************************************** */
+.scheme_black #footerLinks {
+	font-size: 90%;
+	bottom: 3px; /* default bottom: 10px; */
+}
+.scheme_black #footerLinks a:hover {
+	text-shadow: none;
+}
+.scheme_black #footerLinks { /* a link separator : | on footer links */
+	color: transparent;
+}
+
+/* *********************************************** */
+/* ******************* TOOLTIP ******************* */
+/* *********************************************** */
+.scheme_black #tooltip,
+.scheme_black .tooltip-block div {
+	background-color: #000000;
+	color: #808080; /* tooltip windows == left column : left text */
+	border: 1px solid #404040;
+	border-radius: 3px;
+	box-shadow: 0 0 5px 1px #000000;
+}
+.scheme_black .tooltip-block div { /* tooltip on ? top right column */
+	padding: 5px;
+}
+.scheme_black .button_tooltip {
+	background-color: transparent;
+}
+.scheme_black .button_tooltip div { /* tooltip window == left column: right text | center column :highlighting text */
+	color: #b0b0b0;
+}
+.scheme_black .tooltip-inner .desc { /* Tooltip Window : title text */
+    color: #e0e0e0;
+	border-bottom : 1px solid #404040 !important; /* in core.js !important needed */
+	margin-bottom: 5px;
+}
+.scheme_black .tooltip-inner .desc.small {
+	font-size: 75%; /* default font-size: 60%; */
+	opacity: 1; /* default opacity: 0.8; */
+}
+.scheme_black .tooltip-inner .desc.small.auto-off {
+	color: #f9002b;
+}
+.scheme_black .tooltip-inner .desc.small.auto-on {
+	color: #00b029;
+}
+.scheme_black .tooltip-divider { /* border line before effects text */
+	border-bottom : 1px solid #404040 !important; /* in core.js !important needed */
+}
+.scheme_black .effectName { /* Tooltip Window : effects text */
+	color: #6e42ff !important;
+}
+.scheme_black .rawRes { /* Tooltip Window == text for all missing resources for primary resource */
+    color: #505050;
+	font-style: italic;
+	padding-left: 12px;
+}
+.scheme_black .button_tooltip .noRes,
+.scheme_black .limited { /* on ressource limited or not attainable */
+	color: #f9002b;
+}
+.scheme_black #tooltip .flavor { /* Tooltip Window : last bottom text on center column tooltip window */
+    color: #ff6e42;
+	font-size: 13px !important; /* in core.js !important needed */
+	padding-right: 7px;
+}
+
+/* ***************************************************** */
+/* ******************* CENTER COLUMN ******************* */
+/* ***************************************************** */
+.scheme_black .tab { 
+    font-size: 13px;
+}
+.scheme_black .tabInner {
+    border: 1px solid #404040; /* default border: 1px solid gray; */
+	padding-bottom: 6px;/* 16px gained for buttons width. default padding: 15px; */
+	margin-bottom: 36px; /* default margin-bottom: 20px; */
+}
+.scheme_black .tabInner.Workshop div.panelContainer:last-child { /* last panelContainer on Workshop Tab */
+	margin-bottom: 54px; /* to view entire dropdownlink of last button */
+}
+.scheme_black .tabInner.Bonfire {
+	margin-bottom: 2px; /* default margin-bottom: 20px; */
+}
+.scheme_black .tabsContainer {
+	padding-bottom: 5px; /* default padding-bottom: 15px; */
+}
+.scheme_black .tabsContainer a {
+	font-size: 14px;
+}
+.scheme_black .tabsContainer span:not(.genericWarning) { /* separator | for tab */
+	color: #202020;
+}
+.scheme_black .tabsContainer a.activeTab {
+	color: #f0f0f0;
+}
+.scheme_black .tabsContainer a.activeTab:hover {
+    color: #f0f0f0;
+}
+.scheme_black span.genericWarning { /* number of kittens free or engineering free on tab */
+	color: #f9002b;
+}
+.scheme_black div.bldTopContainer > a { /* under tab */
+	font-size: 90%;
+	font-style: italic;
+	margin-bottom: 5px;/* default margin-bottom: 15px; */
+}
+.scheme_black div.bldTopContainer a.activeTab {
+	color: #d0d0d0;
+	opacity: 1;
+}
+.scheme_black div.bldTopContainer a.activeTab:hover {
+    color: #d0d0d0;
+}
+.scheme_black .bldGroupContainer { /* container for all buttons on center column */
+    padding-top: 5px; /* default 15px */
+    border-top: 1px solid #404040;
+    margin-top: 5px; /* default 10px */
+}
+.scheme_black input[type='button'] {
+	background-color: #404040 !important; /* !important in default.css */
+	box-shadow: 2px 2px 5px #000000,
+                 0 -1px 0 #808080 !important; /* !important in default.css */
+    border: solid 1px #181818 !important; /* for no offset when border on */ /* !important in default.css */
+    border-radius: 3px !important; /* !important in default.css */
+	color: #c0c0c0;
+	padding: 5px 20px;
+	margin-left: 10px;
+	text-shadow: 1px 1px 1px #000000;
+}
+.scheme_black input[type='button']:hover,
+.scheme_black input[type='button']#observeBtn:hover {
+	background-color: #202020 !important; /* !important in default.css */
+	border: solid 1px #181818 !important; /* !important in default.css */
+	color: #808080;
+	text-shadow: 1px 1px 1px #000000;
+	box-shadow: inset 2px 2px 3px #000000,
+				 0 1px 0 #606060 !important; /* !important in default.css */
+	cursor: pointer !important;
+}
+/* button observer different from other input buttons  */
+.scheme_black input[type='button']#observeBtn {	
+	font-size: 15px;
+	border-radius: 5px !important; /* !important in default.css */
+	text-shadow: 2px 2px 2px #000000;
+	background-color: #282828 !important; /* !important in default.css */
+	color: #f0f0f0;
+	border: solid 2px #6e42ff !important; /* !important in default.css */
+	box-shadow: 3px 3px 5px #000000,
+				0 1px #6e42ff,
+				0 0 5px 1px #6e42ff !important; /* !important in default.css */	
+}
+.scheme_black .btn.modern a {
+	font-weight: normal;
+	background-color: transparent;
+	padding: 10px 4px 10px 4px !important; /* default :  padding: 10px 6px 10px 6px !important; */
+	text-shadow: none;
+	border-left: 1px solid #202020; /* default border-left: 1px solid #888; */
+}
+.scheme_black .btn.modern:not(.disabled) a {
+    color: #808080;
+}
+.scheme_black .btn.modern.disabled a {
+    color: #808080;
+    line-height: 16px;
+    border-bottom: 1px solid transparent;
+}
+.scheme_black .btn.modern:not(.disabled) a:hover {
+	color: #f0f0f0;
+	background-color: #202020;
+}
+.scheme_black .btn.modern.disabled a:hover {
+	color: #f0f0f0;
+	background-color: #202020;
+    box-shadow: inset 1px 1px 1px #101010;
+    border-bottom: 1px solid #505050;
+}
+.scheme_black .btn.modern:not(.disabled):active,
+.scheme_black input[type='button']:active,
+.scheme_black input[type='button']#observeBtn:active {
+    border-color: #6e42ff !important;
+}
+.scheme_black .linkContent { /* dropdown list on button */
+    margin-top: 26px !important; /* for correct vertical align dropdown list */
+    width: auto !important;
+    background-color: #101010; /* color pick from button not disabled and hover */
+    border-radius: 0 3px 3px 3px;
+	border-style: solid;
+	border-width: 0;
+}
+.scheme_black .linkContent a {
+    color: #808080;
+    width: 36px !important;
+    margin-top: 0 !important;
+	margin-bottom: 0 !important;
+	border-left: 1px solid #202020; /* default border-left: 1px solid #888; */
+}
+.scheme_black .btn.modern.disabled .linkContent { /* dropdown list on button disabled */
+    background-color: #101010; /* color pick from button disabled and hover */
+}
+.scheme_black .linkContent a:first-child,
+.scheme_black .linkContent a:first-child:hover {
+	border-radius: 0 3px 0 0;
+}
+.scheme_black .linkContent a:last-child,
+.scheme_black .linkContent a:last-child:hover {
+	border-radius: 0 0 3px 3px;
+}
+/* Apply the right border radius of the button to the rightmost link */
+.scheme_black .btn.modern span.btnTitle + a,
+.scheme_black .btn.modern:not(.hasSellLink) a.off1Link, /* link minus on buildings buttons */
+.scheme_black .btn.modern:not(.hasSellLink) a.unassignLink { /* link minus on kittens jobs buttons */
+	/* buttons border-radius: 3px; */
+	border-radius: 0 3px 3px 0;
+}
+.scheme_black .btn.modern .btnContent a.rightestLink { /* for Combust TC button in Time tab and Hold Festival in Settlement tab */
+	border-radius: 0 3px 3px 0;
+}
+.scheme_black .panelContainer {
+	border: 1px solid #202020;
+	border-radius: 3px;
+}
+.scheme_black table.statTable {
+    margin-top: 6px;
+	margin-left: 12px;
+	padding: 9px;
+	color: #d0d0d0;
+}
+.scheme_black .panelContainer div.title {
+	padding: 4px 4px 4px 20px; /* default padding: 4px; */ /* default padding-left: 10px; */
+	margin-bottom: 3px;
+	color: #a0a0a0;
+	font-size: 16px !important;
+}
+.scheme_black .tabInner.Trade .panelContainer div.title {
+	padding: 3px 4px 0 20px;
+	margin-bottom: 0;
+}
+.scheme_black .panelContainer .toggle {
+	font-size: 10px;
+	margin: 5px 5px 0 0; /* default margin: 4px; */
+	padding-left:  4px; /* default padding-left 6px */
+	padding-right: 4px; /* default padding-right 6px */
+	padding-bottom: 1px;
+	border: 1px solid #202020;
+	background-color: #101010;
+	border-radius: 5px;
+	color: #909090;
+}
+.scheme_black .container {
+	padding: 5px; /* default padding: 10px; */
+}
+.scheme_black .container div.currentGovernment { /* for padding-bottom too height */
+	padding-bottom: 3px !important;
+}
+.scheme_black .trade-race .buys {
+	color: #f9002b;
+	font-size: smaller;
+}
+.scheme_black .trade-race .sells {
+	color: #00b029;
+	font-size: smaller;
+}
+.scheme_black .trade-race .tradeAmount {
+	color: #606060;
+	font-size: smaller;
+}
+.scheme_black .attitude { /* text for attitude races int trade tab */
+	color: #808080 !important;
+	text-shadow: none !important;
+}
+.scheme_black .attitude:before {
+	content: "\00a0\21C4\00a0"; /* default content: "("; */ /* RIGHTWARDS ARROW OVER LEFTWARDS ARROW */
+	color: #6e42ff;
+	font-size: larger;
+	font-weight: bold;
+}
+.scheme_black .attitude:after {
+	content: ""; /* default content: ")"; */
+}
+.scheme_black .panelContainer div.censusFilters {
+	margin-bottom: 2px; /* for add a margin under the 2 lists (select) in the settlement tab */
+}
+/* ---------- Village ----------*/
+/* container 'Census' -> list of kittens in settlement tab */
+.scheme_black .census-block {
+    padding: 3px; /* default padding: 5px; */
+    background-color: transparent;
+    border: solid 1px #404040;
+    border-radius: 3px;
+}
+.scheme_black .census-block:hover {
+	border-color: #606060;
+}
+.scheme_black .census-block.simLeader {
+    background: rgba(0, 0, 0, 0.2); 
+	border: solid 1px #1e0080;
+}
+.scheme_black .census-block.simLeader:hover {
+	border-color: #6e42ff;
+}
+.scheme_black .census-block.simLeader a.leaderHref {
+	color: #6e42ff;
+}
+.scheme_black .census-block .info { /* info of kitten */
+	font-size: 0.9em;
+	color: #b0b0b0;
+}
+.scheme_black .census-block .skill { /* jobs unasigned */
+	color: #606060;
+}
+.scheme_black .census-block .skill:first-of-type { /* job assigned */
+	color: #6e42ff;
+	font-weight: normal !important;
+}
+.scheme_black .census-block.simLeader .info span.name {  /* Leader name */
+	font-size: 1.2em;
+}
+.scheme_black .census-block.simLeader .skill:first-of-type { /* Leader job assigned */
+	font-size: 1em; /* default font-size: 0.8em; */
+}
+.scheme_black .container .name.color-none { /* name of kitten */
+	color: #909090;
+}
+.scheme_black .container .name.color-brown {
+	color: #824b23;
+}
+.scheme_black .container .name.color-cream {
+	color: #ad884a;
+}
+.scheme_black .container .name.color-black {
+	color: #404040;
+}
+.scheme_black .container .name.color-fawn {
+	color: #713306;
+}
+.scheme_black .container .name.color-white {
+	color: #f0f0f0;
+}
+.scheme_black .container .name.variety-none {
+	border: 1px solid transparent;
+}
+.scheme_black .container .name.variety-dual { /* bicolore */
+	border: 1px solid grey;
+}
+.scheme_black .container .name.variety-tabby { /* tigré  ou rayé*/
+	border: 1px dashed grey;
+}
+.scheme_black .container .name.variety-torbie { /* marbré strié */
+	border: 1px dashed grey;
+	border-left: dotted;
+	border-right: dotted;
+}
+.scheme_black .container .name.variety-calico { /* tricolore */
+	border: 1px solid grey;
+	border-top-color: burlywood;
+	border-bottom-color: burlywood;
+}
+.scheme_black .container .name.variety-spots { /* tacheté */
+	border: 1px dotted grey;
+}
+.scheme_black .btn.modern a.bld-on,
+.scheme_black .btn.modern a.auto-on,
+.scheme_black .btn.modern a.fugit-on {
+	color: #00801e;
+}
+.scheme_black .btn.modern:hover a.bld-on,
+.scheme_black .btn.modern:hover a.auto-on,
+.scheme_black .btn.modern:hover a.fugit-on {
+	color: #00b029;
+}
+.scheme_black .btn.modern a.bld-off,
+.scheme_black .btn.modern a.auto-off,
+.scheme_black .btn.modern a.fugit-off {
+	color: #f9002b;
+}
+.scheme_black .btn.modern:hover a.bld-off,
+.scheme_black .btn.modern:hover a.auto-off,
+.scheme_black .btn.modern:hover a.fugit-off {
+	color: #f9002b;
+}
+.scheme_black .btn.modern.craftOn span.btnTitle { /* all buttons with engineer(s) in workshop tab */
+	color: #00801e;
+}
+.scheme_black .btn.modern.craftOn:hover .btnTitle {
+	color: #00b029;
+	text-shadow: 1px 1px 1px #000000;
+}
+.scheme_black td.craftStuffPanel > span { /* title of craft stuff panel */
+	color: #a0a0a0;
+	font-size: 15px;
+}
+.scheme_black td.craftStuffPanel > table { /* craft stuff panel */
+    margin-top: 2px;
+    padding: 10px 20px; /* default padding-top: 20px; */
+    background-color: rgba(0, 0, 0, 0.3);
+    border: solid 1px #404040;
+    border-radius: 3px;
+}
+
+/* ******************************************************** */
+/* ******************* ACHIEVEMENTS TAB ******************* */
+/* ******************************************************** */
+.scheme_black .achievement-header {
+	color: #6e42ff;
+	font-size: 18px;
+	margin-bottom: 3px;
+	padding-left: 20px;
+}
+.scheme_black .achievement {
+	display: block;
+	font-size: 15px;
+	height: 34px;
+	background-color: transparent;
+	color: #a0a0a0;	
+	letter-spacing: 1px;
+	border: 2px solid rgba(110, 66, 255, 0.3); /* color #6e42ff */	
+	border-radius: 3px;
+}
+.scheme_black .achievement:hover {
+	color: #ffffff;
+	text-shadow: 2px 2px 2px #000000;
+	border: 2px solid rgba(110, 66, 255, 1); /* color #6e42ff */
+	background-image: linear-gradient(90deg,rgba(110, 66, 255, 0.5) 0%, rgba(110, 66, 255, 0.1) 100%);
+}
+.scheme_black .achievement:not(.unethical).unlocked:hover {
+	box-shadow: 0 0 3px 1px #6e42ff;
+}
+.scheme_black .achievement.unethical {
+	border-color : rgba(249, 0, 43, 0.3); /* color #f9002b */
+}
+.scheme_black .achievement.unethical:hover {
+	border-color : rgba(249, 0, 43, 1); /* color #f9002b */
+	box-shadow: 0 0 3px 1px #f9002b;
+	background-image: linear-gradient(90deg,rgba(249, 0, 43, 0.5) 0%, rgba(249, 0, 43, 0.1) 100%);
+}
+.scheme_black .achievement:not(.unlocked) {
+	color: #606060;
+	background-color: transparent;
+	text-shadow: none;
+	border: 2px solid #202020;
+}
+.scheme_black .achievement:not(.unlocked):hover {
+	border-color: #606060;
+	background-image: linear-gradient(90deg,rgba(128, 128, 128, 0.1) 0%, rgba(128, 128, 128, 0.1) 100%);
+}
+.scheme_black .achievement:after {
+	display: block;
+	letter-spacing: normal;
+	margin-top: 2px;
+	font-size: 90%;
+	color: #cccccc;
+	text-shadow: none;
+}
+.scheme_black .achievement-header .star {
+	color: #ff6e42;
+}
+.scheme_black .achievement .star {
+	color : #909090;
+}
+.scheme_black .achievement.unlocked .star {
+	color : #ff6e42;
+	font-weight: bold;
+	text-shadow: 2px 2px 2px #000000;
+}
+
+/* **************************************************** */
+/* ******************* RIGHT COLUMN ******************* */
+/* **************************************************** */
+.scheme_black #rightColumn {
+	width: calc(50% - 355px);
+	max-width: 440px; /* max-width: 400px; */
+	top: 30px; /* default top: 20px; */
+}
+.scheme_black #toggleCenter,
+.scheme_black span.toggleCenter {
+	color: #909090;
+	opacity: 0.6; /* default opacity: 0.2; */
+	cursor: pointer;
+}
+.scheme_black span.toggleCenter {
+	opacity: 1; /* for have #toggleCenter same color */
+}
+.scheme_black #toggleCenter:hover,
+.scheme_black div#toggleCenter:hover > span.toggleCenter {
+	color: #d0d0d0;
+	opacity: 1.0;
+}
+.scheme_black #calendarDiv {
+    color: #a0a0a0;
+	padding-left: 5px;
+    margin-top: 5px;
+	text-shadow: 2px 2px 2px #000000;
+}
+.scheme_black #calendarSign {
+   font-size: 120%;
+}
+.scheme_black #calendarSign:hover {
+   cursor: default;
+}
+.scheme_black .right-tab-header { /* Log | Chat link on right column */
+	color: #202020; /* for separator tab | */
+	font-size: 80%;
+ }
+.scheme_black .right-tab-header a {
+	margin-right: -5px;
+}
+.scheme_black .right-tab-header a.active {
+	border-top: 1px solid #404040;
+	color: #f0f0f0;
+}
+.scheme_black .right-tab-header a.active:hover {
+	color: #f0f0f0;
+}
+.scheme_black div#observeButton {
+	height: 36px; /* default height: 30px; */
+}
+.scheme_black #rightTabChat {
+	margin-top: 14px;
+}
+.scheme_black div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
+	color: #646464;
+	font-weight: normal; /* thin if possible with font sizes */
+	border-top: 1px solid #404040 !important;
+}
+.scheme_black #clearLogHref { /* Link in right column : Clear log */
+	font-size: 80%;
+}
+.scheme_black #logFiltersBlock > a { /* Link in right column : [+]Log Filters */
+	font-size: 80%;
+	margin-left: 5px;
+}
+.scheme_black #pauseBtn { /* Link in right column : pawse */
+	margin-left: 5px;
+}
+.scheme_black div#gameLog {
+	margin: 3px 5px 3px 0;
+}
+.scheme_black #gameLog span.msg:not(.type_date) {
+	font-size: 90%;
+	margin-left: 1.2em;
+	list-style-type: '\25AA'; /* BLACK SMALL SQUARE */
+	padding-left: 0.3em;
+}
+.scheme_black #gameLog span.noBullet {
+	margin-left: 2.3em !important;
+	list-style-type: '\000B7' !important; /* CenterDot */
+}
+.scheme_black .msg {
+	font-weight: normal; /* thin if possible with font sizes */
+	color: #a0a0a0;
+}
+.scheme_black .msg.type_notice {
+    color: #4275FF; /* color default : #01A9DB; */
+}
+.scheme_black .msg.type_important {
+    color: #ff6e42; /* color default : coral; */
+}
+.scheme_black .msg.type_alert {
+    color: #f9002b; /* color default : red; */
+}
+.scheme_black .msg.type_date {
+	color: #6e42ff;
+	border-bottom: solid 1px #404040;
+	padding-left: 5px;
+}
+
+/* *************************************************** */
+/* ******************* LEFT COLUMN ******************* */
+/* *************************************************** */
+.scheme_black #leftColumn {
+	margin-top: 8px; /* default margin-top: 4px; */
+	padding-right: 10px; /* -10px gained on res-toolbar.right padding-right default padding right : 20px */
+}
+.scheme_black a.link.collapse {
+	opacity: 0.5; /* default opacity: 0.2; */
+}
+.scheme_black a.link.collapse:hover {
+	opacity: 1;/* default opacity: 0.9; */
+	color: #d0d0d0;
+}
+.scheme_black #leftColumn .res-toolbar a.link.toggled {
+    color: #6e42ff;
+}
+.scheme_black div.tooltip-block:hover > span {
+	font-weight: bold;
+	color: #d0d0d0;
+}
+.scheme_black .res-table {
+	max-width: 352px;/* default max-width: 340px; */
+    border-collapse: collapse; /* gain of 3 pixel by border -> no margin bottom after */
+	margin-left: 2px; /* without 0px margin left for all ressources */
+}
+.scheme_black .res-toolbar.right {
+	padding-right: 20px;
+}
+ .scheme_black .craftTable {
+	margin-bottom: 10px !important; /* for correct margin bottom due of the line above with border-collapse: collapse on .res-Table ! */
+}
+.scheme_black .res-cell.craft-link {
+	color: #808080;
+}
+.scheme_black .res-cell.craft-link.all { /* column craft all */
+	font-size: 90%; /* default font-size: 85%; */
+	opacity: 1; /* default opacity: 0.4; */
+	color: #505050;
+}
+.scheme_black .res-cell.craft-link:hover,
+.scheme_black .res-cell.craft-link.all:hover { /* craft table left column */
+    color: #d0d0d0;
+	text-decoration: none;
+	font-weight: bold;
+	opacity: 1;
+}
+.scheme_black .res-row {
+	padding-bottom: 2px; /* default padding-bottom: 4px; */
+}
+.scheme_black .res-row:hover {
+    background-color: rgba(240, 240, 240, 0.1);
+	cursor: default;
+}
+.scheme_black .highlited { /* higlighting ressources when hover button on center windows */
+	background-color: rgba(240, 240, 240, 0.1);
+}
+.scheme_black .res-toolbar {
+	white-space: nowrap;
+}
+.scheme_black .resource_faith .resource-name,
+.scheme_black .resource_kittens .resource-name,
+.scheme_black .resource_steel .resource-name,
+.scheme_black .resource_gear .resource-name,
+.scheme_black .resource_alloy .resource-name,
+.scheme_black .resource_megalith .resource-name {
+	color: #707070 !important;
+}
+.scheme_black .maxRes {
+	color: #606060;
+}
+.scheme_black .resAmount {
+    color: #a0a0a0;
+}
+.scheme_black .resLimitWarn {
+    color: #ff6e42;
+	opacity: 1; /* default = 0.75 */
+}
+.scheme_black .resLimitNotice {
+    color: #e0e0e0;
+}
+.scheme_black .resPerTick {
+	cursor: default;
+	color: #a0a0a0;
+}
+.scheme_unicor div#advisorsContainer {
+	color: #f9002b;
+}
+.scheme_black .res-cell.resource-value {
+	color: #a0a0a0;
+}
+.scheme_black #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+	color: #505050;
+	text-shadow: none !important;
+	font-size: smaller;
+}
+.scheme_black #fastPraiseContainer >a:hover {
+	color: #f8f5f0;
+	text-shadow: 1px 1px 4px #f0f0f0, -1px -1px 4px #f0f0f0;
+}
+.scheme_black .res-cell.positive-weather { /* to change the color for bonus cell according to the season */
+	color: #00b029;
+}
+.scheme_black .res-cell.negative-weather { /* to change the color for penalty cell according to the season */
+	color: #f9002b;
+}
+
+/* ************************************************* */
+/* ******************* SCROLLBAR ******************* */
+/* ************************************************* */
+.scheme_black ::-webkit-scrollbar-thumb {
+    background: #101010;
+	border-radius: 40px;
+}
+.scheme_black ::-webkit-scrollbar-track {
+    background: #000000;
+    border-radius: 50px;
+}
+/* Only FireFox */
+.scheme_black #leftColumn,
+.scheme_black #rightColumn,
+.scheme_black #midColumn {
+   scrollbar-width: thin;
+   scrollbar-color: #101010 #000000 !important;
+}
+.scheme_black select {
+   scrollbar-width: auto !important;
+}

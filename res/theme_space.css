@@ -1,9 +1,9 @@
 /**
- *			Space 1.1.0 Theme © Volkeyrn
+ *			Space 1.2.0 Theme © Volkeyrn
  */
 
-@import url(https://fonts.googleapis.com/css?family=Oxanium:wght@200,300,400,500,600,700,800&display=swap);
-@import url(https://fonts.googleapis.com/css?family=Roboto+Slab:wght@300,400,500,600,700,800&display=swap);
+@import url(https://fonts.googleapis.com/css?family=Oxanium:wght@300,400,600,700&display=swap);
+@import url(https://fonts.googleapis.com/css?family=Roboto+Slab:wght@300,400,600,700&display=swap);
 
 /**********************************************/
 /******************** GAME ********************/
@@ -20,36 +20,44 @@ body.scheme_space.with_background_image {
 .scheme_space .btn,
 .scheme_space .modern,
 .scheme_space .btn.modern,
-.scheme_space input[type='button'] {   
+.scheme_space input[type='button'] {
 	 font-family: 'Oxanium', cursive;
 }
 .scheme_space .btn { 
-	color: #9FA5D6;
-	margin-bottom:6px;
+	color: black;
+	margin-bottom:5px; /* default 10px */
 	max-height: 36px;
-	background-color: #1F2F65; 
-	border: solid 1px rgba(34, 34, 34, 0.4); /* color #222222 */
+	background-color: gray; 
+	border: solid 1px gray
 }
-.scheme_space .btn.disabled {
+.scheme_space .btn.modern {
+	border-radius: 5px; /* default border-radius: 3px; */
+	width: 274px; /* +10px gained from tabInner padding. default width: 264px; */
+}
+.scheme_space .btn.modern.disabled {
 	color: #9FA5D6;
 	background-color: #110F31; 
 	border: solid 1px rgba(160, 160, 160, 0.2); /* color #A0A0A0 */
 }
-.scheme_space .btn.disabled:hover {
+.scheme_space .btn.modern.disabled:hover {
 	background-color: #110F31; 
 	border: solid 1px rgba(160, 160, 160, 0.4); /* color #A0A0A0 */
 	cursor: inherit;
 }
-.scheme_space .btn:hover{
-	border: solid 1px #0E8B94;
-	color: gray;	
+.scheme_space .btn.modern:not(.disabled) {
+	color: #9FA5D6;
+	background-color: #1F2F65; /* color for all button not disabled */
+	border: solid 1px rgba(34, 34, 34, 0.4); /* color #222222 */
+ 	cursor: pointer !important;
+}
+.scheme_space .btn.modern:not(.disabled):hover { /* hover on all button in center column */
+	background-color: #14F0D8;
+	border: solid 1px #0E8B94; 
+ 	cursor: pointer !important;
 }
 .scheme_space .btn:not(.disabled):hover span.btnTitle {
-	color: #081644 !important;
-	font-weight: 800;
-}
-.scheme_space .highlited { /* higlighting ressources when hover button on center windows */
-	background-color: rgba(20, 240, 216, 0.2); /* color #14F0D8 */
+	color: #081644;
+	font-weight: bold;
 }
 .scheme_space a {
 	color: #89A4CD;
@@ -75,55 +83,115 @@ body.scheme_space.with_background_image {
 	font-weight: 400;
 }
 .scheme_space h1:first-child {
-    margin-top: 0px;
+    margin-top: 0;
 }
-/* if not use line bottom : '.btn.small-text span' then green light color do not change ! why ??*/
-.scheme_space .btn.small-text span { /* text size for multiple buttons */ 
-    font-size: 90%;
-} 
-/*** green and red light for machine on/off ***/
+.scheme_space .modern .btnContent {
+    padding: 10px 0 9px 1px !important; /* 1px left for buttons without power background-image */
+}
+/* *** green and red light for machine on/off *** */
+.scheme_space .btn.bldEnabled div.btnContent,
 .scheme_space .btn.bldlackResConvert div.btnContent {
-    padding: 4px;
-    border: 1px solid #EA152C; /* color for lack resources convertion */
+	padding: 10px 0 9px 13px !important; /* 13px left for power background-image (linear-gradient) */
+	border: none;	
 }
-.scheme_space .btn.bldEnabled div.btnContent { 
-    padding: 4px;
-    border: 1px solid #418D79; 
+.scheme_space .btn.disabled.bldlackResConvert { /* color #EA152C */ /* color for lack resources convertion */	
+	background: no-repeat border-box linear-gradient(90deg, #EA152C 0%, #EA152C 11px, #110F31 12px, #110F31 100%);
 }
-.scheme_space .btn.bldEnabled.modern div.btnContent,
-.scheme_space .btn.bldlackResConvert.modern div.btnContent{
-    border-width: 0 0 0 8px;
-	border-radius: 3px; /* for align with border buttons */
-    padding: 10px 0px 10px 10px;
+.scheme_space .btn.disabled.bldlackResConvert:hover {
+	background: no-repeat border-box linear-gradient(90deg, #EA152C 0%, #EA152C 11px, #110F31 12px, #110F31 100%);
 }
-/*** end of green light for machine on ***/
-.scheme_space,
-.scheme_space .help { /* window options and version */
-	color: #CCCCCC;	
+.scheme_space .btn:not(.disabled).bldlackResConvert {
+	background: no-repeat border-box linear-gradient(90deg, #EA152C 0%, #EA152C 11px, #1F2F65 12px, #1F2F65 100%);
+}
+.scheme_space .btn:not(.disabled).bldlackResConvert:hover {
+	background: no-repeat border-box linear-gradient(90deg, #EA152C 0%, #EA152C 11px, #14F0D8 12px, #14F0D8 100%);
+}
+.scheme_space .btn.disabled.bldEnabled { /* color #35C283 */
+	background: no-repeat border-box linear-gradient(90deg, #35C283 0%, #35C283 11px, #110F31 12px, #110F31 100%);
+}
+.scheme_space .btn.disabled.bldEnabled:hover {
+	background: no-repeat border-box linear-gradient(90deg, #35C283 0%, #35C283 11px, #110F31 12px, #110F31 100%);
+}
+.scheme_space .btn:not(.disabled).bldEnabled {
+	background: no-repeat border-box linear-gradient(90deg, #35C283 0%, #35C283 11px, #1F2F65 12px, #1F2F65 100%);
+}
+.scheme_space .btn:not(.disabled).bldEnabled:hover {
+	background: no-repeat border-box linear-gradient(90deg, #35C283 0%, #35C283 11px, #14F0D8 12px, #14F0D8 100%);
+}
+/* *** end of green light for machine on/off *** */
+.scheme_space .dialog { /* window options version credits */
+	color: #bbbbbb;
+	top: 40%;
 	background-color: #061030;
-	overflow: hidden;
+	border: ridge 3px #14F0D8;
+	border-radius: 15px;
+	box-shadow: 2px 2px 20px #C23574, -2px -2px 20px #C23574;
 }
-.scheme_space .help,
-.scheme_space .dialog {
-	box-shadow: 0 2px 5px 0 rgb(13, 13, 13), 0 2px 10px 0 rgb(24, 24, 24);
-    height: auto !important;
-    top: 40% !important;
-    border: solid 1px #14F0D8; 
+.scheme_space .dialog a {
+    text-transform: capitalize;
+}
+.scheme_space .dialog a:hover {
+	color: #C23574;
+	text-shadow: 1px 1px 1px #02050E;
+}
+.scheme_space .dialog input[type='button'] {
+	font-size: 14px;
+	margin-left: 12px;
+}
+.scheme_space label i { /* information text in option windows */
+    color: #747c90;
+}
+.scheme_space label:hover {
+	opacity: 1;/* default opacity: 0.7; */
+	color: #f0f5f8;
+	text-shadow: 1px 1px 1px #02050E;
 }
 .scheme_space select { /* dropdown list on settlement tab and options windows */
-    background-color: #0A1A4E;
-	font-family: 'Roboto Slab', serif;
+    background-color: #1F2F65;
     color: #0FC3B1;
     padding-bottom: 2px;
-	border-color : rgba(13,35,110,0.9); /* color #0D236E */
+	border : solid 1px transparent;
+	border-radius: 3px;
 	font-size: 14px;
+	box-shadow: 0 0 3px #02050E;
 }
 .scheme_space select>option {
     background-color: #0A1A4E;
     color: #0FC3B1;
 	padding: 2px 10px; /* -2 pixel vertical */
 }
-
+@-moz-document url-prefix() { /* Firefox only */
+	.scheme_space select>option {
+		font-family: 'Roboto Slab', serif; /* font serif because firefox can't use cursive on select */
+	}
+}
+.scheme_space select > option:disabled {
+	color: #838493;
+	font-size: 90%;
+}
+.scheme_space #optionsDiv input[type="checkbox"] + label:before {
+    content: "\2727"; /* WHITE FOUR POINTED STAR */
+	font: 12px sans-serif;
+	text-shadow: 1px 1px 1px #02050E;
+	color: #999999;
+}
+.scheme_space #optionsDiv input[type="checkbox"]:checked + label:before {
+	content: "\2726"; /* BLACK FOUR POINTED STAR */
+	font: 12px sans-serif;
+	text-shadow: 1px 1px 1px #02050E;
+	color: #f0f5f8;
+}
+.scheme_space textarea#importData,
+.scheme_space textarea#exportData {
+	background-color: #110F31;
+	color: #bbbbbb;
+	box-shadow: inset 0 0 3px 1px #02050E;
+	border: groove 2px #89A4CD;
+	border-radius: 5px;
+	/* Only FireFox */
+	scrollbar-width: thin;
+   	scrollbar-color: #081644 #061030;
+}
 /*************************************************/
 /******************** TOP BAR ********************/
 /*************************************************/
@@ -134,35 +202,59 @@ body.scheme_space.with_background_image {
     height: 22px;
     border-bottom: 1px solid #0A2450;
     box-shadow: none; 
-	top: 0px; /* no space when background-color of top bar different from game */
+	top: 0; /* no space when background-color of top bar different from game */
 }
 .scheme_space #topBar a:hover {
 	text-shadow: none;
 }
-.scheme_space #topBar div {	
-	color: #DDDDDD;
+.scheme_space #topBar div,
+.scheme_space #sorrowTooltip {	/* counter of BLS (Black Liquid Sorrow) */
+	color: #EFEDE8;
+}
+.scheme_space #sorrowTooltip.max {
+    color: #EA152C;
+}
+.scheme_space #topBar a.copyright {
+	color: #C23574;
+}
+.scheme_space #topBar a.copyright:hover {
+	color: #12E7D1;
 }
 .scheme_space #headerLinks div { /* for color text of MOTD on top bar */
 	color: #DDDDDD;
 }
 .scheme_space #headerLinks>div:first-child:before {
     color: #12E7D1;
-    content: 'Theme by Volkeyrn  ';
+    content: 'Theme by Volkeyrn\00a0\00a0\00a0\00a0';
 	text-shadow: none;
     text-decoration: none;
 	font-size : 90%;	
 }
-.scheme_space #sorrowTooltip { /* counter of BLS (Black Liquid Sorrow) */
-	color: #EFEDE8;
-}
 .scheme_space #autosaveTooltip { 
-	color: #0FC3B1;
+	color: #14F0D8;
 }
 .scheme_space #getTheApp-link { /* Get the app */
 	color: #167E9D !important;
 }
 .scheme_space #getTheApp-link:hover { 
 	color: #12E7D1 !important;
+}
+.scheme_space .toolbarIcon.happiness {
+    color: #F4691A;
+}
+.scheme_space .toolbarIcon.energy,
+.scheme_space .button_tooltip .energyProduction {
+    color: #35C283;
+}
+.scheme_space .toolbarIcon.energy.warningWinter {
+    color: #F4691A;
+}
+.scheme_space .toolbarIcon.energy.warning,
+.scheme_space .button_tooltip .energyConsumption {
+	color: #EA152C;
+}
+.scheme_space .button_tooltip .energyPenalty {
+	color: #C23574;
 }
 
 /************************************************/
@@ -171,14 +263,11 @@ body.scheme_space.with_background_image {
 .scheme_space #footerLinks {
 	font-size: 90%;
 	bottom: 6px;
-	background: rgba(3, 10, 29, 0.8); /* color #030A1D */ 
-	-webkit-box-shadow: 0 0 4px 4px rgba(3, 10, 29, 0.6); /* color #030A1D */ 
-	        box-shadow: 0 0 4px 4px rgba(3, 10, 29, 0.6); /* color #030A1D */ 
 }
 .scheme_space #footerLinks a:hover {
 	text-shadow: none;
 }
-.scheme_space .links-block { /* a link separator : | on header and footer links*/
+.scheme_space .links-block { /* a link separator : | on header and footer links */
 	color: #0A2450 !important; 
 }
 
@@ -186,12 +275,15 @@ body.scheme_space.with_background_image {
 /******************** TOOLTIP ********************/
 /*************************************************/
 .scheme_space #tooltip,
-.scheme_space .tooltip-block div {    
+.scheme_space .tooltip-block div {
     color: #167E9D; /* tooltip windows == left column : left text */
 	background-color: #061336;
 	font-size: 95%;
 	border: 1px solid rgba(11, 74, 104, 0.8); /* color #0B4A68 */
 	border-radius: 5px !important;
+}
+.scheme_space .tooltip-block div { /* tooltip on ? top right column */
+	padding: 5px;
 }
 .scheme_space .button_tooltip {
 	background-color: transparent;
@@ -206,10 +298,20 @@ body.scheme_space.with_background_image {
 	border-bottom : 1px solid #0A2450 !important; /* border line under title */
 	margin-bottom: 5px;
 }
+.scheme_space .tooltip-inner .desc.small {
+	font-size: 75%; /* default font-size: 60%; */
+	opacity: 1; /* default opacity: 0.8; */
+}
+.scheme_space .tooltip-inner .desc.small.auto-off {
+	color: #EA152C;
+}
+.scheme_space .tooltip-inner .desc.small.auto-on {
+	color: #35C283;
+}
 .scheme_space .tooltip-divider { /* border line before effects text */
 	border-bottom : 1px solid #0A2450 !important;	
 }
-.scheme_space .effectName { /* Tooltip Window : effects text */    
+.scheme_space .effectName { /* Tooltip Window : effects text */
     color: #F4691A !important;
 	font-size: 90% !important;
 }
@@ -230,11 +332,29 @@ body.scheme_space.with_background_image {
 /******************** CENTER COLUMN ********************/
 /*******************************************************/
 .scheme_space .tab { 
-    font-size: 90%;
+    font-size: 14px;
+}
+.scheme_space .tabInner {
+	border: none; /* border for all under tabs in center column */
+	padding: 5px; /* 20px gained for buttons width. default padding: 15px; */
+	padding-top: 5px;
+	margin-bottom: 30px; /* default margin-bottom: 20px; */
+}
+.scheme_space .tabInner.Workshop div.panelContainer:last-child,
+.scheme_space .tabInner.Space div.panelContainer:last-child,
+.scheme_space .tabInner.Time div.panelContainer:last-child { /* last panelContainer on Workshop, Space and Time Tab */
+	margin-bottom: 54px; /* to view entire dropdownlink of last button */
+}
+.scheme_space .tabInner.Bonfire {
+	margin-bottom: 0; /* default margin-bottom: 20px; */
+}
+.scheme_space .tabsContainer a {
+	font-size: 14px;
 }
 .scheme_space .tabsContainer { /* separator | for tab */
+	font-size: 10px;
 	color: #0A2450 ;
-	padding-bottom: 10px !important; /* default 15px */
+	padding-bottom: 5px; /* default padding-bottom: 15px; */
 }
 .scheme_space .activeTab { 
 	color: #12E7D1; 
@@ -247,6 +367,13 @@ body.scheme_space.with_background_image {
 .scheme_space a.activeTab:hover {
     color: #12E7D1; 
 }
+.scheme_space .tab.traitLeaderBonus::before {
+	content: "\2605"; /* BLACK STAR */
+	color: #1B9CC2;
+}
+.scheme_space span.genericWarning { /* number of kittens free or engineering free on tab */
+	color: #C23574;
+}
 .scheme_space .bldTopContainer { /* under tab */
     font-size: 90%;
 }
@@ -258,73 +385,89 @@ body.scheme_space.with_background_image {
     padding-top: 10px; /* default 15px */
     border-top: 1px solid #0A2450;
 }
-.scheme_space .btn.modern:not(.disabled) {
-   	background-color: #1F2F65; /* color for all button not disabled*/	
-    cursor: pointer !important;
-}
-.scheme_space .btn.modern:not(.disabled):hover, /* hover on all button in center column */
-.scheme_space input[type='button']:hover {
-	background-color: #14F0D8; 
-    cursor: pointer !important;
-}
-.scheme_space input[type='button']:hover {
-	border: solid 1px #12E7D1 !important;
-	font-weight: 600;
-}
 .scheme_space input[type='button'] {
-	background-color: #1F2F65 !important; 
+	background-color: #1F2F65 !important;
     cursor: pointer !important;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.3), 0 2px 10px 0 rgba(0, 0, 0, 0.3) !important;
-    border: solid 1px transparent !important; /* for no offset when border on */
+    box-shadow: 0 0 5px #02050e !important;
+    border: solid 2px transparent !important; /* for no offset when border on */
     border-radius: 3px !important;
-    outline: 0 !important;
     color: #EEEEEE;
     padding: 5px 20px;
 }
-.scheme_space .modern .btnContent {
-    padding: 10px 0 9px 10px !important; /* -1 pixel on vertical for correct align left border */
+.scheme_space input[type='button']:hover {
+	border: groove 2px #12E7D1 !important;
+	background-color: #14F0D8; 
+	cursor: pointer !important;
+	text-shadow: 1px 1px 1px #02050E;
+}
+/* button observer different from other input buttons */
+.scheme_space input[type='button']#observeBtn {
+	border-radius: 9px !important;
+}
+.scheme_space input[type='button']#observeBtn:hover {
+	box-shadow: 1px 1px 10px #C23574, -1px -1px 10px #C23574 !important;
+	border: ridge 3px #14F0D8;
 }
 .scheme_space .btn.modern a {
 	color: #167E9D;
 	background-color: transparent; 
-	padding: 10px 6px 9px 6px !important; /* -1 pixel on vertical for correct align left border */
+	padding: 10px 3px 9px 3px !important; /* -1 pixel on vertical for correct align left border */
+}
+.scheme_space .btn.modern a:hover { 
+	color: #FFFFFF;	
+	text-shadow: none;
 }
 .scheme_space .btn.modern:not(.disabled) a {
-	border-color: rgba(20, 240, 216, 0.2); /* color #14F0D8 */
+	border-color: rgba(20, 240, 216, 0.1); /* color #14F0D8 */
 }
 .scheme_space .btn.modern.disabled a {
 	border-color: #171441 !important; 
 }
-.scheme_space .btn.modern a:hover { 
-	color: #FFFFFF;	
-	font-weight: bold;
-	text-shadow: none;
-}
 .scheme_space .btn.modern:not(.disabled) a:hover { 
 	background-color: rgba(31, 47, 101, 0.3); /* color #1F2F65 */
+	border-color: rgba(20, 240, 216, 0.2); /* color #14F0D8 */
 }
 .scheme_space .btn.modern.disabled a:hover { 
 	background-color: rgba(31, 47, 101, 0.3); /* color #1F2F65 */
 }
-.scheme_space .tabInner {
-    border: none; /* border for all under tabs in center column */
-}
 .scheme_space .linkContent { /* dropdown list on button */
-    margin-top: 24px !important; /* for correct vertical align dropdown list */    
+    margin-top: 25px !important; /* for correct vertical align dropdown list */
     width: auto !important;
-	background-color: #14F0D8; 
+	background-color: #14F0D8;
+	border-radius: 0 5px 5px 5px;
 }
-.scheme_space .btn.modern.disabled .linkContent { /* dropdown list on button disabled*/
+.scheme_space .btn.modern.disabled .linkContent { /* dropdown list on button disabled */
  	background-color: #110F31; /* color pick from button disabled and hover */
 }
 .scheme_space .linkContent a {
     color: #081644;
-    width: 40px !important;
-    margin-top: 0px !important;
-    margin-bottom: 0px !important;
+    width: 36px !important;
+    margin-top: 0 !important;
+	margin-bottom: 0 !important;	
+}
+.scheme_space .linkContent a:first-child,
+.scheme_space .linkContent a:first-child:hover {
+	border-radius: 0 5px 0 0;
+}
+.scheme_space .linkContent a:last-child,
+.scheme_space .linkContent a:last-child:hover {
+	border-radius: 0 0 5px 5px;
+}
+/* Apply the right border radius of the button to the rightmost link */
+.scheme_space .btn.modern span.btnTitle + a,
+.scheme_space .btn.modern:not(.hasSellLink) a.off1Link, /* link minus on buildings buttons */
+.scheme_space .btn.modern:not(.hasSellLink) a.unassignLink { /* link minus on kittens jobs buttons */	
+	border-radius: 0 5px 5px 0; /* buttons border-radius: 5px; */
+}
+.scheme_space .btn.modern .btnContent a.rightestLink { /* for Combust TC button in Time tab and Hold Festival in Settlement tab */
+	border-radius: 0 5px 5px 0;
+}
+.scheme_space .btn .btnContent a.small {
+    font-size: 0.7em;
+    line-height: 17px;
 }
 .scheme_space .panelContainer { 
-    background-color: rgba(4, 10, 32, 0.2) !important; /* color #040A20 */
+    background-color: rgba(4, 10, 32, 0.4) !important; /* color #040A20 */
     border-color: #0A2450;
 	border-radius: 5px;
 }
@@ -338,29 +481,148 @@ body.scheme_space.with_background_image {
 	border-radius: 3px;
 }
 .scheme_space .trade-race .buys {
-    color: #F4691A;
+	color: #F4691A;
+	font-size: smaller;
 }
 .scheme_space .trade-race .sells {
-    color: #14F0D8;   
+	color: #35C283;
+	font-size: smaller;
 }
-.scheme_space .trade-race .ammount {
-    color: #7F7F7F;
+.scheme_space .trade-race .tradeAmount {
+	color: #7F7F7F;
+	font-size: smaller;
 }
-/* for container 'Census' -> list of kittens in settlement tab */
-.scheme_space .panelContainer div[style^='border: 1px solid gray;']{
-	border-color: #0D236E !important;
-	font-size: 90%;
-	border-radius: 5px;
-	background-color : rgba(22, 126, 157, 0.2); /* color #167E9D */
+.scheme_space .attitude { /* text for attitude races int trade tab */
+	color: #909090 !important;
+	text-shadow: none !important;
+	text-transform: capitalize;
 }
-.scheme_space .panelContainer div[style^='border: 1px solid gray;'] span{ /* jobs unasigned */
-	color: #777777;
+.scheme_space .attitude:before {
+	content: "\00a0\21CC\00a0"; /* default content: "("; */ /* RIGHTWARDS HARPOON OVER LEFTWARDS HARPOON */
+	color: #e0e0e0;
 }
-.scheme_space .panelContainer div[style^='border: 1px solid gray;'] span[style='font-weight: bold' i]{ /* job assigned */
-	color: #0FC3B1;
+.scheme_space .attitude:after {
+    content: ""; /* default content: ")"; */
 }
-.scheme_space .panelContainer div.title + .container > div[style^='height:']{
-	margin-bottom: 4px; /* for add a margin under the 2 lists (select) in the settlement tab */ 
+/* ---------- Village ---------- */
+/* container 'Census' -> list of kittens in settlement tab */
+.scheme_space div.censusFilters {
+	margin-bottom: 3px;
+}
+.scheme_space .census-block {
+	background-color: rgba(137, 164, 205, 0.05); /* color #89A4CD */
+	border-radius: 3px;
+	border: solid 1px rgba(137, 164, 205, 0.4);
+}
+.scheme_space .census-block:hover {
+	background-color: rgba(137, 164, 205, 0.1); /* color #89A4CD */
+	border: solid 1px rgba(137, 164, 205, 1);
+}
+.scheme_space .census-block.simLeader {
+	background-color: rgba(18, 231, 209, 0.05); /* color #12E7D1 */
+	border: solid 1px rgba(20, 240, 216, 0.4); /* color #14f0d8 */;
+}
+.scheme_space .census-block.simLeader:hover {
+	background-color: rgba(18, 231, 209, 0.1); /* color #12E7D1 */
+	border: solid 1px rgba(20, 240, 216, 1); /* color #14f0d8 */;
+}
+.scheme_space .census-block.simLeader a.leaderHref {
+	color: #1B9CC2;
+}
+.scheme_space .census-block .info { /* info of kitten */
+	font-size: 0.9em;
+	color: #909090;
+}
+.scheme_space .census-block .skill { /* jobs unasigned */
+	color: #606060;
+}
+.scheme_space .census-block .skill:first-of-type { /* job assigned */
+	color: #1B9CC2;
+	font-weight: normal !important;
+}
+.scheme_space .census-block.simLeader .info span.name {  /* Leader name */
+	font-size: 1.2em;
+}
+.scheme_space .census-block.simLeader .skill:first-of-type { /* Leader job assigned */
+	font-size: 1em; /* default font-size: 0.8em; */
+}
+.scheme_space .container .name.color-none { /* name of kitten */
+	color: #aaaaaa;
+}
+.scheme_space .container .name.color-brown {
+	color: #824b23;
+}
+.scheme_space .container .name.color-cream {
+	color: #ad884a;
+}
+.scheme_space .container .name.color-black {
+	color: #000000;
+}
+.scheme_space .container .name.color-fawn {
+	color: #713306;
+}
+.scheme_space .container .name.color-white {
+	color: #ffffff;
+}
+.scheme_space .container .name.variety-none {
+	border: 1px solid transparent;
+}
+.scheme_space .container .name.variety-dual {
+	border: 1px solid black;
+}
+.scheme_space .container .name.variety-tabby {
+	border: 1px dashed black;
+}
+.scheme_space .container .name.variety-torbie {
+	border: 1px dashed black;
+	border-left: dotted;
+	border-right: dotted;
+}
+.scheme_space .container .name.variety-calico {
+	border: 1px solid black;
+	border-top-color: gray;
+	border-bottom-color: gray;
+}
+.scheme_space .container .name.variety-spots {
+	border: 1px dotted black;
+}
+.scheme_space .btn.modern a.bld-on,
+.scheme_space .btn.modern a.auto-on,
+.scheme_space .btn.modern a.fugit-on {
+	color: #35c283;
+}
+.scheme_space .btn.modern:not(.disabled):hover a.bld-on,
+.scheme_space .btn.modern:not(.disabled):hover a.auto-on,
+.scheme_space .btn.modern:not(.disabled):hover a.fugit-on {
+	color: #0f663c;
+}
+.scheme_space .btn.modern a.bld-off,
+.scheme_space .btn.modern a.auto-off,
+.scheme_space .btn.modern a.fugit-off {
+	color: #EA152C;
+}
+.scheme_space .btn.modern:not(.disabled):hover a.bld-off,
+.scheme_space .btn.modern:not(.disabled):hover a.auto-off,
+.scheme_space .btn.modern:not(.disabled):hover a.fugit-off {
+	color: #bd021c;
+}
+.scheme_space .btn.modern.craftOn span.btnTitle { /* all buttons with engineer(s) in workshop tab */
+	color: #35c283;
+}
+.scheme_space .btn.modern.craftOn:hover span.btnTitle { /* all buttons with engineer(s) in workshop tab */
+	color: #0f663c;
+}
+.scheme_space td.craftStuffPanel > span { /* title of craft stuff panel */
+	color: #C23574;
+	font-size: 15px;
+	text-shadow: 1px 1px rgba(4, 10, 32); /* color #040A20 */
+}
+.scheme_space td.craftStuffPanel > table { /* craft stuff panel */
+	background-color: rgba(137, 164, 205, 0.1); /* color #89A4CD */
+	border: solid 1px rgba(137, 164, 205, 1);
+	border-radius: 3px;
+	margin-top: 2px;
+	padding: 10px 20px; /* default padding-top: 20px; */
 }
 
 /**********************************************************/
@@ -372,7 +634,7 @@ body.scheme_space.with_background_image {
     height: 40px;
     background-color: rgba(18, 231, 209, 0.1); /* color #12E7D1 */
     color: white;
-    text-shadow: rgba(18, 231, 209) 2px 0px 10px; /* color #12E7D1 */
+    text-shadow: rgba(18, 231, 209) 2px 0 10px; /* color #12E7D1 */
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: default !important;
@@ -385,7 +647,7 @@ body.scheme_space.with_background_image {
 	font-size: 18px; 
 }
 .scheme_space .achievement.unethical {
-    text-shadow: rgb(255, 67, 91) 2px 0px 10px;
+    text-shadow: rgb(255, 67, 91) 2px 0 10px;
 	background-color: rgba(146, 0, 23, 0.1); /* color #920017 */
 	border-color : rgba(146, 0, 23, 0.5); /* color #920017 */
 }
@@ -414,7 +676,7 @@ body.scheme_space.with_background_image {
     letter-spacing: normal;
     font-weight: normal !important;
 }
-.scheme_space .achievement.unethical:after {    
+.scheme_space .achievement.unethical:after {
 	color: #FFFFFF !important;
 }
 .scheme_space .achievement-header .star {
@@ -422,13 +684,13 @@ body.scheme_space.with_background_image {
     color: #F4691A; /* orange or dominant color of the theme */
 }
 .scheme_space .achievement .star { 
-	/* default font size = font-size: 18px; */  
+	/* default font size = font-size: 18px; */
 	color : #888888;
 }
-.scheme_space .achievement.unlocked .star {   
+.scheme_space .achievement.unlocked .star {
 	color : #F4691A; /* orange or dominant color of the theme */
 	font-weight: bold;
-	text-shadow: 0px 1px rgba(1, 4, 15,1); /* color #01040F */
+	text-shadow: 0 1px rgba(1, 4, 15,1); /* color #01040F */
 }
 
 /******************************************************/
@@ -437,6 +699,21 @@ body.scheme_space.with_background_image {
 .scheme_space #rightColumn {
 	width: calc(50 - 355px);
 	max-width: 440px;
+	top: 24px; /* default top: 20px; */
+}
+.scheme_space #toggleCenter,
+.scheme_space span.toggleCenter {
+	color: #89A4CD;
+	opacity: 0.4; /* default opacity: 0.2; */
+	cursor: pointer;
+}
+.scheme_space span.toggleCenter {
+	opacity: 1; /* for have #toggleCenter same color */
+}
+.scheme_space #toggleCenter:hover,
+.scheme_space div#toggleCenter:hover > span.toggleCenter {
+	color: #12E7D1;
+	opacity: 1.0;
 }
 .scheme_space #calendarDiv {
     color: #C23574;
@@ -457,7 +734,11 @@ body.scheme_space.with_background_image {
 }
 .scheme_space .right-tab-header a.active {
     color: #14F0D8;
-	font-weight: bold !important;	
+	font-weight: bold !important;
+	border-top: 1px solid #0A2450;	
+}
+.scheme_space #rightTabChat {
+	margin-top: 14px;
 }
 .scheme_space div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #167E9D;
@@ -475,8 +756,25 @@ body.scheme_space.with_background_image {
 .scheme_space #pauseBtn { /* Link in right column : pawse */
 	margin-left: 5px;
 }
+.scheme_space div#gameLog {
+	margin: 6px 5px 5px 0;
+	background: transparent;
+	min-height: 5% !important;
+	height: unset !important;
+	max-height: calc(100% -80px) !important;
+}
+.scheme_space #gameLog span.msg:not(.type_date) {
+	font-size: 80%;
+	margin-left: 1.2em;
+	list-style-type: disc;
+	padding-left: 0.3em;
+}
+.scheme_space #gameLog span.noBullet {
+	margin-left: 2.3em !important;
+	list-style-type: '\000B7' !important; /* CenterDot */
+}
 .scheme_space .msg {
-	font-size: 90%;
+	color: #aaaaaa;
 }
 .scheme_space .msg.type_notice {
     color: #1B9CC2; /* color default : #01A9DB; */
@@ -489,42 +787,56 @@ body.scheme_space.with_background_image {
 }
 .scheme_space .msg.type_date {
     color: #14F0D8; 
-    border-bottom: solid 1px #0B4A68;
+	border-bottom: solid 1px #0B4A68;
+	margin-bottom: 3px;
 }
 
 /*****************************************************/
 /******************** LEFT COLUMN ********************/
 /*****************************************************/
- .scheme_space .res-table { 
+.scheme_space a.link.collapse {
+	opacity: 0.4; /* default opacity: 0.2; */
+}
+.scheme_space a.link.collapse:hover {
+	opacity: 1;/* default opacity: 0.9; */
+	color: #12E7D1;
+}
+.scheme_space #leftColumn .res-toolbar a.link.toggled {
+    color: #12E7D1;
+}
+.scheme_space div.tooltip-block:hover > span {
+	font-weight: bold;
+}
+.scheme_space .res-table { 
     max-width: 352px;    /* +12 pixel */ 
     border-collapse: collapse; /* gain of 3 pixel by border -> no margin bottom after */ 	
 	margin-left: 2px; /* without 0px margin left for all ressources */
- } 
- .scheme_space .craftTable {
+} 
+.scheme_space .craftTable {
 	 margin-bottom: 20px !important; /* for correct margin bottom due of the line above with border-collapse: collapse on .res-Table !*/
- }
-.scheme_space .res-cell.craft-link {  
-     min-width: 30px; /* for not adjust size of cell in live. Without column move horizontally */
- } 
+}
+.scheme_space .res-cell.craft-link {
+    color: #89A4CD;
+}
+.scheme_space .res-cell.craft-link.all {
+	font-size: 90%; /* default font-size: 85%; */
+	opacity: 1; /* default opacity: 0.4; */
+	color: #999999;
+} 
 .scheme_space .res-cell.craft-link:hover { /* craft table left column */
     color: #C23574;
 	text-decoration: none; 
-	font-weight: 800;
+	font-weight: bold;
     text-shadow: 1px 1px #040A20;
 }
-.scheme_space tr.resourceRow:hover,
 .scheme_space .res-row:hover {
     background-color: rgba(20, 240, 216, 0.2); /* color #14F0D8 */
 	cursor: default;
 }
-.scheme_space .res-row.craft:hover {
-    background-color: rgba(20, 240, 216, 0.2); /* color #14F0D8 */
+.scheme_space .highlited { /* higlighting ressources when hover button on center windows */
+	background-color: rgba(20, 240, 216, 0.2); /* color #14F0D8 */
 }
-.scheme_space .res-cell.resPerTick:hover {
-	font-weight: normal !important;
-}
-.scheme_space .maxRes,
-.scheme_space select > option:disabled {
+.scheme_space .maxRes {
 	color: #999999;
 }
 .scheme_space .resAmount { 
@@ -534,35 +846,45 @@ body.scheme_space.with_background_image {
     color: #F4691A;
 	font-weight : 500;
 	font-style: italic;
+	opacity: 1; /* default = 0.75 */
 }
 .scheme_space .resLimitNotice {
     color: #0FC3B1; 
 }
 .scheme_space .resPerTick {
     font-size: 90%;
-    color: #DDDDDD;
+	color: #DDDDDD;
+	cursor: default;
 }
-.scheme_space .res-cell.resPerTick {
-    cursor: default;
+.scheme_space .res-row.resLeaderBonus .resPerTick {
+	color: #1B9CC2;
+	opacity: 0.7;
 }
-.scheme_space #fastHuntContainer > a{ /* Text left column : "Send hunters (xx times)" */
+.scheme_space .res-row.craftEngineer .res-cell.resource-value {
+	color: #35c283;
+	opacity: 0.8;
+}
+.scheme_unicor div#advisorsContainer {
+	color: #C23574;
+}
+.scheme_space #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
 	font-size: 110%;
 }
 .scheme_space #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
 	color: #F4691A;
 }
-.scheme_space #fastPraiseContainer > a{ /* Text left column : "Praise the sun!" */
+.scheme_space #fastPraiseContainer > a { /* Text left column : "Praise the sun!" */
 	font-size: 110%;
 }
-.scheme_space #fastPraiseContainer > a:hover{ 
-	text-shadow: 2px 0px 10px rgba(255, 255, 255, 0.75); /* color #FFFFFF */
+.scheme_space #fastPraiseContainer > a:hover { 
+	text-shadow: 3px 1px 9px #C23574, -3px -1px 9px #C23574;;
 }
-.scheme_space #fastHuntContainer > a:hover{ 
-	text-shadow: 1px 1px #333333;
+.scheme_space #fastHuntContainer > a:hover { 
+	text-shadow: 1px 1px #101010;
 }
 .scheme_space .res-cell.positive-weather { /* to change the color for bonus cell according to the season */
 	font-size: 90% !important;
-	color: #418D79 !important;
+	color: #35C283 !important;
 }
 .scheme_space .res-cell.negative-weather { /* to change the color for penalty cell according to the season */
 	font-size: 90% !important;	
@@ -571,20 +893,12 @@ body.scheme_space.with_background_image {
 .scheme_space .resource_kittens .resource-name { /* change for resource-name = kittens */
 	color: white !important; 
 }
-.scheme_space .resource_faith .resource-name { /* change for resource-name = Faith */
-	color: gray !important;
-}
-.scheme_space .resource_steel .resource-name { /* change for resource-name = Steel */
-	color: gray !important;
-}
-.scheme_space .resource_gear .resource-name { /* change for resource-name = Gear */
-	color: gray !important;
-}
-.scheme_space .resource_alloy .resource-name { /* change for resource-name = Alloy */
-	color: gray !important;
-}
-.scheme_space .resource_megalith .resource-name { /* change for resource-name = Megalith */
-	color: gray !important;
+.scheme_space .resource_faith .resource-name,
+.scheme_space .resource_steel .resource-name,
+.scheme_space .resource_gear .resource-name,
+.scheme_space .resource_alloy .resource-name,
+.scheme_space .resource_megalith .resource-name {
+	color: #808080 !important;
 }
 
 /***************************************************/

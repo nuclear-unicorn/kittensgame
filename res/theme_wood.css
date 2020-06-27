@@ -379,7 +379,7 @@ body.scheme_wood {
 .scheme_wood .trade-race .sells {
     color: #3E8234;
 }
-.scheme_wood .trade-race .ammount {
+.scheme_wood .trade-race .tradeAmount {
     color: #8D7B6F;
 }
 .scheme_wood .attitude { /* text for attitude races int trade tab */

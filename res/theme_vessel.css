@@ -148,9 +148,11 @@ body.scheme_vessel.with_background_image {
 	background-color: #000000;
 	background: no-repeat local top left url('img/theme_vessel_option_screen.jpg'), #000000; /* source of images for graphic design : https://pngtree.com/ Volkeyrn: permanent premium member */
 }
+
+/* Not used anymore, the nice background picture should be used for something else
 .scheme_vessel #changelogDiv {
-	background: no-repeat local top -2px left url('img/theme_vessel_version_screen.jpg'), #000000; /* source of images for graphic design : https://pngtree.com/ Volkeyrn: permanent premium member */
-}
+	background: no-repeat local top -2px left url('img/theme_vessel_version_screen.jpg'), #000000;*/ /* source of images for graphic design : https://pngtree.com/ Volkeyrn: permanent premium member */
+/*}*/
 .scheme_vessel .help a,
 .scheme_vessel .dialog a {
     font-weight: bold;	
@@ -558,7 +560,7 @@ body.scheme_vessel.with_background_image {
 	color: #007B3E;
 	font-size: smaller;
 }
-.scheme_vessel .trade-race .ammount {
+.scheme_vessel .trade-race .tradeAmount {
     color: #909090;
 }
 .scheme_vessel table.statTable {

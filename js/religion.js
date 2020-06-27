@@ -235,24 +235,24 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		description: $I("religion.zu.skyPalace.desc"),
 		prices: [
 			{ name : "ivory", val: 125000 },
-			{ name : "megalith", val: 5 },
-			{ name : "tears", val: 500 }
+			{ name : "tears", val: 500 },
+			{ name : "megalith", val: 5 }
 		],
 		priceRatio: 1.15,
 		effects: {
-			"unicornsRatioReligion" : 0,
-			"ivoryMeteorRatio" : 0,
 			"goldMaxRatio": 0,
+			"unicornsRatioReligion" : 0,
 			"alicornChance" : 0,
-			"alicornPerTick" : 0
+			"alicornPerTick" : 0,
+			"ivoryMeteorRatio" : 0
 		},
 		calculateEffects: function(self, game) {
 			var effects = {
-				"unicornsRatioReligion" : 0.5,
-				"ivoryMeteorRatio" : 0.05,
 				"goldMaxRatio": 0.01,
+				"unicornsRatioReligion" : 0.5,
 				"alicornChance" : 10,
-				"alicornPerTick" : 0
+				"alicornPerTick" : 0,
+				"ivoryMeteorRatio" : 0.05
 			};
 			if (game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.00002;
@@ -269,25 +269,25 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		label: $I("religion.zu.unicornUtopia.label"),
 		description: $I("religion.zu.unicornUtopia.desc"),
 		prices: [
-			{ name : "ivory", val: 1000000 },
 			{ name : "gold", val: 500 },
+			{ name : "ivory", val: 1000000 },
 			{ name : "tears", val: 5000 }
 		],
 		priceRatio: 1.15,
 		effects: {
 			"unicornsRatioReligion" : 0,
-			"ivoryMeteorRatio" : 0,
 			"alicornChance" : 0,
 			"alicornPerTick" : 0,
-			"tcRefineRatio" : 0
+			"tcRefineRatio" : 0,
+			"ivoryMeteorRatio" : 0
 		},
 		calculateEffects: function(self, game) {
 			var effects = {
 				"unicornsRatioReligion" : 2.5,
-				"ivoryMeteorRatio" : 0.15,
 				"alicornChance" : 15,
 				"alicornPerTick" : 0,
-				"tcRefineRatio" : 0.05
+				"tcRefineRatio" : 0.05,
+				"ivoryMeteorRatio" : 0.15
 			};
 			if (game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.000025;
@@ -310,25 +310,25 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		//TODO: make SSPIRE make something really interesting
 		description: $I("religion.zu.sunspire.desc"),
 		prices: [
-			{ name : "ivory", val: 750000 },
 			{ name : "gold", val: 1250 },
+			{ name : "ivory", val: 750000 },
 			{ name : "tears", val: 25000 }
 		],
 		priceRatio: 1.15,
 		effects: {
 			"unicornsRatioReligion" : 0,
-			"ivoryMeteorRatio" : 0,
 			"alicornChance" : 0,
 			"alicornPerTick" : 0,
-			"tcRefineRatio": 0
+			"tcRefineRatio": 0,
+			"ivoryMeteorRatio" : 0
 		},
 		calculateEffects: function(self, game) {
 			var effects = {
 				"unicornsRatioReligion" : 5,
-				"ivoryMeteorRatio" : 0.5,
 				"alicornChance" : 30,
 				"alicornPerTick" : 0,
-				"tcRefineRatio" : 0.1
+				"tcRefineRatio" : 0.1,
+				"ivoryMeteorRatio" : 0.5
 			};
 			if (game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.00005;
@@ -342,16 +342,22 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		label: $I("religion.zu.marker.label"),
 		description: $I("religion.zu.marker.desc"),
 		prices: [
+			{ name : "unobtainium", val: 2500 },
 			{ name : "spice", val: 50000 },
 			{ name : "tears", val: 5000 },
-			{ name : "unobtainium", val: 2500 },
 			{ name : "megalith", val: 750 }
 		],
 		priceRatio: 1.15,
 		effects: {
 			"corruptionRatio" : 0.000001
 		},
-		unlocked: false
+		calculateEffects: function(self, game) {
+			self.effects["corruptionRatio"] = 0.000001 * (game.challenges.getChallengeReward("blackSky"));
+		},
+		unlocked: false,
+		getEffectiveValue: function(game) {
+			return this.val * (game.challenges.getChallengeReward("blackSky"));
+		}
 	},{
 		name: "unicornGraveyard",
 		label: $I("religion.zu.unicornGraveyard.label"),
@@ -377,9 +383,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		label: $I("religion.zu.unicornNecropolis.label"),
 		description: $I("religion.zu.unicornNecropolis.desc"),
 		prices: [
-			{ name : "void", val: 5 },
-			{ name : "necrocorn", val: 15 },
 			{ name : "alicorn", val: 100 },
+			{ name : "necrocorn", val: 15 },
+			{ name : "void", val: 5 },
 			{ name : "megalith", val: 2500 }
 		],
 		priceRatio: 1.15,
@@ -392,9 +398,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		label: $I("religion.zu.blackPyramid.label"),
 		description: $I("religion.zu.blackPyramid.desc"),
 		prices: [
+			{ name : "unobtainium", val: 5000 },
 			{ name : "spice", val: 150000 },
 			{ name : "sorrow", val: 5 },
-			{ name : "unobtainium", val: 5000 },
 			{ name : "megalith", val: 2500 }
 		],
 		priceRatio: 1.15,
@@ -404,7 +410,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			spaceBuilding: ["spaceBeacon"]
 		},
 		unlocked: false,
-		flavor: $I("religion.zu.blackPyramid.flavor")
+		flavor: $I("religion.zu.blackPyramid.flavor"),
+		getEffectiveValue: function(game) {
+			return this.val + (game.challenges.getChallengeResearched("blackSky") ? 1 : 0);
+		}
 	}],
 
 	religionUpgrades:[{
@@ -447,8 +456,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		label: $I("religion.ru.goldenSpire.label"),
 		description: $I("religion.ru.goldenSpire.desc"),
 		prices: [
-			{ name : "faith", val: 350 },
-			{ name : "gold",  val: 150 }
+			{ name : "gold",  val: 150 },
+			{ name : "faith", val: 350 }
 		],
 		faith: 500,
 		effects: {
@@ -468,8 +477,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		label: $I("religion.ru.sunAltar.label"),
 		description: $I("religion.ru.sunAltar.desc"),
 		prices: [
-			{ name : "faith", val: 500 },
-			{ name : "gold",  val: 250 }
+			{ name : "gold",  val: 250 },
+			{ name : "faith", val: 500 }
 		],
 		faith: 750,
 		effects: {
@@ -488,8 +497,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		label: $I("religion.ru.stainedGlass.label"),
 		description: $I("religion.ru.stainedGlass.desc"),
 		prices: [
-			{ name : "faith", val: 500 },
-			{ name : "gold",  val: 250 }
+			{ name : "gold",  val: 250 },
+			{ name : "faith", val: 500 }
 		],
 		faith: 750,
 		effects: {
@@ -508,8 +517,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		label: $I("religion.ru.solarRevolution.label"),
 		description: $I("religion.ru.solarRevolution.desc"),
 		prices: [
-			{ name : "faith", val: 750 },
-			{ name : "gold",  val: 500 }
+			{ name : "gold",  val: 500 },
+			{ name : "faith", val: 750 }
 		],
 		faith: 1000,
 		effects: {
@@ -521,8 +530,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		label: $I("religion.ru.basilica.label"),
 		description: $I("religion.ru.basilica.desc"),
 		prices: [
-			{ name : "faith", val: 1250 },
-			{ name : "gold",  val: 750 }
+			{ name : "gold",  val: 750 },
+			{ name : "faith", val: 1250 }
 		],
 		faith: 10000,
 		effects: {
@@ -541,8 +550,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		label: $I("religion.ru.templars.label"),
 		description: $I("religion.ru.templars.desc"),
 		prices: [
-			{ name : "faith", val: 3500 },
-			{ name : "gold",  val: 3000 }
+			{ name : "gold",  val: 3000 },
+			{ name : "faith", val: 3500 }
 		],
 		faith: 75000,
 		effects: {
@@ -561,8 +570,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		label: $I("religion.ru.apocripha.label"),
 		description: $I("religion.ru.apocripha.desc"),
 		prices: [
-			{ name : "faith", val: 5000 },
-			{ name : "gold",  val: 5000 }
+			{ name : "gold",  val: 5000 },
+			{ name : "faith", val: 5000 }
 		],
 		faith: 100000,
 		effects: {
@@ -574,8 +583,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		label: $I("religion.ru.transcendence.label"),
 		description: $I("religion.ru.transcendence.desc"),
 		prices: [
-			{ name : "faith", val: 7500 },
-			{ name : "gold",  val: 7500 }
+			{ name : "gold",  val: 7500 },
+			{ name : "faith", val: 7500 }
 		],
 		faith: 125000,
 		effects: {
@@ -841,9 +850,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
 	defaults: function() {
 		var result = this.inherited(arguments);
-
 		result.tooltipName = true;
-		result.simplePrices = false;
 		return result;
 	},
 
@@ -871,9 +878,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 dojo.declare("com.nuclearunicorn.game.ui.ReligionBtnController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
 	defaults: function() {
 		var result = this.inherited(arguments);
-
 		result.tooltipName = true;
-		result.simplePrices = false;
 		return result;
 	},
 
@@ -901,9 +906,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ReligionBtnController", com.nuclearunic
 dojo.declare("classes.ui.TranscendenceBtnController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
 	defaults: function() {
 		var result = this.inherited(arguments);
-
 		result.tooltipName = true;
-		result.simplePrices = false;
 		return result;
 	},
 
@@ -1184,7 +1187,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 						model.visible = this.hasResources(model);
 					},
 					gainMultiplier: function() {
-						return 1 + this.game.getEffect("relicRefineRatio") * this.game.religion.getZU("blackPyramid").val;
+						return 1 + this.game.getEffect("relicRefineRatio") * this.game.religion.getZU("blackPyramid").getEffectiveValue(this.game);
 					},
 					gainedResource: "relic",
 					logTextID: "religion.refineTCsBtn.refine.msg"

@@ -19,8 +19,7 @@ body.scheme_grassy {
     text-underline: none;
 }
 
-.scheme_grassy #optionsDiv,
-.scheme_grassy #changelogDiv {
+.scheme_grassy #optionsDiv {
 	padding: 30px;
 
 	background-color: #C6EBA1;

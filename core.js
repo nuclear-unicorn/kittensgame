@@ -377,7 +377,6 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 		if (!saveMeta){
 			console.trace(saveMeta);
 			console.error("Unable to load save metadata, meta is empty");
-			
 			return;
 		}
 
@@ -1189,22 +1188,22 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 	},
 
 	createPriceLineModel: function(model, price) {
-		return this._createPriceLineModel(price, model.options.simpleUI);
+		return this._createPriceLineModel(price, model.simplePrices);
 	},
 
-	_createPriceLineModel: function(price, simpleUI, indent) {
+	_createPriceLineModel: function(price, simplePrices, indent) {
 		var res = this.game.resPool.get(price.name);
-		var hasRes = (res.value >= price.val);
+		var hasRes = res.value >= price.val;
 
 		var hasLimitIssue = res.maxValue && ((price.val > res.maxValue && !indent) || price.baseVal > res.maxValue);
-		var asterisk = hasLimitIssue? "*" : "";	//mark limit issues with asterisk
+		var asterisk = hasLimitIssue ? "*" : "";	//mark limit issues with asterisk
 
-		var displayValue = (hasRes || simpleUI ?
-				this.game.getDisplayValueExt(price.val) :
-				this.game.getDisplayValueExt(res.value) + " / " + this.game.getDisplayValueExt(price.val) + asterisk);
+		var displayValue = hasRes || simplePrices
+				? this.game.getDisplayValueExt(price.val)
+				: this.game.getDisplayValueExt(res.value) + " / " + this.game.getDisplayValueExt(price.val) + asterisk;
 		var resPerTick = this.game.getResourcePerTick(res.name, true);
-		var eta=0;
-		if (!hasRes && resPerTick > 0 && !simpleUI){
+		var eta = 0;
+		if (!hasRes && resPerTick > 0 && !simplePrices) {
 			eta = (price.val - res.value) / (resPerTick * this.game.getTicksPerSecondUI());
 			if (eta >= 1) {
 				displayValue += " (" + this.game.toDisplaySeconds(eta) + ")";
@@ -1228,7 +1227,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 
 
 		//unroll prices to the raw resources
-		if (!hasRes && res.craftable && !simpleUI && res.name != "wood"){
+		if (!hasRes && res.craftable && !simplePrices && res.name != "wood") {
 			var craft = this.game.workshop.getCraft(res.name);
 			if (craft.unlocked) {
 				var craftRatio = this.game.getResCraftRatio(res.name);
@@ -1249,17 +1248,12 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 
 					var comp = {name: components[j].name, val: val, baseVal: components[j].val};
 
-					var compResult = this._createPriceLineModel(comp, simpleUI, indent + 1);
+					var compResult = this._createPriceLineModel(comp, simplePrices, indent + 1);
 					result.children.push(compResult);
 				}
 			}
 		}
 		return result;
-	},
-
-	fetchModel: function(options) {
-		var model = this.inherited(arguments);
-		return model;
 	},
 
 	fetchExtendedModel: function(model) {
@@ -1455,11 +1449,11 @@ ButtonModernHelper = {
 		}
 		for( var i = 0; i < prices.length; i++){
 			var price = prices[i];
-			var span = ButtonModernHelper._renderPriceLine(tooltip, price, model.simplePrices);
+			var span = ButtonModernHelper._renderPriceLine(tooltip, price);
 		}
 	},
 
-	_renderPriceLine : function(tooltip, price, simpleUI){
+	_renderPriceLine : function(tooltip, price) {
 		var priceItemNode = dojo.create("div", {
 				className: "price-block",
 				style : {
@@ -1479,7 +1473,7 @@ ButtonModernHelper = {
 
 		if (price.children && price.children.length) {
 			for (var i = 0; i < price.children.length; i++ ) {
-				var compSpan = this._renderPriceLine(tooltip, price.children[i], simpleUI);
+				var compSpan = this._renderPriceLine(tooltip, price.children[i]);
 				for (var k = 0; k < price.children[i].indent; ++k) {
 					compSpan.name.innerHTML = "&nbsp;&nbsp;&nbsp;" + compSpan.name.innerHTML;
 				}
@@ -1614,14 +1608,6 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 
 
 dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
-
-	defaults: function() {
-		var result = this.inherited(arguments);
-
-		result.simplePrices = true;
-		result.hasResourceHover= false;
-		return result;
-	},
 
 	initModel: function(options) {
 		var model = this.inherited(arguments);
@@ -1831,7 +1817,6 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.ui.ButtonModern, {
 	sellHref: null,
 	toggleHref: null,
-	hasResourceHover: true,
 
 	/**
 	 * Render button links like off/on and sell
@@ -1967,10 +1952,9 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 });
 
 dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nuclearunicorn.game.ui.BuildingBtnController, {
-
 	defaults: function(){
 		var result = this.inherited(arguments);
-
+		result.simplePrices = false;
 		result.multiplyEffects = true;
 		return result;
 	},

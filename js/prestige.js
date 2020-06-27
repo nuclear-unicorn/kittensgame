@@ -39,8 +39,8 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			"perks": ["codexAgrum", "codexLeviathanianus"]
 		},
 		effects:{
-			"compediumCraftRatio" : 0.25,
 			"manuscriptGlobalCraftRatio": 0.05,
+			"compediumCraftRatio" : 0.25,
 			"compediumGlobalCraftRatio": 0.05
 
 		}
@@ -52,9 +52,9 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		unlocked: false,
 		researched: false,
 		effects:{
-			"blueprintCraftRatio" : 0.25,
 			"manuscriptGlobalCraftRatio": 0.05,
 			"compediumGlobalCraftRatio": 0.05,
+			"blueprintCraftRatio" : 0.25,
 			"blueprintGlobalCraftRatio": 0.05
 		}
 	}, {
@@ -111,7 +111,7 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			"perks": ["vitruvianFeline"]
 		},
 		effects:{
-			"priceRatio" : -0.017
+			"priceRatio" : -16/900
 		}
 	},{
 		name: "vitruvianFeline",
@@ -144,6 +144,9 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		unlocked: true,
 		defaultUnlocked: true,
 		researched: false,
+		effects:{
+			"standingRatio" : 0.1
+		},
 		unlocks: {
 			"perks": ["zebraDiplomacy"]
 		}
