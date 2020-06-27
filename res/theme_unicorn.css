@@ -291,7 +291,7 @@ body.scheme_unicorn.with_background_image {
 	border-style: groove;
 	border-color: #f8f5f0;
 	border-width: 2px;
-	border-radius: 5px !important;
+	border-radius: 5px;
 	box-shadow: 4px 4px 9px #111922;
 	margin-left: 5px; /* for offset tooltip due to larger buttons .btn.modern */
 }
@@ -375,7 +375,7 @@ body.scheme_unicorn.with_background_image {
 	padding: 3px 4px 0 4px;
 	border: 1px solid transparent; /* for no offset when border on */
 }
-.scheme_unicorn .tabsContainer span { /* separator | for tab */
+.scheme_unicorn .tabsContainer span:not(.genericWarning) { /* separator | for tab */
 	color: transparent;
 	font-size: 13px; /* to set width = 10px */
 	margin-left: -6px;
@@ -403,6 +403,9 @@ body.scheme_unicorn.with_background_image {
 .scheme_unicorn .tab.traitLeaderBonus::before {
 	content: "\2605"; /* BLACK STAR */
 	color: #4f8fdd;
+}
+.scheme_unicorn span.genericWarning { /* number of kittens free or engineering free on tab */
+	color: #e43011;
 }
 .scheme_unicorn div.bldTopContainer > a { /* under tab */
 	font-size: 90%;
@@ -590,7 +593,7 @@ body.scheme_unicorn.with_background_image {
 	color: #63872d;
 	font-size: smaller;
 }
-.scheme_unicorn .trade-race .ammount {
+.scheme_unicorn .trade-race .tradeAmount {
 	color: #606060;
 	font-size: smaller;
 }

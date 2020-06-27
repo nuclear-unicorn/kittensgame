@@ -1189,9 +1189,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.resPool = new classes.managers.ResourceManager(this);
 		this.calendar = new com.nuclearunicorn.game.Calendar(this, dojo.byId("calendarDiv"));
 
-		// TODO Temporarily kept for compatibility with scripts, WILL BE REMOVED in next minor version (1.4.6.0)
-		this.rate = this.ticksPerSecond;
-
 		this.village = new classes.managers.VillageManager(this);
 		this.resPool.setVillage(this.village);
 
@@ -1526,7 +1523,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		//5mb limit workaround
 		if (saveDataString.length > 5000000 || this.opts.forceLZ) {
 			console.log("compressing the save file...");
-			saveDataString = this.compressLZData(saveDataString);
+			saveDataString = this.compressLZData(saveDataString, true);
 		}
 
 		LCstorage["com.nuclearunicorn.kittengame.savedata"] = saveDataString;
@@ -1589,17 +1586,17 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 */
 	decompressLZData: function(lzData) {
 		var decompressedAsBase64 = LZString.decompressFromBase64(lzData);
-		return decompressedAsBase64 != null
+		return decompressedAsBase64 && decompressedAsBase64[0] == '{'
 			? decompressedAsBase64
 			: LZString.decompressFromUTF16(lzData);
 	},
 
-	compressLZData: function(json, useBase64) {
+	compressLZData: function(json, useUTF16) {
 		//todo check game compatibility flags
 		//console.log("base64 length:", LZString.compressToBase64(json).length, "utf-16 length:", LZString.compressToUTF16(json).length);
-		return useBase64
-			? LZString.compressToBase64(json)
-			: LZString.compressToUTF16(json);
+		return useUTF16
+			? LZString.compressToUTF16(json)
+			: LZString.compressToBase64(json);
 	},
 
 	_parseLSSaveData: function(){
@@ -1728,7 +1725,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var data = this.save();
 		data = JSON.stringify(data);
 
-        var encodedData = this.compressLZData(data, true /*base64*/);
+        var encodedData = this.compressLZData(data);
         this.ui.saveExport(encodedData);
 
 	},
@@ -1750,7 +1747,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
         var $link = $('#download-link');
 
         var data = JSON.stringify(this.save());
-        var lzdata = this.compressLZData(data, true /*base64*/);
+        var lzdata = this.compressLZData(data);
         var blob = new Blob([lzdata], {type: 'text/plain'});
         $link.attr('href', window.URL.createObjectURL(blob));
 
@@ -1768,7 +1765,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.save();
 		var data = this.save();
 		data = JSON.stringify(data);
-		var lzdata = this.compressLZData(data, true /*base64*/);
+		var lzdata = this.compressLZData(data);
 
 
         var callback = function() {
@@ -2797,11 +2794,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
         this.ui.update();
 
 		this.timer.afterUpdate();
-	},
-
-	// TODO Temporarily kept for compatibility with scripts, WILL BE REMOVED in next minor version (1.4.6.0)
-	getRateUI: function() {
-		return this.getTicksPerSecondUI();
 	},
 
 	getTicksPerSecondUI: function() {

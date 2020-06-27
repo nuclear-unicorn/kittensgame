@@ -101,7 +101,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
     isChatActive: false,
     isChatVisited: false,
 
-    defaultSchemes: ["default", "dark", "grassy", "sleek"],
+    defaultSchemes: ["default", "dark", "grassy", "sleek", "black"],
     allSchemes: ["default"].concat(new classes.KGConfig().statics.schemes),
 
     constructor: function(containerId){
@@ -112,10 +112,6 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         });
 
         dojo.connect($("html")[0], "onkeyup", this, function (event) {
-			// ignore hotkeys when focused in a textarea or a text/number input element
-			if (event.target.tagName === "TEXTAREA" || (event.target.tagName === "INPUT" && (event.target.type === "text" || event.target.type === "number"))) {
-				return;
-			}
 
             // Allow user extensibility to keybindings in core events
             var keybinds = [
@@ -195,7 +191,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
                     shift: false,
                     alt: false,
                     control: false,
-                    action: function(){ $('div.dialog:visible').last().hide(); }
+					action: function(){ $('div.dialog:visible').last().hide(); }
                 }
             ];
 
@@ -221,14 +217,15 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
                 }
             }
 
-
+			var isInputElement = event.target.tagName === "TEXTAREA" ||
+				(event.target.tagName === "INPUT" && (event.target.type === "text" || event.target.type === "number"));
             var isTabNumber = ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105));
             //console.log(isTabNumber, event.keyCode);
 
             if (keybind && keybind.action) {
                 // If a keybind is found and has a specific action
                 keybind.action();
-            } else if (isTabNumber){
+            } else if (!isInputElement && isTabNumber){
                 var tabIndex = 9;
                 if (event.keyCode >= 97) { //numpad
                     tabIndex = event.keyCode - 97;
@@ -239,7 +236,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
                     this.game.ui.activeTabId = this.game.tabs[tabIndex].tabId;
                     this.game.ui.render();
                 }
-            } else if (keybind && keybind.name != this.game.ui.activeTabId ) {
+            } else if (!isInputElement && keybind && keybind.name != this.game.ui.activeTabId ) {
                 // If a keybound is found and the tab isn't current
                 for (var i = 0; i < this.game.tabs.length; i++){
                     if (this.game.tabs[i].tabId === keybind.name && this.game.tabs[i].visible){
@@ -653,9 +650,8 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             "catnip" : 0.25
         }});	//calculate estimate winter per tick for catnip;
 
-        if (this.game.resPool.get("catnip").value + winterDays * catnipPerTick * calendar.ticksPerDay <= 0) {
-            advDiv.innerHTML = "<span>" + $I("general.food.advisor.text") + "<span>";
-        }
+        var visibility = this.game.resPool.get("catnip").value + winterDays * catnipPerTick * calendar.ticksPerDay <= 0 ? "visible" : "hidden";
+        advDiv.innerHTML = "<span style='visibility: " + visibility + "'>" + $I("general.food.advisor.text") + "<span>";
     },
 
     updateLanguage: function(){

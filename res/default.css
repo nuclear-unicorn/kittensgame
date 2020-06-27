@@ -528,6 +528,7 @@ table.craftTable tr:hover td {
     color: coral;
 }
 
+span.genericWarning,
 .toolbarIcon.energy.warning,
 .button_tooltip .energyConsumption,
 .button_tooltip .energyPenalty {
@@ -569,15 +570,15 @@ table.craftTable tr:hover td {
     display: inline-block;
 }
 
-.trade-race .ammount {
+.trade-race .tradeAmount {
     color: #777;
 }
 
-.trade-race .ammount:before {
+.trade-race .tradeAmount:before {
     content: "(";
 }
 
-.trade-race .ammount:after {
+.trade-race .tradeAmount:after {
     content: ")";
 }
 

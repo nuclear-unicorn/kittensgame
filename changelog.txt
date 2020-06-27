@@ -1,7 +1,29 @@
-v 1.4.8.0 (?? may 2020)
+v 1.4.8.1 (?? july 2020)
+Major:
+* Fix per-tick resources that were not gained if offline progression is performed during a Temporal Paradox
+* Make gamma the new mainline
+* Make engineers work during time skips
+* Add new challenge: Black Sky
+* Implement Zebra Outpost
+* Add embassies
+
+Themes:
+* New themes: Anthracite, Black
+
+Minor:
+* Caravanserai does not count anymore as a free Tradepost
+* Fix display of Standing ratio for Tradeposts
+* Increase years in stats during offline progression
+* Arrange price lists in buildings and upgrades in the same order as in the left column
+* Prevent food advisor to move stuff in left column
+
+v 1.4.8.0 (11 june 2020)
 Major:
 * Fix precrafted amount
 * Implement Metallurgist and Chemist traits
+* Allow to crash BC market
+* Make BC market evolve during offline progression
+* Make Divine Proportion 16:9 (all hail TV!)
 
 Themes:
 * New theme: Unicorn
@@ -16,9 +38,10 @@ Minor:
 * Add option allowing to modify the ×10 purchase multiplier for Ctrl key
 * Add option allowing to hide downgrade buttons
 * Fix failing load of very old save files
-* Complete description of the no confirmation” option
+* Complete description of the “no confirmation” option
 * Add option allowing to always show festivals/trade/sacrifice/shatter buttons even if not applicable
 * Add option allowing to display craft/trade/sacrifice buttons as percentage
+* In case of unassigned engineers, display the actual number instead of just (!)
 
 v 1.4.7.1 (19 apr 2020)
 Major:

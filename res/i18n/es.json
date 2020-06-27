@@ -134,9 +134,9 @@
     "village.msg.froze": "se congeló hasta la muerte",
     "village.msg.hunt.success": "Tus cazadores han regresado",
     "village.msg.hunt.from": "de {0} búsquedas",
-    "village.msg.hunt.furs": "pieles",
-    "village.msg.hunt.ivory": "marfil",
-    "village.msg.hunt.gold": "oro",
+    "village.msg.hunt.furs": "+{0} pieles",
+    "village.msg.hunt.ivory": "+{0} marfil",
+    "village.msg.hunt.gold": "+{0} oro",
     "village.census.filter.all": "Todos los trabajos",
     "village.job.engineer.desc": "El ingeniero puede operar una fábrica para automatizar la producción de recursos. <br /> Asigne a sus ingenieros en la pestaña taller, que crearán automáticamente una vez cada 10 minutos.",
     "village.bonus.desc.engineer": "Bonificación de elaboración",
@@ -1583,8 +1583,8 @@
     "science.blackchain.desc": "Todos los gatos geniales están extrayendo esto, así que creo que es algún tipo de mineral",
     "science.blackchain.effectDesc": "Desbloquea cryptomineria y intercambiar blackcoin",
     "resources.blackcoin.title": "Blackcoin",
-    "trade.buy.ecoin": "Comprar Bcoin",
-    "trade.buy.ecoin.desc": "Intercambia tus reliquias por blackcoins",
-    "trade.sell.ecoin": "Vender Bcoin",
-    "trade.sell.ecoin.desc": "Vende tus blackcoins y recupera las reliquias"
+    "trade.buy.bcoin": "Comprar Bcoin",
+    "trade.buy.bcoin.desc": "Intercambia tus reliquias por blackcoins",
+    "trade.sell.bcoin": "Vender Bcoin",
+    "trade.sell.bcoin.desc": "Vende tus blackcoins y recupera las reliquias"
 }

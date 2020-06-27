@@ -15,9 +15,14 @@ Please, no ()=>{}, const, require, webpackers, etc.
 ### Roadmap ###
 
 Most recent roadmap: https://trello.com/b/cecIwqp2/kittens-game-roadmap
-Please feel free to add other suggestions.
+^
+Have not been updated for years
 
 ### Contribution guidelines ###
+
+* Brave souls that try to chagne formatting will be fed to wolfs
+* THERE IS NO UNUSED CODE in this repo
+* If you found some confusig place and wasted more than few hours here, please document it for your fellow devs
 
 ## Theme/Setting ##
 

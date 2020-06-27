@@ -249,7 +249,7 @@ WCraftShortcut = React.createClass({
                 ? $r("div", {className: cssClasses, onClick: this.doCraftAll, title: "+" + game.getDisplayValueExt(allCount * (1 + craftRatio), null, null, 0)}, $I("resources.craftTable.all"))
                 : $r("div", {className: cssClasses});
         } else {
-            cssClasses += (craftPercent * 100) + "pc";
+            cssClasses += "craft-" + (craftPercent * 100) + "pc";
             elem = game.resPool.hasRes(craftPrices, craftRowAmt, true)
                 ? game.opts.usePercentageConsumptionValues
                     ? $r("div", {className: cssClasses, onClick: this.doCraft, title: "+" + game.getDisplayValueExt(craftRowAmt * (1 + craftRatio), null, null, 0)}, (craftPercent * 100) + "%")

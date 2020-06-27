@@ -241,8 +241,9 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 	assignJob: function(job, amt){
 		var jobRef = this.getJob(job.name); 	//probably will fix missing ref on loading
+		amt = Math.min(amt, this.getFreeKittens(), this.getJobLimit(job.name) - jobRef.value);
 
-		if ( this.hasFreeKittens(amt) && this.getWorkerKittens(job.name) + amt <= this.getJobLimit(job.name) ) {
+		if (amt > 0) {
 			this.sim.assignJob(job.name, amt);
 			jobRef.value += amt;
 			if (job.name == "engineer") {
@@ -316,10 +317,11 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 		//check job limits
 		for (var i = 0; i < this.jobs.length; i++) {
-			var jobName = this.jobs[i].name;
+			var job = this.jobs[i];
+			var jobName = job.name;
 			var limit = this.getJobLimit(jobName);
-			while (this.getWorkerKittens(jobName) > limit) {
-				this.sim.removeJob(jobName);
+			if (job.value > limit) {
+				this.sim.removeJob(jobName, job.value - limit);
 			}
 		}
 
@@ -380,7 +382,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		return 0;
 	},
 
-	getFreeEngineer: function() {
+	getFreeEngineers: function() {
 		var engineerNoFree = 0;
 		for (var i = this.game.workshop.crafts.length -1; i >= 0; i--) {
 			engineerNoFree += this.game.workshop.crafts[i].value;
@@ -686,91 +688,60 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		this.happiness = happiness/100;
 	},
 
-	sendHuntersImpl: function(squads) {
-		var huntedResources = {},
-			hunterRatio = this.game.getEffect("hunterRatio") + this.game.village.getEffectLeader("manager", 0);
-
-		huntedResources["furs"] = 80 * this.game.math.irwinHallRandom(squads) +
-			65 * hunterRatio * this.game.math.irwinHallRandom(squads);
-
-		var ivoryProbability = 0.45 + 0.02 * hunterRatio,
-			ivoryHunts = this.game.math.binominalRandomInteger(squads, ivoryProbability);
-
-		huntedResources["ivory"] = 50 * this.game.math.irwinHallRandom(ivoryHunts) +
-			40 * hunterRatio * this.game.math.irwinHallRandom(ivoryHunts);
-
-		var unicornProbabilty = 0.05;
-		huntedResources["unicorns"] = this.game.math.binominalRandomInteger(squads, unicornProbabilty);
-
-		var resPool = this.game.resPool;
-		if (resPool.get("zebras").value >= 10) {
-			var bloodstoneProbability = resPool.get("bloodstone").value == 0 ? 0.05 : 0.0005;
-			huntedResources["bloodstone"] = this.game.math.binominalRandomInteger(squads, bloodstoneProbability);
-		}
-
-		if (this.game.ironWill && this.game.workshop.get("goldOre").researched) {
-			var goldProbability = 0.25,
-				goldHunts = this.game.math.binominalRandomInteger(squads, goldProbability);
-
-			huntedResources["gold"] = 5 * this.game.math.irwinHallRandom(goldHunts) +
-				10 * hunterRatio / 2 * this.game.math.irwinHallRandom(goldHunts);
-		}
-
-		return huntedResources;
-	},
-
 	sendHunters: function() {
-		this.gainHuntRes(this.sendHuntersImpl(1), 1);
+		this.gainHuntRes(1);
 	},
 
 	huntAll: function() {
-		var mpower = this.game.resPool.getTotal("manpower");
-		var squads = Math.floor(mpower / 100);
-		this.huntMultiple(squads);
+		var squads = Math.floor(this.game.resPool.getTotal("manpower") / 100);
+		if (squads >= 1) {
+			this.game.resPool.addResEvent("manpower", -squads * 100);
+			this.gainHuntRes(squads);
+		}
 	},
 
-	huntMultiple: function (squads){
-		var mpower = this.game.resPool.getTotal("manpower");
-		squads = Math.min(squads, Math.floor(mpower / 100));
-
-		if (squads < 1){
-			return;
-		}
-
-		this.game.resPool.addResEvent("manpower", -(squads * 100));
-		this.gainHuntRes(this.sendHuntersImpl(squads), squads);
-	},
-
-	gainHuntRes: function (totalYield, squads) {
-		for (var res in totalYield){
-			totalYield[res] = this.game.resPool.addResEvent(res, totalYield[res]);
-		}
-
-		if (totalYield.unicorns > 0){
-			var unicornMsg = "";
-			if (Math.round(totalYield.unicorns) === 1) {
-				unicornMsg = $I("village.new.one.unicorn");
-			} else {
-				unicornMsg = $I("village.new.many.unicorns", [this.game.getDisplayValueExt(totalYield.unicorns)]);
-			}
+	gainHuntRes: function (squads) {
+		var unicorns = this.game.resPool.addResEvent("unicorns", this.game.math.binominalRandomInteger(squads, 0.05));
+		if (unicorns > 0) {
+			var unicornMsg = unicorns == 1
+				? $I("village.new.one.unicorn")
+				: $I("village.new.many.unicorns", [this.game.getDisplayValueExt(unicorns)]);
 			this.game.msg(unicornMsg, "important", "hunt");
 		}
-		if (totalYield.bloodstone > 0 && this.game.resPool.get("bloodstone").value == 1){
-			this.game.msg($I("village.new.bloodstone"), "important", "ironWill");
+
+		if (this.game.resPool.get("zebras").value >= 10) {
+			var bloodstone = this.game.resPool.addResEvent("bloodstone", this.game.math.binominalRandomInteger(squads, this.game.resPool.get("bloodstone").value == 0 ? 0.05 : 0.0005));
+			if (bloodstone > 0 && this.game.resPool.get("bloodstone").value == 1) {
+				this.game.msg($I("village.new.bloodstone"), "important", "ironWill");
+			}
+		}
+
+		var hunterRatio = this.game.getEffect("hunterRatio") + this.game.village.getEffectLeader("manager", 0);
+
+		if (this.game.ironWill && this.game.workshop.get("goldOre").researched) {
+			var goldHunts = this.game.math.binominalRandomInteger(squads, 0.25);
+			var gold = this.game.resPool.addResEvent("gold", 5 * this.game.math.irwinHallRandom(goldHunts) + 5 * hunterRatio * this.game.math.irwinHallRandom(goldHunts));
+			if (gold > 0) {
+				this.game.msg($I("village.msg.hunt.gold", [this.game.getDisplayValueExt(gold)]), null, "hunt", true);
+			}
+		}
+
+		var ivoryHunts = this.game.math.binominalRandomInteger(squads, 0.45 + 0.02 * hunterRatio);
+		var ivory = this.game.resPool.addResEvent("ivory", 50 * this.game.math.irwinHallRandom(ivoryHunts) + 40 * hunterRatio * this.game.math.irwinHallRandom(ivoryHunts));
+		if (ivory > 0) {
+			this.game.msg($I("village.msg.hunt.ivory", [this.game.getDisplayValueExt(ivory)]), null, "hunt", true);
+		}
+
+		var furs = this.game.resPool.addResEvent("furs", 80 * this.game.math.irwinHallRandom(squads) + 65 * hunterRatio * this.game.math.irwinHallRandom(squads));
+		if (furs > 0) {
+			this.game.msg($I("village.msg.hunt.furs", [this.game.getDisplayValueExt(furs)]), null, "hunt", true);
 		}
 
 		var msg = $I("village.msg.hunt.success");
 		if (squads > 1) {
 			msg += $I("village.msg.hunt.from", [squads]);
 		}
-		msg += ". +" + this.game.getDisplayValueExt(totalYield.furs) + " " + $I("village.msg.hunt.furs");
-		if (totalYield.ivory > 0){
-			msg += ", +" + this.game.getDisplayValueExt(totalYield.ivory) + " " + $I("village.msg.hunt.ivory");
-		}
-		if (totalYield.gold > 0){
-			msg += ", +" + this.game.getDisplayValueExt(totalYield.gold) + " " + $I("village.msg.hunt.gold");
-		}
-		this.game.msg( msg, null, "hunt" );
+		this.game.msg(msg, null, "hunt");
 	},
 
 	holdFestival: function(amt){
@@ -896,7 +867,7 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 	// 100 surnames MAX!
 	// Add new surnames at the end of the list
 	surnames: ["Smoke", "Dust", "Chalk", "Fur", "Clay", "Paws", "Tails", "Sand", "Scratch", "Berry", "Shadow",
-				"Ash", "Bark", "Bowl", "Brass", "Dusk", "Gaze", "Gleam", "Grass", "Moss", "Plaid", "Puff", "Rain", 
+				"Ash", "Bark", "Bowl", "Brass", "Dusk", "Gaze", "Gleam", "Grass", "Moss", "Plaid", "Puff", "Rain",
 				"Silk", "Silver", "Speck", "Stripes", "Tingle", "Wool", "Yarn"],
 
 	traits: [{
@@ -1583,6 +1554,7 @@ dojo.declare("classes.village.KittenSim", null, {
 			}*/
 		}
 		this.game.villageTab.updateTab();
+		this.game.workshopTab.updateTab();
 		this.game.village.updateResourceProduction();
 		this.game.village.updateTraits();
 		this.game.updateResources();
@@ -1634,7 +1606,6 @@ dojo.declare("classes.village.KittenSim", null, {
 		var freeKittens = [];
 		var optimizeJobs = this.game.workshop.get("register").researched && this.game.village.leader;
 
-
 		for (var i = this.kittens.length - 1; i >= 0; i--) {
 			var kitten = this.kittens[i];
 			if (!kitten.job){
@@ -1643,11 +1614,14 @@ dojo.declare("classes.village.KittenSim", null, {
 					continue;
 				}
 				var val = kitten.skills[job] || 0;
-				freeKittens.push({"id": i, "val": val});
+				freeKittens.push({"id": i, "val": val, "leader": kitten.isLeader});
 			}
 		}
 
-		freeKittens.sort(function(a, b){return b.val-a.val;});
+		if (optimizeJobs) {
+			//sort leader before other kittens with the same skill level so it gets assigned before them
+			freeKittens.sort(function(a, b){return b.val-a.val||b.leader-a.leader;});
+		}
 
 		amt = amt || 1;
 		for (var i = amt - 1; i >= 0; i--) {
@@ -1668,23 +1642,25 @@ dojo.declare("classes.village.KittenSim", null, {
 	 */
 	removeJob: function(job, amt){
 		var jobKittens = [];
-		var optimizeJobs = (this.game.workshop.get("register").researched && this.game.village.leader) ? true : false;
+		var optimizeJobs = (this.game.workshop.get("register").researched && this.game.village.leader);
 
-		var register = this.game.workshop.get("register");
 		for (var i = this.kittens.length - 1; i >= 0; i--) {
 			var kitten = this.kittens[i];
-            if (kitten.job == job){
+			if (kitten.job == job){
 				if (!optimizeJobs) {
 					jobKittens.push({"id": i});
 					continue;
 				}
-                var val = kitten.skills[job] ? kitten.skills[job] : 0;
-                jobKittens.push({"id": i, "val": val});
-            }
+				var val = kitten.skills[job] ? kitten.skills[job] : 0;
+				jobKittens.push({"id": i, "val": val, "leader": kitten.isLeader});
+			}
 		}
 
-		//probably a bad idea to sort 50K kittens
-		jobKittens.sort(function(a, b){return a.val-b.val;});
+		if (optimizeJobs) {
+			//sort leader after other kittens with the same skill level so it gets unassigned after them
+			//probably a bad idea to sort 50K kittens
+			jobKittens.sort(function(a, b){return a.val-b.val||a.leader-b.leader;});
+		}
 
 		amt = amt || 1;
 		for (var i = amt - 1; i >= 0; i--) {
@@ -1699,6 +1675,9 @@ dojo.declare("classes.village.KittenSim", null, {
 		}
 
 		this.game.village.updateResourceProduction();   //out of synch, refresh instantly
+		if (job == "engineer") {
+			this.game.workshopTab.updateTab();
+		}
 	},
 
 	assignCraftJob: function(craft) {
@@ -1729,9 +1708,9 @@ dojo.declare("classes.village.KittenSim", null, {
 			}
 			return true;
 		} else {
-			//TODO: check free kittens and compare them with game.village.getFreeEngineer()
+			//TODO: check free kittens and compare them with game.village.getFreeEngineers()
 			//------------- hack start (todo: remove me someday -----
-			/*if (this.game.village.getFreeEngineer() > 0){
+			/*if (this.game.village.getFreeEngineers() > 0){
 				var job = this.game.village.getJob("engineer"),
 					amt = job.value;
 				for (var i = 0; i< amt; i++) {
@@ -1901,7 +1880,9 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 			amt = job.value;
 		}
 
-		this.game.village.sim.removeJob(job.name, amt);
+		if (amt > 0) {
+			this.game.village.sim.removeJob(job.name, amt);
+		}
 	},
 
 	unassignAllJobs: function(model){
@@ -2176,7 +2157,7 @@ dojo.declare("classes.ui.village.Census", null, {
 
 	getGovernmentInfo: function() {
 		//update leader stats
-		var leaderInfo = "YOU!";
+		var leaderInfo = "%username%";
 		var leader = this.game.village.leader;
 
 		if (leader) {
@@ -2731,22 +2712,14 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 	},
 
 	updateTab: function(){
-		//-------- update tab title -------
-		var tabName = this.getTabName();
-		this.tabName = tabName;
+		this.tabName = this.getVillageTitle();
+		var freeKittens = this.game.village.getFreeKittens();
+		if (freeKittens > 0) {
+			this.tabName += " <span class='genericWarning'>(" + this.game.getDisplayValueExt(freeKittens, false, false, 0) + ")</span>";
+		}
 		if (this.domNode) {
-			this.domNode.innerHTML = tabName;
+			this.domNode.innerHTML = this.tabName;
 		}
-	},
-
-	getTabName: function(){
-		var tabName = this.getVillageTitle(),
-			freeKittens = this.game.village.getFreeKittens();
-
-		if (freeKittens){
-			tabName = this.getVillageTitle() + " (" + this.game.getDisplayValueExt(freeKittens, false, false, 0) + ")";
-		}
-		return tabName;
 	},
 
 	getVillageTitle: function(){

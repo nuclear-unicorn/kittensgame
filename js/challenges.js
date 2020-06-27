@@ -78,6 +78,17 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		difficulty: 3,
         researched: 0,
         unlocked: false
+	},{
+		name: "blackSky",
+		label: $I("challendge.blackSky.label"),
+		description: $I("challendge.blackSky.desc"),
+		effectDesc: $I("challendge.blackSky.effect.desc"),
+		repeatEffectDesc: $I("challendge.blackSky.repeatEffect.desc"),
+		res: "unobtainium",
+		resAmt: 100000,
+		difficulty: 10,
+        researched: 0,
+        unlocked: false
 	}],
 
 	conditions:[
@@ -196,6 +207,12 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		if (this.getChallenge("anarchy").on) {
 			if (this.game.bld.get("aiCore").val > 0){
 				this.researchChallenge("anarchy");
+			}
+		}
+
+		if (this.getChallenge("blackSky").on) {
+			if (this.game.space.getBuilding('spaceBeacon').val > 0) {
+				this.researchChallenge("blackSky");
 			}
 		}
 
@@ -333,6 +350,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			return 1 - this.game.getHyperbolicEffect(challenge.researched * 0.1, 1);
 		} else if (name == "1000Years") {
 			return 1 + 0.5 * challenge.researched;
+		} else if (name == "blackSky") {
+			return 1 + 0.5 * challenge.researched;
 		}
 	},
 
@@ -358,6 +377,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		} else if (name == "1000Years") {
 			var amt = -0.1;
 			var limit = 1;
+		} else if (name == "blackSky") {
+			var amt = 0.1;
+			var limit = 2;
 		}
 
 		return 1 + this.game.getHyperbolicEffect(challenge.researched * amt, limit);

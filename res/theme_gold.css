@@ -389,7 +389,7 @@ body.scheme_gold {
     color: #7cb342; /* #DFCE99; */
     font-size: 90%;
 }
-.scheme_gold .trade-race .ammount {
+.scheme_gold .trade-race .tradeAmount {
     font-size: 85%;
     color: rgba(145, 144, 132, 0.7); /* color: #919084; */
 }

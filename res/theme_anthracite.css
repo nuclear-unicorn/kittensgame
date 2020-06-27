@@ -1,0 +1,1112 @@
+/* ******************************************************** */
+/* ***			Anthracite 1.00 Theme © Volkeyrn        *** */
+/* ******************************************************** */
+
+ @import url(https://fonts.googleapis.com/css?family=PT+Sans:ital,wght@400,700,400italic,700italic&display=swap);
+
+/* ******************************************** */
+/* ******************* GAME ******************* */
+/* ******************************************** */
+
+body.scheme_anthracite {
+	background-color: #181818;
+}
+body.scheme_anthracite.with_background_image,
+.scheme_anthracite .dialog {
+	background: repeat local top left -230px url('img/theme_anthracite_texture_brushed_background.jpg'), #181818; /* source: https://pngtree.com/freebackground/black-metal-texture-texture-background-banner_1141447.html Volkeyrn: permanent premium member */
+}
+.scheme_anthracite #game,
+.scheme_anthracite #loadingContainer {
+	top: 22px; /* height of top-bar */
+}
+.scheme_anthracite #gamePageContainer,
+.scheme_anthracite select,
+.scheme_anthracite .btn,
+.scheme_anthracite .modern,
+.scheme_anthracite .btn.modern,
+.scheme_anthracite input[type='button'] {
+	font-family: 'PT Sans', sans-serif;
+}
+.scheme_anthracite .btn {
+	color: gray;
+	margin-bottom: 6px; /* default 10px */
+	max-height: 36px;
+	background-color: transparent;
+	border: solid 1px transparent;
+}
+.scheme_anthracite .btn.modern {
+	border-radius: 5px; /* default border-radius: 3px; */
+	width: 280px; /* +10px gained from left column +15px gained from padding default width: 264px; */
+}
+.scheme_anthracite .btn.modern.disabled {
+	background-color: #202020;
+	border: inset 1px #181818;
+	background-image: url('img/theme_anthracite_button_disabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
+	background-repeat: no-repeat;
+	background-attachment: local;
+	background-position: top left;
+}
+.scheme_anthracite .btn.modern.disabled:hover {
+	background-color: #202020;
+	background-image: url('img/theme_anthracite_button_disabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
+	background-repeat: no-repeat;
+	background-attachment: local;
+	background-position: top left;
+	border: inset 1px #606060;
+}
+.scheme_anthracite .btn.modern.disabled span.btnTitle { /* color text for all buttons disabled */
+	color: #808080;
+}
+.scheme_anthracite .btn.modern.disabled span.btnTitle.limited { /* color text for all buttons limited */
+	color: #d42f2b;
+}
+.scheme_anthracite .btn.modern:not(.disabled) {
+	background-color: #404040; /* color for all button not disabled */
+	background-image: url('img/theme_anthracite_button_enabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
+	background-repeat: no-repeat;
+	background-attachment: local;
+	background-position: top -150px left;
+	border: outset 1px #505050;
+	box-shadow: 1px 1px 2px #000000;
+}
+.scheme_anthracite .btn.modern:not(.disabled):hover { /* hover on all button not disabled in center column */
+	background-color: #505050;
+	background-image: url('img/theme_anthracite_button_enabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
+	background-repeat: no-repeat;
+	background-attachment: local;
+	background-position: top left -20px;
+	border: outset 1px #606060;
+    box-shadow: 2px 2px 4px #000000;
+    text-shadow: 1px 1px 1px #000000;
+}
+.scheme_anthracite .btn.modern:not(.disabled) span.btnTitle { /* color text for all buttons not disabled */
+	color: #d0d0d0;
+}
+.scheme_anthracite .btn:not(.disabled):hover span.btnTitle { /* to change only the properties of the button name for buttons enabled */
+	color: #f0f0f0;
+}
+.scheme_anthracite a {
+	color: #909090;
+}
+.scheme_anthracite a,
+.scheme_anthracite .craft-link {
+    text-decoration: none;
+}
+.scheme_anthracite a:hover {
+	color: #d0d0d0;
+	opacity: 1.0; /* default opacity: 0.6 */
+}
+.scheme_anthracite div {
+	color:#b0b0b0;
+}
+.scheme_anthracite .disabled div { /* color text for disabled */
+	color: #808080;
+}
+.scheme_anthracite h1 {
+	font-size: 18px; /* default font size = font-size: 12px; */
+	text-transform: capitalize;
+	color: #a0a0a0;
+	text-shadow: 2px 2px 2px #000000;
+	padding-left: 20px;
+}
+.scheme_anthracite h1:first-child {
+    margin-top: 0p;
+}
+.scheme_anthracite .modern .btnContent {
+    padding: 10px 0 10px 1px !important; /* 1px left for buttons without power background-image */
+}
+/*** green and red light for machine on/off ***/
+.scheme_anthracite .btn.bldEnabled div.btnContent,
+.scheme_anthracite .btn.bldlackResConvert div.btnContent {
+	padding: 10px 0 10px 20px !important; /* 20px left for power background-image (linear-gradient) */
+	border: none;	
+}
+.scheme_anthracite .btn.bldlackResConvert div.btnContent {
+	background: no-repeat local left 3px center url('img/theme_anthracite_power_off.png'); /* source of images for graphic design : Volkeyrn */
+}
+.scheme_anthracite .btn.bldEnabled div.btnContent {
+	background: no-repeat local left 3px center url('img/theme_anthracite_power_on.png'); /* source of images for graphic design : Volkeyrn */
+}
+.scheme_anthracite .btn:not(.disabled).bldEnabled:hover div.btnContent {
+	background: no-repeat local left 3px center url('img/theme_anthracite_power_on_hover.png'); /* source of images for graphic design : Volkeyrn */
+}
+/*** end of green light for machine on/off ***/
+.scheme_anthracite .dialog {
+    background: repeat local bottom -100px right url('img/theme_anthracite_texture_brushed_background.jpg'), #181818; /* source: https://pngtree.com/freebackground/black-metal-texture-texture-background-banner_1141447.html Volkeyrn: permanent premium member */
+    box-shadow: 0 0 5px 2px #000000;
+	border: outset 3px #404040;
+	border-radius: 5px;
+	top: 40%;
+}
+.scheme_anthracite .credits {
+    font-size: 98%;
+}
+.scheme_anthracite .dialog a {
+    text-transform: capitalize;
+}
+.scheme_anthracite .dialog a:hover {
+	color: #19b0ff;
+	text-shadow: 2px 2px 2px #000000;
+}
+.scheme_anthracite label i { /* information text in option windows */
+	color: #19b0ff;
+	opacity: 0.7;
+}
+.scheme_anthracite label:hover {
+	opacity: 1;/* default opacity: 0.7; */
+	color: #f8f5f0;
+}
+.scheme_anthracite label:hover i {
+	text-shadow: none;
+}
+.scheme_anthracite select { /* dropdown list on settlement tab and options windows */
+	background-color: #202020;
+	background-image: url('img/theme_anthracite_button_disabled_background.png'); /* source of images for graphic design : https://pngtree.com/ Volkeyrn: permanent premium member */
+	background-repeat: no-repeat;
+	background-attachment: local;
+	background-position: top left;
+    color: #b0b0b0;
+	border: ridge 2px #181818;
+	border-radius: 3px;
+	font-size: 13px;
+	margin-left: 3px;
+}
+.scheme_anthracite select>option {
+	background-color: #202020;
+    color: #a0a0a0;
+	padding: 2px 10px; /* -2 pixel vertical */
+}
+.scheme_anthracite select > option:disabled {
+	color: #707070;
+	font-size: 90%;
+}
+.scheme_anthracite #optionsDiv input[type="checkbox"] + label:before {
+    content: "\25CB"; /* WHITE CIRCLE */
+	font: 16px sans-serif;
+	color: #a0a0a0;
+}
+.scheme_anthracite #optionsDiv input[type="checkbox"]:checked + label:before {
+	content: "\2686"; /* WHITE CIRCLE WITH DOT RIGHT */
+	font: 12px sans-serif;
+	color: #19b0ff;
+	text-shadow: 2px 2px 2px #000000;
+}
+.scheme_anthracite textarea#importData,
+.scheme_anthracite textarea#exportData {
+	background-color: rgba(240, 240, 240, 0.4);
+	box-shadow: inset 0 0 3px 2px #000000;
+	border: groove 3px #19b0ff;
+	padding: 5px;
+	/* border-right-color: #585858; */
+	/* border-bottom-color: #585858; */
+	border-radius: 5px;
+	/* Only FireFox */
+	scrollbar-width: thin;
+   	scrollbar-color: #808080 #505050;
+}
+
+/* *********************************************** */
+/* ******************* TOP BAR ******************* */
+/* *********************************************** */
+.scheme_anthracite #topBar {
+	background: repeating-linear-gradient(135deg,rgba(20, 20, 20, 0.7) 0%, rgba(60, 60, 60, 0.7) 25%, rgba(20, 20, 20, 0.7) 50%), #101010;
+    height: 22px; /* default height: 26px; */
+	border-bottom: none;
+	box-shadow: 0 1px 1px #404040, inset 0 1px 1px #404040, 0 3px 5px #000000;
+	top: 0; /* for no shadow on top */
+	padding-top: 4px;
+}
+.scheme_anthracite #topBar a.copyright {
+	color: #f0140f;
+}
+.scheme_anthracite #topBar a.copyright:hover {
+	color: #d0d0d0;
+}
+.scheme_anthracite #headerLinks .links-block { /* a link separator : | on header links */
+	color: transparent;
+}
+.scheme_anthracite #topBar div,
+.scheme_anthracite #topBar #sorrowTooltip { /* counter of BLS (Black Liquid Sorrow) */
+	color: #d0d0d0;
+}
+.scheme_anthracite #sorrowTooltip.max {
+    color: #f0140f;
+}
+.scheme_anthracite #headerLinks>div:first-child:before {
+    color: #707070;
+    content: 'Theme by Volkeyrn\00a0\00a0\00a0';
+    text-decoration: none;
+	font-weight: normal;
+}
+.scheme_anthracite #autosaveTooltip {
+	color: #19b0ff;
+}
+.scheme_anthracite #getTheApp-link { /* Get the app */
+	color: #d0d0d0 !important;
+}
+.scheme_anthracite #getTheApp-link:hover {
+	color: #909090 !important;
+}
+.scheme_anthracite .links-block {
+	padding-top: 5px !important;
+}
+.scheme_anthracite .toolbarIcon.happiness {
+    color: #19b0ff;
+}
+.scheme_anthracite .toolbarIcon.energy,
+.scheme_anthracite .button_tooltip .energyProduction {
+    color: #69b65f;
+}
+.scheme_anthracite .toolbarIcon.energy.warningWinter {
+    color: #d29948;
+}
+.scheme_anthracite .toolbarIcon.energy.warning,
+.scheme_anthracite .button_tooltip .energyConsumption,
+.scheme_anthracite .button_tooltip .energyPenalty {
+	color: #f0140f;
+}
+
+/* ********************************************** */
+/* ******************* FOOTER ******************* */
+/* ********************************************** */
+.scheme_anthracite #footerLinks {
+	font-size: 90%;
+	bottom: 3px; /* default bottom: 10px; */
+}
+.scheme_anthracite #footerLinks a:hover {
+	text-shadow: none;
+}
+.scheme_anthracite #footerLinks { /* a link separator : | on footer links */
+	color: transparent;
+}
+
+/* *********************************************** */
+/* ******************* TOOLTIP ******************* */
+/* *********************************************** */
+.scheme_anthracite #tooltip,
+.scheme_anthracite .tooltip-block div {
+	background-color: #282828;
+	background-image: url('img/theme_anthracite_tooltip_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
+	background-repeat: repeat;
+	background-attachment: local;
+	background-position: top left;
+	color: #808080; /* tooltip windows == left column : left text */
+	border: 2px outset #404040;
+	border-radius: 5px;
+	box-shadow: 2px 2px 3px #000000;
+}
+.scheme_anthracite .tooltip-block div { /* tooltip on ? top right column */
+	padding: 5px;
+}
+.scheme_anthracite .button_tooltip {
+	background-color: transparent;
+}
+.scheme_anthracite .button_tooltip div { /* tooltip window == left column: right text | center column :highlighting text */
+	color: #b0b0b0;
+}
+.scheme_anthracite .tooltip-inner .desc { /* Tooltip Window : title text */
+    color: #e0e0e0;
+	border-bottom : 1px solid #505050 !important; /* in core.js !important needed */
+	margin-bottom: 5px;
+}
+.scheme_anthracite .tooltip-inner .desc.small {
+	font-size: 75%; /* default font-size: 60%; */
+	opacity: 1; /* default opacity: 0.8; */
+}
+.scheme_anthracite .tooltip-inner .desc.small.auto-off {
+	color: #b91f29;
+}
+.scheme_anthracite .tooltip-inner .desc.small.auto-on {
+	color: #69b65f;
+}
+.scheme_anthracite .tooltip-divider { /* border line before effects text */
+	border-bottom : 1px solid #505050 !important; /* in core.js !important needed */
+}
+.scheme_anthracite .effectName { /* Tooltip Window : effects text */
+	color: #36a7e2 !important;
+}
+.scheme_anthracite .rawRes { /* Tooltip Window == text for all missing resources for primary resource */
+    color: #707070;
+	font-style: italic;
+	padding-left: 12px;
+}
+.scheme_anthracite .button_tooltip .noRes,
+.scheme_anthracite .limited { /* on ressource limited or not attainable */
+	color: #b91f29;
+}
+.scheme_anthracite #tooltip .flavor { /* Tooltip Window : last bottom text on center column tooltip window */
+    color: #d29948;
+	font-size: 13px !important; /* in core.js !important needed */
+	padding-right: 7px;
+}
+
+/* ***************************************************** */
+/* ******************* CENTER COLUMN ******************* */
+/* ***************************************************** */
+.scheme_anthracite .tab { 
+    font-size: 13px;
+}
+.scheme_anthracite .tabInner {
+    border: none; /* default border: 1px solid gray; */
+	padding: 8px; /* 16px gained for buttons width. default padding: 15px; */
+	padding-top: 5px;
+	margin-bottom: 30px; /* default margin-bottom: 20px; */
+}
+.scheme_anthracite .tabInner.Workshop div.panelContainer:last-child { /* last panelContainer on Workshop Tab */
+	margin-bottom: 54px; /* to view entire dropdownlink of last button */
+}
+.scheme_anthracite .tabInner.Bonfire {
+	margin-bottom: 0; /* default margin-bottom: 20px; */
+}
+.scheme_anthracite .tabInner label[for='toggleResearched'],
+.scheme_anthracite .tabInner .expandAllBar a:last-child {
+	margin-right: 15px !important;
+}
+.scheme_anthracite .tabsContainer {
+	padding-bottom: 5px; /* default padding-bottom: 15px; */
+	padding-top: 4px; /* default padding-top: 2px; */
+	padding-left: 3px;
+}
+.scheme_anthracite .tabsContainer a {
+	font-size: 14px;
+	padding: 0 4px 0 4px;
+	border: 1px solid transparent; /* for no offset when border on */
+}
+.scheme_anthracite .tabsContainer span:not(.genericWarning) { /* separator | for tab */
+	color: transparent;
+	font-size: 13px; /* to set width = 10px */
+	margin-left: -6px;
+	margin-right: -6px;
+}
+.scheme_anthracite .tabsContainer a:not(.activeTab) {
+	border-bottom: 1px solid #505050;
+}
+.scheme_anthracite .tabsContainer a:not(.activeTab):hover {
+	border: 1px solid #505050;
+	border-radius: 5px 5px 0 0;
+	background-color: #101010;
+}
+.scheme_anthracite .tabsContainer a.activeTab {
+	border: 1px solid #505050;
+	border-top-color: #606060;
+	border-left-color: #606060;
+	border-right-color: #404040;
+	border-radius: 5px 5px 0 0;
+	color: #f0f0f0;
+}
+.scheme_anthracite .tabsContainer a.activeTab:hover {
+    color: #f0f0f0;
+}
+.scheme_anthracite .tab.traitLeaderBonus::before {
+	content: "\2605"; /* BLACK STAR */
+	color: #19b0ff;
+}
+.scheme_anthracite span.genericWarning { /* number of kittens free or engineering free on tab */
+	color: #d42f2b;
+}
+.scheme_anthracite div.bldTopContainer > a { /* under tab */
+	font-size: 90%;
+	font-style: italic;
+	margin-bottom: 5px;/* default margin-bottom: 15px; */
+}
+.scheme_anthracite div.bldTopContainer a.activeTab {
+	color: #d0d0d0;
+	opacity: 1;
+}
+.scheme_anthracite div.bldTopContainer a.activeTab:hover {
+    color: #d0d0d0;
+}
+.scheme_anthracite .bldGroupContainer { /* container for all buttons on center column */
+    padding-top: 5px; /* default 15px */
+    border-top: 1px solid transparent;
+    margin-top: 5px; /* default 10px */
+}
+.scheme_anthracite input[type='button'] {
+	background-color: #404040 !important; /* !important in default.css */
+	background-image: url('img/theme_anthracite_button_enabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
+	background-repeat: no-repeat;
+	background-attachment: local;
+	background-position: center right;
+	box-shadow: 2px 2px 5px #000000,
+                 0 -1px 0 #808080 !important; /* !important in default.css */
+    border: solid 1px #181818 !important; /* for no offset when border on */ /* !important in default.css */
+    border-radius: 7px !important; /* !important in default.css */
+	color: #c0c0c0;
+	padding: 5px 20px;
+	margin-left: 10px;
+	text-shadow: 1px 1px 1px #000000;
+}
+.scheme_anthracite input[type='button']:hover,
+.scheme_anthracite input[type='button']#observeBtn:hover {
+	background-color: #202020 !important; /* !important in default.css */
+	background-image: url('img/theme_anthracite_button_enabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
+	background-repeat: no-repeat;
+	background-attachment: local;
+	background-position: bottom left;
+	border: solid 1px #181818 !important; /* !important in default.css */
+	color: #808080;
+	text-shadow: 1px 1px 1px #000000;
+	box-shadow: inset 2px 2px 3px #000000,
+				 0 1px 0 #606060 !important; /* !important in default.css */
+	cursor: pointer !important;
+}
+/* button observer different from other input buttons */
+.scheme_anthracite input[type='button']#observeBtn {	
+	font-size: 15px;
+	border-radius: 7px !important; /* !important in default.css */
+	text-shadow: 2px 2px 2px #000000;
+	background-color: #404040 !important; /* !important in default.css */
+	color: #f0f0f0;
+	border: ridge 2px #19b0ff !important; /* !important in default.css */
+	box-shadow: 3px 3px 5px #000000,
+				0 1px #19b0ff,
+				0 0 5px 1px #19b0ff !important; /* !important in default.css */	
+	position: absolute;
+	left: 60px;
+}
+.scheme_anthracite .btn .btnContent a {
+    max-width: 60px; /* default max-width: 50px; */
+}
+.scheme_anthracite .btn.modern a {
+	font-size: 12px;
+	font-weight: normal;
+	background-color: transparent;
+	padding: 10px 3px 10px 3px !important; /* default : padding: 10px 6px 10px 6px !important; */
+	text-shadow: none;
+	border-left: none; /* default border-left: 1px solid #888; */
+}
+.scheme_anthracite .btn.modern:not(.disabled) a {
+    color: #808080;
+}
+.scheme_anthracite .btn.modern.disabled a {
+    color: #808080;
+    line-height: 16px;
+    border-bottom: 1px solid transparent;
+}
+.scheme_anthracite .btn.modern:not(.disabled) a:hover {
+	color: #f0f0f0;
+	background-color: rgba(32, 32, 32, 0.5);
+}
+.scheme_anthracite .btn.modern.disabled a:hover {
+	color: #f0f0f0;
+	background-color: rgba(64, 64, 64, 0.5);
+    box-shadow: inset 1px 1px 1px #101010;
+    border-bottom: 1px solid #505050;
+}
+.scheme_anthracite .btn.modern:not(.disabled):active,
+.scheme_anthracite input[type='button']:active,
+.scheme_anthracite input[type='button']#observeBtn:active {
+    border-color: #19b0ff !important;
+}
+.scheme_anthracite .linkContent { /* dropdown list on button */
+    margin-top: 26px !important; /* for correct vertical align dropdown list */
+    width: auto !important;
+    background-color: #505050; /* color pick from button not disabled and hover */
+    background-image: url('img/theme_anthracite_button_enabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
+    background-repeat: no-repeat;
+	background-attachment: local;
+	background-position: top left -220px;
+    border-radius: 0 3px 3px 3px;
+	border-style: solid;
+	border-width: 0;
+	box-shadow: 2px 2px 4px #000000;
+}
+.scheme_anthracite .linkContent a {
+    color: #808080;
+    width: 36px !important;
+    margin-top: 0 !important;
+	margin-bottom: 0 !important;
+	border-left: none; /* default border-left: 1px solid #888; */
+}
+.scheme_anthracite .btn.modern.disabled .linkContent { /* dropdown list on button disabled */
+    background-color: #202020; /* color pick from button disabled and hover */
+    background-image: url('img/theme_anthracite_button_disabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
+	background-repeat: no-repeat;
+	background-attachment: local;
+	background-position: top left -200px;
+	box-shadow: inset 1px 0 1px #101010, 
+                 1px 1px 0 #808080;
+}
+.scheme_anthracite .linkContent a:first-child,
+.scheme_anthracite .linkContent a:first-child:hover {
+	border-radius: 0 3px 0 0;
+}
+.scheme_anthracite .linkContent a:last-child,
+.scheme_anthracite .linkContent a:last-child:hover {
+	border-radius: 0 0 3px 3px;
+}
+/* Apply the right border radius of the button to the rightmost link */
+.scheme_anthracite .btn.modern span.btnTitle + a,
+.scheme_anthracite .btn.modern:not(.hasSellLink) a.off1Link, /* link minus on buildings buttons */
+.scheme_anthracite .btn.modern:not(.hasSellLink) a.unassignLink { /* link minus on kittens jobs buttons */	
+	border-radius: 0 5px 5px 0; /* buttons border-radius: 5px; */
+}
+.scheme_anthracite .btn.modern .btnContent a.rightestLink { /* for Combust TC button in Time tab and Hold Festival in Settlement tab */
+	border-radius: 0 5px 5px 0;
+}
+.scheme_anthracite .panelContainer {
+	border: 3px outset #202020;
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 5px;
+	box-shadow: 2px 2px 3px #000000;
+}
+.scheme_anthracite table.statTable {
+    background: rgba(0, 0, 0, 0.2); 
+    margin-top: 6px;
+	margin-left: 12px;
+	padding: 9px;
+	border: 3px outset #404040;
+	border-radius: 0;
+	box-shadow: 4px 4px 9px 1px #000000;
+	color: #d0d0d0;
+}
+.scheme_anthracite .panelContainer div.title {
+	padding: 4px 4px 4px 20px; /* default padding: 4px; */ /* default padding-left: 10px; */
+	margin-bottom: 3px;
+	color: #a0a0a0;
+	font-size: 16px !important;
+	text-shadow: 2px 2px 2px #000000;
+}
+.scheme_anthracite .tabInner.Trade .panelContainer div.title {
+	padding: 3px 4px 0 20px;
+	margin-bottom: 0;
+}
+.scheme_anthracite .panelContainer .toggle {
+	font-size: 6px;
+	margin: 5px 5px 0 0; /* default margin: 4px; */
+	padding-left: 3px; /* default padding-left 6px */
+	padding-right: 3px; /* default padding-right 6px */
+	padding-bottom: 1px;
+	border: 1px outset #404040;
+	background-color: #202020;
+	border-radius: 7px;
+	box-shadow: 1px 1px 2px #000000;
+	color: #707070;
+}
+.scheme_anthracite .container {
+	padding: 5px; /* default padding: 10px; */
+}
+.scheme_anthracite .container div.currentGovernment { /* for padding-bottom too height */
+	padding-bottom: 3px !important;
+}
+.scheme_anthracite .trade-race .buys {
+	color: #b91f29;
+	font-size: smaller;
+}
+.scheme_anthracite .trade-race .sells {
+	color: #69b65f;
+	font-size: smaller;
+}
+.scheme_anthracite .trade-race .tradeAmount {
+	color: #606060;
+	font-size: smaller;
+}
+.scheme_anthracite .attitude { /* text for attitude races int trade tab */
+	color: #808080 !important;
+	text-shadow: none !important;
+}
+.scheme_anthracite .attitude:before {
+	content: "\00a0\2194\00a0"; /* default content: "("; */ /* LEFT RIGHT ARROW */
+	color: #36a7e2;
+	font-size: larger;
+	font-weight: bold;
+}
+.scheme_anthracite .attitude:after {
+	content: ""; /* default content: ")"; */
+}
+.scheme_anthracite .panelContainer div.censusFilters {
+	margin-bottom: 2px; /* for add a margin under the 2 lists (select) in the settlement tab */
+}
+/* ---------- Village ---------- */
+/* container 'Census' -> list of kittens in settlement tab */
+.scheme_anthracite .census-block {
+    padding: 3px; /* default padding: 5px; */
+    background-color: rgba(0, 0, 0, 0.3);
+    border: inset 1px #404040;
+    border-radius: 0;
+    box-shadow: inset 1px 1px 2px #000000, inset -1px -1px #505050;	
+}
+.scheme_anthracite .census-block:hover {
+	border-color: #808080;
+}
+.scheme_anthracite .census-block.simLeader {
+    background: rgba(0, 0, 0, 0.2); 
+	box-shadow: 1px 1px 3px #000000, -1px -1px 1px #606060;
+	border: outset 1px #181818;
+}
+.scheme_anthracite .census-block.simLeader:hover {
+	border-color: #585858;
+}
+.scheme_anthracite .census-block.simLeader a.leaderHref {
+	color: #19b0ff;
+}
+.scheme_anthracite .census-block .info { /* info of kitten */
+	font-size: 0.9em;
+	color: #b0b0b0;
+}
+.scheme_anthracite .census-block .skill { /* jobs unasigned */
+	color: #606060;
+}
+.scheme_anthracite .census-block .skill:first-of-type { /* job assigned */
+	color: #36a7e2;
+	font-weight: normal !important;
+}
+.scheme_anthracite .census-block.simLeader .info span.name { /* Leader name */
+	font-size: 1.2em;
+}
+.scheme_anthracite .census-block.simLeader .skill:first-of-type { /* Leader job assigned */
+	font-size: 1em; /* default font-size: 0.8em; */
+}
+.scheme_anthracite .container .name.color-none { /* name of kitten */
+	color: #909090;
+}
+.scheme_anthracite .container .name.color-brown {
+	color: #824b23;
+}
+.scheme_anthracite .container .name.color-cream {
+	color: #ad884a;
+}
+.scheme_anthracite .container .name.color-black {
+	color: #404040;
+}
+.scheme_anthracite .container .name.color-fawn {
+	color: #713306;
+}
+.scheme_anthracite .container .name.color-white {
+	color: #f0f0f0;
+}
+.scheme_anthracite .container .name.variety-none {
+	border: 1px solid transparent;
+}
+.scheme_anthracite .container .name.variety-dual {
+	border: 1px solid grey;
+}
+.scheme_anthracite .container .name.variety-tabby {
+	border: 1px dashed grey;
+}
+.scheme_anthracite .container .name.variety-torbie {
+	border: 1px dashed grey;
+	border-left: dotted;
+	border-right: dotted;
+}
+.scheme_anthracite .container .name.variety-calico {
+	border: 1px solid grey;
+	border-top-color: burlywood;
+	border-bottom-color: burlywood;
+}
+.scheme_anthracite .container .name.variety-spots {
+	border: 1px dotted grey;
+}
+.scheme_anthracite .btn.modern a.bld-on,
+.scheme_anthracite .btn.modern a.bld-off,
+.scheme_anthracite .btn.modern a.auto-on,
+.scheme_anthracite .btn.modern a.auto-off,
+.scheme_anthracite .btn.modern a.fugit-on,
+.scheme_anthracite .btn.modern a.fugit-off {
+	width: 32px;
+	background-repeat: no-repeat;
+	background-attachment: local;
+	background-position: left 6px center;
+	padding: 10px 0 10px 0 !important;
+	/* the code below for hiding text */
+	text-indent: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+}
+.scheme_anthracite .btn.modern a.bld-on,
+.scheme_anthracite .btn.modern a.fugit-on {
+	background-image: url('img/theme_anthracite_light_on.png'); /* source of images for graphic design : Volkeyrn */
+}
+.scheme_anthracite .btn.modern:not(.disabled):hover a.bld-on,
+.scheme_anthracite .btn.modern:not(.disabled):hover a.fugit-on {
+	background-image: url('img/theme_anthracite_light_on_hover.png'); /* source of images for graphic design : Volkeyrn */
+}
+.scheme_anthracite .btn.modern a.bld-off,
+.scheme_anthracite .btn.modern a.fugit-off {
+	background-image: url('img/theme_anthracite_light_off.png'); /* source of images for graphic design : Volkeyrn */
+}
+.scheme_anthracite .btn.modern a.auto-on {
+	background-image: url('img/theme_anthracite_gear_on.png'); /* source of images for graphic design : Volkeyrn */
+}
+.scheme_anthracite .btn.modern:not(.disabled):hover a.auto-on {
+	background-image: url('img/theme_anthracite_gear_on_hover.png'); /* source of images for graphic design : Volkeyrn */
+}
+.scheme_anthracite .btn.modern a.auto-off {
+	background-image: url('img/theme_anthracite_gear_off.png'); /* source of images for graphic design : Volkeyrn */
+}
+.scheme_anthracite .btn.modern.craftOn span.btnTitle { /* all buttons with engineer(s) in workshop tab */
+	color: #69b65f;
+}
+.scheme_anthracite .btn.modern.craftOn:hover .btnTitle {
+	color: #58cc49;
+	text-shadow: 1px 1px 1px #000000;
+}
+.scheme_anthracite td.craftStuffPanel > span { /* title of craft stuff panel */
+	color: #a0a0a0;
+	font-size: 15px;
+	text-shadow: 2px 2px 2px #000000;
+}
+.scheme_anthracite td.craftStuffPanel > table { /* craft stuff panel */
+    margin-top: 2px;
+    padding: 10px 20px; /* default padding-top: 20px; */
+    background-color: rgba(0, 0, 0, 0.3);
+    border: inset 1px #404040;
+    border-radius: 0;
+    box-shadow: inset 1px 1px 3px #000000, inset -1px -1px 1px #606060;	
+}
+
+/* ******************************************************** */
+/* ******************* ACHIEVEMENTS TAB ******************* */
+/* ******************************************************** */
+.scheme_anthracite .achievement-header {
+	color: #19b0ff;
+	text-shadow: 2px 2px 2px #000000;
+	font-size: 18px;
+	margin-bottom: 3px;
+	padding-left: 150px;
+}
+.scheme_anthracite .achievement {
+	display: block;
+	font-size: 15px;
+	margin-right: 120px;
+	margin-left: 120px;
+	height: 34px;
+	background-color: transparent;
+	color: #a0a0a0;	
+	letter-spacing: 1px;
+	border: 3px outset rgba(25, 176, 255, 0.2); /* color #19b0ff */	
+	border-radius: 5px;
+	box-shadow: 2px 2px 3px #000000;
+	background-image: url('img/theme_anthracite_button_enabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
+	background-repeat: no-repeat;
+	background-attachment: local;
+	background-position: top left;
+}
+.scheme_anthracite .achievement:hover {
+	color: #f0f0f0;
+	text-shadow: 2px 2px 2px #000000;
+	border: 3px outset rgba(25, 176, 255, 1); /* color #19b0ff */
+	background-image: linear-gradient(135deg,rgba(25, 176, 255, 0.2) 0%, rgba(25, 176, 255, 0.01) 100%),
+	url('img/theme_anthracite_button_enabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
+}
+.scheme_anthracite .achievement:not(.unethical).unlocked:hover {
+	box-shadow: -1px -1px #77d0ff, 4px 4px 8px #000000;
+}
+.scheme_anthracite .achievement.unethical {
+	border-color : rgba(185, 31, 41, 0.2); /* color #b91f29 */
+}
+.scheme_anthracite .achievement.unethical:hover {
+	border-color : rgba(185, 31, 41, 1); /* color #b91f29 */
+	box-shadow: -1px -1px #e97e85, 4px 4px 8px #000000;
+	background-image: linear-gradient(135deg,rgba(185, 31, 41, 0.2) 0%, rgba(185, 31, 41, 0.01) 100%),
+	url('img/theme_anthracite_button_enabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
+}
+.scheme_anthracite .achievement:not(.unlocked) {
+	color: #606060;
+	background-color: transparent;
+	text-shadow: none;
+	border: 3px ridge #404040;
+	background-image: url('img/theme_anthracite_button_disabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
+}
+.scheme_anthracite .achievement:not(.unlocked):hover {
+	border: 3px ridge #606060;
+	box-shadow: inset -1px -1px #505050, 4px 4px 8px #000000;	
+	background-image: linear-gradient(135deg,rgba(128, 128, 128, 0.2) 0%, rgba(128, 128, 128, 0.01) 100%),
+	url('img/theme_anthracite_button_disabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
+}
+.scheme_anthracite .achievement:after {
+	display: block;
+	letter-spacing: normal;
+	margin-top: 2px;
+	font-size: 90%;
+	color: #d0d0d0;
+	text-shadow: none;
+}
+.scheme_anthracite .achievement-header .star {
+	color: #d29948;
+}
+.scheme_anthracite .achievement .star {
+	color : #909090;
+}
+.scheme_anthracite .achievement.unlocked .star {
+	color : #d29948;
+	font-weight: bold;
+	text-shadow: 2px 2px 2px #000000;
+}
+
+/* **************************************************** */
+/* ******************* RIGHT COLUMN ******************* */
+/* **************************************************** */
+.scheme_anthracite #rightColumn {
+	width: calc(50% - 355px);
+	max-width: 440px; /* max-width: 400px; */
+	top: 30px; /* default top: 20px; */
+}
+.scheme_anthracite #toggleCenter,
+.scheme_anthracite span.toggleCenter {
+	color: #909090;
+	opacity: 0.6; /* default opacity: 0.2; */
+	cursor: pointer;
+}
+.scheme_anthracite span.toggleCenter {
+	opacity: 1; /* for have #toggleCenter same color */
+}
+.scheme_anthracite #toggleCenter:hover,
+.scheme_anthracite div#toggleCenter:hover > span.toggleCenter {
+	color: #d0d0d0;
+	opacity: 1.0;
+}
+.scheme_anthracite #calendarDiv {
+    color: #a0a0a0;
+	padding-left: 5px;
+    margin-top: 5px;
+	text-shadow: 2px 2px 2px #000000;
+}
+.scheme_anthracite #calendarSign {
+   font-size: 120% ;
+}
+.scheme_anthracite #calendarSign:hover {
+   cursor: default ;
+}
+.scheme_anthracite .right-tab-header { /* Log | Chat link on right column */
+	color: transparent; /* for separator tab | */
+	font-size: 80%;
+ }
+.scheme_anthracite .right-tab-header a {
+	border: 1px solid transparent; /* for no offset when border on */
+	margin-right: -5px;
+}
+.scheme_anthracite .right-tab-header a:not(.active) {
+	border-bottom: 1px solid #505050;
+}
+.scheme_anthracite .right-tab-header a:not(.active):hover {
+	border: 1px solid #505050;
+	border-radius: 5px 5px 0 0;
+	background-color: #101010;
+}
+.scheme_anthracite .right-tab-header a.active {
+	border: 1px solid #505050;
+	border-top-color: #606060;
+	border-left-color: #606060;
+	border-right-color: #404040;
+	border-radius: 5px 5px 0 0;
+	color: #f0f0f0;
+}
+.scheme_anthracite .right-tab-header a.active:hover {
+	color: #f0f0f0;
+}
+.scheme_anthracite div#observeButton {
+	height: 35px; /* default height: 30px; */
+}
+.scheme_anthracite #rightTabChat {
+	margin-top: 14px;
+}
+.scheme_anthracite div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
+	color: #646464;
+	font-weight: normal; /* thin if possible with font sizes */
+	border-top: 1px solid transparent !important;
+}
+.scheme_anthracite #clearLogHref { /* Link in right column : Clear log */
+	font-size: 80%;
+}
+.scheme_anthracite #logFiltersBlock > a { /* Link in right column : [+]Log Filters */
+	font-size: 80%;
+	margin-left: 5px;
+}
+.scheme_anthracite #pauseBtn { /* Link in right column : pawse */
+	margin-left: 5px;
+}
+.scheme_anthracite div#gameLog {
+	margin: 6px 5px 5px 0;
+}
+.scheme_anthracite #gameLog span.msg:not(.type_date) {
+	font-size: 80%;
+	margin-left: 1.2em;
+	list-style-type: '\25B8'; /* BLACK RIGHT-POINTING SMALL TRIANGLE */
+	padding-left: 0.3em;
+}
+.scheme_anthracite #gameLog span.noBullet {
+	margin-left: 2.3em !important;
+	list-style-type: '\25AA' !important; /* black small square */
+}
+.scheme_anthracite .msg {
+	font-weight: 400; /* thin if possible with font sizes */
+	color: #a0a0a0;
+}
+.scheme_anthracite .msg.type_notice {
+    color: #36a7e2; /* color default : #01A9DB; */
+}
+.scheme_anthracite .msg.type_important {
+    color: #d29948; /* color default : coral; */
+}
+.scheme_anthracite .msg.type_alert {
+    color: #f0140f; /* color default : red; */
+}
+.scheme_anthracite .msg.type_date {
+	color: #e0e0e0;
+	text-transform: none;
+	text-shadow: 1px 1px 1px #000000;
+	border-bottom: solid 1px #505050;
+	padding-left: 5px;
+}
+
+/* *************************************************** */
+/* ******************* LEFT COLUMN ******************* */
+/* *************************************************** */
+.scheme_anthracite #leftColumn {
+	margin-top: 9px;/* default margin-top: 4px; */
+	padding-right: 10px; /* -10px gained on res-toolbar.right padding-right default padding right : 20px */
+}
+.scheme_anthracite a.link.collapse {
+	opacity: 0.5; /* default opacity: 0.2; */
+}
+.scheme_anthracite a.link.collapse:hover {
+	opacity: 1;/* default opacity: 0.9; */
+	color: #d0d0d0;
+}
+.scheme_anthracite #leftColumn .res-toolbar a.link.toggled {
+    color: #19b0ff;
+}
+.scheme_anthracite div.tooltip-block:hover > span {
+	font-weight: bold;
+	color: #d0d0d0;
+}
+.scheme_anthracite .res-table {
+	max-width: 352px;/* default max-width: 340px; */
+    border-collapse: collapse; /* gain of 3 pixel by border -> no margin bottom after */
+	margin-left: 2px; /* without 0px margin left for all ressources */
+}
+.scheme_anthracite .res-toolbar {
+    font-size: 90%;
+}
+.scheme_anthracite .res-toolbar.right {
+	padding-right: 20px;
+}
+ .scheme_anthracite .craftTable {
+	margin-bottom: 10px !important; /* for correct margin bottom due of the line above with border-collapse: collapse on .res-Table ! */
+}
+.scheme_anthracite .res-cell.craft-link {
+	color: #808080;
+}
+.scheme_anthracite .res-cell.craft-link.craft-1pc { /* column 1% craft */
+	color: #707070;
+}
+.scheme_anthracite .res-cell.craft-link.craft-5pc { /* column 5% craft */
+	color: #909090;
+}
+.scheme_anthracite .res-cell.craft-link.craft-10pc { /* column 10% craft */
+	color: #b0b0b0;
+}
+.scheme_anthracite .res-cell.craft-link.all { /* column craft all */
+	font-size: 90%; /* default font-size: 85%; */
+	opacity: 0.60; /* default opacity: 0.4; */
+	color: #19b0ff;
+}
+.scheme_anthracite .res-cell.craft-link:hover,
+.scheme_anthracite .res-cell.craft-link.all:hover { /* craft table left column */
+    color: #d0d0d0;
+	text-decoration: none;
+	font-weight: bold;
+	text-shadow: 1px 1px 1px #000000;
+	opacity: 1;
+}
+.scheme_anthracite .res-row {
+	padding-bottom: 2px; /* default padding-bottom: 4px; */
+}
+.scheme_anthracite .res-row:hover {
+    background-color: rgba(240, 240, 240, 0.1);
+	cursor: default;
+}
+.scheme_anthracite .highlited { /* higlighting ressources when hover button on center windows */
+	background-color: rgba(240, 240, 240, 0.1);
+}
+.scheme_anthracite .res-toolbar {
+	white-space: nowrap;
+}
+.scheme_anthracite .resource_faith .resource-name,
+.scheme_anthracite .resource_kittens .resource-name,
+.scheme_anthracite .resource_steel .resource-name,
+.scheme_anthracite .resource_gear .resource-name,
+.scheme_anthracite .resource_alloy .resource-name,
+.scheme_anthracite .resource_megalith .resource-name {
+	color: #707070 !important;
+}
+.scheme_anthracite .maxRes {
+	color: #606060;
+}
+.scheme_anthracite .resAmount {
+    color: #a0a0a0;
+}
+.scheme_anthracite .resLimitWarn {
+    color: #d29948;
+	opacity: 1; /* default = 0.75 */
+	font-style: italic;
+}
+.scheme_anthracite .resLimitNotice {
+    color: #e0e0e0;
+}
+.scheme_anthracite .resPerTick {
+	cursor: default;
+	color: #a0a0a0;
+}
+.scheme_anthracite .res-row.resLeaderBonus .resPerTick {
+	color: #19b0ff;
+	opacity: 0.8;
+}
+.scheme_anthracite .res-row.craftEngineer .res-cell.resource-value {
+	color: #69b65f;
+}
+.scheme_anthracite div#advisorsContainer {
+	color: #b91f29;
+}
+.scheme_anthracite .res-cell.resource-value {
+	color: #a0a0a0;
+}
+.scheme_anthracite #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */	
+	font-size: 110%;
+}
+.scheme_anthracite #fastHuntContainer > a:hover {
+	text-shadow: 2px 2px 2px #000000;
+}
+.scheme_anthracite #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+	color: #606060;
+	text-shadow: none !important;
+	font-size: smaller;
+}
+.scheme_anthracite #fastPraiseContainer > a { /* Text left column : "Praise the sun!" */
+	font-size: 110%;
+}
+.scheme_anthracite #fastPraiseContainer > a:hover {
+	color: #f8f5f0;
+	text-shadow: 1px 1px 4px #f0f0f0, -1px -1px 4px #f0f0f0;
+}
+.scheme_anthracite .res-cell.positive-weather { /* to change the color for bonus cell according to the season */
+	font-size: 85%;
+	color: #69b65f;
+}
+.scheme_anthracite .res-cell.negative-weather { /* to change the color for penalty cell according to the season */
+	font-size: 85%;
+	color: #b91f29;
+}
+
+/* ************************************************* */
+/* ******************* SCROLLBAR ******************* */
+/* ************************************************* */
+.scheme_anthracite ::-webkit-scrollbar-thumb {
+    background: #202020;
+	border-radius: 40px;
+}
+.scheme_anthracite ::-webkit-scrollbar-track {
+    background: #181818;
+    border-radius: 50px;
+}
+/* Only FireFox */
+.scheme_anthracite #leftColumn,
+.scheme_anthracite #rightColumn,
+.scheme_anthracite #midColumn {
+   scrollbar-width: thin;
+   scrollbar-color: #202020 #181818 !important;
+}
+.scheme_anthracite select {
+   scrollbar-width: auto !important;
+}
