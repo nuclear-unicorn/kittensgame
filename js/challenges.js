@@ -437,7 +437,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
                           }
                         }
 
-			if (this.game.prestige.getPerk("anachronomancy").researched) {
+			if (this.game.prestige.getPerk("anachronomancy").researched || this.game.prestige.getPerk("anachronomancy").reserve) {
 				var chronophysics = this.game.science.get("chronophysics");
 				chronophysics.researched = true;
 				this.game.unlock(chronophysics.unlocks);
