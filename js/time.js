@@ -263,7 +263,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     amt = 5; //limit calculations needed per tick
                 }
                 self.heat -= 100 * amt;
-                game.time.shatter(amt * (game.challenges.getChallengeResearched("1000Years", true) ? self.on : 1));
+                game.time.shatter(amt * (game.challenges.getChallengeResearched("1000Years") ? self.on : 1));
             }
         },
 		unlocks: {
