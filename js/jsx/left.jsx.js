@@ -1,7 +1,19 @@
+/* global 
+
+    $r,
+    WResourceRow:writable, 
+    WCraftRow:writable, 
+    WResourceTable:writable,
+    WCraftTable:writable,
+    WLeftPanel:writable,
+    WTooltip:writable,
+    WCraftShortcut:writable,
+    game
+*/
 WResourceRow = React.createClass({
 
     getDefaultProperties: function(){
-        return {resource: null, isEditMode: false, isRequired: false};
+        return {resource: null, isEditMode: false, isRequired: false, showHiddenResources: false};
     },
 
     getInitialState: function(){
@@ -21,6 +33,7 @@ WResourceRow = React.createClass({
             oldRes.unlocked == newRes.unlocked &&
             this.props.isEditMode == nextProp.isEditMode &&
             this.props.isRequired == nextProp.isRequired &&
+            this.props.showHiddenResources == nextProp.showHiddenResources &&
             this.state.visible == nextState.visible;
 
         if (isEqual){
@@ -37,7 +50,7 @@ WResourceRow = React.createClass({
     render: function(){
         var res = this.props.resource;
 
-        if (!res.visible){
+        if (!res.visible && !this.props.showHiddenResources){
             return null;
         }
 
@@ -120,7 +133,6 @@ WResourceRow = React.createClass({
             }
         }
 
-
         //----------------------------------------------------------------------------
 
         var specialClass = "";
@@ -134,7 +146,7 @@ WResourceRow = React.createClass({
             specialClass = " leet";
         }
 
-        var resLeaderBonus ="";
+        var resLeaderBonus = "";
         var currentLeader = game.village.leader;
         
         if (currentLeader){
@@ -143,18 +155,21 @@ WResourceRow = React.createClass({
                 if(currentLeaderJob) {
                     for (var jobResName in currentLeaderJob.modifiers){
                         if ( res.name == jobResName ){
-                            resLeaderBonus = " resLeaderBonus "
+                            resLeaderBonus = " resLeaderBonus ";
                         }
                     }                                      
                 }
             }
         }
 
-        return $r("div", {className:"res-row resource_" + res.name + resLeaderBonus + (this.props.isRequired ? " highlited" : "")}, [
+        var resRowClass = "res-row resource_" + res.name + resLeaderBonus + 
+            (this.props.isRequired ? " highlited" : "") +
+            (!res.visible ? " hidden" : "")
+        ;
+
+        return $r("div", {className: resRowClass}, [
             this.props.isEditMode ? 
                 $r("div", {className:"res-cell"},
-                    /*$r("input", {type:"checkbox"})*/
-
                     $r("input", {
                         type:"checkbox", 
                         checked: this.state.visible,
@@ -163,6 +178,7 @@ WResourceRow = React.createClass({
                         style:{display:"inline-block"},
                     })
                 ) : null,
+
             $r("div", {
                 className:"res-cell resource-name", 
                 style:resNameCss,
@@ -280,7 +296,7 @@ WCraftShortcut = React.createClass({
 				var prices = game.workshop.getCraftPrice(recipe);
 
 				var allCount = game.workshop.getCraftAllCount(recipe.name);
-				var ratioCount = Math.floor(allCount*ratio);
+				var ratioCount = Math.floor(allCount * ratio);
 				if (num < ratioCount){
 					num = ratioCount;
 				}
@@ -321,7 +337,7 @@ WCraftShortcut = React.createClass({
     
     doCraft: function(event){
         var res = this.props.resource;
-        var allCount = game.workshop.getCraftAllCount(res.name);
+        var allCount = game.workshop.getCraftAllCount(res.name),
             ratioCount = Math.floor(allCount * this.props.craftPercent);
         
         var num = this.props.craftFixed;
@@ -411,7 +427,7 @@ WCraftRow = React.createClass({
         }
         //----------------------------------------------------------------------------
         var resVal = game.getDisplayValueExt(res.value);
-        return $r("div", {className:"res-row craft resource_" + res.name + (game.workshop.getEffectEngineer(res.name) !=0 ? " craftEngineer " : "")
+        return $r("div", {className:"res-row craft resource_" + res.name + (game.workshop.getEffectEngineer(res.name) != 0 ? " craftEngineer " : "")
         + (this.props.isRequired ? " highlited" : "")}, [
             this.props.isEditMode ? 
                 $r("div", {className:"res-cell"},
@@ -468,16 +484,6 @@ WCraftRow = React.createClass({
 });
 
 /*=======================================================
-                    GENERAL TABLE
-=======================================================*/
-
-WResourceTable = React.createClass({
-    render: function(){
-        return null;
-    }
-});
-
-/*=======================================================
                      RESORUCES
 =======================================================*/
 
@@ -488,18 +494,27 @@ WResourceTable = React.createClass({
     getInitialState: function(){
         return {
             isEditMode: false,
-            isCollapsed: false
+            isCollapsed: false,
+            showHiddenResources: false
         };
     },
     render: function(){
         var resRows = [];
+
         for (var i in this.props.resources){
             var res = this.props.resources[i];
             var isRequired = (this.props.reqRes.indexOf(res.name) >= 0);
             resRows.push(
-                $r(WResourceRow, {resource: res, isEditMode: this.state.isEditMode, isRequired: isRequired})
+                $r(WResourceRow, {
+                    resource: res, 
+                    isEditMode: this.state.isEditMode, 
+                    isRequired: isRequired,
+                    showHiddenResources: this.state.showHiddenResources
+                })
             );
         }
+        //TODO: mixing special stuff like fatih and such here
+        
         return $r("div", null, [
             $r("div", null,[
                 $r("div", {
@@ -522,13 +537,26 @@ WResourceTable = React.createClass({
                 
                 )
             ]),
-            this.state.isCollapsed ? null :
-            $r("div", null, [
-                this.state.isEditMode ? $r("div", {style:{"textAlign":"right"}}, [
-                    $r("a", {className:"link", onClick: game.ui.zoomUp.bind(game.ui)}, "font+"),
-                    $r("a", {className:"link", onClick: game.ui.zoomDown.bind(game.ui)}, "font-"),
-                ]): null,
-                $r("div", {className:"res-table"}, resRows)
+            (!this.state.isCollapsed) &&
+                $r("div", null, [
+                    this.state.isEditMode && $r("div", {style:{"textAlign":"right"}}, [
+                        $r("a", {className:"link", onClick: game.ui.zoomUp.bind(game.ui)}, "font+"),
+                        $r("a", {className:"link", onClick: game.ui.zoomDown.bind(game.ui)}, "font-"),
+                    ]),
+                    $r("div", {className:"res-table"}, resRows)
+                ]),
+
+            //TODO: this stuff should not be exposed to beginner player to not overwhelm them
+            //we can enable it later like we normally, if, say, year is >1k or paragon > 0
+            (!this.state.isCollapsed && this.state.isEditMode) && 
+            $r("div", {className:"res-toggle-hidden"}, [
+                $r("input", {
+                    type:"checkbox", 
+                    checked: this.state.showHiddenResources,
+                    onClick: this.toggleHiddenResources,
+                    style:{display:"inline-block"},
+                }),
+                $I("res.show.hidden")
             ])
         ]);
     },
@@ -539,6 +567,10 @@ WResourceTable = React.createClass({
 
     toggleCollapsed: function(){
         this.setState({isCollapsed: !this.state.isCollapsed});
+    },
+
+    toggleHiddenResources: function(e){
+        this.setState({showHiddenResources: e.target.checked});
     }
 });
 
@@ -615,12 +647,22 @@ WLeftPanel = React.createClass({
     getInitialState: function(){
         return {game: this.props.game};
     },
+
+    getResources: function(){
+        var resPool = [];
+        var game = this.state.game;
+        
+        resPool = resPool.concat(game.resPool.resources);
+        resPool = resPool.concat(game.resPool.getPseudoResources());
+        return resPool;
+    },
+
     render: function(){
         var game = this.state.game,
             reqRes = game.getRequiredResources(game.selectedBuilding);
 
         return $r("div", null, [
-            $r(WResourceTable, {resources: game.resPool.resources, reqRes: reqRes}),
+            $r(WResourceTable, {resources: this.getResources(), reqRes: reqRes}),
 
             $r("div", {id:"advisorsContainer",style:{paddingTop: "10px"}}),        
             $r("div", {id:"fastHuntContainer", style:{paddingLeft: "5px", visibility:"hidden"}},
@@ -667,7 +709,7 @@ WTooltip = React.createClass({
             this.props.body || $r("div", {className: "tooltip-icon"}, "[?]"),
             this.state.showTooltip ? $r("div", {className: "tooltip-content"}, 
                 this.props.children
-            ): null
+            ) : null
         ]);
     },
 

@@ -485,18 +485,18 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
     },
 
 	getBurnedParagonRatio: function(){
-		return this.game.getTriValue(this.game.resPool.get("burnedParagon").value, 500);
+		return this.game.getUnlimitedDR(this.game.resPool.get("burnedParagon").value, 500);
 	},
 
 	getParagonProductionRatio: function(){
 		var paragonRatio = this.getParagonRatio();
 
 		var productionRatioParagon = (this.game.resPool.get("paragon").value * 0.010) * paragonRatio;
-		productionRatioParagon = this.game.getHyperbolicEffect(productionRatioParagon, 2 * paragonRatio);
+		productionRatioParagon = this.game.getLimitedDR(productionRatioParagon, 2 * paragonRatio);
 
 		var ratio = this.game.calendar.darkFutureYears() >= 0 ? 4 : 1;
 		var productionRatioBurnedParagon = this.game.resPool.get("burnedParagon").value * 0.010 * paragonRatio;
-		productionRatioBurnedParagon = this.game.getHyperbolicEffect(productionRatioBurnedParagon, ratio * paragonRatio);
+		productionRatioBurnedParagon = this.game.getLimitedDR(productionRatioBurnedParagon, ratio * paragonRatio);
 
 		return productionRatioParagon + productionRatioBurnedParagon;
 	},

@@ -1,0 +1,38 @@
+{
+  "name": "kitten-game",
+  "version": "14.8.0",
+  "description": "A game of kittens",
+  "main": "config.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "jest --config jest.config.unittest.json",
+    "lint": "eslint *.js js/*.js --quiet",
+    "start": "http-server"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint",
+      "commit-msg": "echo 'commitlint -E HUSKY_GIT_PARAMS'"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/bloodrizer/kitten-game.git"
+  },
+  "keywords": [
+    "incremental",
+    "game"
+  ],
+  "author": "bloodrizer",
+  "license": "SEE LICENSE IN license.txt",
+  "homepage": "https://bitbucket.org/bloodrizer/kitten-game#readme",
+  "devDependencies": {
+    "eslint": "^7.4.0",
+    "http-server": "^0.12.3",
+    "husky": "^4.2.5",
+    "jest": "^26.1.0"
+  }
+}

@@ -931,6 +931,10 @@ a.link.collapse:hover {
     border-spacing: 3px;
 }
 
+.res-toggle-hidden {
+    margin-top: 10px;
+}
+
 .res-row {
     padding-bottom: 4px;
     display:table-row;
@@ -953,6 +957,11 @@ a.link.collapse:hover {
 .res-cell.resource-name {
     width: 60px;
     max-width: 85px;
+}
+
+.res-row.hidden .res-cell.resource-name {
+    text-decoration: underline;
+    text-decoration-style: dotted;
 }
 
 .res-cell.resource-value {

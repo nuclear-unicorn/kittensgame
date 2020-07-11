@@ -5,11 +5,17 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 	game: null,
 
+	//your TT level!
+	transcendenceTier: 0,
+	transcendenceTierReserve: 0,
+
+	//an amount of faith temporarily moved to a praised pool (aka worship)
 	faith: 0,
+
+	//an amount of converted faith obtained through the faith reset (aka eupyphany)
 	faithRatio : 0,
 	faithRatioReserve: 0,
-	tcratio: 0,
-	tcratioReserve: 0,
+
 	corruption: 0,
 
 	alicornCounter: 0,
@@ -25,10 +31,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	resetState: function(){
 		this.faith = 0;
 		this.corruption = 0;
+		this.transcendenceTier = 0;
+                this.transcendenceTierReserve = 0;
 		this.faithRatio = 0;
 		this.faithRatioReserve = 0;
-		this.tcratio = 0;
-		this.tcratioReserve = 0;
 
 		for (var i = 0; i < this.zigguratUpgrades.length; i++){
 			var zu = this.zigguratUpgrades[i];
@@ -54,8 +60,11 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			corruption: this.corruption,
 			faithRatio: this.faithRatio,
 			faithRatioReserve: this.faithRatioReserve,
-			tcratio: this.tcratio,
-			tcratioReserve: this.tcratioReserve,
+			transcendenceTier: this.transcendenceTier,
+			transcendenceTierReserve: this.transcendenceTierReserve,
+			// Duplicated save, for older versions like mobile
+			tcratio: this._getTranscendTotalPrice(this.transcendenceTier),
+			tcratioReserve: this._getTranscendTotalPrice(this.transcendenceTierReserve),
 			zu: this.filterMetadata(this.zigguratUpgrades, ["name", "val", "on", "unlocked"]),
 			ru: this.filterMetadata(this.religionUpgrades, ["name", "val", "on"]),
 			tu: this.filterMetadata(this.transcendenceUpgrades, ["name", "val", "on", "reserve", "unlocked"])
@@ -71,17 +80,23 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		this.corruption = saveData.religion.corruption || 0;
 		this.faithRatio = saveData.religion.faithRatio || 0;
 		this.faithRatioReserve = saveData.religion.faithRatioReserve || 0;
-		this.tcratio = saveData.religion.tcratio || 0;
-		this.tcratioReserve = saveData.religion.tcratioReserve || 0;
+		this.transcendenceTier = saveData.religion.transcendenceTier || 0;
+		this.transcendenceTierReserve = saveData.religion.transcendenceTierReserve || 0;
+		// Read old save
+		if (this.transcendenceTier == 0 && saveData.religion.tcratio > 0) {
+			this.transcendenceTier = Math.max(0, Math.round(Math.log(10 * this.game.getUnlimitedDR(saveData.religion.tcratio, 0.1))));
+		}
+		if (this.transcendenceTierReserve == 0 && saveData.religion.tcratioReserve > 0) {
+			this.transcendenceTierReserve = Math.max(0, Math.round(Math.log(10 * this.game.getUnlimitedDR(saveData.religion.tcratioReserve, 0.1))));
+		}
+
 		this.loadMetadata(this.zigguratUpgrades, saveData.religion.zu);
 		this.loadMetadata(this.religionUpgrades, saveData.religion.ru);
 		this.loadMetadata(this.transcendenceUpgrades, saveData.religion.tu);
 
-		this.tclevel = this.getTranscendenceLevel();
-
 		for (var i = 0; i < this.transcendenceUpgrades.length; i++){
 			var tu = this.transcendenceUpgrades[i];
-			if (this.tclevel >= tu.tier) {
+			if (this.transcendenceTier >= tu.tier) {
 				tu.unlocked = true;
 			}
 		}
@@ -606,7 +621,12 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		],
 		tier: 1,
 		priceRatio: 1.15,
-		effects: {},
+		effects: {
+			"solarRevolutionLimit": 0.05
+		},
+		calculateEffects: function(self, game) {
+			self.effects["solarRevolutionLimit"] = 0.05 * game.religion.transcendenceTier;
+		},
 		unlocked: false,
 		flavor: $I("religion.tu.blackObelisk.flavor")
 	},{
@@ -746,21 +766,13 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		return this.getMeta(name, this.transcendenceUpgrades);
 	},
 
-	getProductionBonus: function(){
-		var rate = this.getRU("solarRevolution").on ? this.game.getTriValue(this.faith, 1000) : 0;
-		//Solar Revolution capped to 1000% so it doesn't become game-breaking
-		var atheismBonus = this.game.challenges.getChallengeResearched("atheism") ? this.getTranscendenceLevel() * 0.1 : 0;
-		var blackObeliskBonus = this.getTranscendenceLevel() * this.getTU("blackObelisk").val * 0.005;
-		rate = this.game.getHyperbolicEffect(rate, 1000) * (1 + atheismBonus + blackObeliskBonus);
-		return rate;
+	getSolarRevolutionRatio: function() {
+		var uncappedBonus = this.getRU("solarRevolution").on ? this.game.getUnlimitedDR(this.faith, 1000) / 100 : 0;
+		return this.game.getLimitedDR(uncappedBonus, 10 + this.game.getEffect("solarRevolutionLimit") + this.game.challenges.getChallengeResearched("atheism") ? this.transcendenceTier : 0);
 	},
 
 	getApocryphaBonus: function(){
-		return this.getTriValueReligion(this.faithRatio);
-	},
-
-	getTriValueReligion: function(ratio){
-		return this.game.getTriValue(ratio, 0.1)*0.1;
+		return this.game.getUnlimitedDR(this.faithRatio, 0.1) * 0.1;
 	},
 
 	praise: function(){
@@ -775,9 +787,27 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	getApocryphaResetBonus: function(bonusRatio){
 		//100% Bonus per Transcendence Level
 		if (this.getRU("transcendence").on) {
-			bonusRatio *= Math.pow((1 + this.getTranscendenceLevel()), 2);
+			bonusRatio *= Math.pow((1 + this.transcendenceTier), 2);
 		}
-		return (this.faith/100000) * 0.1 * bonusRatio;
+		return (this.faith / 100000) * 0.1 * bonusRatio;
+	},
+
+
+	resetFaith: function(bonusRatio, withConfirmation) {
+		if (withConfirmation) {
+			var self = this;
+			this.game.ui.confirm("", $I("religion.resetFaith.confirmation.msg"), function() {
+				self._resetFaithInternal(bonusRatio);
+			});
+		} else {
+			this._resetFaithInternal(bonusRatio);
+		}
+	},
+
+	_resetFaithInternal: function(bonusRatio) {
+		var ttPlus1 = (this.game.religion.getRU("transcendence").on ? this.game.religion.transcendenceTier : 0) + 1;
+		this.faithRatio += this.faith / 1000000 * ttPlus1 * ttPlus1 * bonusRatio;
+		this.faith = 0.01;
 	},
 
 	transcend: function(){
@@ -788,39 +818,31 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 		var game = this.game;
 		game.ui.confirm($I("religion.transcend.confirmation.title"), $I("religion.transcend.confirmation.msg"), function() {
-			var tclevel = religion.getTranscendenceLevel();
 			//Transcend one Level at a time
-			var needNextLevel = religion.getTranscendenceRatio(tclevel+1) - religion.getTranscendenceRatio(tclevel);
+			var needNextLevel = 
+				religion._getTranscendTotalPrice(religion.transcendenceTier + 1) - 
+				religion._getTranscendTotalPrice(religion.transcendenceTier);
+
 			if (religion.faithRatio > needNextLevel) {
 				religion.faithRatio -= needNextLevel;
 				religion.tcratio += needNextLevel;
-				religion.tclevel += 1;
-				game.msg($I("religion.transcend.msg.success", [religion.tclevel]));
+				religion.transcendenceTier += 1;
+
+				var blackObelisk = religion.getTU("blackObelisk");
+				blackObelisk.calculateEffects(blackObelisk, game);
+
+				game.msg($I("religion.transcend.msg.success", [religion.transcendenceTier]));
 			} else {
-				var progressPercentage = game.toDisplayPercentage(religion.faithRatio / needNextLevel, 2, true);
-				var leftNumber = (religion.faithRatio / needNextLevel) * (religion.tclevel + 1) - 1;
-				if (leftNumber < 0) {
-					leftNumber = 0;
-				}
-				var progressNumber = leftNumber.toFixed(0) + " / " + (religion.tclevel + 1);
-				game.msg($I("religion.transcend.msg.failure", [progressNumber, progressPercentage]));
+				game.msg($I("religion.transcend.msg.failure", [
+					game.toDisplayPercentage(religion.faithRatio / needNextLevel, 2, true)
+				]));
 			}
 		});
 	},
 
-	getTranscendenceLevel: function(){
-		var bonus = this.getTriValueReligion(this.tcratio) * 100;
-		bonus = Math.round(Math.log(bonus));
-			if (bonus < 0) {
-				bonus = 0;
-			}
-		return bonus;
+	_getTranscendTotalPrice: function(tier) {
+		return this.game.getInverseUnlimitedDR(Math.exp(tier) / 10, 0.1);
 	},
-
-    getTranscendenceRatio: function(level){
-            var bonus = Math.exp(level);
-            return (Math.pow(bonus/5+1,2)-1)/80;
-    },
 
 	unlockAll: function(){
 		for (var i in this.religionUpgrades){
@@ -837,7 +859,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 
 		this.faith = 1000000;
-		this.tcratio = 100000000;
+		this.transcendenceTier = 25;
 
 		this.game.msg("All religion upgrades are unlocked!");
 	}
@@ -921,24 +943,30 @@ dojo.declare("classes.ui.TranscendenceBtnController", com.nuclearunicorn.game.ui
 dojo.declare("com.nuclearunicorn.game.ui.PraiseBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	getName: function(model) {
 		if (this.game.religion.faithRatio > 0){
-			return model.options.name + " [" + this.game.getDisplayValueExt(this.game.religion.getApocryphaBonus()*100, true, false, 3) + "%]";
+			return model.options.name + " [" + this.game.getDisplayValueExt(this.game.religion.getApocryphaBonus() * 100, true, false, 3) + "%]";
 		} else {
 			return model.options.name;
 		}
 	}
 });
 
-dojo.declare("com.nuclearunicorn.game.ui.TranscendBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
-
+dojo.declare("com.nuclearunicorn.game.ui.ResetFaithBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	getName: function(model) {
-		if (this.game.religion.tclevel > 0){
-			return model.options.name + " [" + this.game.religion.tclevel + "]";
-		} else {
-			return model.options.name;
-		}
+		var ttPlus1 = this.game.religion.transcendenceTier + 1;
+		return model.options.name + (this.game.religion.getRU("transcendence").on ? " [×" + (ttPlus1 * ttPlus1) + "]" : "");
 	},
 
-	updateVisible: function (model){
+	updateVisible: function (model) {
+		model.visible = this.game.religion.getRU("apocripha").on;
+	}
+});
+
+dojo.declare("com.nuclearunicorn.game.ui.TranscendBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
+	getName: function(model) {
+		return model.options.name + (this.game.religion.transcendenceTier > 0 ? " [" + this.game.religion.transcendenceTier + "]" : "");
+	},
+
+	updateVisible: function (model) {
 		model.visible = this.game.religion.getRU("transcendence").on;
 	}
 });
@@ -1093,7 +1121,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 
 	sacrificeBtn : null,
 	sacrificeAlicornsBtn: null,
-	faithResetBtn: null,
 
 	zgUpgradeButtons: null,
 	rUpgradeButtons: null,
@@ -1224,33 +1251,54 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 			var faithCount = dojo.create("span", { style: { display: "inline-block", marginBottom: "10px"}}, content);
 			this.faithCount = faithCount;
 
-			//----------------------- reset -----------------------
-			var faithResetBtn = dojo.create("a", { style: { paddingLeft: "10px", marginBottom: "10px", display: "none"},
-				href: "#",
-				innerHTML: $I("religion.faithResetBtn.label")
-			}, content);
-			this.faithResetBtn = faithResetBtn;
-			dojo.connect(this.faithResetBtn, "onclick", this, "resetFaith");
-
-			var praiseBtn = new com.nuclearunicorn.game.ui.ButtonModern({
+			this.praiseBtn = new com.nuclearunicorn.game.ui.ButtonModern({
 				name: $I("religion.praiseBtn.label"),
 				description: $I("religion.praiseBtn.desc"),
 				controller: new com.nuclearunicorn.game.ui.PraiseBtnController(game),
-				handler: function(){
-					this.game.religion.praise();	//sigh, enjoy your automation scripts
+				handler: function() {
+					game.religion.praise();	//sigh, enjoy your automation scripts
 				}
 			}, game);
 
-			praiseBtn.render(content);
-			this.praiseBtn = praiseBtn;
+			this.adoreBtn = new com.nuclearunicorn.game.ui.ButtonModern({
+				name: $I("religion.adoreBtn.label"),
+				description: $I("religion.adoreBtn.desc"),
+				controller: new com.nuclearunicorn.game.ui.ResetFaithBtnController(game),
+				handler: function(btn) {
+					game.religion.resetFaith(1.01, true);
+				}
+			}, game);
+
+			this.transcendBtn = new com.nuclearunicorn.game.ui.ButtonModern({
+				name: $I("religion.transcendBtn.label"),
+				description: $I("religion.transcendBtn.desc"),
+				controller: new com.nuclearunicorn.game.ui.TranscendBtnController(game),
+				handler: function(btn) {
+					game.religion.transcend();
+					var transcendenceLevel = game.religion.transcendenceTier;
+					for (var i = 0; i < game.religion.transcendenceUpgrades.length; i++) {
+						if (transcendenceLevel >= game.religion.transcendenceUpgrades[i].tier) {
+							game.religion.transcendenceUpgrades[i].unlocked = true;
+						}
+					}
+				}
+			}, game);
+
+			var buttonAssociations = {
+				"transcendence": this.transcendBtn
+			};
+
+			this.praiseBtn.render(content);
+			this.adoreBtn.render(content);
+
 			var controller = new com.nuclearunicorn.game.ui.ReligionBtnController(game);
 			var upgrades = game.religion.religionUpgrades;
-			for (var i = 0; i < upgrades.length; i++){
+			for (var i = 0; i < upgrades.length; i++) {
 				var upgr = upgrades[i];
 
 				var button = new com.nuclearunicorn.game.ui.BuildingStackableBtn({
-					id: 		upgr.name,
-					name: 		upgr.label,
+					id: upgr.name,
+					name: upgr.label,
 					description: upgr.description,
 					prices: upgr.prices,
 					controller: controller,
@@ -1262,26 +1310,12 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 					}
 				}, game);
 				button.render(content);
+				var associatedButton = buttonAssociations[upgr.name];
+				if (associatedButton) {
+					associatedButton.render(content);
+				}
 				this.rUpgradeButtons.push(button);
 			}
-
-			var transcendBtn = new com.nuclearunicorn.game.ui.ButtonModern({
-				name: $I("religion.transcendBtn.label"),
-				description: $I("religion.transcendBtn.desc"),
-				controller: new com.nuclearunicorn.game.ui.TranscendBtnController(game),
-				handler: function(btn) {
-					game.religion.transcend();
-					var transcendenceLevel = game.religion.getTranscendenceLevel();
-					for (var i = 0; i < game.religion.transcendenceUpgrades.length; i++) {
-						if (transcendenceLevel >= game.religion.transcendenceUpgrades[i].tier) {
-							game.religion.transcendenceUpgrades[i].unlocked = true;
-						}
-					}
-				}
-			}, game);
-
-			transcendBtn.render(content);
-			this.transcendBtn = transcendBtn;
 		}
 
 		this.inherited(arguments);
@@ -1310,11 +1344,15 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 		}
 
 		if (!this.game.challenges.getChallenge("atheism").on) {
-			if (this.praiseBtn){
+			if (this.praiseBtn) {
 				this.praiseBtn.update();
 			}
 
-			if (this.transcendBtn){
+			if (this.adoreBtn) {
+				this.adoreBtn.update();
+			}
+
+			if (this.transcendBtn) {
 				this.transcendBtn.update();
 			}
 
@@ -1324,18 +1362,14 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 				this.faithCount.innerHTML = "";
 			}
 
-			var bonus = religion.getProductionBonus();
+			var bonus = religion.getSolarRevolutionRatio();
 			if (bonus != 0) {
-				this.faithCount.innerHTML += ( " (+" + this.game.getDisplayValueExt(bonus) + "% " + $I("religion.faithCount.bonus") + ")" );
-			}
-
-			if (religion.getRU("apocripha").on){
-				dojo.style(this.faithResetBtn, "display", "");
+				this.faithCount.innerHTML += ( " (+" + this.game.getDisplayValueExt(100 * bonus) + "% " + $I("religion.faithCount.bonus") + ")" );
 			}
 
 			dojo.forEach(this.rUpgradeButtons,  function(e, i){ e.update(); });
 
-			var hasCT = this.game.science.get("cryptotheology").researched && this.game.religion.tclevel > 0;
+			var hasCT = this.game.science.get("cryptotheology").researched && this.game.religion.transcendenceTier > 0;
 			if (hasCT){
 				this.ctPanel.setVisible(true);
 			}
@@ -1343,20 +1377,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 
 		dojo.forEach(this.zgUpgradeButtons, function(e, i){ e.update(); });
 
-	},
+	}
 
-	resetFaith: function(event){
-		event.preventDefault();
-		if (this.game.religion.getRU("apocripha").on) { // trust no one
-			var self = this;
-			this.game.ui.confirm("", $I("religion.resetFaith.confirmation.msg"), function() {
-				self.resetFaithInternal(1.01);
-			});
-		}
-	},
-
-    resetFaithInternal: function(bonusRatio){
-        this.game.religion.faithRatio += this.game.religion.getApocryphaResetBonus(bonusRatio);
-		this.game.religion.faith = 0.01;
-    }
 });

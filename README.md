@@ -1,54 +1,100 @@
-# README #
+# README
+## Contents
+* [General Information](#general-information)
+    * [No ES6, please](#no-es6-please)
+    * [Roadmap](#roadmap)
 
-### General Information ###
+* [CONTRIBUTION GUIDELINES](#contribution-guidelines)
+    * [General Design Principles](#general-design-principles)
+    * [Consistency](#consistency)
+    * [Themes](#themes)
+    * [Translation and Localization — *COMING SOON!!*](#translation-and-localization--coming-soon)
+    * [LINKS](#links)
 
-* https://www.reddit.com/r/kittensgame
-* https://dojotoolkit.org/reference-guide/1.7/dojo/index.html#dojo-index (I'm using mostly pre-1.7 dojo functionality)
+## General Information
+* [Discord](https://discord.gg/Y8bTG3) - * check it first! *
+* [Kittens Game subreddit](https://www.reddit.com/r/kittensgame)
+* [dojo Reference Guide](https://dojotoolkit.org/reference-guide/1.7/dojo/index.html)
+    * (I'm using mostly pre-1.7 dojo functionality.)
 
-### No ES6 please ###
 
-KG ecosystem have to support about 20.000 different android devices, iOS, os and browser versions dating 1980, chrome/FF/IE/Edge/webkit of all possible releases.
-We support IE6. We support browsers that does not know how to work with local storage or web workers. I'm not sure but it might acutally work on Netscape, Links or Mosaic.
+## Setup
+
+### Prereq
+
+* [NodeJS](https://nodejs.org/) v10+
+* [yarn](https://yarnpkg.com/)
+
+### Installation
+
+```
+yarn install
+```
+To run the local developer server:
+
+```
+yarn start
+```
+
+## Contribution
+
+### Rules
+
+1. No meanies and baddies
+2. No bureocracy
+
+### Repo access
+
+As a general rule, all changes should go through the PR.
+If you have a write access, you can submit small changes directly without approval. Major changes are still advised to be pushed through PR.
+
+Please run all major UI changes through Blood first or you will risk loosing your direct write access.
+
+### No ES6, please
+The KG ecosystem must support about 20.000 different Android devices, iOS, and various OS and browser versions dating from 1980, including Chrome/FF/IE/Edge/webkit of all possible releases.
+
+We support IE6. We support browsers that do not know how to work with local storage or web workers. I'm not sure, but it might actually work on Netscape, Links or Mosaic.
 
 Please, no ()=>{}, const, require, webpackers, etc.
 
-### Roadmap ###
+### Roadmap
+* [Most recent roadmap on Trello](https://trello.com/b/cecIwqp2/kittens-game-roadmap)
+    * NB: This has not been updated for years.
 
-Most recent roadmap: https://trello.com/b/cecIwqp2/kittens-game-roadmap
-^
-Have not been updated for years
+## Contribution Guidelines
+* Brave souls that try to change formatting will be fed to wolfs.
+* THERE IS NO UNUSED CODE in this repo.
+* If you found some confusing place and wasted more than few hours here, please document it for your fellow devs.
 
-### Contribution guidelines ###
+### General Design Principles
+* It's better to reuse existing buildings and resources than to introduce new ones.
+* Active gameplay should be encouraged when possible, but it should not be an absolute requirement to play.
+* Every problem or bottleneck should be addressed in multiple ways,
+e.g. Tradepost to reduce fur consumption AND Hunting upgrade to get better yield.
+* Every solution to a problem should create a new problem.
+* Design things to be difficult initially, and address them with upgrades later.
+    * For god's sake, never, **ever** nerf anything!!
+* Consider how things will scale at later stages. You have a rare resource that costs 1 million unobtainium?
+Someone will be able to farm trillions of them.
+* Try to introduce some variety to the mechanics, but stay within the established rule system.
+    * For example, Hunting requires catpower, grants you various resources, and has a chance to give you something rare.
+    * Similarly, Trade requires catpower, grants you various resources, and has a chance to give you something rare.
+        * Our players are really comfortable with the Trade mechanic because it uses familiar terms they know already.
+* Don't use percent reduction effects. For every problem they may solve, a trillion new issues will appear.
+* Don't use price reduction effects. (If you do, be *extremely* careful.)
 
-* Brave souls that try to chagne formatting will be fed to wolfs
-* THERE IS NO UNUSED CODE in this repo
-* If you found some confusig place and wasted more than few hours here, please document it for your fellow devs
+### Consistency
+* With code formatting, it's nice to have, but it's not critical.
+* For more information and specific guidelines, click the relevant link below:
+    * [Resource Order](./Resource-Order.md)
 
-## Theme/Setting ##
-
-In a grim and dark future of the catkind no one can hear you scream.
+### Themes
+In a grim and dark future of catkind, no one can hear you scream.
 
 * Good: mythical monsters, elder artifacts, arcane technologies, lost civilizations
 * Bad: elves, fairies, robots, owls
 
-## General Design Principles ##
+### Translation and Localization — *COMING SOON!!*
 
-* It's better to reuse existing buildings and resources rather than introduce new
-* Active gameplay should be encouraged if possible, but should not be an absolute requirement to play.
-* Every problem or bottleneck should be addressed in multiple ways
-(E.g.: Tradepost to reduce fur consumption AND hunting upgrade to get better yield)
-* Every solution to a problem should create a new problem
-
-* Design things difficult first and address them with upgrades later
-    * For god's sake never ever nerf anything
-
-* Think how things will scale at later stages. You have a rare resource that cost 1M unobtainium? 
-Someone will be able to farm trillions of them.
-
-* Try to introduce some varieties in mechanic but stay withing established rule system.
-    * For example, hunt require catpower, grants you various resource and have a chance of giving you something rare
-    * Similarly trade require catpower, grants you various resource and have a chance of giving you something rare.
-        * Everyone are really comfortable with trade mechanic because it speaks in familiar terms that players have learned already.
-
-* Don't use %reduction effects. For every problem it may solve, a trillion new issues will appear.
-* Don't use price reduction effects. If you do, be extremely careful.
+### Links
+* [Resource Order](./Resource-Order.md)

@@ -12,6 +12,10 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	 * Those flags are not mutually exclusive
 	 *
 	 *  transient: will not be affected by magneto production bonus (and other bonuses)
+	 *  persists: affects how resources are carried over through reset
+	 *  * undefined: carries over depending on Chronospheres
+	 *  * true: carries over untouched
+	 *  * false: does not carry over
 	 *  type: common/uncommon/rare/exotic
 	 */
 	resourceData: [
@@ -147,13 +151,15 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		title: $I("resources.kittens.title"),
 		type : "common",
 		transient: true,
-		visible: true
+		visible: true,
+		persists: false
 	},{
 		name : "zebras",
 		title: $I("resources.zebras.title"),
 		type : "common",
 		transient: true,
-		visible: true
+		visible: true,
+		persists: false
 	},{
 		name : "starchart",
 		title: $I("resources.starchart.title"),
@@ -175,14 +181,16 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		type : "common",
 		transient: true,
 		craftable: false,
-		visible: false
+		visible: false,
+		persists: false
 	},{
 		name : "hashrates",
 		title: "hashrates",
 		type : "common",
 		transient: true,
 		craftable: false,
-		visible: false
+		visible: false,
+		persists: false
 	},
 	//=========================================
 	// 			  luxury resources
@@ -193,6 +201,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		type : "uncommon",
 		transient: true,
 		visible: true,
+		persists: false,
 		calculatePerTick: true,
 		aiCanDestroy: true
 	},{
@@ -201,6 +210,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		type : "uncommon",
 		transient: true,
 		visible: true,
+		persists: false,
 		calculatePerTick: true,
 		aiCanDestroy: true
 	},{
@@ -209,6 +219,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		type : "uncommon",
 		transient: true,
 		visible: true,
+		persists: false,
 		calculatePerTick: true,
 		aiCanDestroy: true
 	},{
@@ -217,6 +228,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		type : "rare",
 		transient: true,
 		visible: true,
+		persists: false,
 		calculatePerTick: true,
 		aiCanDestroy: true
 	},{
@@ -224,6 +236,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		title: $I("resources.alicorn.title"),
 		type : "rare",
 		visible: true,
+		persists: false,
 		calculatePerTick: true,
 		aiCanDestroy: true
 	},{
@@ -231,17 +244,20 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		title: $I("resources.necrocorn.title"),
 		type : "rare",			//todo: some special FX
 		visible: true,
-		color: "#E00000"
+		color: "#E00000",
+		persists: false
 	},{
 		name : "tears",
 		title: $I("resources.tears.title"),
 		type : "rare",
-		visible: true
+		visible: true,
+		persists: false
 	},{
 		name : "karma",
 		title: $I("resources.karma.title"),
 		type : "rare",
-		visible: true
+		visible: true,
+		persists: false
 	},{
 		name : "paragon",
 		title: $I("resources.paragon.title"),
@@ -339,14 +355,13 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		type : "exotic",
 		craftable: false,
 		visible: true,
-		color: "gold",
+		color: "gold"
 		/*style: {
 			         animation : "neon-gold 1.5s ease-in-out infinite alternate",
 			"-webkit-animation": "neon-gold 1.5s ease-in-out infinite alternate",
 			   "-moz-animation": "neon-gold 1.5s ease-in-out infinite alternate",
 			     "-o-animation": "neon-gold 1.5s ease-in-out infinite alternate"
-		},*/
-		persists: false
+		}*/
 	},
 	{
 		name: "bloodstone",
@@ -354,14 +369,13 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		type : "exotic",
 		craftable: true,
 		visible: true,
-		color: "red",
+		color: "red"
 		/*style: {
 			         animation : "neon-red 1.5s ease-in-out infinite alternate",
 			"-webkit-animation": "neon-red 1.5s ease-in-out infinite alternate",
 			   "-moz-animation": "neon-red 1.5s ease-in-out infinite alternate",
 			     "-o-animation": "neon-red 1.5s ease-in-out infinite alternate"
-		},*/
-		persists: false
+		}*/
 	},
 	//=========================================
 	// 				    CRAFT
@@ -508,7 +522,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		this.resources = [];
 		this.resourceMap = {};
 
-		for (var i = 0; i< this.resourceData.length; i++){
+		for (var i = 0; i < this.resourceData.length; i++){
 			var res = dojo.clone(this.resourceData[i]);
 			res.value = 0;
 			res.reserve = 0;
@@ -533,7 +547,28 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		// }
 
 		//if no resource found, return false
-		return res? res : false;
+		return res ? res : false;
+	},
+
+	//put your custom fake resources there
+	getPseudoResources: function(){
+		return [
+			{
+				name: "worship",
+				title: $I("resources.worship.title"),
+				value: this.game.religion.faith,
+				unlocked: true,
+				visible: false
+			},
+			{
+				name: "epiphany",
+				title: $I("resources.epiphany.title"),
+				value: this.game.religion.faithRatio,
+				unlocked: true,
+				visible: false
+			}
+		];
+		//TODO: mixin unlocked and visible automatically
 	},
 
 	createResource: function(name){
@@ -594,8 +629,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		}
 
 		if (res.name == "karma"){
-			this.game.karmaKittens = Math.round(this.game.getTriValueOrigin(res.value, 5));
-			res.value = this.game.getTriValue(this.game.karmaKittens, 5);
+			this.game.karmaKittens = Math.round(this.game.getInverseUnlimitedDR(res.value, 5));
+			res.value = this.game.getUnlimitedDR(this.game.karmaKittens, 5);
 		}
 
 		return res.value - prevValue;
@@ -808,7 +843,17 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		if (res.tag == "baseMetal") {
 			maxValue *= 1 + this.game.getEffect("baseMetalMaxRatio");
 		}
+		
+        //policies
+		//technocracy policy bonus
+		if(res.name == "science"){
+			maxValue *= (1 + this.game.getEffect("technocracyScienceCap"));
+		}
 
+        //city on a hill bonus
+        if(res.name == "culture"){
+            maxValue *= (1 + this.game.getEffect("onAHillCultureCap"));
+        }
 		return maxValue;
 	},
 
@@ -909,7 +954,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	},
 
 	maxAll: function(){
-		for(var i = 0; i< this.resources.length; i++){
+		for(var i = 0; i < this.resources.length; i++){
 			var res = this.resources[i];
 			if (res.maxValue && res.value < res.maxValue){
 				res.value = res.maxValue;
@@ -950,7 +995,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
     },
 
 	setDisplayAll: function() {
-		for(var i = 0; i< this.resources.length; i++){
+		for(var i = 0; i < this.resources.length; i++){
 			this.resources[i].isHidden = false;
 		}
 	},
