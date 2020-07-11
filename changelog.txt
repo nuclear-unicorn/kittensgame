@@ -6,6 +6,7 @@ Major:
 * Add new challenge: Black Sky
 * Implement Zebra Outpost
 * Add embassies
+* Double timeout of the “Observe the sky” button for Iron Will
 
 Themes:
 * New themes: Anthracite, Black
@@ -16,6 +17,7 @@ Minor:
 * Increase years in stats during offline progression
 * Arrange price lists in buildings and upgrades in the same order as in the left column
 * Prevent food advisor to move stuff in left column
+* Fix effect of Atheism and Black Obelisks
 
 v 1.4.8.0 (11 june 2020)
 Major:

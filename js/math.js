@@ -54,6 +54,7 @@ dojo.declare("com.nuclearunicorn.game.Math", null, {
         }
 
         // If the Gaussian approximation gives a result outside the bounds, just retry
+        /* eslint-disable no-constant-condition */
         while (true) {
             var result = globalStandardDeviation * this.standardGaussianRandom() + globalMean;
             if (isDiscrete) {

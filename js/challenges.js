@@ -297,7 +297,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		var conditionTotal = 0;
 		for (var i = 0; i < this.conditions.length; i++) {
 			if (this.conditions[i].on && this.conditions[i].bonus) {
-				conditionTotal += Math.pow(this.conditions[i].bonus * (1 - this.game.getHyperbolicEffect(this.conditions[i].resets / 10, 1)), 2);
+				conditionTotal += Math.pow(this.conditions[i].bonus * (1 - this.game.getLimitedDR(this.conditions[i].resets / 10, 1)), 2);
 			}
 		}
 
@@ -334,20 +334,20 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 	},
 
 	getChallengeEffect: function(name, type) {
-		var challenge = this.getChallenge(name)
+		var challenge = this.getChallenge(name);
 
 		if (name == "winterIsComing") {
 			if (type == "frequency") {
-				return this.game.getHyperbolicEffect(challenge.researched * 50, 825);
+				return this.game.getLimitedDR(challenge.researched * 50, 825);
 			} else {
-				return 1 - this.game.getHyperbolicEffect(challenge.researched * 0.1, 1);
+				return 1 - this.game.getLimitedDR(challenge.researched * 0.1, 1);
 			}
 		} else if (name == "anarchy") {
-			return 0.5 - this.game.getHyperbolicEffect(challenge.researched * 0.05, 0.4);
+			return 0.5 - this.game.getLimitedDR(challenge.researched * 0.05, 0.4);
 		} else if (name == "energy") {
 			return 2 + 0.1 * challenge.researched;
 		} else if (name == "atheism") {
-			return 1 - this.game.getHyperbolicEffect(challenge.researched * 0.1, 1);
+			return 1 - this.game.getLimitedDR(challenge.researched * 0.1, 1);
 		} else if (name == "1000Years") {
 			return 1 + 0.5 * challenge.researched;
 		} else if (name == "blackSky") {
@@ -382,11 +382,11 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			var limit = 2;
 		}
 
-		return 1 + this.game.getHyperbolicEffect(challenge.researched * amt, limit);
+		return 1 + this.game.getLimitedDR(challenge.researched * amt, limit);
 	},
 
 	getEnergyMod: function() {
-		return (game.challenges.getChallenge("energy").on ? this.getChallengeEffect("energy") : 1) * this.getChallengeReward("energy");
+		return (this.game.challenges.getChallenge("energy").on ? this.getChallengeEffect("energy") : 1) * this.getChallengeReward("energy");
 	},
 
 	handleChallengeToggle: function(name, on) {
@@ -489,7 +489,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 					if (res.name == "karma") {
 						this.game.karmaKittens += this.game.karmaKittensReserve;
 						this.game.karmaKittensReserve = 0;
-						res.value = this.game.getTriValue(this.game.karmaKittens, 5);
+						res.value = this.game.getUnlimitedDR(this.game.karmaKittens, 5);
 					} else {
 						res.value += res.reserve;
 						res.reserve = 0;
@@ -540,9 +540,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			if (on) {
 				this.game.religion.faithRatioReserve = this.game.religion.faithRatio;
 				this.game.religion.faithRatio = 0;
-				this.game.religion.tcratioReserve = this.game.religion.tcratio;
-				this.game.religion.tcratio = 0;
-				this.game.religion.tclevel = 0;
+				this.game.religion.transcendenceTierReserve = this.game.religion.transcendenceTier;
+				this.game.religion.transcendenceTier = 0;
 
 				for (var i = 0; i < this.game.religion.transcendenceUpgrades.length; i++) {
 					this.game.religion.transcendenceUpgrades[i].reserve = this.game.religion.transcendenceUpgrades[i].val;
@@ -552,9 +551,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			} else {
 				this.game.religion.faithRatio += this.game.religion.faithRatioReserve;
 				this.game.religion.faithRatioReserve = 0;
-				this.game.religion.tcratio += this.game.religion.tcratioReserve;
-				this.game.religion.tcratioReserve = 0;
-				this.game.religion.tclevel = this.game.religion.getTranscendenceLevel();
+				this.game.religion.transcendenceTier = Math.floor(Math.log(10 * this.game.getUnlimitedDR(this.game.religion._getTranscendTotalPrice(this.game.religion.transcendenceTier) + this.game.religion._getTranscendTotalPrice(this.game.religion.transcendenceTierReserve), 0.1))); 
+				this.game.religion.transcendenceTierReserve = 0;
 
 				for (var i = 0; i < this.game.religion.transcendenceUpgrades.length; i++) {
 					var tu = this.game.religion.transcendenceUpgrades[i];

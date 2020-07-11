@@ -1,3 +1,4 @@
+/* global WLeftPanel */
 /**
  * Class that provides an abstraction layer for UI/model communication
  * Extended in web version and in mobile version, so change signatures below only if you can change them in mobile too!
@@ -116,71 +117,71 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             // Allow user extensibility to keybindings in core events
             var keybinds = [
                 {
-                    name: 'Bonfire',
-                    key: 'B',
+                    name: "Bonfire",
+                    key: "B",
                     shift: true,
                     alt: false,
                     control: false
                 },
                 {
-                    name: 'Village',
-                    key: 'V',
+                    name: "Village",
+                    key: "V",
                     shift: true,
                     alt: false,
                     control: false
                 },
                 {
                     name: "Science",
-                    key: 'S',
+                    key: "S",
                     shift: true,
                     alt: false,
                     control: false
                 },
                 {
-                    name: 'Workshop',
-                    key: 'W',
+                    name: "Workshop",
+                    key: "W",
                     shift: true,
                     alt: false,
                     control: false
                 },
                 {
-                    name: 'Trade',
-                    key: 'T',
+                    name: "Trade",
+                    key: "T",
                     shift: true,
                     alt: false,
                     control: false
                 },
                 {
-                    name: 'Religion',
-                    key: 'R',
+                    name: "Religion",
+                    key: "R",
                     shift: true,
                     alt: false,
                     control: false
                 },
                 {
-                    name: 'Space',
-                    key: 'P',
+                    name: "Space",
+                    key: "P",
                     shift: true,
                     alt: false,
                     control: false
                 },
                 {
-                    name: 'Time',
-                    key: 'I',
+                    name: "Time",
+                    key: "I",
                     shift: true,
                     alt: false,
                     control: false
                 },
                 {
-                    name: 'Achievements',
-                    key: 'M',
+                    name: "Achievements",
+                    key: "M",
                     shift: true,
                     alt: false,
                     control: false
                 },
                 {
-                    name: 'Stats',
-                    key: 'A',
+                    name: "Stats",
+                    key: "A",
                     shift: true,
                     alt: false,
                     control: false
@@ -191,7 +192,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
                     shift: false,
                     alt: false,
                     control: false,
-					action: function(){ $('div.dialog:visible').last().hide(); }
+					action: function(){ $("div.dialog:visible").last().hide(); }
                 }
             ];
 
@@ -804,7 +805,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         var height = $(window.top).height() || 850;
         //console.log("IRC WINDOW HEIGHT:", height);
 
-        var $chat = $('#IRCChatInner iframe');
+        var $chat = $("#IRCChatInner iframe");
         $chat.css("height", height - 180);
 
         //swfobject.embedSWF("lib/lightirc/lightIRC.swf", $chat[0], 600, height - 150, 10, "lib/lightirc/expressInstall.swf", params);
@@ -904,15 +905,15 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             msg.span = span;
         }
         //Place date headers above actual log events.
-        if (msg.type === 'date') {
+        if (msg.type === "date") {
             dojo.place(msg.span, gameLog, "first");
         } else {
             dojo.place(msg.span, gameLog, 1);
         }
         dojo.attr(msg.span, {innerHTML: msg.text});
         //Destroy child nodes if there are too many.
-        var logLength = dojo.byId('gameLog').childNodes.length;
-        if (logLength > _console.maxMessages) {dojo.destroy(dojo.byId('gameLog').childNodes[logLength-1]);}
+        var logLength = dojo.byId("gameLog").childNodes.length;
+        if (logLength > _console.maxMessages) {dojo.destroy(dojo.byId("gameLog").childNodes[logLength-1]);}
 
         //fade message spans as they get closer to being removed and replaced
         var spans = dojo.query("span", gameLog);
