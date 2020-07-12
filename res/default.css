@@ -288,8 +288,17 @@ select>option {
     width: 600px;
     height: 400px;
 
+
+    overflow-y: scroll;
+
     margin-top: -200px;
     margin-left: -300px;
+}
+
+.credits li {
+    text-decoration: underline;
+    text-decoration-color: gainsboro;
+    cursor: pointer;
 }
 
 .disabled {
@@ -601,7 +610,8 @@ label:hover {
 }
 
 #optionsDiv {
-    height: auto;
+    overflow-y: scroll;
+    height: 400px;
     margin-top:-170px; 
 }
 
@@ -1498,4 +1508,8 @@ div.leet {
     0 0 15px red,
     0 0 20px red,
     0 0 25px red;}
+}
+
+.pin-link {
+    padding-left: 5px;
 }

@@ -894,6 +894,9 @@ dojo.declare("classes.diplomacy.ui.EmbassyButton", com.nuclearunicorn.game.ui.Bu
 		this.pinLinkHref = this.addLink({
 			title: "&#9733;",
 			handler: function() {
+				if (!this.race.embassyLevel){
+					return;
+				}
 				this.race.pinned = !this.race.pinned;
 				console.log("toggled pin for race:", this.game.diplomacy.races);
 			}

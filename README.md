@@ -23,7 +23,7 @@
 ### Prereq
 
 * [NodeJS](https://nodejs.org/) v10+
-* [yarn](https://yarnpkg.com/)
+* [yarn](https://classic.yarnpkg.com/en/docs/install/#debian-stable )
 
 ### Installation
 
