@@ -343,6 +343,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 				var effect_cycle = effect;
 				if (typeof list_festivalEffects_cycle[effect_cycle] !== "undefined") {
 					effects[effect] *= list_festivalEffects_cycle[effect_cycle];
+					effects[effect] *= 1 + this.game.getEffect("festivalRatio");
 				}
 			}
 		}

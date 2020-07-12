@@ -1,15 +1,46 @@
 /* global 
 
     $r,
+    WCollapsiblePanel: writable,
     WResourceRow:writable, 
     WCraftRow:writable, 
     WResourceTable:writable,
     WCraftTable:writable,
     WLeftPanel:writable,
+    WPins: writable,
     WTooltip:writable,
     WCraftShortcut:writable,
     game
 */
+
+WCollapsiblePanel = React.createClass({
+    getInitialState: function(){
+        return {isCollapsed: false};
+    },
+
+    render: function(){
+        return $r("div", null, [
+            $r("div", null,[
+                $r("div", {
+                    className:  "left"
+                    }, 
+                    $r("a", {
+                            className:"link collapse", 
+                            onClick: this.toggleCollapsed
+                        },
+                        this.state.isCollapsed ? ">(" +  this.props.title + ")" : "v"
+                    )
+                )
+            ]),
+            !this.state.isCollapsed && this.props.children
+        ]);
+    },
+
+    toggleCollapsed: function(){
+        this.setState({isCollapsed: !this.state.isCollapsed});
+    },
+});
+
 WResourceRow = React.createClass({
 
     getDefaultProperties: function(){
@@ -17,7 +48,9 @@ WResourceRow = React.createClass({
     },
 
     getInitialState: function(){
-        return {visible: !this.props.resource.isHidden};
+        return {
+            visible: !this.props.resource.isHidden
+        };
     },
 
     //this is a bit ugly, probably React.PureComponent + immutable would be a much better approach
@@ -34,6 +67,7 @@ WResourceRow = React.createClass({
             this.props.isEditMode == nextProp.isEditMode &&
             this.props.isRequired == nextProp.isRequired &&
             this.props.showHiddenResources == nextProp.showHiddenResources &&
+            this.props.isTemporalParadox != nextProp.isTemporalParadox &&
             this.state.visible == nextState.visible;
 
         if (isEqual){
@@ -66,7 +100,9 @@ WResourceRow = React.createClass({
         }
 
         //wtf is this code
-        var perTick = game.calendar.day < 0 ? 0 : game.getResourcePerTick(res.name, true);
+        var isTimeParadox = this.props.isTemporalParadox;
+        
+        var perTick = isTimeParadox ? 0 : game.getResourcePerTick(res.name, true);
         perTick = game.opts.usePerSecondValues ? perTick * game.getTicksPerSecondUI() : perTick;
         var postfix = game.opts.usePerSecondValues ? "/sec" : "";
         if (game.opts.usePercentageResourceValues && res.maxValue){
@@ -192,7 +228,8 @@ WResourceRow = React.createClass({
             $r("div", {className:"res-cell maxRes"}, 
                 res.maxValue ? "/" + game.getDisplayValueExt(res.maxValue) : ""
             ),
-            $r("div", {className:"res-cell resPerTick", ref:"perTickNode"}, perTickVal),
+            $r("div", {className:"res-cell resPerTick", ref:"perTickNode"}, 
+                isTimeParadox ? "???" : perTickVal),
             $r("div", {className:"res-cell" + (weatherModCss ? " " + weatherModCss : "")}, weatherModValue)
         ]);
     },
@@ -509,7 +546,8 @@ WResourceTable = React.createClass({
                     resource: res, 
                     isEditMode: this.state.isEditMode, 
                     isRequired: isRequired,
-                    showHiddenResources: this.state.showHiddenResources
+                    showHiddenResources: this.state.showHiddenResources,
+                    isTemporalParadox: game.calendar.day < 0
                 })
             );
         }
@@ -640,6 +678,42 @@ WCraftTable = React.createClass({
     }
 });
 
+WPins = React.createClass({
+    getPins: function(){
+        var pins = [];
+        for (var i in this.props.game.diplomacy.races){
+            var race = this.props.game.diplomacy.races[i];
+
+            if (race.pinned){
+                pins.push({
+                    title: "Trade with " + race.title, 
+                    handler: function(race){ 
+                        this.props.game.diplomacy.tradeAll(race); 
+                    }.bind(this, race)
+                });
+            }
+        }
+        return pins;
+    },
+    render: function(){
+        var pins = this.getPins();
+        var pinLinks = [];
+        for (var i in pins){
+            var pin = pins[i];
+            pinLinks.push(
+                $r("div", {className:"pin-link"},
+                    $r("a", {href:"#", onClick: pin.handler},
+                        pin.title
+                    )
+                )   
+            );
+        }
+        return (
+            $r(WCollapsiblePanel, {title:"pins"}, pinLinks)
+        );
+    }
+});
+
 WLeftPanel = React.createClass({
     getDefaultProperties: function(){
         return {game: null};
@@ -665,18 +739,19 @@ WLeftPanel = React.createClass({
             $r(WResourceTable, {resources: this.getResources(), reqRes: reqRes}),
 
             $r("div", {id:"advisorsContainer",style:{paddingTop: "10px"}}),        
-            $r("div", {id:"fastHuntContainer", style:{paddingLeft: "5px", visibility:"hidden"}},
+            $r("div", {id:"fastHuntContainer", className:"pin-link", style:{visibility:"hidden"}},
                 $r("a", {href:"#", onClick: game.huntAll.bind(game)},
                     "Send hunters (",
                     $r("span", {id:"fastHuntContainerCount"}),
                     ")"
                 )
             ),
-            $r("div", {id:"fastPraiseContainer", style:{paddingLeft: "5px", visibility:"hidden"}},
+            $r("div", {id:"fastPraiseContainer", className:"pin-link", style:{visibility:"hidden"}},
                 $r("a", {href:"#", onClick: game.praise.bind(game)},
                     "Praise the sun!"
                 )
             ),              
+            $r(WPins, {game: game}),
             $r(WCraftTable, {resources: game.resPool.resources, reqRes: reqRes})
         ]);
     },

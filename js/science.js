@@ -1,4 +1,3 @@
-
 /**
  * Weird cat science
  */
@@ -21,7 +20,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		},
         flavor: $I("science.calendar.flavor")
 
-	},{
+	}, {
 		name: "agriculture",
 		label: $I("science.agriculture.label"),
 		description: $I("science.agriculture.desc"),
@@ -33,7 +32,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["mining", "archery"]
 		},
         flavor: $I("science.agriculture.flavor")
-	},{
+	}, {
 		name: "archery",
 		label: $I("science.archery.label"),
 		description: $I("science.archery.desc"),
@@ -45,7 +44,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["animal"]
 		},
 		flavor: $I("science.archery.flavor")
-	},{
+	}, {
 		name: "mining",
 		label: $I("science.mining.label"),
 		description: $I("science.mining.desc"),
@@ -57,7 +56,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["bolas"]
 		},
 		flavor: $I("science.mining.flavor")
-	},{
+	}, {
 		name: "metal",
 		label: $I("science.metal.label"),
 		description: $I("science.metal.desc"),
@@ -79,7 +78,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["civil", "math", "construction"]
 			//crafts: ["leather"]
 		}
-	},{
+	}, {
 		/*==============	NOT USED ANYMORE   ============*/
 		name: "brewery",
 		label: $I("science.brewery.label"),
@@ -98,7 +97,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["currency"]	//currency
 		},
 		flavor: $I("science.civil.flavor")
-	},{
+	}, {
 		name: "math",
 		label: $I("science.math.label"),
 		description: $I("science.math.desc"),
@@ -110,7 +109,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["celestialMechanics"]
 		},
 		flavor: $I("science.math.flavor")
-	},{
+	}, {
 		name: "construction",
 		label: $I("science.construction.label"),
 		description: $I("science.construction.desc"),
@@ -122,7 +121,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["compositeBow", "advancedRefinement", "reinforcedSaw"]
 		},
 		flavor: $I("science.construction.flavor")
-	},{
+	}, {
 		name: "engineering",
 		label: $I("science.engineering.label"),
 		description: $I("science.engineering.desc"),
@@ -131,9 +130,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			buildings: ["aqueduct"],
 			tech: ["writing"],
-            policies: ["stripMining","clearCutting","environmentalism"],
+            policies: ["stripMining", "clearCutting", "environmentalism"],
 		}
-	},{
+	}, {
 		name: "currency",
 		label: $I("science.currency.label"),
 		description: $I("science.currency.desc"),
@@ -141,10 +140,10 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		prices: [{name : "science", val: 2200}],
 		unlocks: {
 			buildings: ["tradepost"],
-            policies: ["diplomacy","isolationism"],
+            policies: ["diplomacy", "isolationism"],
 			upgrades: ["goldOre"]
 		}
-	},{
+	}, {
 		name: "writing",
 		label: $I("science.writing.label"),
 		description: $I("science.writing.desc"),
@@ -158,7 +157,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			crafts: ["parchment"]
 		},
 		flavor: $I("science.writing.flavor")
-	},{
+	}, {
 		name: "philosophy",
 		label: $I("science.philosophy.label"),
 		description: $I("science.philosophy.desc"),
@@ -171,7 +170,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			crafts: ["compedium"]
 		},
 		flavor: $I("science.philosophy.flavor")
-	},{
+	}, {
 		name: "machinery",
 		label: $I("science.machinery.label"),
 		description: $I("science.machinery.desc"),
@@ -181,7 +180,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			buildings: ["steamworks"],
 			upgrades: ["printingPress", "factoryAutomation", "crossbow"]
 		}
-	},{
+	}, {
 		name: "steel",
 		label: $I("science.steel.label"),
 		description: $I("science.steel.desc"),
@@ -192,7 +191,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 						"reinforcedWarehouses", "steelAxe", "steelArmor"],
 			crafts: ["steel"]
 		}
-	},{
+	}, {
 		name: "theology",
 		label: $I("science.theology.label"),
 		description: $I("science.theology.desc"),
@@ -209,7 +208,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			buildings: ["temple"]
 		},
         flavor: $I("science.theology.flavor")
-	},{
+	}, {
 		name: "astronomy",
 		label: $I("science.astronomy.label"),
 		description: $I("science.astronomy.desc"),
@@ -228,16 +227,16 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
            //for things that need double unlocks:
         calculateEffects: function(self, game){
            if(game.science.getPolicy("diplomacy").researched){
-                self.unlocks["policies"] = ["knowledgeSharing","culturalExchange"];
+                self.unlocks["policies"] = ["knowledgeSharing", "culturalExchange"];
            }
            if(game.science.getPolicy("isolationism").researched){
-                self.unlocks["policies"] = ["bigStickPolicy","cityOnAHill"];
+                self.unlocks["policies"] = ["bigStickPolicy", "cityOnAHill"];
 		   }
 		   if(self.researched){
 			   game.unlock(self.unlocks);
 		   }
         }
-	},{
+	}, {
 		name: "navigation",
 		label: $I("science.navigation.label"),
 		description: $I("science.navigation.desc"),
@@ -253,7 +252,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 						"titaniumMirrors", "titaniumAxe"],
 			crafts: ["ship"]
 		}
-	},{
+	}, {
 		name: "architecture",
 		label: $I("science.architecture.label"),
 		description: $I("science.architecture.desc"),
@@ -267,7 +266,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["acoustics"]
 		},
 		flavor: $I("science.architecture.flavor")
-	},{
+	}, {
 		name: "physics",
 		label: $I("science.physics.label"),
 		description: $I("science.physics.desc"),
@@ -281,7 +280,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["pneumaticPress", "pyrolysis", "steelSaw"],
 			crafts: ["blueprint"]
 		}
-	},{
+	}, {
 		name: "metaphysics",
 		label: $I("science.metaphysics.label"),
 		description: $I("science.metaphysics.desc"),
@@ -290,7 +289,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: 	"unobtainium", val: 5},
 			{name : "science", val: 55000}
 		],
-	},{
+	}, {
 		name: "chemistry",
 		label: $I("science.chemistry.label"),
 		description: $I("science.chemistry.desc"),
@@ -304,7 +303,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["alloyAxe", "alloyArmor", "alloyWarehouses", "alloyBarns"],
 			crafts: ["alloy"]
 		}
-	},{
+	}, {
 		name: "acoustics",
 		label: $I("science.acoustics.label"),
 		description: $I("science.acoustics.desc"),
@@ -317,7 +316,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			buildings: ["chapel"],
 			tech: ["drama"]
 		}
-	},{
+	}, {
 		name: "drama",
 		label: $I("science.drama.label"),
 		description: $I("science.drama.desc"),
@@ -326,6 +325,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name : "science", val: 90000},
 			{name: 	"parchment", val: 5000}
 		],
+		unlocks: {
+			buildings: ["brewery"]
+		}
 	},{
 		name: "archeology",
 		label: $I("science.archeology.label"),
@@ -342,7 +344,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades:["geodesy"]
 		},
 		flavor: $I("science.archeology.flavor")
-	},{
+	}, {
 		name: "electricity",
 		label: $I("science.electricity.label"),
 		description: $I("science.electricity.desc"),
@@ -356,7 +358,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["industrialization"]
 		},
 		flavor: $I("science.electricity.flavor")
-	},{
+	}, {
 		name: "biology",
 		label: $I("science.biology.label"),
 		description: $I("science.biology.desc"),
@@ -370,7 +372,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["biochemistry"]
 		},
 		flavor: $I("science.biology.flavor")
-	},{
+	}, {
 		name: "biochemistry",
 		label: $I("science.biochemistry.label"),
 		description: $I("science.biochemistry.desc"),
@@ -384,7 +386,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["biofuel"]
 		},
 		flavor: $I("science.biochemistry.flavor")
-	},{
+	}, {
 		name: "genetics",
 		label: $I("science.genetics.label"),
 		description: $I("science.genetics.desc"),
@@ -397,7 +399,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["unicornSelection", "gmo"]
 		},
 		flavor: $I("science.genetics.flavor")
-	},{
+	}, {
 		name: "industrialization",
 		label: $I("science.industrialization.label"),
 		description: $I("science.industrialization.desc"),
@@ -414,14 +416,14 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
            policies: ["stripMining", "clearCutting"]
         },
         calculateEffects: function(self, game){
-        	if((game.science.getPolicy("stripMining").researched) || (game.science.getPolicy("clearCutting").researched)){
-                self.unlocks["policies"] = ["sustainability","fullIndustrialization"];
-		   	}
-		   	if(self.researched){
+			if((game.science.getPolicy("stripMining").researched) || (game.science.getPolicy("clearCutting").researched)){
+                self.unlocks["policies"] = ["sustainability", "fullIndustrialization"];
+			}
+			if(self.researched){
 				game.unlock(self.unlocks);
-		   	}
+			}
         }
-	},{
+	}, {
 		name: "mechanization",
 		label: $I("science.mechanization.label"),
 		description: $I("science.mechanization.desc"),
@@ -437,7 +439,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["pumpjack", "strenghtenBuild"],
 			crafts: ["concrate"]
 		}
-	},{
+	}, {
 		name: "metalurgy",
 		label: $I("science.metalurgy.label"),
 		description: $I("science.metalurgy.desc"),
@@ -449,7 +451,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			upgrades: ["electrolyticSmelting", "oxidation", "miningDrill"]
 		}
-	},{
+	}, {
 		name: "combustion",
 		label: $I("science.combustion.label"),
 		description: $I("science.combustion.desc"),
@@ -473,18 +475,18 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: 	"blueprint", val: 55}
 		],
 		unlocks: {
-			stages: [{bld:"pasture",stage:1}] 	// Solar Farm
+			stages: [{bld:"pasture", stage:1}] 	// Solar Farm
 		},
         upgrades:{
             policies: ["environmentalism"]
         },
         calculateEffects: function(self, game){
-           	if(game.science.getPolicy("environmentalism").researched){
-                self.unlocks["policies"] = ["conservation","openWoodlands"];
-		   	}
+			if(game.science.getPolicy("environmentalism").researched){
+                self.unlocks["policies"] = ["conservation", "openWoodlands"];
+			}
 			if(self.researched){
 				game.unlock(self.unlocks);
-		   	}
+			}
         }
 	},
 	{
@@ -498,13 +500,13 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		],
 		unlocks: {
 			stages: [
-				{bld:"library",stage:1},		// Data Center
-				{bld:"amphitheatre",stage:1}	// Broadcast Tower
+				{bld:"library", stage:1},		// Data Center
+				{bld:"amphitheatre", stage:1}	// Broadcast Tower
 			],
 			tech: ["nuclearFission", "rocketry", "robotics"],
 			upgrades: ["cadSystems", "refrigeration", "seti", "factoryLogistics", "factoryOptimization", "internet"]
 		}
-	},{
+	}, {
 		name: "robotics",
 		label: $I("science.robotics.label"),
 		description: $I("science.robotics.desc"),
@@ -514,12 +516,12 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: 	"blueprint", val: 80}
 		],
 		unlocks: {
-			stages: [{bld:"aqueduct",stage:1}], // Hydro Plant
+			stages: [{bld:"aqueduct", stage:1}], // Hydro Plant
 			tech: ["ai"],
 			upgrades: ["steelPlants", "rotaryKiln", "assistance", "factoryRobotics"],
 			crafts: ["tanker"]
 		}
-	},{
+	}, {
 		name: "ai",
 		label: $I("science.ai.label"),
 		description: $I("science.ai.desc"),
@@ -533,7 +535,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["quantumCryptography"],
 			upgrades: ["neuralNetworks", "aiEngineers", "machineLearning"]
 		}
-	},{
+	}, {
 		name: "quantumCryptography",
 		label: $I("science.quantumCryptography.label"),
 		description: $I("science.quantumCryptography.desc"),
@@ -545,7 +547,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			tech: ["blackchain"]
 		}
-	},{
+	}, {
 		name: "blackchain",
 		label: $I("science.blackchain.label"),
 		description: $I("science.blackchain.desc"),
@@ -557,7 +559,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			upgrades: ["invisibleBlackHand"]
 		}
-	},{
+	}, {
 		name: "nuclearFission",
 		label: $I("science.nuclearFission.label"),
 		description: $I("science.nuclearFission.desc"),
@@ -571,7 +573,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["nanotechnology", "particlePhysics"],
 			upgrades: ["reactorVessel", "nuclearSmelters"]
 		}
-	},{
+	}, {
 		name: "rocketry",
 		label: $I("science.rocketry.label"),
 		description: $I("science.rocketry.desc"),
@@ -598,7 +600,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             upgrades: [ "factoryProcessing" ],
             crafts: ["kerosene"]
         }
-    },{
+    }, {
         name: "sattelites",
         label: $I("science.sattelites.label"),
         description: $I("science.sattelites.desc"),
@@ -612,7 +614,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             upgrades: ["photolithography", "orbitalGeodesy", "uplink", "thinFilm"]
         },
         flavor: $I("science.sattelites.flavor")
-    },{
+    }, {
 		name: "orbitalEngineering",
 		label: $I("science.orbitalEngineering.label"),
 		description: $I("science.orbitalEngineering.desc"),
@@ -625,7 +627,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["exogeology", "thorium"],
 			upgrades: ["hubbleTelescope", "satelliteRadio", "astrophysicists", "solarSatellites", "spaceEngineers", "starlink"]
 		}
-	},{
+	}, {
 		name: "thorium",
 		label: $I("science.thorium.label"),
 		description: $I("science.thorium.desc"),
@@ -638,7 +640,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["thoriumReactors", "thoriumEngine", "qdot"],
 			crafts: ["thorium"]
 		}
-	},{
+	}, {
 		name: "exogeology",
 		label: $I("science.exogeology.label"),
 		description: $I("science.exogeology.desc"),
@@ -651,7 +653,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["advExogeology"],
 			upgrades: ["unobtainiumReflectors", "unobtainiumHuts", "unobtainiumDrill", "hydroPlantTurbines", "storageBunkers"]
 		}
-	},{
+	}, {
 		name: "advExogeology",
 		label: $I("science.advExogeology.label"),
 		description: $I("science.advExogeology.desc"),
@@ -678,7 +680,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["superconductors"],
 			upgrades: ["augumentation", "nanosuits", "photovoltaic", "fluidizedReactors"]
 		}
-	},{
+	}, {
 		name: "superconductors",
 		label: $I("science.superconductors.label"),
 		description: $I("science.superconductors.desc"),
@@ -691,7 +693,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["antimatter"],
 			upgrades: ["coldFusion", "spaceManufacturing", "cryocomputing"]
 		}
-	},{
+	}, {
 		name: "antimatter",
 		label: $I("science.antimatter.label"),
 		description: $I("science.antimatter.desc"),
@@ -704,7 +706,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["terraformation"],
 			upgrades: ["amReactors", "amBases", "amDrive", "amFission"]
 		}
-	},{
+	}, {
 		name: "terraformation",
 		label: $I("science.terraformation.label"),
 		description: $I("science.terraformation.desc"),
@@ -716,7 +718,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			tech: ["hydroponics"]
 		}
-	},{
+	}, {
 		name: "hydroponics",
 		label: $I("science.hydroponics.label"),
 		description: $I("science.hydroponics.desc"),
@@ -728,7 +730,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			tech: ["exogeophysics"]
 		}
-	},{
+	}, {
 		name: "exogeophysics",
 		label: $I("science.exogeophysics.label"),
 		description: $I("science.exogeophysics.desc"),
@@ -752,7 +754,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["chronophysics", "dimensionalPhysics"],
 			upgrades: ["enrichedUranium", "railgun"]
 		}
-	},{
+	}, {
 		name: "dimensionalPhysics",
 		label: $I("science.dimensionalPhysics.label"),
 		description: $I("science.dimensionalPhysics.desc"),
@@ -763,7 +765,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			upgrades: ["energyRifts", "lhc"]
 		}
-	},{
+	}, {
 		name: "chronophysics",
 		label: $I("science.chronophysics.label"),
 		description: $I("science.chronophysics.desc"),
@@ -777,7 +779,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["tachyonTheory"],
 			upgrades: ["stasisChambers", "fluxCondensator"]
 		}
-	},{
+	}, {
 		name: "tachyonTheory",
 		label: $I("science.tachyonTheory.label"),
 		description: $I("science.tachyonTheory.desc"),
@@ -791,7 +793,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["voidSpace"],
 			upgrades: ["tachyonAccelerators", "chronoforge", "chronoEngineers"]
 		}
-	},{
+	}, {
 		name: "cryptotheology",
 		label: $I("science.cryptotheology.label"),
 		description: $I("science.cryptotheology.desc"),
@@ -803,7 +805,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			upgrades: ["relicStation"]
 		}
-	},{
+	}, {
 		name: "voidSpace",
 		label: $I("science.voidSpace.label"),
 		description: $I("science.voidSpace.desc"),
@@ -819,7 +821,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			voidSpace: ["cryochambers"],
 			challenges: ["atheism"]
 		}
-	},{
+	}, {
 		name: "paradoxalKnowledge",
 		label: $I("science.paradoxalKnowledge.label"),
 		description: $I("science.paradoxalKnowledge.desc"),
@@ -854,7 +856,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks:{
 			policies: ["authocracy", "republic"]
 		}
-	},{
+	}, {
 		name: "tradition",
 		label: $I("policy.tradition.label"),
 		description:$I("policy.tradition.desc"),
@@ -882,7 +884,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         },
 		blocked: false,
 		blocks:["authocracy", "republic", "communism"]
-	},{
+	}, {
 		name: "authocracy",
 		label: $I("policy.autocracy.label"),
 		description: $I("policy.autocracy.desc"),
@@ -898,7 +900,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks:{
 			policies: ["socialism"]
 		}
-	},{
+	}, {
 		name: "republic",
         label: $I("policy.republic.label"),
         description: $I("policy.republic.desc"),
@@ -945,7 +947,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocked: false,
 		blocked: false,
 		blocks:["communism", "fascism"]
-	},{
+	}, {
 		name: "communism",
         label: $I("policy.communism.label"),
         description: $I("policy.communism.desc"),
@@ -961,7 +963,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocked: false,
 		blocked: false,
 		blocks:["liberalism", "fascism"]
-	},{
+	}, {
 		name: "fascism",
         label: $I("policy.fascism.label"),
         description: $I("policy.fascism.desc"),
@@ -989,7 +991,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocked: false,
 		blocked: false,
 		blocks:["theocracy", "expansionism"]
-	},{
+	}, {
 		name: "theocracy",
         label: $I("policy.theocracy.label"),
         description: $I("policy.theocracy.desc"),
@@ -1003,7 +1005,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		blocked: false,
 		requiredLeaderJob :"priest",
 		blocks:["technocracy", "expansionism"]
-	},{
+	}, {
 		name: "expansionism",
         label: $I("policy.expansionism.label"),
         description: $I("policy.expansionism.desc"),
@@ -1081,13 +1083,13 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["isolationism"],
         calculateEffects: function(self, game){
               if(game.science.get("astronomy").researched){
-                self.unlocks["policies"] = ["knowledgeSharing","culturalExchange"];
+                self.unlocks["policies"] = ["knowledgeSharing", "culturalExchange"];
               }
 			  if(self.researched){
 				  game.unlock(self.unlocks);
 			  }
         }
-    },{
+    }, {
         name: "isolationism",
         label: $I("policy.isolationism.label"),
         description: $I("policy.isolationism.desc"),
@@ -1106,13 +1108,13 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         },
         calculateEffects: function(self, game){
             if(game.science.get("astronomy").researched){
-            	self.unlocks["policies"] = ["bigStickPolicy","cityOnAHill"];
+				self.unlocks["policies"] = ["bigStickPolicy", "cityOnAHill"];
             }
 			if(self.researched){
 				game.unlock(self.unlocks);
 			}
 		}
-    },{
+    }, {
         name: "zebraRelationsAppeasement",
         label: $I("policy.zebraRelationsAppeasement.label"),
         description: $I("policy.zebraRelationsAppeasement.desc"),
@@ -1126,7 +1128,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
         blocks:["zebraRelationsBellicosity"]
-    },{
+    }, {
         name: "zebraRelationsBellicosity",
         label: $I("policy.zebraRelationsBellicosity.label"),
         description: $I("policy.zebraRelationsBellicosity.desc"),
@@ -1140,7 +1142,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
         blocks:["zebraRelationsAppeasement"]
-    },{
+    }, {
         name: "knowledgeSharing",
         label: $I("policy.knowledgeSharing.label"),
         description: $I("policy.knowledgeSharing.desc"),
@@ -1153,7 +1155,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
         blocks:["culturalExchange"]
-    },{
+    }, {
         name: "culturalExchange",
         label: $I("policy.culturalExchange.label"),
         description: $I("policy.culturalExchange.desc"),
@@ -1166,7 +1168,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
         blocks:["knowledgeSharing"]
-    },{
+    }, {
         name: "bigStickPolicy",
         label: $I("policy.bigStickPolicy.label"),
         description: $I("policy.bigStickPolicy.desc"),
@@ -1179,7 +1181,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
         blocks:["cityOnAHill"]
-    },{
+    }, {
         name: "cityOnAHill",
         label: $I("policy.cityOnAHill.label"),
         description: $I("policy.cityOnAHill.desc"),
@@ -1187,17 +1189,17 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 4000}
         ],
         effects:{
-              "onAHillCultureCap" : 0.05
+            "onAHillCultureCap" : 0.05
         },
         unlocked: false,
         blocked: false,
         blocks:["bigStickPolicy"]
-    },{
+    }, {
         name: "outerSpaceTreaty",
         label: $I("policy.outerSpaceTreaty.label"),
         description: $I("policy.outerSpaceTreaty.desc"),
         prices: [
-                {name : "culture", val: 10000}
+            {name : "culture", val: 10000}
         ],
         effects:{
             "spaceRelationsBonus" : 10
@@ -1205,12 +1207,12 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
         blocks:["militarizeSpace"]
-    },{
+    }, {
         name: "militarizeSpace",
         label: $I("policy.militarizeSpace.label"),
         description: $I("policy.militarizeSpace.desc"),
         prices: [
-            {name : "culture", val: 10000}
+			{name : "culture", val: 10000}
         ],
         effects:{
             "satelliteSynergyBonus" : 0.1
@@ -1236,7 +1238,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocks:{
             policies: ["rationality", "mysticism"]
         }
-    },{
+    }, {
         name: "epicurianism",
         label: $I("policy.epicurianism.label"),
         description: $I("policy.epicurianism.desc"),
@@ -1252,7 +1254,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocks:{
             policies: ["rationality", "mysticism"]
         }
-    },{
+    }, {
         name: "rationality",
         label: $I("policy.rationality.label"),
         description: $I("policy.rationality.desc"),
@@ -1266,7 +1268,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
         blocks:["mysticism"]
-    },{
+    }, {
         name: "mysticism",
         label: $I("policy.mysticism.label"),
         description: $I("policy.mysticism.desc"),
@@ -1296,7 +1298,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         unlocks:{},
         blocked: false,
-        blocks:["clearCutting","environmentalism"],
+        blocks:["clearCutting", "environmentalism"],
         upgrades:{
               tech:["industrialization"]
         },
@@ -1308,7 +1310,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 				game.unlock(self.unlocks);
 			}
         }
-    },{
+    }, {
         name: "clearCutting",
         label: $I("policy.clearCutting.label"),
         description: $I("policy.clearCutting.desc"),
@@ -1322,7 +1324,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         unlocks:{},
         blocked: false,
-        blocks:["stripMining","environmentalism"],
+        blocks:["stripMining", "environmentalism"],
         upgrades:{
             tech:["industrialization"]
         },
@@ -1334,7 +1336,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 				game.unlock(self.unlocks);
 			}
         }
-    },{
+    }, {
         name: "environmentalism",
         label: $I("policy.environmentalism.label"),
         description: $I("policy.environmentalism.desc"),
@@ -1353,13 +1355,13 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         },
         calculateEffects: function(self, game){
             if(game.science.get("ecology").researched){
-                self.unlocks["policies"] = ["conservation","openWoodlands"];
+                self.unlocks["policies"] = ["conservation", "openWoodlands"];
             }
 			if(self.researched){
 				game.unlock(self.unlocks);
 			}
         }
-    },{
+    }, {
         name: "sustainability",
         label: $I("policy.sustainability.label"),
         description: $I("policy.sustainability.desc"),
@@ -1372,7 +1374,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
         blocks:["fullIndustrialization"]
-    },{
+    }, {
         name: "fullIndustrialization",
         label: $I("policy.fullIndustrialization.label"),
         description: $I("policy.fullIndustrialization.desc"),
@@ -1385,7 +1387,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
         blocks:["sustainability"]
-    },{
+    }, {
         name: "conservation",
         label: $I("policy.conservation.label"),
         description: $I("policy.conservation.desc"),
@@ -1398,7 +1400,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
         blocks:["openWoodlands"]
-    },{
+    }, {
         name: "openWoodlands",
         label: $I("policy.openWoodlands.label"),
         description: $I("policy.openWoodlands.desc"),
@@ -1412,7 +1414,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
         blocks:["conservation"]
-    },{
+    }, {
         name: "spaceBasedTerraforming",
         label: $I("policy.spaceBasedTerraforming.label"),
         description: $I("policy.spaceBasedTerraforming.desc"),
@@ -1425,7 +1427,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
         blocks:["clearSkies"]
-    },{
+    }, {
         name: "clearSkies",
         label: $I("policy.clearSkies.label"),
         description: $I("policy.clearSkies.desc"),
@@ -1458,7 +1460,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 				return effect;
 			}
 		});
-		this.registerMeta("research", this.policies,{
+		this.registerMeta("research", this.policies, {
 			getEffect: function(meta, name){
 				var effect = 0;
 				if (meta.effect){
