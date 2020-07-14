@@ -460,7 +460,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 
 		//-------------- pay prices ------------------
-        var manpowerCost = 50 - this.game.getEffect("culturalExchangeBonus");
+        var manpowerCost = 50 - this.game.getEffect("tradeCatpowerDiscount");
         var goldCost = 15 - this.game.getEffect("tradeGoldDiscount");
 		this.game.resPool.addResEvent("manpower", -manpowerCost * amt);
 		this.game.resPool.addResEvent("gold", -goldCost * amt);
@@ -471,8 +471,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
  	},
 
 	hasMultipleResources: function(race, amt){
-		return (this.game.resPool.get("gold").value >= 15 * amt &&
-			this.game.resPool.get("manpower").value >= 50 * amt &&
+		return (this.game.resPool.get("gold").value >= (15 - this.game.getEffect("tradeGoldDiscount")) * amt &&
+			this.game.resPool.get("manpower").value >= (50 - this.game.getEffect("tradeCatpowerDiscount")) * amt &&
 			this.game.resPool.get(race.buys[0].name).value >= race.buys[0].val * amt);
 	},
 
@@ -515,10 +515,10 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		
 		var amt = [
 			Math.floor(this.game.resPool.get("gold").value / 
-				Math.max(goldCost - this.game.getEffect("catpowerCostReduction"), 1)
+				Math.max(goldCost - this.game.getEffect("tradeGoldDiscount"), 1)
 			),
 			Math.floor(this.game.resPool.get("manpower").value / Math.max(
-				manpowerCost - this.game.getEffect("tradeGoldDiscount"), 1)
+				manpowerCost - this.game.getEffect("tradeCatpowerDiscount"), 1)
 			),
 			Math.floor(this.game.resPool.get(race.buys[0].name).value / race.buys[0].val)
 		];
