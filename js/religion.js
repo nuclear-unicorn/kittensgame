@@ -768,7 +768,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 	getSolarRevolutionRatio: function() {
 		var uncappedBonus = this.getRU("solarRevolution").on ? this.game.getUnlimitedDR(this.faith, 1000) / 100 : 0;
-		return this.game.getLimitedDR(uncappedBonus, 10 + this.game.getEffect("solarRevolutionLimit") + this.game.challenges.getChallengeResearched("atheism") ? this.transcendenceTier : 0);
+		return this.game.getLimitedDR(uncappedBonus, 10 + this.game.getEffect("solarRevolutionLimit") + (this.game.challenges.getChallengeResearched("atheism") ? this.transcendenceTier : 0));
 	},
 
 	getApocryphaBonus: function(){
