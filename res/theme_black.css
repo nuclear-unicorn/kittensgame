@@ -880,7 +880,7 @@ body.scheme_black {
 	opacity: 1; /* default = 0.75 */
 }
 .scheme_black .resLimitNotice {
-    color: #e0e0e0;
+    color: #6e42ff;
 }
 .scheme_black .resPerTick {
 	cursor: default;

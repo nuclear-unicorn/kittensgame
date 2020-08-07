@@ -1,0 +1,1110 @@
+/*
+*			Chocolate 1.0.0 Theme © Volkeyrn
+*/
+
+@import url(https://fonts.googleapis.com/css?family=Ruluko);
+
+/**********************************************/
+/******************** GAME ********************/
+/**********************************************/
+body.scheme_chocolate,
+.scheme_chocolate .help,
+.scheme_chocolate .dialog {
+	background-color: #403022;
+}
+body.scheme_chocolate.with_background_image {
+	background:	repeat-x local top left url('img/theme_chocolate_topbar_background.png'), #403022; /* source of images for graphic design : https://pngtree.com/freepng/set-of-cloud-collection-vector_3575869.html Volkeyrn: permanent premium member */
+}
+.scheme_chocolate #game,
+.scheme_chocolate #loadingContainer {
+    top: 18px;
+}
+.scheme_chocolate  #gamePageContainer,
+.scheme_chocolate select,
+.scheme_chocolate input[type='button'] {
+	font-family: 'Ruluko', sans-serif;
+}
+.scheme_chocolate .btn,
+.scheme_chocolate .modern,
+.scheme_chocolate .btn.modern {
+	font-family: 'Ruluko', sans-serif;
+}
+.scheme_chocolate .btn {
+	color: gray;
+	margin-bottom: 6px; /* default 10px */
+	max-height: 36px;
+	background-color: transparent;
+	border: solid 1px transparent;
+}
+.scheme_chocolate .btn.modern {
+	/* default font-size: 14px; */
+	border-radius: 9px;
+	width: 280px; /* +8px gained from padding default width: 264px; */
+}
+.scheme_chocolate .btn.modern.disabled {
+	background-color: #c3ae99;/*#a38463;*/
+	border: 2px solid rgba(128, 128, 128, 0.8);
+	border-right-color: rgba(128, 128, 128, 0.6);
+	border-bottom-color: rgba(128, 128, 128, 0.6);
+	box-shadow: inset -1px -1px 3px rgba(180, 180, 180, 0.6), inset 2px 2px 3px #202020, 1px 1px 3px #101010;
+}
+.scheme_chocolate .btn.modern.disabled:hover {
+	background-color: #c3ae99;
+	border: 2px solid rgba(160, 160, 160, 0.8);
+	cursor: inherit;
+}
+.scheme_chocolate .btn.modern.disabled span.btnTitle { /* to change only the properties of the button name for buttons disabled */
+	color: #120f0c;
+}
+.scheme_chocolate .btn.modern.disabled span.btnTitle.limited { /* to change only the properties of the button name for buttons limited */
+	color: #cb000b;
+}
+.scheme_chocolate .btn.modern:not(.disabled) {
+	background-color: #2f2220;
+	border: 2px solid #d9bea3;
+	border-right-color: rgba(217, 190, 163, 0.8);
+	border-bottom-color: rgba(217, 190, 163, 0.8);
+	box-shadow: inset 1px 1px 3px rgba(255, 255, 255, 0.4), inset -2px -2px 3px #202020,
+				1px 1px 3px #101010;
+}
+.scheme_chocolate .btn.modern:not(.disabled):hover {
+	background-color: #513c39;
+	border: 2px solid #eddcc7;
+	box-shadow: 2px 2px 3px #000000;
+	cursor: pointer;
+}
+.scheme_chocolate .btn:not(.disabled) span.btnTitle { /* to change only the properties of the button name for buttons enabled */
+	color: #e0c8af;
+}
+.scheme_chocolate .btn:not(.disabled):hover span.btnTitle {
+	color: #fcf5e9;
+	text-shadow: 1px 1px 2px #090909;
+}
+.scheme_chocolate a {
+	color: #ece4db;
+}
+.scheme_chocolate a,
+.scheme_chocolate .craft-link {
+    text-decoration: none;
+}
+.scheme_chocolate a:hover {
+	color: #e8969f;
+	opacity: 1.0; /* default opacity: 0.6 */
+}
+.scheme_chocolate div {
+	color: #dccebd;
+}
+.scheme_chocolate .disabled div { /* color text for disabled */
+	color: #857160;
+}
+.scheme_chocolate h1 {
+    font-size: 18px; /* default font size = font-size: 12px; */
+    color: #e8b696;
+	padding-left: 20px;
+	text-shadow: 1px 1px 2px #000000;
+	text-transform: capitalize;
+}
+.scheme_chocolate h1:first-child {
+    margin-top: 10px;
+}
+.scheme_chocolate .modern .btnContent {
+	/* 10px left not necessary for buttons without on/off */
+	padding: 10px 0 10px 1px; /* default :  padding: 10px 0 10px 10px; */
+}
+/*** green and red light for machine on/off ***/
+.scheme_chocolate .btn.bldEnabled div.btnContent,
+.scheme_chocolate .btn.bldlackResConvert div.btnContent {
+	padding: 10px 0 10px 14px !important; /* 14px left for power background-image (linear-gradient) */
+	border: none;
+}
+.scheme_chocolate .btn.disabled.bldlackResConvert { /* color #991A22 */ /* color for lack resources convertion */
+	background: no-repeat border-box linear-gradient(90deg, #930000 0%, #930000 10px, #c3ae99 12px, #c3ae99 100%);
+}
+.scheme_chocolate .btn.disabled.bldlackResConvert:hover {
+	background: no-repeat border-box linear-gradient(90deg, #c30000 0%, #c30000 10px, #c3ae99 12px, #c3ae99 100%);
+}
+.scheme_chocolate .btn:not(.disabled).bldlackResConvert {
+	background: no-repeat border-box linear-gradient(90deg, #930000 0%, #930000 10px, #2f2220 12px, #2f2220 100%);
+}
+.scheme_chocolate .btn:not(.disabled).bldlackResConvert:hover {
+	background: no-repeat border-box linear-gradient(90deg, #c30000 0%, #c30000 10px, #513c39 12px, #513c39 100%);
+}
+.scheme_chocolate .btn.disabled.bldEnabled { /* color #7AA738 */
+	background: no-repeat border-box linear-gradient(90deg, #a7da58 0%, #a7da58 10px, #c3ae99 12px, #c3ae99 100%);
+}
+.scheme_chocolate .btn.disabled.bldEnabled:hover {
+	background: no-repeat border-box linear-gradient(90deg, #c8e896 0%, #c8e896 10px, #c3ae99 12px, #c3ae99 100%);
+}
+.scheme_chocolate .btn:not(.disabled).bldEnabled {
+	background: no-repeat border-box linear-gradient(90deg, #a7da58 0%, #a7da58 10px, #2f2220 12px, #2f2220 100%);
+}
+.scheme_chocolate .btn:not(.disabled).bldEnabled:hover {
+	background: no-repeat border-box linear-gradient(90deg, #c8e896 0%, #c8e896 10px, #513c39 12px, #513c39 100%);
+}
+/*** end of green light for machine on/off ***/
+.scheme_chocolate .dialog { /* window options, credits and get the app */
+	background-color: #403022;
+	margin-right: 12px;
+	border: 1px solid transparent;
+	border-image-width: 66px 66px 66px 66px;
+	border-image-slice: 66 66 66 66;
+	border-image-repeat: round;
+	border-image-source: url('img/theme_chocolate_frame_white.png'); /* source of images for graphic design : https://pngtree.com/freepng/white-square-frame-border_5054088.html Volkeyrn: permanent premium member */
+	border-image-outset: 10px 12px 10px 10px;
+	padding: 15px;
+}
+.scheme_chocolate .dialog a {
+    text-transform: capitalize;
+}
+.scheme_chocolate .dialog a:hover {
+	color: #e8969f;
+}
+.scheme_chocolate label i { /* information text in option windows */
+    /* default font size = font-size: 90%; */
+    color: #b89679;
+}
+.scheme_chocolate label:hover {
+	opacity: 1;/* default opacity: 0.7; */
+	color: #ffffff;
+}
+.scheme_chocolate label:hover i {
+	text-shadow: none;
+}
+.scheme_chocolate .dialog input[type="button"] {
+	font-size : 14px !important;
+	margin-left: 7px;
+	margin-bottom: 7px;
+}
+.scheme_chocolate select { /* dropdown list on settlement tab and options windows */
+	background-color: #584230;
+	color: #edddcf;
+	border: solid 1px #e6d2bc;
+	border-right-color: #d6b591;
+	border-bottom-color: #d6b591;
+	box-shadow: 2px 2px 3px rgba(40, 40, 40, 0.8);
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8); /* color #000000 */
+	font-size: 13px;
+	margin-left: 3px;
+	padding-bottom: 2px;
+	border-radius: 7px;
+}
+.scheme_chocolate select>option {
+    background-color: #584230;
+    color: #f4ebe2;
+	padding: 3px 10px; /* default padding: 4px 10px; */
+}
+.scheme_chocolate select > option:disabled {
+	color: #857160;
+	font-size: 90%;
+}
+.scheme_chocolate #optionsDiv input[type="checkbox"] + label:before {
+    content: "\25C7"; /* WHITE DIAMOND */
+	font: 14px sans-serif;
+	color: #c0c0c0;
+}
+.scheme_chocolate #optionsDiv input[type="checkbox"]:checked + label:before {
+	content: "\25c8"; /* WHITE DIAMOND CONTAINING BLACK SMALL DIAMOND */
+	font: 14px sans-serif;
+	color: #6cdfd2;
+}
+.scheme_chocolate textarea#importData,
+.scheme_chocolate textarea#exportData {
+	background-color: #c3ae99;/*#a38463;*/
+	border: 2px solid rgba(128, 128, 128, 0.8);
+	border-right-color: rgba(128, 128, 128, 0.6);
+	border-bottom-color: rgba(128, 128, 128, 0.6);
+	box-shadow: inset -1px -1px 3px rgba(180, 180, 180, 0.6), inset 2px 2px 3px #202020, 1px 1px 3px #101010;
+	border-radius: 3px;
+	margin-top: 2px;
+	color: #120f0c;
+	padding: 5px;
+	/* Only FireFox */
+	scrollbar-width: thin;
+	scrollbar-color: #584230 #403022;
+}
+
+/*************************************************/
+/******************** TOP BAR ********************/
+/*************************************************/
+.scheme_chocolate #topBar {
+	background-color: #ffe7d4;
+    height: 20px;
+	border-bottom: none;
+	box-shadow: none;
+	top: 0; /* for no shadow on top */
+	padding-top: 0;
+}
+.scheme_chocolate #topBar a {
+	color: #362724;
+}
+.scheme_chocolate #topBar a:hover {
+	color: #e8969f;
+}
+.scheme_chocolate #topBar a.copyright {
+	color: #eb000b;
+}
+.scheme_chocolate #topBar a.copyright:hover {
+	color: #e8969f;
+}
+.scheme_chocolate #headerLinks .links-block { /* a link separator : | on header links */
+	color: #70543d;
+}
+.scheme_chocolate #topBar div,
+.scheme_chocolate #headerLinks div { /* for color text of MOTD on top bar */
+	color: #7b624a;
+}
+.scheme_chocolate #headerLinks>div:first-child:before {
+    color: #dc5d6b;
+    content: 'Theme by Volkeyrn\00a0\00a0\00a0';
+	text-shadow: none;
+    text-decoration: none;
+	font-weight: normal;
+}
+.scheme_chocolate #sorrowTooltip { /* counter of BLS (Black Liquid Sorrow) */
+	color: #7b624a;
+}
+.scheme_chocolate #sorrowTooltip.max {
+    color: #cb000b;
+}
+.scheme_chocolate #autosaveTooltip {
+	color: #dc5d6b;
+}
+.scheme_chocolate #getTheApp-link { /* Get the app */
+	color: #DF996C !important;
+}
+.scheme_chocolate #getTheApp-link:hover {
+	color: #e8969f !important;
+}
+.scheme_chocolate .links-block {
+	padding-top: 0 !important;
+}
+.scheme_chocolate .toolbarIcon.happiness {
+    color: #FF7A5B;
+}
+.scheme_chocolate .toolbarIcon.energy,
+.scheme_chocolate .button_tooltip .energyProduction {
+    color: #80b929;
+}
+.scheme_chocolate .toolbarIcon.energy.warningWinter {
+    color: #FF7A5B;
+}
+.scheme_chocolate .toolbarIcon.energy.warning,
+.scheme_chocolate .button_tooltip .energyConsumption,
+.scheme_chocolate .button_tooltip .energyPenalty {
+	color: #cb000b;
+}
+
+/************************************************/
+/******************** FOOTER ********************/
+/************************************************/
+.scheme_chocolate #footerLinks {
+	font-size: 90%;
+	bottom: 5px; /* default bottom: 10px; */
+	color: #70543d;
+}
+.scheme_chocolate #footerLinks a:hover {
+	text-shadow: none;
+}
+
+/*************************************************/
+/******************** TOOLTIP ********************/
+/*************************************************/
+.scheme_chocolate #tooltip,
+.scheme_chocolate .tooltip-block div {
+	background-color: #42302d;
+	color: #a0a0a0; /* tooltip windows == left column : left text */
+	border-style: solid;
+	border-color: #d9bea3;
+	border-width: 2px 2px 2px 2px;
+	border-radius: 9px;
+	margin-left: 15px; /* for offset tooltip due to larger buttons .btn.modern */
+	box-shadow: -1px -1px 2px #584230, 1px 1px 2px #241b13;
+}
+.scheme_chocolate .tooltip-block div {
+	padding: 5px;
+}
+.scheme_chocolate .button_tooltip {
+	background-color: transparent;
+}
+.scheme_chocolate .button_tooltip div { /* tooltip window == left column: right text | center column :highlighting text */
+	color: #c0c0c0;
+}
+.scheme_chocolate .tooltip-inner .desc { /* Tooltip Window : title text */
+    color: #dccebd;
+	/* default font-size: 15px; */
+	border-bottom : 2px dotted #70543d !important;
+	margin-bottom: 5px;
+	border-radius: 17px 7px 0 0;
+}
+.scheme_chocolate .tooltip-inner .desc.small {
+	font-size: 75%; /* default font-size: 60%; */
+	opacity: 1; /* default opacity: 0.8; */
+}
+.scheme_chocolate .tooltip-inner .desc.small.auto-off {
+	color: #cb000b;
+}
+.scheme_chocolate .tooltip-inner .desc.small.auto-on {
+	color: #a7da58;
+}
+.scheme_chocolate .tooltip-divider { /* border line before effects text */
+	border-bottom : 2px dotted #70543d !important;
+}
+.scheme_chocolate #tooltip .effectName { /* Tooltip Window : effects text */
+	color: #DF6C79;
+	/* default font-size: 14px; */
+}
+.scheme_chocolate .rawRes { /* Tooltip Window == text for all missing resources for primary resource */
+    color: #808080;
+	font-style: italic;
+	padding-left: 12px;
+}
+.scheme_chocolate .button_tooltip .noRes,
+.scheme_chocolate .limited { /* on ressource limited or not attainable */
+	color: #cb000b;
+}
+.scheme_chocolate #tooltip .flavor { /* Tooltip Window : last bottom text on center column tooltip window */
+    color: #96e8df;
+	font-size: 13px !important; /* default 12px italic */
+	padding-right: 7px;
+}
+
+/*******************************************************/
+/******************** CENTER COLUMN ********************/
+/*******************************************************/
+.scheme_chocolate .tab {
+	font-size: 15px;
+}
+.scheme_chocolate .tabInner {
+    border: none; /* border for all under tabs in center column */
+	padding: 7px !important; /* 8px gained for buttons width. default padding: 15px; */
+	margin-bottom: 30px;
+}
+.scheme_chocolate .tabInner label[for='toggleResearched'],
+.scheme_chocolate .tabInner .expandAllBar a:last-child {
+	margin-right: 15px !important;
+}
+.scheme_chocolate .tabInner.Bonfire {
+	margin-bottom: 0; /* default margin-bottom: 20px; */
+}
+.scheme_chocolate .tabInner.Workshop {
+	margin-bottom: 80px; /* to view entire dropdownlink of last button */
+}
+.scheme_chocolate .tabInner.Time {
+	margin-bottom: 50px; /* to view entire dropdownlink of last button */
+}
+.scheme_chocolate .tabsContainer { /* separator | for tab */
+	color: #70543d;
+	padding-bottom: 5px; /* default padding-bottom: 15px; */
+	/* default padding-top: 2px; */
+}
+.scheme_chocolate .activeTab {
+	color: #f0eae3;
+}
+.scheme_chocolate a.activeTab {
+	border-bottom: 2px dotted #e8969f;
+}
+.scheme_chocolate a.activeTab:hover {
+    color: #f0eae3;
+}
+.scheme_chocolate span.genericWarning { /* number of kittens free or engineering free on tab */
+	color: #cb000b;
+}
+.scheme_chocolate .tab.traitLeaderBonus::before {
+	content: "\2605"; /* BLACK STAR */
+	color: #96e8df;
+}
+.scheme_chocolate .bldTopContainer { /* under tab */
+	font-size: 95%;
+}
+.scheme_chocolate .bldTopContainer a.activeTab {
+	color: #f0eae3;
+	border-image-source: none;
+}
+.scheme_chocolate .bldTopContainer a.activeTab:hover {
+    color: #f0eae3;
+	opacity: 0.7; /* default opacity 0.7 on not hover */
+}
+.scheme_chocolate .bldGroupContainer { /* container for all buttons on center column */
+    padding-top: 5px; /* default 15px */
+    border-top: 1px solid #70543d;
+    margin-top: 5px; /* default 10px */
+}
+.scheme_chocolate input[type='button'] {
+	font-size: 15px !important;
+	background-color: #38d4c2 !important;
+	color: #ffffff;
+	border: solid 1px #5be0ff !important;
+	border-right-color: #02a2c9 !important;
+	border-bottom-color: #02a2c9 !important;
+	box-shadow: 2px 2px 3px rgba(40, 40, 40, 0.9) !important;
+	text-shadow: 1px 1px 0 #000000;
+	font-weight: normal !important;
+	border-radius: 9px !important;
+}
+.scheme_chocolate input[type='button']:hover {
+	background-color: #e8969f !important;
+	border: solid 1px #393939 !important;
+	color: #f0eae3 !important;
+	cursor: pointer !important;
+	box-shadow: 1px 1px 3px #000000 inset,
+				 0 1px 1px rgba(200, 200, 200, 0.2) !important;
+	text-shadow: -1px -1px 0 #000000;
+}
+/* button observer different from other input buttons  */
+.scheme_chocolate input[type='button']#observeBtn {
+	height: 40px;
+	background: no-repeat local center url('img/theme_chocolate_cloud_blue.png'); /* source of images for graphic design : https://pngtree.com/freepng/set-of-cloud-collection-vector_3575869.html Volkeyrn: permanent premium member */
+	background-color: transparent !important;
+	border-radius: none;
+	border: none !important;
+	color: #f0eae3;
+	text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
+	padding-top: 10px;
+	box-shadow: none !important;
+	font-weight: normal !important;
+}
+.scheme_chocolate input[type='button']#observeBtn:hover {
+	background: no-repeat local center url('img/theme_chocolate_cloud_white.png'); /* source of images for graphic design : https://pngtree.com/freepng/set-of-cloud-collection-vector_3575869.html Volkeyrn: permanent premium member */
+	background-color: transparent !important;
+	border-radius: none;
+	border: none !important;
+	color: #5be0ff !important;
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+	padding-top: 10px;
+	box-shadow: none !important;
+	font-weight: normal !important;
+}
+.scheme_chocolate .btn.modern a {
+	color: gray;
+	/* default min-width: 20px; */
+	border-left: none; /* default border-left: 1px solid #888; */
+	line-height: 16px;
+	font-weight: normal;
+	background-color: transparent;
+	padding: 10px 4px 10px 4px !important; /* default :  padding: 10px 6px 10px 6px !important; */
+	text-shadow: none;
+}
+.scheme_chocolate .btn.modern:not(.disabled) a {
+	color: #c0905e;
+}
+.scheme_chocolate .btn.modern.disabled a {
+	color: #5d433e;
+}
+.scheme_chocolate .btn.modern:not(.disabled) a:hover {
+	color: #e0c9b0;
+	background-color: rgba(255, 255, 255, 0.2);
+	text-shadow: 1px 1px 1px #000000;
+}
+.scheme_chocolate .btn.modern.disabled a:hover {
+	color: #362724;
+	background-color: rgba(64, 48, 34, 0.2); /* color #403022 */
+}
+.scheme_chocolate .btn.modern:not(.disabled):active,
+.scheme_chocolate input[type='button']:active,
+.scheme_chocolate input[type='button']#observeBtn:active {
+    border-color: #e8969f; /* #fbf6eb;*/
+}
+.scheme_chocolate .btn.modern .linkContent { /* dropdown list on button */
+    margin-top: 26px !important; /* for correct vertical align dropdown list */
+    width: auto !important;
+	background-color: #513c39; /* color pick from button not disabled and hover */
+	border-radius: 0 9px 9px 9px;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #eddcc7;
+	box-shadow: 2px 2px 3px #000000;
+}
+.scheme_chocolate .btn.modern .linkContent a {
+    width: 36px;
+    margin-top: 0;
+	margin-bottom: 0;
+}
+.scheme_chocolate .btn.modern.disabled .linkContent { /* dropdown list on button disabled */
+	margin-top: 27px !important; /* for correct vertical align dropdown list */
+	background-color: #c3ae99; /* color pick from button disabled and hover */
+	border: 2px solid rgba(160, 160, 160, 0.8);
+	box-shadow: inset -1px -1px 3px rgba(180, 180, 180, 0.6), inset 2px 2px 3px #202020, 1px 1px 3px #101010;
+}
+.scheme_chocolate .linkContent a:first-child,
+.scheme_chocolate .linkContent a:first-child:hover {
+	border-radius: 0 9px 0 0;
+}
+.scheme_chocolate .linkContent a:last-child,
+.scheme_chocolate .linkContent a:last-child:hover {
+	border-radius: 0 0 9px 9px;
+}
+/* Apply the right border radius of the button to the rightmost link */
+.scheme_chocolate .btn.modern span.btnTitle + a,
+.scheme_chocolate .btn.modern:not(.hasSellLink) a.off1Link, /* link minus on buildings buttons */
+.scheme_chocolate .btn.modern:not(.hasSellLink) a.unassignLink { /* link minus on kittens jobs buttons */
+	/* buttons border-radius: 9px; */
+	border-radius: 0 9px 9px 0;
+}
+.scheme_chocolate .btn.modern .btnContent a.rightestLink { /* for Combust TC button in Time tab and Hold Festival in Settlement tab */
+	border-radius: 0 9px 9px 0;
+}
+.scheme_chocolate .panelContainer {
+	/* default margin-top: 8px; */
+	min-height: 40px; /* default min-height: 30px; */
+	background: transparent;
+	border: 2px dotted #876f57;
+	border-radius: 11px;
+}
+.scheme_chocolate table.statTable {
+	background: #2f2220;
+	margin-top: 6px;
+	margin-left: 12px;
+	padding: 9px;
+	border-radius: 15px;
+	border: 2px solid rgba(237, 220, 199, 0.9);
+	border-right-color: rgba(237, 220, 199, 0.7);
+	border-bottom-color: rgba(237, 220, 199, 0.7);
+	box-shadow: inset 1px 1px 3px rgba(237, 220, 199, 0.6), inset -2px -2px 3px #292929,
+	-2px -2px 3px #494949, 2px 2px 3px #000000;
+}
+.scheme_chocolate .panelContainer .title {
+	padding: 4px 4px 0 20px; /* default padding: 4px; */ /* default padding-left: 10px; */
+	margin-bottom: 4px;
+}
+.scheme_chocolate .panelContainer div.title {
+    color: #e8b696;
+	font-size: 16px !important;
+}
+.scheme_chocolate .panelContainer .toggle {
+	border : 1px solid transparent;
+	color: #876f57;
+	font-size: 20px;
+	padding: 7px;
+	border-radius: 0;
+	margin: 0 12px 0 0;
+}
+.scheme_chocolate .container {
+	padding: 5px; /* default padding: 10px; */
+}
+.scheme_chocolate .container div.currentGovernment { /* for padding-bottom too height */
+	padding-bottom: 6px !important; /* default padding-bottom: 10px; */
+}
+.scheme_chocolate .trade-race .buys {
+	color: #cb000b;
+	font-size: smaller;
+}
+.scheme_chocolate .trade-race .sells {
+	color: #a7da58;
+	font-size: smaller;
+}
+.scheme_chocolate .trade-race .ammount {
+	color: #909090;
+	font-size: smaller;
+}
+.scheme_chocolate .attitude { /* text for attitude races int trade tab */
+	/* default font size = font-size: 90%; */
+	color: #b8b8b8 !important;
+	text-shadow: none !important;
+}
+.scheme_chocolate .attitude:before {
+	content: "\00a0\2194\00a0"; /* default content: "("; */ /* LEFT RIGHT ARROW */
+	color: #e8969f;
+	font-size: larger;
+	font-weight: bold;
+}
+.scheme_chocolate .attitude:after {
+	content: ""; /* default content: ")"; */
+}
+.scheme_chocolate .panelContainer div.censusFilters {
+	margin-bottom: 3px; /* for add a margin under the 2 lists (select) in the settlement tab */
+}
+/* ---------- Village ---------- */
+/* container 'Census' -> list of kittens in settlement tab */
+.scheme_chocolate .census-block {
+	background-color: rgba(36, 27, 19, 0.25); /* color #241b13 */
+	border: 1px solid rgba(128, 128, 128, 0.8);
+	border-right-color: rgba(128, 128, 128, 0.6);
+	border-bottom-color: rgba(128, 128, 128, 0.6);
+	border-radius: 9px;
+	margin-top: 2px;
+	color: #120f0c;
+	/* default padding: 5px; */
+	/* default margin-bottom: 5px; */
+}
+.scheme_chocolate .census-block:hover {
+	border-color: rgba(128, 128, 128, 1);
+}
+.scheme_chocolate .census-block.simLeader {
+	background-color: #2f2220;
+	border: 1px solid #d9bea3;
+	border-right-color: rgba(217, 190, 163, 0.8);
+	border-bottom-color: rgba(217, 190, 163, 0.8);
+	box-shadow: inset 1px 1px 3px rgba(255, 255, 255, 0.4), inset -2px -2px 3px #202020,
+				1px 1px 3px #101010;
+}
+.scheme_chocolate .census-block.simLeader:hover {
+	border-color: #eddcc7;
+}
+.scheme_chocolate .census-block.simLeader a.leaderHref {
+	color: #96e8df;
+}
+.scheme_chocolate .census-block .info { /* info of kitten */
+	font-size: 0.9em;
+	color: #c0a787;
+}
+.scheme_chocolate .census-block .skill { /* jobs unasigned */
+	color: #a0a0a0;
+}
+.scheme_chocolate .census-block .skill:first-of-type { /* job assigned */
+	color: #96e8df;
+	font-weight: normal !important;
+}
+.scheme_chocolate .census-block.simLeader .info span.name {  /* Leader name */
+	font-size: 1.2em;
+}
+.scheme_chocolate .census-block.simLeader .skill:first-of-type { /* Leader job assigned */
+	font-size: 1em; /* default font-size: 0.8em; */
+}
+.scheme_chocolate .container .name.color-none { /* name of kitten */
+	color: #c0a787;
+}
+.scheme_chocolate .container .name.color-brown {
+	color: #b46831;
+}
+.scheme_chocolate .container .name.color-cream {
+	color: #ad884a;
+}
+.scheme_chocolate .container .name.color-black {
+	color: #000000;
+}
+.scheme_chocolate .container .name.color-fawn {
+	color: #ac4e09;
+}
+.scheme_chocolate .container .name.color-white {
+	color: #909090;
+}
+.scheme_chocolate .container .name.variety-none {
+	border: 1px solid transparent;
+}
+.scheme_chocolate .container .name.variety-dual {
+	border: 1px solid black;
+}
+.scheme_chocolate .container .name.variety-tabby {
+	border: 1px dashed black;
+}
+.scheme_chocolate .container .name.variety-torbie {
+	border: 1px dashed black;
+	border-left: dotted;
+	border-right: dotted;
+}
+.scheme_chocolate .container .name.variety-calico {
+	border: 1px solid black;
+	border-top-color: gray;
+	border-bottom-color: gray;
+}
+.scheme_chocolate .container .name.variety-spots {
+	border: 1px dotted black;
+}
+.scheme_chocolate .btn.modern a.bld-on,
+.scheme_chocolate .btn.modern a.auto-on,
+.scheme_chocolate .btn.modern a.fugit-on {
+	color: #a7da58;
+}
+.scheme_chocolate .btn.modern.disabled a.bld-on,
+.scheme_chocolate .btn.modern.disabled a.auto-on,
+.scheme_chocolate .btn.modern.disabled a.fugit-on {
+	color: #c8e896;
+}
+.scheme_chocolate .btn.modern:not(.disabled):hover a.bld-on,
+.scheme_chocolate .btn.modern:not(.disabled):hover a.auto-on,
+.scheme_chocolate .btn.modern:not(.disabled):hover a.fugit-on {
+	color: #c8e896;
+}
+.scheme_chocolate .btn.modern.disabled:hover a.bld-on,
+.scheme_chocolate .btn.modern.disabled:hover a.auto-on,
+.scheme_chocolate .btn.modern.disabled:hover a.fugit-on {
+	color: #c8e896;
+}
+.scheme_chocolate .btn.modern a.bld-off,
+.scheme_chocolate .btn.modern a.auto-off,
+.scheme_chocolate .btn.modern a.fugit-off {
+	color: #c30000;
+}
+.scheme_chocolate .btn.modern:not(.disabled):hover a.bld-off,
+.scheme_chocolate .btn.modern:not(.disabled):hover a.auto-off,
+.scheme_chocolate .btn.modern:not(.disabled):hover a.fugit-off {
+	color: #f30000;
+}
+.scheme_chocolate .btn.modern.disabled:hover a.bld-off,
+.scheme_chocolate .btn.modern.disabled:hover a.auto-off,
+.scheme_chocolate .btn.modern.disabled:hover a.fugit-off {
+	color: #c30000;
+}
+.scheme_chocolate .btn.modern.craftOn span.btnTitle { /* all buttons with engineer(s) in workshop tab */
+	color: #a7da58;
+}
+.scheme_chocolate .btn.modern.craftOn:hover span.btnTitle {
+	color: #c8e896;
+}
+.scheme_chocolate .btn.modern.disabled.craftOn span.btnTitle {
+	color: #a7da58;
+	text-shadow: 1px 1px 1px #000000;
+}
+.scheme_chocolate td.craftStuffPanel > span { /* title of craft stuff panel */
+	color: #e8b696;
+	font-size: 15px;
+	text-shadow: 1px 1px 1px #000000;
+}
+.scheme_chocolate td.craftStuffPanel > table { /* craft stuff panel */
+	background-color: #c3ae99;
+	border: 2px solid rgba(128, 128, 128, 0.8);
+	border-right-color: rgba(128, 128, 128, 0.6);
+	border-bottom-color: rgba(128, 128, 128, 0.6);
+	box-shadow: inset -1px -1px 3px rgba(180, 180, 180, 0.6), inset 2px 2px 3px #202020, 1px 1px 3px #101010;
+	border-radius: 3px;
+	margin-top: 2px;
+	padding: 10px 20px; /* default padding-top: 20px; */
+	color: #120f0c;
+}
+
+/**********************************************************/
+/******************** ACHIEVEMENTS TAB ********************/
+/**********************************************************/
+.scheme_chocolate .achievement-header {
+	color: #96e8df;
+	font-size: 18px;
+	margin-bottom: 10px;
+	padding-left: 20px;
+}
+.scheme_chocolate .achievement {
+	display: block;
+	font-size: 15px;
+	margin: 10px; /* default margin-bottom: 10px; */
+    height: 40px;
+    background-color: rgba(81, 60, 57, 0.4); /* color #513c39 */
+    color: #c0a787;
+    text-shadow: rgba(192, 167, 135) 1px 0 10px; /* color #BBC0CA */
+    letter-spacing: 1px;
+	border-radius: 15px;
+	border: 2px solid #d9bea3;
+	border-right-color: rgba(217, 190, 163, 0.8);
+	border-bottom-color: rgba(217, 190, 163, 0.8);
+	box-shadow: inset 1px 1px 3px rgba(255, 255, 255, 0.4), inset -2px -2px 3px #202020,
+				1px 1px 3px #101010;
+}
+.scheme_chocolate .achievement:hover {
+	color: #eddcc7;
+	text-shadow: rgba(237, 220, 199) 2px 0 10px; /* color #eddcc7 */
+    background-color: rgba(81, 60, 57, 0.7); /* color #513c39 */
+	border-color : #eddcc7, inset 0 0 5px 1px rgba(81, 60, 57, 0.1);
+}
+.scheme_chocolate .achievement:not(.unethical).unlocked:hover {
+	box-shadow: 0 0 5px #eddcc7;
+}
+.scheme_chocolate .achievement.unethical {
+	color: #e8969f;
+	text-shadow: #e8969f 1px 0 10px;
+	background-color: rgba(232, 150, 159, 0.2); /* color #e8969f */;
+	border-color : rgba(232, 150, 159, 0.7);
+}
+.scheme_chocolate .achievement.unethical:hover {
+	color: #df6c79;
+	background-color: rgba(223, 108, 121, 0.2); /* color #df6c79 */
+	border-color : rgba(223, 108, 121, 1);
+	box-shadow: 0 0 5px #df6c79, inset 0 0 5px 1px rgba(223, 108, 121, 0.1);
+}
+.scheme_chocolate .achievement:not(.unlocked) {
+	color: rgba(220, 220, 220, 0.5);
+	background-color: rgba(36, 27, 19, 0.3); /* color #241b13 */
+	text-shadow: none;
+	box-shadow: none;
+	border-color : #707070;
+}
+.scheme_chocolate .achievement:not(.unlocked):hover {
+	color: rgba(220, 220, 220, 0.6);
+	border-color : #909090;
+}
+.scheme_chocolate .achievement:after {
+	display: block;
+	letter-spacing: normal;
+    margin-top: 5px;
+	font-size: 100%;
+    color: #c0a787;
+    text-shadow: none;
+}
+.scheme_chocolate .achievement-header .star {
+	/* default font size = font-size: 18px; */
+    color: #FF7A5B; /* orange or dominant color of the theme */
+}
+.scheme_chocolate .achievement .star {
+	/* default font size = font-size: 18px; */
+	color : #909090;
+}
+.scheme_chocolate .achievement.unlocked .star {
+	color : #FF7A5B; /* orange or dominant color of the theme */
+	font-weight: bold;
+	text-shadow: 0 1px #000000;
+}
+
+/******************************************************/
+/******************** RIGHT COLUMN ********************/
+/******************************************************/
+.scheme_chocolate #rightColumn {
+	width: calc(50% - 355px);
+	max-width: 440px; /* max-width: 400px; */
+	top: 30px; /* default top: 20px; */
+}
+.scheme_chocolate #toggleCenter,
+.scheme_chocolate span.toggleCenter {
+	color: #ece4db;
+	opacity: 0.4; /* default opacity: 0.2; */
+	cursor: pointer;
+}
+.scheme_chocolate span.toggleCenter {
+	opacity: 1; /* for have #toggleCenter same color */
+}
+.scheme_chocolate #toggleCenter:hover,
+.scheme_chocolate div#toggleCenter:hover > span.toggleCenter {
+	color: #e8969f;
+	opacity: 1.0;
+}
+.scheme_chocolate #calendarDiv {
+    color: #E8DF96;
+	padding-left: 5px;
+    margin-top: 5px;
+	text-shadow: 2px 2px 2px #000000;
+}
+.scheme_chocolate #calendarSign {
+   font-size: 120%;
+}
+.scheme_chocolate #calendarSign:hover {
+   cursor: default;
+}
+.scheme_chocolate .right-tab-header { /* Log | Chat link on right column */
+	color: #70543d; /* for separator tab | */
+	font-size: 80%;
+ }
+.scheme_chocolate .right-tab-header a {
+	margin-right: -5px;
+}
+.scheme_chocolate .right-tab-header a.active {
+	border-top: 2px dotted #e8969f;
+	color: #f0eae3;
+}
+.scheme_chocolate .right-tab-header a.active:hover {
+	color: #f0eae3;
+}
+.scheme_chocolate div#observeButton {
+	height: 40px; /* default height 30px */
+ }
+.scheme_chocolate .right-tab {
+	height: calc(100% - 160px); /* default height: calc(100% - 150px); */
+}
+.scheme_chocolate #rightTabChat {
+	margin-top: 20px;
+}
+.scheme_chocolate div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
+	color: #876f57;
+	font-size: 90%;
+	font-weight: normal; /* thin if possible with font sizes */
+	border-top: 1px solid #70543d !important;
+	margin-top: 10px;
+}
+.scheme_chocolate #clearLogHref { /* Link in right column : Clear log */
+	font-size: 80%;
+}
+.scheme_chocolate #logFiltersBlock > a { /* Link in right column : [+]Log Filters */
+	font-size: 80%;
+	margin-left: 5px;
+}
+.scheme_chocolate #pauseBtn { /* Link in right column : pawse */
+	margin-left: 5px;
+}
+.scheme_chocolate #gameLog {
+	/* default overflow-y: auto !important; */
+	margin: 6px 5px 5px 0;
+	border: 2px dotted #eddcc7;
+	background-color: rgba(36, 27, 19, 0.25); /* color #241b13 */
+	border-radius: 9px;
+	box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
+	padding: 0 4px 4px 4px;
+	min-height: 5% !important;
+	height: unset !important;
+	max-height: calc(100% -80px) !important;
+	scrollbar-width: thin; /* only Firefox */
+}
+.scheme_chocolate #gameLog span.msg:not(.type_date)  {
+    margin-left: 1.2em;
+	list-style-type: disc;
+	padding-left: 0.3em;
+}
+.scheme_chocolate #gameLog span.noBullet {
+	margin-left: 2.3em !important;
+	list-style-type: '\000B7' !important; /* CenterDot */
+}
+.scheme_chocolate .msg {
+	font-size: 95%;
+	font-weight: normal; /* thin if possible with font sizes */
+	color: #dccebd;
+}
+.scheme_chocolate .msg.type_notice {
+    color: #96e8df; /* color default : #01A9DB; */
+}
+.scheme_chocolate .msg.type_important {
+    color: #e8b696; /* color default : coral; */
+}
+.scheme_chocolate .msg.type_alert {
+    color: #a90909; /* color default : red; */
+}
+.scheme_chocolate .msg.type_date {
+	color: #e8969f;
+	font-size: 100%;
+	/* default font-size: 90%; */
+	text-transform: none;
+	border-bottom: solid 1px #d9bea3;
+	padding-left: 10px;
+}
+
+/*****************************************************/
+/******************** LEFT COLUMN ********************/
+/*****************************************************/
+.scheme_chocolate #leftColumn {
+	margin-top: 12px;/* default margin-top: 4px; */
+	padding-right: 10px; /* -10px gained on res-toolbar.right padding-right default padding right : 20px */
+}
+.scheme_chocolate a.link.collapse {
+    opacity: 0.5; /* default opacity: 0.2; */
+}
+.scheme_chocolate a.link.collapse:hover {
+	color: #e8969f;
+	opacity: 1;
+}
+.scheme_chocolate .res-toolbar {
+    font-size: 90%;
+}
+.scheme_chocolate .res-toolbar.right {
+	padding-right: 20px;
+}
+.scheme_chocolate div.tooltip-block:hover > span {
+	font-weight: bold;
+}
+.res-toolbar .link.toggled {
+    color: #e8969f;
+}
+.scheme_chocolate .res-table {
+    border-collapse: collapse; /* gain of 3 pixel by border -> no margin bottom after */
+	margin-left: 2px; /* without 0px margin left for all ressources */
+}
+.scheme_chocolate .res-row:hover {
+    background-color: rgba(220, 220, 220, 0.1);
+	cursor: default;
+}
+.scheme_chocolate .highlited { /* higlighting ressources when hover button on center windows */
+	background-color: rgba(220, 220, 220, 0.1);
+}
+.scheme_chocolate .resource_faith .resource-name,
+.scheme_chocolate .resource_kittens .resource-name,
+.scheme_chocolate .resource_steel .resource-name,
+.scheme_chocolate .resource_gear .resource-name,
+.scheme_chocolate .resource_alloy .resource-name,
+.scheme_chocolate .resource_megalith .resource-name {
+	color: #808080 !important;
+}
+.scheme_chocolate .resource_paragon .resource-name {
+	color: #846bd8 !important;
+}
+.scheme_chocolate .resource_burnedParagon .resource-name {
+	color: #6141cd!important;
+}
+.scheme_chocolate .resource_antimatter .resource-name,
+.scheme_chocolate .resource_relic .resource-name,
+.scheme_chocolate .resource_void .resource-name {
+	color: #7557e8 !important;
+}
+.scheme_chocolate .resource_unobtainium .resource-name {
+	color: #d5000f!important;
+}
+.scheme_chocolate .resource_eludium .resource-name {
+	color: #b003ff!important;
+}
+.scheme_chocolate .craftTable {
+	 margin-bottom: 68px !important; /* for correct margin bottom due of the line above with border-collapse: collapse on .res-Table ! */
+ }
+.scheme_chocolate .res-cell.craft-link {
+	color: #ece4db;
+ }
+.scheme_chocolate .res-cell.craft-link:hover,
+.scheme_chocolate .res-cell.craft-link.all:hover { /* craft table left column */
+    color: #e8969f;
+	text-decoration: none;
+	opacity: 1;
+}
+.scheme_chocolate .maxRes {
+	color: #909090;
+}
+.scheme_chocolate .resAmount,
+.scheme_chocolate .resource-value {
+    color: #c0a787;
+}
+.scheme_chocolate .resLimitWarn {
+    color: #DF996C;
+	opacity: 1; /* default = 0.75 */
+}
+.scheme_chocolate .resLimitNotice {
+    color: #e8969f;
+}
+.scheme_chocolate .resPerTick {
+	color: #b8b8b8;
+}
+.scheme_chocolate .res-row.resLeaderBonus .resPerTick {
+	color: #96e8df;
+}
+.scheme_chocolate .res-row.craftEngineer .res-cell.resource-value {
+	color: #c8e896;
+	opacity: 0.7;
+}
+.scheme_chocolate div#advisorsContainer {
+	color: #cb000b;
+	padding-top: 6px;/* default padding-top:10px; */
+}
+.scheme_chocolate #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+	color: #b8b8b8;
+	font-size: smaller;
+}
+.scheme_chocolate #fastPraiseContainer >a:hover {
+	color: #E8DF96;
+	text-shadow: 0 0 5px #E8DF96 !important;
+}
+.scheme_chocolate .res-cell.positive-weather { /* to change the color for bonus cell according to the season */
+	font-size: 0.8em !important;
+	color: #a7da58 !important;
+}
+.scheme_chocolate .res-cell.negative-weather { /* to change the color for penalty cell according to the season */
+	font-size: 0.8em !important;
+	color: #cb000b !important;
+}
+.scheme_chocolate .res-cell.craft-link.all { /* 6th column of craft table : "all" */
+	font-size: 90%; /* default font-size: 80%; */
+	opacity: 0.7; /* default opacity: 0.4; */
+	color: #909090;
+}
+
+/***************************************************/
+/******************** SCROLLBAR ********************/
+/***************************************************/
+.scheme_chocolate ::-webkit-scrollbar-thumb {
+    background: #584230;
+	border-radius: 40px;
+}
+.scheme_chocolate ::-webkit-scrollbar-track {
+    background: #403022;
+    border-radius: 50px;
+}
+/* Only FireFox */
+.scheme_chocolate #leftColumn,
+.scheme_chocolate #rightColumn,
+.scheme_chocolate #midColumn,
+.scheme_chocolate select,
+.scheme_chocolate #gamelog,
+.scheme_chocolate .dialog {
+   scrollbar-width: thin !important;
+   scrollbar-color: #584230 #403022 !important;
+}
+.scheme_chocolate select {
+   scrollbar-width: auto !important;
+}

@@ -453,9 +453,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"manpowerMax": 50,
 			"maxKittens": 1
 		},
-		calculateEffects: function(self, game){
-            game.getPriceAdjustment("N/A", self.prices, game.getEffect("logCabinCostReduction"), true);
-		},
 		unlocks: {
 			tabs: ["village"]
 		},
@@ -1266,7 +1263,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			effects["energyConsumption"] *= game.challenges.getEnergyMod();
 
 			self.effects = effects;
-				game.getPriceAdjustment("N/A" /*Doesn't matter for whole building cost reduction*/, self.prices, game.getEffect("factoryCostReduction"), true /*this IS the whole building cost reduction*/);
 			if(game.science.getPolicy("monarchy").researched == true){
 				var unlocksTemp = {
 					policies:["liberalism", "fascism"]
@@ -1416,8 +1412,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game) {
 			self.effects["standingRatio"] = game.workshop.get("caravanserai").researched ? 0.0035 : 0;
-            game.getPriceAdjustment("gold", self.prices, game.getEffect("goldCostReduction"));
-                     },
+       },
 		flavor: $I("buildings.tradepost.flavor")
 	},{
 		name: "mint",
@@ -1438,7 +1433,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function (self, game){
 			self.effects["goldMax"] = 100 * (1 + game.getEffect("warehouseRatio"));
-            game.getPriceAdjustment("gold", self.prices, game.getEffect("goldCostReduction"));
 		},
 		lackResConvert: false,
 		action: function(self, game){
@@ -1515,7 +1509,11 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			self.effects["festivalArrivalRatio"] *= amt; 
 			return amt;
 		},
-		flavor: $I("buildings.brewery.flavor")
+		flavor: $I("buildings.brewery.flavor"),
+		unlockScheme: {
+			name: "chocolate",
+			threshold: 10
+		}
 	},
 	//-------------------------- Culture -------------------------------
 	{
@@ -1690,8 +1688,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}
 
 			self.effects = effects;
-
-            game.getPriceAdjustment("gold", self.prices, game.getEffect("goldCostReduction"));
 		},
 		flavor: $I("buildings.temple.flavor")
 	},
@@ -1795,7 +1791,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		flavor: $I("buildings.aicore.flavor"),
 		canSell: function(self, game){
-			if ((game.getPolicy("transkittenism").researched == true) || (self.effects["aiLevel"] < 15)){
+			if ((game.science.getPolicy("transkittenism").researched == true) || (self.effects["aiLevel"] < 15)){
 				return true;
 			}
 			game.systemShockMode = true;
@@ -1946,9 +1942,14 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 
 		var prices = [];
 
+		var pricesDiscount = this.game.getLimitedDR((this.game.getEffect(bld.get("name") + "CostReduction")), 1);
+		var priceModifier = 1 - pricesDiscount;
+
 		for (var i = 0; i < bldPrices.length; i++) {
+			var resPriceDiscount = this.game.getLimitedDR(this.game.getEffect(bldPrices[i].name+"CostReduction"), 1);
+			var resPriceModifier = 1 - resPriceDiscount;
 			prices.push({
-				val: bldPrices[i].val * Math.pow(ratio, bld.get("val")),
+				val: bldPrices[i].val * Math.pow(ratio, bld.get("val")) * priceModifier * resPriceModifier,
 				name: bldPrices[i].name
 			});
 		}
@@ -2053,7 +2054,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 
 	save: function(saveData){
 		saveData.buildings = this.filterMetadata(this.buildingsData, ["name", "unlocked", "val", "on", "stage", "jammed", "isAutomationEnabled"]);
-
 		if (!saveData.bldData){
 			saveData.bldData = {};
 		}

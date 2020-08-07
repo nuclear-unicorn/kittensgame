@@ -6,6 +6,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 	game: null,
 
 	hideResearched: false,
+	policyToggleBlocked: false,
+	policyToggleResearched: false,
 
 	//list of technologies
 	techs:[{
@@ -839,8 +841,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 	}],
 
 	/**
-	 * If policy is locked, it means some conflicting policy was researched first
-	 * Once policy is locked, there is no way to unlock it other than reset
+	 * If policy is blocked, it means some conflicting policy was researched first
+	 * Once policy is blocked, there is no way to unlock it other than reset
 	 */
 	policies: [
 	{
@@ -942,7 +944,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		],
 		effects:{
 			"goldCostReduction": 0.2,
-			"tradeRelationBoost" : 10
+			"globalRelationsBonus" : 10
 		},
 		unlocked: false,
 		blocked: false,
@@ -971,7 +973,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name : "culture", val: 15000}
 		],
 		effects:{
-			"logCabinCostReduction" : 0.5
+			"logHouseCostReduction" : 0.5
 		},
 		unlocked: false,
 		blocked: false,
@@ -1202,7 +1204,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 10000}
         ],
         effects:{
-            "spaceRelationsBonus" : 10
+            "globalRelationsBonus" : 10
         },
         unlocked: false,
         blocked: false,
@@ -1227,7 +1229,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         label: $I("policy.stoicism.label"),
         description: $I("policy.stoicism.desc"),
         prices: [
-            {name : "culture", val: 2000}
+            {name : "culture", val: 2500}
         ],
         effects:{
             "luxuryConsuptionReduction" : 0.5
@@ -1243,7 +1245,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         label: $I("policy.epicurianism.label"),
         description: $I("policy.epicurianism.desc"),
         prices: [
-            {name : "culture", val: 2000}
+            {name : "culture", val: 2500}
         ],
         effects:{
             "luxuryHappinessBonus" : 1
@@ -1292,8 +1294,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "science", val: 2000}
         ],
         effects:{
-            "environmentUnhappiness" : -5,
-			"mineralsPolicyRatio" : 0.25
+            "environmentUnhappiness" : -2,
+			"mineralsPolicyRatio" : 0.3
         },
         unlocked: false,
         unlocks:{},
@@ -1318,8 +1320,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "science", val: 2000}
         ],
         effects:{
-            "environmentUnhappiness" : -5,
-			"woodPolicyRatio" : 0.25
+            "environmentUnhappiness" : -2,
+			"woodPolicyRatio" : 0.3
         },
         unlocked: false,
         unlocks:{},
@@ -1341,10 +1343,10 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         label: $I("policy.environmentalism.label"),
         description: $I("policy.environmentalism.desc"),
         prices: [
-            {name : "science", val: 2000}
+            {name : "culture", val: 2000}
         ],
         effects:{
-            "environmentHappinessBonus" : 5
+            "environmentHappinessBonus" : 3
         },
         unlocked: false,
         unlocks:{},
@@ -1369,7 +1371,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 10000}
         ],
         effects:{
-            "environmentUnhappinessModifier" : -1
+            "environmentHappinessBonus" : 5
         },
         unlocked: false,
         blocked: false,
@@ -1381,6 +1383,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         prices: [
             {name : "culture", val: 10000}
         ],
+		upgrades: {
+			buildings: ["temple"]
+		},
         effects:{
             "environmentFactoryCraftBonus" : 0.05
         },
@@ -1395,7 +1400,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 10000}
         ],
         effects:{
-            "environmentHappinessBonusModifier" : 1
+            "environmentHappinessBonus" : 5
         },
         unlocked: false,
         blocked: false,
@@ -1519,8 +1524,15 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			}
 			tech.researched = false;
 		}
-
+		for (var i = 0; i < this.policies.length; i++){
+			var policy = this.policies[i];
+			policy.unlocked = false;
+			policy.blocked = false;
+			policy.researched = false;
+		}
 		this.hideResearched = false;
+		this.policyToggleBlocked = false;
+		this.policyToggleResearched = false;
 	},
 
 	save: function(saveData){
@@ -1613,7 +1625,12 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 	updateVisible: function(model){
 		var meta = model.metadata;
 		model.visible = meta.unlocked;
-
+		if (meta.researched && this.game.science.policyToggleResearched){
+			model.visible = false;
+		}
+		if (meta.blocked && this.game.science.policyToggleBlocked){
+			model.visible = false;
+		}
 		//uncomment when no longer debugging the code
 		/*
 			if (
@@ -1631,40 +1648,105 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 		}
 	},
 
-	onPurchase: function(model){
-		if((model.metadata.blocked != true) && 
-			(
-				(this.game.village.leader == null || !model.metadata.requiredLeaderJob) || 
-				(this.game.village.leader.job == model.metadata.requiredLeaderJob)
-			) && (
-				(!model.metadata.name == "transkittenism") || 
-				(this.game.bld.getBuildingExt("aiCore").meta.effects["aiLevel"] < 15)
-			)
-		){
+	shouldBeBough: function(model, game){ //fail checks:
+		if(this.game.village.leader && model.metadata.requiredLeaderJob && this.game.village.leader.job != model.metadata.requiredLeaderJob){
+			var jobTitle = this.game.village.getJob(model.metadata.requiredLeaderJob).title;
+			this.game.msg($I("msg.policy.wrongLeaderJobForResearch", [model.metadata.label, jobTitle]), "important");
+			return false;
+		}else if(model.metadata.name == "transkittenism" && this.game.bld.getBuildingExt("aiCore").meta.effects["aiLevel"] >= 15){
+			this.game.msg($I("msg.policy.aiNotMerges"),"alert", "ai");
+			return false;
+		}else if(model.metadata.blocked != true) {
              for(var i = 0; i < model.metadata.blocks.length; i++){
                 if(this.game.science.getPolicy(model.metadata.blocks[i]).researched){
                     model.metadata.blocked = true;
-                    return;
+                    return false;
                 }
-             }
-			this.inherited(arguments);
-			var meta = model.metadata;
+			}
+			var confirmed = false; //confirmation:
+			if(game.opts.noConfirm){
+				return true;
+			}
+			game.ui.confirm($I("policy.confirmation.title"), $I("policy.confirmation.title"), function() {
+				confirmed = true;
+			});
+		}
+		return confirmed;
+	},
+	buyItem: function(model, event, callback) {
+		if ((!model.metadata.researched && this.hasResources(model)) || this.game.devMode){
+			if(!this.shouldBeBough(model, this.game)){
+				callback(false);
+				return;
+			}
+			this.payPrice(model);
 
+			this.onPurchase(model);
+			
+			callback(true);
+			this.game.render();
+			return;
+		}
+		callback(false);
+	},
+	onPurchase: function(model){
+		this.inherited(arguments);
+		var meta = model.metadata;
 			if (meta.blocks){
 				for (var i in meta.blocks){
 					var policy = this.game.science.getPolicy( meta.blocks[i]);
 					policy.blocked = true;
 				}
 			}
+
 		}
-	}
 });
 
 dojo.declare("classes.ui.PolicyPanel", com.nuclearunicorn.game.ui.Panel, {
 	render: function(container){
 		var content = this.inherited(arguments),
 			self = this;
-        
+		var msgBox = dojo.create("span", { style: { display: "inline-block", marginBottom: "10px"}}, content);
+		msgBox.innerHTML = $I("msg.policy.exclusivity");
+
+		var div = dojo.create("div", { style: { float: "right"}}, content);
+		var groupCheckbox = dojo.create("input", {
+            id : "policyToggleResearched",
+            type: "checkbox",
+            checked: this.game.science.policyToggleResearched,
+            style: {
+                //display: hasCivil ? "" : "none"
+            }
+        }, div);
+
+        dojo.connect(groupCheckbox, "onclick", this, function(){
+            this.game.science.policyToggleResearched = !this.game.science.policyToggleResearched;
+
+            dojo.empty(content);
+            this.game.render(content);
+        });
+
+		dojo.create("label", { innerHTML: $I("science.policyToggleResearched.label")+"<br>", for: "policyToggleResearched"}, div);
+		
+		var groupCheckbox1 = dojo.create("input", {
+            id : "policyToggleBlocked",
+            type: "checkbox",
+            checked: this.game.science.policyToggleBlocked,
+            style: {
+                //display: hasCivil ? "" : "none"
+            }
+        }, div);
+
+        dojo.connect(groupCheckbox1, "onclick", this, function(){
+            this.game.science.policyToggleBlocked = !this.game.science.policyToggleBlocked;
+
+            dojo.empty(content);
+            this.game.render(content);
+        });
+
+        dojo.create("label", { innerHTML: $I("science.policyToggleBlocked.label"), for: "policyToggleBlocked"}, div);
+
+
 		var controller = new classes.ui.PolicyBtnController(this.game);
 		dojo.forEach(this.game.science.policies, function(policy, i){
 			var button = 

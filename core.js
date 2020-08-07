@@ -1993,12 +1993,17 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 		var meta = model.metadata;
         var ratio = meta.priceRatio || 1;
         var prices = [];
+		var pricesDiscount = this.game.getLimitedDR((this.game.getEffect(meta.name + "CostReduction")), 1);
+		var priceModifier = 1 - pricesDiscount;
 
         for (var i = 0; i < meta.prices.length; i++){
+			var resPriceDiscount = this.game.getEffect(meta.prices[i].name+"CostReduction");
+			resPriceDiscount = this.game.getLimitedDR(resPriceDiscount, 1);
+			var resPriceModifier = 1 - resPriceDiscount;
             prices.push({
-            	val: meta.prices[i].val * Math.pow(ratio, meta.val),
+            	val: meta.prices[i].val * Math.pow(ratio, meta.val) * resPriceModifier * priceModifier,
             	name: meta.prices[i].name
-            });
+			});
         }
         return prices;
     },

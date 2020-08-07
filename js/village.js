@@ -83,7 +83,10 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			"faith" : 0.0015
 		},
 		value: 0,
-		unlocked: false
+		unlocked: false,
+		evaluateLocks: function(game){
+			return !game.challenges.getChallenge("atheism").on;
+		}
 	},{
 		name: "geologist",
 		title: $I("village.job.geologist"),
@@ -450,6 +453,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			{
 				kitten.isLeader = false;
 				this.game.village.leader = null;
+				var jobTitle = this.game.village.getJob(theocracy.requiredLeaderJob).title;
+				this.game.msg($I("msg.policy.wrongLeaderJobDemoted", [theocracy.label, jobTitle]), "important");
 			}
 			if(kitten.job) {
 				var job = this.getJob(kitten.job);
@@ -663,10 +668,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
     getEnvironmentEffect: function(){
 		var game = this.game;
 
-		return game.getEffect("environmentHappinessBonus") * 
-			game.getEffect("environmentHappinessBonusModifier") + 
-			game.getEffect("environmentUnhappiness") * 
-			game.getEffect("environmentUnhappinessModifier");
+		return game.getEffect("environmentHappinessBonus") + game.getEffect("environmentUnhappiness") ;
 	},
 	
 	/** Calculates a total happiness where result is a value of [0..1] **/
@@ -2173,7 +2175,10 @@ dojo.declare("classes.ui.village.Census", null, {
 	},
 
 	makeLeader: function(kitten){
-		if((this.game.science.getPolicy("theocracy").researched) && (kitten.job != "priest")){
+		var theocracy =this.game.science.getPolicy("theocracy");
+		if((theocracy.researched) && (kitten.job != theocracy.requiredLeaderJob)){
+			var jobTitle = this.game.village.getJob(theocracy.requiredLeaderJob).title;
+			this.game.msg($I("msg.policy.kittenNotMadeLeader", [theocracy.label, jobTitle]), "important");
              //can't assign non-priest leaders if orderOfTheStars is researched
 			return;
 		}
