@@ -48,7 +48,7 @@ yarn start
 As a general rule, all changes should go through the PR.
 If you have a write access, you can submit small changes directly without approval. Major changes are still advised to be pushed through PR.
 
-Please run all major UI changes through Blood first or you will risk loosing your direct write access.
+Please run all major UI changes through Blood first.
 
 ### No ES6, please
 The KG ecosystem must support about 20.000 different Android devices, iOS, and various OS and browser versions dating from 1980, including Chrome/FF/IE/Edge/webkit of all possible releases.
@@ -85,8 +85,6 @@ Someone will be able to farm trillions of them.
 
 ### Consistency
 * With code formatting, it's nice to have, but it's not critical.
-* For more information and specific guidelines, click the relevant link below:
-    * [Resource Order](./Resource-Order.md)
 
 ### Themes
 In a grim and dark future of catkind, no one can hear you scream.
