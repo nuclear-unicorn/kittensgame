@@ -566,6 +566,9 @@
                     <input id="IWSmelter" type="checkbox" onclick="gamePage.opts.IWSmelter = $('#IWSmelter')[0].checked;">
                     <label for="IWSmelter">Smelters turn off at 95% max Iron in Iron Will mode</label>
                     <br>
+                    <input id="disableHardCaps" type="checkbox" onclick="gamePage.setHardCapsEnforced(!$('#disableHardCaps')[0].checked);">
+                    <label for="disableHardCaps">Allow resources to remain overcap</label>
+                    <br>
 					<input id="disableTelemetry" type="checkbox" onclick="gamePage.opts.disableTelemetry = $('#disableTelemetry')[0].checked;">
 					<label for="disableTelemetry">Disable game telemetry</label>
 					<br>
