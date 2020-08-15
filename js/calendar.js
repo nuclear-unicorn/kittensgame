@@ -912,13 +912,13 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 	},
 
 	getWeatherMod: function(res){
-		if (this.game.science.getPolicy("communism").researched && this.getCurSeason().name == "winter" && this.weather == "cold"){
-			return 0;
-		}
-
 		var mod = 1;
 
 		if (this.getCurSeason().modifiers[res.name]){
+			if (this.game.science.getPolicy("communism").researched && this.getCurSeason().name == "winter" && this.weather == "cold"){
+				return 0;
+			}
+
 			mod = this.getCurSeason().modifiers[res.name];
 
 			if (this.weather == "warm"){
