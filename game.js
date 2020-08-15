@@ -1312,6 +1312,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			tooltipsInRightColumn: false,
 			noConfirm: false,
 			IWSmelter: true,
+			disableHardCaps: false,
 			disableCMBR: false,
 			disableTelemetry: false,
 			enableRedshift: false,
@@ -1425,6 +1426,35 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		this.effectsMgr = new com.nuclearunicorn.game.EffectsManager(this);
 	},
+
+    getHardCapsEnforced: function() {
+        // Modify this and setHardCapsEnabled to manage hard caps behavior
+        // Uncomment to enforce hard caps (current default alpha behavior)
+        // return true;
+        // Uncomment to not enforce hard caps (original behavior)
+        // return false;
+        return !this.opts.disableHardCaps;
+    },
+
+    setHardCapsEnforced: function(on) {
+        // Handles turning hard caps on and off
+        for (var i = 0; i < this.resPool.resources.length; i++) {
+            var res = this.resPool.resources[i];
+            if (on) {
+                if (res.maxValue && res.value > res.maxValue) {
+                    res.reserve += res.value - res.maxValue;
+                    res.value = res.maxValue;
+                }
+            } else {
+                if (!this.challenges.getCondition("disableChrono").on) {
+                    res.value += res.reserve;
+                    res.reserve = 0;
+                }
+            }
+        }
+
+	this.opts.disableHardCaps = !on;
+    },
 
     setDropboxClient: function(dropBoxClient) {
         this.dropBoxClient = dropBoxClient;
@@ -1577,6 +1607,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			tooltipsInRightColumn: false,
 			noConfirm: false,
 			IWSmelter: true,
+			disableHardCaps: false,
 			disableCMBR: false,
 			disableTelemetry: false,
 			enableRedshift: false,
@@ -3765,7 +3796,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 							reserve = res.reserve + res.value * saveRatio;
 						}
 					} else {
-						if (res.maxValue) {
+						if (res.maxValue && this.getHardCapsEnforced()) {
 							reserve = (res.value + res.reserve) * saveRatio;
 						} else {
 							value = (res.value + res.reserve) * saveRatio;

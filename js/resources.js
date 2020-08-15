@@ -607,7 +607,11 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 				// Give the benefit of the doubt
 				res.reserve = res.value - res.maxValue;
 			}
-			res.value = res.maxValue;
+			if (this.game.getHardCapsEnforced()) {
+				res.value = res.maxValue;
+			} else {
+				res.value = Math.min(res.value, Math.max(prevValue, res.maxValue));
+			}
 		}
 
 		if (res.maxValue && res.value < res.maxValue && res.reserve && !this.game.challenges.getCondition("disableChrono").on){
