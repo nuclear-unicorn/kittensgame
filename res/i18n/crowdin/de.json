@@ -128,6 +128,7 @@
     "buildings.chronosphere.label": "Chronosphäre",
     "buildings.chronosphere.desc": "Verlagert kleine Mengen an Ressourcen durch die Zeit. Kann weiter verbessert werden. Jede Chronosphäre steigert die Wahrscheinlichkeit eines zeitlichen Paradoxes.",
     "buildings.dataCenter.label": "Rechenzentrum",
+    "buildings.dataCenter.desc": "Erhöht die Gesamtwirkung von Kompendien auf deine maximale Wissenschaft",
     "buildings.factory.label": "Fabrik",
     "buildings.factory.desc": "Verbessert die Effektivität der Herstellung.",
     "buildings.field.label": "Katzenminze-Feld",
@@ -524,6 +525,7 @@
     "policy.liberty.label": "Freiheit",
     "policy.monarchy.label": "Monarchie",
     "policy.mysticism.label": "Mystik",
+    "policy.openWoodlands.label": "Offene Wälder",
     "policy.outerSpaceTreaty.label": "Weltraumabkommen",
     "policy.republic.label": "Republik",
     "policy.republic.desc": "Am besten für große Gesellschaften. Anführer auf hohem Level geben einen kleinen Bonus für die Produktion aller Kätzchen.",
@@ -1090,6 +1092,7 @@
     "ui.filter.all": "Aktiviert",
     "ui.filter.available": "Aktiviert",
     "ui.filter.enabled": "Aktiviert",
+    "ui.filter.togglable": "Umschaltbar",
     "ui.toggle.researched": "Erforschtes umschalten",
     "ui.loading.msg.0": "Zebras füttern",
     "ui.loading.msg.1": "Ziggurats kalibrieren",
@@ -1411,6 +1414,7 @@
     "workshop.titaniumMirrors.desc": "Improved telescope reflectors. Every observatory will give 2% to Library effectiveness.",
     "workshop.titaniumSaw.label": "Titansäge",
     "workshop.undo.msg": "{0} {1} rückerstattet",
+    "workshop.unobtainiumDrill.label": "Unobtaniumbohrer",
     "workshop.unobtainiumReflectors.desc": "Improved telescope reflectors. Every observatory will give an additional 2% to Library effectiveness.",
     "workshop.voidReactors.desc": "Your Research Vessels are 4 times as effective"
 }
