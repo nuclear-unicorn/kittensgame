@@ -1,4 +1,9 @@
 {
+    "console.intro": "Ти кошеня в лісі котячої м'яти.",
+    "console.intro.zebra": "Ти зебра в саванні, повній титанових шахт.",
+    "achievements.header": "Досягнення: {0} з {1}",
+    "achievements.msg.unlock": "Досягнення здобуто: {0}!",
+    "achievements.anachronox.desc": "Будь ласка, зупиніться",
     "achievements.ironWill.title": "Залізна воля",
     "achievements.sinsOfEmpire.title": "Гріхи Сонячної Імперії",
     "achievements.sunGod.desc": "合計696,342の崇拝を得る",
