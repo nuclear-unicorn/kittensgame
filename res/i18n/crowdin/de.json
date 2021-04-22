@@ -1325,7 +1325,7 @@
     "workshop.compositeBow.label": "Kompositbogen",
     "workshop.compositeBow.desc": "Eine verbesserte Version eines Bogens, die einen dauerhaften +50%igen Schub für die Produktion von Katzenkraft bietet",
     "workshop.concreteBarns.label": "Beton Scheune",
-    "workshop.concreteHuts.label": "Betonhütten",
+    "workshop.concreteHuts.label": "Zement Hütten",
     "workshop.concreteHuts.desc": "Hüttenpreisverhältnis um 30% reduziert",
     "workshop.concreteWarehouses.label": "Betonlagerhäuser",
     "workshop.craft.effectiveness": "Fertigungs-wirksamkeit: +{0}%",
