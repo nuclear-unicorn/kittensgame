@@ -270,7 +270,7 @@
     "challendge.atheism.desc": "重启游戏，没有信仰加成。<br /><br />目标: 带着至少一个冷冻仓重置游戏",
     "challendge.atheism.effect.desc": "每个超越等级将信仰加成的上限提升 100% (相当于 20 级黑方尖碑)",
     "challendge.blackSky.label": "黑暗天空",
-    "challendge.blackSky.desc": "重置后不会出现天文事件。<br><br>目标：建造一个灯塔(每次挑战成功灯塔目标数量+1)",
+    "challendge.blackSky.desc": "重置后不会出现天文事件。<br><br>目标：建造一个太空灯塔(每次挑战成功太空灯塔目标数量+1)",
     "challendge.blackSky.effect.desc": "古神更早降临",
     "challendge.blackSky.event": "漆黑的天空，观测不到任何星星",
     "challendge.energy.label": "能源",
