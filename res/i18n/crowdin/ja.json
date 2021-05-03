@@ -1300,6 +1300,7 @@
     "ui.save.tooltip": "保存しました",
     "ui.undo.title": "変更を元に戻す",
     "ui.option.language": "言語:",
+    "ui.option.language.apply": "変更を適用する",
     "ui.option.scheme.tip": "まだ選択できないテーマも、特定の行動を取ることで永久にアンロックできます。",
     "ui.option.force.lz": "常にインメモリセーブをUTF-16 で圧縮する<i>(実験的)</i>",
     "ui.option.compress.savefile": "エクスポートしたセーブファイルを圧縮する <i>(実験的)<br>\n警告: 古いバージョンと互換性がないセーブファイルを生成します。</i>",
