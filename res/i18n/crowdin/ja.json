@@ -1308,6 +1308,7 @@
     "ui.option.import.button": "インポート",
     "ui.option.export": "エクスポート先:",
     "ui.option.export.dropbox": "Dropbox (ベータ版)",
+    "ui.option.export.simple.file": "ファイル (簡単な題名)",
     "ui.option.export.text": "テキスト エクスポート:",
     "ui.option.close.button": "閉じる",
     "ui.option.import.warning": "警告！データをインポートすると、現在のゲームデータが上書きされます。",
