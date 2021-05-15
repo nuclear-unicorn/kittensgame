@@ -223,6 +223,7 @@
     "effectsMgr.statics.corruptionBoostRatio.title": "Bonus alla corruzione",
     "effectsMgr.statics.cryostation-mineralsMax.title": "Criostazione - Limite Massimo Minerali",
     "effectsMgr.statics.dataCenterAIRatio.title": "Bonus di sinergia dati dell'IA",
+    "effectsMgr.statics.energyConsumptionRatio.title": "Riduzione consumo energia",
     "effectsMgr.statics.expansionismUnobtainiumProductionBonus.title": "Bonus alla produzione di Unobtainium",
     "effectsMgr.statics.factoryCostReduction.title": "Riduzione del costo delle Fabbriche",
     "effectsMgr.statics.goldCostReduction.title": "Riduzione in costi di oro",
