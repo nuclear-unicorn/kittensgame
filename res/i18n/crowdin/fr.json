@@ -297,6 +297,7 @@
     "discardParagon.confirmation.msg1": "Voulez-vous vraiment défausser toutes vos âmes ? Cette action est irréversible.",
     "discardParagon.confirmation.msg2": "Vous avez beaucoup d'âmes. Êtes-vous vraiment sûr(e) ?",
     "discardParagon.confirmation.msgIW": "Attention ! Brûler des âmes va annuler le mode Volonté de fer. Voulez-vous continuer ?",
+    "effectsMgr.statics.aiCoreProductivity.title": "Productivité des Puces IA",
     "effectsMgr.statics.aiCoreUpgradeBonus.title": "Bonus de synergies des Puces IA",
     "effectsMgr.statics.aiLevel.title": "Niveau IA",
     "effectsMgr.statics.alicornChance.title": "Chances de descente d'alicornes",
