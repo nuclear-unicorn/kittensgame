@@ -424,6 +424,7 @@
     "effectsMgr.statics.shatterTCGain.title": "Destruir recursos de CT recuperados",
     "effectsMgr.statics.shipLimit.title": "Efecto de límite de envío",
     "effectsMgr.statics.skillMultiplier.title": "Efecto de la habilidad del gatito",
+    "effectsMgr.statics.masterSkillMultiplier.title": "El efecto de habilidad del gatito maestro",
     "effectsMgr.statics.skillXP.title": "Aprendizaje de habilidades",
     "effectsMgr.statics.smelterRatio.title": "Bonificación de fundición",
     "effectsMgr.statics.solarFarmRatio.title": "Bonificación Granja solar",
