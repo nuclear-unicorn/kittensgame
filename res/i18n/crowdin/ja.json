@@ -1319,6 +1319,7 @@
     "ui.option.cancel.button": "キャンセル",
     "ui.option.app.android": "Android",
     "ui.option.app.ios": "iOS",
+    "ui.option.notation": "表記",
     "left.resources": "資源",
     "left.craft": "クラフト",
     "left.trade.do": "{0} と取引する",
