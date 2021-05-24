@@ -1157,6 +1157,7 @@
     "space.planet.moon.moonBase.desc": "Redmoonの地表に建設された基地です。",
     "space.planet.moon.moonOutpost.label": "月前哨基地",
     "space.planet.moon.moonOutpost.desc": "Redmoonに原子力鉱業前哨基地を配備します。",
+    "space.planet.piscine.label": "魚",
     "space.planet.piscine.orbitalArray.label": "軌道上施設",
     "space.planet.piscine.orbitalArray.desc": "すべての宇宙建造物に対して2%の生産ボーナスを与えます。",
     "space.planet.piscine.researchVessel.label": "調査船",
