@@ -1143,6 +1143,7 @@
     "space.planet.helios.heatsink.desc": "Un sistema de disipación de calor. Cada disipador de calor aumentará el consumo de energía de la cámara de contención en un 1% y la capacidad de almacenamiento de antimateria en un 2%",
     "space.planet.helios.sunlifter.label": "Amplificador Solar",
     "space.planet.helios.sunlifter.desc": "Genera antimateria una vez al año. Inactivo si la producción de energía es negativa",
+    "space.planet.kairo.label": "Kairo",
     "space.planet.kairo.spaceBeacon.label": "Faro Espacial",
     "space.planet.kairo.spaceBeacon.desc": "Una estación espacial AM utilizada para la investigación y la navegación interestelar.",
     "space.planet.moon.moonBase.label": "Base lunar",
