@@ -901,6 +901,7 @@
     "science.thorium.label": "Thorium",
     "science.thorium.desc": "Le thorium est un isotope extrêmement radioactif et économe en énergie qui peut être utilisé dans diverses améliorations de l'ère spatiale.",
     "science.voidSpace.label": "Néant",
+    "science.voidSpace.effectDesc": "Débloque les chambres cryogéniques",
     "science.writing.label": "Ecriture",
     "science.writing.desc": "L'écriture est l'art d'enregistrer des informations sur divers support à l'aide de signes. L'écriture peut avoir un certain impact sur le bonheur et les progrès culturels de votre civilisation.",
     "science.writing.effectDesc": "Permet de construire des amphithéatres",
