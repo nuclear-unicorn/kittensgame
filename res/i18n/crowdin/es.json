@@ -1274,6 +1274,7 @@
     "trade.bcoin.buy.desc": "Intercambia tus reliquias por blackcoins",
     "trade.bcoin.sell": "Vender Bcoin",
     "trade.bcoin.sell.desc": "Vende tus blackcoins y recupera las reliquias",
+    "trade.bcoin.crash.desc": "Fuerza la caída del mercado de blackcoin",
     "ui.filter.all": "Habilitado",
     "ui.filter.available": "Habilitado",
     "ui.filter.enabled": "Habilitado",
