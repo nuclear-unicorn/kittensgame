@@ -343,6 +343,7 @@
     "effectsMgr.statics.factoryRefineRatio.title": "Factory-Raffinierungsbonus",
     "effectsMgr.statics.faithRatioReligion.title": "Glaubensbonus",
     "effectsMgr.statics.festivalRatio.title": "Festivaleffekte",
+    "effectsMgr.statics.festivalArrivalRatio.title": "Festival wachstums Rate",
     "effectsMgr.statics.gflopsConsumption.title": "GFlops Konsum",
     "effectsMgr.statics.globalRelationsBonus.title": "Beziehungsbonus",
     "effectsMgr.statics.globalResourceRatio.title": "Maximaler Ressourcenbonus",
