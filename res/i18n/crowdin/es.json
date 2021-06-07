@@ -1281,6 +1281,7 @@
     "ui.toggle.researched": "Alternar investigado",
     "ui.log.link": "Registro",
     "ui.chat.link": "Chat",
+    "ui.undo.title": "Deshacer los cambios",
     "console.filter.workshopAutomation": "Automatización del taller",
     "console.filter.meteor": "Meteoritos",
     "console.filter.ivoryMeteor": "Meteoritos de Marfil",
