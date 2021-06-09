@@ -96,6 +96,7 @@
     "btn.trade": "Trocar",
     "btn.blocked.capital": "(Bloqueado)",
     "sell.all.confirmation.msg": "Tem certeza de que deseja vender tudo?",
+    "construct.all.confirmation.title": "Construir tudo",
     "construct.all.confirmation.msg": "Tem certeza que você quer construir todas as construções?",
     "construct.all.msg": "{0} x{1} construído.",
     "buildings.academy.label": "Academia",
