@@ -479,6 +479,7 @@
     "opts.tabLayout": "Nutze das legacy Tab Layout",
     "opts.tabLayout.desc": "Das Spiel wird ein 2-Spalten-Layout für Breitbildauflösungen verwenden (768px+). ",
     "opts.theme": "Farbschema",
+    "opts.theme.arctic": "Arktisch",
     "opts.theme.black": "OLED Schwarz",
     "opts.theme.chocolate": "Schokolade",
     "opts.theme.computer": "Computer",
