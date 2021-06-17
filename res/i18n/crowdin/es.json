@@ -96,7 +96,7 @@
     "btn.blocked.capital": "(Bloqueado)",
     "sell.all.confirmation.msg": "¿Estás seguro de que quieres vender todo?",
     "construct.all.confirmation.title": "Construir todo",
-    "construct.all.confirmation.msg": "¿Estás seguro de que quieres construir todos los edificios?",
+    "construct.all.confirmation.msg": "¿Estás seguro de que deseas construir todos los edificios?",
     "construct.all.msg": "{0} x{1} construido.",
     "buildings.academy.label": "Academia",
     "buildings.academy.desc": "Mejora tu ratio de investigación y la velocidad de crecimiento de tus habilidades con los gatitos. Cada nivel de mejora mejora tu producción científica en un 20%",
