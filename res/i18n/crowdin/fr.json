@@ -1332,6 +1332,7 @@
     "workshop.crafts.slab.desc": "Une petite dalle faite de minerai. Requise pour des constructions plus avancées.",
     "workshop.crafts.steel.label": "Acier",
     "workshop.crafts.tanker.label": "Conteneur",
+    "workshop.crafts.tanker.desc": "Augmente la capacité maximale de pétrole par 500",
     "workshop.crafts.thorium.label": "Thorium",
     "workshop.crafts.wood.label": "Raffiner de l'herbe à chat",
     "workshop.crossbow.label": "Arbalète",
