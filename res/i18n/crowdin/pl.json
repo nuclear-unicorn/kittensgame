@@ -1235,6 +1235,7 @@
     "trade.bcoin.buy.desc": "Zamień swój relikt na kocie tokeny",
     "trade.bcoin.sell": "Sprzedaj kocie tokeny",
     "trade.bcoin.sell.desc": "Sprzedaj swoje kocie tokeny i odzyskaj relikt",
+    "trade.bcoin.crash": "Denerwuj Niewidzialną Czarną Dłoń",
     "trade.embassy.open": "Otwórz ambasadę",
     "trade.embassy.desc": "Załóż ambasadę i popraw dzięki niej stosunki dyplomatyczne",
     "ui.filter.all": "Wszystko",
