@@ -1446,6 +1446,7 @@
     "workshop.neuralNetworks.desc": "Engineers effectiveness doubles at the cost of double energy consumption of factories",
     "workshop.nuclearPlants.desc": "Stahlwerkes are additionally boosted by 2% of your craft ratio per Reactor",
     "workshop.offsetPress.label": "Offsetdruck",
+    "workshop.offsetPress.desc": "Druckerpressen sind 4x so effektiv",
     "workshop.offsetPress.flavor": "Papier geht rein, Katzenbilder kommen raus.",
     "workshop.oilRefinery.desc": "Verbessert Effektivität von Ölquellen um 35%",
     "workshop.oxidation.label": "Oxidierung",
