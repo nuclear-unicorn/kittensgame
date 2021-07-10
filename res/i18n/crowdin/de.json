@@ -1377,7 +1377,7 @@
     "workshop.concreteHuts.label": "Betonhütten",
     "workshop.concreteHuts.desc": "Preissteigerung der Hütten um 30% reduziert",
     "workshop.concreteWarehouses.label": "Betonlagerhäuser",
-    "workshop.concreteWarehouses.desc": "Lagerhäuser bieten Platz für 35% mehr Ressourcen",
+    "workshop.concreteWarehouses.desc": "Lagereinrichtungen speichern 35% mehr Ressourcen",
     "workshop.craft.effectiveness": "Fertigungs-wirksamkeit: +{0}%",
     "workshop.craftPanel.counts.label": "Zeugs",
     "workshop.craftPanel.header.freeEngineers": "Freie Ingenieure",
