@@ -889,6 +889,7 @@
     "workshop.titaniumAxe.desc": "Onverwoestbare bijlen. Houthakkers zijn 50% effectiever.",
     "workshop.titaniumBarns.label": "Titanium schuren",
     "workshop.titaniumMirrors.desc": "Verbeterde telescoop reflectoren. Elk Observatorium zal 2% aan extra effectiviteit geven aan bibliotheken/datacentra.",
+    "workshop.titaniumMirrors.flavor": "Bewoog die lichtplek net?",
     "workshop.unobtainiumReflectors.desc": "Improved telescope reflectors. Every observatory will give an additional 2% to Library effectiveness.",
     "workshop.unobtainiumSaw.desc": "Verbeter de efficiëntie van de houtzagerij met 25%"
 }
