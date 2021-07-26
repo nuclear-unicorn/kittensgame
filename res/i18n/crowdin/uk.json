@@ -3,6 +3,7 @@
     "console.intro.zebra": "Ти зебра в саванні, повній титанових шахт.",
     "achievements.header": "Досягнення: {0} з {1}",
     "achievements.msg.unlock": "Досягнення здобуто: {0}!",
+    "achievements.msg.starUnlock": "Зірку досягнення розблоковано: {0}!",
     "achievements.anachronox.title": "Анахронокс",
     "achievements.anachronox.desc": "Будь ласка, зупиніться",
     "achievements.hundredYearsSolitude.desc": "Як далеко занадто далеко?",

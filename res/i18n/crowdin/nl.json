@@ -565,6 +565,7 @@
     "science.acoustics.label": "Akoestiek",
     "science.acoustics.effectDesc": "Ontgrendelt kapellen",
     "science.advExogeology.label": "Geavanceerde exogeologie",
+    "science.advExogeology.effectDesc": "Opent Eludium en Eludium upgrades",
     "science.agriculture.desc": "De basis van al geciviliseerd leven, Agricultuur laat het bewerken van het land voor voedsel toe. Agricultuur kan jouw voedselproductie significant verbeteren.",
     "science.ai.effectDesc": "Ontgrendelt Neurale Netwerken en KI Kern",
     "science.archeology.desc": "Geologie is de wetenschap van het bestuderen van Cath, de stenen waaruit het bestaan en de processen waarmee ze veranderen. Kan mogelijk jouw mijn-industrie bevoordelen.",
@@ -609,7 +610,7 @@
     "science.quantumCryptography.label": "Kwantumcryptografie",
     "science.robotics.label": "Robotica",
     "science.robotics.effectDesc": "Ontgrendelt staalfabrieken, waterkrachtcentrales, tankers en draaiovens.",
-    "science.sattelites.desc": "Satellieten zijn machines die de planeet voortdurend omwentelen buiten zijn dampkring",
+    "science.sattelites.desc": "Satellieten zijn machines die permanent ronddraaien in een baan rond de planeet buiten diens atmosfeer",
     "science.sattelites.flavor": "Katten videos verspreiden, sneller dan licht",
     "science.steel.label": "Staal",
     "science.superconductors.label": "Supergeleiders",
@@ -790,6 +791,7 @@
     "village.tab.title.civilisation": "Beschaving",
     "village.tab.title.consortium": "Consortium",
     "village.tab.title.council": "Planetaire Raad",
+    "village.tab.title.dominion": "Rijk",
     "village.tab.title.empire": "Keizerrijk",
     "village.tab.title.federation": "Federatie",
     "village.tab.title.metropolis": "Metropolis",
@@ -889,6 +891,7 @@
     "workshop.titaniumAxe.desc": "Onverwoestbare bijlen. Houthakkers zijn 50% effectiever.",
     "workshop.titaniumBarns.label": "Titanium schuren",
     "workshop.titaniumMirrors.desc": "Verbeterde telescoop reflectoren. Elk Observatorium zal 2% aan extra effectiviteit geven aan bibliotheken/datacentra.",
+    "workshop.titaniumMirrors.flavor": "Bewoog die lichtplek net?",
     "workshop.unobtainiumReflectors.desc": "Improved telescope reflectors. Every observatory will give an additional 2% to Library effectiveness.",
     "workshop.unobtainiumSaw.desc": "Verbeter de efficiëntie van de houtzagerij met 25%"
 }
