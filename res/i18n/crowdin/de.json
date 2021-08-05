@@ -1454,6 +1454,7 @@
     "workshop.machineLearning.desc": "Jede Stufe von KI Kern erhöht die Effektivität des Rechenzentrums um 10%",
     "workshop.mineralAxes.desc": "Holzfäller sind um 70% effektiver",
     "workshop.miningDrill.desc": "Geologisten sind effektiver",
+    "workshop.nanosuits.label": "Nanogewebeanzug",
     "workshop.neuralNetworks.label": "Neuronale Netzwerke",
     "workshop.neuralNetworks.desc": "Engineers effectiveness doubles at the cost of double energy consumption of factories",
     "workshop.nuclearPlants.desc": "Stahlwerkes are additionally boosted by 2% of your craft ratio per Reactor",
