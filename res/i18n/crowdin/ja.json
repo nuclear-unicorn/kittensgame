@@ -1153,6 +1153,7 @@
     "space.planet.helios.sunlifter.desc": "1年に1回反物質を生成します。停止中はエナジー生産を行いません。",
     "space.planet.kairo.spaceBeacon.label": "スペースビーコン",
     "space.planet.kairo.spaceBeacon.desc": "AM電波施設付きの宇宙ステーションが調査や惑星間航行に使用します。",
+    "space.planet.moon.label": "レッドムーン",
     "space.planet.moon.moonBase.label": "月面基地",
     "space.planet.moon.moonBase.desc": "Redmoonの地表に建設された基地です。",
     "space.planet.moon.moonOutpost.label": "月前哨基地",
