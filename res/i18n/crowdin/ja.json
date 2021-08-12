@@ -1137,6 +1137,7 @@
     "space.planet.charon.label": "カロン",
     "space.planet.charon.entangler.label": "エンタングルメントステーション",
     "space.planet.charon.entangler.desc": "エンタングルメントステーションは量子コンピュータの量子ビットとしても知られている一連の量子もつれを生成します。この工程は膨大な量のエネルギーを必要としますが、太古の暗号アルゴリズムへ暗号解読攻撃が行えるようになります。",
+    "space.planet.dune.label": "砂丘",
     "space.planet.dune.hydrofracturer.label": "水圧破砕機",
     "space.planet.dune.hydrofracturer.desc": "高圧のオイルを産出します。 すべての宇宙エレベーターは全体の建造物から+0.1%のボーナスをこの施設に付与します。",
     "space.planet.dune.planetCracker.label": "惑星破砕船",
