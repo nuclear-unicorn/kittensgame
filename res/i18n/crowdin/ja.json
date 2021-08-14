@@ -1377,6 +1377,7 @@
     "village.happiness.penalty.base": "ペナルティ基礎値",
     "village.happiness.penalty.mitigated": "ペナルティ軽減値",
     "village.happiness.rare.resources": "レア資源",
+    "village.panel.job": "仕事",
     "village.job.bonus": "ジョブボーナス",
     "village.job.engineer": "技術者",
     "village.job.engineer.desc": "技術者は工場を操業することができ、資源生産が自動化されます。<br />工房タブから技術者を任命すると、10分ごとに１回自動で製造が行われます。",
