@@ -1165,6 +1165,7 @@
     "ui.undo": "rückgängig ({0}s)",
     "ui.undo.title": "Änderung rückgängig machen",
     "ui.option.language": "Sprache:",
+    "ui.option.language.add": "Übersetzung hinzufügen",
     "ui.option.hide.sell": "Verstecke 'verkaufen'-Button",
     "ui.option.more": "Mehr...",
     "ui.option.no.confirm": "Bestätigen Sie nicht, wenn Sie alle Jobs löschen, Richtlinien recherchieren oder alle kaufen oder verkaufen (Umschalt-Klick)",
