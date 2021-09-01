@@ -1329,6 +1329,7 @@
     "left.craft": "クラフト",
     "left.trade.do": "{0} と取引する",
     "left.hunt": "狩人を送る",
+    "left.hunt.time": "回",
     "left.hunt.times": "回",
     "left.praise": "太陽を賛美する!",
     "console.filter.astronomicalEvent": "天文現象",
