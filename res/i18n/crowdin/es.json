@@ -468,6 +468,7 @@
     "effectsMgr.type.resConversion": "{0} conversión",
     "effectsMgr.type.resCraftRatio": "{0} bonificación artesanal",
     "effectsMgr.type.resDemandRatio": "{0} reducción de demanda",
+    "effectsMgr.type.resMax": "Máx {0}",
     "effectsMgr.type.resProduction": "{0} producción",
     "effectsMgr.type.resRatio": "{0} bonificación",
     "effectsMgr.statics.coalPolicyRatio.title": "Bono de producción de carbón",
