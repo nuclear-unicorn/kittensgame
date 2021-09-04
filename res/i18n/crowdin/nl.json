@@ -452,7 +452,7 @@
     "religion.praise.msg": "You have accumulated +{0} units of faith",
     "religion.praiseBtn.desc": "Convert all your accumulated faith to the total pool",
     "religion.refineTCsBtn.label": "Refine Time Crystals",
-    "religion.refineTCsBtn.refine.msg": "{0} relics crafted",
+    "religion.refineTCsBtn.refine.msg": "{0} tijd kristallen verfijnd, {1} relikwie gemaakt",
     "religion.refineTearsBtn.refine.msg.failure": "Er gebeurt niks",
     "religion.ru.apocripha.desc": "Grants the ability to discard accumulated faith to improve effectiveness of praying",
     "religion.ru.basilica.label": "Basilieken",
