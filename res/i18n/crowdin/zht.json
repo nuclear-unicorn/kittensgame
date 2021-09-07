@@ -1338,6 +1338,7 @@
     "ui.filter.enabled": "可建造",
     "ui.filter.togglable": "可增減",
     "ui.toggle.researched": "切換研究",
+    "ui.option.export.full.file": "檔案(完整名稱)",
     "ui.option.export.text": "匯出文字:",
     "ui.option.close.button": "關閉",
     "village.bonus.desc.engineer": "工藝增益",
