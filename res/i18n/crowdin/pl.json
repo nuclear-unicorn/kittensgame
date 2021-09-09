@@ -597,7 +597,7 @@
     "msg.policy.exclusivity": "Doktryny o tym samym koszcie numerycznym są wzajemnie się wykluczają",
     "msg.policy.kittenNotMadeLeader": "{0} może być prowadzone tylko przez {1}",
     "msg.policy.wrongLeaderJobDemoted": "{0} może być prowadzone tylko przez {1}",
-    "msg.policy.wrongLeaderJobForResearch": "Doktryna {0} może być zbadana tylko jeśli przywódcą jest {1}",
+    "msg.policy.wrongLeaderJobForResearch": "Doktryna {0} może być zbadana tylko jeżeli przywódcą jest {1}",
     "policy.confirmation.title": "Jesteś pewien? Nie możesz się uchylić od uchwytu swojej historii.\nEfekty doktryn są trwałe i nie możesz ich zmienić aż nie dokonasz resetu.",
     "policy.panel.label": "Doktryny",
     "policy.autocracy.label": "Autokracja",
