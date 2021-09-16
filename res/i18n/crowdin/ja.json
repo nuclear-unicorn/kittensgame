@@ -1302,6 +1302,7 @@
     "ui.filter.available": "利用可能",
     "ui.filter.enabled": "建設可能",
     "ui.toggle.researched": "研究済みと切り替える",
+    "ui.loading.msg.7": "トカゲを集める",
     "ui.autosave.tooltip": "自動保存中...",
     "ui.save.tooltip": "保存しました",
     "ui.log.link": "ログ",
