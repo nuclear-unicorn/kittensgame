@@ -1,5 +1,6 @@
 {
     "console.intro": "Jsi koťě v šantovém lese.",
+    "console.intro.zebra": "Jste zebra v savaně plné titanových dolů.",
     "achievements.header": "Úspěchy: {0} z {1}",
     "achievements.msg.unlock": "Úspěch odemčen: {0}!",
     "achievements.msg.starUnlock": "Hvězdný úspěch odemčen: {0}!",
