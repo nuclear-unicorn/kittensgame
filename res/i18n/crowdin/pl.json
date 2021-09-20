@@ -514,6 +514,7 @@
     "kittens.craft.confirmation.msg": "Twoje kociaki UMRĄ",
     "craft.msg.notEnoughCatnip": "za mało kocimiętki!",
     "log.clear": "Wyczyść dziennik",
+    "menu.about": "O grze",
     "menu.close": "Zamknąć",
     "menu.export": "Eksportuj",
     "menu.export.btn": "Zapisz w Dropbox (Beta)",
