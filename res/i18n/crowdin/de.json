@@ -1476,6 +1476,7 @@
     "workshop.crafts.concrate.label": "Beton",
     "workshop.crafts.concrate.desc": "Ein Block aus verstärktem Beton.",
     "workshop.crafts.gear.label": "Zahnrad",
+    "workshop.crafts.gear.desc": "Ein wesentlicher Bestandteil automatischer Strukturen.",
     "workshop.crafts.kerosene.label": "Kerosin",
     "workshop.crafts.manuscript.label": "Manuskript",
     "workshop.crafts.manuscript.desc": "Schriftliches Dokument, das für technologischen Fortschritt erförderlich est. Jedes Manuskript erhöht ein bisschen (mit abnehmenden Ertragszuwachs) die maximale Kultur",
