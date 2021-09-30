@@ -848,6 +848,7 @@
     "resources.wood.title": "Holz",
     "resources.wrappingPaper.title": "Einpackpapier",
     "resources.zebras.title": "Zebras",
+    "gift.metaphysics": "{0} freigeschaltet!",
     "save.export.msg": "Speicherstand export erfolgreih!",
     "save.import.msg": "Speicherstand import erfolgreich!",
     "science.toggleResearched.label": "Erforschtes ausblenden.",
