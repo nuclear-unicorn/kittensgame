@@ -1231,7 +1231,7 @@
     "space.planet.cath.spaceStation.desc": "우주 정거장을 배치합니다. 각 우주 정거장은 과학력을 생산하고 2마리의 고양이 우주비행사가 묵을 공간을 마련합니다.",
     "space.planet.centaurusSystem.label": "센타우루스",
     "space.planet.centaurusSystem.moltenCore.label": "용융 핵",
-    "space.planet.centaurusSystem.moltenCore.desc": "용융 핵의 레벨 당 지각의 효율성이 5% 증가합니다.",
+    "space.planet.centaurusSystem.moltenCore.desc": "녹아내린 핵의 레벨 당 지각의 효율성이 5% 증가합니다.",
     "space.planet.centaurusSystem.tectonic.label": "지각",
     "space.planet.centaurusSystem.tectonic.desc": "마그마 에너지를 수집하기 위해 켄타우루스 근처의 행성을 찢어발깁니다.",
     "space.planet.charon.label": "카론",
