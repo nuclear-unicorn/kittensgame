@@ -1233,7 +1233,7 @@
     "ui.chat.link": "Chat",
     "ui.clear.log": "Protokoll leeren",
     "ui.undo": "rückgängig ({0}s)",
-    "ui.undo.title": "Änderung rückgängig machen",
+    "ui.undo.title": "Rückgängig machen",
     "ui.option.language": "Sprache:",
     "ui.option.language.add": "Übersetzung hinzufügen",
     "ui.option.hide.sell": "Verstecke 'verkaufen'-Button",
