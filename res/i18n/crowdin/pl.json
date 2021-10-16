@@ -1399,7 +1399,7 @@
     "trade.bcoin.buy.msg": "Kupiłeś {0} mrocznych monet",
     "trade.bcoin.sell": "Sprzedaj kocie tokeny",
     "trade.bcoin.sell.desc": "Sprzedaj swoje mroczne monety i odzyskaj relikt",
-    "trade.bcoin.sell.msg": "Posiadasz {0} relikwii",
+    "trade.bcoin.sell.msg": "Masz {0} reliktów",
     "trade.bcoin.crash": "Denerwuj Niewidzialną Czarną Dłoń",
     "trade.bcoin.crash.desc": "Wymuś krach rynku mrocznej monety",
     "trade.correct.bcoin": "Nastąpiła ogromna korekta na rynku kryptowalutowym",
