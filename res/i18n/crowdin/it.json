@@ -796,6 +796,7 @@
     "ui.option.import.warning": "Attenzione! importare i dati sovrascriverà il tuo salvataggio attuale.",
     "ui.option.import.from": "Modalità di Importazione:",
     "ui.option.import.from.dropbox": "Dropbox (Beta)",
+    "ui.option.do.import.button": "Importa",
     "ui.option.notation": "Notazione:",
     "left.hunt.times": "tempi",
     "left.praise": "Lode al Sole!",
