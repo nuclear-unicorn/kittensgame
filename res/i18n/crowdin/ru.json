@@ -96,7 +96,7 @@
     "btn.trade": "Торговать",
     "btn.blocked.capital": "(Заблокировано)",
     "sell.all.confirmation.msg": "Вы уверены что хотите продать всё?",
-    "construct.all.confirmation.title": "Построить всё",
+    "construct.all.confirmation.title": "Построить все",
     "construct.all.confirmation.msg": "Вы уверены что хотите построить все здания?",
     "construct.all.msg": "{0} x{1} построено.",
     "buildings.academy.label": "Академия",
