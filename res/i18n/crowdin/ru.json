@@ -411,6 +411,7 @@
     "effectsMgr.statics.priceRatio.title": "Наценка на строения",
     "effectsMgr.statics.prodTransferBonus.title": "Бонус к получаемой с Катта продукции",
     "effectsMgr.statics.productionRatio.title": "Бонус к производству",
+    "effectsMgr.statics.rankLeaderBonusConversion.title": "Обращение производства за ранг лидера",
     "effectsMgr.statics.rationalityBonus.title": "Бонус рациональности",
     "effectsMgr.statics.reactorEnergyRatio.title": "Бонус энерговыдачи реакторов",
     "effectsMgr.statics.reactorThoriumPerTick.title": "Потребление тория реакторами",
