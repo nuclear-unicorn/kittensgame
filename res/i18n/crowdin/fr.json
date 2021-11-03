@@ -1536,6 +1536,7 @@
     "workshop.coalFurnace.flavor": "Si chaud... si sommeil...",
     "workshop.coldFusion.label": "Fusion Froide",
     "workshop.coldFusion.desc": "Augmente la production d'énergie des réacteurs de 25%",
+    "workshop.combustionEngine.label": "Machine haute pression",
     "workshop.combustionEngine.flavor": "Un meilleur piège à souris",
     "workshop.compositeBow.label": "Arc composite",
     "workshop.compositeBow.desc": "Une version améliorée de l'arc qui augmente de 50% la production de chaptitude",
