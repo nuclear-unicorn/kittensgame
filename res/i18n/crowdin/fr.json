@@ -1663,7 +1663,7 @@
     "workshop.nuclearPlants.desc": "Steel Plants are additionally boosted by 2% of your craft ratio per Reactor",
     "workshop.nuclearSmelters.label": "Fonderies nucléaires",
     "workshop.nuclearSmelters.desc": "Les fonderies peuvent maintenant produire du titane",
-    "workshop.offsetPress.label": "Presse offset",
+    "workshop.offsetPress.label": "Impression offset",
     "workshop.offsetPress.desc": "La presse d'imprimerie est 4 fois plus efficace",
     "workshop.offsetPress.flavor": "Le papier rentre, des images de chat sortent.",
     "workshop.oilDistillation.label": "Distillation d'huile",
