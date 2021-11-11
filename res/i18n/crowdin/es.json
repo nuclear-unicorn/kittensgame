@@ -1319,6 +1319,7 @@
     "ui.option.force.high.precision": "Usar alta precisión para los valores de los recursos",
     "ui.option.show.non.applicable.buttons": "Mostrar siempre botones de festivales/comercio/sacrificar/destrozar, incluso si no es aplicable",
     "ui.option.use.percentage.consumption.values": "Expresar valores con porcentajes en los botónes artesanía/comercio/sacrificio",
+    "console.filter.astronomicalEvent": "Eventos Astronómicos",
     "console.filter.workshopAutomation": "Automatización del taller",
     "console.filter.meteor": "Meteoritos",
     "console.filter.ivoryMeteor": "Meteoritos de Marfil",
