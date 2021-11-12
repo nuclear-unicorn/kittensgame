@@ -353,7 +353,7 @@
     "effectsMgr.statics.embassyCostReduction.title": "大使馆费用降低",
     "effectsMgr.statics.energyConsumption.title": "能源消耗",
     "effectsMgr.statics.energyConsumptionIncrease.title": "能源消耗增加",
-    "effectsMgr.statics.energyConsumptionRatio.title": "能源消耗减少",
+    "effectsMgr.statics.energyConsumptionRatio.title": "减少能源消耗",
     "effectsMgr.statics.energyProduction.title": "能源产出",
     "effectsMgr.statics.energyProductionRatio.title": "能源产出加成",
     "effectsMgr.statics.entangler-gflopsConsumption.title": "纠缠站 - GFlops 转化",
