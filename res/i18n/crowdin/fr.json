@@ -368,6 +368,8 @@
     "effectsMgr.statics.goldMaxRatio.title": "Bonus d'or maximum",
     "effectsMgr.statics.happiness.title": "Bonheur",
     "effectsMgr.statics.harborRatio.title": "Harbor'ship expansion",
+    "effectsMgr.statics.hashrate.title": "Taux de hachage",
+    "effectsMgr.statics.hashrateLevel.title": "Niveau de taux de hachage",
     "effectsMgr.statics.heatMax.title": "Température maximale",
     "effectsMgr.statics.heatPerTick.title": "Transfert de chaleur",
     "effectsMgr.statics.holyGenocideBonus.title": "Bonus de génocide sacré",
