@@ -1542,7 +1542,7 @@
     "village.job.farmer": "農家",
     "village.job.farmer.desc": "毎秒キャットニップを +5",
     "village.job.geologist": "地質学者",
-    "village.job.geologist.desc": "毎秒石炭を +0.075 (may be upgraded)",
+    "village.job.geologist.desc": "毎秒石炭を +0.075 (アップグレードでさらに効果は上昇するかもしれません)",
     "village.job.hunter": "狩人",
     "village.job.hunter.desc": "毎秒キャットパワーを +0.3",
     "village.job.hunter.flavor": "獲物が死ぬまでのゾクゾク感には熱中するね。",
