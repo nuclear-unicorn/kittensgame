@@ -1301,6 +1301,7 @@
     "village.btn.unassign": "Anführer abwählen",
     "village.btn.unassign.job": "Von Beruf entbinden",
     "village.btn.unwrap": "Packe Geschenk aus",
+    "village.btn.unwrap.confirmation.msg": "Bist du dir sicher, dass du das Geschenk jetzt öffnen willst? Eventuell bekommst du ein besseres Geschenk, wenn du noch ein wenig wartest!",
     "village.census.age": "Jahre alt",
     "village.census.filter.all": "Alle Berufe",
     "village.census.lbl.festival.duration": "Festdauer",
