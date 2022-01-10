@@ -586,7 +586,7 @@
     "msg.policy.kittenNotMadeLeader": "{0} kann nur von einer {1} geführt werden",
     "msg.policy.wrongLeaderJobDemoted": "{0} kann nur von {1} angeführt werden",
     "msg.policy.wrongLeaderJobForResearch": "{0} kann nur erforscht werden, wenn dein Anführer ein {1} ist",
-    "policy.confirmation.title": "Bist du sicher? Du kannst dem Griff deiner Geschichte nicht entfliehen.\nDie Auswirkungen von Richtlinien sind dauerhaft und du kannst sie nicht ändern, bis du resettest.",
+    "policy.confirmation.title": "Bist du sicher? Du kannst dem Griff der Geschichte nicht entfliehen.\nDie Auswirkungen von Richtlinien sind dauerhaft und du kannst sie nicht ändern, bis du einen Reset durchführst.",
     "policy.panel.label": "Richtlinien",
     "policy.autocracy.label": "Autokratie",
     "policy.autocracy.desc": "Am besten für Gesellschaften mit stark beförderten Kätzchen. Macht die Arbeitsleistung des Anführers doppelt so gut. Der Anführer erhöht die Umwandlungsproduktion basierend auf ungebauten Wohngebäuden.",
