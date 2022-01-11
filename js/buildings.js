@@ -608,6 +608,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		calculateEffects: function(self, game){
 			if(game.workshop.getZebraUpgrade("minerologyDepartment").researched) {
 				self.effects["academyMeteorBonus"] = 0.01;
+			}else{
+				self.effects["academyMeteorBonus"] = 0;
 			}
 		},
 		flavor: $I("buildings.academy.flavor"),
@@ -1960,7 +1962,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		lackResConvert: false,
 		togglable: true,
 		calculateEffects: function(self, game){
-			if(game.workshop.getZebraUpgrade("whispers").researched && self.on > 0){
+			if(game.workshop.getZebraUpgrade("whispers").researched && self.on > 0 && self.isAutomationEnabled == null){
 				self.isAutomationEnabled = true;
 			}
 		},

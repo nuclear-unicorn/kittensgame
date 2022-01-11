@@ -990,7 +990,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			title: links[0].alt || links[0].title
 		}, linksDiv);
 
-		linksTooltip.style.left = link.offsetLeft;	//hack hack hack
+		linksTooltip.style.left = link.offsetLeft + 'px'; //hack hack hack
 
 		dojo.connect(link, "onclick", this, dojo.partial(function(handler, event){
 			event.stopPropagation();

@@ -24,8 +24,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 	constructor: function(game){
 		this.game = game;
-		this.registerMeta("stackable", this.zigguratUpgrades, null);
-		this.registerMeta(/*"stackable"*/false, this.religionUpgrades, {
+		this.registerMeta(/*"stackable"*/false, this.zigguratUpgrades, {
 			getEffect : function(bld, effect){
 				if(bld.name == "blackPyramid") {
 					return (bld.effects) ? bld.effects[effect] * bld.getEffectiveValue(game) : 0;
@@ -33,6 +32,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				return (bld.effects) ? bld.effects[effect] * bld.on : 0;
 			}
 		});
+		this.registerMeta("stackable", this.religionUpgrades, null);
 		this.registerMeta(/*"stackable"*/false, this.transcendenceUpgrades, {
 			getEffect: function(bld, effectName){
 				var effectValue = bld.effects[effectName] || 0;
