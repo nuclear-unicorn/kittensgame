@@ -1260,6 +1260,7 @@
     "ui.option.language": "Sprache:",
     "ui.option.language.add": "Übersetzung hinzufügen",
     "ui.option.scheme": "Farbthema:",
+    "ui.option.use.percentage.consumption.values": "Prozentwerte anzeigen auf den Buttons für Handwerk/Handel/Opfer",
     "ui.option.highlight.unavailable": "Gebäude hervorheben, die aufgrund von Lagerraum eingeschränkt sind",
     "ui.option.hide.sell": "Verstecke 'verkaufen'-Button",
     "ui.option.more": "Mehr...",
