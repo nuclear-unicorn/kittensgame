@@ -571,7 +571,7 @@ WLogin = React.createClass({
     render: function(){
         var game = this.props.game;
 
-        var lastBackup = (new Date().getTime() - game.lastBackup) / (1000 * 60 * 6 * 24);
+        var lastBackup = (new Date().getTime() - game.lastBackup) / (1000 * 60 * 60 * 24);
 
         return $r(WToolbarIconContainer, {
             game: game,
