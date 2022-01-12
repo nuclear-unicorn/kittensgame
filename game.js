@@ -4487,7 +4487,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				}],
 				vsu: [],
 				usedCryochambers: usedCryochambers_reset,
-				timestamp: Date.now()
+				timestamp: Date.now(),
+				testShatter: this.time.testShatter
 			},
 			village :{
 				kittens: newKittens,
