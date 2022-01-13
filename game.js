@@ -542,6 +542,16 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.maxKittens.title")
 			},
 
+			"maxKittensRatio" : {
+				title: $I("effectsMgr.statics.maxKittensRatio.title"),
+				type: "ratio"
+			},
+
+			"simScalingRatio" : {
+				title: $I("effectsMgr.statics.simScalingRatio.title"),
+				type: "ratio"
+			},
+
 			"antimatterProduction": {
 				title: $I("effectsMgr.statics.antimatterProduction.title"),
 				type: "perYear"
@@ -988,6 +998,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
             "rrRatio" :  {
                 title: $I("effectsMgr.statics.rrRatio.title"),
                 type: "ratio"
+            },
+
+            "shatterYearBoost":{
+                title: $I("effectsMgr.statics.shatterYearBoost.title")
             },
 
 			"priceRatio" :  {
@@ -1480,6 +1494,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 title: $I("effectsMgr.statics.shatterCostReduction.title"),
                 type: "ratio"
 			},
+            "temporalPressCap": {
+                title: $I("effectsMgr.statics.temporalPressCap.title"),
+                type: "fixed"
+			},
             "shatterCostIncreaseChallenge": {
                 title: $I("effectsMgr.statics.shatterCostIncreaseChallenge.title"),
                 type: "ratio"
@@ -1514,6 +1532,17 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			},
 			"policyFakeBought":{
 				title: $I("effectsMgr.statics.policyFakeBought.title")
+			},
+			"weaponEfficency":{
+				title: $I("effectsMgr.statics.weaponEfficency.title"),
+				type: "ratio"
+			},
+			"cryochamberSupport":{
+				title: $I("effectsMgr.statics.cryochamberSupport.title"),
+			},
+			"arrivalSlowdown":{
+				title: $I("effectsMgr.statics.arrivalSlowdown.title"),
+				type: "ratio"
 			},
 			"mausoleumBonus":{
 				title: $I("effectsMgr.statics.mausoleumBonus.title"),
