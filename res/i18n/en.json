@@ -816,6 +816,8 @@
     "prestige.blackCodex.desc": "Unlocks unicorn graveyards.",
     "prestige.btn.burnParagon.label": "Burn your paragon",
     "prestige.btn.burnParagon.desc": "Discard all paragon points",
+    "prestige.btn.turnHGOff.label":"Turn off HG",
+    "prestige.btn.turnHGOff.desc": "Turn off all Holy Genocide for current and next runs. Will have to manually turn them on",
     "prestige.carnivals.label": "Carnivals",
     "prestige.carnivals.desc": "Festivals can now stack in duration.",
     "prestige.chesed.label": "Chesed",
@@ -1596,6 +1598,8 @@
     "trade.embassy.desc": "Improve your diplomatic relationships by establishing an embassy",
     "trade.embassy.pinned": "Pinned",
     "trade.embassy.unpinned": "Unpinned",
+
+    "turnHGOff.confirmation.msg": "Are you sure you want to turn off Holy Genocide for this and future runs?",
 
     "ui.filter.all": "All",
     "ui.filter.available": "Available",

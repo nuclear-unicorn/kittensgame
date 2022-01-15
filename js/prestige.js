@@ -563,6 +563,12 @@ dojo.declare("classes.ui.BurnParagonBtnController", com.nuclearunicorn.game.ui.B
 	}
 });
 
+dojo.declare("classes.ui.turnHGOffButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
+	updateVisible: function(model){
+		model.visible = (this.game.religion.activeHolyGenocide > 0) || (this.game.religion.getTU("holyGenocide").on > 0);
+	}
+});
+
 dojo.declare("classes.ui.PrestigePanel", com.nuclearunicorn.game.ui.Panel, {
 
 	game: null,
@@ -592,6 +598,16 @@ dojo.declare("classes.ui.PrestigePanel", com.nuclearunicorn.game.ui.Panel, {
 		}, self.game);
 		buttonBP.render(content);
 		self.addChild(buttonBP);
+		var buttonOffHG = new com.nuclearunicorn.game.ui.ButtonModern({
+			name : $I("prestige.btn.turnHGOff.label"),
+			description: $I("prestige.btn.turnHGOff.desc"),
+			handler: dojo.hitch(this, function(){
+				this.game.religion.turnHGOff();
+			}),
+			controller: new classes.ui.turnHGOffButtonController(self.game)
+		}, self.game);
+		buttonOffHG.render(content);
+		self.addChild(buttonOffHG);
 		//---------------------------------------------------------------------
 	}
 

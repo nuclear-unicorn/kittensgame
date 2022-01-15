@@ -979,6 +979,14 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		) *(1 + scalingRatio);
 	},
 
+	turnHGOff: function(){
+		var self = this;
+		this.game.ui.confirm("", $I("turnHGOff.confirmation.msg"), function() {
+			self.activeHolyGenocide = 0;
+			self.getTU("holyGenocide").on = 0;
+		});
+	},
+
 	praise: function(){
 		var faith = this.game.resPool.get("faith");
 		this.faith += faith.value * (1 + this.getApocryphaBonus()); //starting up from 100% ratio will work surprisingly bad
