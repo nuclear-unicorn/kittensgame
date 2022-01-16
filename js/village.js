@@ -296,10 +296,10 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		if(!maxKittensRatio){
 			return this.maxKittens;
 		}
-		var withRatioMaxKittens = Math.round(this.maxKittens * (1 - this.game.getLimitedDR(maxKittensRatio, 1)));
+		var withRatioMaxKittens = Math.round(this.maxKittens * (1 + this.game.getLimitedDR(maxKittensRatio, 1)));
 		return withRatioMaxKittens;
 		/*var hgImmuneMaxKittens = 2;//Math.max(2, this.game.time.getVSU("usedCryochambers").val);
-		var withRatioMaxKittens = Math.round(this.maxKittens * (1 - this.game.getLimitedDR(maxKittensRatio, 1)));
+		var withRatioMaxKittens = Math.round(this.maxKittens * (1 + this.game.getLimitedDR(maxKittensRatio, 1)));
 		this.maxKittensRatioApplied = (hgImmuneMaxKittens <= withRatioMaxKittens);
 		return (this.maxKittensRatioApplied)? withRatioMaxKittens : Math.min(this.maxKittens, hgImmuneMaxKittens);*/
 	},
@@ -318,7 +318,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		}
 
 		this.sim.maxKittens = this.calculateSimMaxKittens();
-		//this.sim.maxKittens = Math.round(this.maxKittens * (1 - this.game.getLimitedDR(maxKittensRatio, 1)));
+		//this.sim.maxKittens = Math.round(this.maxKittens * (1 + this.game.getLimitedDR(maxKittensRatio, 1)));
 		//todo: consider discarding extra population, but DO account for disabled buildings like space stations
 		//likely the best way to do it is once, upon HG upgrade
 
@@ -2039,7 +2039,7 @@ dojo.declare("classes.village.KittenSim", null, {
 		if(times == 1){
 			times = frequency; //fastforward should ignore frequency. Non fastforward should take frequency into the account for skill!
 		}
-		var hgSkillModifier = (this.kittens.length <= this.maxKittens)? 1 /(1 - this.game.getLimitedDR(this.game.getEffect("maxKittensRatio"), 1)): 1; //overcrowding makes it not work
+		var hgSkillModifier = (this.kittens.length <= this.maxKittens)? 1 /(1 + this.game.getLimitedDR(this.game.getEffect("maxKittensRatio"), 1)): 1; //overcrowding makes it not work
 		var baseSkillXP = game.workshop.get("internet").researched ? Math.max(this.getKittens() * hgSkillModifier / 10000, 0.01) : 0.01;
 		var skillXP = (baseSkillXP + game.getEffect("skillXP")) * times;
 		var neuralNetworks = game.workshop.get("neuralNetworks").researched;

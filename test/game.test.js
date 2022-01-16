@@ -225,7 +225,7 @@ test("Reset should assign a correct ammount of paragon and preserve certain upgr
     //-----------------------------------------------------
 
     expect(game.religion.getTU("holyGenocide").val).toBe(2);
-    expect(game.getEffect("maxKittensRatio")).toBe(0.02);
+    expect(game.getEffect("maxKittensRatio")).toBe(-0.02);
     expect(game.getEffect("simScalingRatio")).toBe(0.04);
     //game.village.maxKittensRatioApplied = true;
     //expect(game.resPool.get("kittens").maxValue).toBe(1);
