@@ -1028,6 +1028,7 @@
     "res.stack.bonusTransf": "Bonus Transferred",
     "res.stack.boost": "Boost",
     "res.stack.buildings": "Buildings",
+    "res.stack.corruptionPerDay": "Corruption",
     "res.stack.policy": "Policy",
     "res.stack.pollution": "Pollution",
     "res.stack.convCons": "Conversion Consumption",
@@ -1068,6 +1069,7 @@
     "res.stack.weather": "Weather",
     "res.stack.zebraRelationsAppeasementPenalty": "Zebra relations appeasement penalty",
     "res.toCap": "To cap",
+    "res.toNextNecrocorn": "To next necrocorn",
     "res.toZero": "To zero",
     "res.show.hidden": "Show hidden resources",
 

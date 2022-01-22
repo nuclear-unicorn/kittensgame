@@ -3096,7 +3096,27 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		return perTick;
 	},
-
+	addGlobalModToStack: function(array, resName){
+		var game = this;
+		if(game.science.getPolicy("necrocracy").researched){
+			array.push({
+				name: $I("res.stack.necrocracy"),
+				type: "ratio",
+				value: game.getEffect("blsProductionBonus") * game.resPool.get("sorrow").value,
+			});
+		}
+		array.push({
+			name: $I("res.stack.policy"),
+			type: "ratio",
+			value: game.getEffect(resName + "PolicyRatio")
+		});
+		array.push({
+			name: $I("res.stack.destruction"),
+			type: "ratio",
+			value: game.getEffect("pyramidGlobalProductionRatio")
+		});
+		return array;
+	},
 	/**
 	 * Generates a stack of resource modifiers. (TODO: use it with resource per tick calculation logic)
 	 */
@@ -3144,6 +3164,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				type: "ratio",
 				value: spaceRatio - 1
 			});
+			this.addGlobalModToStack(perTickBaseSpaceStack, resName);
 		//<----
 		stack.push(perTickBaseSpaceStack);
 
@@ -3368,6 +3389,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				type: "fixed",
 				value: this.getEffect(res.name + "PerTickAutoprodSpace")
 			});
+			this.addGlobalModToStack(perTickAutoprodSpaceStack, resName);
 			perTickAutoprodSpaceStack.push({
 				name: $I("res.stack.spaceProdBonus"),
 				type: "ratio",
@@ -3400,6 +3422,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				type: "ratio",
 				value: spaceRatio - 1
 			});
+			this.addGlobalModToStack(perTickSpace, resName);
 		//<----
 		stack.push(perTickSpace);
 
@@ -3418,19 +3441,23 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			value: cycleEffect
 		});
 
+		var baselineModifiers = [];
 		// +BUILDING AND SPACE PerTick
-		stack.push({
-			name: $I("res.stack.baseline"),
-			type: "fixed",
-			value: this.getEffect(res.name + "PerTick")
-		});
 
-		stack.push({
-			name: $I("res.stack.baseline"),
-			type: "ratio",
-			value: this.getEffect(res.name + "PerTickRatio")
-		});
-
+		//----->
+			baselineModifiers.push({
+				name: $I("res.stack.baseline"),
+				type: "fixed",
+				value: this.getEffect(res.name + "PerTick")
+			});
+			baselineModifiers.push({
+				name: $I("res.stack.baselineRatio"),
+				type: "ratio",
+				value: this.getEffect(res.name + "PerTickRatio")
+			});
+			this.addGlobalModToStack(baselineModifiers, resName);
+		stack.push(baselineModifiers);
+		//<----
 		// +CRAFTING JOB PRODUCTION
 		stack.push({
 			name: $I("res.stack.engineer"),
@@ -3465,6 +3492,58 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return stack;
 	},
 
+	getResourcePerDayStack: function(resName){
+		var stack = [];
+		var res = null;
+		for (var i in this.resPool.resources){
+			var _res = this.resPool.resources[i];
+			if (_res.name == resName){
+				res = _res;
+				break;
+			}
+		}
+
+		if (!res){
+			//console.error("Unable to fetch resource stack for resName '" + resName + "'");
+			return;
+		}
+		stack.push({
+			name: $I("res.stack.buildings"),
+			type: "perDay",
+			value: this.getEffect(res.name + "PerDay")
+		});
+		if(resName == "necrocorn"){
+			stack.push({
+				name: $I("res.stack.corruptionPerDay"),
+				type: "perDay",
+				value: this.religion.getCorruptionPerTick() * this.calendar.ticksPerDay
+			});
+		}
+		return stack;
+	},
+
+	getResourceOnYearStack: function(resName){
+		var stack = [];
+		var res = null;
+		for (var i in this.resPool.resources){
+			var _res = this.resPool.resources[i];
+			if (_res.name == resName){
+				res = _res;
+				break;
+			}
+		}
+
+		if (!res){
+			//console.error("Unable to fetch resource stack for resName '" + resName + "'");
+			return;
+		}
+		stack.push({
+			name: $I("res.stack.buildings"),
+			type: "perYear",
+			value: this.getEffect(res.name + "Production")
+		});
+		return stack;
+	},
 	getCMBRBonus: function() {
 		return this.isCMBREnabled ? 0.2 : 0;
 	},
@@ -3636,6 +3715,19 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 	},
 
+	getResourcePerDay: function(resName){
+		if(resName == "necrocorn"){
+			return this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect(resName + "PerDay") +
+			this.religion.getCorruptionPerTick() * this.calendar.ticksPerDay;
+		}
+		return this.getEffect(resName + "PerDay");
+	},
+	getResourceOnYearProduction: function(resName){
+		if (resName == "antimatter"){
+			return this.getEffect("antimatterProduction");
+		}
+		return this.getEffect(resName + "Production"); //this might need to be changed!
+	},
 	getResourcePerTickConvertion: function(resName) {
 		return this.fixFloatPointNumber(this.getEffect(resName + "PerTickCon"));
 	},
@@ -3683,6 +3775,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			if (this.getResourcePerTick(resRef.name, false) != 0
 				|| this.getResourcePerTickConvertion(resRef.name) != 0
 				|| this.workshop.getEffectEngineer(resRef.name) != 0
+				|| this.getResourcePerDay(resRef.name) != 0
+				|| this.getResourceOnYearProduction(resRef.name) != 0
 			){
 
 				tooltip.innerHTML = this.getDetailedResMap(resRef);
@@ -3712,7 +3806,31 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * Returns a flat map of resource production
 	 */
 	getDetailedResMap: function(res){
-
+		if(res.calculatePerDay){
+			var resStack = this.getResourcePerDayStack(res.name),
+				resString = this.processResourcePerTickStack(resStack, res, 0), //processResourcePerTickStack can work with perDay stack
+				resPerDay = this.getResourcePerDay(res.name);
+				if (this.opts.usePercentageResourceValues){
+					resString += "<br> " + $I("res.netGain") + ": " + this.getDisplayValueExt(resPerDay, true, true);
+				}
+			if (resPerDay < 0) {
+				var toZero = this.calendar.ticksPerDay * res.value / (-resPerDay * this.getTicksPerSecondUI());
+				resString += "<br>" + $I("res.toZero") + ": " + this.toDisplaySeconds(toZero.toFixed());
+			}
+			if(res.name == "necrocorn"){
+				var toNextNecrocorn = (1 - this.religion.corruption)/(this.religion.getCorruptionPerTick() * 5);
+				resString += "<br>" + $I("res.toNextNecrocorn") + ": " + this.toDisplaySeconds(toNextNecrocorn.toFixed());
+			}
+			return resString;
+		}else if(res.calculateOnYear){
+			var resStack = this.getResourceOnYearStack(res.name),
+				resString = this.processResourcePerTickStack(resStack, res, 0), //processResourcePerTickStack can work with perDay stack
+				resPerYear = this.getResourceOnYearProduction(res.name);
+				if (this.opts.usePercentageResourceValues){
+					resString += "<br> " + $I("res.netGain") + ": " + this.getDisplayValueExt(resPerYear, true, true);
+				}
+			return resString;
+		}
 		var resStack = this.getResourcePerTickStack(res.name),
 			resString = this.processResourcePerTickStack(resStack, res, 0),
 			resPerTick = this.getResourcePerTick(res.name, true);
@@ -3753,7 +3871,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				continue;
 			}
 
-			if (!stackElem.value || (stackElem.type != "fixed" && !hasFixed)) {
+			if (!stackElem.value || (stackElem.type != "fixed" && stackElem.type != "perDay" &&
+			stackElem.type != "perYear" && !hasFixed)) {
 				continue;
 			}
 
@@ -3785,6 +3904,16 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			resString += "×" + this.getDisplayValueExt((stackElem.value * 100).toFixed()) + "%";
 		} else if (stackElem.type == "ratioIndent") {
 			resString = "|->" + resString + this.getDisplayValueExt((stackElem.value * 100).toFixed(), true) + "%";
+		} else if (stackElem.type == "perDay") {
+			if (stackElem.value>0){
+				resString += "+";
+			}
+			resString += this.getDisplayValueExt((stackElem.value)) + "/" + $I("res.per.day");
+		} else if(stackElem.type == "perYear"){
+			if (stackElem.value > 0){
+				resString += "+";
+			}
+			resString += this.getDisplayValueExt((stackElem.value)) + "/" + $I("res.per.year");
 		}
 
 		resString += "</div><br>";

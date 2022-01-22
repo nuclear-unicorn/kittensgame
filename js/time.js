@@ -51,7 +51,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.flux = saveData["time"].flux || 0;
         this.heat = saveData["time"].heat || 0;
         this.testShatter = saveData["time"].testShatter || 0; //temporary
-        this.isAccelerated = saveData["time"].isAccelerated || 0;
+        this.isAccelerated = saveData["time"].isAccelerated || false;
 		this.loadMetadata(this.chronoforgeUpgrades, saveData.time.cfu);
 		this.loadMetadata(this.voidspaceUpgrades, saveData.time.vsu);
 
@@ -569,7 +569,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         if (game.challenges.isActive("1000Years") && cal.year >= 1000) {
             game.challenges.researchChallenge("1000Years");
         }
-        
+
         // Apply seasonEffect for the newSeason
 		game.upgrade({
 			buildings: ["pasture"]
@@ -586,7 +586,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     4)calculates flux
     likely to be deprecated after shatterInGroupCycles is finished
     */
-    shatterInCycles: function(amt){ 
+    shatterInCycles: function(amt){
         amt = amt || 1;
         var maxYearsShattered = amt;
 
@@ -664,7 +664,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 			buildings: ["pasture"]
 		});
     },
-    /* 
+    /*
     shatterInGroupCycles does this:
     1) indepenently calculates space travel
     2) calculates how many years are spent in each cycle (optimised for amt%50 == 0)
@@ -840,10 +840,10 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         if(!ignoreOldFunction && !ignoreGroupCycles){
              console.log("newEfficensy = " + (oldShatterD2.getTime() - oldShatterD1.getTime())/(newShatterD2.getTime() - newShatterD1.getTime()));
         }
-        
+
         if(!ignoreOldFunction && !ignoreShatterInCycles){
             console.log("new1Efficensy = " + (oldShatterD2.getTime() - oldShatterD1.getTime())/(new1ShatterD2.getTime() - new1ShatterD1.getTime()));
-        } 
+        }
     },
     unlockAll: function(){
         for (var i in this.cfu){
@@ -970,7 +970,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
     _newLink: function(model, shatteredQuantity) {
         var self = this;
         return {
-            visible: this.game.opts.showNonApplicableButtons || 
+            visible: this.game.opts.showNonApplicableButtons ||
                 (this.getPricesMultiple(model, shatteredQuantity).timeCrystal <= this.game.resPool.get("timeCrystal").value &&
                 (this.getPricesMultiple(model, shatteredQuantity).void <= this.game.resPool.get("void").value)
             ),
@@ -1042,7 +1042,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
                 val: shatterVoidCost
             });
         }
-        
+
 		for (var k = 0; k < amt; k++) {
 			for (var i in prices_cloned) {
 				var price = prices_cloned[i];
@@ -1056,11 +1056,11 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 	                    priceLoop *= (1 + (this.game.time.heat + k * heatFactor - heatMax) * 0.01);  //1% per excessive heat unit
 	                }
 
-                    priceLoop *= (1 + this.game.getLimitedDR(this.game.getEffect("shatterCostReduction"),1) + 
+                    priceLoop *= (1 + this.game.getLimitedDR(this.game.getEffect("shatterCostReduction"),1) +
                         this.game.getEffect("shatterCostIncreaseChallenge"));
 
                     pricesTotal.timeCrystal += priceLoop;
-                    
+
 				}else if (price["name"] == "void"){
                     var priceLoop = price["val"];
 	                if ((this.game.time.heat + k * heatFactor) > heatMax) {
@@ -1111,7 +1111,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         this.game.time.heat += amt * factor;
         //this.game.time.shatter(amt);
         if(this.game.time.testShatter == 1) {this.game.time.shatterInGroupCycles(amt);}
-        //else if(this.game.time.testShatter == 2) {this.game.time.shatterInCycles(amt);} 
+        //else if(this.game.time.testShatter == 2) {this.game.time.shatterInCycles(amt);}
         //shatterInCycles is deprecated
         else {this.game.time.shatter(amt);}
     },
@@ -1366,7 +1366,7 @@ dojo.declare("classes.ui.ResetWgt", [mixin.IChildrenAware, mixin.IGameAware], {
         var karmaPointsPresent = this.game.getUnlimitedDR(this.game.karmaKittens, stripe);
         var karmaPointsAfter = this.game.getUnlimitedDR(this.game.karmaKittens + this.game._getKarmaKittens(kittens), stripe);
 		var karmaPoints = Math.floor((karmaPointsAfter - karmaPointsPresent) * 100) / 100;
-        
+
 
 		var _prestige = this.game.getResetPrestige();
 		var paragonPoints = _prestige.paragonPoints;

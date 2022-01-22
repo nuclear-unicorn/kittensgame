@@ -969,7 +969,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		blocks:["communism", "fascism"],
 		evaluateLocks: function(game){
 			return (game.science.getPolicy("monarchy").researched || game.science.getPolicy("republic").researched)
-			&& game.bld.getBuildingExt("factory").meta.val > 0; 
+			&& game.bld.getBuildingExt("factory").meta.val > 0;
 		}
 	}, {
 		name: "communism",
@@ -989,7 +989,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		blocks:["liberalism", "fascism"],
 		evaluateLocks: function(game){
 			return (game.science.getPolicy("republic").researched || game.science.getPolicy("authocracy").researched)
-			&& game.bld.getBuildingExt("factory").meta.val > 0; 
+			&& game.bld.getBuildingExt("factory").meta.val > 0;
 		}
 	}, {
 		name: "fascism",
@@ -1006,7 +1006,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		blocks:["liberalism", "communism"],
 		evaluateLocks: function(game){
 			return (game.science.getPolicy("monarchy").researched || game.science.getPolicy("authocracy").researched)
-			&& game.bld.getBuildingExt("factory").meta.val > 0; 
+			&& game.bld.getBuildingExt("factory").meta.val > 0;
 		}
 	},
 	//----------------	information age --------------------
@@ -1097,6 +1097,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			transcendenceUpgrades:["mausoleum"]
 		},
 		calculateEffects: function (self, game){
+			self.effects["pactsAvailable"] = 5;
 			if(game.religion.getPact("fractured").on >= 1 || !game.getFeatureFlag("MAUSOLEUM_PACTS")){
 				self.effects["pactsAvailable"] = 0;
 			}
@@ -1184,7 +1185,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocked: false,
         blocks:["culturalExchange"],
 		evaluateLocks: function(game){
-			return game.science.getPolicy("diplomacy").researched && game.science.get("astronomy").researched; 
+			return game.science.getPolicy("diplomacy").researched && game.science.get("astronomy").researched;
 		}
     }, {
         name: "culturalExchange",
@@ -1200,7 +1201,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocked: false,
         blocks:["knowledgeSharing"],
 		evaluateLocks: function(game){
-			return game.science.getPolicy("diplomacy").researched && game.science.get("astronomy").researched; 
+			return game.science.getPolicy("diplomacy").researched && game.science.get("astronomy").researched;
 		}
     }, {
         name: "bigStickPolicy",
@@ -1216,7 +1217,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocked: false,
         blocks:["cityOnAHill"],
 		evaluateLocks: function(game){
-			return game.science.getPolicy("isolationism").researched && game.science.get("astronomy").researched && !game.challenges.isActive("pacifism"); 
+			return game.science.getPolicy("isolationism").researched && game.science.get("astronomy").researched && !game.challenges.isActive("pacifism");
 		}
     }, {
         name: "cityOnAHill",
@@ -1739,7 +1740,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         if (effectsBase){
              effectsBase = this.game.resPool.addBarnWarehouseRatio(effectsBase);
         }
-             
+
         for (var name in this.effectsCachedExisting) {
              // Add effect from meta
              var effect = 0;
@@ -1747,19 +1748,19 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
                 var effectMeta = this.getMetaEffect(name, this.meta[i]);
                 effect += effectMeta;
              }
-             
+
              // Previously, catnip demand (or other buildings that both affect the same resource)
              // could have theoretically had more than 100% reduction because they diminished separately,
              // this takes the total effect and diminishes it as a whole.
              if (this.game.isHyperbolic(name) && effect !== 0) {
              effect = this.game.getLimitedDR(effect, 1.0);
              }
-             
+
              // Add effect from effectsBase
              if (effectsBase && effectsBase[name]) {
              effect += effectsBase[name];
              }
-             
+
              // Add effect in globalEffectsCached, in addition of other managers
              this.game.globalEffectsCached[name] = typeof(this.game.globalEffectsCached[name]) == "number" ? this.game.globalEffectsCached[name] + effect : effect;
              }
@@ -1865,7 +1866,7 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 			this.payPrice(model);
 
 			this.onPurchase(model);
-			
+
 			callback(true);
 			this.game.render();
 			return;
@@ -1912,7 +1913,7 @@ dojo.declare("classes.ui.PolicyPanel", com.nuclearunicorn.game.ui.Panel, {
         });
 
 		dojo.create("label", { innerHTML: $I("science.policyToggleResearched.label") + "<br>", for: "policyToggleResearched"}, div);
-		
+
 		var groupCheckbox1 = dojo.create("input", {
             id : "policyToggleBlocked",
             type: "checkbox",
@@ -1934,13 +1935,13 @@ dojo.declare("classes.ui.PolicyPanel", com.nuclearunicorn.game.ui.Panel, {
 
 		var controller = new classes.ui.PolicyBtnController(this.game);
 		dojo.forEach(this.game.science.policies, function(policy, i){
-			var button = 
+			var button =
 				new com.nuclearunicorn.game.ui.BuildingResearchBtn({
 					id: policy.name, controller: controller}, self.game);
 			button.render(content);
 			self.addChild(button);
 		});
-		
+
 		dojo.create("div", { style: { clear: "both"}}, content);
 	}
 });
@@ -2091,7 +2092,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Library", com.nuclearunicorn.game.u
 			if(this.detailedPollutionInfo){
 				var currentCathPollution = this.game.bld.cathPollution;
 				var currenCathPerTickPollution = this.game.bld.cathPollutionPerTick;
-				this.detailedPollutionInfo.innerHTML = "Pollution is " + Math.floor(currentCathPollution) + 
+				this.detailedPollutionInfo.innerHTML = "Pollution is " + Math.floor(currentCathPollution) +
 					" (" + this.game.getDisplayValueExt(currentCathPollution) + ") " +
 					"<br>Polution per tick is " + Math.floor(currenCathPerTickPollution);
 				var pollutionLevel = this.game.bld.getPollutionLevel();
