@@ -1413,7 +1413,7 @@
     "ui.autosave.tooltip": "自動保存中...",
     "ui.save.tooltip": "保存しました",
     "ui.energy.tooltip": "エネルギー",
-    "ui.log.link": "丸太",
+    "ui.log.link": "ログ",
     "ui.chat.link": "チャット",
     "ui.clear.log": "ログを消去",
     "ui.log.filters.block": "[<span id=\"filterIcon\">+</span>] フィルター",
