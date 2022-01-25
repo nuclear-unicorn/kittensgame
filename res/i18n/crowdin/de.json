@@ -1554,6 +1554,7 @@
     "workshop.crafts.manuscript.desc": "Schriftliches Dokument, das für technologischen Fortschritt erförderlich est. Jedes Manuskript erhöht ein bisschen (mit abnehmenden Ertragszuwachs) die maximale Kultur",
     "workshop.crafts.megalith.label": "Megalith",
     "workshop.crafts.parchment.label": "Pergament",
+    "workshop.crafts.parchment.desc": "Ein Material aus Tierhäuten, auf dem man schreiben kann, wird für kulturelle Gebäude benötigt.",
     "workshop.crafts.plate.label": "Metallplatte",
     "workshop.crafts.plate.desc": "Eine Metallplatte. Erforderlich für fortgeschrittene Konstruktionen.",
     "workshop.crafts.scaffold.label": "Gerüst",
