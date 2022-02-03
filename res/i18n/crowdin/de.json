@@ -427,6 +427,7 @@
     "effectsMgr.statics.researchVessel-starchartPerTickBaseSpace.title": "Forschungsschiff - Sternenkarten Produktion",
     "effectsMgr.statics.riftChance.title": "Chance eines Einhornrisses",
     "effectsMgr.statics.routeSpeed.title": "Weltraum-Reisegeschwindigkeit",
+    "effectsMgr.statics.rrRatio.title": "Splitter TC Ressourcen Rückholbonus",
     "effectsMgr.statics.satelliteSynergyBonus.title": "Satelliten-Synergiebonus",
     "effectsMgr.statics.satnavRatio.title": "Handelsschiff-Kosten-Ersparnisse",
     "effectsMgr.statics.sattelite-observatoryRatio.title": "Satellite - Observatory's science ratio",
