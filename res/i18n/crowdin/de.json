@@ -762,6 +762,7 @@
     "religion.btn.refine": "Verbessern",
     "religion.faithCount.bonus": "bonus",
     "religion.faithCount.pool": "Gesamter Glaube: {0}",
+    "religion.adore.confirmation.msg": "Bist du sicher, dass du allen Glauben in Epiphanie konvertieren möchtest?\n\nDu erhältst einen Bonus zu Glaubenskonvertierung (Lob die Sonne) basierend auf deiner Gesamtzahl an Epiphany.\n\nEpiphany und dieser Bonus bleiben auch beim Zurücksetzen erhalten.\n\nKLICKEN AUF DIESEN BUTTON WIRD SÄMTLICHEN GLAUBEN ENTFERNEN UND DEN SOLAR-REVOLUTION PRODUKTIONSBONUS ZURÜCKSETZEN.",
     "religion.msg.corruption": "Dein Alicorn wurde von den Markern korrumpiert!",
     "religion.panel.cryptotheology.label": "Cryptotheologie",
     "religion.panel.orderOfTheSun.label": "Orden der Sonne",
