@@ -359,8 +359,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			this.baseGoldCost = this.defaultGoldCost;
 			this.baseManpowerCost = this.defaultManpowerCost;
 			if (!this.game.workshop.get("goldOre").researched) {
-				this.baseGoldCost = (this.game.resPool.get('gold').value == 0) ? 0 : this.baseGoldCost;
-				this.baseManpowerCost = (this.game.resPool.get('manpower').value == 0) ? 0 : this.baseManpowerCost;
+				this.baseGoldCost = (this.game.resPool.get('gold').value == 0) ? 0 : this.defaultGoldCost;
+				this.baseManpowerCost = (this.game.resPool.get('manpower').value == 0) ? 0 : this.defaultManpowerCost;
 			}
 
 			// BSK+IW discount!
@@ -386,6 +386,29 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		 }
 	},
 
+	onLeavingIW: function(){
+		var sharks = this.get("sharks");
+		var griffins = this.get("griffins");
+		for (var i = 0; i < griffins.buys.length; i++) {
+			if(griffins.buys[i].name == "wood") {
+				griffins.buys[i].val = 500;
+			}
+		}
+		this.baseGoldCost = this.defaultGoldCost;
+		this.baseManpowerCost = this.defaultManpowerCost;
+		for (var i = 0; i < sharks.sells.length; i++) {
+			var sellResource = sharks.sells[i];
+			if(sellResource["name"] == "science") {
+				sellResource.name = "catnip";
+				sellResource.value = 35000;
+				sellResource.seasons = {
+					"spring": 0.2,
+					"summer": -0.05,
+					"autumn": 0.15,
+					"winter": 0.45};
+			}
+		}
+	},
     //------------ IDK, silly gimmickish stuff -----------
     unlockElders : function(){
         var elders = this.get("leviathans");

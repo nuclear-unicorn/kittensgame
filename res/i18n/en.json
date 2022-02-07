@@ -1500,6 +1500,7 @@
     "time.cfu.ressourceRetrieval.desc": "Retrieve part of your yearly resources when you burn TC",
     "time.cfu.temporalAccelerator.label": "Temporal Accelerator",
     "time.cfu.temporalAccelerator.desc": "Improves time-related effects by 5%",
+    "time.cfu.temporalAccelerator.desc2": "Automation decreases shatter lag",
     "time.cfu.temporalBattery.label": "Temporal Battery",
     "time.cfu.temporalBattery.desc": "Improves your flux energy capacity by 25%",
     "time.cfu.temporalPress.label": "Temporal Press",
