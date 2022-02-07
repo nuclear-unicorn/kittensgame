@@ -1831,7 +1831,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 			this.game.karmaKittens += millenium * this.game._getKarmaKittens(kittens) *
 				this.game.getUnlimitedDR(
 					kittensKarmaPerMinneliaRatio * 
-					Math.max(1 + 0.1 * this.game.religion.transcendenceTier - 25, 1)*
+					Math.max(1 + 0.1 * (this.game.religion.transcendenceTier - 25), 1)*
 					(this.game.getEffect("pactsAvailable"))
 				, 100);
 			var karmaOld = this.game.resPool.get("karma").value;
