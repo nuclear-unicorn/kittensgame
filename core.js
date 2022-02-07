@@ -990,7 +990,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			title: links[0].alt || links[0].title
 		}, linksDiv);
 
-		linksTooltip.style.left = link.offsetLeft;	//hack hack hack
+		linksTooltip.style.left = link.offsetLeft + 'px'; //hack hack hack
 
 		dojo.connect(link, "onclick", this, dojo.partial(function(handler, event){
 			event.stopPropagation();
@@ -1999,6 +1999,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 				liberty.calculateEffects(liberty, this.game);
 				var zebraOutpostMeta = this.game.bld.getBuildingExt("zebraOutpost").meta;
 				zebraOutpostMeta.calculateEffects(zebraOutpostMeta, this.game);
+				this.game.diplomacy.onLeavingIW();
 			}
 
 			if (meta.unlocks) {

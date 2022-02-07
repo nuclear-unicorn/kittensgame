@@ -542,6 +542,16 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.maxKittens.title")
 			},
 
+			"maxKittensRatio" : {
+				title: $I("effectsMgr.statics.maxKittensRatio.title"),
+				type: "ratio"
+			},
+
+			"simScalingRatio" : {
+				title: $I("effectsMgr.statics.simScalingRatio.title"),
+				type: "ratio"
+			},
+
 			"antimatterProduction": {
 				title: $I("effectsMgr.statics.antimatterProduction.title"),
 				type: "perYear"
@@ -988,6 +998,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
             "rrRatio" :  {
                 title: $I("effectsMgr.statics.rrRatio.title"),
                 type: "ratio"
+            },
+
+            "shatterYearBoost":{
+                title: $I("effectsMgr.statics.shatterYearBoost.title")
             },
 
 			"priceRatio" :  {
@@ -1480,6 +1494,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 title: $I("effectsMgr.statics.shatterCostReduction.title"),
                 type: "ratio"
 			},
+            "temporalPressCap": {
+                title: $I("effectsMgr.statics.temporalPressCap.title"),
+                type: "fixed"
+			},
             "shatterCostIncreaseChallenge": {
                 title: $I("effectsMgr.statics.shatterCostIncreaseChallenge.title"),
                 type: "ratio"
@@ -1515,6 +1533,71 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"policyFakeBought":{
 				title: $I("effectsMgr.statics.policyFakeBought.title")
 			},
+			"weaponEfficency":{
+				title: $I("effectsMgr.statics.weaponEfficency.title"),
+				type: "ratio"
+			},
+			"cryochamberSupport":{
+				title: $I("effectsMgr.statics.cryochamberSupport.title"),
+			},
+			"arrivalSlowdown":{
+				title: $I("effectsMgr.statics.arrivalSlowdown.title"),
+				type: "ratio"
+			},
+			"mausoleumBonus":{
+				title: $I("effectsMgr.statics.mausoleumBonus.title"),
+				type: "ratio"
+			},
+			//pacts
+            "pactsAvailable":{
+				title: $I("effectsMgr.statics.pactsAvailable.title"),
+				type: "fixed"
+			},
+            "kittensKarmaPerMinneliaRatio":{
+				title: $I("effectsMgr.statics.kittensKarmaPerMinneliaRatio.pact.title"),
+				type: "ratio"
+			},
+            "necrocornPerDay":{
+				title: $I("effectsMgr.statics.necrocornPerDay.pact.title"),
+				type: "perDay"
+			},
+            "pactGlobalResourceRatio":{
+				title: $I("effectsMgr.statics.pactGlobalResourceRatio.title"),
+				type: "ratio"
+			},
+            "pactGlobalProductionRatio":{
+				title: $I("effectsMgr.statics.pactGlobalProductionRatio.title"),
+				type: "ratio"
+			},
+            "pactFaithRatio":{
+				title: $I("effectsMgr.statics.pactFaithRatio.title"),
+				type: "ratio"
+			},
+			"pyramidGlobalResourceRatio":{
+				title: $I("effectsMgr.statics.pyramidGlobalResourceRatio.title"),
+				type: "ratio"
+			},
+			"pyramidGlobalProductionRatio":{
+				title: $I("effectsMgr.statics.pyramidGlobalProductionRatio.title"),
+				type: "ratio"
+			},
+			"deficitRecoveryRatio":{
+				title: $I("effectsMgr.statics.deficitRecoveryRatio.title"),
+				type: "ratio"
+			},
+			"pyramidFaithRatio":{
+				title: $I("effectsMgr.statics.pyramidFaithRatio.title"),
+				type: "ratio"
+			},
+			"pactBlackLibraryBoost":{
+				title: $I("effectsMgr.statics.pactBlackLibraryBoost.title"),
+				type: "ratio"
+			},
+			"pactDeficitRecoveryRatio":{
+				title: $I("effectsMgr.statics.pactDeficitRecoveryRatio.title"),
+				type: "ratio"
+			},
+			//pollution
 			"cathPollutionPerTickProd":{
 				type: "hidden"
 			},
@@ -1670,6 +1753,14 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	featureFlags: {
 		VILLAGE_MAP: {
+			beta: true,
+			main: false
+		},
+		SPACE_EXPL: {
+			beta: true,
+			main: false
+		},
+		MAUSOLEUM_PACTS:{
 			beta: true,
 			main: false
 		}
@@ -2985,7 +3076,16 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		// +POLICY EFFECTS
 
 		//necrocracy global effect
-		perTick *= (1 + (this.resPool.get("sorrow").value * this.getEffect("blsProductionBonus"))); 
+		perTick *= (1 + (this.resPool.get("sorrow").value * this.getEffect("blsProductionBonus")));
+		//pact Global Production Ratio- effect from pacts per pyramid
+		var pyramidGlobalProductionRatio = this.getEffect("pyramidGlobalProductionRatio");
+		perTick *= 1 + pyramidGlobalProductionRatio;
+
+		//pyramid faith ratio
+		if(res.name=="faith"){
+			var pyramidFaithRatio = this.getEffect("pyramidFaithRatio");
+			perTick *= 1 + pyramidFaithRatio;
+		}
 		//policy ratio effects
 		perTick *= (1 + this.getEffect(res.name + "PolicyRatio"));
 
@@ -2996,7 +3096,27 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		return perTick;
 	},
-
+	addGlobalModToStack: function(array, resName){
+		var game = this;
+		if(game.science.getPolicy("necrocracy").researched){
+			array.push({
+				name: $I("res.stack.necrocracy"),
+				type: "ratio",
+				value: game.getEffect("blsProductionBonus") * game.resPool.get("sorrow").value,
+			});
+		}
+		array.push({
+			name: $I("res.stack.policy"),
+			type: "ratio",
+			value: game.getEffect(resName + "PolicyRatio")
+		});
+		array.push({
+			name: $I("res.stack.destruction"),
+			type: "ratio",
+			value: game.getEffect("pyramidGlobalProductionRatio")
+		});
+		return array;
+	},
 	/**
 	 * Generates a stack of resource modifiers. (TODO: use it with resource per tick calculation logic)
 	 */
@@ -3044,6 +3164,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				type: "ratio",
 				value: spaceRatio - 1
 			});
+			this.addGlobalModToStack(perTickBaseSpaceStack, resName);
 		//<----
 		stack.push(perTickBaseSpaceStack);
 
@@ -3226,6 +3347,20 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
                 value: this.getEffect("blsProductionBonus") * this.resPool.get("sorrow").value,
             });
 		}
+		var pyramidGlobalProductionRatio = this.getEffect("pyramidGlobalProductionRatio");
+		stack.push({
+			name: $I("res.stack.destruction"),
+			type: "ratio",
+			value: pyramidGlobalProductionRatio
+		});
+		var pyramidFaithRatio = this.getEffect("pyramidFaithRatio");
+		if(res.name == "faith"){
+			stack.push({
+                name: $I("res.stack.extermination"),
+				type: "ratio",
+				value: pyramidFaithRatio
+			});
+		}
 		// +*POLICY
 		stack.push({
 			name: $I("res.stack.policy"),
@@ -3254,6 +3389,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				type: "fixed",
 				value: this.getEffect(res.name + "PerTickAutoprodSpace")
 			});
+			this.addGlobalModToStack(perTickAutoprodSpaceStack, resName);
 			perTickAutoprodSpaceStack.push({
 				name: $I("res.stack.spaceProdBonus"),
 				type: "ratio",
@@ -3286,6 +3422,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				type: "ratio",
 				value: spaceRatio - 1
 			});
+			this.addGlobalModToStack(perTickSpace, resName);
 		//<----
 		stack.push(perTickSpace);
 
@@ -3304,19 +3441,23 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			value: cycleEffect
 		});
 
+		var baselineModifiers = [];
 		// +BUILDING AND SPACE PerTick
-		stack.push({
-			name: $I("res.stack.baseline"),
-			type: "fixed",
-			value: this.getEffect(res.name + "PerTick")
-		});
 
-		stack.push({
-			name: $I("res.stack.baseline"),
-			type: "ratio",
-			value: this.getEffect(res.name + "PerTickRatio")
-		});
-
+		//----->
+			baselineModifiers.push({
+				name: $I("res.stack.baseline"),
+				type: "fixed",
+				value: this.getEffect(res.name + "PerTick")
+			});
+			baselineModifiers.push({
+				name: $I("res.stack.baselineRatio"),
+				type: "ratio",
+				value: this.getEffect(res.name + "PerTickRatio")
+			});
+			this.addGlobalModToStack(baselineModifiers, resName);
+		stack.push(baselineModifiers);
+		//<----
 		// +CRAFTING JOB PRODUCTION
 		stack.push({
 			name: $I("res.stack.engineer"),
@@ -3351,6 +3492,65 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return stack;
 	},
 
+	getResourcePerDayStack: function(resName){
+		var stack = [];
+		var res = null;
+		for (var i in this.resPool.resources){
+			var _res = this.resPool.resources[i];
+			if (_res.name == resName){
+				res = _res;
+				break;
+			}
+		}
+
+		if (!res){
+			//console.error("Unable to fetch resource stack for resName '" + resName + "'");
+			return;
+		}
+		stack.push({
+			name: $I("res.stack.buildings"),
+			type: "perDay",
+			value: this.getEffect(res.name + "PerDay")
+		});
+		if(resName == "necrocorn"){
+			stack.push({
+				name: $I("res.stack.corruptionPerDay"),
+				type: "perDay",
+				value: this.religion.getCorruptionPerTick() * this.calendar.ticksPerDay
+			});
+				// TIME extra-compare
+			stack.push({
+				name: $I("res.stack.time"),
+				type: "ratio",
+				value: this.timeAccelerationRatio()
+			});
+		}
+
+		return stack;
+	},
+
+	getResourceOnYearStack: function(resName){
+		var stack = [];
+		var res = null;
+		for (var i in this.resPool.resources){
+			var _res = this.resPool.resources[i];
+			if (_res.name == resName){
+				res = _res;
+				break;
+			}
+		}
+
+		if (!res){
+			//console.error("Unable to fetch resource stack for resName '" + resName + "'");
+			return;
+		}
+		stack.push({
+			name: $I("res.stack.buildings"),
+			type: "perYear",
+			value: this.getEffect(res.name + "Production")
+		});
+		return stack;
+	},
 	getCMBRBonus: function() {
 		return this.isCMBREnabled ? 0.2 : 0;
 	},
@@ -3522,6 +3722,19 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 	},
 
+	getResourcePerDay: function(resName){
+		if(resName == "necrocorn"){
+			return this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect(resName + "PerDay") +
+			this.religion.getCorruptionPerTick() * this.calendar.ticksPerDay;
+		}
+		return this.getEffect(resName + "PerDay");
+	},
+	getResourceOnYearProduction: function(resName){
+		if (resName == "antimatter"){
+			return this.getEffect("antimatterProduction");
+		}
+		return this.getEffect(resName + "Production"); //this might need to be changed!
+	},
 	getResourcePerTickConvertion: function(resName) {
 		return this.fixFloatPointNumber(this.getEffect(resName + "PerTickCon"));
 	},
@@ -3569,6 +3782,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			if (this.getResourcePerTick(resRef.name, false) != 0
 				|| this.getResourcePerTickConvertion(resRef.name) != 0
 				|| this.workshop.getEffectEngineer(resRef.name) != 0
+				|| this.getResourcePerDay(resRef.name) != 0
+				|| this.getResourceOnYearProduction(resRef.name) != 0
 			){
 
 				tooltip.innerHTML = this.getDetailedResMap(resRef);
@@ -3598,7 +3813,31 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * Returns a flat map of resource production
 	 */
 	getDetailedResMap: function(res){
-
+		if(res.calculatePerDay){
+			var resStack = this.getResourcePerDayStack(res.name),
+				resString = this.processResourcePerTickStack(resStack, res, 0), //processResourcePerTickStack can work with perDay stack
+				resPerDay = this.getResourcePerDay(res.name);
+				if (this.opts.usePercentageResourceValues){
+					resString += "<br> " + $I("res.netGain") + ": " + this.getDisplayValueExt(resPerDay, true, true);
+				}
+			if (resPerDay < 0) {
+				var toZero = this.calendar.ticksPerDay * res.value / (-resPerDay * this.getTicksPerSecondUI() * (1 + this.timeAccelerationRatio()));
+				resString += "<br>" + $I("res.toZero") + ": " + this.toDisplaySeconds(toZero.toFixed());
+			}
+			if(res.name == "necrocorn"){
+				var toNextNecrocorn = (1 - this.religion.corruption)/(this.religion.getCorruptionPerTick() * 5 * (1 + this.timeAccelerationRatio()));
+				resString += "<br>" + $I("res.toNextNecrocorn") + ": " + this.toDisplaySeconds(toNextNecrocorn.toFixed());
+			}
+			return resString;
+		}else if(res.calculateOnYear){
+			var resStack = this.getResourceOnYearStack(res.name),
+				resString = this.processResourcePerTickStack(resStack, res, 0), //processResourcePerTickStack can work with perDay stack
+				resPerYear = this.getResourceOnYearProduction(res.name);
+				if (this.opts.usePercentageResourceValues){
+					resString += "<br> " + $I("res.netGain") + ": " + this.getDisplayValueExt(resPerYear, true, true);
+				}
+			return resString;
+		}
 		var resStack = this.getResourcePerTickStack(res.name),
 			resString = this.processResourcePerTickStack(resStack, res, 0),
 			resPerTick = this.getResourcePerTick(res.name, true);
@@ -3639,7 +3878,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				continue;
 			}
 
-			if (!stackElem.value || (stackElem.type != "fixed" && !hasFixed)) {
+			if (!stackElem.value || (stackElem.type != "fixed" && stackElem.type != "perDay" &&
+			stackElem.type != "perYear" && !hasFixed)) {
 				continue;
 			}
 
@@ -3652,7 +3892,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 
 			resString += this.getStackElemString(stackElem, res);
-			if (stackElem.type == "fixed") {
+			if (stackElem.type == "fixed" || stackElem.type == "perDay") {
 				hasFixed = true;
 			}
 		}
@@ -3671,6 +3911,16 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			resString += "×" + this.getDisplayValueExt((stackElem.value * 100).toFixed()) + "%";
 		} else if (stackElem.type == "ratioIndent") {
 			resString = "|->" + resString + this.getDisplayValueExt((stackElem.value * 100).toFixed(), true) + "%";
+		} else if (stackElem.type == "perDay") {
+			if (stackElem.value>0){
+				resString += "+";
+			}
+			resString += this.getDisplayValueExt((stackElem.value)) + "/" + $I("res.per.day");
+		} else if(stackElem.type == "perYear"){
+			if (stackElem.value > 0){
+				resString += "+";
+			}
+			resString += this.getDisplayValueExt((stackElem.value)) + "/" + $I("res.per.year");
 		}
 
 		resString += "</div><br>";
@@ -4402,7 +4652,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				}],
 				vsu: [],
 				usedCryochambers: usedCryochambers_reset,
-				timestamp: Date.now()
+				timestamp: Date.now(),
+				testShatter: this.time.testShatter
 			},
 			village :{
 				kittens: newKittens,
@@ -4501,6 +4752,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			zigguratUpgrades: this.religion.zigguratUpgrades.map(function(item){return item.name;}),
 			religion: this.religion.religionUpgrades.map(function(item){return item.name;}),
 			transcendenceUpgrades: this.religion.transcendenceUpgrades.map(function(item){return item.name;}),
+			pacts: this.religion.pactsManager.pacts.map(function(item){return item.name;}),
 			challenges: this.challenges.challenges.map(function(item){return item.name;})
 		});
 		this.upgrade({policies: ["authocracy"]});
@@ -4544,6 +4796,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				return this.religion.getRU(unlockId);
 			case "transcendenceUpgrades":
 				return this.religion.getTU(unlockId);
+			case "pacts":
+				return this.religion.getPact(unlockId);
 			case "challenges":
 				return this.challenges.getChallenge(unlockId);
 			case "schemes":
@@ -4841,7 +5095,44 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	isEldermass: function(){
 		var date = new Date();
 		return (date.getMonth() == 11 && date.getDate() >= 15  && date.getDate() <= 31);
-	}
+	},
+	createRandomName: function(lenConst, charPool) {
+		if(!charPool) {
+			charPool = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■◆◆åœ∑ß≈ç∂´®ƒ√∫©†¥˙˜µ∆¨ˆ˚µ≤¬øπ≥…π“æ÷æ«§¡™£¢∞§¶•ªº≠"; //◆ 
+		}
+		var nameLength = Math.floor(Math.random() * 6 + 5);
+		if(lenConst) {
+			nameLength = lenConst - 1;
+		}
+		var name = "";
+		for (var i = 0; i <= nameLength; i++){
+			name += charPool[Math.floor(Math.random() * charPool.length)];
+		}
+		return name;
+	},
 
+	createRandomVarietyAndColor: function(ch1, ch2){
+		if(ch1 == null) {
+			ch1 = 10;
+		}
+		if(ch2 == null) {
+			ch2 = 10;
+		}
+		function rand(ratio){
+			return (Math.floor(Math.random() * ratio));
+		}
+		var color = 0;
+		var variety = 0;
+		//10% of chance to generate one of 6 primary colors (rare colors TBD)
+		if (rand(100) <= ch1){
+			color = rand(6) + 1;
+
+			//10% of chance of colored cat to be one of 5 rare varieties (dual, tabby, torbie, calico, spots)
+			if (rand(100) <= ch2){
+				variety = rand(4) + 1;
+			}
+		}
+		return [color, variety];
+	}
 });
 

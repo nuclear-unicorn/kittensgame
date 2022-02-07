@@ -804,6 +804,30 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 						(1 + game.getUnlimitedDR(yearBonus, 0.075) * 0.01) *
 						(1 + game.getEffect("umbraBoostRatio"));
 				}
+			},{
+				name: "navigationRelay",
+				label: $I("space.planet.umbra.navigationRelay.label"),
+				description: $I("space.planet.umbra.navigationRelay.desc"),
+				unlocked: false,
+				requiredTech: false,
+				priceRatio: 1.2,
+				prices: [
+					{name: "titanium", val: 50000 }, // TBD
+					{name: "concrate", val: 5000 }
+				],
+				effects: {} // TBD
+			}, {
+				name: "spaceShuttle",
+				label: $I("space.planet.umbra.spaceShuttle.label"),
+				description: $I("space.planet.umbra.spaceShuttle.desc"),
+				unlocked: false,
+				requiredTech: false,
+				priceRatio: 1.15,
+				prices: [
+					{name: "antimatter", val: 50 }, // TBD
+					{name: "eludium", val: 500 }
+				],
+				effects: {} // TBD
 			}
 		]
 	},{
@@ -1044,7 +1068,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				if (!bld.unlocked && planet.reached) {
 					if (typeof(bld.requiredTech) == "undefined"){
 						bld.unlocked = true;
-					} else {
+					} else if (bld.requiredTech) {
 						var isUnlocked = true;
 						for (var i = bld.requiredTech.length - 1; i >= 0; i--) {
 							var tech = this.game.science.get(bld.requiredTech[i]);

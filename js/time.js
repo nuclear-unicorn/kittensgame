@@ -51,7 +51,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.flux = saveData["time"].flux || 0;
         this.heat = saveData["time"].heat || 0;
         this.testShatter = saveData["time"].testShatter || 0; //temporary
-        this.isAccelerated = saveData["time"].isAccelerated || 0;
+        this.isAccelerated = saveData["time"].isAccelerated || false;
 		this.loadMetadata(this.chronoforgeUpgrades, saveData.time.cfu);
 		this.loadMetadata(this.voidspaceUpgrades, saveData.time.vsu);
 
@@ -304,7 +304,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     },{
         name: "temporalAccelerator",
         label: $I("time.cfu.temporalAccelerator.label"),
-        description: $I("time.cfu.temporalAccelerator.desc"),
+        description: $I("time.cfu.temporalAccelerator.desc") +"\n" + $I("time.cfu.temporalAccelerator.desc2"),
         prices: [
             { name : "timeCrystal", val: 10 },
             { name : "relic", val: 1000 }
@@ -569,7 +569,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         if (game.challenges.isActive("1000Years") && cal.year >= 1000) {
             game.challenges.researchChallenge("1000Years");
         }
-        
+
         // Apply seasonEffect for the newSeason
 		game.upgrade({
 			buildings: ["pasture"]
@@ -586,7 +586,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     4)calculates flux
     likely to be deprecated after shatterInGroupCycles is finished
     */
-    shatterInCycles: function(amt){ 
+    shatterInCycles: function(amt){
         amt = amt || 1;
         var maxYearsShattered = amt;
 
@@ -664,7 +664,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 			buildings: ["pasture"]
 		});
     },
-    /* 
+    /*
     shatterInGroupCycles does this:
     1) indepenently calculates space travel
     2) calculates how many years are spent in each cycle (optimised for amt%50 == 0)
@@ -744,25 +744,13 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 }
                 // XXX Partially duplicates resources#fastforward and #enforceLimits, some nice factorization is probably possible
                 var limits = {};
+                var delta = {};
                 for (var j = 0; j < game.resPool.resources.length; j++) {
                     var res = game.resPool.resources[j];
                     var resLimit = Math.max(res.value, res.maxValue || Number.POSITIVE_INFINITY);
-                    game.resPool.addRes(res, game.getResourcePerTick(res.name, true) * ticksInCurrentCycle * shatterTCGain, false, true);
-                    /*
-                    if resource can be destroyed by ai:
-                        1) and isn't overcapped, we can just limit the cap
-                        2) and doesn't have a cap, it will just decrease the number of resources by decreasing it using power function — approximation, might destroy less or more
-                        3) and (last possible option is that it) is overcapped, we can also limit the cap
-                    */
+                    var deltaRes = game.resPool.addRes(res, game.getResourcePerTick(res.name, true) * ticksInCurrentCycle * shatterTCGain, false, true);
                     if (aiApocalypseLevel && res.aiCanDestroy){
-                        console.log(res.name);
-                        if(resLimit == res.MaxValue){
-                            resLimit = Math.min(resLimit, res.value) * (1 + aiDestructionMod);
-                        }else if (!res.maxValue){
-                            game.resPool.addResEvent(res.name, -res.value * (1 - Math.pow(1 + aiDestructionMod, yearsInCurrentCycle))); //hopefully this works
-                        }else /*if (resLimit == res.value)*/{
-                            resLimit = Math.min(resLimit, res.value) * Math.pow(1 + aiDestructionMod, yearsInCurrentCycle);
-                        }
+                        delta[res.name] = deltaRes;
                     }
                     limits[res.name] = resLimit;
                 }
@@ -771,6 +759,27 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 }
                 for (var j = 0; j < game.resPool.resources.length; j++) {
                     var res = game.resPool.resources[j];
+                    /*
+                    if resource can be destroyed by ai:
+                        1) and isn't overcapped, and production would cause it to be capped for each year, decrease the cap
+                        2) and doesn't have a cap, it will just decrease the number of resources by decreasing it using power function on starting value and sum of geometric progression for produced value
+                        3) and (last possible option is that it) we can also limit the cap
+                    */
+                    if (aiApocalypseLevel && res.aiCanDestroy){
+                        //console.log(res.name);
+                        var oldVal = res.value - delta[res.name];
+                        delta[res.name] /= yearsInCurrentCycle;
+                        if(resLimit == res.MaxValue && oldVal + delta[res.name] - (oldVal + delta[res.name]) * aiDestructionMod >= resLimit){
+                            resLimit = Math.min(resLimit, res.value) * (1 + aiDestructionMod);
+                        }else if (!res.maxValue){
+                            delta[res.name] = Math.min(delta[res.name], 0);
+                            //using sum of geometrical progression:
+                            var decreaseOfDelta = delta[res.name] * (1 - Math.abs(Math.pow(aiDestructionMod, yearsInCurrentCycle)))/(1 + yearsInCurrentCycle);
+                            game.resPool.addResEvent(res.name, decreaseOfDelta + oldVal * Math.pow((1 - aiDestructionMod), yearsInCurrentCycle)); //hopefully this works
+                        }else /*if (resLimit == res.value)*/{
+                            resLimit = Math.min(resLimit, res.value) * Math.pow(1 + aiDestructionMod, yearsInCurrentCycle);
+                        }
+                    }
                     res.value = Math.min(res.value, limits[res.name]);
                 }
                 game.bld.cacheCathPollutionPerTick();
@@ -840,10 +849,10 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         if(!ignoreOldFunction && !ignoreGroupCycles){
              console.log("newEfficensy = " + (oldShatterD2.getTime() - oldShatterD1.getTime())/(newShatterD2.getTime() - newShatterD1.getTime()));
         }
-        
+
         if(!ignoreOldFunction && !ignoreShatterInCycles){
             console.log("new1Efficensy = " + (oldShatterD2.getTime() - oldShatterD1.getTime())/(new1ShatterD2.getTime() - new1ShatterD1.getTime()));
-        } 
+        }
     },
     unlockAll: function(){
         for (var i in this.cfu){
@@ -970,7 +979,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
     _newLink: function(model, shatteredQuantity) {
         var self = this;
         return {
-            visible: this.game.opts.showNonApplicableButtons || 
+            visible: this.game.opts.showNonApplicableButtons ||
                 (this.getPricesMultiple(model, shatteredQuantity).timeCrystal <= this.game.resPool.get("timeCrystal").value &&
                 (this.getPricesMultiple(model, shatteredQuantity).void <= this.game.resPool.get("void").value)
             ),
@@ -1042,7 +1051,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
                 val: shatterVoidCost
             });
         }
-        
+
 		for (var k = 0; k < amt; k++) {
 			for (var i in prices_cloned) {
 				var price = prices_cloned[i];
@@ -1056,11 +1065,11 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 	                    priceLoop *= (1 + (this.game.time.heat + k * heatFactor - heatMax) * 0.01);  //1% per excessive heat unit
 	                }
 
-                    priceLoop *= (1 + this.game.getLimitedDR(this.game.getEffect("shatterCostReduction"),1) + 
+                    priceLoop *= (1 + this.game.getLimitedDR(this.game.getEffect("shatterCostReduction"),1) +
                         this.game.getEffect("shatterCostIncreaseChallenge"));
 
                     pricesTotal.timeCrystal += priceLoop;
-                    
+
 				}else if (price["name"] == "void"){
                     var priceLoop = price["val"];
 	                if ((this.game.time.heat + k * heatFactor) > heatMax) {
@@ -1111,7 +1120,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         this.game.time.heat += amt * factor;
         //this.game.time.shatter(amt);
         if(this.game.time.testShatter == 1) {this.game.time.shatterInGroupCycles(amt);}
-        //else if(this.game.time.testShatter == 2) {this.game.time.shatterInCycles(amt);} 
+        //else if(this.game.time.testShatter == 2) {this.game.time.shatterInCycles(amt);}
         //shatterInCycles is deprecated
         else {this.game.time.shatter(amt);}
     },
@@ -1366,7 +1375,7 @@ dojo.declare("classes.ui.ResetWgt", [mixin.IChildrenAware, mixin.IGameAware], {
         var karmaPointsPresent = this.game.getUnlimitedDR(this.game.karmaKittens, stripe);
         var karmaPointsAfter = this.game.getUnlimitedDR(this.game.karmaKittens + this.game._getKarmaKittens(kittens), stripe);
 		var karmaPoints = Math.floor((karmaPointsAfter - karmaPointsPresent) * 100) / 100;
-        
+
 
 		var _prestige = this.game.getResetPrestige();
 		var paragonPoints = _prestige.paragonPoints;

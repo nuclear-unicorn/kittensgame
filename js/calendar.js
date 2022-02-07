@@ -452,7 +452,16 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			//------------------------- relic -------------------------
 			this.game.resPool.addResPerTick("relic", this.game.getEffect("relicPerDay"));
 		}
+		//------------------------- necrocorns pacts -------------------------
+		//deficit changing
+		this.game.religion.pactsManager.necrocornConsumptionDays(1);
+		this.game.religion.getZU("blackPyramid").updateEffects(this.game.religion.getZU("blackPyramid"), this.game);
+		this.game.religion.getPact("payDebt").onNewDay(this.game);
 
+		//-------------------------  consequenses of accumulating too much necrocorn deficit -------------------------
+		if(this.game.religion.pactsManager.necrocornDeficit>=this.game.religion.pactsManager.fractureNecrocornDeficit){
+			this.game.religion.pactsManager.necrocornDeficitPunishment();
+		}
 		//------------------------- astronomical events -------------------------
 		if (this.game.bld.get("library").on > 0) {
 			var eventChance = (0.0025 + this.game.getEffect("starEventChance")) * chanceRatio;
@@ -753,6 +762,8 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		beacons.action(beacons, this.game);
 		this.game.updateCaches();
 		this.game.resPool.addResPerTick("relic", this.game.getEffect("relicPerDay") * daysOffset);
+		//------------------------- necrocorns pacts -------------------------
+		this.game.religion.pactsManager.necrocornConsumptionDays(daysOffset);
 
 		//not sure if it is a good idea
 		//calculate amount of void earned on average per day, then multiply by days and percentage of time in paradox
@@ -788,6 +799,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			resPool.addResEvent("paragon", paragon);
 			this.game.stats.getStat("totalParagon").val += paragon;
 		}
+		this.game.religion.pactsManager.pactsMilleniumKarmaKittens(paragon);
 		this.year += yearsOffset;
 		this.game.stats.getStat("totalYears").val += yearsOffset;
 		//------------------------------------------------------------------
@@ -863,6 +875,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 	calculateMilleniumProduction: function(milleniums){
 		this.game.resPool.addResEvent("paragon", milleniums);
 		this.game.stats.getStat("totalParagon").val += milleniums;
+		this.game.religion.pactsManager.pactsMilleniumKarmaKittens(milleniums);
 	},
 	onNewYears: function(updateUI, years, milleniumChangeCalculated) {
 		var ty = this.game.stats.getStat("totalYears");
@@ -967,6 +980,10 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 		if ( this.year % 1000 === 0 ){
 			this.game.resPool.addResEvent("paragon", 1);
 			this.game.stats.getStat("totalParagon").val++;
+			var kittens = this.game.resPool.get("kittens").value;
+
+			//holy genocide karma effect
+			this.game.religion.pactsManager.pactsMilleniumKarmaKittens(1);
 		}
 
 		var pyramidVal = this.game.religion.getZU("blackPyramid").getEffectiveValue(this.game);

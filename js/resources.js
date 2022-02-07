@@ -111,6 +111,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		transient: true,
 		visible: true,
 		color: "#5A0EDE",
+		calculateOnYear: true,
 		isRefundable: function(game) {
 			return game.resPool.energyProd >= game.resPool.energyCons;
 		}
@@ -245,7 +246,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		type : "rare",			//todo: some special FX
 		visible: true,
 		color: "#E00000",
-		persists: false
+		persists: false,
+		calculatePerDay: true,
 	},{
 		name : "tears",
 		title: $I("resources.tears.title"),
@@ -293,6 +295,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		craftable: false,
 		visible: true,
 		color: "#5A0EDE",
+		calculatePerDay: true,
 		/*style: {
 			         animation : "neon-purple 1.5s ease-in-out infinite alternate",
 			"-webkit-animation": "neon-purple 1.5s ease-in-out infinite alternate",
@@ -574,7 +577,14 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 				value: this.game.religion.faithRatio,
 				unlocked: true,
 				visible: false
-			}
+			},
+			{
+				name: "necrocornDeficit",
+				title: $I("resources.necrocornDeficit.title"),
+				value: this.game.religion.pactsManager.necrocornDeficit,
+				unlocked: true,
+				visible: false,
+				color: "#E00000"}
 		];
 		//TODO: mixin unlocked and visible automatically
 	},
@@ -826,7 +836,14 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		if (!this.isNormalCraftableResource(res) && !res.transient) {
 			maxValue *= 1 + this.game.getEffect("globalResourceRatio");
 		}
-
+		//pacts effect
+		if (!this.isNormalCraftableResource(res) && !res.transient) {
+			var pyramidModifier = this.game.getEffect("pyramidGlobalResourceRatio");
+			/*if(pyramidModifier < 0){
+				pyramidModifier = -this.game.getLimitedDR(-pyramidModifier * 1000, 1000)/1000
+			}*/
+			maxValue *= 1 + pyramidModifier;
+		}
 		if (res.tag == "baseMetal") {
 			maxValue *= 1 + this.game.getEffect("baseMetalMaxRatio");
 		}
