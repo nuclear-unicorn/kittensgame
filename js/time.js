@@ -649,9 +649,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             remainingDaysInFirstYear = cal.daysPerSeason * cal.seasonsPerYear;
         }
         if (amt == 1) {
-            game.msg($I("time.tc.shatterOne"), "", "tc");
+            game.msg($I("time.tc.shatterOne"), "", "tcShatter");
         } else {
-            game.msg($I("time.tc.shatter",[amt]), "", "tc");
+            game.msg($I("time.tc.shatter",[amt]), "", "tcShatter");
         }
         this.flux += amt - 1 + remainingDaysInFirstYearSaved / daysPerYear;
 
@@ -801,9 +801,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         cal.onNewYears(endYear == cal.year, maxYearsShattered, false);
         cal.calculateMilleniumProduction(cal.getMilleniaChanged(startYear, cal.year));
         if (amt == 1) {
-            game.msg($I("time.tc.shatterOne"), "", "tc");
+            game.msg($I("time.tc.shatterOne"), "", "tcShatter");
         } else {
-            game.msg($I("time.tc.shatter",[amt]), "", "tc");
+            game.msg($I("time.tc.shatter",[amt]), "", "tcShatter");
         }
 
 		if(aiApocalypseLevel){
