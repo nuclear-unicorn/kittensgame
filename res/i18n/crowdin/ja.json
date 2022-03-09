@@ -654,6 +654,7 @@
     "policy.transkittenism.label": "超子猫主義",
     "policy.transkittenism.desc": "子猫の身体を捨てAIと統合します。AIコアは2倍の効率を発揮し、AIレベルに悪影響はありません。",
     "policy.zebraRelationsAppeasement.label": "シマウマ族関係：融和政策",
+    "policy.zebraRelationsAppeasement.desc": "あなたを毛嫌いしているシマウマ族に対して、友好的な態度で応じます。\n交易条件がわずかに緩和しますが、ゴールド生産はわずかに減少します。",
     "policy.zebraRelationsBellicosity.label": "シマウマ族関係：敵意政策",
     "policy.zebraRelationsBellicosity.desc": "シマウマ族に対して行動を起こした結果、彼らとの取引を悪化させますが、他の種族からの尊敬を得ます。",
     "prestige.panel.label": "形而上学",
