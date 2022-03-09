@@ -965,7 +965,7 @@
     "save.export.msg": "セーブデータのエクスポートに成功しました!",
     "save.import.confirmation.msg": "保存しますか? データは上書きされてしまいます!",
     "save.import.msg": "セーブデータのインポートに成功しました!",
-    "science.policyToggleBlocked.label": "使用不可の表示切替",
+    "science.policyToggleBlocked.label": "使用不可の政策を非表示にする",
     "science.policyToggleResearched.label": "調査済みの政策を非表示にする。",
     "science.toggleResearched.label": "研究の終わった技術を非表示にする。",
     "science.acoustics.label": "音響学",
