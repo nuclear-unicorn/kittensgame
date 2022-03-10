@@ -769,7 +769,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     if (aiApocalypseLevel && res.aiCanDestroy){
                         //console.log(res.name);
                         var oldVal = res.value - delta[res.name];
-                        delta[res.name]/= yearsInCurrentCycle||1  
+                        delta[res.name]/= yearsInCurrentCycle||1;  
                         if(resLimit == res.MaxValue && oldVal + delta[res.name] - (oldVal + delta[res.name]) * aiDestructionMod >= resLimit){
                             resLimit = Math.min(resLimit, res.value) * (1 + aiDestructionMod);
                         }else if (!res.maxValue){
