@@ -764,18 +764,19 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                         1) and isn't overcapped, and production would cause it to be capped for each year, decrease the cap
                         2) and doesn't have a cap, it will just decrease the number of resources by decreasing it using power function on starting value and sum of geometric progression for produced value
                         3) and (last possible option is that it) we can also limit the cap
+                        NOTE: aiDestructionMod is A NEGATIVE VALUE!!!
                     */
                     if (aiApocalypseLevel && res.aiCanDestroy){
                         //console.log(res.name);
                         var oldVal = res.value - delta[res.name];
-                        delta[res.name] /= yearsInCurrentCycle;
+                        delta[res.name]/= yearsInCurrentCycle||1  
                         if(resLimit == res.MaxValue && oldVal + delta[res.name] - (oldVal + delta[res.name]) * aiDestructionMod >= resLimit){
                             resLimit = Math.min(resLimit, res.value) * (1 + aiDestructionMod);
                         }else if (!res.maxValue){
-                            delta[res.name] = Math.min(delta[res.name], 0);
+                            delta[res.name] = Math.max(delta[res.name], 0);
                             //using sum of geometrical progression:
-                            var decreaseOfDelta = delta[res.name] * (1 - Math.abs(Math.pow(aiDestructionMod, yearsInCurrentCycle)))/(1 + yearsInCurrentCycle);
-                            game.resPool.addResEvent(res.name, decreaseOfDelta + oldVal * Math.pow((1 - aiDestructionMod), yearsInCurrentCycle)); //hopefully this works
+                            var decreaseOfDelta = -delta[res.name] * (1 - Math.abs(Math.pow(aiDestructionMod, yearsInCurrentCycle)))/(Math.abs(1 - aiDestructionMod)||1);
+                            game.resPool.addResEvent(res.name, decreaseOfDelta - oldVal * (1- Math.pow((1 + aiDestructionMod), yearsInCurrentCycle))); //this is no longer broken
                         }else /*if (resLimit == res.value)*/{
                             resLimit = Math.min(resLimit, res.value) * Math.pow(1 + aiDestructionMod, yearsInCurrentCycle);
                         }

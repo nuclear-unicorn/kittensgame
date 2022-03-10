@@ -119,6 +119,10 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 			effectsBase = this.game.resPool.addBarnWarehouseRatio(effectsBase);
 		}
 
+		for (var i = 0; i < this.meta.length; i++){
+			this.updateMetaEffectCached(this.meta[i]);
+		}
+
 		for (var name in this.effectsCachedExisting) {
 			// Add effect from meta
 			var effect = 0;
@@ -140,6 +144,22 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 
 			// Add effect in globalEffectsCached, in addition of other managers
 			this.game.globalEffectsCached[name] = typeof(this.game.globalEffectsCached[name]) == "number" ? this.game.globalEffectsCached[name] + effect : effect;
+		}
+	},
+
+	updateMetaEffectCached: function (metadata) {
+		for (var i = 0; i < metadata.meta.length; i++){
+			var meta = metadata.meta[i];
+			meta.totalEffectsCached = {};
+			for (var effectName in this.effectsCachedExisting){
+				var effect;
+				if (metadata.provider){
+					effect = metadata.provider.getEffect(meta, effectName) || 0;
+				} else {
+					effect = meta.effects[effectName] || 0;
+				}
+				meta.totalEffectsCached[effectName] = effect;
+			}
 		}
 	},
 
@@ -192,12 +212,9 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 			// Ideally just a getter handler should be called there returning correct value
 			//
 
-			var effect;
-			if (metadata.provider){
-				effect = metadata.provider.getEffect(meta, name) || 0;
-			} else {
-				effect = meta.effects[name] || 0;
-
+			var effect = 0;
+			if (meta.totalEffectsCached){
+				effect = meta.totalEffectsCached[name] || 0;
 			}
 			totalEffect += effect;
 		}
@@ -1060,6 +1077,10 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 		return undefined;
 	},
 
+	getTotalEffects: function(model){
+		return undefined;
+	},
+
 	getNextEffectValue: function(model, effectName) {
 		return undefined;
 	},
@@ -1147,8 +1168,11 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 		}
 
 		//-----------------------------------------
+		var displayEffects = effectsList;
 		var isEffectMultiplierEnabled = model.multiplyEffects && this.game.ui.isEffectMultiplierEnabled();
-		var valMultiplier = isEffectMultiplierEnabled && model.metadata ? model.metadata.on : 1;
+		if (isEffectMultiplierEnabled) {
+			displayEffects = this.getTotalEffects(model) || effectsList;
+		}
 		for (var effectName in effectsList) {
 			var effectMeta = this.game.getEffectMeta(effectName);
 			if(effectMeta.type === "hidden") {continue;}
@@ -1156,7 +1180,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 				continue;	//hide resource-related effects if we did not unlocked this effect yet
 			}
 
-			var effectValue = effectsList[effectName] * (effectMeta.calculation === "constant" ? 1 : valMultiplier);
+			var effectValue = displayEffects[effectName];
 			if (!isEffectMultiplierEnabled && effectMeta.calculation === "nonProportional") {
 				var nextEffectValue = this.getNextEffectValue(model, effectName);
 				if (nextEffectValue) {
@@ -1556,6 +1580,10 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 
 	getEffects: function(model){
 		return model.metadata.effects;
+	},
+
+	getTotalEffects: function(model){
+		return model.metadata.totalEffectsCached;
 	},
 
 	getNextEffectValue: function(model, effectName) {

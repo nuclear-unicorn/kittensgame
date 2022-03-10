@@ -266,7 +266,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		calculateEffects: function(self, game){
 			if(self.active){
 				self.effects["arrivalSlowdown"] = 10;
-				self.effects["cryochamberSupport"] = 0;
+				self.effects["cryochamberSupport"] = 1; //this is a quick fix for cryochamber cap when resetting into PA; does not make PA easier so it's ok
 			}else{
 				self.effects["arrivalSlowdown"] = 0;
 				self.effects["cryochamberSupport"] = 1;
