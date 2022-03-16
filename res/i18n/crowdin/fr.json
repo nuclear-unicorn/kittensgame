@@ -1303,6 +1303,7 @@
     "ui.option.scheme": "Thème de couleurs :",
     "ui.option.scheme.relock": "Verrouiller les thèmes",
     "ui.option.scheme.tip": "Les thèmes indisponibles peuvent être débloqués par des actions spécifiques.",
+    "ui.option.use.per.second.values": "Utiliser des valeurs par secondes <i>(sinon par tick)</i>",
     "ui.option.use.percentage.resource.values": "Afficher la production en pourcentage",
     "ui.option.hide.sell": "Cacher les boutons \"vente\"",
     "ui.option.more": "Plus...",
