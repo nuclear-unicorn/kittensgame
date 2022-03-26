@@ -716,14 +716,15 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 remainingCyclesYears[j] = maxYearsShattered/10;
             }
         }else{
-            remainingCyclesYears[cal.cycle] += Math.min(cal.yearsPerCycle - cal.cycleYear, maxYearsShattered);
-            maxYearsShattered += -remainingCyclesYears[cal.cycle];
+            var wholeCycleYears = maxYearsShattered - maxYearsShattered%50;
             for (j in remainingCyclesYears){
-                remainingCyclesYears[j] += Math.floor(maxYearsShattered/50);
-                maxYearsShattered += -Math.floor(maxYearsShattered/50);
+                remainingCyclesYears[j] = wholeCycleYears/10;
             }
+            maxYearsShattered -= wholeCycleYears;
+            remainingCyclesYears[cal.cycle] += Math.min(cal.yearsPerCycle - cal.cycleYear, maxYearsShattered);
+            maxYearsShattered -= Math.min(cal.yearsPerCycle - cal.cycleYear, maxYearsShattered);
             for (j = 1; j < cal.cyclesPerEra; j++){
-                remainingCyclesYears[(cal.cycle + j)%10] = Math.min(cal.yearsPerCycle, maxYearsShattered);
+                remainingCyclesYears[(cal.cycle + j)%10] += Math.min(cal.yearsPerCycle, maxYearsShattered);
                 maxYearsShattered += -Math.min(cal.yearsPerCycle, maxYearsShattered);
             }
         }
