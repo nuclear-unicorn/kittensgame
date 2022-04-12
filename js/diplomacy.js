@@ -412,7 +412,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
     //------------ IDK, silly gimmickish stuff -----------
     unlockElders : function(){
         var elders = this.get("leviathans");
-		if (elders.duration){	//elder visits do not stack
+		if (elders.duration || !this.hasUnlockedRaces()){	//elder visits do not stack, and elders do not like being first
 			return;
 		}
 

@@ -705,7 +705,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 			maxValue = this.addResMaxRatios(res, maxValue);
 			
-			var challengeEffect = this.game.getLimitedDR(this.addResMaxRatios(res, this.game.getEffect(res.name + "MaxChallenge")), maxValue - 1);
+			var challengeEffect = this.game.getLimitedDR(this.addResMaxRatios(res, this.game.getEffect(res.name + "MaxChallenge")), maxValue - 1 - game.bld.effectsBase[res.name +'Max']||0);
 			maxValue += challengeEffect;
 
 			if (maxValue < 0 ){
