@@ -424,6 +424,7 @@
     "effectsMgr.statics.smelterRatio.title": "Bonus de fonderie",
     "effectsMgr.statics.solarFarmRatio.title": "Bonus ferme solaire",
     "effectsMgr.statics.solarRevolutionRatio.title": "Bonus de production",
+    "effectsMgr.statics.faithSolarRevolutionBoost.title": "Boost de Croyance de Révolution Solaire",
     "effectsMgr.statics.spaceElevator-prodTransferBonus.title": "Ascenceurs Spatiaux - Bonus de production transféré",
     "effectsMgr.statics.spaceRatio.title": "Bonus de production spatial",
     "effectsMgr.statics.spaceScienceRatio.title": "Bonus de l'espace sur la production de la science",
