@@ -1448,6 +1448,7 @@
     "wipe.confirmation.title": "Borrar confirmación",
     "wipe.confirmation.msg1": "Todos los datos guardados serán DESTRUIDOS, ¿está seguro?",
     "wipe.confirmation.msg2": "¿Está ABSOLUTAMENTE seguro?",
+    "res.per.sec": "/s",
     "about.discord": "¡Únete a nuestro Discord!: ",
     "iron.will.warning.msg": "Esto terminará con la voluntad de hierro. ¿Estás seguro?",
     "effectsMgr.workshop.eludiumAutomationBonus.title": "Bonus de automatización de Eludio",
