@@ -1909,13 +1909,28 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		zebraRequired: 5,
 		effects: {
 			"hunterRatio" : 0.05,
+			"manpowerMax": 5,
 			"zebraPreparations" : 0
 		},
 		calculateEffects: function(self, game){
 			if(game.workshop.getZebraUpgrade("darkRevolution").researched){
 				self.effects["zebraPreparations"] = game.ironWill? 1:0.1;
+				//self.jammed = false;
 			}
-		}
+		},/*
+		action: function(self, game){
+			if(self.val < 1 || self.jammed){
+				return
+			}
+			game.upgrade(
+			{
+				buildings: ["zebraWorkshop"]
+			})
+			self.jammed = true;
+		},
+		upgrades: {
+			buildings: ["zebraWorkshop"]
+		}*/
 	},{
 		name: "zebraWorkshop",
 		label: $I("buildings.zebraWorkshop.label"),
@@ -1930,8 +1945,23 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		priceRatio: 1.15,
 		zebraRequired: 10,
 		effects: {
+			"manpowerMax": 25,
+			"bloodstoneRatio": 0
 			//"bloodstoneCraftRatio" : 0.01
-		}
+		},
+		/* not sure how to call the upgrade yet
+		"workshop.zebraUpgrade.nostalgia.label": "Nostalgia",
+		"workshop.zebraUpgrade.nostalgia.desc": "No memory of finding it. Zebra workshops increase chance to find Bloodstones in hunts",
+		"workshop.zebraUpgrade.nostalgia.flavor": "Bittersweet dreams",
+		*/
+
+		/*
+		calculateEffects: function(self, game){
+			if(game.workshop.getZebraUpgrade("nostalgia").researched){
+				self.effects["bloodstoneRatio"] = 0.001 * game.getLimitedDR(self.on * (game.ironWill? 1:0.1) * (game.karmaZebras + 1), game.getEffect("zebraPreparations") + 40) / self.on;
+			}
+		}*/
+		
 	},{
 		name: "zebraForge",
 		label: $I("buildings.zebraForge.label"),
@@ -1948,6 +1978,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		zebraRequired: 50,
 		effects: {
 			//"bloodstoneCraftRatio" : 0.02,
+			"manpowerMax": 50,
 			"tMythrilCraftRatio" : 0.01,
 		},
 	},{
@@ -1973,6 +2004,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"titaniumPerTickCon": 0,
 			"alicornPerTickCon": 0,
 			"tMythrilPerTick": 0,
+			"manpowerMax": 10
 		},
 		lackResConvert: false,
 		togglable: true,

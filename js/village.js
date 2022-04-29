@@ -766,7 +766,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		}
 
 		if (this.game.resPool.get("zebras").value >= 10) {
-			var bloodstone = this.game.resPool.addResEvent("bloodstone", this.game.math.binominalRandomInteger(squads, this.game.resPool.get("bloodstone").value == 0 ? 0.05 : 0.0005));
+			var bloodstoneRatio = 1 + this.game.getEffect("bloodstoneRatio");
+			var bloodstone = this.game.resPool.addResEvent("bloodstone", this.game.math.binominalRandomInteger(squads, (this.game.resPool.get("bloodstone").value == 0 ? 0.05 : 0.0005) * bloodstoneRatio));
 			if (bloodstone > 0 && this.game.resPool.get("bloodstone").value == 1) {
 				this.game.msg($I("village.new.bloodstone"), "important", "ironWill");
 			}

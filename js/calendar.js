@@ -640,7 +640,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 		// Auto observable events
         var numberEvents = 0, totalNumberOfEvents = 0;
-        if (this.game.bld.get("library").on > 0) {
+        if (this.game.bld.get("library").on > 0 && !this.game.challenges.isActive("blackSky")) { //blackSky should block rare astr. events
             var eventChance = (0.0025 + this.game.getEffect("starEventChance")) * chanceRatio;
             if (this.game.prestige.getPerk("astromancy").researched) {
                 eventChance *= 2;
@@ -658,7 +658,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
             //console.log("eventChance="+eventChance+", autoChance="+autoChance);
             numberEvents = Math.round(daysOffset * eventChance * autoChance);
             //console.log("number of startcharts="+numberEvents);
-            if (numberEvents && !this.game.challenges.isActive("blackSky")) {
+            if (numberEvents) {
                 this.game.resPool.addResEvent("starchart", numberEvents);
             }
 
@@ -718,6 +718,16 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			if ( zebras.value > 0 && zebras.value <= this.game.karmaZebras && this.game.karmaZebras > 0){
 				numberEvents = Math.round(daysOffset * 500 / 100000);
 				this.game.resPool.addResEvent("zebras", numberEvents);
+				totalNumberOfEvents += numberEvents;
+			}
+		}
+		//------------------------- 0.035% chance of spawning unicorns in Pacifism -----------------
+		if(this.game.challenges.isActive("pacifism")){
+			var animal = this.game.science.get("animal");
+			var unicorns = this.game.resPool.get("unicorns");
+			if (unicorns.value < 2 && animal.researched){
+				numberEvents = Math.round(daysOffset * 17 * unicornChanceRatio / 100000);
+				this.game.resPool.addResEvent("unicorns", numberEvents);
 				totalNumberOfEvents += numberEvents;
 			}
 		}

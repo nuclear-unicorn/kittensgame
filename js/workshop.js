@@ -2223,7 +2223,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			prices:[
 				{name : "science", val: 75000},
 				{name: 	"compedium", val: 75}
-			]
+			],
+			upgrades:{
+				buildings: ["academy"]
+			}
 	
 		}
 	],
