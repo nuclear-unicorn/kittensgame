@@ -234,10 +234,10 @@ WToolbarPollution = React.createClass({
         var polLvl = game.bld.getPollutionLevel();
         var polLvlShow = game.bld.getPollutionLevel(pollution * 2);
         if (polLvl >= 4){
-            message += $I("pollution.level1") + "<br/>" + $I("pollution.level2") + "<br/>" + $I("pollution.level3", [game.getDisplayValueExt(game.villageTab.getVillageTitle(), false, false, 0)]) + "<br/>" + $I("pollution.level4");
+            message += $I("pollution.level1") + "<br/>" + $I("pollution.level2") + "<br/>" + $I("pollution.level3", [game.villageTab.getVillageTitle()]) + "<br/>" + $I("pollution.level4");
         }
         else if (polLvlShow == 3 || polLvl == 3){
-            message += $I("pollution.level1") + "<br/>" + $I("pollution.level2") + "<br/>" + $I("pollution.level3", [game.getDisplayValueExt(game.villageTab.getVillageTitle(), false, false, 0)]);
+            message += $I("pollution.level1") + "<br/>" + $I("pollution.level2") + "<br/>" + $I("pollution.level3", [game.villageTab.getVillageTitle()]);
         }
         else if (polLvlShow == 2){
             message += $I("pollution.level1") + "<br/>" + $I("pollution.level2");
