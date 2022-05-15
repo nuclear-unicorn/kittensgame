@@ -1652,7 +1652,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	telemetry: null,
 	server: null,
 	math: null,
-	importingSave: false, //while save is being imported we should ignore production from buildings for one tick; hack
+	loadingSave: false, //while save is being imported we should ignore production from buildings for one tick; hack
 
 	//global cache
 	globalEffectsCached: {},
@@ -2549,9 +2549,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				throw "Integrity check failure";
 			}
 
-			this.importingSave = true;
+			this.loadingSave = true;
 			this.load();
-			this.importingSave = false;
+			this.loadingSave = false;
 			this.msg($I("save.import.msg"));
 
 			this.render();

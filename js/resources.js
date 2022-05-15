@@ -715,7 +715,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 			}
 
 			res.maxValue = maxValue;
-			if(game.importingSave){ //hack to stop production before game.calculateAllEffects after manual import
+			if(game.loadingSave){ //hack to stop production before game.calculateAllEffects after manual import
 				continue;
 			}
 			var resPerTick = game.getResourcePerTick(res.name, false);
