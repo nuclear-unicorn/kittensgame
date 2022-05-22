@@ -119,7 +119,7 @@ WToolbarHappiness = React.createClass({
         tooltip += "* " + $I("village.happiness.penalty.base") + ": -" + this.game.getDisplayValueExt(unhappiness, false, false, 0) + "%<br>";
 		tooltip += "* " + $I("village.happiness.penalty.mitigated") + ": " + this.game.getDisplayValueExt(-unhappinessReduction, false, false, 0) + "%<br>";
         tooltip += $I("village.happiness.environment") + ": " + this.game.getDisplayValueExt(environmentEffect, false, false, 0) + "%<br>";
-        var overpopulation = this.game.village.getKittens() - this.game.village.maxKittens;
+        var overpopulation = this.game.village.getOverpopulation();
         if (overpopulation > 0){
             tooltip += $I("village.happiness.overpopulation") + ": -" + overpopulation * 2 + "%<br>";
         }

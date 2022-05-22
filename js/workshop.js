@@ -2200,7 +2200,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				{ name : "parchment", val: 3000 },
 				{ name : "science", val: 100 }
 			]
-		},{
+		},
+		//resources:
+		//tMythril
+		{
 			name: "whispers",
 			label: $I("workshop.zebraUpgrade.whispers.label"),
 			description: $I("workshop.zebraUpgrade.whispers.desc"),
@@ -2226,9 +2229,28 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			],
 			upgrades:{
 				buildings: ["academy"]
+			},
+			unlocks: {
+				zebraUpgrades: ["bloodstoneInstitute"]
 			}
-	
-		}
+		},
+		//bloodstone
+		{
+			name: "bloodstoneInstitute",
+			label: $I("workshop.zebraUpgrade.bloodstoneInstitute.label"),
+			description: $I("workshop.zebraUpgrade.bloodstoneInstitute.desc"),
+			effects: {		
+			},
+			prices:[
+				{name : "science", val: 85000},
+				{name: 	"blueprint", val: 50},
+				{name : "bloodstone", val: 25},
+				{name: 	"tMythril", val: 10}
+			],
+			upgrades:{
+				buildings: ["zebraWorkshop"]
+			}
+		},
 	],
 	effectsBase: {
 		"oilMax" : 0,
