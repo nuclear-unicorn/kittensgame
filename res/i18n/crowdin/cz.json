@@ -430,7 +430,7 @@
     "effectsMgr.statics.woodJobRatio.title": "Dřevorubecké nástroje",
     "effectsMgr.type.resConversion": "Přeměna {0}",
     "effectsMgr.type.resCraftRatio": "{0} výrobní účinnost",
-    "effectsMgr.type.resDemandRatio": "{0} spotřey sníženo",
+    "effectsMgr.type.resDemandRatio": "{0} - spotřeba snížena",
     "effectsMgr.type.resMax": "Maximální {0}",
     "effectsMgr.type.resProduction": "Výroba {0}",
     "effectsMgr.statics.ironPolicyRatio.title": "Bonus produkce železa",
