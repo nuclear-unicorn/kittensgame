@@ -161,6 +161,8 @@
     "buildings.hut.flavor": "The Nation of Two",
     "buildings.hydroplant.label": "Hydro Plant",
     "buildings.hydroplant.desc": "A modern source of power production",
+    "buildings.ivoryTemple.label": "Ivory Temple",
+    "buildings.ivoryTemple.desc": "Mystical temple where ivory is converted into minerals",
     "buildings.library.label": "Library",
     "buildings.library.desc": "Build a Library to store sacred catkind knowledge. Each upgrade level improves your science output by 10%",
     "buildings.library.flavor": "All in Catonese",

@@ -1976,10 +1976,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	},{
 		name: "ivoryTemple",
 		defaultUnlockable: true,
-		//label: $I("buildings.ivoryTemple.label"),
-		//description: $I("buildings.ivoryTemple.desc"),
-		label: "Ivory Temple",
-		description: "Mystical temple where ivory is converted into minerals",
+		label: $I("buildings.ivoryTemple.label"),
+		description: $I("buildings.ivoryTemple.desc"),
 		unlockRatio: 0.1,
 		prices: [
 			{ name : "tMythril", val: 1 },
