@@ -1915,22 +1915,21 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		calculateEffects: function(self, game){
 			if(game.workshop.getZebraUpgrade("darkRevolution").researched){
 				self.effects["zebraPreparations"] = game.ironWill? 1:0.1;
-				//self.jammed = false;
+				self.jammed = false;
 			}
-		},/*
+		},
 		action: function(self, game){
 			if(self.val < 1 || self.jammed){
-				return
+				return;
 			}
 			game.upgrade(
-			{
-				buildings: ["zebraWorkshop"]
-			})
+				self.upgrades
+			);
 			self.jammed = true;
 		},
 		upgrades: {
 			buildings: ["zebraWorkshop"]
-		}*/
+		}
 	},{
 		name: "zebraWorkshop",
 		label: $I("buildings.zebraWorkshop.label"),
@@ -1949,19 +1948,14 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"bloodstoneRatio": 0
 			//"bloodstoneCraftRatio" : 0.01
 		},
-		/* not sure how to call the upgrade yet
-		"workshop.zebraUpgrade.nostalgia.label": "Nostalgia",
-		"workshop.zebraUpgrade.nostalgia.desc": "No memory of finding it. Zebra workshops increase chance to find Bloodstones in hunts",
-		"workshop.zebraUpgrade.nostalgia.flavor": "Bittersweet dreams",
-		*/
-
-		/*
 		calculateEffects: function(self, game){
-			if(game.workshop.getZebraUpgrade("nostalgia").researched){
-				self.effects["bloodstoneRatio"] = 0.001 * game.getLimitedDR(self.on * (game.ironWill? 1:0.1) * (game.karmaZebras + 1), game.getEffect("zebraPreparations") + 40) / self.on;
+			if(game.workshop.getZebraUpgrade("bloodstoneInstitute").researched){
+				self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(self.on * (game.ironWill? 1:0.1) * (game.karmaZebras + 1), game.getEffect("zebraPreparations") + 40) / self.on;
 			}
-		}*/
-		
+		},
+		upgrades: {
+			buildings: ["zebraWorkshop"]
+		}
 	},{
 		name: "zebraForge",
 		label: $I("buildings.zebraForge.label"),
@@ -1984,18 +1978,13 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	},{
 		name: "ivoryTemple",
 		defaultUnlockable: true,
-		//label: $I("buildings.ivoryTemple.label"),
-		//description: $I("buildings.ivoryTemple.desc"),
-		label: "Ivory Temple",
-		description: "Mystical temple where ivory is converted into minerals",
+		label: $I("buildings.ivoryTemple.label"),
+		description: $I("buildings.ivoryTemple.desc"),
 		unlockRatio: 0.1,
 		prices: [
 			{ name : "tMythril", val: 1 },
 			{ name : "ivory", val: 100 }
 		],
-		/*unlocks: {
-			zebraUpgrades:["darkRevolution"]
-		},*/
 		priceRatio: 1.15,
 		//zebraRequired: 10,
 		effects: {
