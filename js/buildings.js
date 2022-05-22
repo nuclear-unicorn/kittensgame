@@ -1920,7 +1920,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		action: function(self, game){
 			if(self.val < 1 || self.jammed){
-				return
+				return;
 			}
 			game.upgrade(
 				self.upgrades

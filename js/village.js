@@ -691,6 +691,10 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		return game.getEffect("environmentHappinessBonus") + game.getEffect("environmentUnhappiness") + game.bld.pollutionEffects["pollutionHappines"];
 	},
 
+	getOverpopulation: function(){
+		return this.getKittens() - this.sim.maxKittens;
+	},
+
 	/** Calculates a total happiness where result is a value of [0..1] **/
 	updateHappines: function(){
 		var happiness = 100;
@@ -728,7 +732,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		var karma = this.game.resPool.get("karma");
 		happiness += karma.value;	//+1% to the production per karma point
 
-		var overpopulation = this.getKittens() - this.maxKittens;
+		var overpopulation = this.getOverpopulation();
 		if (overpopulation > 0){
 			var overpopulationPenalty = 2;
 			happiness -= overpopulation * overpopulationPenalty;
