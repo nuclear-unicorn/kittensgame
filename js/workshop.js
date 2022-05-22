@@ -2242,8 +2242,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			effects: {		
 			},
 			prices:[
-				{name : "science", val: 75000},
-				{name: 	"compedium", val: 75}
+				{name : "science", val: 85000},
+				{name: 	"blueprint", val: 50},
+				{name : "bloodstone", val: 25},
+				{name: 	"tMythril", val: 10}
 			],
 			upgrades:{
 				buildings: ["zebraWorkshop"]
