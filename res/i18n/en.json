@@ -2215,7 +2215,7 @@
     "workshop.spaceEngineers.label": "Space Engineers",
     "workshop.spaceEngineers.desc": "Improves Engineer's effectiveness",
     "workshop.spaceManufacturing.label": "Space Manufacturing",
-    "workshop.spaceManufacturing.desc": "Factories provide bonus to Space Elevators and Orbital Arrays",
+    "workshop.spaceManufacturing.desc": "Factories provide bonus to space production as 75% of factory craft ratio",
     "workshop.spiceNavigation.label": "Spice Navigation",
     "workshop.spiceNavigation.desc": "Unlocks Navigation Relay. Enable you to staff kittens to explore space as a crew",
     "workshop.spiceNavigation.flavor": "A curious melange",
