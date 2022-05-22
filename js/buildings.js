@@ -1950,10 +1950,12 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game){
 			if(game.workshop.getZebraUpgrade("bloodstoneInstitute").researched){
-				self.effects["bloodstoneRatio"] = 0.001 * game.getLimitedDR(self.on * (game.ironWill? 1:0.1) * (game.karmaZebras + 1), game.getEffect("zebraPreparations") + 40) / self.on;
+				self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(self.on * (game.ironWill? 1:0.1) * (game.karmaZebras + 1), game.getEffect("zebraPreparations") + 40) / self.on;
 			}
+		},
+		upgrades: {
+			buildings: ["zebraWorkshop"]
 		}
-		
 	},{
 		name: "zebraForge",
 		label: $I("buildings.zebraForge.label"),
