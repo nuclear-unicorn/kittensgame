@@ -389,6 +389,10 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			kittensPerTick = kittensPerTick * (2 + this.game.getEffect("festivalArrivalRatio"));
 		}
 
+		var pollutionArrivalSlowdown = this.game.bld.pollutionEffects["pollutionArrivalSlowdown"] + this.game.getEffect("arrivalSlowdown");
+		if (pollutionArrivalSlowdown > 1){
+			kittensPerTick /= pollutionArrivalSlowdown;
+		}
 		this.sim.maxKittens = this.calculateSimMaxKittens();
 		this.sim.update(kittensPerTick, times);
 	},
