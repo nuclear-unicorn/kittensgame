@@ -303,7 +303,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		this.maxKittensRatioApplied = (hgImmuneMaxKittens <= withRatioMaxKittens);
 		return (this.maxKittensRatioApplied)? withRatioMaxKittens : Math.min(this.maxKittens, hgImmuneMaxKittens);*/
 	},
-	update: function(){
+	calculateKittensPerTick: function(){
 		//calculate kittens
 		var kittensPerTick = this.kittensPerTickBase * (1 + this.game.getEffect("kittenGrowthRatio"));
 
@@ -316,6 +316,11 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		if (pollutionArrivalSlowdown > 1){
 			kittensPerTick /= pollutionArrivalSlowdown;
 		}
+		return kittensPerTick;
+	},
+	update: function(){
+		//calculate kittens
+		var kittensPerTick = this.calculateKittensPerTick();
 
 		this.sim.maxKittens = this.calculateSimMaxKittens();
 		//this.sim.maxKittens = Math.round(this.maxKittens * (1 + this.game.getLimitedDR(maxKittensRatio, 1)));
@@ -382,13 +387,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 	fastforward: function(daysOffset){
 		var times = daysOffset * this.game.calendar.ticksPerDay;
 		//calculate kittens
-		var kittensPerTick = this.kittensPerTickBase * (1 + this.game.getEffect("kittenGrowthRatio"));
-
-		//Allow festivals to double birth rate.
-		if (this.game.calendar.festivalDays > 0) {
-			kittensPerTick = kittensPerTick * (2 + this.game.getEffect("festivalArrivalRatio"));
-		}
-
+		var kittensPerTick = this.calculateKittensPerTick();
 		this.sim.maxKittens = this.calculateSimMaxKittens();
 		this.sim.update(kittensPerTick, times);
 	},
@@ -629,6 +628,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			biomes: this.filterMetadata(this.map.biomes, ["name", "unlocked", "level", "cp"]),
 			currentBiome: this.map.currentBiome,
 			hadKittenHunters: this.sim.hadKittenHunters,
+			nextKittenProgress: this.sim.nextKittenProgress,
 			map: this.map.save()
 		};
 	},
@@ -668,7 +668,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 				this.map.currentBiome = saveData.village.currentBiome;
 			}
 			this.sim.hadKittenHunters = (saveData.village.hadKittenHunters === undefined)? true: saveData.village.hadKittenHunters;
-
+			this.sim.nextKittenProgress = saveData.village.nextKittenProgress ||0;
 			if (saveData.village.map){
 				this.map.load(saveData.village.map);
 			}

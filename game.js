@@ -3787,6 +3787,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				|| this.workshop.getEffectEngineer(resRef.name) != 0
 				|| this.getResourcePerDay(resRef.name) != 0
 				|| this.getResourceOnYearProduction(resRef.name) != 0
+				|| (resRef.name == "kittens" && this.village.sim.kittens.length < this.village.sim.maxKittens)
 			){
 
 				tooltip.innerHTML = this.getDetailedResMap(resRef);
@@ -3839,6 +3840,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				if (this.opts.usePercentageResourceValues){
 					resString += "<br> " + $I("res.netGain") + ": " + this.getDisplayValueExt(resPerYear, true, true);
 				}
+			return resString;
+		}
+		if(res.name == "kittens"){
+			var nextKittenProgress = this.village.sim.nextKittenProgress;
+			var kittensPerTick = this.village.calculateKittensPerTick();
+			var resString =  " [" + ( nextKittenProgress * 100 ).toFixed()  + "%]";
+			resString += "<br>" + $I("res.toNextKitten") + " " + this.toDisplaySeconds((1 - nextKittenProgress)/kittensPerTick);
 			return resString;
 		}
 		var resStack = this.getResourcePerTickStack(res.name),
