@@ -3844,7 +3844,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 		if(res.name == "kittens"){
 			var nextKittenProgress = this.village.sim.nextKittenProgress;
-			var kittensPerTick = this.village.calculateKittensPerTick()
+			var kittensPerTick = this.village.calculateKittensPerTick();
 			var resString =  " [" + ( nextKittenProgress * 100 ).toFixed()  + "%]";
 			resString += "<br>" + $I("res.toNextKitten") + " " + this.toDisplaySeconds((1 - nextKittenProgress)/kittensPerTick);
 			return resString;
