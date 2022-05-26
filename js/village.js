@@ -316,7 +316,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		if (pollutionArrivalSlowdown > 1){
 			kittensPerTick /= pollutionArrivalSlowdown;
 		}
-		return kittensPerTick
+		return kittensPerTick;
 	},
 	update: function(){
 		//calculate kittens
@@ -628,6 +628,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			biomes: this.filterMetadata(this.map.biomes, ["name", "unlocked", "level", "cp"]),
 			currentBiome: this.map.currentBiome,
 			hadKittenHunters: this.sim.hadKittenHunters,
+			nextKittenProgress: this.sim.nextKittenProgress,
 			map: this.map.save()
 		};
 	},
@@ -667,7 +668,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 				this.map.currentBiome = saveData.village.currentBiome;
 			}
 			this.sim.hadKittenHunters = (saveData.village.hadKittenHunters === undefined)? true: saveData.village.hadKittenHunters;
-
+			this.sim.nextKittenProgress = saveData.village.nextKittenProgress ||0;
 			if (saveData.village.map){
 				this.map.load(saveData.village.map);
 			}
