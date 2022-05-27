@@ -1372,15 +1372,15 @@ dojo.declare("classes.ui.ResetWgt", [mixin.IChildrenAware, mixin.IGameAware], {
 
         var msg = $I("time.reset.instructional");
 
-        var kittens = this.game.resPool.get("kittens").value;
-        var stripe = 5;
-        var karmaPointsPresent = this.game.getUnlimitedDR(this.game.karmaKittens, stripe);
-        var karmaPointsAfter = this.game.getUnlimitedDR(this.game.karmaKittens + this.game._getKarmaKittens(kittens), stripe);
-		var karmaPoints = Math.floor((karmaPointsAfter - karmaPointsPresent) * 100) / 100;
-
-
 		var _prestige = this.game.getResetPrestige();
 		var paragonPoints = _prestige.paragonPoints;
+		var karmaKittens = _prestige.karmaKittens;
+
+        var stripe = 5;
+        var karmaPointsPresent = this.game.getUnlimitedDR(this.game.karmaKittens, stripe);
+        var karmaPointsAfter = this.game.getUnlimitedDR(karmaKittens, stripe);
+		var karmaPoints = Math.floor((karmaPointsAfter - karmaPointsPresent) * 100) / 100;
+
 
 
         msg += "<br>" + $I("time.reset.karma") + ": " + karmaPoints;
