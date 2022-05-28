@@ -1463,7 +1463,7 @@
     "ui.option.language.apply": "应用更改",
     "ui.option.scheme": "主题：",
     "ui.option.scheme.relock": "重新锁定主题",
-    "ui.option.scheme.tip": "主题可以通过特定操作解锁",
+    "ui.option.scheme.tip": "未解锁主题可以通过特定操作永久解锁",
     "ui.option.workers": "启用 web worker\n<i>(游戏可以在后台运行，可这能会影响性能)<br>您需要刷新页面使该设置生效</i>",
     "ui.option.force.high.precision": "高精度资源值",
     "ui.option.use.per.second.values": "按秒显示资源变化 <i>(否则按tick显示资源变化)</i>",
