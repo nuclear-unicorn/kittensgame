@@ -150,19 +150,19 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	},
 	getCorruptionPerTickConsumption: function(){
 		if(this.game.getFeatureFlag("MAUSOLEUM_PACTS") > 0 && this.game.science.getPolicy("siphoning").researched){
-			return this.game.calendar.ticksPerDay * this.game.getEffect("necrocornPerDay")
+			return this.game.getEffect("necrocornPerDay")/this.game.calendar.ticksPerDay;
 		}
 		return 0;
 	},
 	getCorruptionDeficitPerTick: function(){
-		return Math.max(0, this.corruption - this.getCorruptionPerTickProduction() - this.getCorruptionPerTickConsumption());
+		return Math.max(-this.corruption - this.getCorruptionPerTickProduction() + this.getCorruptionPerTickConsumption(),0);
 	},
 	getCorruptionPerTick: function(){
 		var corruptionProduction = this.getCorruptionPerTickProduction();
 		if(this.game.getFeatureFlag("MAUSOLEUM_PACTS") && corruptionProduction > 0 && this.game.science.getPolicy("siphoning").researched){
-			corruptionProduction += this.game.calendar.ticksPerDay * this.game.getEffect("necrocornPerDay")
+			corruptionProduction += this.getCorruptionPerTickConsumption();
 		}
-		return corruptionProduction;
+		return Math.max(corruptionProduction, 0);
 	},
 	update: function(){
 		if (this.game.resPool.get("faith").value > 0 || this.game.challenges.isActive("atheism") && this.game.bld.get("ziggurat").val > 0){
@@ -1831,15 +1831,14 @@ dojo.declare("classes.religion.pactsManager", null, {
 		}
 		return necrocornDeficitRepaymentModifier;
 	},
-	getCompensatedNecrocorns: function(days, necrocornPerTick){
+	//how much corruption siphening spends in x days
+	getSiphonedCorruption: function(days){
+		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
 		if(this.game.science.getPolicy(["siphoning"]).researched){
-			if(this.game.religion.getCorruptionDeficitPerTick() / this.game.calendar.ticksPerDay <= 0 || this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
-				this.game.resPool.addResPerTick("alicorn", necrocornPerDay * days);
-				return necrocornPerTick;
+			if(this.game.religion.getCorruptionDeficitPerTick() <= 0){
+				return -necrocornPerDay * days;
 			}
-			var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
-			var siphenedNecrocorns = Math.min(necrocornPerDay * days, this.game.religion.getCorruptionPerTick()/this.game.calendar.ticksPerDay * day);
-			return Math.min(consumedAlicorns, siphenedNecrocorns);
+			return siphenedNecrocorns = Math.min(-necrocornPerDay * days, this.game.religion.getCorruptionPerTick()/this.game.calendar.ticksPerDay * days);
 		}
 		return 0;
 	},
@@ -1850,14 +1849,14 @@ dojo.declare("classes.religion.pactsManager", null, {
 		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
 		var compensatedNecrocorns = 0;
 		if(this.game.science.getPolicy(["siphoning"]).researched){
-			if(this.game.religion.getCorruptionDeficitPerTick() / this.game.calendar.ticksPerDay <= 0 || this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
+			if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
 				this.game.resPool.addResPerTick("alicorn", necrocornPerDay * days);
 				return;
 			}
 			var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
-			var siphenedNecrocorns = Math.min(necrocornPerDay * days, this.game.religion.getCorruptionPerTick()/this.game.calendar.ticksPerDay * day);
-			compensatedNecrocorns = Math.min(consumedAlicorns, siphenedNecrocorns);
+			var siphenedNecrocorns = this.getSiphonedCorruption(days);
 			this.game.resPool.addResPerTick("alicorn", consumedAlicorns);
+			compensatedNecrocorns = Math.min(consumedAlicorns, siphenedNecrocorns);
 		}
 		//if siphening is not enough to pay for per day consumption ALSO consume necrocorns;
 		if(this.necrocornDeficit > 0){
