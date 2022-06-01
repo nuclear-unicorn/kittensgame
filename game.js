@@ -3523,12 +3523,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				name: $I("res.stack.corruptionPerDayProduction"),
 				type: "perDay",
 				value: this.religion.getCorruptionPerTickProduction() * this.calendar.ticksPerDay
-			})
+			});
 			corruptionStack.push({
 				name: $I("res.stack.corruptionPerDaySiphoned"),
 				type: "perDay",
 				value: - this.religion.pactsManager.getSiphonedCorruption(1)
-			})
+			});
 			stack.push(corruptionStack);
 				// TIME extra-compare
 			stack.push({
