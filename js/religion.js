@@ -215,10 +215,11 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				: 0;
 			if(ticksBeforeFirstNecrocorn > 0 && ticksBeforeFirstNecrocorn < times){
 				this.game.resPool.get("necrocorn").value = 1;
-				this.corruption = 0;
+				this.corruption = 1;
 				var ticksAfterFirstNecrocorn = times - ticksBeforeFirstNecrocorn;
 				var corruptionPerTickAfterFirstNecrocorn = this.getCorruptionPerTick();
 				this.corruption += ticksAfterFirstNecrocorn * corruptionPerTickAfterFirstNecrocorn;
+				this.game.resPool.get("necrocorn").value = 0;
 			} else{
 				this.corruption += corruptionPerTick * times;
 			}
@@ -1830,6 +1831,18 @@ dojo.declare("classes.religion.pactsManager", null, {
 		}
 		return necrocornDeficitRepaymentModifier;
 	},
+	getCompensatedNecrocorns: function(days, necrocornPerTick){
+		if(this.game.science.getPolicy(["siphoning"]).researched){
+			if(this.game.religion.getCorruptionDeficitPerTick() / this.game.calendar.ticksPerDay <= 0 || this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
+				this.game.resPool.addResPerTick("alicorn", necrocornPerDay * days);
+				return necrocornPerTick;
+			}
+			var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
+			var siphenedNecrocorns = Math.min(necrocornPerDay * days, this.game.religion.getCorruptionPerTick()/this.game.calendar.ticksPerDay * day);
+			return Math.min(consumedAlicorns, siphenedNecrocorns);
+		}
+		return 0;
+	},
 	necrocornConsumptionDays: function(days){
 		//------------------------- necrocorns pacts -------------------------
 		//deficit changing
@@ -1843,7 +1856,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 			}
 			var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
 			var siphenedNecrocorns = Math.min(necrocornPerDay * days, this.game.religion.getCorruptionPerTick()/this.game.calendar.ticksPerDay * day);
-			compensatedNecrocorns = Math.min(consumedAlicorns, siphenedNecrocorns)
+			compensatedNecrocorns = Math.min(consumedAlicorns, siphenedNecrocorns);
 			this.game.resPool.addResPerTick("alicorn", consumedAlicorns);
 		}
 		//if siphening is not enough to pay for per day consumption ALSO consume necrocorns;
