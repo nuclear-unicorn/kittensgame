@@ -1843,7 +1843,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 			if(this.game.religion.getCorruptionDeficitPerTick() <= 0){
 				return -necrocornPerDay * days;
 			}
-			return siphenedNecrocorns = Math.min(-necrocornPerDay * days, this.game.religion.getCorruptionPerTickProduction()*this.game.calendar.ticksPerDay * days);
+			return Math.min(-necrocornPerDay * days, this.game.religion.getCorruptionPerTickProduction()*this.game.calendar.ticksPerDay * days);
 		}
 		return 0;
 	},
