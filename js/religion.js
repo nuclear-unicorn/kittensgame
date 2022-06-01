@@ -155,7 +155,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		return 0;
 	},
 	getCorruptionDeficitPerTick: function(){
-		return Math.max(-this.corruption - this.getCorruptionPerTickProduction() + this.getCorruptionPerTickConsumption(),0);
+		return Math.max(-this.getCorruptionPerTickProduction() - this.getCorruptionPerTickConsumption(),0);
 	},
 	getCorruptionPerTick: function(){
 		var corruptionProduction = this.getCorruptionPerTickProduction();
@@ -1822,8 +1822,13 @@ dojo.declare("classes.religion.pactsManager", null, {
 		if (this.necrocornDeficit <= 0){
 			return 1;
 		}
-		var necrocornDeficitRepaymentModifier = 1;
 		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
+		if(this.game.science.getPolicy(["siphoning"]).researched){
+			if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay >= 1){ //check if siphening is enough to pay for per day consumption
+				return 1;
+			}
+		}
+		var necrocornDeficitRepaymentModifier = 1;
 		necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
 		if((this.game.resPool.get("necrocorn").value + necrocornPerDay * necrocornDeficitRepaymentModifier) < 0){
 			necrocornDeficitRepaymentModifier = Math.max((necrocornPerDay * necrocornDeficitRepaymentModifier + this.game.resPool.get("necrocorn").value)/necrocornPerDay, 0);
@@ -1838,7 +1843,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 			if(this.game.religion.getCorruptionDeficitPerTick() <= 0){
 				return -necrocornPerDay * days;
 			}
-			return siphenedNecrocorns = Math.min(-necrocornPerDay * days, this.game.religion.getCorruptionPerTick()/this.game.calendar.ticksPerDay * days);
+			return siphenedNecrocorns = Math.min(-necrocornPerDay * days, this.game.religion.getCorruptionPerTickProduction()*this.game.calendar.ticksPerDay * days);
 		}
 		return 0;
 	},
