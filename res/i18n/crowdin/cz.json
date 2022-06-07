@@ -124,7 +124,7 @@
     "buildings.broadcasttower.label": "Vysílací věž",
     "buildings.broadcasttower.desc": "Generuje kulturu a spokojenost. Účinnější s vyšší produkcí energie.",
     "buildings.calciner.label": "Tavná pec",
-    "buildings.calciner.desc": "Vysoce efektivní zdroj kovu. Spotřebuje 1.5 rudy a 0.02 ropy za tick. Produkuje železo a trochu titanu",
+    "buildings.calciner.desc": "Vysoce efektivní zdroj kovu. Spotřebuje 1,5 rudy a 0,02 ropy za tick. Produkuje železo a trochu titanu",
     "buildings.chapel.label": "Kostel",
     "buildings.chapel.desc": "Produkuje trochu kultury a víry každý tick. Lze zkvalitnit náboženskými vylepšeními",
     "buildings.chronosphere.label": "Chronosféra",
