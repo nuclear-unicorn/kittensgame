@@ -11,6 +11,7 @@
 
 body.scheme_bluish {
 	background-color: #141936;
+	color-scheme: dark;
 }
 .scheme_bluish #gamePageContainer,
 .scheme_bluish select,

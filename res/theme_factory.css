@@ -12,6 +12,7 @@
 /* ******************************************** */
 body.scheme_factory {
 	background-color: #242324;
+	color-scheme: dark;
 }
 .scheme_factory #gamePageContainer,
 .scheme_factory select,
