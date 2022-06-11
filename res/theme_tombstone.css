@@ -13,6 +13,7 @@
 /* ******************************************** */
 body.scheme_tombstone {
 	background: #27282c;
+	color-scheme: dark;
 }
 .scheme_tombstone #gamePageContainer,
 .scheme_tombstone select,
