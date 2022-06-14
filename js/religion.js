@@ -137,7 +137,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			});
 		}
 	},
-	getCorruptionPerTick: function(){
+	getCorruptionPerTickProduction: function(){
 		if (this.game.resPool.get("alicorn").value > 0) {
 			//30% bls * 20 Radiance should yield ~ 50-75% boost rate which is laughable but we can always buff it
 			var blsBoost = 1 + Math.sqrt(this.game.resPool.get("sorrow").value * this.game.getEffect("blsCorruptionRatio"));
@@ -147,6 +147,22 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			return this.game.getEffect("corruptionRatio") * blsBoost * corruptionBoost;
 		}
 		return 0;
+	},
+	getCorruptionPerTickConsumption: function(){
+		if(this.game.getFeatureFlag("MAUSOLEUM_PACTS") > 0 && this.game.science.getPolicy("siphoning").researched){
+			return this.game.getEffect("necrocornPerDay")/this.game.calendar.ticksPerDay;
+		}
+		return 0;
+	},
+	getCorruptionDeficitPerTick: function(){
+		return Math.max(-this.getCorruptionPerTickProduction() - this.getCorruptionPerTickConsumption(),0);
+	},
+	getCorruptionPerTick: function(){
+		var corruptionProduction = this.getCorruptionPerTickProduction();
+		if(this.game.getFeatureFlag("MAUSOLEUM_PACTS") && corruptionProduction > 0 && this.game.science.getPolicy("siphoning").researched){
+			corruptionProduction += this.getCorruptionPerTickConsumption();
+		}
+		return Math.max(corruptionProduction, 0);
 	},
 	update: function(){
 		if (this.game.resPool.get("faith").value > 0 || this.game.challenges.isActive("atheism") && this.game.bld.get("ziggurat").val > 0){
@@ -160,12 +176,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 		var alicorns = this.game.resPool.get("alicorn");
 		if (alicorns.value > 0) {
-			//30% bls * 20 Radiance should yield ~ 50-75% boost rate which is laughable but we can always buff it
-			var blsBoost = 1 + Math.sqrt(this.game.resPool.get("sorrow").value * this.game.getEffect("blsCorruptionRatio"));
-			var corruptionBoost = this.game.resPool.get("necrocorn").value > 0
-				? 0.25 * (1 + this.game.getEffect("corruptionBoostRatio")) // 75% penalty
-				: 1;
-			this.corruption += this.game.getEffect("corruptionRatio") * blsBoost * corruptionBoost;
+			this.corruption += this.getCorruptionPerTick();
 		} else {
 			this.corruption = 0;
 		}
@@ -197,6 +208,22 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 		var alicorns = this.game.resPool.get("alicorn");
 		if (alicorns.value > 0) {
+			var corruptionPerTick = this.getCorruptionPerTick();
+			var ticksBeforeFirstNecrocorn = this.game.resPool.get("necrocorn").value == 0
+				// this.corruption is <= 1 at this point, no need to check if 1-this.corruption is negative
+				? Math.min(Math.ceil((1 - this.corruption) / corruptionPerTick), times)
+				: 0;
+			if(ticksBeforeFirstNecrocorn > 0 && ticksBeforeFirstNecrocorn < times){
+				this.game.resPool.get("necrocorn").value = 1;
+				this.corruption = 1;
+				var ticksAfterFirstNecrocorn = times - ticksBeforeFirstNecrocorn;
+				var corruptionPerTickAfterFirstNecrocorn = this.getCorruptionPerTick();
+				this.corruption += ticksAfterFirstNecrocorn * corruptionPerTickAfterFirstNecrocorn;
+				this.game.resPool.get("necrocorn").value = 0;
+			} else{
+				this.corruption += corruptionPerTick * times;
+			}
+			/* old implemintation
 			//30% bls * 20 Radiance should yield ~ 50-75% boost rate which is laughable but we can always buff it
 			var blsBoost = 1 + Math.sqrt(this.game.resPool.get("sorrow").value * this.game.getEffect("blsCorruptionRatio"));
 			var corruptionPerTickBeforeFirstNecrocorn = this.game.getEffect("corruptionRatio") * blsBoost;
@@ -207,8 +234,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			var ticksAfterFirstNecrocorn = times - ticksBeforeFirstNecrocorn;
 			var corruptionBoost = 0.25 * (1 + this.game.getEffect("corruptionBoostRatio")); // 75% penalty
 			this.corruption += corruptionPerTickBeforeFirstNecrocorn * (ticksBeforeFirstNecrocorn + ticksAfterFirstNecrocorn * corruptionBoost);
+			
 		} else {
-			this.corruption = 0;
+			this.corruption = 0;*/
 		}
 
 		// Prevents alicorn count to fall to 0, which would stop the per-tick generation
@@ -225,6 +253,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		if (this.corruption >= 1) {
 			this.corruption = 1;
 		}
+
+		//------------------------- necrocorns pacts -------------------------
+		this.pactsManager.necrocornConsumptionDays(daysOffset);
 
 		this.triggerOrderOfTheVoid(times);
 	},
@@ -870,7 +901,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		},
 		unlocked: false,
 		unlocks: {
-			pacts: ["pactOfCleansing", "pactOfDestruction",  "pactOfExtermination", "pactOfPurity"]
+			pacts: ["pactOfCleansing", "pactOfDestruction",  "pactOfExtermination", "pactOfPurity"],
+			policies: ["siphoning"]
 		},
 		calculateEffects: function (self, game){
 			if(!game.getFeatureFlag("MAUSOLEUM_PACTS")){
@@ -1790,8 +1822,13 @@ dojo.declare("classes.religion.pactsManager", null, {
 		if (this.necrocornDeficit <= 0){
 			return 1;
 		}
-		var necrocornDeficitRepaymentModifier = 1;
 		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
+		if(this.game.science.getPolicy(["siphoning"]).researched){
+			if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay >= 1){ //check if siphening is enough to pay for per day consumption
+				return 1;
+			}
+		}
+		var necrocornDeficitRepaymentModifier = 1;
 		necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
 		if((this.game.resPool.get("necrocorn").value + necrocornPerDay * necrocornDeficitRepaymentModifier) < 0){
 			necrocornDeficitRepaymentModifier = Math.max((necrocornPerDay * necrocornDeficitRepaymentModifier + this.game.resPool.get("necrocorn").value)/necrocornPerDay, 0);
@@ -1799,11 +1836,34 @@ dojo.declare("classes.religion.pactsManager", null, {
 		}
 		return necrocornDeficitRepaymentModifier;
 	},
+	//how much corruption siphening spends in x days
+	getSiphonedCorruption: function(days){
+		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
+		if(this.game.science.getPolicy(["siphoning"]).researched){
+			if(this.game.religion.getCorruptionDeficitPerTick() <= 0){
+				return -necrocornPerDay * days;
+			}
+			return Math.min(-necrocornPerDay * days, this.game.religion.getCorruptionPerTickProduction()*this.game.calendar.ticksPerDay * days);
+		}
+		return 0;
+	},
 	necrocornConsumptionDays: function(days){
 		//------------------------- necrocorns pacts -------------------------
 		//deficit changing
 		var necrocornDeficitRepaymentModifier = 1;
 		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
+		var compensatedNecrocorns = 0;
+		if(this.game.science.getPolicy(["siphoning"]).researched){
+			if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
+				this.game.resPool.addResPerTick("alicorn", necrocornPerDay * days);
+				return;
+			}
+			var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
+			var siphenedNecrocorns = this.getSiphonedCorruption(days);
+			this.game.resPool.addResPerTick("alicorn", consumedAlicorns);
+			compensatedNecrocorns = Math.min(consumedAlicorns, siphenedNecrocorns);
+		}
+		//if siphening is not enough to pay for per day consumption ALSO consume necrocorns;
 		if(this.necrocornDeficit > 0){
 			necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
 		}
@@ -1814,7 +1874,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 			this.necrocornDeficit += necrocornPerDay *(0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")) * days);
 			this.necrocornDeficit = Math.max(this.necrocornDeficit, 0);
 		}
-		this.game.resPool.addResPerTick("necrocorn", necrocornPerDay * necrocornDeficitRepaymentModifier);
+		this.game.resPool.addResPerTick("necrocorn", necrocornPerDay * necrocornDeficitRepaymentModifier * days - compensatedNecrocorns);
 	},
 	pactsMilleniumKarmaKittens: function(millenium){
 		//pacts karma effect
