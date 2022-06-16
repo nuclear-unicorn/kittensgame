@@ -1092,7 +1092,7 @@
     "village.leader.promoted.many.kittens": "l tuo leader ha promosso {0} gattini",
     "village.msg.froze": "morto assiderato.",
     "village.msg.hunt.from": " da {0} battute di caccia",
-    "village.msg.hunt.furs": "pelli",
+    "village.msg.hunt.furs": "+{0} pellicce",
     "village.msg.hunt.gold": "+{0} oro",
     "village.msg.hunt.ivory": "+{0} avorio",
     "village.msg.hunt.success": "I cacciatori sono tornati",
