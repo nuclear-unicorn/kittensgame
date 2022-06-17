@@ -1860,8 +1860,8 @@ dojo.declare("classes.religion.pactsManager", null, {
 			}
 			var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
 			var siphenedNecrocorns = this.getSiphonedCorruption(days);
-			this.game.resPool.addResPerTick("alicorn", consumedAlicorns);
-			compensatedNecrocorns = Math.min(consumedAlicorns, siphenedNecrocorns);
+			compensatedNecrocorns = Math.max(consumedAlicorns, -siphenedNecrocorns);
+			this.game.resPool.addResPerTick("alicorn", compensatedNecrocorns);
 		}
 		//if siphening is not enough to pay for per day consumption ALSO consume necrocorns;
 		if(this.necrocornDeficit > 0){
