@@ -741,7 +741,9 @@ WLeftPanel = React.createClass({
         var catpower = game.resPool.get("manpower");
         var huntCount = Math.floor(catpower.value / 100);
 
-        var showFastHunt = (catpower.value >= 100) && (!game.challenges.isActive("pacifism"));
+        var canHunt = ((game.resPool.get("paragon").value > 0) || (game.science.get("archery").researched)) &&
+            (!game.challenges.isActive("pacifism"));
+        var showFastHunt = (catpower.value >= 100);
 
         //---------- advisor ---------
         var showAdvisor = false;
@@ -766,7 +768,10 @@ WLeftPanel = React.createClass({
             }, 
                 $I("general.food.advisor.text")
             ), 
-            $r("div", {id:"fastHuntContainer", className:"pin-link", style:{display: (showFastHunt ? "block" : "none")}},
+            $r("div", {id:"fastHuntContainer", className:"pin-link", style:{
+                display: (canHunt ? "block" : "none"),
+                visibility: (showFastHunt ? "visible" : "hidden")
+            }},
                 $r("a", {href:"#", onClick: this.huntAll},
                     $I("left.hunt") + " (",
                     $r("span", {
