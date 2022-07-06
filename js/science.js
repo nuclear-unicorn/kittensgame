@@ -1547,7 +1547,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "manpower", val: 10000}
         ],
         effects:{
-            "terraformingMaxKittensRatio": 0.001 //might be too weak - could be fixed later on
+            "terraformingMaxKittensRatio": 0.1
         },
         unlocked: false,
         blocked: false,

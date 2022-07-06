@@ -1860,15 +1860,15 @@ dojo.declare("classes.religion.pactsManager", null, {
 			}
 			var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
 			var siphenedNecrocorns = this.getSiphonedCorruption(days);
-			this.game.resPool.addResPerTick("alicorn", consumedAlicorns);
-			compensatedNecrocorns = Math.min(consumedAlicorns, siphenedNecrocorns);
+			compensatedNecrocorns = Math.max(consumedAlicorns, -siphenedNecrocorns);
+			this.game.resPool.addResPerTick("alicorn", compensatedNecrocorns);
 		}
 		//if siphening is not enough to pay for per day consumption ALSO consume necrocorns;
 		if(this.necrocornDeficit > 0){
 			necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
 		}
-		if((this.game.resPool.get("necrocorn").value + necrocornPerDay * days * necrocornDeficitRepaymentModifier) < 0){
-			this.necrocornDeficit += Math.max(-necrocornPerDay * days - this.game.resPool.get("necrocorn").value, 0);
+		if((this.game.resPool.get("necrocorn").value + necrocornPerDay * days * necrocornDeficitRepaymentModifier - compensatedNecrocorns) < 0){
+			this.necrocornDeficit += Math.max(-necrocornPerDay * days - this.game.resPool.get("necrocorn").value + compensatedNecrocorns, 0);
 			necrocornDeficitRepaymentModifier = 1;
 		}else if(this.necrocornDeficit > 0){
 			this.necrocornDeficit += necrocornPerDay *(0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")) * days);

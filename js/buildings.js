@@ -186,6 +186,21 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
         this.setEffectsCachedExisting();
 	},
 
+	setEffectsCachedExisting: function(){
+		this.inherited(arguments);
+		//register effect names on building stages
+		for (var i = 0; i < this.buildingsData.length; i++){
+			var building = this.buildingsData[i];
+			if (building.stages){
+				for (var j = 0; j < building.stages.length; j++){
+					for (var effectName in building.stages[j].effects){
+						this.effectsCachedExisting[effectName] = 0;
+					}
+				}
+			}
+		}
+	},
+
 	buildingGroups: [{
 		name: "food",
 		title: $I("buildings.group.food"),
@@ -1894,12 +1909,26 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		zebraRequired: 5,
 		effects: {
 			"hunterRatio" : 0.05,
+			"manpowerMax": 5,
 			"zebraPreparations" : 0
 		},
 		calculateEffects: function(self, game){
 			if(game.workshop.getZebraUpgrade("darkRevolution").researched){
 				self.effects["zebraPreparations"] = game.ironWill? 1:0.1;
+				self.jammed = false;
 			}
+		},
+		action: function(self, game){
+			if(self.val < 1 || self.jammed){
+				return;
+			}
+			game.upgrade(
+				self.upgrades
+			);
+			self.jammed = true;
+		},
+		upgrades: {
+			buildings: ["zebraWorkshop"]
 		}
 	},{
 		name: "zebraWorkshop",
@@ -1915,7 +1944,17 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		priceRatio: 1.15,
 		zebraRequired: 10,
 		effects: {
+			"manpowerMax": 25,
+			"bloodstoneRatio": 0
 			//"bloodstoneCraftRatio" : 0.01
+		},
+		calculateEffects: function(self, game){
+			if(game.workshop.getZebraUpgrade("bloodstoneInstitute").researched){
+				self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(self.on * (game.ironWill? 1:0.1) * (game.karmaZebras + 1), game.getEffect("zebraPreparations") + 40) / self.on;
+			}
+		},
+		upgrades: {
+			buildings: ["zebraWorkshop"]
 		}
 	},{
 		name: "zebraForge",
@@ -1933,23 +1972,19 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		zebraRequired: 50,
 		effects: {
 			//"bloodstoneCraftRatio" : 0.02,
+			"manpowerMax": 50,
 			"tMythrilCraftRatio" : 0.01,
 		},
 	},{
 		name: "ivoryTemple",
 		defaultUnlockable: true,
-		//label: $I("buildings.ivoryTemple.label"),
-		//description: $I("buildings.ivoryTemple.desc"),
-		label: "Ivory Temple",
-		description: "Mystical temple where ivory is converted into minerals",
+		label: $I("buildings.ivoryTemple.label"),
+		description: $I("buildings.ivoryTemple.desc"),
 		unlockRatio: 0.1,
 		prices: [
 			{ name : "tMythril", val: 1 },
 			{ name : "ivory", val: 100 }
 		],
-		/*unlocks: {
-			zebraUpgrades:["darkRevolution"]
-		},*/
 		priceRatio: 1.15,
 		//zebraRequired: 10,
 		effects: {
@@ -1958,6 +1993,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"titaniumPerTickCon": 0,
 			"alicornPerTickCon": 0,
 			"tMythrilPerTick": 0,
+			"manpowerMax": 10
 		},
 		lackResConvert: false,
 		togglable: true,
@@ -1973,7 +2009,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					"mineralsPerTickProd": 2,
 					"titaniumPerTickCon": -2,
 					"alicornPerTickCon": -0.00002,
-					"tMythrilPerTick": 0.00005
+					"tMythrilPerTick": 0.00005,
+					"manpowerMax": 10
 				};
 			}else {
 				self.effects = {
@@ -1981,7 +2018,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					"mineralsPerTickProd": 1,
 					"titaniumPerTickCon": 0,
 					"alicornPerTickCon": 0,
-					"tMythrilPerTick": 0
+					"tMythrilPerTick": 0,
+					"manpowerMax": 10
 				};
 			}
 			var amt = game.resPool.getAmtDependsOnStock(
@@ -2743,6 +2781,10 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 			effects = currentStage.effects;
 		}
 		return effects;
+	},
+
+	getTotalEffects: function(model){
+		return this.getMetadataRaw(model).totalEffectsCached;
 	},
 
 	getStageLinks: function(model){

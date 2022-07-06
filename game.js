@@ -1652,6 +1652,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	telemetry: null,
 	server: null,
 	math: null,
+	loadingSave: false, //while save is being imported we should ignore production from buildings for one tick; hack
 
 	//global cache
 	globalEffectsCached: {},
@@ -2548,7 +2549,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				throw "Integrity check failure";
 			}
 
+			this.loadingSave = true;
 			this.load();
+			this.loadingSave = false;
 			this.msg($I("save.import.msg"));
 
 			this.render();
@@ -3796,6 +3799,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				|| this.workshop.getEffectEngineer(resRef.name) != 0
 				|| this.getResourcePerDay(resRef.name) != 0
 				|| this.getResourceOnYearProduction(resRef.name) != 0
+				|| (resRef.name == "kittens" && this.village.sim.kittens.length < this.village.sim.maxKittens)
 			){
 
 				tooltip.innerHTML = this.getDetailedResMap(resRef);
@@ -3850,6 +3854,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				if (this.opts.usePercentageResourceValues){
 					resString += "<br> " + $I("res.netGain") + ": " + this.getDisplayValueExt(resPerYear, true, true);
 				}
+			return resString;
+		}
+		if(res.name == "kittens"){
+			var nextKittenProgress = this.village.sim.nextKittenProgress;
+			var kittensPerTick = this.village.calculateKittensPerTick();
+			var resString =  " [" + ( nextKittenProgress * 100 ).toFixed()  + "%]";
+			resString += "<br>" + $I("res.toNextKitten") + " " + this.toDisplaySeconds((1 - nextKittenProgress)/kittensPerTick);
 			return resString;
 		}
 		var resStack = this.getResourcePerTickStack(res.name),
@@ -4578,17 +4589,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var cryochambers = this.time.getVSU("cryochambers").on;
 
 		var cathPollution = 0;
-		if(this.challenges.getChallenge("postApocalypse").pending){
-			if(cryochambers > 0){
-				var catnip = this.resPool.get("catnip");
-				if (!catnip){
-					catnip = this.resPool.createResource("catnip");
-				}
-				catnip.value = cryochambers * 1000 * (1 + this.resPool.get("karma").value/100);
-				newResources.push(catnip);
-			}
-			cathPollution = (this.challenges.getChallenge("postApocalypse").on + cryochambers) * 1e+8 + 1e+11;
-		}
 
 		if (cryochambers > 0) {
 			this.village.sim.sortKittensByExp();
@@ -4597,8 +4597,27 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				delete newKittens[i].job;
 				delete newKittens[i].engineerSpeciality;
 			}
+			var usedCryochambers_reset = this.time.filterMetadata([this.time.getVSU("usedCryochambers")], ["name", "val", "on"]);
+			usedCryochambers_reset[0]["val"] = cryochambers;
+			usedCryochambers_reset[0]["on"] = cryochambers;
+		}else{
+			var usedCryochambers_reset = this.time.filterMetadata([this.time.getVSU("usedCryochambers")], ["name", "val", "on"]);
+			usedCryochambers_reset[0]["val"] = 0;
+			usedCryochambers_reset[0]["on"] = 0;
+		}
+		if(this.challenges.getChallenge("postApocalypse").pending){
+			if(newKittens.length > 0){
+				var catnip = this.resPool.get("catnip");
+				if (!catnip){
+					catnip = this.resPool.createResource("catnip");
+				}
+				catnip.value = newKittens.length * 1000 * (1 + this.resPool.get("karma").value/100);
+				newResources.push(catnip);
+			}
+			cathPollution = (this.challenges.getChallenge("postApocalypse").on + newKittens.length) * 1e+8 + 1e+11;
 		}
 
+/*
 		if (newKittens.length > 0) {
 			var usedCryochambers_reset = this.time.filterMetadata([this.time.getVSU("usedCryochambers")], ["name", "val", "on"]);
 			usedCryochambers_reset[0]["val"] = newKittens.length;
@@ -4608,7 +4627,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			usedCryochambers_reset[0]["val"] = 0;
 			usedCryochambers_reset[0]["on"] = 0;
 		}
-
+*/
 		// Set the challenge for after reset
 		for (var i = 0; i < this.challenges.challenges.length; i++){
 			var challenge = this.challenges.challenges[i];

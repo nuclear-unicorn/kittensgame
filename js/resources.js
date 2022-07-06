@@ -705,15 +705,19 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 			maxValue = this.addResMaxRatios(res, maxValue);
 			
-			var challengeEffect = this.game.getLimitedDR(this.addResMaxRatios(res, this.game.getEffect(res.name + "MaxChallenge")), maxValue - 1);
-			maxValue += challengeEffect;
-
+			var challengeEffect = this.game.getEffect(res.name + "MaxChallenge");
+			if(challengeEffect){
+				challengeEffect = this.game.getLimitedDR(this.addResMaxRatios(res, challengeEffect), maxValue - 1);
+				maxValue += challengeEffect;
+			}
 			if (maxValue < 0 ){
 				maxValue = 0;
 			}
 
 			res.maxValue = maxValue;
-
+			if(game.loadingSave){ //hack to stop production before game.calculateAllEffects after manual import
+				continue;
+			}
 			var resPerTick = game.getResourcePerTick(res.name, false);
 			this.addResPerTick(res.name, resPerTick);
 

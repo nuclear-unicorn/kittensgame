@@ -412,7 +412,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
     //------------ IDK, silly gimmickish stuff -----------
     unlockElders : function(){
         var elders = this.get("leviathans");
-		if (elders.duration){	//elder visits do not stack
+		if (elders.duration || !this.hasUnlockedRaces()){	//elder visits do not stack, and elders do not like being first
 			return;
 		}
 
@@ -1210,7 +1210,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 		var self = this;
 
 		var div = dojo.create("div", { class: "expandAllBar", style: { float: "left"}}, tabContainer);
-		dojo.create("span", { innerHTML: $I("trade.effectiveness", [this.game.getDisplayValueExt(this.game.diplomacy.getTradeRatio() * 100, false, false, 0)]) }, div);
+		dojo.create("span", { innerHTML: $I("trade.effectiveness", [this.game.getDisplayValueExt((this.game.diplomacy.getTradeRatio() + this.game.challenges.getChallenge("pacifism").getTradeBonusEffect(this.game))* 100, false, false, 0)]) }, div);
 
 		// expand all / collapse all panels
 

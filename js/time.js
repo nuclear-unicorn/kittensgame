@@ -649,9 +649,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             remainingDaysInFirstYear = cal.daysPerSeason * cal.seasonsPerYear;
         }
         if (amt == 1) {
-            game.msg($I("time.tc.shatterOne"), "", "tc");
+            game.msg($I("time.tc.shatterOne"), "", "tcShatter");
         } else {
-            game.msg($I("time.tc.shatter",[amt]), "", "tc");
+            game.msg($I("time.tc.shatter",[amt]), "", "tcShatter");
         }
         this.flux += amt - 1 + remainingDaysInFirstYearSaved / daysPerYear;
 
@@ -716,14 +716,15 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 remainingCyclesYears[j] = maxYearsShattered/10;
             }
         }else{
-            remainingCyclesYears[cal.cycle] += Math.min(cal.yearsPerCycle - cal.cycleYear, maxYearsShattered);
-            maxYearsShattered += -remainingCyclesYears[cal.cycle];
+            var wholeCycleYears = maxYearsShattered - maxYearsShattered%50;
             for (j in remainingCyclesYears){
-                remainingCyclesYears[j] += Math.floor(maxYearsShattered/50);
-                maxYearsShattered += -Math.floor(maxYearsShattered/50);
+                remainingCyclesYears[j] = wholeCycleYears/10;
             }
+            maxYearsShattered -= wholeCycleYears;
+            remainingCyclesYears[cal.cycle] += Math.min(cal.yearsPerCycle - cal.cycleYear, maxYearsShattered);
+            maxYearsShattered -= Math.min(cal.yearsPerCycle - cal.cycleYear, maxYearsShattered);
             for (j = 1; j < cal.cyclesPerEra; j++){
-                remainingCyclesYears[(cal.cycle + j)%10] = Math.min(cal.yearsPerCycle, maxYearsShattered);
+                remainingCyclesYears[(cal.cycle + j)%10] += Math.min(cal.yearsPerCycle, maxYearsShattered);
                 maxYearsShattered += -Math.min(cal.yearsPerCycle, maxYearsShattered);
             }
         }
@@ -764,18 +765,19 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                         1) and isn't overcapped, and production would cause it to be capped for each year, decrease the cap
                         2) and doesn't have a cap, it will just decrease the number of resources by decreasing it using power function on starting value and sum of geometric progression for produced value
                         3) and (last possible option is that it) we can also limit the cap
+                        NOTE: aiDestructionMod is A NEGATIVE VALUE!!!
                     */
                     if (aiApocalypseLevel && res.aiCanDestroy){
                         //console.log(res.name);
                         var oldVal = res.value - delta[res.name];
-                        delta[res.name] /= yearsInCurrentCycle;
+                        delta[res.name]/= yearsInCurrentCycle||1;  
                         if(resLimit == res.MaxValue && oldVal + delta[res.name] - (oldVal + delta[res.name]) * aiDestructionMod >= resLimit){
                             resLimit = Math.min(resLimit, res.value) * (1 + aiDestructionMod);
                         }else if (!res.maxValue){
-                            delta[res.name] = Math.min(delta[res.name], 0);
+                            delta[res.name] = Math.max(delta[res.name], 0);
                             //using sum of geometrical progression:
-                            var decreaseOfDelta = delta[res.name] * (1 - Math.abs(Math.pow(aiDestructionMod, yearsInCurrentCycle)))/(1 + yearsInCurrentCycle);
-                            game.resPool.addResEvent(res.name, decreaseOfDelta + oldVal * Math.pow((1 - aiDestructionMod), yearsInCurrentCycle)); //hopefully this works
+                            var decreaseOfDelta = -delta[res.name] * (1 - Math.abs(Math.pow(aiDestructionMod, yearsInCurrentCycle)))/(Math.abs(1 - aiDestructionMod)||1);
+                            game.resPool.addResEvent(res.name, decreaseOfDelta - oldVal * (1- Math.pow((1 + aiDestructionMod), yearsInCurrentCycle))); //this is no longer broken
                         }else /*if (resLimit == res.value)*/{
                             resLimit = Math.min(resLimit, res.value) * Math.pow(1 + aiDestructionMod, yearsInCurrentCycle);
                         }
@@ -801,9 +803,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         cal.onNewYears(endYear == cal.year, maxYearsShattered, false);
         cal.calculateMilleniumProduction(cal.getMilleniaChanged(startYear, cal.year));
         if (amt == 1) {
-            game.msg($I("time.tc.shatterOne"), "", "tc");
+            game.msg($I("time.tc.shatterOne"), "", "tcShatter");
         } else {
-            game.msg($I("time.tc.shatter",[amt]), "", "tc");
+            game.msg($I("time.tc.shatter",[amt]), "", "tcShatter");
         }
 
 		if(aiApocalypseLevel){
@@ -1370,15 +1372,15 @@ dojo.declare("classes.ui.ResetWgt", [mixin.IChildrenAware, mixin.IGameAware], {
 
         var msg = $I("time.reset.instructional");
 
-        var kittens = this.game.resPool.get("kittens").value;
-        var stripe = 5;
-        var karmaPointsPresent = this.game.getUnlimitedDR(this.game.karmaKittens, stripe);
-        var karmaPointsAfter = this.game.getUnlimitedDR(this.game.karmaKittens + this.game._getKarmaKittens(kittens), stripe);
-		var karmaPoints = Math.floor((karmaPointsAfter - karmaPointsPresent) * 100) / 100;
-
-
 		var _prestige = this.game.getResetPrestige();
 		var paragonPoints = _prestige.paragonPoints;
+		var karmaKittens = _prestige.karmaKittens;
+
+        var stripe = 5;
+        var karmaPointsPresent = this.game.getUnlimitedDR(this.game.karmaKittens, stripe);
+        var karmaPointsAfter = this.game.getUnlimitedDR(karmaKittens, stripe);
+		var karmaPoints = Math.floor((karmaPointsAfter - karmaPointsPresent) * 100) / 100;
+
 
 
         msg += "<br>" + $I("time.reset.karma") + ": " + karmaPoints;

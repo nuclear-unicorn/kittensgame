@@ -266,7 +266,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		calculateEffects: function(self, game){
 			if(self.active){
 				self.effects["arrivalSlowdown"] = 10;
-				self.effects["cryochamberSupport"] = 0;
+				self.effects["cryochamberSupport"] = 1; //this is a quick fix for cryochamber cap when resetting into PA; does not make PA easier so it's ok
 			}else{
 				self.effects["arrivalSlowdown"] = 0;
 				self.effects["cryochamberSupport"] = 1;
@@ -358,6 +358,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				}
 				this.game.challenges.reserves.reserveKittens = reserveKittens;
 				this.game.challenges.reserves.reserveResources = saveData.challenges.reserves.reserveResources;
+				this.game.challenges.reserves.reserveCryochambers = saveData.challenges.reserves.reserveCryochambers||kittens.length;
 		}
 	},
 
@@ -470,10 +471,12 @@ dojo.declare("classes.reserveMan", null,{
 		this.game = game;
 		this.reserveResources = null;
 		this.reserveKittens = null;
+		this.reserveCryochambers = 0;
 	},
 	resetState: function(){
 		this.reserveResources = {};
 		this.reserveKittens = [];
+		this.reserveCryochambers = 0;
 	},
 	calculateReserveResources: function(){
 		var saveRatio = this.game.bld.get("chronosphere").val > 0 ? this.game.getEffect("resStasisRatio") : 0;
@@ -534,6 +537,7 @@ dojo.declare("classes.reserveMan", null,{
 		this.game.challenges.reserves.calculateReserveResources();
 		if(!this.game.challenges.getChallenge("postApocalypse").pending || isIronWillPending){
 			this.game.challenges.reserves.calculateReserveKittens();
+			this.reserveCryochambers += this.game.time.getVSU("cryochambers").on;
 		}
 	},
 	addReserves: function(){
@@ -554,8 +558,9 @@ dojo.declare("classes.reserveMan", null,{
 		for(var i in this.reserveKittens){
 			this.game.village.sim.kittens.push(this.reserveKittens[i]);
 		}
-		this.game.time.getVSU("usedCryochambers").val += this.reserveKittens.length;
-		this.game.time.getVSU("usedCryochambers").on += this.reserveKittens.length;
+		this.game.time.getVSU("usedCryochambers").val += this.reserveCryochambers;
+		this.game.time.getVSU("usedCryochambers").on += this.reserveCryochambers;
+		this.reserveCryochambers = 0;
 		this.reserveKittens = [];
 		this.game.msg($I("challendge.reservesReclaimed.msg"));
 	},
@@ -569,7 +574,8 @@ dojo.declare("classes.reserveMan", null,{
 		return {
 			reserveKittens: kittens,
 			reserveResources: this.game.challenges.reserves.reserveResources,
-			ironWillClaim: this.ironWillClaim
+			ironWillClaim: this.ironWillClaim,
+			reserveCryochambers: this.reserveCryochambers
 		};
 	},
 	reservesExist: function(){
