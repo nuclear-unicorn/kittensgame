@@ -11,13 +11,14 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     isAccelerated: false,
 
     timestamp: null,    /*NO FUCKING timestamp resources*/
-
+    queue: null,
     constructor: function(game){
         this.game = game;
 
 		this.registerMeta("stackable", this.chronoforgeUpgrades, null);
 		this.registerMeta("stackable", this.voidspaceUpgrades, null);
 		this.setEffectsCachedExisting();
+        this.queue = new classes.queue.manager(game);
     },
 
     save: function(saveData) {
@@ -139,6 +140,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             if (cfu.action) {
                 cfu.action(cfu, this.game);
             }
+        }
+        if(this.game.ticks % this.queue.periodInTicks == 0){
+            this.queue.update();
         }
         this.calculateRedshift();
     },
@@ -1465,4 +1469,169 @@ dojo.declare("classes.tab.TimeTab", com.nuclearunicorn.game.ui.tab, {
         }
 
     }
+});
+
+
+
+dojo.declare("classes.queue.manager", null,{
+    game: null,
+    queue_list : [],
+    periodInTicks: 10,
+    constructor: function(game){
+        this.game = game;
+        if(game.getFeatureFlag("MAUSOLEUM_PACTS")){
+            queueSources.push("pacts");
+        }
+    },
+    queueSources : ["policies", "tech", "buildings", "spaceMission",
+                    "spaceBuilding","chronoforge", "voidSpace", "zigguratUpgrades",  
+                    "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],
+    update: function(){
+        if(this.queue_list.length <= 0){
+            return;
+        }
+        var el = this.queue_list[0];
+        var itemMetaRaw = this.game.getUnlockByName(el[0], el[1]);
+        console.log(el);
+        var compare = "val"; //we should do some sort of refractoring of the switch mechanism
+        //var buyItem = true;
+        switch (el[1]){
+            case "policies":
+                compare = "researched";
+                var props = {
+                    id:          itemMetaRaw.name
+                };
+                props.controller = new classes.ui.PolicyBtnController(this.game);
+                var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                props.controller.buyItem(model, 1,  function(result) {});
+                break;
+            case "tech":
+                compare = "researched";
+                var props = {
+                    id:            itemMetaRaw.name
+                };
+                props.controller = new com.nuclearunicorn.game.ui.TechButtonController(this.game);
+                var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                props.controller.buyItem(model, 1,  function(result) {});
+                break;
+            case "buildings":
+                var bld = new classes.BuildingMeta(itemMetaRaw).getMeta();
+                    oldVal = itemMetaRaw.val;
+                var props = {
+                    key:            bld.name,
+                    name:           bld.label,
+                    description:    bld.description,
+                    building:       bld.name
+                };
+                if (typeof(bld.stages) == "object"){
+                    props.controller = new classes.ui.btn.StagingBldBtnController(this.game);
+                } else {
+                    props.controller = new classes.ui.btn.BuildingBtnModernController(this.game);
+                }
+                var model = props.controller.fetchModel(props);
+                props.controller.build(model, 1);
+                break;
+            case "spaceMission":
+                var props = {
+                    id:            itemMetaRaw.name
+                };
+                props.controller = new com.nuclearunicorn.game.ui.SpaceProgramBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                props.controller.buyItem(model, 1,  function(result) {});
+                break;
+            case "spaceBuilding":
+                var props = {
+                    id:            itemMetaRaw.name
+                };
+                props.controller = new classes.ui.space.PlanetBuildingBtnController(this.game);
+                var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                props.controller.buyItem(model, 1,  function(result) {});
+                break;
+            case "chronoforge":
+                var props = {
+                    id:            itemMetaRaw.name
+                };
+                props.controller = new classes.ui.time.ChronoforgeBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                props.controller.buyItem(model, 1,  function(result) {});
+                break;
+            case "voidSpace":
+                var props = {
+                    id:            itemMetaRaw.name
+                };
+                props.controller = new classes.ui.time.VoidSpaceBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                props.controller.buyItem(model, 1,  function(result) {});
+                break;
+            case "zigguratUpgrades":
+                var props = {
+                    id:            itemMetaRaw.name
+                };
+                props.controller = new com.nuclearunicorn.game.ui.ZigguratBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                props.controller.buyItem(model, 1,  function(result) {});
+                break;
+            case "religion":
+                var props = {
+                    id:            itemMetaRaw.name
+                };
+                props.controller = new com.nuclearunicorn.game.ui.ReligionBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                props.controller.buyItem(model, 1,  function(result) {});
+                break;
+            case "transcendenceUpgrades":
+                var props = {
+                    id:            itemMetaRaw.name
+                };
+                props.controller = new classes.ui.TranscendenceBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                props.controller.buyItem(model, 1,  function(result) {});
+                break;
+            case "pacts":
+                var props = {
+                    id:            itemMetaRaw.name
+                };
+                props.controller = new com.nuclearunicorn.game.ui.PactsBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                props.controller.buyItem(model, 1,  function(result) {});
+                break;
+            case "upgrades":
+                compare = "researched";
+                var props = {
+                    id:            itemMetaRaw.name
+                };
+                props.controller = new com.nuclearunicorn.game.ui.UpgradeButtonController(this.game);
+                var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                props.controller.buyItem(model, 1,  function(result) {});
+                break;
+            case "zebraUpgrades":
+                compare = "researched";
+                var props = {
+                    id:            itemMetaRaw.name
+                };
+                props.controller = new com.nuclearunicorn.game.ui.ZebraUpgradeButtonController(this.game);
+                var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                props.controller.buyItem(model, 1,  function(result) {});
+                break;
+        }
+            //var model = props.controller.fetchModel(props);
+            //console.log(oldVal,  model.metadata.val);
+            if(oldVal != model.metadata[compare]){
+                this.queue_list.shift();
+            }
+    }
+
+
 });
