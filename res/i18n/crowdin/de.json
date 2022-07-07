@@ -1450,7 +1450,7 @@
     "ui.energy.tooltip": "Energie",
     "ui.log.link": "Protokoll",
     "ui.chat.link": "Chat",
-    "ui.clear.log": "Log leeren",
+    "ui.clear.log": "Protokoll leeren",
     "ui.log.filters.block": "[<span id=\"filterIcon\">+</span>] Protokoll filtern",
     "ui.pause": "pausieren",
     "ui.unpause": "fortfahren",
