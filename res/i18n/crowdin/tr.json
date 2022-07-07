@@ -314,7 +314,7 @@
     "effectsMgr.statics.calcinerSteelCraftRatio.title": "Çelikhane'nin Kireçleştirici bonusu",
     "effectsMgr.statics.calcinerSteelRatio.title": "Kireçleştirici çelik üretimi",
     "effectsMgr.statics.calcinerSteelReactorBonus.title": "Kireçleştirici çelik üretim bonusu",
-    "effectsMgr.statics.catnipDemandWorkerRatioGlobal.title": "İşçilerin kedinanesi talebini azaltma",
+    "effectsMgr.statics.catnipDemandWorkerRatioGlobal.title": "Çalışanların kedi nanesi ihtiyacını azaltır",
     "effectsMgr.statics.catnipJobRatio.title": "Çiftçi aletleri",
     "effectsMgr.statics.catnipMaxRatio.title": "Kedinanesi depolanmasında artış",
     "effectsMgr.statics.challengeHappiness.title": "Mutluluk",
@@ -526,6 +526,7 @@
     "trade.msg.elders.feed": "Yaşlıları besle",
     "trade.race.dragons": "Ejderhalar",
     "trade.bcoin.buy": "Siyah para satın al",
+    "ui.loading.msg.15": "Zaman paradokslarını düzeltmek",
     "ui.save.tooltip": "Kaydedildi!",
     "ui.option.tooltips.right": "Alet ipuçlarını sağ sütuna taşı",
     "ui.option.close.button": "Kapat",
@@ -548,6 +549,6 @@
     "workshop.miningDrill.label": "Madencilik Matkabı",
     "workshop.qdot.label": "Kuantum nokta hücreleri",
     "workshop.qdot.desc": "Güneş Panelleri yıl boyunca biraz daha verimlidir",
-    "workshop.reactorVessel.label": "Reaktör Kabı",
+    "workshop.reactorVessel.label": "Reaktör Gemisi",
     "workshop.thoriumReactors.label": "Toryum Reaktörleri"
 }
