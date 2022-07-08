@@ -1345,7 +1345,7 @@
     "ui.option.export.button": "Exporter",
     "ui.option.import.button": "Importer",
     "ui.option.export": "Exporter vers :",
-    "ui.option.export.dropbox": "Dropbox (Beta)",
+    "ui.option.export.dropbox": "Dropbox (Bêta)",
     "ui.option.export.simple.file": "Fichier (nom simple)",
     "ui.option.export.full.file": "Fichier (nom complet)",
     "ui.option.close.button": "Fermer",
