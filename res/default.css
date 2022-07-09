@@ -635,6 +635,13 @@ table.craftTable tr:hover td {
     border-bottom: 1px solid gray;
 }
 
+.login-popup .error {
+    max-width: 25rem;
+    display: block;
+    white-space: break-spaces;
+    color: red;
+}
+
 .hazard {
     background-image: linear-gradient(135deg, #f5ce31 25%, #2b4352 25%, #2b4352 50%, #f5ce31 50%, #f5ce31 75%, #2b4352 75%, #2b4352 100%);
     background-size: 28.28px 28.28px;
@@ -700,6 +707,10 @@ table.craftTable tr:hover td {
 .save-record-cell {
     display: table-cell;
     padding-right: 10px;
+}
+
+.save-record input {
+    width: 5rem;
 }
 
 .userProfile .save-record {

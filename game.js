@@ -270,7 +270,7 @@ dojo.declare("classes.game.Server", null, {
 	 * @param {*} handler - onDone callback handler
 	 */
 	_xhr: function(url, method, data, handler){
-		$.ajax({
+		return $.ajax({
             cache: false,
             type: method || "GET",
             dataType: "JSON",
@@ -301,7 +301,7 @@ dojo.declare("classes.game.Server", null, {
 
 	syncSaveData: function(){
 		var self = this;
-		this._xhr("/kgnet/save/", "GET", {}, function(resp){
+		return this._xhr("/kgnet/save/", "GET", {}, function(resp){
 			self.saveData = resp;
 		});
 	},
