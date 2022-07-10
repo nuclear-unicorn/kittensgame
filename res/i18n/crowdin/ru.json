@@ -1475,6 +1475,7 @@
     "ui.option.close.button": "Закрыть",
     "ui.option.import.warning": "Внимание! Импортирование сохранения перезапишет текущую игру.",
     "ui.option.import.from": "Вид импорта:",
+    "ui.option.import.from.dropbox": "Dropbox (Beta)",
     "ui.option.import.from.text": "Текстовый импорт:",
     "ui.option.do.import.button": "Импорт",
     "ui.option.cancel.button": "Отмена",
