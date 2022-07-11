@@ -450,7 +450,8 @@ WCloudSaveRecord = React.createClass({
     getInitialState: function(){
         return {
             showActions: false,
-            isEditable: false
+            isEditable: false,
+            label: this.props.save.label
         }
     },
 
@@ -477,9 +478,22 @@ WCloudSaveRecord = React.createClass({
                         onClick: function(e){
                             e.stopPropagation();
                         },
-                        onKeyDown: function(e){
+                        onChange: function(e){
+                            self.setState({
+                                label: e.target.value
+                            });
+                        },
+                        onKeyPress: function(e){
                             console.log("foo");
                             //TODO: set save label
+                            if(e.key === 'Enter'){
+                                game.server.pushSaveMetadata({
+                                    label: self.state.label
+                                });
+                                self.setState({
+                                    isEditable: false
+                                });
+                            }
                         }
                      }) :
                     $r("a", { 
@@ -489,7 +503,7 @@ WCloudSaveRecord = React.createClass({
                                 isEditable: !self.state.isEditable
                             })
                         }
-                    }, guid.substring(guid.length-4, guid.length))
+                    }, save.label || guid.substring(guid.length-4, guid.length))
                 ,
                 isActiveSave ? "[" + $I("ui.kgnet.save.current") + "]" : ""
             ),

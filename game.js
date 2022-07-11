@@ -332,6 +332,26 @@ dojo.declare("classes.game.Server", null, {
 		});
 	},
 
+	/**
+	 * 
+	 * @param {*} metadata 
+	 * {
+	 * 	archived?: boolean;
+	 *  label?: string
+	 * }
+	 */
+	pushSaveMetadata: function(metadata){
+		this._xhr("/kgnet/save/update/", "POST", 
+		{
+			//pre-parsing guid to avoid checking it on the backend side
+			guid: this.game.telemetry.guid,
+			metadata: metadata
+		}, 
+		function(resp){
+			self.saveData = resp;
+		});
+	},
+
 	loadSave: function(guid){
 		var self = this;
 		this._xhr("/kgnet/save/" + guid + "/download/", "GET", {}, function(resp){
