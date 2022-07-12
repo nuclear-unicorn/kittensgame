@@ -117,7 +117,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 		for (var i = 0; i < this.transcendenceUpgrades.length; i++){
 			var tu = this.transcendenceUpgrades[i];
-			if (this.transcendenceTier >= tu.tier) {
+			if (this.transcendenceTier >= tu.tier && (!tu.evaluateLocks || tu.evaluateLocks(this.game))) {
 				tu.unlocked = true;
 			}
 			if(tu.val > 0 && tu.unlocks){
@@ -1085,7 +1085,11 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				atheism.calculateEffects(atheism, game);
 				var blackObelisk = religion.getTU("blackObelisk");
 				blackObelisk.calculateEffects(blackObelisk, game);
-
+				if(game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val){
+					var blackPyramid = game.religion.getZU("blackPyramid");
+					blackPyramid.calculateEffects(blackPyramid, game);
+					blackPyramid.cashPreDeficitEffects(game);
+				}
 				game.msg($I("religion.transcend.msg.success", [religion.transcendenceTier]));
 			} else {
 				game.msg($I("religion.transcend.msg.failure", [
