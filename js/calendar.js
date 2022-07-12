@@ -776,8 +776,6 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		beacons.action(beacons, this.game);
 		this.game.updateCaches();
 		this.game.resPool.addResPerTick("relic", this.game.getEffect("relicPerDay") * daysOffset);
-		//------------------------- necrocorns pacts -------------------------
-		this.game.religion.pactsManager.necrocornConsumptionDays(daysOffset);
 
 		//not sure if it is a good idea
 		//calculate amount of void earned on average per day, then multiply by days and percentage of time in paradox
