@@ -487,9 +487,12 @@ WCloudSaveRecord = React.createClass({
                             console.log("foo");
                             //TODO: set save label
                             if(e.key === 'Enter'){
-                                game.server.pushSaveMetadata({
-                                    label: self.state.label
-                                });
+                                game.server.pushSaveMetadata(
+                                    save.guid,
+                                    {
+                                        label: self.state.label
+                                    }
+                                );
                                 self.setState({
                                     isEditable: false
                                 });

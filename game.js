@@ -340,11 +340,11 @@ dojo.declare("classes.game.Server", null, {
 	 *  label?: string
 	 * }
 	 */
-	pushSaveMetadata: function(metadata){
+	pushSaveMetadata: function(guid, metadata){
 		this._xhr("/kgnet/save/update/", "POST", 
 		{
 			//pre-parsing guid to avoid checking it on the backend side
-			guid: this.game.telemetry.guid,
+			guid: guid,
 			metadata: metadata
 		}, 
 		function(resp){
