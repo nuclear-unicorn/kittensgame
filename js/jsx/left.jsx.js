@@ -112,7 +112,7 @@ WResourceRow = React.createClass({
             game.getResourcePerTick(res.name, false) || 
             game.getResourcePerTickConvertion(res.name) ? 
             game.getDisplayValueExt(perTick, true, false) + postfix : 
-            (res.calculatePerDay)? game.getDisplayValueExt(game.getResourcePerDay(res.name) *((res.name == "necrocorn")? 1 + game.timeAccelerationRatio():1), true, false) + "/" + $I("unit.d"):
+            (res.calculatePerDay)? game.getDisplayValueExt((game.getResourcePerDay(res.name)) *((res.name == "necrocorn")? 1 + game.timeAccelerationRatio():1), true, false) + "/" + $I("unit.d"):
             (res.calculateOnYear)? game.getDisplayValueExt(game.getResourceOnYearProduction(res.name), true, false) + "/" + $I("unit.y"): "";
             // "(" + game.getDisplayValueExt(perTick, true, false) + postfix + ")" : "";
 

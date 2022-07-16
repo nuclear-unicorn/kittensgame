@@ -3533,14 +3533,26 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		stack.push({
 			name: $I("res.stack.buildings"),
 			type: "perDay",
-			value: this.getEffect(res.name + "PerDay")
+			value: this.getEffect(res.name + "PerDay") - this.religion.pactsManager.getSiphonedCorruption(1)
 		});
 		if(resName == "necrocorn"){
-			stack.push({
+			var corruptionStack = [];
+			corruptionStack.push({
 				name: $I("res.stack.corruptionPerDay"),
 				type: "perDay",
 				value: this.religion.getCorruptionPerTick() * this.calendar.ticksPerDay
 			});
+			corruptionStack.push({
+				name: $I("res.stack.corruptionPerDayProduction"),
+				type: "perDay",
+				value: this.religion.getCorruptionPerTickProduction() * this.calendar.ticksPerDay
+			});
+			corruptionStack.push({
+				name: $I("res.stack.corruptionPerDaySiphoned"),
+				type: "perDay",
+				value: - this.religion.pactsManager.getSiphonedCorruption(1)
+			});
+			stack.push(corruptionStack);
 				// TIME extra-compare
 			stack.push({
 				name: $I("res.stack.time"),
@@ -3747,8 +3759,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	getResourcePerDay: function(resName){
 		if(resName == "necrocorn"){
-			return this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect(resName + "PerDay") +
-			this.religion.getCorruptionPerTick() * this.calendar.ticksPerDay;
+			return (this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect(resName + "PerDay") + this.religion.pactsManager.getSiphonedCorruption(1) +
+			this.religion.getCorruptionPerTick() * this.calendar.ticksPerDay);
 		}
 		return this.getEffect(resName + "PerDay");
 	},
@@ -3850,7 +3862,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 			if(res.name == "necrocorn"){
 				var toNextNecrocorn = (1 - this.religion.corruption)/(this.religion.getCorruptionPerTick() * 5 * (1 + this.timeAccelerationRatio()));
-				resString += "<br>" + $I("res.toNextNecrocorn") + ": " + this.toDisplaySeconds(toNextNecrocorn.toFixed());
+				if(toNextNecrocorn > 0){
+					resString += "<br>" + $I("res.toNextNecrocorn") + ": " + this.toDisplaySeconds(toNextNecrocorn.toFixed());
+				}
 			}
 			return resString;
 		}else if(res.calculateOnYear){

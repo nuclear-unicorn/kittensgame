@@ -1579,6 +1579,27 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocked: false,
         blocks:["spaceBasedTerraforming"]
         }*/
+	//pact policy
+	{
+        name: "siphoning",
+		label: $I("policy.siphoning.label"),
+        description: $I("policy.siphoning.desc"),
+        prices: [
+            {name : "necrocorn", val: 1}
+        ],
+		calculateEffect: function(game, self){
+			if(!game.getFeatureFlag("MAUSOLEUM_PACTS")){
+				self.unlocked = false;
+				return;
+			}
+		},
+		evaluateLocks: function(game){
+			return game.getFeatureFlag("MAUSOLEUM_PACTS");
+		},
+        unlocked: false,
+        blocked: false,
+        blocks:[]
+    }
 ],
 
 	metaCache: null,
