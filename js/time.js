@@ -142,7 +142,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             }
         }
 
-        if(game.getFeatureFlag("QUEUE") && this.game.ticks % this.queue.periodInTicks == 0){
+        if(this.game.getFeatureFlag("QUEUE") && this.game.ticks % this.queue.periodInTicks == 0){
             this.queue.update();
         }
         this.calculateRedshift();
@@ -1489,7 +1489,7 @@ dojo.declare("classes.queue.manager", null,{
         }
     },
     calculateCap: function(){
-        return game.bld.getBuildingExt("aiCore").meta.on + game.space.getBuilding("entangler").effects["hashRateLevel"]; //
+        return this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"]; //
     },
     addToQueue: function(name, type){
         if(this.queue_list.length < this.cap){
