@@ -1764,6 +1764,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		MAUSOLEUM_PACTS:{
 			beta: true,
 			main: false
+		},
+		QUEUE:{
+			beta: true,
+			main: false
 		}
 	},
 
