@@ -795,6 +795,17 @@ label:hover {
     opacity: 0.7;
 }
 
+/* mark archived saves with strikethrough and lighter color */
+
+.save-record.archived .save-record-cell, .save-record.archived .save-record-cell * {
+    text-decoration:line-through;
+    color:#999;
+}
+
+/* -----------------------------------
+            Options
+-----------------------------------*/
+
 #optionsDiv {
     overflow-y: scroll;
     height: 400px;

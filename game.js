@@ -341,7 +341,7 @@ dojo.declare("classes.game.Server", null, {
 	 * }
 	 */
 	pushSaveMetadata: function(guid, metadata){
-		this._xhr("/kgnet/save/update/", "POST", 
+		return this._xhr("/kgnet/save/update/", "POST", 
 		{
 			//pre-parsing guid to avoid checking it on the backend side
 			guid: guid,
