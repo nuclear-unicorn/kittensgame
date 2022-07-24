@@ -141,7 +141,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 cfu.action(cfu, this.game);
             }
         }
-        if(this.game.ticks % this.queue.periodInTicks == 0){
+
+        if(game.getFeatureFlag("QUEUE") && this.game.ticks % this.queue.periodInTicks == 0){
             this.queue.update();
         }
         this.calculateRedshift();
@@ -1480,16 +1481,23 @@ dojo.declare("classes.queue.manager", null,{
     queueSources : ["policies", "tech", "buildings", "spaceMission",
                     "spaceBuilding","chronoforge", "voidSpace", "zigguratUpgrades",  
                     "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],
+    cap: 0,
     constructor: function(game){
         this.game = game;
         if(game.getFeatureFlag("MAUSOLEUM_PACTS")){
             this.queueSources.push("pacts");
         }
     },
-    getCap: function(){
-        
+    calculateCap: function(){
+        return game.bld.getBuildingExt("aiCore").meta.on + game.space.getBuilding("entangler").effects["hashRateLevel"]; //
+    },
+    addToQueue: function(name, type){
+        if(this.queue_list.length < this.cap){
+            this.queue_list.push([name, type]);
+        }
     },
     update: function(){
+        this.cap = this.calculateCap();
         if(this.queue_list.length <= 0){
             return;
         }
@@ -1585,6 +1593,10 @@ dojo.declare("classes.queue.manager", null,{
                 var model = props.controller.fetchModel(props);
                 break;
         }
+            if(!props.controller){
+                console.error(el[0] + " of " + el[1] + " queing is not supported!");
+                this.queue_list.shift();
+            }
             if(buyItem){
                 props.controller.buyItem(model, 1,  function(result) {});
             }
