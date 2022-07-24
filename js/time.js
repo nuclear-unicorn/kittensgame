@@ -11,13 +11,14 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     isAccelerated: false,
 
     timestamp: null,    /*NO FUCKING timestamp resources*/
-
+    queue: null,
     constructor: function(game){
         this.game = game;
 
 		this.registerMeta("stackable", this.chronoforgeUpgrades, null);
 		this.registerMeta("stackable", this.voidspaceUpgrades, null);
 		this.setEffectsCachedExisting();
+        this.queue = new classes.queue.manager(game);
     },
 
     save: function(saveData) {
@@ -139,6 +140,10 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             if (cfu.action) {
                 cfu.action(cfu, this.game);
             }
+        }
+
+        if(game.getFeatureFlag("QUEUE") && this.game.ticks % this.queue.periodInTicks == 0){
+            this.queue.update();
         }
         this.calculateRedshift();
     },
@@ -1465,4 +1470,142 @@ dojo.declare("classes.tab.TimeTab", com.nuclearunicorn.game.ui.tab, {
         }
 
     }
+});
+
+
+
+dojo.declare("classes.queue.manager", null,{
+    game: null,
+    queue_list : [],
+    periodInTicks: 10,
+    queueSources : ["policies", "tech", "buildings", "spaceMission",
+                    "spaceBuilding","chronoforge", "voidSpace", "zigguratUpgrades",  
+                    "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],
+    cap: 0,
+    constructor: function(game){
+        this.game = game;
+        if(game.getFeatureFlag("MAUSOLEUM_PACTS")){
+            this.queueSources.push("pacts");
+        }
+    },
+    calculateCap: function(){
+        return game.bld.getBuildingExt("aiCore").meta.on + game.space.getBuilding("entangler").effects["hashRateLevel"]; //
+    },
+    addToQueue: function(name, type){
+        if(this.queue_list.length < this.cap){
+            this.queue_list.push([name, type]);
+        }
+    },
+    update: function(){
+        this.cap = this.calculateCap();
+        if(this.queue_list.length <= 0){
+            return;
+        }
+        var el = this.queue_list[0];
+        var itemMetaRaw = this.game.getUnlockByName(el[0], el[1]);
+        console.log(el);
+        var compare = "val"; //we should do some sort of refractoring of the switch mechanism
+        var props = {
+            id:            itemMetaRaw.name
+        };
+        var buyItem = true;
+        switch (el[1]){
+            case "policies":
+                compare = "researched";
+                props.controller = new classes.ui.PolicyBtnController(this.game);
+                var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "tech":
+                compare = "researched";
+                props.controller = new com.nuclearunicorn.game.ui.TechButtonController(this.game);
+                var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "buildings":
+                var bld = new classes.BuildingMeta(itemMetaRaw).getMeta();
+                    oldVal = itemMetaRaw.val;
+                props = {
+                    key:            bld.name,
+                    name:           bld.label,
+                    description:    bld.description,
+                    building:       bld.name
+                };
+                if (typeof(bld.stages) == "object"){
+                    props.controller = new classes.ui.btn.StagingBldBtnController(this.game);
+                } else {
+                    props.controller = new classes.ui.btn.BuildingBtnModernController(this.game);
+                }
+                var model = props.controller.fetchModel(props);
+                props.controller.build(model, 1);
+                buyItem = false;
+                break;
+            case "spaceMission":
+                props.controller = new com.nuclearunicorn.game.ui.SpaceProgramBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "spaceBuilding":
+                props.controller = new classes.ui.space.PlanetBuildingBtnController(this.game);
+                var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "chronoforge":
+                props.controller = new classes.ui.time.ChronoforgeBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "voidSpace":
+                props.controller = new classes.ui.time.VoidSpaceBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "zigguratUpgrades":
+                props.controller = new com.nuclearunicorn.game.ui.ZigguratBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "religion":
+                props.controller = new com.nuclearunicorn.game.ui.ReligionBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "transcendenceUpgrades":
+                props.controller = new classes.ui.TranscendenceBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "pacts":
+                props.controller = new com.nuclearunicorn.game.ui.PactsBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "upgrades":
+                compare = "researched";
+                props.controller = new com.nuclearunicorn.game.ui.UpgradeButtonController(this.game);
+                var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "zebraUpgrades":
+                compare = "researched";
+                props.controller = new com.nuclearunicorn.game.ui.ZebraUpgradeButtonController(this.game);
+                var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                break;
+        }
+            if(!props.controller){
+                console.error(el[0] + " of " + el[1] + " queing is not supported!");
+                this.queue_list.shift();
+            }
+            if(buyItem){
+                props.controller.buyItem(model, 1,  function(result) {});
+            }
+            //var model = props.controller.fetchModel(props);
+            //console.log(oldVal,  model.metadata.val);
+            if(oldVal != model.metadata[compare]){
+                this.queue_list.shift();
+            }
+    }
+
+
 });
