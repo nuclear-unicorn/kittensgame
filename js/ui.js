@@ -868,20 +868,24 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#leftColumn").css("font-size", this.fontSize + "px");
     },
 
-    hideChat: function(){
+    hideChat: function(){ //actually loads log!
         $("#rightTabLog").show();
         $("#IRCChatInner").css("visibility", "hidden");
         $("#logLink").toggleClass("active", true);
         $("#chatLink").toggleClass("active", false);
+        $("#queueLink").toggleClass("active", false);
         $("#rightTabChat").hide();
+        $("#rightTabQueue").hide();
     },
 
     loadChat: function(){
         $("#rightTabChat").show();
         $("#rightTabLog").hide();
+        $("#rightTabQueue").hide();
 
         $("#logLink").toggleClass("active", false);
         $("#chatLink").toggleClass("active", true);
+        $("#logQueue").toggleClass("active", false);
 
         $("#IRCChatInner").css("visibility", "visible");
 
@@ -900,7 +904,16 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         this.isChatActive = true;
         //this.isChatVisited = true;
     },
-
+    loadQueue: function(){
+        $("#rightTabChat").hide();
+        $("#rightTabLog").hide();
+        $("#rightTabQueue").show();
+        $("#IRCChatInner").css("visibility", "hidden");
+        $("#logLink").toggleClass("active", false);
+        $("#chatLink").toggleClass("active", false);
+        $("#queueLink").toggleClass("active", true);
+        $("#rightTabChat").hide();
+    },
     resetConsole: function(){
         this.game.console.resetState();
     },
@@ -951,6 +964,9 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#saveTooltip").text($I("ui.save.tooltip"));
         $("#logLink").text($I("ui.log.link"));
         $("#chatLink").text($I("ui.chat.link"));
+        if(this.game.getFeatureFlag("QUEUE")){
+            $("#queueLink").text($I("ui.queue.link"));
+        };
         $("#clearLogHref").text($I("ui.clear.log"));
         $("#logFiltersBlockText").html($I("ui.log.filters.block"));
         $("#pauseBtn").text($I("ui.pause"));

@@ -438,6 +438,7 @@
 					<div class="right-tab-header">
 						<a id="logLink" href="#" class="active" onclick="gamePage.ui.hideChat();">Log</a>
 						<a id="chatLink" class="chatLink" href="#" onclick="gamePage.ui.loadChat();">Chat</a>
+						<a id="queueLink" class="queueLink" href="#" onclick="gamePage.ui.loadQueue();">Queue</a>
 					</div>
 					<div id="observeButton"></div>
 					<div class="right-tab" id="rightTabLog">
@@ -468,6 +469,18 @@
 							<!--iframe-- src="https://kiwiirc.com/client/irc.canternet.org/?nick=kitten_?#kittensgame" style="border:0; width: 400px; height:800px;"></iframe-->
 							<iframe id="kiwiirc_iframe" style="border:0; width: 400px; height:800px;"></iframe>
 						</div>
+					</div>
+					<div class="right-tab" id="rightTabQueue" style="display:none;">
+						<div id="IRCChatInner">QUEUE GOES HERE</div>
+						<label for="queueTypeSelect">Choose a type:</label>
+
+						<select name="queueTypeSelect" id="queueTypeSelect">
+						<option value="volvo">Volvo</option>
+						<option value="saab">Saab</option>
+						<option value="mercedes">Mercedes</option>
+						<option value="audi">Audi</option>
+						</select>
+
 					</div>
 				</div>
 				<div
