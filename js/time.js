@@ -1501,15 +1501,19 @@ dojo.declare("classes.queue.manager", null,{
         if(this.queue_list.length <= 0){
             return;
         }
-        var el = this.queue_list[0];
-        var itemMetaRaw = this.game.getUnlockByName(el[0], el[1]);
+        var el = {
+            "name": queue_list[0][0],
+            "type": queue_list[0][1]
+        }
+        //var el = this.queue_list[0];
+        var itemMetaRaw = this.game.getUnlockByName(el.name, el.type);
         console.log(el);
         var compare = "val"; //we should do some sort of refractoring of the switch mechanism
         var props = {
             id:            itemMetaRaw.name
         };
         var buyItem = true;
-        switch (el[1]){
+        switch (el.type){
             case "policies":
                 compare = "researched";
                 props.controller = new classes.ui.PolicyBtnController(this.game);
@@ -1594,7 +1598,7 @@ dojo.declare("classes.queue.manager", null,{
                 break;
         }
             if(!props.controller){
-                console.error(el[0] + " of " + el[1] + " queing is not supported!");
+                console.error(el.name + " of " + el.type + " queing is not supported!");
                 this.queue_list.shift();
             }
             if(buyItem){
