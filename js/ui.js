@@ -885,7 +885,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
 
         $("#logLink").toggleClass("active", false);
         $("#chatLink").toggleClass("active", true);
-        $("#logQueue").toggleClass("active", false);
+        $("#queueLink").toggleClass("active", false);
 
         $("#IRCChatInner").css("visibility", "visible");
 

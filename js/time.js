@@ -29,7 +29,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             testShatter: this.testShatter, //temporary
             isAccelerated: this.isAccelerated,
             cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "unlocked"]),
-            vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"])
+            vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"]),
+            queue_list: this.queue.queue_list
         };
         this._forceChronoFurnaceStop(saveData.time.cfu);
     },
@@ -71,6 +72,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
         this.gainTemporalFlux(ts);
         this.timestamp = ts;
+        this.queue.queue_list = saveData["time"].queue_list ||[];
 	},
 
 	gainTemporalFlux: function (timestamp){
@@ -1478,9 +1480,10 @@ dojo.declare("classes.queue.manager", null,{
     game: null,
     queue_list : [],
     periodInTicks: 10,
-    queueSources : ["policies", "tech", "buildings", "spaceMission",
+    /*queueSources : ["policies", "tech", "buildings", "spaceMission",
                     "spaceBuilding","chronoforge", "voidSpace", "zigguratUpgrades",  
-                    "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],
+                    "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],*/
+    queueSources: ["buildings", "spaceBuilding"],
     cap: 0,
     constructor: function(game){
         this.game = game;
@@ -1492,7 +1495,7 @@ dojo.declare("classes.queue.manager", null,{
             return; //I guess for mobile this can be fine?
         }
         for (var i in this.queueSources){
-            console.warn(Number(i)+1)
+            //console.warn(Number(i)+1)
             queueSel.options[Number(i) + 1] = new Option(this.queueSources[i], this.queueSources[i]);
         }
         //console.warn(queueSel.options);
@@ -1500,10 +1503,11 @@ dojo.declare("classes.queue.manager", null,{
     calculateCap: function(){
         return this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"]; //
     },
-    addToQueue: function(name, type){
+    addToQueue: function(name, type, label = ""){
         if(this.queue_list.length < this.cap){
-            this.queue_list.push([name, type]);
+            this.queue_list.push([name, type, label]);
         }
+        this.showList();
     },
     updateBuySelect: function(event){
         /*if (evt.target.value === "Say Hello") {
@@ -1529,9 +1533,24 @@ dojo.declare("classes.queue.manager", null,{
                         queueBuySelect.options[q] = new Option(label, name);
                         q+=1;
                     }
-                    //console.warn(building);
                 }
                 break;
+            case "spaceBuilding":
+                var spaceBuildMap = this.game.space.spaceBuildingsMap;
+                for (var i in spaceBuildMap){
+                    var building = this.game.space.getBuilding(spaceBuildMap[i]);
+                    if(building.unlocked){
+                        queueBuySelect.options[q] = new Option(building.label, building.name);
+                        q+=1;
+                    }
+                }
+                break;
+            default: //lets not cause errors when changing to None/not coded in types
+                var i = queueBuySelect.options.length - 1;
+                while(i > 0){
+                    queueBuySelect.removeChild(queueBuySelect.options[i]);
+                    i--;
+                }
         }
     },
     buyFromSelect: function(event){
@@ -1541,7 +1560,7 @@ dojo.declare("classes.queue.manager", null,{
         if(name == "noneBuy" || type == "noneType"){
             return;
         }
-        this.addToQueue(name, type);
+        this.addToQueue(name, type, event.target.selectedOptions[0].label);
     },
     buttonQueue: function(event){
         var queueTypeSelect = document.getElementById('queueTypeSelect');
@@ -1551,7 +1570,26 @@ dojo.declare("classes.queue.manager", null,{
         if(name == "noneBuy" || type == "noneType"){
             return;
         }
-        this.addToQueue(name, type);
+        this.addToQueue(name, type, queueBuySelect.selectedOptions[0].label);
+    },
+    showList: function(){
+        var queue_list_ui = document.getElementById('queue_list_ui');
+        if(!queue_list_ui){
+            return;
+        }
+        var i = 0;
+        queue_list_ui.textContent = "";
+        while(i < this.queue_list.length){
+            if(i !=0){
+                queue_list_ui.textContent += ", ";
+            }
+            queue_list_ui.textContent += this.queue_list[i][2];
+            i +=1;
+        }
+    },
+    listDrop: function(event){
+        this.queue_list.pop();
+        this.showList();
     },
     update: function(){
         this.cap = this.calculateCap();
@@ -1564,7 +1602,6 @@ dojo.declare("classes.queue.manager", null,{
         };
         //var el = this.queue_list[0];
         var itemMetaRaw = this.game.getUnlockByName(el.name, el.type);
-        console.log(el);
         var compare = "val"; //we should do some sort of refractoring of the switch mechanism
         var props = {
             id:            itemMetaRaw.name
@@ -1665,8 +1702,9 @@ dojo.declare("classes.queue.manager", null,{
             //console.log(oldVal,  model.metadata.val);
             if(oldVal != model.metadata[compare]){
                 this.queue_list.shift();
-                this.update();
+                //this.update();
             }
+        this.showList();
     }
 
 
