@@ -29,7 +29,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             testShatter: this.testShatter, //temporary
             isAccelerated: this.isAccelerated,
             cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "unlocked"]),
-            vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"])
+            vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"]),
+            queue_list: this.queue.queue_list
         };
         this._forceChronoFurnaceStop(saveData.time.cfu);
     },
@@ -71,6 +72,11 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
         this.gainTemporalFlux(ts);
         this.timestamp = ts;
+        this.queue.queue_list = saveData["time"].queue_list ||[];
+
+        if(!this.game.getFeatureFlag("QUEUE")){
+            $("#queueLink").hide();
+        }
 	},
 
 	gainTemporalFlux: function (timestamp){
@@ -1478,38 +1484,145 @@ dojo.declare("classes.queue.manager", null,{
     game: null,
     queue_list : [],
     periodInTicks: 10,
-    queueSources : ["policies", "tech", "buildings", "spaceMission",
+    /*queueSources : ["policies", "tech", "buildings", "spaceMission",
                     "spaceBuilding","chronoforge", "voidSpace", "zigguratUpgrades",  
-                    "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],
+                    "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],*/
+    queueSources: ["buildings", "spaceBuilding"],
     cap: 0,
     constructor: function(game){
         this.game = game;
-        if(game.getFeatureFlag("MAUSOLEUM_PACTS")){
+        /*if(game.getFeatureFlag("MAUSOLEUM_PACTS")){
             this.queueSources.push("pacts");
+        }*/ //let's deal with this later!
+        var queueSel = document.getElementById('queueTypeSelect');
+        if(!queueSel){
+            return; //I guess for mobile this can be fine?
         }
+        for (var i in this.queueSources){
+            //console.warn(Number(i)+1)
+            queueSel.options[Number(i) + 1] = new Option(this.queueSources[i], this.queueSources[i]);
+        }
+        //console.warn(queueSel.options);
     },
     calculateCap: function(){
-        return this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"]; //
+        return this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + 2; //
     },
-    addToQueue: function(name, type){
+    addToQueue: function(name, type, label){
+        if(!label){
+            label = "???";
+        }
         if(this.queue_list.length < this.cap){
-            this.queue_list.push([name, type]);
+            this.queue_list.push([name, type, label]);
+        }
+        this.showList();
+    },
+    updateBuySelect: function(event){
+        /*if (evt.target.value === "Say Hello") {
+            alert('Hello');
+          }*/
+        var type = event.target.value;
+        //console.warn(event.target.value);
+        var q = 1;
+        var queueBuySelect = document.getElementById('queueBuySelect');
+        //lets not cause errors when changing to None/not coded in types
+       var i = queueBuySelect.options.length - 1;
+        while(i > 0){
+            queueBuySelect.removeChild(queueBuySelect.options[i]);
+            i--;
+        }
+        switch (type){
+            case "buildings":
+                var bld = this.game.bld;
+                for (var i in this.game.bld.buildingsData){
+                    var building = this.game.bld.buildingsData[i];
+                    if(building.unlocked){
+                        var name = building.name;
+                        var label = building.label;
+                        if(building.stages){
+                            if(building.stages){
+                                label = building.stages[building.stage].label;
+                            }
+                        }
+                        queueBuySelect.options[q] = new Option(label, name);
+                        q+=1;
+                    }
+                }
+                break;
+            case "spaceBuilding":
+                var spaceBuildMap = this.game.space.spaceBuildingsMap;
+                for (var i in spaceBuildMap){
+                    var building = this.game.space.getBuilding(spaceBuildMap[i]);
+                    if(building.unlocked){
+                        queueBuySelect.options[q] = new Option(building.label, building.name);
+                        q+=1;
+                    }
+                }
+                break;
         }
     },
+    buyFromSelect: function(event){
+        var queueTypeSelect = document.getElementById('queueTypeSelect');
+        var type = queueTypeSelect.selectedOptions[0].value;
+        var name = event.target.value;
+        if(name == "noneBuy" || type == "noneType"){
+            return;
+        }
+        this.addToQueue(name, type, event.target.selectedOptions[0].label);
+    },
+    buttonQueue: function(event){
+        var queueTypeSelect = document.getElementById('queueTypeSelect');
+        var type = queueTypeSelect.selectedOptions[0].value;
+        var queueBuySelect = document.getElementById('queueBuySelect');
+        var name = queueBuySelect.selectedOptions[0].value;
+        if(name == "noneBuy" || type == "noneType"){
+            return;
+        }
+        this.addToQueue(name, type, queueBuySelect.selectedOptions[0].label);
+    },
+    showList: function(){
+        var queue_list_ui = document.getElementById('queue_list_ui');
+        if(!queue_list_ui){
+            return;
+        }
+        var i = 0;
+        queue_list_ui.textContent = "";
+        while(i < this.queue_list.length){
+            if(i !=0){
+                queue_list_ui.textContent += ", ";
+            }
+            queue_list_ui.textContent += this.queue_list[i][2];
+            i +=1;
+        }
+    },
+    listDrop: function(event){
+        this.queue_list.pop();
+        this.showList();
+    },
     update: function(){
+        var queueTypeSelect = document.getElementById('queueTypeSelect');
+        if(queueTypeSelect){
+            if(!this.game.science.get("rocketry").researched){
+                queueTypeSelect.options[2].label = "???";
+            }else{
+                queueTypeSelect.options[2].label = queueTypeSelect.options[2].value;
+            }
+        }
         this.cap = this.calculateCap();
         if(this.queue_list.length <= 0){
             return;
         }
-        var el = this.queue_list[0];
-        var itemMetaRaw = this.game.getUnlockByName(el[0], el[1]);
-        console.log(el);
+        var el = {
+            "name": this.queue_list[0][0],
+            "type": this.queue_list[0][1]
+        };
+        //var el = this.queue_list[0];
+        var itemMetaRaw = this.game.getUnlockByName(el.name, el.type);
         var compare = "val"; //we should do some sort of refractoring of the switch mechanism
         var props = {
             id:            itemMetaRaw.name
         };
         var buyItem = true;
-        switch (el[1]){
+        switch (el.type){
             case "policies":
                 compare = "researched";
                 props.controller = new classes.ui.PolicyBtnController(this.game);
@@ -1594,7 +1707,7 @@ dojo.declare("classes.queue.manager", null,{
                 break;
         }
             if(!props.controller){
-                console.error(el[0] + " of " + el[1] + " queing is not supported!");
+                console.error(el.name + " of " + el.type + " queing is not supported!");
                 this.queue_list.shift();
             }
             if(buyItem){
@@ -1604,7 +1717,9 @@ dojo.declare("classes.queue.manager", null,{
             //console.log(oldVal,  model.metadata.val);
             if(oldVal != model.metadata[compare]){
                 this.queue_list.shift();
+                //this.update();
             }
+        this.showList();
     }
 
 
