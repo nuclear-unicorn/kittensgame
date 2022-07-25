@@ -1503,7 +1503,10 @@ dojo.declare("classes.queue.manager", null,{
     calculateCap: function(){
         return 2 + this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"]; //
     },
-    addToQueue: function(name, type, label = ""){
+    addToQueue: function(name, type, label){
+        if(!label){
+            label = "???"
+        }
         if(this.queue_list.length < this.cap){
             this.queue_list.push([name, type, label]);
         }
