@@ -1487,9 +1487,9 @@ dojo.declare("classes.queue.manager", null,{
     cap: 0,
     constructor: function(game){
         this.game = game;
-        if(game.getFeatureFlag("MAUSOLEUM_PACTS")){
+        /*if(game.getFeatureFlag("MAUSOLEUM_PACTS")){
             this.queueSources.push("pacts");
-        }
+        }*/
         var queueSel = document.getElementById('queueTypeSelect');
         if(!queueSel){
             return; //I guess for mobile this can be fine?
@@ -1501,7 +1501,7 @@ dojo.declare("classes.queue.manager", null,{
         //console.warn(queueSel.options);
     },
     calculateCap: function(){
-        return this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"]; //
+        return 2 + this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"]; //
     },
     addToQueue: function(name, type, label = ""){
         if(this.queue_list.length < this.cap){
