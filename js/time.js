@@ -1489,7 +1489,7 @@ dojo.declare("classes.queue.manager", null,{
         this.game = game;
         /*if(game.getFeatureFlag("MAUSOLEUM_PACTS")){
             this.queueSources.push("pacts");
-        }*/
+        }*/ //let's deal with this later!
         var queueSel = document.getElementById('queueTypeSelect');
         if(!queueSel){
             return; //I guess for mobile this can be fine?
@@ -1592,6 +1592,12 @@ dojo.declare("classes.queue.manager", null,{
         this.showList();
     },
     update: function(){
+        var queueTypeSelect = document.getElementById('queueTypeSelect');
+        if(!game.science.get("rocketry").researched){
+            queueTypeSelect.options[2].label = "???";
+        }else{
+            queueTypeSelect.options[2].label = queueTypeSelect.options[2].value;
+        }
         this.cap = this.calculateCap();
         if(this.queue_list.length <= 0){
             return;
