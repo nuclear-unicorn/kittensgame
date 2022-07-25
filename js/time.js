@@ -76,7 +76,6 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
         if(!this.game.getFeatureFlag("QUEUE")){
             $("#queueLink").hide();
-            return;
         }
 	},
 
