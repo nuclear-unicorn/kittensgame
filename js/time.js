@@ -1502,9 +1502,9 @@ dojo.declare("classes.queue.manager", null,{
             return;
         }
         var el = {
-            "name": queue_list[0][0],
-            "type": queue_list[0][1]
-        }
+            "name": this.queue_list[0][0],
+            "type": this.queue_list[0][1]
+        };
         //var el = this.queue_list[0];
         var itemMetaRaw = this.game.getUnlockByName(el.name, el.type);
         console.log(el);

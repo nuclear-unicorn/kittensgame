@@ -966,7 +966,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#chatLink").text($I("ui.chat.link"));
         if(this.game.getFeatureFlag("QUEUE")){
             $("#queueLink").text($I("ui.queue.link"));
-        };
+        }
         $("#clearLogHref").text($I("ui.clear.log"));
         $("#logFiltersBlockText").html($I("ui.log.filters.block"));
         $("#pauseBtn").text($I("ui.pause"));
