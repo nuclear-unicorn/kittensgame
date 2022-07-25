@@ -1505,7 +1505,7 @@ dojo.declare("classes.queue.manager", null,{
     },
     addToQueue: function(name, type, label){
         if(!label){
-            label = "???"
+            label = "???";
         }
         if(this.queue_list.length < this.cap){
             this.queue_list.push([name, type, label]);
@@ -1596,10 +1596,12 @@ dojo.declare("classes.queue.manager", null,{
     },
     update: function(){
         var queueTypeSelect = document.getElementById('queueTypeSelect');
-        if(!game.science.get("rocketry").researched){
-            queueTypeSelect.options[2].label = "???";
-        }else{
-            queueTypeSelect.options[2].label = queueTypeSelect.options[2].value;
+        if(queueTypeSelect){
+            if(!this.game.science.get("rocketry").researched){
+                queueTypeSelect.options[2].label = "???";
+            }else{
+                queueTypeSelect.options[2].label = queueTypeSelect.options[2].value;
+            }
         }
         this.cap = this.calculateCap();
         if(this.queue_list.length <= 0){
