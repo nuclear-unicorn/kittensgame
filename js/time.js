@@ -1506,7 +1506,7 @@ dojo.declare("classes.queue.manager", null,{
         //console.warn(queueSel.options);
     },
     calculateCap: function(){
-        return this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"]; //
+        return this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + 2; //
     },
     addToQueue: function(name, type, label){
         if(!label){
@@ -1525,6 +1525,12 @@ dojo.declare("classes.queue.manager", null,{
         //console.warn(event.target.value);
         var q = 1;
         var queueBuySelect = document.getElementById('queueBuySelect');
+        //lets not cause errors when changing to None/not coded in types
+       var i = queueBuySelect.options.length - 1;
+        while(i > 0){
+            queueBuySelect.removeChild(queueBuySelect.options[i]);
+            i--;
+        }
         switch (type){
             case "buildings":
                 var bld = this.game.bld;
@@ -1553,12 +1559,6 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 break;
-            default: //lets not cause errors when changing to None/not coded in types
-                var i = queueBuySelect.options.length - 1;
-                while(i > 0){
-                    queueBuySelect.removeChild(queueBuySelect.options[i]);
-                    i--;
-                }
         }
     },
     buyFromSelect: function(event){
