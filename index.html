@@ -474,13 +474,17 @@
 						<div id="IRCChatInner">QUEUE GOES HERE</div>
 						<label for="queueTypeSelect">Choose a type:</label>
 
-						<select name="queueTypeSelect" id="queueTypeSelect">
-						<option value="volvo">Volvo</option>
-						<option value="saab">Saab</option>
-						<option value="mercedes">Mercedes</option>
-						<option value="audi">Audi</option>
+						<select name="queueTypeSelect" id="queueTypeSelect" onchange='game.time.queue.updateBuySelect(event)'>
+						<option value="noneType">None</option>
+						<option value="a">a</option>
 						</select>
 
+						<label for="queueBuySelect">Choose:</label>
+
+						<select name="queueBuySelect" id="queueBuySelect" onchange= 'game.time.queue.buyFromSelect(event)'>
+						<option value="noneBuy">None</option>
+						</select>
+						<button type="queueAddButton" onclick="game.time.queue.buttonQueue(event)">Add to queue</button>
 					</div>
 				</div>
 				<div

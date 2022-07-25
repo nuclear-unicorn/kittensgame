@@ -1487,6 +1487,15 @@ dojo.declare("classes.queue.manager", null,{
         if(game.getFeatureFlag("MAUSOLEUM_PACTS")){
             this.queueSources.push("pacts");
         }
+        var queueSel = document.getElementById('queueTypeSelect');
+        if(!queueSel){
+            return; //I guess for mobile this can be fine?
+        }
+        for (var i in this.queueSources){
+            console.warn(Number(i)+1)
+            queueSel.options[Number(i) + 1] = new Option(this.queueSources[i], this.queueSources[i]);
+        }
+        //console.warn(queueSel.options);
     },
     calculateCap: function(){
         return this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"]; //
@@ -1495,6 +1504,54 @@ dojo.declare("classes.queue.manager", null,{
         if(this.queue_list.length < this.cap){
             this.queue_list.push([name, type]);
         }
+    },
+    updateBuySelect: function(event){
+        /*if (evt.target.value === "Say Hello") {
+            alert('Hello');
+          }*/
+        var type = event.target.value;
+        //console.warn(event.target.value);
+        var q = 1;
+        var queueBuySelect = document.getElementById('queueBuySelect');
+        switch (type){
+            case "buildings":
+                var bld = this.game.bld;
+                for (var i in this.game.bld.buildingsData){
+                    var building = this.game.bld.buildingsData[i];
+                    if(building.unlocked){
+                        var name = building.name;
+                        var label = building.label;
+                        if(building.stages){
+                            if(building.stages){
+                                label = building.stages[building.stage].label;
+                            }
+                        }
+                        queueBuySelect.options[q] = new Option(label, name);
+                        q+=1;
+                    }
+                    //console.warn(building);
+                }
+                break;
+        }
+    },
+    buyFromSelect: function(event){
+        var queueTypeSelect = document.getElementById('queueTypeSelect');
+        var type = queueTypeSelect.selectedOptions[0].value;
+        var name = event.target.value;
+        if(name == "noneBuy" || type == "noneType"){
+            return;
+        }
+        this.addToQueue(name, type);
+    },
+    buttonQueue: function(event){
+        var queueTypeSelect = document.getElementById('queueTypeSelect');
+        var type = queueTypeSelect.selectedOptions[0].value;
+        var queueBuySelect = document.getElementById('queueBuySelect');
+        var name = queueBuySelect.selectedOptions[0].value;
+        if(name == "noneBuy" || type == "noneType"){
+            return;
+        }
+        this.addToQueue(name, type);
     },
     update: function(){
         this.cap = this.calculateCap();
@@ -1608,6 +1665,7 @@ dojo.declare("classes.queue.manager", null,{
             //console.log(oldVal,  model.metadata.val);
             if(oldVal != model.metadata[compare]){
                 this.queue_list.shift();
+                this.update();
             }
     }
 
