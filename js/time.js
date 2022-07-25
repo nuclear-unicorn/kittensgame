@@ -73,6 +73,11 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.gainTemporalFlux(ts);
         this.timestamp = ts;
         this.queue.queue_list = saveData["time"].queue_list ||[];
+
+        if(!this.game.getFeatureFlag("QUEUE")){
+            $("#queueLink").hide();
+            return;
+        }
 	},
 
 	gainTemporalFlux: function (timestamp){
