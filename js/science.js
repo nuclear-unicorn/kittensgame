@@ -1065,7 +1065,11 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		},
 		unlocked: false,
 		blocked: false,
-		blocks:["necrocracy", "radicalXenophobia"]
+		blocks:["necrocracy", "radicalXenophobia"],
+		upgrades: {
+			buildings:["library"],
+			spaceBuilding: ["moonOutpost"]
+		},
 	},
 	{
 		name: "necrocracy",
