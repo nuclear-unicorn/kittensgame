@@ -1655,6 +1655,7 @@
     "ui.pause.title": "Pause/unpause the game",
     "ui.undo": "undo ({0}s)",
     "ui.undo.title": "Undo the change",
+    "ui.queue.link": "Queue",
 
     "ui.close": "close",
     "ui.option.language": "Language:",

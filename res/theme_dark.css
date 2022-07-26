@@ -6,6 +6,7 @@
 .scheme_dark .help {
 	color: #DCDCDC;
 	background-color: #201F1D;
+	color-scheme: dark;
 }
 
 .scheme_dark #autosaveTooltip {
