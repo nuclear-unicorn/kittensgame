@@ -9,6 +9,7 @@
 /* ******************************************** */
 body.scheme_black {
 	background-color: #000000;
+	color-scheme: dark;
 }
 .scheme_black  #gamePageContainer,
 .scheme_black select,

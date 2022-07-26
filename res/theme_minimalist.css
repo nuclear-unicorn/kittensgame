@@ -9,6 +9,7 @@
 /**********************************************/
 body.scheme_minimalist {
 	background-color: #0C0D10;
+	color-scheme: dark;
 }
 body.scheme_minimalist.with_background_image,
 .scheme_minimalist .dialog {
