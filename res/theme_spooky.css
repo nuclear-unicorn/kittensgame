@@ -35,6 +35,7 @@
 /* ******************************************** */
 body.scheme_spooky {
 	background-color: #0b0c23;
+	color-scheme: dark;
 }
 body.scheme_spooky.with_background_image {
 	background: no-repeat local top left url('img/theme_spooky_tree_spider_web.png'),

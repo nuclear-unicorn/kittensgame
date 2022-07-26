@@ -28,6 +28,7 @@
 
 body.scheme_wood {
 	background-color:#201916;
+	color-scheme: dark;
 }
 body.scheme_wood.with_background_image {
 	background:	repeat-x local top left url('img/theme_wood_border_01.png'), #201916;

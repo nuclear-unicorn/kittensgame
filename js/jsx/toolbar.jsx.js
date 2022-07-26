@@ -342,6 +342,7 @@ WLoginForm = React.createClass({
         return {
             login: null,
             password: null,
+            error: null,
             isLoading: false
         }
     },
@@ -390,6 +391,9 @@ WLoginForm = React.createClass({
                         target: "_blank",
                         href: "http://kittensgame.com/ui/register"
                     }, "register")
+                ]),
+                this.state.error && $r("div", {className: "row"}, [
+                    $r("span", {className:"error"}, this.state.error)
                 ])
             ]
         )
@@ -432,13 +436,24 @@ WLoginForm = React.createClass({
             if (resp.id){
                 self.props.game.server.setUserProfile(resp);
             }
-		}).always(function(){
+		}).fail(function(resp, status){
+            console.error("something went wrong, resp:", resp, status)
+            self.setState({error: resp.responseText})
+        }).always(function(){
             self.setState({isLoading: false});
         });
     }
 });
 
 WCloudSaveRecord = React.createClass({
+
+    getInitialState: function(){
+        return {
+            showActions: false,
+            isEditable: false,
+            label: this.props.save.label
+        }
+    },
 
     bytesToSize(bytes) {
         var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -456,9 +471,47 @@ WCloudSaveRecord = React.createClass({
 
         var self = this;
 
-        return $r("div", {className:"save-record"}, [
+        return $r("div", {className:"save-record " + (save.archived ? "archived" : "")}, [
             $r("div", {className:"save-record-cell"},
-                $r("a", { }, guid.substring(guid.length-4, guid.length)),
+                this.state.isEditable ? 
+                    $r("input", {
+                        onClick: function(e){
+                            e.stopPropagation();
+                        },
+                        onChange: function(e){
+                            self.setState({
+                                label: e.target.value
+                            });
+                        },
+                        onKeyPress: function(e){
+                            console.log("foo");
+                            //TODO: set save label
+                            if(e.key === 'Enter'){
+                                game.server.pushSaveMetadata(
+                                    save.guid,
+                                    {
+                                        label: self.state.label
+                                    }
+                                ).then(function(){
+                                    //force sync-up of the game's server state with UI
+                                    //(pushMetadata should return a new save snapshot)
+                                    self.forceUpdate();
+                                });
+                                self.setState({
+                                    isEditable: false
+                                });
+                            }
+                        }
+                     }) :
+                    $r("a", { 
+                        onClick: function(e){
+                            e.stopPropagation();
+                            self.setState({
+                                isEditable: !self.state.isEditable
+                            })
+                        }
+                    }, save.label || guid.substring(guid.length-4, guid.length))
+                ,
                 isActiveSave ? "[" + $I("ui.kgnet.save.current") + "]" : ""
             ),
             $r("div", {className:"save-record-cell"},
@@ -484,18 +537,55 @@ WCloudSaveRecord = React.createClass({
             $r("a", {
                 className: "link",
                 title: "Download a cloud save and apply it to your game (your current data will be lost)",
-                    onClick: function(e){
+                onClick: function(e){
                     e.stopPropagation();
                     game.ui.confirm("[L]oad", "This will override [LOCAL] save. Y/N", function(){
                         game.server.loadSave(save.guid);
                     });
                 }}, $I("ui.kgnet.save.load")),
-                
+            $r("a", {
+                className: "link",
+                onClick: function(e){
+                    e.stopPropagation();
+                    self.setState({
+                        showActions: !self.state.showActions
+                    })
+                }
+            }, ".."),
+            this.state.showActions &&
+                $r("a", {
+                    onClick: function(e){
+                        e.stopPropagation();
+                        self.setState({
+                            isEditable: !self.state.isEditable
+                        })
+                }}, "edit"
+            ),
+            this.state.showActions &&
+                $r("a", { onClick: function(e){
+                    e.stopPropagation();
+                    game.server.pushSaveMetadata(
+                        save.guid,
+                        {
+                            archived: !save.archived
+                        }
+                    ).then(function(){
+                        //force sync-up of the game's server state with UI
+                        //(pushMetadata should return a new save snapshot)
+                        self.forceUpdate();
+                    });
+                }}, "archive")  
         ]);
     }
 })
 
 WCloudSaves = React.createClass({
+
+    getInitialState: function(){
+        return {
+            isLoading: false
+        }
+    },
 
     render: function(){
         var self = this;
@@ -551,9 +641,15 @@ WCloudSaves = React.createClass({
                         title: "Fetch the latest information about your cloud saves from the serer. This is a safe operation and it wont change any data.",
                         onClick: function(e){
                             e.stopPropagation();
-                            game.server.syncSaveData();
+                            self.setState({isLoading: true})
+                            game.server.syncSaveData().always(function(){
+                                self.setState({isLoading: false})
+                            })
                         }
-                    }, $I("ui.kgnet.sync")),
+                    }, 
+                        (this.state.isLoading && "[loading..]"), 
+                        $I("ui.kgnet.sync")
+                    ),
                     $r("span", {paddingTop:"10px"}, $I("ui.kgnet.instructional"))
                 ])
             ])
