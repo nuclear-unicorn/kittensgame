@@ -1487,7 +1487,7 @@ dojo.declare("classes.queue.manager", null,{
     /*queueSources : ["policies", "tech", "buildings", "spaceMission",
                     "spaceBuilding","chronoforge", "voidSpace", "zigguratUpgrades",  
                     "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],*/
-    queueSources: ["buildings", "spaceBuilding"],
+    queueSources: ["buildings", "spaceBuilding", "zigguratUpgrades", "transcendenceUpgrades"],
     cap: 0,
     constructor: function(game){
         this.game = game;
@@ -1558,6 +1558,26 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 break;
+            case "zigguratUpgrades":
+                var zigguratUpgrades = this.game.religion.zigguratUpgrades;
+                for (var i in zigguratUpgrades){
+                    var building = this.game.religion.zigguratUpgrades[i];
+                    if(building.unlocked){
+                        queueBuySelect.options[q] = new Option(building.label, building.name);
+                        q+=1;
+                    }
+                }
+                break;
+            case "transcendenceUpgrades":
+                var transcendenceUpgrades = this.game.religion.transcendenceUpgrades;
+                for (var i in transcendenceUpgrades){
+                    var building = this.game.religion.transcendenceUpgrades[i];
+                    if(building.unlocked){
+                        queueBuySelect.options[q] = new Option(building.label, building.name);
+                        q+=1;
+                    }
+                }
+                break;
         }
     },
     buyFromSelect: function(event){
@@ -1605,6 +1625,16 @@ dojo.declare("classes.queue.manager", null,{
                 queueTypeSelect.options[2].label = "???";
             }else{
                 queueTypeSelect.options[2].label = queueTypeSelect.options[2].value;
+            }
+            if(!(this.game.science.get("theology").researched && this.game.bld.get("ziggurat").val > 0)){
+                queueTypeSelect.options[3].label = "???";
+            }else{
+                queueTypeSelect.options[3].label = queueTypeSelect.options[3].value;
+            }
+            if(!this.game.science.get("cryptotheology").researched){
+                queueTypeSelect.options[4].label = "???";
+            }else{
+                queueTypeSelect.options[4].label = queueTypeSelect.options[4].value;
             }
         }
         this.cap = this.calculateCap();
