@@ -270,7 +270,7 @@ dojo.declare("classes.game.Server", null, {
 	 * @param {*} handler - onDone callback handler
 	 */
 	_xhr: function(url, method, data, handler){
-		$.ajax({
+		return $.ajax({
             cache: false,
             type: method || "GET",
             dataType: "JSON",
@@ -301,7 +301,7 @@ dojo.declare("classes.game.Server", null, {
 
 	syncSaveData: function(){
 		var self = this;
-		this._xhr("/kgnet/save/", "GET", {}, function(resp){
+		return this._xhr("/kgnet/save/", "GET", {}, function(resp){
 			self.saveData = resp;
 		});
 	},
@@ -329,6 +329,26 @@ dojo.declare("classes.game.Server", null, {
 			console.log("save successful?");
 			self.saveData = resp;
 			self.game.msg($I("save.export.msg"));
+		});
+	},
+
+	/**
+	 * 
+	 * @param {*} metadata 
+	 * {
+	 * 	archived?: boolean;
+	 *  label?: string
+	 * }
+	 */
+	pushSaveMetadata: function(guid, metadata){
+		return this._xhr("/kgnet/save/update/", "POST", 
+		{
+			//pre-parsing guid to avoid checking it on the backend side
+			guid: guid,
+			metadata: metadata
+		}, 
+		function(resp){
+			self.saveData = resp;
 		});
 	},
 
@@ -3513,14 +3533,26 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		stack.push({
 			name: $I("res.stack.buildings"),
 			type: "perDay",
-			value: this.getEffect(res.name + "PerDay")
+			value: this.getEffect(res.name + "PerDay") - this.religion.pactsManager.getSiphonedCorruption(1)
 		});
 		if(resName == "necrocorn"){
-			stack.push({
+			var corruptionStack = [];
+			corruptionStack.push({
 				name: $I("res.stack.corruptionPerDay"),
 				type: "perDay",
 				value: this.religion.getCorruptionPerTick() * this.calendar.ticksPerDay
 			});
+			corruptionStack.push({
+				name: $I("res.stack.corruptionPerDayProduction"),
+				type: "perDay",
+				value: this.religion.getCorruptionPerTickProduction() * this.calendar.ticksPerDay
+			});
+			corruptionStack.push({
+				name: $I("res.stack.corruptionPerDaySiphoned"),
+				type: "perDay",
+				value: - this.religion.pactsManager.getSiphonedCorruption(1)
+			});
+			stack.push(corruptionStack);
 				// TIME extra-compare
 			stack.push({
 				name: $I("res.stack.time"),
@@ -3727,8 +3759,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	getResourcePerDay: function(resName){
 		if(resName == "necrocorn"){
-			return this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect(resName + "PerDay") +
-			this.religion.getCorruptionPerTick() * this.calendar.ticksPerDay;
+			return (this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect(resName + "PerDay") + this.religion.pactsManager.getSiphonedCorruption(1) +
+			this.religion.getCorruptionPerTick() * this.calendar.ticksPerDay);
 		}
 		return this.getEffect(resName + "PerDay");
 	},
@@ -3830,7 +3862,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 			if(res.name == "necrocorn"){
 				var toNextNecrocorn = (1 - this.religion.corruption)/(this.religion.getCorruptionPerTick() * 5 * (1 + this.timeAccelerationRatio()));
-				resString += "<br>" + $I("res.toNextNecrocorn") + ": " + this.toDisplaySeconds(toNextNecrocorn.toFixed());
+				if(toNextNecrocorn > 0){
+					resString += "<br>" + $I("res.toNextNecrocorn") + ": " + this.toDisplaySeconds(toNextNecrocorn.toFixed());
+				}
 			}
 			return resString;
 		}else if(res.calculateOnYear){

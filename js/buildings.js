@@ -2009,7 +2009,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					"mineralsPerTickProd": 2,
 					"titaniumPerTickCon": -2,
 					"alicornPerTickCon": -0.00002,
-					"tMythrilPerTick": 0.00005
+					"tMythrilPerTick": 0.00005,
+					"manpowerMax": 10
 				};
 			}else {
 				self.effects = {
@@ -2017,7 +2018,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					"mineralsPerTickProd": 1,
 					"titaniumPerTickCon": 0,
 					"alicornPerTickCon": 0,
-					"tMythrilPerTick": 0
+					"tMythrilPerTick": 0,
+					"manpowerMax": 10
 				};
 			}
 			var amt = game.resPool.getAmtDependsOnStock(
