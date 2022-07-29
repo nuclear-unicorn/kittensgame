@@ -1684,13 +1684,14 @@ dojo.declare("classes.queue.manager", null,{
                 buyItem = false;
                 break;
             case "spaceMission":
+                compare = "researched";
                 props.controller = new com.nuclearunicorn.game.ui.SpaceProgramBtnController(this.game);
-                var oldVal = itemMetaRaw.val;
+                var oldVal = itemMetaRaw.researched;
                 var model = props.controller.fetchModel(props);
                 break;
             case "spaceBuilding":
                 props.controller = new classes.ui.space.PlanetBuildingBtnController(this.game);
-                var oldVal = itemMetaRaw.researched;
+                var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 break;
             case "chronoforge":
