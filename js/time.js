@@ -30,7 +30,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             isAccelerated: this.isAccelerated,
             cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "unlocked"]),
             vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"]),
-            queue_list: this.queue.queue_list
+            queueItems: this.queue.queueItems
         };
         this._forceChronoFurnaceStop(saveData.time.cfu);
     },
@@ -72,7 +72,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
         this.gainTemporalFlux(ts);
         this.timestamp = ts;
-        this.queue.queue_list = saveData["time"].queue_list || [];
+        this.queue.queueItems = saveData["time"].queueItems || [];
 
         if(!this.game.getFeatureFlag("QUEUE")){
             $("#queueLink").hide();
@@ -1632,7 +1632,7 @@ dojo.declare("classes.queue.manager", null,{
         //var el = this.queue_list[0];*/
 
         this.cap = this.calculateCap();
-        if(this.queue_list.length <= 0){
+        if(!this.queueItems.length){
             return;
         }
         var el = this.queueItems[0];
@@ -1730,7 +1730,7 @@ dojo.declare("classes.queue.manager", null,{
         }
         if(!props.controller){
             console.error(el.name + " of " + el.type + " queing is not supported!");
-            this.queue_list.shift();
+            this.queueItems.shift();
         }
         if(buyItem){
             props.controller.buyItem(model, 1,  function(result) {});
