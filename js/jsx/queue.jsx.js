@@ -19,7 +19,7 @@ WQueue = React.createClass({
         var self = this;
 
         //TODO: uncomment and change all game references to this.state.game if you want to update it dynamically
-        
+
         /*this.onUpdateHandler = dojo.subscribe("ui/update", function(game){
             self.setState({game: game});
         });*/
@@ -71,11 +71,22 @@ WQueue = React.createClass({
     },
 
     getQueueItems: function(){
+        var self = this;
         var items = [];
         for (var i in game.time.queue.queueItems){
-            var item = game.time.queue.queueItems[0];
-            items.push($r("div", {}, 
-                "[" + item.type + "] - " + item.label
+            var item = game.time.queue.queueItems[i];
+            items.push($r("div", {}, [
+                "[" + item.type + "] - " + item.label,
+                $r("a", {
+                    href: "#", 
+                    onClick: function(e){
+                        e.preventDefault();
+                        
+                        //TODO: implement me!
+                        game.time.queue.remove(item.type, item.id);
+                        self.forceUpdate();
+                }}, "[x]")
+            ]
             ));
         }
         return $r("div", {}, 

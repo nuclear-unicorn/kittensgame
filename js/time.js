@@ -1516,6 +1516,13 @@ dojo.declare("classes.queue.manager", null,{
         }
     },
 
+    remove: function(type, name){
+        // Array.filter might cause some issues in older browsers, let's use jquery grep
+        this.queueItems = $.grep(this.queueItems, function( item, i ) {
+            return (item.name != name && item.type != type);
+        });
+    },
+
     /**
      * Return a list of sub-options for a building queue
      * in a form of [{
