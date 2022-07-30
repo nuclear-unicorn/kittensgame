@@ -54,6 +54,7 @@ WQueue = React.createClass({
     },
 
     getQueueItemSelect: function(options){
+        var self = this;
         var selectOpts = [];
 
         for (var i in options){
