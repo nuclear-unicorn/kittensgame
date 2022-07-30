@@ -15,6 +15,16 @@ WQueue = React.createClass({
         };
     },
 
+    componentDidMount: function(){
+        var self = this;
+
+        //TODO: uncomment and change all game references to this.state.game if you want to update it dynamically
+        
+        /*this.onUpdateHandler = dojo.subscribe("ui/update", function(game){
+            self.setState({game: game});
+        });*/
+    },
+
     getQueueTypeSelect: function(){
         var options = [];
         var self = this;
