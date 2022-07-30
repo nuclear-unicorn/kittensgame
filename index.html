@@ -141,6 +141,7 @@
 					"js/jsx/toolbar.jsx",
 					"js/jsx/chiral.jsx",
 					"js/jsx/map.jsx",
+					"js/jsx/queue.jsx",
 
 					//required for defining IReactAware, will be relied upon by js/space
 					"js/ui",
@@ -465,8 +466,10 @@
 						</div>
 					</div>
 					<div class="right-tab" id="rightTabQueue" style="display:none;">
-						<div id="IRCChatInner"></div>
-						<label for="queueTypeSelect">Choose a type:</label>
+
+						<div id="queueViewport"></div>
+						
+						<!--<label for="queueTypeSelect">Choose a type:</label>
 
 						<select name="queueTypeSelect" id="queueTypeSelect" onchange='game.time.queue.updateBuySelect(event)'>
 						<option value="noneType">None</option>
@@ -479,7 +482,8 @@
 						<option value="noneBuy">None</option>
 						</select>
 						<button type="queueAddButton" onclick="game.time.queue.buttonQueue(event)">Add to queue</button>
-						<p id = "queue_list_ui" onclick = "game.time.queue.listDrop(event)"></p>
+						<p id = "queue_list_ui" onclick = "game.time.queue.listDrop(event)"></p>-->
+
 					</div>
 				</div>
 				<div
