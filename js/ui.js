@@ -1,7 +1,8 @@
 /* global
     WLeftPanel
     WMidPanel
-    WToolbar
+    WToolbar,
+    WQueue
 */
 
 
@@ -582,6 +583,12 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         React.render($r(WMidPanel, {
             game: this.game
         }), document.getElementById("midColumnViewport"));
+
+        if(this.game.getFeatureFlag("QUEUE")){
+            React.render($r(WQueue, {
+                game: this.game
+            }), document.getElementById("queueViewport"));
+        }
 
         React.render($r(WToolbar, {
             game: this.game

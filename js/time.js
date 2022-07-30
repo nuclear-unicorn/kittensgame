@@ -30,7 +30,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             isAccelerated: this.isAccelerated,
             cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "unlocked"]),
             vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"]),
-            queue_list: this.queue.queue_list
+            queueItems: this.queue.queueItems
         };
         this._forceChronoFurnaceStop(saveData.time.cfu);
     },
@@ -72,7 +72,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
         this.gainTemporalFlux(ts);
         this.timestamp = ts;
-        this.queue.queue_list = saveData["time"].queue_list ||[];
+        this.queue.queueItems = saveData["time"].queueItems || [];
 
         if(!this.game.getFeatureFlag("QUEUE")){
             $("#queueLink").hide();
@@ -147,11 +147,13 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 cfu.action(cfu, this.game);
             }
         }
+        this.calculateRedshift();
+    },
 
-        if(this.game.getFeatureFlag("QUEUE") && this.game.ticks % this.queue.periodInTicks == 0){
+    updateQueue: function(){
+        if(this.game.getFeatureFlag("QUEUE")){
             this.queue.update();
         }
-        this.calculateRedshift();
     },
 
     calculateRedshift: function(){
@@ -1479,62 +1481,65 @@ dojo.declare("classes.tab.TimeTab", com.nuclearunicorn.game.ui.tab, {
 });
 
 
-
 dojo.declare("classes.queue.manager", null,{
     game: null,
-    queue_list : [],
-    periodInTicks: 10,
+    queueItems : [],
     /*queueSources : ["policies", "tech", "buildings", "spaceMission",
                     "spaceBuilding","chronoforge", "voidSpace", "zigguratUpgrades",  
                     "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],*/
     queueSources: ["buildings", "spaceBuilding", "zigguratUpgrades", "transcendenceUpgrades"],
     cap: 0,
+
     constructor: function(game){
         this.game = game;
-        /*if(game.getFeatureFlag("MAUSOLEUM_PACTS")){
-            this.queueSources.push("pacts");
-        }*/ //let's deal with this later!
-        var queueSel = document.getElementById('queueTypeSelect');
-        if(!queueSel){
-            return; //I guess for mobile this can be fine?
-        }
-        for (var i in this.queueSources){
-            //console.warn(Number(i)+1)
-            queueSel.options[Number(i) + 1] = new Option(this.queueSources[i], this.queueSources[i]);
-        }
-        //console.warn(queueSel.options);
+        
     },
     calculateCap: function(){
         return this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + 2; //
     },
+
     addToQueue: function(name, type, label){
+        if (!name || !type){
+            console.error("queueMgr#addToQueue: unable to add item:", name, type, label);
+            return;
+        }
+
         if(!label){
-            label = "???";
+            label = "$" + name + "$";
         }
-        if(this.queue_list.length < this.cap){
-            this.queue_list.push([name, type, label]);
+        if(this.queueItems.length < this.cap){
+            this.queueItems.push({
+                name: name,
+                type: type,
+                label: label
+            });
         }
-        this.showList();
     },
-    updateBuySelect: function(event){
-        /*if (evt.target.value === "Say Hello") {
-            alert('Hello');
-          }*/
-        var type = event.target.value;
-        //console.warn(event.target.value);
-        var q = 1;
-        var queueBuySelect = document.getElementById('queueBuySelect');
-        //lets not cause errors when changing to None/not coded in types
-       var i = queueBuySelect.options.length - 1;
-        while(i > 0){
-            queueBuySelect.removeChild(queueBuySelect.options[i]);
-            i--;
-        }
+
+    remove: function(type, name){
+        // Array.filter might cause some issues in older browsers, let's use jquery grep
+        this.queueItems = $.grep(this.queueItems, function( item, i ) {
+            return (item.name != name && item.type != type);
+        });
+    },
+
+    /**
+     * Return a list of sub-options for a building queue
+     * in a form of [{
+     *      name: <queue item name>,
+     *      label: <display label>
+     * }]
+     * 
+     * @param {*} type: queue type (buildings, upgrades, etc.). See game.time.queue.queueSources
+     * @returns 
+     */
+    getQueueOptions: function(type){
+        var options = [];
         switch (type){
             case "buildings":
                 var bld = this.game.bld;
-                for (var i in this.game.bld.buildingsData){
-                    var building = this.game.bld.buildingsData[i];
+                for (var i in bld.buildingsData){
+                    var building = bld.buildingsData[i];
                     if(building.unlocked){
                         var name = building.name;
                         var label = building.label;
@@ -1543,83 +1548,62 @@ dojo.declare("classes.queue.manager", null,{
                                 label = building.stages[building.stage].label;
                             }
                         }
-                        queueBuySelect.options[q] = new Option(label, name);
-                        q+=1;
+                        options.push({
+                            name: name,
+                            label: label
+                        });
                     }
                 }
-                break;
+                return options;
+
             case "spaceBuilding":
                 var spaceBuildMap = this.game.space.spaceBuildingsMap;
                 for (var i in spaceBuildMap){
                     var building = this.game.space.getBuilding(spaceBuildMap[i]);
                     if(building.unlocked){
-                        queueBuySelect.options[q] = new Option(building.label, building.name);
-                        q+=1;
+                        options.push({
+                            name: building.name,
+                            label: building.label
+                        });
                     }
                 }
-                break;
+                return options;
+
             case "zigguratUpgrades":
                 var zigguratUpgrades = this.game.religion.zigguratUpgrades;
                 for (var i in zigguratUpgrades){
                     var building = this.game.religion.zigguratUpgrades[i];
                     if(building.unlocked){
-                        queueBuySelect.options[q] = new Option(building.label, building.name);
-                        q+=1;
+                        options.push({
+                            name: building.name,
+                            label: building.label
+                        });
                     }
                 }
-                break;
+                return options;
+
             case "transcendenceUpgrades":
                 var transcendenceUpgrades = this.game.religion.transcendenceUpgrades;
                 for (var i in transcendenceUpgrades){
                     var building = this.game.religion.transcendenceUpgrades[i];
                     if(building.unlocked){
-                        queueBuySelect.options[q] = new Option(building.label, building.name);
-                        q+=1;
+                        options.push({
+                            name: building.name,
+                            label: building.label
+                        });
                     }
                 }
-                break;
+                return options;
         }
     },
-    buyFromSelect: function(event){
-        var queueTypeSelect = document.getElementById('queueTypeSelect');
-        var type = queueTypeSelect.selectedOptions[0].value;
-        var name = event.target.value;
-        if(name == "noneBuy" || type == "noneType"){
-            return;
-        }
-        this.addToQueue(name, type, event.target.selectedOptions[0].label);
-    },
-    buttonQueue: function(event){
-        var queueTypeSelect = document.getElementById('queueTypeSelect');
-        var type = queueTypeSelect.selectedOptions[0].value;
-        var queueBuySelect = document.getElementById('queueBuySelect');
-        var name = queueBuySelect.selectedOptions[0].value;
-        if(name == "noneBuy" || type == "noneType"){
-            return;
-        }
-        this.addToQueue(name, type, queueBuySelect.selectedOptions[0].label);
-    },
-    showList: function(){
-        var queue_list_ui = document.getElementById('queue_list_ui');
-        if(!queue_list_ui){
-            return;
-        }
-        var i = 0;
-        queue_list_ui.textContent = "";
-        while(i < this.queue_list.length){
-            if(i !=0){
-                queue_list_ui.textContent += ", ";
-            }
-            queue_list_ui.textContent += this.queue_list[i][2];
-            i +=1;
-        }
-    },
+
     listDrop: function(event){
         this.queue_list.pop();
         this.showList();
     },
+
     update: function(){
-        var queueTypeSelect = document.getElementById('queueTypeSelect');
+        /*var queueTypeSelect = document.getElementById('queueTypeSelect');
         if(queueTypeSelect){
             if(!this.game.science.get("rocketry").researched){
                 queueTypeSelect.options[2].label = "???";
@@ -1645,7 +1629,14 @@ dojo.declare("classes.queue.manager", null,{
             "name": this.queue_list[0][0],
             "type": this.queue_list[0][1]
         };
-        //var el = this.queue_list[0];
+        //var el = this.queue_list[0];*/
+
+        this.cap = this.calculateCap();
+        if(!this.queueItems.length){
+            return;
+        }
+        var el = this.queueItems[0];
+
         var itemMetaRaw = this.game.getUnlockByName(el.name, el.type);
         var compare = "val"; //we should do some sort of refractoring of the switch mechanism
         var props = {
@@ -1737,20 +1728,18 @@ dojo.declare("classes.queue.manager", null,{
                 var model = props.controller.fetchModel(props);
                 break;
         }
-            if(!props.controller){
-                console.error(el.name + " of " + el.type + " queing is not supported!");
-                this.queue_list.shift();
-            }
-            if(buyItem){
-                props.controller.buyItem(model, 1,  function(result) {});
-            }
-            //var model = props.controller.fetchModel(props);
-            //console.log(oldVal,  model.metadata.val);
-            if(oldVal != model.metadata[compare]){
-                this.queue_list.shift();
-                //this.update();
-            }
-        this.showList();
+        if(!props.controller){
+            console.error(el.name + " of " + el.type + " queing is not supported!");
+            this.queueItems.shift();
+        }
+        if(buyItem){
+            props.controller.buyItem(model, 1,  function(result) {});
+        }
+
+        if(oldVal != model.metadata[compare]){
+            this.queueItems.shift();
+        }
+
     }
 
 
