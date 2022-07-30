@@ -147,11 +147,13 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 cfu.action(cfu, this.game);
             }
         }
+        this.calculateRedshift();
+    },
 
-        if(this.game.getFeatureFlag("QUEUE") && this.game.ticks % this.queue.periodInTicks == 0){
+    updateQueue: function(){
+        if(this.game.getFeatureFlag("QUEUE")){
             this.queue.update();
         }
-        this.calculateRedshift();
     },
 
     calculateRedshift: function(){
@@ -1482,7 +1484,6 @@ dojo.declare("classes.tab.TimeTab", com.nuclearunicorn.game.ui.tab, {
 dojo.declare("classes.queue.manager", null,{
     game: null,
     queueItems : [],
-    periodInTicks: 10,
     /*queueSources : ["policies", "tech", "buildings", "spaceMission",
                     "spaceBuilding","chronoforge", "voidSpace", "zigguratUpgrades",  
                     "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],*/
@@ -1595,7 +1596,7 @@ dojo.declare("classes.queue.manager", null,{
     },
 
     update: function(){
-        var queueTypeSelect = document.getElementById('queueTypeSelect');
+        /*var queueTypeSelect = document.getElementById('queueTypeSelect');
         if(queueTypeSelect){
             if(!this.game.science.get("rocketry").researched){
                 queueTypeSelect.options[2].label = "???";
@@ -1621,7 +1622,14 @@ dojo.declare("classes.queue.manager", null,{
             "name": this.queue_list[0][0],
             "type": this.queue_list[0][1]
         };
-        //var el = this.queue_list[0];
+        //var el = this.queue_list[0];*/
+
+        this.cap = this.calculateCap();
+        if(this.queue_list.length <= 0){
+            return;
+        }
+        var el = this.queueItems[0];
+
         var itemMetaRaw = this.game.getUnlockByName(el.name, el.type);
         var compare = "val"; //we should do some sort of refractoring of the switch mechanism
         var props = {
@@ -1713,20 +1721,18 @@ dojo.declare("classes.queue.manager", null,{
                 var model = props.controller.fetchModel(props);
                 break;
         }
-            if(!props.controller){
-                console.error(el.name + " of " + el.type + " queing is not supported!");
-                this.queue_list.shift();
-            }
-            if(buyItem){
-                props.controller.buyItem(model, 1,  function(result) {});
-            }
-            //var model = props.controller.fetchModel(props);
-            //console.log(oldVal,  model.metadata.val);
-            if(oldVal != model.metadata[compare]){
-                this.queue_list.shift();
-                //this.update();
-            }
-        this.showList();
+        if(!props.controller){
+            console.error(el.name + " of " + el.type + " queing is not supported!");
+            this.queue_list.shift();
+        }
+        if(buyItem){
+            props.controller.buyItem(model, 1,  function(result) {});
+        }
+
+        if(oldVal != model.metadata[compare]){
+            this.queueItems.shift();
+        }
+
     }
 
 
