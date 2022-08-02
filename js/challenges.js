@@ -191,10 +191,14 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
             }else{
 				self.effects["corruptionBoostRatioChallenge"] = 0.1;
 			}
+			game.upgrade(self.upgrades);
         },
 		checkCompletionCondition: function(game){
 			return game.space.getBuilding("spaceBeacon").val > (game.challenges.getChallenge("blackSky").on || 0) ;
-		}
+		},
+		upgrades:{
+			zigguratUpgrades: ["marker"]
+		},
 	},{
 		name: "pacifism",
 		label: $I("challendge.pacifism.label"),
