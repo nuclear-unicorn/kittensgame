@@ -1326,6 +1326,7 @@
     "ui.option.use.percentage.consumption.values": "Expresar valores con porcentajes en los botónes artesanía/comercio/sacrificio",
     "ui.option.import.button": "Importar",
     "ui.option.export.full.file": "Archivo (Nombre completo)",
+    "ui.option.cancel.button": "Cancelar",
     "ui.option.notation": "Notacion:",
     "console.filter.astronomicalEvent": "Eventos Astronómicos",
     "console.filter.workshopAutomation": "Automatización del taller",
