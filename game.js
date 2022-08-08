@@ -1544,6 +1544,11 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"tradeKnowledge":{
 				title: $I("effectsMgr.statics.tradeKnowledge.title")
 			},
+			"tradeKnowledgeRatio" :  {
+				title: $I("effectsMgr.statics.tradeKnowledgeRatio.title"),
+				type: "ratio",
+				calculation: "constant"
+			},
 			"steamworksFakeBought":{
 				title: $I("effectsMgr.statics.steamworksFakeBought.title")
 			},
