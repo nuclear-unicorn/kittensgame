@@ -210,7 +210,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"weaponEfficency": 0,
 			"policyFakeBought": 0,
 			"embassyFakeBought": 0,
-			"steamworksFakeBought": 0
+			"steamworksFakeBought": 0,
+			"tradeKnowledgeRatio": 0
         },
         calculateEffects: function(self, game){
             if (self.active) {
@@ -220,6 +221,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
                 self.effects["policyFakeBought"] = 1;
 				self.effects["embassyFakeBought"] = 1;
 				self.effects["steamworksFakeBought"] = Math.floor(1.5 * self.on || 1)/ (self.on || 1);
+                self.effects["tradeKnowledgeRatio"] = 0;
             }else{
 				self.effects["alicornPerTickRatio"] = 0.1;
 				self.effects["tradeKnowledge"] = 1;
@@ -227,8 +229,12 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
                 self.effects["policyFakeBought"] = 0;
 				self.effects["embassyFakeBought"] = 0;
 				self.effects["steamworksFakeBought"] = 0;
+                self.effects["tradeKnowledgeRatio"] = self.getTradeBonusEffect(game);
 			}
 			game.upgrade(self.upgrades); //this is a hack, might need to think of a better sollution later
+		},
+		updateTradeKnowledgeRatio: function(self, game){
+			self.effects["tradeKnowledgeRatio"] = self.getTradeBonusEffect(game);
 		},
 		checkCompletionConditionOnReset: function(game){
 			if(game.diplomacy.baseManpowerCost > 0) { // BSK+IW precaution

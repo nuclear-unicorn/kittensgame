@@ -1502,6 +1502,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		calculateEffects: function(self, game) {
 			self.effects["standingRatio"] = game.workshop.get("caravanserai").researched ? 0.0035 : 0;
        },
+		upgrades: {
+			challenges: ["pacifism"]
+		},
 		flavor: $I("buildings.tradepost.flavor")
 	},{
 		name: "mint",
