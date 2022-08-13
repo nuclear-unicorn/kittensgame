@@ -83,14 +83,14 @@ WQueue = React.createClass({
         for (var i in game.time.queue.queueItems){
             var item = game.time.queue.queueItems[i];
             items.push($r("div", {}, [
-                "[" + item.type + "][" + item.name + "] - " + item.label,
+                "[" + item.type + "][" + item.name + "] - " + item.label + ((item.value)? " " + item.value: ""),
                 $r("a", {
                     href: "#", 
                     onClick: function(e){
                         e.preventDefault();
                         
                         //TODO: implement me!
-                        game.time.queue.remove(item.type, item.id);
+                        game.time.queue.remove(item.type, item.name);
                         self.forceUpdate();
                 }}, "[x]")
             ]
