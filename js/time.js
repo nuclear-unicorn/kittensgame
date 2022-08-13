@@ -1508,7 +1508,7 @@ dojo.declare("classes.queue.manager", null,{
         }
 
         if(this.queueLength >= this.cap){
-            return
+            return;
         }
         if(this.queueItems.length > 0 && this.queueItems[this.queueItems.length - 1].name == name){
             var valOfItem = (this.queueItems[this.queueItems.length - 1].value || 1) + 1;
@@ -1770,6 +1770,7 @@ dojo.declare("classes.queue.manager", null,{
             console.error(el.name + " of " + el.type + " queing is not supported!");
             var deletedElement = this.queueItems.shift();
             this.queueLength -= deletedElement.value || 1;
+            this.game.ui.render();
         }
         if(buyItem){
             props.controller.buyItem(model, 1,  function(result) {});
@@ -1779,6 +1780,7 @@ dojo.declare("classes.queue.manager", null,{
             //this.queueItems.shift();
             this.dropLastItem();
             this.queueLength -= 1;
+            this.game.ui.render();
         }
 
     }
