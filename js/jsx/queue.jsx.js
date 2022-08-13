@@ -11,7 +11,8 @@ WQueue = React.createClass({
         return {
             typeId: "buildings",
             itemId: null,
-            itemLabel: null
+            itemLabel: null,
+            game: this.props.game
         };
     },
 
@@ -20,9 +21,9 @@ WQueue = React.createClass({
 
         //TODO: uncomment and change all game references to this.state.game if you want to update it dynamically
 
-        /*this.onUpdateHandler = dojo.subscribe("ui/update", function(game){
+        this.onUpdateHandler = dojo.subscribe("ui/update", function(game){
             self.setState({game: game});
-        });*/
+        });
     },
 
     getQueueTypeSelect: function(){
@@ -80,8 +81,10 @@ WQueue = React.createClass({
     getQueueItems: function(){
         var self = this;
         var items = [];
-        for (var i in game.time.queue.queueItems){
-            var item = game.time.queue.queueItems[i];
+
+        var queueItems = self.state.game.time.queue.queueItems;
+        for (var i in queueItems){
+            var item = queueItems[i];
             items.push($r("div", {}, [
                 "[" + item.type + "][" + item.name + "] - " + item.label + ((item.value)? " " + item.value: ""),
                 $r("a", {
