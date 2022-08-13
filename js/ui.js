@@ -295,8 +295,11 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
                 }
             }
 
+            var targetType = event.target.type;
 			var isInputElement = event.target.tagName === "TEXTAREA" ||
-				(event.target.tagName === "INPUT" && (event.target.type === "text" || event.target.type === "number"));
+				(event.target.tagName === "INPUT" && (
+                    targetType === "text" || targetType === "number" || targetType === "password" || targetType === "email"
+                ));
             var isTabNumber = ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105));
             //console.log(isTabNumber, event.keyCode);
 
