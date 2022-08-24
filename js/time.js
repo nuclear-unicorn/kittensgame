@@ -1770,7 +1770,7 @@ dojo.declare("classes.queue.manager", null,{
             console.error(el.name + " of " + el.type + " queing is not supported!");
             var deletedElement = this.queueItems.shift();
             this.queueLength -= deletedElement.value || 1;
-            this.game.ui.render();
+            this.game._publish("ui/update", this.game);
         }
         if(buyItem){
             props.controller.buyItem(model, 1,  function(result) {});
@@ -1780,7 +1780,7 @@ dojo.declare("classes.queue.manager", null,{
             //this.queueItems.shift();
             this.dropLastItem();
             this.queueLength -= 1;
-            this.game.ui.render();
+            this.game._publish("ui/update", this.game);
         }
 
     }
