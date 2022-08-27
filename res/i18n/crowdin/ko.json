@@ -71,7 +71,7 @@
     "btn.all.assign": "[+전체]",
     "btn.all.unassign": "[-전체]",
     "btn.aoff.tooltip": "자동화 비활성화",
-    "btn.aon.tooltip": "자동 생산 활성화 됨",
+    "btn.aon.tooltip": "자동화 활성화",
     "btn.build": "건설",
     "btn.challenge": "도전 시작",
     "btn.complete": "(완료)",
