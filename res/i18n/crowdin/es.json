@@ -540,7 +540,7 @@
     "navbar.btn.hunters": "Enviar a todos los cazadores",
     "navbar.btn.praise": "Alabado sea el sol",
     "navbar.energy.cons": "Consumo: - {0} Wt",
-    "navbar.energy.cons.short": "Consumo:",
+    "navbar.energy.cons.short": "Consumición:",
     "navbar.energy.penalty": "Reducción de bonificación de producción: ",
     "navbar.energy.prod": "Producción: {0} Wt",
     "navbar.energy.prod.short": "Producción:",
