@@ -549,7 +549,7 @@
     "navbar.res.amount": "数量",
     "notification.save.title": "正在保存...",
     "notification.save.desc": "游戏已保存",
-    "navbar.energy": "能量：{0}瓦",
+    "navbar.energy": "能量:{0}Wt",
     "opts.group.interface": "界面",
     "opts.hideSell": "隐藏出售按钮",
     "opts.hideSell.desc": "隐藏所有建筑的出售按钮",
