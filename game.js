@@ -542,7 +542,7 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.coalRatioGlobal.title"),
 				resName: "coal",
 				type: "ratio",
-				calculation: "constant"
+				calculation: "nonProportional"
 			},
 
 			"coalRatioGlobalReduction" : {
@@ -1167,13 +1167,13 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"hrProgress": {
 				title: $I("effectsMgr.statics.entangler-hrProgress.title"),
 				type: "ratio",
-				calculation: "constant"
+				calculation: "nonProportional"
 			},
 
 			"aiLevel" :  {
 				title: $I("effectsMgr.statics.aiLevel.title"),
 				type: "fixed",
-				calculation: "constant"
+				calculation: "nonProportional"
 			},
 
 			"gflopsConsumption" :  {
@@ -1184,19 +1184,19 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"hashrate" :  {
 				title: $I("effectsMgr.statics.hashrate.title"),
 				type: "fixed",
-				calculation: "constant"
+				calculation: "nonProportional"
 			},
 
 			"nextHashLevelAt" :  {
 				title: $I("effectsMgr.statics.nextHashLevelAt.title"),
 				type: "fixed",
-				calculation: "constant"
+				calculation: "nonProportional"
 			},
 
 			"hashRateLevel" :  {
 				title: $I("effectsMgr.statics.hashrateLevel.title"),
 				type: "fixed",
-				calculation: "constant"
+				calculation: "nonProportional"
 			},
 
 			"corruptionBoostRatio": {
@@ -1547,7 +1547,7 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"tradeKnowledgeRatio" :  {
 				title: $I("effectsMgr.statics.tradeKnowledgeRatio.title"),
 				type: "ratio",
-				calculation: "constant"
+				calculation: "nonProportional"
 			},
 			"steamworksFakeBought":{
 				title: $I("effectsMgr.statics.steamworksFakeBought.title")
@@ -1645,7 +1645,7 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"activeHG":{
 				title: $I("effectsMgr.statics.activeHG.title"),
 				type: "fixed",
-				calculation: "constant"
+				calculation: "nonProportional"
 
 			}
 		}
