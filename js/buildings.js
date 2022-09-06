@@ -1825,6 +1825,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			};
 			effects["cultureMaxRatio"] = 0.08 + game.getEffect("cultureMaxRatioBonus");
 			self.effects = effects;
+			if(self.val){
+				game.time.queue.unlockQueueSource("zigguratUpgrades");
+			}
 		}
 	},{
 		name: "chronosphere",

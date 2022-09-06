@@ -29,10 +29,11 @@ WQueue = React.createClass({
     getQueueTypeSelect: function(){
         var options = [];
         var self = this;
-
-        for (var i in game.time.queue.queueSources){
-            var source = game.time.queue.queueSources[i];
-            options.push($r("option", { value: source}, source));
+        var queueSources = game.time.queue.queueSources;
+        for (var i in queueSources){
+            if(queueSources[i]){
+                options.push($r("option", { value: i}, i));
+            }
         }
         return $r("select", {
             value: this.state.queueTypeId,
@@ -45,7 +46,8 @@ WQueue = React.createClass({
                 var options = game.time.queue.getQueueOptions(typeId);
                 if (options.length){
                     self.setState({
-                        itemId: options[0].name,
+                        //itemId: options[0].name,
+                        itemId: 0,
                         itemLabel: options[0].label
                     });
                 }
@@ -60,7 +62,8 @@ WQueue = React.createClass({
 
         for (var i in options){
             var option = options[i];
-            selectOpts.push($r("option", { value: option.name, "data-label": option.label}, option.label));
+            //selectOpts.push($r("option", { value: option.name, "data-label": option.label}, option.label));
+            selectOpts.push($r("option", { value: i, "data-label": option.label}, option.label));
         }
 
         if (!options.length){
@@ -72,7 +75,9 @@ WQueue = React.createClass({
             onChange: function(e){
                 self.setState({
                     itemId: e.target.value,
-                    itemLabel: e.target.dataset.label
+                    //itemLabel: e.target.dataset.label
+                    //itemId: options[e.target.value].name,
+                    itemLabel: options[e.target.value].label
                 });
             }
         }, selectOpts);
@@ -118,7 +123,8 @@ WQueue = React.createClass({
                 onClick: function(){
                     if(self.state.itemId){
                         game.time.queue.addToQueue(
-                            self.state.itemId,
+                            //self.state.itemId,
+                            options[self.state.itemId].name,
                             self.state.typeId,
                             self.state.itemLabel
                         );

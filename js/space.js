@@ -312,7 +312,12 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				tabs: ["village"]
 			},
 			breakIronWill: true
-		}]
+		}],
+		calculateEffects: function(self, game){
+			if(self.reached){
+				game.time.queue.unlockQueueSource("spaceBuilding");
+			}
+		}
 	},{
 		name: "moon",
 		label: $I("space.planet.moon.label"),
