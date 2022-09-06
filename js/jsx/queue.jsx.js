@@ -60,7 +60,7 @@ WQueue = React.createClass({
 
         for (var i in options){
             var option = options[i];
-            selectOpts.push($r("option", { /*value: option.name*/ value:i, val:1, "data-label": option.label}, option.label));
+            selectOpts.push($r("option", { /*value: option.name*/ value:i, "dataset-label":i, "data-label": option.label}, option.label));
         }
 
         if (!options.length){
@@ -68,30 +68,12 @@ WQueue = React.createClass({
         }
 
         return $r("select", {
-            value: this.state.itemId,
-            //value: (options.length)?options[i].name : "-",
+            value: options[i].name,
             onChange: function(e){
-                console.log(e.target.value);
-                console.log(e.target.val);
-                if(options.length){
-                    self.setState({
-                        //itemId: options[e.target.value].name,
-                        itemId: e.target.value,
-                        itemLabel: options[e.target.value].label
-                    })
-                }else{
-                    self.setState({
-                        itemId: "-",
-                        itemLabel: "-"
-                    });
-                }
-                //console.log(e.target.label)
-                //console.log(e.target.dataset)
-                //self.setState({
-                //    itemId: e.target.value,
-                //    itemLabel: e.target.dataset.label
-                //});
-                
+                self.setState({
+                    itemId: options[e.target.value].name,
+                    itemLabel: options[e.target.value].label
+                })
             }
         }, selectOpts);
     },
@@ -139,8 +121,7 @@ WQueue = React.createClass({
                 onClick: function(){
 
                     game.time.queue.addToQueue(
-                        //self.state.itemId,
-                        options[self.state.itemId].name,
+                        self.state.itemId,
                         self.state.typeId,
                         self.state.itemLabel
                     );
