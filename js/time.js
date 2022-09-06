@@ -1559,7 +1559,6 @@ dojo.declare("classes.queue.manager", null,{
         });*/
     },
 
-
     /**
      * Return a list of sub-options for a building queue
      * in a form of [{
