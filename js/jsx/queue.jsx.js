@@ -72,8 +72,6 @@ WQueue = React.createClass({
         return $r("select", {
             value: this.state.itemId,
             onChange: function(e){
-                console.log(e.target.value)
-                console.log(options[e.target.value])
                 self.setState({
                     itemId: e.target.value,
                     //itemLabel: e.target.dataset.label
