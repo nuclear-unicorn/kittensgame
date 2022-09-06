@@ -1551,7 +1551,7 @@ dojo.declare("classes.queue.manager", null,{
                 console.error("Queue index is pointing to a wrong item!");
             }
         } else{
-            console.error("Queue item index is out of bounds!", index, "   ", this.queueLength);
+            console.error("Queue item index is out of bounds!", index, " ",this.queueLength);
         }
         // Array.filter might cause some issues in older browsers, let's use jquery grep
         /*this.queueItems = $.grep(this.queueItems, function( item, i ) {

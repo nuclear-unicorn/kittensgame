@@ -45,7 +45,8 @@ WQueue = React.createClass({
                 var options = game.time.queue.getQueueOptions(typeId);
                 if (options.length){
                     self.setState({
-                        itemId: options[0].name,
+                        //itemId: options[0].name,
+                        itemId: 0,
                         itemLabel: options[0].label
                     });
                 }
@@ -60,7 +61,8 @@ WQueue = React.createClass({
 
         for (var i in options){
             var option = options[i];
-            selectOpts.push($r("option", { value: option.name, "data-label": option.label}, option.label));
+            //selectOpts.push($r("option", { value: option.name, "data-label": option.label}, option.label));
+            selectOpts.push($r("option", { value: i, "data-label": option.label}, option.label));
         }
 
         if (!options.length){
@@ -70,9 +72,13 @@ WQueue = React.createClass({
         return $r("select", {
             value: this.state.itemId,
             onChange: function(e){
+                console.log(e.target.value)
+                console.log(options[e.target.value])
                 self.setState({
                     itemId: e.target.value,
-                    itemLabel: e.target.dataset.label
+                    //itemLabel: e.target.dataset.label
+                    //itemId: options[e.target.value].name,
+                    itemLabel: options[e.target.value].label
                 });
             }
         }, selectOpts);
@@ -118,7 +124,8 @@ WQueue = React.createClass({
                 onClick: function(){
                     if(self.state.itemId){
                         game.time.queue.addToQueue(
-                            self.state.itemId,
+                            //self.state.itemId,
+                            options[self.state.itemId].name,
                             self.state.typeId,
                             self.state.itemLabel
                         );
