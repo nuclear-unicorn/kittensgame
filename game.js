@@ -3591,11 +3591,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		});
 		if(resName == "antimatter" && this.resPool.energyProd < this.resPool.energyCons){
 
-		stack.push({
-			name: $I("ui.energy.tooltip"), //kinda hack text
-			type: "perYear",
-			value: -this.getEffect(res.name + "Production")
-		});
+			stack.push({
+				name: $I("ui.energy.tooltip"), //kinda hack text
+				type: "perYear",
+				value: -this.getEffect(res.name + "Production")
+			});
 		}
 		return stack;
 	},
