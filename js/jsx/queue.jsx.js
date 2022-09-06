@@ -129,7 +129,7 @@ WQueue = React.createClass({
                         game.time.queue.addToQueue(
                             options[0].name,
                             self.state.typeId,
-                            options[0].itemLabel
+                            self.state.itemLabel
                         );
                     }
 
