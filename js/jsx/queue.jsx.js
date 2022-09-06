@@ -34,8 +34,6 @@ WQueue = React.createClass({
             if(queueSources[i]){
                 options.push($r("option", { value: i}, i));
             }
-            //var source = game.time.queue.queueSources[i];
-            //options.push($r("option", { value: source}, source));
         }
         return $r("select", {
             value: this.state.queueTypeId,
