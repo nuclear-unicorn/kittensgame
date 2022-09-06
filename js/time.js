@@ -1529,17 +1529,16 @@ dojo.declare("classes.queue.manager", null,{
 
     remove: function(type, name, index){
         if(!this.queueItems.length){
+            this.queueLength = 0;
             return;
         }
         if(this.queueItems.length > index){
             var item = this.queueItems[index];
-            console.log(name, item.name);
-            console.log(type, item.type);
             if(item.name == name && item.type == type){
-                if(!item.value){
+                if(!item.value || item.value ===1){
                     this.queueItems.splice(index, 1);
                 }
-                if(item.value){
+                else{
                     item.value -=1;
                     if(item.value == 1){
                         item.value = null;
