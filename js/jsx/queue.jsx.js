@@ -85,10 +85,6 @@ WQueue = React.createClass({
         var queueItems = self.state.game.time.queue.queueItems;
         for (var i in queueItems){
             var item = queueItems[i];
-            //how about we not do shallow copies?
-            /*var index = JSON.parse(JSON.stringify(i));
-            var type = JSON.parse(JSON.stringify(item.type));
-            var name = JSON.parse(JSON.stringify(item.name));*/
             var index = i;
             var type = item.type;
             var name = item.name;
@@ -96,13 +92,13 @@ WQueue = React.createClass({
                 "[" + item.type + "][" + item.name + "] - " + item.label + ((item.value)? " " + item.value: ""),
                 $r("a", {
                     href: "#", 
-                    onClick: function(e){
+                    onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
+                    /*onClick: dojo.hitch([type, name, index], function(e){
                         e.preventDefault();
-                        
-                        //TODO: implement me!
                         game.time.queue.remove(type, name, index);
                         self.forceUpdate();
-                }}, "[x]")
+                    })*/
+                }, "[x]")
             ]
             ));
         }
