@@ -85,6 +85,10 @@ WQueue = React.createClass({
         var queueItems = self.state.game.time.queue.queueItems;
         for (var i in queueItems){
             var item = queueItems[i];
+            //how about we not do shallow copies?
+            let index = JSON.parse(JSON.stringify(i));
+            let type = JSON.parse(JSON.stringify(item.type));
+            let name = JSON.parse(JSON.stringify(item.name));
             items.push($r("div", {}, [
                 "[" + item.type + "][" + item.name + "] - " + item.label + ((item.value)? " " + item.value: ""),
                 $r("a", {
@@ -93,7 +97,7 @@ WQueue = React.createClass({
                         e.preventDefault();
                         
                         //TODO: implement me!
-                        game.time.queue.remove(item.type, item.name);
+                        game.time.queue.remove(type, name, index);
                         self.forceUpdate();
                 }}, "[x]")
             ]

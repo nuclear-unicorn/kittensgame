@@ -1527,25 +1527,32 @@ dojo.declare("classes.queue.manager", null,{
         this.queueLength += 1;
     },
 
-    remove: function(type, name){
+    remove: function(type, name, index){
         if(!this.queueItems.length){
+            this.queueLength = 0;
             return;
         }
-        var changedIndex = this.queueItems.findIndex(function(element){
-            return (element.name == name && element.type == type);
-        });
-        var changedItem = this.queueItems[changedIndex];
-        if(!changedItem.value){
-            this.queueItems.splice(changedIndex, 1);
-        }
-        if(changedItem.value){
-            changedItem.value -=1;
-            if(changedItem.value == 1){
-                changedItem.value = null;
+        if(this.queueItems.length > index){
+            var item = this.queueItems[index];
+            if(item.name == name && item.type == type){
+                if(!item.value || item.value ===1){
+                    this.queueItems.splice(index, 1);
+                }
+                else{
+                    item.value -=1;
+                    if(item.value == 1){
+                        item.value = null;
+                    }
+                }
+                this.queueLength -= 1;
+                return;
             }
+            else{
+                console.error("Queue index is pointing to a wrong item!");
+            }
+        } else{
+            console.error("Queue item index is out of bounds!");
         }
-        this.queueLength -= 1;
-        return;
         // Array.filter might cause some issues in older browsers, let's use jquery grep
         /*this.queueItems = $.grep(this.queueItems, function( item, i ) {
             return (item.name != name && item.type != type);
