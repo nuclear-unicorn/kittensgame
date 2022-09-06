@@ -119,12 +119,19 @@ WQueue = React.createClass({
             this.getQueueItemSelect(options),
             $r("button", {
                 onClick: function(){
-
-                    game.time.queue.addToQueue(
-                        self.state.itemId,
-                        self.state.typeId,
-                        self.state.itemLabel
-                    );
+                    if(self.state.itemId){
+                        game.time.queue.addToQueue(
+                            self.state.itemId,
+                            self.state.typeId,
+                            self.state.itemLabel
+                        );
+                    }else{
+                        game.time.queue.addToQueue(
+                            options[0].name,
+                            self.state.typeId,
+                            options[0].itemLabel
+                        );
+                    }
 
                     //re-render component
                     self.forceUpdate();
