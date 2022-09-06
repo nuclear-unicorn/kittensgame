@@ -582,6 +582,9 @@
     "effectsMgr.statics.springCatnipRatio.title": "Spring catnip bonus",
     "effectsMgr.statics.summerSolarFarmRatio.title": "Summer Solar Farm bonus",
 
+
+    "effectsMgr.winterEnergy.warning.title": "Not enough energy for production in winter",
+
     "general.copy.to.clipboard.prompt": "Copy to clipboard: Ctrl+C, Enter",
     "general.food.advisor.text": "Food advisor: 'Your catnip supply is too low!'",
 

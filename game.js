@@ -3771,7 +3771,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 	getResourceOnYearProduction: function(resName){
 		if (resName == "antimatter"){
-			return this.getEffect("antimatterProduction");
+			if(this.resPool.energyProd >= this.resPool.energyCons){
+				return this.getEffect("antimatterProduction");
+			}
+			else{
+				return 0;
+			}
 		}
 		return this.getEffect(resName + "Production"); //this might need to be changed!
 	},
@@ -3878,6 +3883,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				resPerYear = this.getResourceOnYearProduction(res.name);
 				if (this.opts.usePercentageResourceValues){
 					resString += "<br> " + $I("res.netGain") + ": " + this.getDisplayValueExt(resPerYear, true, true);
+				}
+				if(res.name == "antimatter" && resPerYear && this.resPool.energyWinterProd < this.resPool.energyCons){
+					resString += "<br> " + $I("effectsMgr.winterEnergy.warning.title");
 				}
 			return resString;
 		}
