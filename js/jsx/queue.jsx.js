@@ -60,7 +60,7 @@ WQueue = React.createClass({
 
         for (var i in options){
             var option = options[i];
-            selectOpts.push($r("option", { /*value: option.name*/ value:i, "dataset-label":i, "data-label": option.label}, option.label));
+            selectOpts.push($r("option", { value: option.name, "data-label": option.label}, option.label));
         }
 
         if (!options.length){
@@ -68,12 +68,12 @@ WQueue = React.createClass({
         }
 
         return $r("select", {
-            value: options[i].name,
+            value: this.state.itemId,
             onChange: function(e){
                 self.setState({
-                    itemId: options[e.target.value].name,
-                    itemLabel: options[e.target.value].label
-                })
+                    itemId: e.target.value,
+                    itemLabel: e.target.dataset.label
+                });
             }
         }, selectOpts);
     },
