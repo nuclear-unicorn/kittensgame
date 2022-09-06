@@ -421,7 +421,12 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",     val: 500000 },
 			{ name : "timeCrystal", val: 10 },
 			{ name : "relic",     	val: 5 }
-		]
+		],
+		calculateEffects: function(self, game){
+			if(self.researched){
+				game.time.queue.unlockQueueSource("chronoforge");
+			}
+		}
 	},{
 		name: "tachyonAccelerators",
 		label: $I("workshop.tachyonAccelerators.label"),

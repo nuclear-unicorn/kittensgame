@@ -791,6 +791,11 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		],
 		unlocks: {
 			upgrades: ["relicStation"]
+		},
+		calculateEffects: function(self, game){
+			if(self.researched){
+				game.time.queue.unlockQueueSource("transcendenceUpgrades");
+			}
 		}
 	}, {
 		name: "voidSpace",
