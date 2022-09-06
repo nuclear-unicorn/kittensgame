@@ -1649,7 +1649,7 @@ dojo.declare("classes.queue.manager", null,{
                         options.push({
                             name: building.name,
                             label: building.label
-                        })
+                        });
                     }
                 }
                 return options;

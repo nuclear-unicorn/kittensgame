@@ -792,7 +792,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			upgrades: ["relicStation"]
 		},
-		calculateEffects(self, game){
+		calculateEffects: function(self, game){
 			if(self.researched){
 				game.time.queue.unlockQueueSource("transcendenceUpgrades");
 			}
