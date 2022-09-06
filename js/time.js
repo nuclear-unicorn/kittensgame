@@ -1488,7 +1488,18 @@ dojo.declare("classes.queue.manager", null,{
     /*queueSources : ["policies", "tech", "buildings", "spaceMission",
                     "spaceBuilding","chronoforge", "voidSpace", "zigguratUpgrades",  
                     "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],*/
-    queueSources: ["buildings", "spaceBuilding", "zigguratUpgrades", "transcendenceUpgrades"],
+    //queueSources: ["buildings", "spaceBuilding", "zigguratUpgrades", "transcendenceUpgrades"],
+    queueSources: { "buildings": true, 
+                    "spaceBuilding": false,
+                    "zigguratUpgrades": false,
+                    "transcendenceUpgrades": false,
+                    "chronoforge": false    
+                },
+    unlockQueueSource: function(source){
+        if(this.queueSources[source] ===false){
+            this.queueSources[source] = true;
+        }
+    },
     cap: 0,
     queueLength: 0,
     baseCap :2,
@@ -1629,6 +1640,20 @@ dojo.declare("classes.queue.manager", null,{
                         });
                     }
                 }
+                return options;
+            case "chronoforge":
+                var chronoforgeUpgrades = this.game.time.chronoforgeUpgrades;
+                for (var i in chronoforgeUpgrades){
+                    var building = chronoforgeUpgrades[i];
+                    if (building.unlocked){
+                        options.push({
+                            name: building.name,
+                            label: building.label
+                        })
+                    }
+                }
+                return options;
+            default:
                 return options;
         }
     },

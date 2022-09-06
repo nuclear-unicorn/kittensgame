@@ -29,10 +29,13 @@ WQueue = React.createClass({
     getQueueTypeSelect: function(){
         var options = [];
         var self = this;
-
-        for (var i in game.time.queue.queueSources){
-            var source = game.time.queue.queueSources[i];
-            options.push($r("option", { value: source}, source));
+        var queueSources = game.time.queue.queueSources;
+        for (var i in queueSources){
+            if(queueSources[i]){
+                options.push($r("option", { value: i}, i));
+            }
+            //var source = game.time.queue.queueSources[i];
+            //options.push($r("option", { value: source}, source));
         }
         return $r("select", {
             value: this.state.queueTypeId,
