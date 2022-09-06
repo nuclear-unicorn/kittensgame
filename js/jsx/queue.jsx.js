@@ -86,9 +86,12 @@ WQueue = React.createClass({
         for (var i in queueItems){
             var item = queueItems[i];
             //how about we not do shallow copies?
-            let index = JSON.parse(JSON.stringify(i));
-            let type = JSON.parse(JSON.stringify(item.type));
-            let name = JSON.parse(JSON.stringify(item.name));
+            /*var index = JSON.parse(JSON.stringify(i));
+            var type = JSON.parse(JSON.stringify(item.type));
+            var name = JSON.parse(JSON.stringify(item.name));*/
+            var index = i;
+            var type = item.type;
+            var name = item.name;
             items.push($r("div", {}, [
                 "[" + item.type + "][" + item.name + "] - " + item.label + ((item.value)? " " + item.value: ""),
                 $r("a", {
