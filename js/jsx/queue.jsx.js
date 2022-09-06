@@ -85,9 +85,6 @@ WQueue = React.createClass({
         var queueItems = self.state.game.time.queue.queueItems;
         for (var i in queueItems){
             var item = queueItems[i];
-            var index = i;
-            var type = item.type;
-            var name = item.name;
             items.push($r("div", {}, [
                 "[" + item.type + "][" + item.name + "] - " + item.label + ((item.value)? " " + item.value: ""),
                 $r("a", {
@@ -129,7 +126,7 @@ WQueue = React.createClass({
                         game.time.queue.addToQueue(
                             options[0].name,
                             self.state.typeId,
-                            self.state.itemLabel
+                            options[0].label
                         );
                     }
 
