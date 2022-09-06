@@ -1181,7 +1181,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 			}
 
 			var effectValue = displayEffects[effectName];
-			if (!isEffectMultiplierEnabled && effectMeta.calculation === "nonProportional") {
+			if (!isEffectMultiplierEnabled && effectMeta.calculation !== "nonProportional") {
 				var nextEffectValue = this.getNextEffectValue(model, effectName);
 				if (nextEffectValue) {
 					effectValue = nextEffectValue * (model.metadata.on + 1) - effectValue * model.metadata.on;
