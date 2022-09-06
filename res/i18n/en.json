@@ -545,6 +545,7 @@
     "effectsMgr.statics.tradeGoldDiscount.title" : "Gold trade discount",
     "effectsMgr.statics.tradeKnowledge.title": "Trade Knowledge",
     "effectsMgr.statics.tradeRatio.title": "Trade ratio",
+    "effectsMgr.statics.tradeKnowledgeRatio.title": "Current trade ratio",
     "effectsMgr.statics.umbraBoostRatio.title": "HR Harvester bonus",
     "effectsMgr.statics.unhappinessRatio.title": "Unhappiness reduction",
     "effectsMgr.statics.unicornsGlobalRatio.title": "Unicorns bonus",
@@ -580,6 +581,9 @@
     "effectsMgr.statics.goldPolicyRatio.title": "Gold production bonus",
     "effectsMgr.statics.springCatnipRatio.title": "Spring catnip bonus",
     "effectsMgr.statics.summerSolarFarmRatio.title": "Summer Solar Farm bonus",
+
+
+    "effectsMgr.winterEnergy.warning.title": "Not enough energy for production in winter",
 
     "general.copy.to.clipboard.prompt": "Copy to clipboard: Ctrl+C, Enter",
     "general.food.advisor.text": "Food advisor: 'Your catnip supply is too low!'",

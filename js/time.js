@@ -30,7 +30,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             isAccelerated: this.isAccelerated,
             cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "unlocked"]),
             vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"]),
-            queueItems: this.queue.queueItems
+            queueItems: this.queue.queueItems,
+            queueLength: this.queue.queueLength
         };
         this._forceChronoFurnaceStop(saveData.time.cfu);
     },
@@ -73,7 +74,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.gainTemporalFlux(ts);
         this.timestamp = ts;
         this.queue.queueItems = saveData["time"].queueItems || [];
-
+        this.queue.queueLength = saveData["time"].queueLength || this.queue.queueItems.length;
         if(!this.game.getFeatureFlag("QUEUE")){
             $("#queueLink").hide();
         }
@@ -1489,13 +1490,15 @@ dojo.declare("classes.queue.manager", null,{
                     "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],*/
     queueSources: ["buildings", "spaceBuilding", "zigguratUpgrades", "transcendenceUpgrades"],
     cap: 0,
+    queueLength: 0,
+    baseCap :2,
 
     constructor: function(game){
         this.game = game;
         
     },
     calculateCap: function(){
-        return this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + 2; //
+        return this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap; //
     },
 
     addToQueue: function(name, type, label){
@@ -1504,23 +1507,49 @@ dojo.declare("classes.queue.manager", null,{
             return;
         }
 
+        if(this.queueLength >= this.cap){
+            return;
+        }
+        if(this.queueItems.length > 0 && this.queueItems[this.queueItems.length - 1].name == name){
+            var valOfItem = (this.queueItems[this.queueItems.length - 1].value || 1) + 1;
+            this.queueItems[this.queueItems.length - 1].value = valOfItem;
+            this.queueLength += 1;
+            return;
+        }
         if(!label){
             label = "$" + name + "$";
         }
-        if(this.queueItems.length < this.cap){
             this.queueItems.push({
                 name: name,
                 type: type,
                 label: label
             });
-        }
+        this.queueLength += 1;
     },
 
     remove: function(type, name){
-        // Array.filter might cause some issues in older browsers, let's use jquery grep
-        this.queueItems = $.grep(this.queueItems, function( item, i ) {
-            return (item.name != name && item.type != type);
+        if(!this.queueItems.length){
+            return;
+        }
+        var changedIndex = this.queueItems.findIndex(function(element){
+            return (element.name == name && element.type == type);
         });
+        var changedItem = this.queueItems[changedIndex];
+        if(!changedItem.value){
+            this.queueItems.splice(changedIndex, 1);
+        }
+        if(changedItem.value){
+            changedItem.value -=1;
+            if(changedItem.value == 1){
+                changedItem.value = null;
+            }
+        }
+        this.queueLength -= 1;
+        return;
+        // Array.filter might cause some issues in older browsers, let's use jquery grep
+        /*this.queueItems = $.grep(this.queueItems, function( item, i ) {
+            return (item.name != name && item.type != type);
+        });*/
     },
 
     /**
@@ -1596,9 +1625,18 @@ dojo.declare("classes.queue.manager", null,{
                 return options;
         }
     },
-
+    dropLastItem: function(){
+        var item = this.queueItems[this.queueItems.length - 1];
+        if(item.value && item.value > 1){
+            item.value -= 1;
+        }
+        else{
+            this.queueItems.shift();
+        }
+    },
     listDrop: function(event){
-        this.queue_list.pop();
+        //this.queueItems.pop();
+        this.dropLastItem();
         this.showList();
     },
 
@@ -1611,9 +1649,9 @@ dojo.declare("classes.queue.manager", null,{
                 queueTypeSelect.options[2].label = queueTypeSelect.options[2].value;
             }
             if(!(this.game.science.get("theology").researched && this.game.bld.get("ziggurat").val > 0)){
-                queueTypeSelect.options[3].label = "???";
+                queueTypeSelect.options.value.label = "???";
             }else{
-                queueTypeSelect.options[3].label = queueTypeSelect.options[3].value;
+                queueTypeSelect.options.value.label = queueTypeSelect.options.value.value;
             }
             if(!this.game.science.get("cryptotheology").researched){
                 queueTypeSelect.options[4].label = "???";
@@ -1622,14 +1660,14 @@ dojo.declare("classes.queue.manager", null,{
             }
         }
         this.cap = this.calculateCap();
-        if(this.queue_list.length <= 0){
+        if(this.queueItems.length <= 0){
             return;
         }
         var el = {
-            "name": this.queue_list[0][0],
-            "type": this.queue_list[0][1]
+            "name": this.queueItems[0][0],
+            "type": this.queueItems[0][1]
         };
-        //var el = this.queue_list[0];*/
+        //var el = this.queueItems[0];*/
 
         this.cap = this.calculateCap();
         if(!this.queueItems.length){
@@ -1730,14 +1768,19 @@ dojo.declare("classes.queue.manager", null,{
         }
         if(!props.controller){
             console.error(el.name + " of " + el.type + " queing is not supported!");
-            this.queueItems.shift();
+            var deletedElement = this.queueItems.shift();
+            this.queueLength -= deletedElement.value || 1;
+            this.game._publish("ui/update", this.game);
         }
         if(buyItem){
             props.controller.buyItem(model, 1,  function(result) {});
         }
 
         if(oldVal != model.metadata[compare]){
-            this.queueItems.shift();
+            //this.queueItems.shift();
+            this.dropLastItem();
+            this.queueLength -= 1;
+            this.game._publish("ui/update", this.game);
         }
 
     }

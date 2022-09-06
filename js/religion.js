@@ -2081,7 +2081,8 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 					game.religion.transcend();
 					var transcendenceLevel = game.religion.transcendenceTier;
 					for (var i = 0; i < game.religion.transcendenceUpgrades.length; i++) {
-						if (transcendenceLevel >= game.religion.transcendenceUpgrades[i].tier) {
+						var check = (!game.religion.transcendenceUpgrades[i].evaluateLocks || game.religion.transcendenceUpgrades[i].evaluateLocks(game));
+						if (check && transcendenceLevel >= game.religion.transcendenceUpgrades[i].tier) {
 							game.religion.transcendenceUpgrades[i].unlocked = true;
 						}
 					}
