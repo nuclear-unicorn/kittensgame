@@ -3589,6 +3589,14 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			type: "perYear",
 			value: this.getEffect(res.name + "Production")
 		});
+		if(resName == "antimatter" && this.resPool.energyProd < this.resPool.energyCons){
+
+		stack.push({
+			name: $I("ui.energy.tooltip"), //kinda hack text
+			type: "perYear",
+			value: -this.getEffect(res.name + "Production")
+		});
+		}
 		return stack;
 	},
 	getCMBRBonus: function() {
@@ -3828,7 +3836,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				|| this.getResourcePerTickConvertion(resRef.name) != 0
 				|| this.workshop.getEffectEngineer(resRef.name) != 0
 				|| this.getResourcePerDay(resRef.name) != 0
-				|| this.getResourceOnYearProduction(resRef.name) != 0
+				|| (this.getResourceOnYearProduction(resRef.name) != 0 || resRef.name == "antimatter")
 				|| (resRef.name == "kittens" && this.village.sim.kittens.length < this.village.sim.maxKittens)
 			){
 
