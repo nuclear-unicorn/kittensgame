@@ -422,7 +422,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "timeCrystal", val: 10 },
 			{ name : "relic",     	val: 5 }
 		],
-		calculateEffects(self, game){
+		calculateEffects: function(self, game){
 			if(self.researched){
 				game.time.queue.unlockQueueSource("chronoforge");
 			}
