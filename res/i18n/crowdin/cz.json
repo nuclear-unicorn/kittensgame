@@ -1244,7 +1244,7 @@
     "ui.option.export.button": "Exportovat",
     "ui.option.import.button": "Importovat",
     "ui.option.export": "Exportovat do:",
-    "ui.option.export.dropbox": "Dropbox (Beta)",
+    "ui.option.export.dropbox": "Dropbox (beta)",
     "ui.option.export.simple.file": "Soubor (jednoduchý název)",
     "ui.option.export.full.file": "Soubor (celé jméno)",
     "ui.option.export.text": "Export do textu:",
