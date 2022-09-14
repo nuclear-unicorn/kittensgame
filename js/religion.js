@@ -211,6 +211,23 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 		this.triggerOrderOfTheVoid(times);
 	},
+	corruptNecrocorns: function(){
+		var alicorns = this.game.resPool.get("alicorn");
+		// Prevents alicorn count to fall to 0, which would stop the per-tick generation
+		var maxAlicornsToCorrupt = Math.ceil(alicorns.value) - 1;
+		var alicornsToCorrupt = Math.floor(Math.min(this.corruption, maxAlicornsToCorrupt));
+		if (alicornsToCorrupt > 0) {
+			this.corruption -= alicornsToCorrupt;
+			alicorns.value -= alicornsToCorrupt;
+			this.game.resPool.get("necrocorn").value += alicornsToCorrupt;
+			this.game.upgrade({
+				zigguratUpgrades: ["skyPalace", "unicornUtopia", "sunspire"]
+			});
+		}
+		if (this.corruption >= 1) {
+			this.corruption = 1;
+		}
+	},
 	necrocornsNaiveFastForward: function(daysOffset, times){
 		var alicorns = this.game.resPool.get("alicorn");
 		if (alicorns.value > 0) {
@@ -231,20 +248,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			}
 		}
 
-		// Prevents alicorn count to fall to 0, which would stop the per-tick generation
-		var maxAlicornsToCorrupt = Math.ceil(alicorns.value) - 1;
-		var alicornsToCorrupt = Math.floor(Math.min(this.corruption, maxAlicornsToCorrupt));
-		if (alicornsToCorrupt > 0) {
-			this.corruption -= alicornsToCorrupt;
-			alicorns.value -= alicornsToCorrupt;
-			this.game.resPool.get("necrocorn").value += alicornsToCorrupt;
-			this.game.upgrade({
-				zigguratUpgrades: ["skyPalace", "unicornUtopia", "sunspire"]
-			});
-		}
-		if (this.corruption >= 1) {
-			this.corruption = 1;
-		}
+		this.corruptNecrocorns();
 
 		//------------------------- necrocorns pacts -------------------------
 		this.pactsManager.necrocornConsumptionDays(daysOffset);
@@ -304,6 +308,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			this.game.resPool.addResPerTick("alicorn", alicornsSpent);
 			return;
 		}
+		var corruptionPerTickProduction = this.getCorruptionPerTickProduction();
 		var compensatedNecrocorns = 0;
 		var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
 		/*if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
@@ -322,7 +327,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			this.necrocornDeficit += necrocornPerDay *(0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")) * days);
 			this.necrocornDeficit = Math.max(this.necrocornDeficit, 0);
 		}
-		this.game.resPool.addResPerTick("necrocorn", necrocornPerDay * necrocornDeficitRepaymentModifier * days - compensatedNecrocorns);
+		this.game.resPool.addResPerTick("necrocorn",  necrocornPerDay * necrocornDeficitRepaymentModifier * days - compensatedNecrocorns);
+		this.corruption += this.getCorruptionPerTick() * times;
+		this.corruptNecrocorns();
 	},
 
 	// Converts the equivalent of 10 % (improved by Void Resonators) of produced faith, but with only a quarter of apocrypha bonus
