@@ -308,14 +308,13 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			this.game.resPool.addResPerTick("alicorn", alicornsSpent);
 			return;
 		}
-		var corruptionPerTickProduction = this.getCorruptionPerTickProduction();
 		var compensatedNecrocorns = 0;
 		var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
 		/*if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
 			this.game.resPool.addResPerTick("alicorn",consumedAlicorns);
 		}*/
 		//var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
-		var siphenedNecrocorns = this.getSiphonedCorruption(days);
+		var siphenedNecrocorns = this.pactsManager.getSiphonedCorruption(days);
 		compensatedNecrocorns = Math.max(consumedAlicorns, -siphenedNecrocorns);
 		this.game.resPool.addResPerTick("alicorn", compensatedNecrocorns);
 	
@@ -1871,7 +1870,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 	resetState: function(){
 		//console.warn(this)
 		//console.warn(this.game.religion.pactsManager)
-		console.warn(this.game.religion.pactsManager.pacts);
+		//console.warn(this.game.religion.pactsManager.pacts);
 		for(var i in this.game.religion.pactsManager.pacts){
 			this.game.religion.pactsManager.pacts[i].on = 0;
 			this.game.religion.pactsManager.pacts[i].val = 0;
