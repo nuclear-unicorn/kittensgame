@@ -812,7 +812,12 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["voidAspiration"],
 			voidSpace: ["cryochambers"],
 			challenges: ["atheism"]
-		}
+		},
+        calculateEffects: function(self, game){
+            if (self.val > 0){
+                game.time.queue.queueSources["voidSpace"] = true;
+            }
+        },
 	}, {
 		name: "paradoxalKnowledge",
 		label: $I("science.paradoxalKnowledge.label"),
