@@ -424,6 +424,11 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         prices: [
 
         ],
+        fixPrices:[
+            {name: "temporalFlux", val: 3000},
+			{name: "timeCrystal", val: 100},
+			{name: "void", val: 500}
+        ],
         priceRatio: 1.25,
         limitBuild: 0,
         effects: {
@@ -1327,11 +1332,12 @@ dojo.declare("classes.ui.VoidSpaceWgt", [mixin.IChildrenAware, mixin.IGameAware]
 		this.addChild(new com.nuclearunicorn.game.ui.ButtonModern({
             name: $I("time.fixCryochambers.label"),
             description: $I("time.fixCryochambers.desc"),
-            prices: [
+            prices: game.time.getVSU("usedCryochambers").fixPrices,
+            /*prices: [
 				{name: "temporalFlux", val: 3000},
 				{name: "timeCrystal", val: 100},
 				{name: "void", val: 500}
-            ],
+            ],*/
             controller: new classes.ui.time.FixCryochamberBtnController(game)
         }, game));
 
@@ -1493,7 +1499,8 @@ dojo.declare("classes.queue.manager", null,{
                     "spaceBuilding": false,
                     "zigguratUpgrades": false,
                     "transcendenceUpgrades": false,
-                    "chronoforge": false    
+                    "chronoforge": false,
+                    "voidSpace": true,
                 },
     unlockQueueSource: function(source){
         if(this.queueSources[source] ===false){
@@ -1653,6 +1660,25 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+            case "voidSpace":
+                var voidSpaceUpgrades = this.game.time.voidspaceUpgrades;
+                for (var i in voidSpaceUpgrades){
+                    var building = voidSpaceUpgrades[i];
+                    if(building.name == "usedCryochambers"){
+                        options.push({
+                            name: building.name,
+                            label: $I("time.fixCryochambers.label")
+                        });
+                        continue;
+                    }
+                    if (building.unlocked){
+                        options.push({
+                            name: building.name,
+                            label: building.label
+                        });
+                    }
+                }
+                return options;
             default:
                 return options;
         }
@@ -1764,6 +1790,13 @@ dojo.declare("classes.queue.manager", null,{
                 props.controller = new classes.ui.time.VoidSpaceBtnController(this.game);
                 var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
+                if(el.name == "usedCryochambers"){ //a bunch of model black magic
+                    props.controller = new classes.ui.time.FixCryochamberBtnController(game);
+                    itemMetaRaw = this.game.getUnlockByName("cryochambers", el.type);
+                    model.prices = game.time.getVSU("usedCryochambers").fixPrices;
+                    model.enabled = true;
+                    console.log(model);
+                }
                 break;
             case "zigguratUpgrades":
                 props.controller = new com.nuclearunicorn.game.ui.ZigguratBtnController(this.game);
