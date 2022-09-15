@@ -1796,9 +1796,9 @@ dojo.declare("classes.queue.manager", null,{
                 var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 if(el.name == "usedCryochambers"){ //a bunch of model black magic
-                    props.controller = new classes.ui.time.FixCryochamberBtnController(game);
+                    props.controller = new classes.ui.time.FixCryochamberBtnController(this.game);
                     itemMetaRaw = this.game.getUnlockByName("cryochambers", el.type);
-                    model.prices = game.time.getVSU("usedCryochambers").fixPrices;
+                    model.prices = this.game.time.getVSU("usedCryochambers").fixPrices;
                     model.enabled = true;
                     console.log(model);
                 }
