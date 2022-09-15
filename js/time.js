@@ -434,6 +434,11 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         effects: {
 
         },
+        calculateEffects: function(self, game){
+            if (self.val > 0){
+                game.time.queue.queueSources["voidSpace"] = true;
+            }
+        },
         unlocked: false
     },{
         name: "voidHoover",
@@ -1500,7 +1505,7 @@ dojo.declare("classes.queue.manager", null,{
                     "zigguratUpgrades": false,
                     "transcendenceUpgrades": false,
                     "chronoforge": false,
-                    "voidSpace": true,
+                    "voidSpace": false,
                 },
     unlockQueueSource: function(source){
         if(this.queueSources[source] ===false){
