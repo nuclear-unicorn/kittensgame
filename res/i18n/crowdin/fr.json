@@ -1377,7 +1377,7 @@
     "trade.bcoin.sell.desc": "Vendez vos blackcoins et récupérez des reliques",
     "trade.bcoin.sell.msg": "Vous avez {0} reliques",
     "trade.bcoin.crash": "Ennuyer la Main Noire Invisible",
-    "trade.bcoin.crash.desc": "Déclencher un crash du marché du blackcoin instantanément",
+    "trade.bcoin.crash.desc": "Déclencher un crash du marché de la pièce obscure instantanément",
     "trade.correct.bcoin": "Il y a eu une immense correction du marché des cryptos",
     "trade.embassy.open": "Ouvre une embassade",
     "trade.embassy": "Niveau d'ambassade ({0})",
