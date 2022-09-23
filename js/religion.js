@@ -1032,6 +1032,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	praise: function(){
 		var faith = this.game.resPool.get("faith");
 		this.faith += faith.value * (1 + this.getApocryphaBonus()); //starting up from 100% ratio will work surprisingly bad
+		this.faith = Math.min(this.faith, Number.MAX_VALUE);
 		this.game.msg($I("religion.praise.msg", [this.game.getDisplayValueExt(faith.value, false, false, 0)]), "", "faith");
 		faith.value = 0.0001;	//have a nice autoclicking
 
@@ -1060,6 +1061,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	_resetFaithInternal: function(bonusRatio) {
 		var ttPlus1 = (this.game.religion.getRU("transcendence").on ? this.game.religion.transcendenceTier : 0) + 1;
 		this.faithRatio += this.faith / 1000000 * ttPlus1 * ttPlus1 * bonusRatio;
+		this.faithRatio = Math.min(this.faithRatio, Number.MAX_VALUE);
 		this.faith = 0.01;
 	},
 
@@ -1072,9 +1074,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		var game = this.game;
 		game.ui.confirm($I("religion.transcend.confirmation.title"), $I("religion.transcend.confirmation.msg"), function() {
 			//Transcend one Level at a time
-			var needNextLevel = 
-				religion._getTranscendTotalPrice(religion.transcendenceTier + 1) - 
-				religion._getTranscendTotalPrice(religion.transcendenceTier);
+			var needNextLevel = _getTranscendNextPrice();
 
 			if (religion.faithRatio > needNextLevel) {
 				religion.faithRatio -= needNextLevel;
@@ -1101,6 +1101,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 	_getTranscendTotalPrice: function(tier) {
 		return this.game.getInverseUnlimitedDR(Math.exp(tier) / 10, 0.1);
+	},
+
+	_getTranscendNextPrice: function() {
+		return this._getTranscendTotalPrice(this.transcendenceTier + 1) - this._getTranscendTotalPrice(this.transcendenceTier);
 	},
 
 	unlockAll: function(){
@@ -1252,6 +1256,12 @@ dojo.declare("com.nuclearunicorn.game.ui.ResetFaithBtnController", com.nuclearun
 dojo.declare("com.nuclearunicorn.game.ui.TranscendBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	getName: function(model) {
 		return model.options.name + (this.game.religion.transcendenceTier > 0 ? " [" + this.game.religion.transcendenceTier + "]" : "");
+	},
+
+	updateEnabled: function(model) {
+		model.enabled = this.game.religion._getTranscendNextPrice() < Infinity;
+		model.highlightUnavailable = this.game.opts.highlightUnavailable;
+		model.resourceIsLimited = model.highlightUnavailable && !model.enabled;
 	},
 
 	updateVisible: function (model) {

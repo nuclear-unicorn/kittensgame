@@ -2028,7 +2028,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	},
 
-	// Unlimited Diminishing Return
+	// Limited Diminishing Return
 	//getHyperbolicEffect
 	getLimitedDR: function(effect, limit) {
 		var absEffect = Math.abs(effect);
@@ -3995,6 +3995,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	toDisplaySeconds : function (secondsRaw) {
+		if (secondsRaw == Infinity) {
+			return "&infin;";
+		}
+
 	    var sec_num = parseInt(secondsRaw, 10); // don't forget the second param
 
         var year_secs = 86400 * 365;
@@ -4621,7 +4625,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 			if (value > 0) {
 				var newRes = this.resPool.createResource(res.name);
-				newRes.value = value;
+				newRes.value = Math.min(value, Number.MAX_VALUE);
 				newResources.push(newRes);
 			}
 		}
@@ -4782,11 +4786,14 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	// Unlimited Diminishing Return
 	//getTriValue
 	getUnlimitedDR: function(value, stripe) {
-		return (Math.sqrt(1 + 8 * value / stripe) - 1) / 2;
+		var result = (Math.sqrt(1 + (value / stripe) * 8) - 1) / 2;
+		return result == Infinity
+			? Math.sqrt(value) / Math.sqrt(stripe) * Math.SQRT2
+			: result;
 	},
 
 	getInverseUnlimitedDR: function(value, stripe) {
-		return value * (value + 1) * stripe / 2;
+		return stripe / 2 * value * (value + 1);
 	},
 
 	getTab: function(name) {

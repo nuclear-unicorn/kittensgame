@@ -518,7 +518,7 @@ dojo.declare("classes.reserveMan", null,{
 			}
 
 			if (value > 0) {
-				reserveResources[res.name] = Math.max(reserveResources[res.name] || 0, value);
+				reserveResources[res.name] = Math.max(reserveResources[res.name] || 0, Math.min(value, Number.MAX_VALUE));
 			}
 		}
 		this.game.challenges.reserves.reserveResources = reserveResources;
@@ -558,7 +558,7 @@ dojo.declare("classes.reserveMan", null,{
 			}
 			var resCap = this.game.resPool.get(i).maxValue;
 			if(!resCap){
-				this.game.resPool.get(i).value += this.reserveResources[i];
+				this.game.resPool.get(i).value = Math.min(this.game.resPool.get(i).value + this.reserveResources[i], Number.MAX_VALUE);
 			}else{
 				this.game.resPool.get(i).value = Math.max(this.game.resPool.get(i).value, this.reserveResources[i]);
 			}
