@@ -1614,12 +1614,20 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.pyramidFaithRatio.title"),
 				type: "ratio"
 			},
+			"pyramidSpaceCompendiumRatio":{
+				title: $I("effectsMgr.statics.pyramidSpaceCompendiumRatio.title"),
+				type: "ratio"
+			},
 			"pactBlackLibraryBoost":{
 				title: $I("effectsMgr.statics.pactBlackLibraryBoost.title"),
 				type: "ratio"
 			},
 			"pactDeficitRecoveryRatio":{
 				title: $I("effectsMgr.statics.pactDeficitRecoveryRatio.title"),
+				type: "ratio"
+			},
+			"pactSpaceCompendiumRatio":{
+				title: $I("effectsMgr.statics.pactSpaceCompendiumRatio.title"),
 				type: "ratio"
 			},
 			//pollution
