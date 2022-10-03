@@ -516,7 +516,7 @@
     "kittens.craft.confirmation.title": "Bist du dir sicher?",
     "kittens.craft.confirmation.msg": "Deine Kätzchen werden STERBEN",
     "craft.msg.notEnoughCatnip": "nicht genügend Katzenminze!",
-    "log.clear": "Lösche Chatlog",
+    "log.clear": "Protokoll leeren",
     "menu.about": "Über",
     "menu.close": "Schließen",
     "menu.export": "Exportieren",
