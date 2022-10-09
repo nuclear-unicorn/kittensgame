@@ -1757,7 +1757,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 				"necrocornPerDay": 0,
 				"pactDeficitRecoveryRatio": 0.005,
 				"pactBlackLibraryBoost": 0.0005,
-				"pactSpaceCompendiumRatio": 0.0001
+				"pactSpaceCompendiumRatio": 0.001
 				//"cathPollutionPerTickCon" : -7
 			},
 			unlocked: false,
