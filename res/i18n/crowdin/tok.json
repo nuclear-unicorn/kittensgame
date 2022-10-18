@@ -1,1 +1,6 @@
-{}
+{
+    "console.intro": "sina soweli lili li lon e ma pi kasi pi nasa soweli.",
+    "console.intro.zebra": "sina soweli pimeja walo li lon e ma kasi seli pi kiwen wawa mute.",
+    "achievements.header": "pali pona: {0} li tan {1}",
+    "achievements.msg.unlock": "o pini e pali pona: {0}!"
+}
