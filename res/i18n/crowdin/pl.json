@@ -1558,7 +1558,7 @@
     "village.happiness.penalty.base": "Kara Bazowa",
     "village.happiness.penalty.mitigated": "Złagodzonie kary",
     "village.happiness.rare.resources": "Rzadkie zasoby",
-    "village.panel.job": "Prace",
+    "village.panel.job": "Zawody",
     "village.job.bonus": "Bonus pracy",
     "village.job.engineer": "Inżynier",
     "village.job.engineer.desc": "Inżynier może operować jedną fabryką aby zautomatyzować produkcję zasobów.<br />Przydziel swoim inżynierom zadanie w zakładce Warsztat, będą automatycznie pracować co 10 minut.(zużywa surowce)",
