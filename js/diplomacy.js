@@ -660,11 +660,13 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			(1 + this.game.getEffect("leviathansEnergyModifier"))
 		);
 	},
-	feedElders: function(){
+	feedElders: function(amtRequested){
 		var ncorns = this.game.resPool.get("necrocorn");
 		var elders = this.game.diplomacy.get("leviathans");
-		if (ncorns.value >= 1){
-			elders.energy++;
+		var cleanRequest = Math.max(amtRequested, 1) || 1;
+		var amt = Math.floor(Math.min(cleanRequest, ncorns.value));
+		if (amt >= 1){
+			elders.energy += amt;
 
 			var markerCap = this.game.diplomacy.getMarkerCap();
 
@@ -672,7 +674,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				elders.energy = markerCap;
 			}
 
-			ncorns.value--;
+			ncorns.value -= amt;
 			this.game.msg($I("trade.msg.elders.pleased"), "notice");
 		} else {
 			ncorns.value = 0;
@@ -778,7 +780,9 @@ dojo.declare("classes.diplomacy.ui.EldersPanel", classes.diplomacy.ui.RacePanel,
 				description: $I("trade.msg.elders.feed.desc"),
 				controller: new com.nuclearunicorn.game.ui.ButtonModernController(this.game),
 				handler: function(){
-					self.game.diplomacy.feedElders();
+					var batchSize = event.shiftKey ? 10000 :
+						event.ctrlKey || event.metaKey ? this.game.opts.batchSize : 1;
+					self.game.diplomacy.feedElders(batchSize);
 				}
 			}, this.game);
 		this.feedBtn.render(content);
