@@ -97,10 +97,8 @@ WQueue = React.createClass({
                 "[" + item.type + "][" + item.name + "] - " + item.label + ((item.value)? " " + item.value: ""),
                 $r("a", {
                     href: "#", 
-                    onClick: function(e){
-                        e.preventDefault();
-                        game.time.queue.remove(item.type, item.name, i, e.shiftKey)
-                    },
+                    onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
+                    //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
                 }, "[x]")
             ]
             ));
