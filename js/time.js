@@ -1551,7 +1551,7 @@ dojo.declare("classes.queue.manager", null,{
         
     },
     calculateCap: function(){
-        return this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap; //
+        return this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap + this.game.getEffect("queueCap");
     },
 
     addToQueue: function(name, type, label, shiftKey){
@@ -1590,7 +1590,7 @@ dojo.declare("classes.queue.manager", null,{
         }
     },
 
-    remove: function(type, name, index, shiftKey){
+    remove: function(type, name, index){
         if(!this.queueItems.length){
             this.queueLength = 0;
             return;
@@ -1602,7 +1602,7 @@ dojo.declare("classes.queue.manager", null,{
                     this.queueItems.splice(index, 1);
                 }
                 else{
-                    if (shiftKey){
+                    if (this.game.ui.isEffectMultiplierEnabled()){
                         this.queueLength -= item.value;
                         this.queueItems.splice(index, 1);
                         return;
