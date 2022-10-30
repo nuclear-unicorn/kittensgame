@@ -102,12 +102,6 @@ WQueue = React.createClass({
                         e.preventDefault();
                         game.time.queue.remove(item.type, item.name, i, e.shiftKey)
                     },
-                    //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i);
-                    /*onClick: dojo.hitch([type, name, index], function(e){
-                        e.preventDefault();
-                        game.time.queue.remove(type, name, index);
-                        self.forceUpdate();
-                    })*/
                 }, "[x]")
             ]
             ));
