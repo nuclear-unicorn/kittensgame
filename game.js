@@ -1058,7 +1058,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 title: $I("effectsMgr.statics.t5CraftRatio.title"),
                 type: "fixed"
             },
-
+			"queueCap": {
+                title: $I("effectsMgr.statics.queueCap"),
+                type: "fixed"
+			},
 			// cycleEffects
 			"spaceElevator-prodTransferBonus": {
                 title: $I("effectsMgr.statics.spaceElevator-prodTransferBonus.title"),

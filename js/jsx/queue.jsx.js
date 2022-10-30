@@ -12,8 +12,7 @@ WQueue = React.createClass({
             typeId: "buildings",
             itemId: null,
             itemLabel: null,
-            game: this.props.game,
-            queueSourcesLen: 0
+            game: this.props.game
         };
     },
 
@@ -99,11 +98,7 @@ WQueue = React.createClass({
                 $r("a", {
                     href: "#", 
                     onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
-                    /*onClick: dojo.hitch([type, name, index], function(e){
-                        e.preventDefault();
-                        game.time.queue.remove(type, name, index);
-                        self.forceUpdate();
-                    })*/
+                    //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
                 }, "[x]")
             ]
             ));
@@ -118,31 +113,27 @@ WQueue = React.createClass({
 
         var typeId = this.state.typeId;
         var options = game.time.queue.getQueueOptions(typeId);
-        if(options.length != self.queueSourcesLen){
-            self.queueSourcesLen = options.length;
-            self.typeId = "buildings";
-            self.itemId = null;
-            self.itemLabel = null;
-        }
 
         return $r("div", {
         }, [
             this.getQueueTypeSelect(),
             this.getQueueItemSelect(options),
             $r("button", {
-                onClick: function(){
+                onClick: function(e){
                     if(self.state.itemId){
                         game.time.queue.addToQueue(
                             //self.state.itemId,
                             options[self.state.itemId].name,
                             self.state.typeId,
-                            self.state.itemLabel
+                            self.state.itemLabel,
+                            e.shiftKey
                         );
                     }else if(options.length){
                         game.time.queue.addToQueue(
                             options[0].name,
                             self.state.typeId,
-                            options[0].label
+                            options[0].label,
+                            e.shiftKey
                         );
                     }
 

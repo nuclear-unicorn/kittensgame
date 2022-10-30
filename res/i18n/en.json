@@ -475,6 +475,7 @@
     "effectsMgr.statics.priceRatio.title": "Building's prices",
     "effectsMgr.statics.prodTransferBonus.title": "Transferred cath production bonus",
     "effectsMgr.statics.productionRatio.title": "Production bonus",
+    "effectsMgr.statics.queueCap": "Queue cap",
     "effectsMgr.statics.rankLeaderBonusConversion.title": "Conversion production per leader rank",
     "effectsMgr.statics.rationalityBonus.title" :"Rationality bonus",
     "effectsMgr.statics.reactorEnergyRatio.title": "Reactor energy bonus",

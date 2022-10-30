@@ -1252,7 +1252,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		description: $I("workshop.factoryOptimization.desc"),
 		effects: {
 			"t1CraftRatio": 10,
-			"t2CraftRatio": 2
+			"t2CraftRatio": 2,
+			"queueCap": 1
 		},
 		prices:[
 			{ name : "titanium", val: 1250 },
@@ -1266,7 +1267,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		effects: {
 			"t1CraftRatio": 10,
 			"t2CraftRatio": 5,
-			"t3CraftRatio": 2
+			"t3CraftRatio": 2,
+			"queueCap": 2
 		},
 		prices:[
 			{ name : "titanium", val: 2500 },
@@ -1281,7 +1283,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			"t1CraftRatio": 2,
 			"t2CraftRatio": 2,
 			"t3CraftRatio": 2,
-			"t4CraftRatio": 2
+			"t4CraftRatio": 2,
+			"queueCap": 2
 		},
 		prices:[
 			{ name : "science",  val: 225000 },
@@ -1296,7 +1299,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			"t2CraftRatio": 5,
 			"t3CraftRatio": 5,
 			"t4CraftRatio": 2,
-			"t5CraftRatio": 2
+			"t5CraftRatio": 2,
+			"queueCap": 3
 		},
 		prices:[
 			{ name : "antimatter",  val: 500 },
@@ -1312,7 +1316,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			"t2CraftRatio": 2,
 			"t3CraftRatio": 2,
 			"t4CraftRatio": 2,
-			"t5CraftRatio": 2
+			"t5CraftRatio": 2,
+			"queueCap": 3
 		},
 		prices:[
 			{ name : "science",     val: 500000 },
