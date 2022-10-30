@@ -12,8 +12,7 @@ WQueue = React.createClass({
             typeId: "buildings",
             itemId: null,
             itemLabel: null,
-            game: this.props.game,
-            queueSourcesLen: 0
+            game: this.props.game
         };
     },
 
@@ -118,12 +117,6 @@ WQueue = React.createClass({
 
         var typeId = this.state.typeId;
         var options = game.time.queue.getQueueOptions(typeId);
-        if(options.length != self.queueSourcesLen){
-            self.queueSourcesLen = options.length;
-            self.typeId = "buildings";
-            self.itemId = null;
-            self.itemLabel = null;
-        }
 
         return $r("div", {
         }, [
