@@ -12,7 +12,8 @@ WQueue = React.createClass({
             typeId: "buildings",
             itemId: null,
             itemLabel: null,
-            game: this.props.game
+            game: this.props.game,
+            queueSourcesLen: 0
         };
     },
 
@@ -29,11 +30,14 @@ WQueue = React.createClass({
     getQueueTypeSelect: function(){
         var options = [];
         var self = this;
-        var queueSources = game.time.queue.queueSources;
-        for (var i in queueSources){
+        var queueSources = game.time.queue.queueSourcesArr;
+        /*for (var i in queueSources){
             if(queueSources[i]){
                 options.push($r("option", { value: i}, i));
             }
+        }*/
+        for (var i in queueSources){
+                options.push($r("option", { value: queueSources[i]}, queueSources[i]));
         }
         return $r("select", {
             value: this.state.queueTypeId,
@@ -114,6 +118,12 @@ WQueue = React.createClass({
 
         var typeId = this.state.typeId;
         var options = game.time.queue.getQueueOptions(typeId);
+        if(options.length != self.queueSourcesLen){
+            self.queueSourcesLen = options.length;
+            self.typeId = "buildings";
+            self.itemId = null;
+            self.itemLabel = null;
+        }
 
         return $r("div", {
         }, [

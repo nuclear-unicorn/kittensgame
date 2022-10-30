@@ -31,7 +31,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "unlocked"]),
             vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"]),
             queueItems: this.queue.queueItems,
-            queueLength: this.queue.queueLength
+            queueLength: this.queue.queueLength,
+            queueSources: this.queue.queueSources
         };
         this._forceChronoFurnaceStop(saveData.time.cfu);
     },
@@ -75,6 +76,13 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.timestamp = ts;
         this.queue.queueItems = saveData["time"].queueItems || [];
         this.queue.queueLength = saveData["time"].queueLength || this.queue.queueItems.length;
+        this.queue.queueSources = saveData["time"].queueSources || this.queue.queueSourcesDefault;
+        for (var i in this.queue.queueSourcesDefault){
+            if (this.queue.queueSources[i] === undefined){
+                this.queue.queueSources[i] = this.queue.queueSourcesDefault[i];
+            }
+        }
+        this.queue.updateQueueSourcesArr();
         if(!this.game.getFeatureFlag("QUEUE")){
             $("#queueLink").hide();
         }
@@ -1496,20 +1504,42 @@ dojo.declare("classes.tab.TimeTab", com.nuclearunicorn.game.ui.tab, {
 dojo.declare("classes.queue.manager", null,{
     game: null,
     queueItems : [],
+    updateQueueSourcesArr: function(){
+        for (var i in this.queueSources){
+            if(!this.queueSourcesArr.includes(i) && this.queueSources[i]){
+                this.queueSourcesArr.push(i);
+            }
+        }
+        self.queueSourcesArr;
+    },
     /*queueSources : ["policies", "tech", "buildings", "spaceMission",
                     "spaceBuilding","chronoforge", "voidSpace", "zigguratUpgrades",  
                     "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],*/
     //queueSources: ["buildings", "spaceBuilding", "zigguratUpgrades", "transcendenceUpgrades"],
-    queueSources: { "buildings": true, 
+    queueSourcesArr:["buildings"],
+    queueSourcesDefault: { 
+                    "buildings": true, 
+                    "tech": false,
+                    "upgrades": false,
+                    "policies": false,
+                    "religion": false,
+                    "zebraUpgrades": false,
+                    "spaceMission": false,
                     "spaceBuilding": false,
                     "zigguratUpgrades": false,
                     "transcendenceUpgrades": false,
                     "chronoforge": false,
                     "voidSpace": false,
                 },
+    queueSources: {},
+    queueNonStabkable:[
+        "tech", "upgrades", "policies", "zebraUpgrades", "spaceMission"
+    ],
     unlockQueueSource: function(source){
-        if(this.queueSources[source] ===false){
+        if(this.queueSources[source] === false){
             this.queueSources[source] = true;
+            this.queueSourcesArr.push(source);
+            this.game._publish("ui/update", this.game);
         }
     },
     cap: 0,
@@ -1533,7 +1563,7 @@ dojo.declare("classes.queue.manager", null,{
         if(this.queueLength >= this.cap){
             return;
         }
-        if(this.queueItems.length > 0 && this.queueItems[this.queueItems.length - 1].name == name){
+        if(this.queueItems.length > 0 && this.queueItems[this.queueItems.length - 1].name == name && !this.queueNonStabkable.includes(type)){
             var valOfItem = (this.queueItems[this.queueItems.length - 1].value || 1) + 1;
             this.queueItems[this.queueItems.length - 1].value = valOfItem;
             this.queueLength += 1;
@@ -1684,6 +1714,81 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+            case "tech":
+                var technologies = this.game.science.techs;
+                for (var i in technologies){
+                    var technology = technologies[i];
+                    if (technology.unlocked && !technology.researched){
+                        options.push({
+                            name: technology.name,
+                            label: technology.label
+                        });
+                    }
+                }
+                return options;
+            case "upgrades":
+                var upgrades = this.game.workshop.upgrades;
+                for (var i in upgrades){
+                    var upgrade = upgrades[i];
+                    if (upgrade.unlocked && !upgrade.researched){
+                        options.push({
+                            name: upgrade.name,
+                            label: upgrade.label
+                        });
+                    }
+                }
+                return options;
+            case "zebraUpgrades":
+                var zebraUpgrades = this.game.workshop.zebraUpgrades;
+                for (var i in zebraUpgrades){
+                    var upgrade = zebraUpgrades[i];
+                    if (upgrade.unlocked && !upgrade.researched){
+                        options.push({
+                            name: upgrade.name,
+                            label: upgrade.label
+                        });
+                    }
+                }
+                return options;
+            case "spaceMission":
+                var spaceMissions = this.game.space.planets;
+                for (var i in spaceMissions){
+                    var planet = spaceMissions[i];
+                    if (planet.unlocked && !planet.reached){
+                        options.push({
+                            name: planet.name,
+                            label: planet.label
+                        });
+                    }
+                }
+                return options;
+            case "policies":
+                var policies = this.game.science.policies;
+                for (var i in policies){
+                    var policy = policies[i];
+                    if (policy.unlocked && !policy.researched && !policy.blocked){
+                        options.push({
+                            name: policy.name,
+                            label: policy.label
+                        });
+                    }
+                }
+                return options;
+            case "religion":
+                var religionUpgrades = this.game.religion.religionUpgrades;
+                if(this.game.challenges.getChallenge("atheism").active){
+                    return options; //just in case
+                }
+                for (var i in religionUpgrades){
+                    var upgrade = religionUpgrades[i];
+                    if (upgrade.faith <= this.game.religion.faith && (!upgrade.noStackable || !upgrade.val)){
+                        options.push({
+                            name: upgrade.name,
+                            label: upgrade.label
+                        });
+                    }
+                }
+                return options;
             default:
                 return options;
         }
@@ -1746,9 +1851,12 @@ dojo.declare("classes.queue.manager", null,{
         var buyItem = true;
         switch (el.type){
             case "policies":
-                compare = "researched";
+                compare = ["researched", "blocked"];
                 props.controller = new classes.ui.PolicyBtnController(this.game);
-                var oldVal = itemMetaRaw.researched;
+                var oldVal = {
+                    researched: itemMetaRaw.researched,
+                    blocked: itemMetaRaw.blocked
+                };
                 var model = props.controller.fetchModel(props);
                 break;
             case "tech":
@@ -1776,7 +1884,7 @@ dojo.declare("classes.queue.manager", null,{
                 buyItem = false;
                 break;
             case "spaceMission":
-                compare = "researched";
+                compare = "reached";
                 props.controller = new com.nuclearunicorn.game.ui.SpaceProgramBtnController(this.game);
                 var oldVal = itemMetaRaw.researched;
                 var model = props.controller.fetchModel(props);
@@ -1845,14 +1953,30 @@ dojo.declare("classes.queue.manager", null,{
         if(buyItem){
             props.controller.buyItem(model, 1,  function(result) {});
         }
-
-        if(oldVal != model.metadata[compare]){
+        var changed = false;
+        if (Array.isArray(compare)){
+            for (var i in compare){
+                if (oldVal[compare[i]] != model.metadata[compare[i]]){
+                    changed = true;
+                }
+            }
+        }else{
+            changed = oldVal != model.metadata[compare];
+        }
+        if(changed){
             //this.queueItems.shift();
             this.dropLastItem();
             this.queueLength -= 1;
             this.game._publish("ui/update", this.game);
         }
-
+        if(compare == "research" || compare == "reached" && model.metadata[compare] == true
+        || (compare.includes("blocked") && model.metadata["blocked"] == true) ||
+        (compare.includes("research") && model.metadata["research"] == true)
+        ){
+            this.dropLastItem();
+            this.queueLength -= 1;
+            this.game._publish("ui/update", this.game);
+        }
     }
 
 

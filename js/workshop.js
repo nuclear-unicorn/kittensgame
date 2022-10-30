@@ -2557,6 +2557,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		this.effectsBase["oilMax"] = Math.floor(this.game.resPool.get("tanker").value * 500);
 
 		var scienceMaxCap = this.game.bld.getEffect("scienceMax");
+		scienceMaxCap += this.game.getEffect("pyramidSpaceCompendiumRatio") * this.game.space.getEffect("scienceMax"); //lets treat trasnfered science max from space same way
 		if (this.game.ironWill) {
 			scienceMaxCap *= 10;
 		}
@@ -2566,8 +2567,6 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			scienceMaxCap *= 1 + 0.05 * ttBoostRatio * this.game.religion.transcendenceTier;
 		}
 		scienceMaxCap += this.game.bld.getEffect("scienceMaxCompendia");
-		
-		scienceMaxCap += this.game.getEffect("pyramidSpaceCompendiumRatio") * this.game.space.getEffect("scienceMax");
 		
 		// there is a lot of ongoing discussing about the necessity of compedia unnerf, and the original intention of ch40krun was never to allow it
 		/* // Quadratic increase, so that deep enough run will eventually unnerf the compendia cap

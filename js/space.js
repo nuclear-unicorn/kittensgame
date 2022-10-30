@@ -316,6 +316,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 		calculateEffects: function(self, game){
 			if(self.reached){
 				game.time.queue.unlockQueueSource("spaceBuilding");
+				game.time.queue.unlockQueueSource("spaceMission");
 			}
 		}
 	},{
