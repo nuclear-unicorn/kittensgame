@@ -93,14 +93,32 @@ WQueue = React.createClass({
         var queueItems = self.state.game.time.queue.queueItems;
         for (var i in queueItems){
             var item = queueItems[i];
+            buttons = [];
+            if (item.value){
+                buttons = [
+                    $r("a", {
+                        href: "#", 
+                        onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i, false),
+                        //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
+                    }, "[-]"),
+                    $r("a", {
+                        href: "#", 
+                        onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i, item.value),
+                        //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
+                    }, "[x]")
+                ]
+            }else{
+                buttons = [
+                    $r("a", {
+                        href: "#", 
+                        onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i, false),
+                        //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
+                    }, "[x]")
+                ]
+            }
             items.push($r("div", {}, [
-                "[" + item.type + "][" + item.name + "] - " + item.label + ((item.value)? " " + item.value: ""),
-                $r("a", {
-                    href: "#", 
-                    onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
-                    //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
-                }, "[x]")
-            ]
+                "[" + item.type + "][" + item.name + "] - " + item.label + ((item.value)? " " + item.value: "")
+            ].concat(buttons)
             ));
         }
         return $r("div", {}, 

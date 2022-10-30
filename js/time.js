@@ -1563,7 +1563,10 @@ dojo.declare("classes.queue.manager", null,{
         if(this.queueLength >= this.cap){
             return;
         }
-        if(this.queueItems.length > 0 && this.queueItems[this.queueItems.length - 1].name == name && !this.queueNonStabkable.includes(type)){
+        if(this.queueItems.length > 0 && this.queueItems[this.queueItems.length - 1].name == name){
+            if(this.queueNonStabkable.includes(type)){
+                return;
+            }
             var valOfItem = (this.queueItems[this.queueItems.length - 1].value || 1) + 1;
             this.queueItems[this.queueItems.length - 1].value = valOfItem;
             this.queueLength += 1;
@@ -1590,7 +1593,7 @@ dojo.declare("classes.queue.manager", null,{
         }
     },
 
-    remove: function(type, name, index){
+    remove: function(type, name, index, full){
         if(!this.queueItems.length){
             this.queueLength = 0;
             return;
@@ -1602,7 +1605,7 @@ dojo.declare("classes.queue.manager", null,{
                     this.queueItems.splice(index, 1);
                 }
                 else{
-                    if (this.game.ui.isEffectMultiplierEnabled()){
+                    if (full){
                         this.queueLength -= item.value;
                         this.queueItems.splice(index, 1);
                         return;
