@@ -1,7 +1,8 @@
 /* global
     WLeftPanel
     WMidPanel
-    WToolbar
+    WToolbar,
+    WQueue
 */
 
 
@@ -294,8 +295,11 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
                 }
             }
 
+            var targetType = event.target.type;
 			var isInputElement = event.target.tagName === "TEXTAREA" ||
-				(event.target.tagName === "INPUT" && (event.target.type === "text" || event.target.type === "number"));
+				(event.target.tagName === "INPUT" && (
+                    targetType === "text" || targetType === "number" || targetType === "password" || targetType === "email"
+                ));
             var isTabNumber = ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105));
             //console.log(isTabNumber, event.keyCode);
 
@@ -583,6 +587,12 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             game: this.game
         }), document.getElementById("midColumnViewport"));
 
+        if(this.game.getFeatureFlag("QUEUE")){
+            React.render($r(WQueue, {
+                game: this.game
+            }), document.getElementById("queueViewport"));
+        }
+
         React.render($r(WToolbar, {
             game: this.game
         }), document.getElementById("headerToolbar"));
@@ -868,20 +878,24 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#leftColumn").css("font-size", this.fontSize + "px");
     },
 
-    hideChat: function(){
+    hideChat: function(){ //actually loads log!
         $("#rightTabLog").show();
         $("#IRCChatInner").css("visibility", "hidden");
         $("#logLink").toggleClass("active", true);
         $("#chatLink").toggleClass("active", false);
+        $("#queueLink").toggleClass("active", false);
         $("#rightTabChat").hide();
+        $("#rightTabQueue").hide();
     },
 
     loadChat: function(){
         $("#rightTabChat").show();
         $("#rightTabLog").hide();
+        $("#rightTabQueue").hide();
 
         $("#logLink").toggleClass("active", false);
         $("#chatLink").toggleClass("active", true);
+        $("#queueLink").toggleClass("active", false);
 
         $("#IRCChatInner").css("visibility", "visible");
 
@@ -900,7 +914,16 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         this.isChatActive = true;
         //this.isChatVisited = true;
     },
-
+    loadQueue: function(){
+        $("#rightTabChat").hide();
+        $("#rightTabLog").hide();
+        $("#rightTabQueue").show();
+        $("#IRCChatInner").css("visibility", "hidden");
+        $("#logLink").toggleClass("active", false);
+        $("#chatLink").toggleClass("active", false);
+        $("#queueLink").toggleClass("active", true);
+        $("#rightTabChat").hide();
+    },
     resetConsole: function(){
         this.game.console.resetState();
     },
@@ -951,6 +974,9 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#saveTooltip").text($I("ui.save.tooltip"));
         $("#logLink").text($I("ui.log.link"));
         $("#chatLink").text($I("ui.chat.link"));
+        if(this.game.getFeatureFlag("QUEUE")){
+            $("#queueLink").text($I("ui.queue.link"));
+        }
         $("#clearLogHref").text($I("ui.clear.log"));
         $("#logFiltersBlockText").html($I("ui.log.filters.block"));
         $("#pauseBtn").text($I("ui.pause"));

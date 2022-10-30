@@ -11,13 +11,14 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     isAccelerated: false,
 
     timestamp: null,    /*NO FUCKING timestamp resources*/
-
+    queue: null,
     constructor: function(game){
         this.game = game;
 
 		this.registerMeta("stackable", this.chronoforgeUpgrades, null);
 		this.registerMeta("stackable", this.voidspaceUpgrades, null);
 		this.setEffectsCachedExisting();
+        this.queue = new classes.queue.manager(game);
     },
 
     save: function(saveData) {
@@ -28,7 +29,10 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             testShatter: this.testShatter, //temporary
             isAccelerated: this.isAccelerated,
             cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "unlocked"]),
-            vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"])
+            vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"]),
+            queueItems: this.queue.queueItems,
+            queueLength: this.queue.queueLength,
+            queueSources: this.queue.queueSources
         };
         this._forceChronoFurnaceStop(saveData.time.cfu);
     },
@@ -70,6 +74,18 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
         this.gainTemporalFlux(ts);
         this.timestamp = ts;
+        this.queue.queueItems = saveData["time"].queueItems || [];
+        this.queue.queueLength = saveData["time"].queueLength || this.queue.queueItems.length;
+        this.queue.queueSources = saveData["time"].queueSources || this.queue.queueSourcesDefault;
+        for (var i in this.queue.queueSourcesDefault){
+            if (this.queue.queueSources[i] === undefined){
+                this.queue.queueSources[i] = this.queue.queueSourcesDefault[i];
+            }
+        }
+        this.queue.updateQueueSourcesArr();
+        if(!this.game.getFeatureFlag("QUEUE")){
+            $("#queueLink").hide();
+        }
 	},
 
 	gainTemporalFlux: function (timestamp){
@@ -141,6 +157,12 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             }
         }
         this.calculateRedshift();
+    },
+
+    updateQueue: function(){
+        if(this.game.getFeatureFlag("QUEUE")){
+            this.queue.update();
+        }
     },
 
     calculateRedshift: function(){
@@ -410,10 +432,20 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         prices: [
 
         ],
+        fixPrices:[
+            {name: "temporalFlux", val: 3000},
+			{name: "timeCrystal", val: 100},
+			{name: "void", val: 500}
+        ],
         priceRatio: 1.25,
         limitBuild: 0,
         effects: {
 
+        },
+        calculateEffects: function(self, game){
+            if (self.val > 0){
+                game.time.queue.queueSources["voidSpace"] = true;
+            }
         },
         unlocked: false
     },{
@@ -1313,11 +1345,12 @@ dojo.declare("classes.ui.VoidSpaceWgt", [mixin.IChildrenAware, mixin.IGameAware]
 		this.addChild(new com.nuclearunicorn.game.ui.ButtonModern({
             name: $I("time.fixCryochambers.label"),
             description: $I("time.fixCryochambers.desc"),
-            prices: [
+            prices: game.time.getVSU("usedCryochambers").fixPrices,
+            /*prices: [
 				{name: "temporalFlux", val: 3000},
 				{name: "timeCrystal", val: 100},
 				{name: "void", val: 500}
-            ],
+            ],*/
             controller: new classes.ui.time.FixCryochamberBtnController(game)
         }, game));
 
@@ -1465,4 +1498,501 @@ dojo.declare("classes.tab.TimeTab", com.nuclearunicorn.game.ui.tab, {
         }
 
     }
+});
+
+
+dojo.declare("classes.queue.manager", null,{
+    game: null,
+    queueItems : [],
+    updateQueueSourcesArr: function(){
+        for (var i in this.queueSources){
+            if(!this.queueSourcesArr.includes(i) && this.queueSources[i]){
+                this.queueSourcesArr.push(i);
+            }
+        }
+        self.queueSourcesArr;
+    },
+    /*queueSources : ["policies", "tech", "buildings", "spaceMission",
+                    "spaceBuilding","chronoforge", "voidSpace", "zigguratUpgrades",  
+                    "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],*/
+    //queueSources: ["buildings", "spaceBuilding", "zigguratUpgrades", "transcendenceUpgrades"],
+    queueSourcesArr:["buildings"],
+    queueSourcesDefault: { 
+                    "buildings": true, 
+                    "tech": false,
+                    "upgrades": false,
+                    "policies": false,
+                    "religion": false,
+                    "zebraUpgrades": false,
+                    "spaceMission": false,
+                    "spaceBuilding": false,
+                    "zigguratUpgrades": false,
+                    "transcendenceUpgrades": false,
+                    "chronoforge": false,
+                    "voidSpace": false,
+                },
+    queueSources: {},
+    queueNonStabkable:[
+        "tech", "upgrades", "policies", "zebraUpgrades", "spaceMission"
+    ],
+    unlockQueueSource: function(source){
+        if(this.queueSources[source] === false){
+            this.queueSources[source] = true;
+            this.queueSourcesArr.push(source);
+            this.game._publish("ui/update", this.game);
+        }
+    },
+    cap: 0,
+    queueLength: 0,
+    baseCap :2,
+
+    constructor: function(game){
+        this.game = game;
+        
+    },
+    calculateCap: function(){
+        return this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap; //
+    },
+
+    addToQueue: function(name, type, label, shiftKey){
+        if (!name || !type){
+            console.error("queueMgr#addToQueue: unable to add item:", name, type, label);
+            return;
+        }
+
+        if(this.queueLength >= this.cap){
+            return;
+        }
+        if(this.queueItems.length > 0 && this.queueItems[this.queueItems.length - 1].name == name && !this.queueNonStabkable.includes(type)){
+            var valOfItem = (this.queueItems[this.queueItems.length - 1].value || 1) + 1;
+            this.queueItems[this.queueItems.length - 1].value = valOfItem;
+            this.queueLength += 1;
+            if (shiftKey){
+                while(this.queueLength < this.cap){
+                    this.addToQueue(name, type, label, false);
+                }
+            }
+            return;
+        }
+        if(!label){
+            label = "$" + name + "$";
+        }
+            this.queueItems.push({
+                name: name,
+                type: type,
+                label: label
+            });
+        this.queueLength += 1;
+        if (shiftKey && !this.queueNonStabkable.includes(type)){
+            while(this.queueLength < this.cap){
+                this.addToQueue(name, type, label, false);
+            }
+        }
+    },
+
+    remove: function(type, name, index, shiftKey){
+        if(!this.queueItems.length){
+            this.queueLength = 0;
+            return;
+        }
+        if(this.queueLength > index){
+            var item = this.queueItems[index];
+            if(item.name == name && item.type == type){
+                if(!item.value || item.value ===1){
+                    this.queueItems.splice(index, 1);
+                }
+                else{
+                    if (shiftKey){
+                        this.queueLength -= item.value;
+                        this.queueItems.splice(index, 1);
+                        return;
+                    }
+                    item.value -=1;
+                    if(item.value == 1){
+                        item.value = null;
+                    }
+                }
+                this.queueLength -= 1;
+                return;
+            }
+            else{
+                console.error("Queue index is pointing to a wrong item!");
+            }
+        } else{
+            console.error("Queue item index is out of bounds!", index, " ",this.queueLength);
+        }
+        // Array.filter might cause some issues in older browsers, let's use jquery grep
+        /*this.queueItems = $.grep(this.queueItems, function( item, i ) {
+            return (item.name != name && item.type != type);
+        });*/
+    },
+
+    /**
+     * Return a list of sub-options for a building queue
+     * in a form of [{
+     *      name: <queue item name>,
+     *      label: <display label>
+     * }]
+     * 
+     * @param {*} type: queue type (buildings, upgrades, etc.). See game.time.queue.queueSources
+     * @returns 
+     */
+    getQueueOptions: function(type){
+        var options = [];
+        switch (type){
+            case "buildings":
+                var bld = this.game.bld;
+                for (var i in bld.buildingsData){
+                    var building = bld.buildingsData[i];
+                    if(building.unlocked){
+                        var name = building.name;
+                        var label = building.label;
+                        if(building.stages){
+                            if(building.stages){
+                                label = building.stages[building.stage].label;
+                            }
+                        }
+                        options.push({
+                            name: name,
+                            label: label
+                        });
+                    }
+                }
+                return options;
+
+            case "spaceBuilding":
+                var spaceBuildMap = this.game.space.spaceBuildingsMap;
+                for (var i in spaceBuildMap){
+                    var building = this.game.space.getBuilding(spaceBuildMap[i]);
+                    if(building.unlocked){
+                        options.push({
+                            name: building.name,
+                            label: building.label
+                        });
+                    }
+                }
+                return options;
+
+            case "zigguratUpgrades":
+                var zigguratUpgrades = this.game.religion.zigguratUpgrades;
+                for (var i in zigguratUpgrades){
+                    var building = this.game.religion.zigguratUpgrades[i];
+                    if(building.unlocked){
+                        options.push({
+                            name: building.name,
+                            label: building.label
+                        });
+                    }
+                }
+                return options;
+
+            case "transcendenceUpgrades":
+                var transcendenceUpgrades = this.game.religion.transcendenceUpgrades;
+                for (var i in transcendenceUpgrades){
+                    var building = this.game.religion.transcendenceUpgrades[i];
+                    if(building.unlocked){
+                        options.push({
+                            name: building.name,
+                            label: building.label
+                        });
+                    }
+                }
+                return options;
+            case "chronoforge":
+                var chronoforgeUpgrades = this.game.time.chronoforgeUpgrades;
+                for (var i in chronoforgeUpgrades){
+                    var building = chronoforgeUpgrades[i];
+                    if (building.unlocked){
+                        options.push({
+                            name: building.name,
+                            label: building.label
+                        });
+                    }
+                }
+                return options;
+            case "voidSpace":
+                var voidSpaceUpgrades = this.game.time.voidspaceUpgrades;
+                for (var i in voidSpaceUpgrades){
+                    var building = voidSpaceUpgrades[i];
+                    if(building.name == "usedCryochambers"){
+                        options.push({
+                            name: building.name,
+                            label: $I("time.fixCryochambers.label")
+                        });
+                        continue;
+                    }
+                    if (building.unlocked){
+                        options.push({
+                            name: building.name,
+                            label: building.label
+                        });
+                    }
+                }
+                return options;
+            case "tech":
+                var technologies = this.game.science.techs;
+                for (var i in technologies){
+                    var technology = technologies[i];
+                    if (technology.unlocked && !technology.researched){
+                        options.push({
+                            name: technology.name,
+                            label: technology.label
+                        });
+                    }
+                }
+                return options;
+            case "upgrades":
+                var upgrades = this.game.workshop.upgrades;
+                for (var i in upgrades){
+                    var upgrade = upgrades[i];
+                    if (upgrade.unlocked && !upgrade.researched){
+                        options.push({
+                            name: upgrade.name,
+                            label: upgrade.label
+                        });
+                    }
+                }
+                return options;
+            case "zebraUpgrades":
+                var zebraUpgrades = this.game.workshop.zebraUpgrades;
+                for (var i in zebraUpgrades){
+                    var upgrade = zebraUpgrades[i];
+                    if (upgrade.unlocked && !upgrade.researched){
+                        options.push({
+                            name: upgrade.name,
+                            label: upgrade.label
+                        });
+                    }
+                }
+                return options;
+            case "spaceMission":
+                var spaceMissions = this.game.space.planets;
+                for (var i in spaceMissions){
+                    var planet = spaceMissions[i];
+                    if (planet.unlocked && !planet.reached){
+                        options.push({
+                            name: planet.name,
+                            label: planet.label
+                        });
+                    }
+                }
+                return options;
+            case "policies":
+                var policies = this.game.science.policies;
+                for (var i in policies){
+                    var policy = policies[i];
+                    if (policy.unlocked && !policy.researched && !policy.blocked){
+                        options.push({
+                            name: policy.name,
+                            label: policy.label
+                        });
+                    }
+                }
+                return options;
+            case "religion":
+                var religionUpgrades = this.game.religion.religionUpgrades;
+                if(this.game.challenges.getChallenge("atheism").active){
+                    return options; //just in case
+                }
+                for (var i in religionUpgrades){
+                    var upgrade = religionUpgrades[i];
+                    if (upgrade.faith <= this.game.religion.faith && (!upgrade.noStackable || !upgrade.val)){
+                        options.push({
+                            name: upgrade.name,
+                            label: upgrade.label
+                        });
+                    }
+                }
+                return options;
+            default:
+                return options;
+        }
+    },
+    dropLastItem: function(){
+        var item = this.queueItems[this.queueItems.length - 1];
+        if(item.value && item.value > 1){
+            item.value -= 1;
+        }
+        else{
+            this.queueItems.shift();
+        }
+    },
+    listDrop: function(event){
+        //this.queueItems.pop();
+        this.dropLastItem();
+        this.showList();
+    },
+
+    update: function(){
+        /*var queueTypeSelect = document.getElementById('queueTypeSelect');
+        if(queueTypeSelect){
+            if(!this.game.science.get("rocketry").researched){
+                queueTypeSelect.options[2].label = "???";
+            }else{
+                queueTypeSelect.options[2].label = queueTypeSelect.options[2].value;
+            }
+            if(!(this.game.science.get("theology").researched && this.game.bld.get("ziggurat").val > 0)){
+                queueTypeSelect.options.value.label = "???";
+            }else{
+                queueTypeSelect.options.value.label = queueTypeSelect.options.value.value;
+            }
+            if(!this.game.science.get("cryptotheology").researched){
+                queueTypeSelect.options[4].label = "???";
+            }else{
+                queueTypeSelect.options[4].label = queueTypeSelect.options[4].value;
+            }
+        }
+        this.cap = this.calculateCap();
+        if(this.queueItems.length <= 0){
+            return;
+        }
+        var el = {
+            "name": this.queueItems[0][0],
+            "type": this.queueItems[0][1]
+        };
+        //var el = this.queueItems[0];*/
+
+        this.cap = this.calculateCap();
+        if(!this.queueItems.length){
+            return;
+        }
+        var el = this.queueItems[0];
+
+        var itemMetaRaw = this.game.getUnlockByName(el.name, el.type);
+        var compare = "val"; //we should do some sort of refractoring of the switch mechanism
+        var props = {
+            id:            itemMetaRaw.name
+        };
+        var buyItem = true;
+        switch (el.type){
+            case "policies":
+                compare = ["researched", "blocked"];
+                props.controller = new classes.ui.PolicyBtnController(this.game);
+                var oldVal = {
+                    researched: itemMetaRaw.researched,
+                    blocked: itemMetaRaw.blocked
+                };
+                var model = props.controller.fetchModel(props);
+                break;
+            case "tech":
+                compare = "researched";
+                props.controller = new com.nuclearunicorn.game.ui.TechButtonController(this.game);
+                var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "buildings":
+                var bld = new classes.BuildingMeta(itemMetaRaw).getMeta();
+                    oldVal = itemMetaRaw.val;
+                props = {
+                    key:            bld.name,
+                    name:           bld.label,
+                    description:    bld.description,
+                    building:       bld.name
+                };
+                if (typeof(bld.stages) == "object"){
+                    props.controller = new classes.ui.btn.StagingBldBtnController(this.game);
+                } else {
+                    props.controller = new classes.ui.btn.BuildingBtnModernController(this.game);
+                }
+                var model = props.controller.fetchModel(props);
+                props.controller.build(model, 1);
+                buyItem = false;
+                break;
+            case "spaceMission":
+                compare = "reached";
+                props.controller = new com.nuclearunicorn.game.ui.SpaceProgramBtnController(this.game);
+                var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "spaceBuilding":
+                props.controller = new classes.ui.space.PlanetBuildingBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "chronoforge":
+                props.controller = new classes.ui.time.ChronoforgeBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "voidSpace":
+                props.controller = new classes.ui.time.VoidSpaceBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                if(el.name == "usedCryochambers"){ //a bunch of model black magic
+                    props.controller = new classes.ui.time.FixCryochamberBtnController(this.game);
+                    itemMetaRaw = this.game.getUnlockByName("cryochambers", el.type);
+                    model.prices = this.game.time.getVSU("usedCryochambers").fixPrices;
+                    model.enabled = true;
+                    console.log(model);
+                }
+                break;
+            case "zigguratUpgrades":
+                props.controller = new com.nuclearunicorn.game.ui.ZigguratBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "religion":
+                props.controller = new com.nuclearunicorn.game.ui.ReligionBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "transcendenceUpgrades":
+                props.controller = new classes.ui.TranscendenceBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "pacts":
+                props.controller = new com.nuclearunicorn.game.ui.PactsBtnController(this.game);
+                var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "upgrades":
+                compare = "researched";
+                props.controller = new com.nuclearunicorn.game.ui.UpgradeButtonController(this.game);
+                var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                break;
+            case "zebraUpgrades":
+                compare = "researched";
+                props.controller = new com.nuclearunicorn.game.ui.ZebraUpgradeButtonController(this.game);
+                var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                break;
+        }
+        if(!props.controller){
+            console.error(el.name + " of " + el.type + " queing is not supported!");
+            var deletedElement = this.queueItems.shift();
+            this.queueLength -= deletedElement.value || 1;
+            this.game._publish("ui/update", this.game);
+        }
+        if(buyItem){
+            props.controller.buyItem(model, 1,  function(result) {});
+        }
+        var changed = false;
+        if (Array.isArray(compare)){
+            for (var i in compare){
+                if (oldVal[compare[i]] != model.metadata[compare[i]]){
+                    changed = true;
+                }
+            }
+        }else{
+            changed = oldVal != model.metadata[compare];
+        }
+        if(changed){
+            //this.queueItems.shift();
+            this.dropLastItem();
+            this.queueLength -= 1;
+            this.game._publish("ui/update", this.game);
+        }
+        if(compare == "research" || compare == "reached" && model.metadata[compare] == true
+        || (compare.includes("blocked") && model.metadata["blocked"] == true) ||
+        (compare.includes("research") && model.metadata["research"] == true)
+        ){
+            this.dropLastItem();
+            this.queueLength -= 1;
+            this.game._publish("ui/update", this.game);
+        }
+    }
+
+
 });

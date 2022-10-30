@@ -601,6 +601,10 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}
 
 			stageMeta.effects = effects;
+			if(self.val){
+				game.time.queue.unlockQueueSource("tech");
+				game.time.queue.unlockQueueSource("policies");
+			}
 		}
 	},{
 		name: "academy",
@@ -1329,6 +1333,11 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		effects: {
 			"craftRatio" : 0.06	//6% for craft output
 		},
+		calculateEffects: function(self, game){
+			if (self.val) {
+				game.time.queue.unlockQueueSource("upgrades");
+			}
+		},
 		flavor: $I("buildings.workshop.flavor")
 	},{
 		name: "factory",
@@ -1778,6 +1787,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				if (templars.on){
 					effects["manpowerMax"] = 50 + 25 * templars.on;
 				}
+				game.time.queue.unlockQueueSource("religion");
 			} else {
 				var effects = {
 					"culturePerTickBase" : 0.1
@@ -1825,6 +1835,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			};
 			effects["cultureMaxRatio"] = 0.08 + game.getEffect("cultureMaxRatioBonus");
 			self.effects = effects;
+			if(self.val){
+				game.time.queue.unlockQueueSource("zigguratUpgrades");
+			}
 		}
 	},{
 		name: "chronosphere",
@@ -1954,6 +1967,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		calculateEffects: function(self, game){
 			if(game.workshop.getZebraUpgrade("bloodstoneInstitute").researched){
 				self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(self.on * (game.ironWill? 1:0.1) * (game.karmaZebras + 1), game.getEffect("zebraPreparations") + 40) / self.on;
+			}
+			if (self.val) {
+				game.time.queue.unlockQueueSource("zebraUpgrades");
 			}
 		},
 		upgrades: {

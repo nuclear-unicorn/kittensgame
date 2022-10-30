@@ -312,7 +312,13 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				tabs: ["village"]
 			},
 			breakIronWill: true
-		}]
+		}],
+		calculateEffects: function(self, game){
+			if(self.reached){
+				game.time.queue.unlockQueueSource("spaceBuilding");
+				game.time.queue.unlockQueueSource("spaceMission");
+			}
+		}
 	},{
 		name: "moon",
 		label: $I("space.planet.moon.label"),
@@ -1196,6 +1202,14 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 			this.programs[i].unlocked = true;
 		}
 		this.game.msg("All space upgrades are unlocked");
+	},
+	getEffect: function(effectName){
+		var effect = 0;
+		for (var i = 0; i < this.meta.length; i++){
+			var effectMeta = this.getMetaEffect(effectName, this.meta[i]);
+			effect += effectMeta;
+		}
+		return effect;
 	}
 });
 
