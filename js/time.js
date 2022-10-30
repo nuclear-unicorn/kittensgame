@@ -1554,7 +1554,7 @@ dojo.declare("classes.queue.manager", null,{
         return this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap; //
     },
 
-    addToQueue: function(name, type, label){
+    addToQueue: function(name, type, label, shiftKey){
         if (!name || !type){
             console.error("queueMgr#addToQueue: unable to add item:", name, type, label);
             return;
@@ -1567,6 +1567,11 @@ dojo.declare("classes.queue.manager", null,{
             var valOfItem = (this.queueItems[this.queueItems.length - 1].value || 1) + 1;
             this.queueItems[this.queueItems.length - 1].value = valOfItem;
             this.queueLength += 1;
+            if (shiftKey){
+                while(this.queueLength < this.cap){
+                    this.addToQueue(name, type, label, false);
+                }
+            }
             return;
         }
         if(!label){
@@ -1578,9 +1583,14 @@ dojo.declare("classes.queue.manager", null,{
                 label: label
             });
         this.queueLength += 1;
+        if (shiftKey && !this.queueNonStabkable.includes(type)){
+            while(this.queueLength < this.cap){
+                this.addToQueue(name, type, label, false);
+            }
+        }
     },
 
-    remove: function(type, name, index){
+    remove: function(type, name, index, shiftKey){
         if(!this.queueItems.length){
             this.queueLength = 0;
             return;
@@ -1592,6 +1602,11 @@ dojo.declare("classes.queue.manager", null,{
                     this.queueItems.splice(index, 1);
                 }
                 else{
+                    if (shiftKey){
+                        this.queueLength -= item.value;
+                        this.queueItems.splice(index, 1);
+                        return;
+                    }
                     item.value -=1;
                     if(item.value == 1){
                         item.value = null;

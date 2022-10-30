@@ -98,7 +98,11 @@ WQueue = React.createClass({
                 "[" + item.type + "][" + item.name + "] - " + item.label + ((item.value)? " " + item.value: ""),
                 $r("a", {
                     href: "#", 
-                    onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
+                    onClick: function(e){
+                        e.preventDefault();
+                        game.time.queue.remove(item.type, item.name, i, e.shiftKey)
+                    },
+                    //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i);
                     /*onClick: dojo.hitch([type, name, index], function(e){
                         e.preventDefault();
                         game.time.queue.remove(type, name, index);
@@ -130,19 +134,21 @@ WQueue = React.createClass({
             this.getQueueTypeSelect(),
             this.getQueueItemSelect(options),
             $r("button", {
-                onClick: function(){
+                onClick: function(e){
                     if(self.state.itemId){
                         game.time.queue.addToQueue(
                             //self.state.itemId,
                             options[self.state.itemId].name,
                             self.state.typeId,
-                            self.state.itemLabel
+                            self.state.itemLabel,
+                            e.shiftKey
                         );
                     }else if(options.length){
                         game.time.queue.addToQueue(
                             options[0].name,
                             self.state.typeId,
-                            options[0].label
+                            options[0].label,
+                            e.shiftKey
                         );
                     }
 
