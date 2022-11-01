@@ -1925,7 +1925,7 @@ dojo.declare("classes.queue.manager", null,{
                     props.controller = new classes.ui.time.FixCryochamberBtnController(this.game);
                     itemMetaRaw = this.game.getUnlockByName("cryochambers", el.type);
                     model.prices = this.game.time.getVSU("usedCryochambers").fixPrices;
-                    model.enabled = true;
+                    model.enabled = this.game.resPool.hasRes(model.prices); //check we actually have enough to do one fix!
                     console.log(model);
                 }
                 break;
