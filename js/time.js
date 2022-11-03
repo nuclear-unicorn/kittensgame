@@ -1812,7 +1812,7 @@ dojo.declare("classes.queue.manager", null,{
         }
     },
     dropLastItem: function(){
-        var item = this.queueItems[this.queueItems.length - 1];
+        var item = this.queueItems[0];
         if(item.value && item.value > 1){
             item.value -= 1;
         }
