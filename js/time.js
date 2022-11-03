@@ -1817,7 +1817,7 @@ dojo.declare("classes.queue.manager", null,{
             item.value -= 1;
         }
         else{
-            this.queueItems.shift();
+            this.queueItems.pop();
         }
     },
     listDrop: function(event){
