@@ -814,9 +814,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			challenges: ["atheism"]
 		},
         calculateEffects: function(self, game){
-            if (self.val > 0){
-                game.time.queue.queueSources["voidSpace"] = true;
-            }
+			if(self.researched){
+				game.time.queue.unlockQueueSource("voidSpace");
+			}
         },
 	}, {
 		name: "paradoxalKnowledge",
