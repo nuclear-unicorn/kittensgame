@@ -791,6 +791,11 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		],
 		unlocks: {
 			upgrades: ["relicStation"]
+		},
+		calculateEffects: function(self, game){
+			if(self.researched){
+				game.time.queue.unlockQueueSource("transcendenceUpgrades");
+			}
 		}
 	}, {
 		name: "voidSpace",
@@ -807,7 +812,12 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["voidAspiration"],
 			voidSpace: ["cryochambers"],
 			challenges: ["atheism"]
-		}
+		},
+        calculateEffects: function(self, game){
+			if(self.researched){
+				game.time.queue.unlockQueueSource("voidSpace");
+			}
+        },
 	}, {
 		name: "paradoxalKnowledge",
 		label: $I("science.paradoxalKnowledge.label"),

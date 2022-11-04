@@ -421,7 +421,12 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",     val: 500000 },
 			{ name : "timeCrystal", val: 10 },
 			{ name : "relic",     	val: 5 }
-		]
+		],
+		calculateEffects: function(self, game){
+			if(self.researched){
+				game.time.queue.unlockQueueSource("chronoforge");
+			}
+		}
 	},{
 		name: "tachyonAccelerators",
 		label: $I("workshop.tachyonAccelerators.label"),
@@ -1247,7 +1252,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		description: $I("workshop.factoryOptimization.desc"),
 		effects: {
 			"t1CraftRatio": 10,
-			"t2CraftRatio": 2
+			"t2CraftRatio": 2,
+			"queueCap": 1
 		},
 		prices:[
 			{ name : "titanium", val: 1250 },
@@ -1261,7 +1267,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		effects: {
 			"t1CraftRatio": 10,
 			"t2CraftRatio": 5,
-			"t3CraftRatio": 2
+			"t3CraftRatio": 2,
+			"queueCap": 2
 		},
 		prices:[
 			{ name : "titanium", val: 2500 },
@@ -1276,7 +1283,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			"t1CraftRatio": 2,
 			"t2CraftRatio": 2,
 			"t3CraftRatio": 2,
-			"t4CraftRatio": 2
+			"t4CraftRatio": 2,
+			"queueCap": 2
 		},
 		prices:[
 			{ name : "science",  val: 225000 },
@@ -1291,7 +1299,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			"t2CraftRatio": 5,
 			"t3CraftRatio": 5,
 			"t4CraftRatio": 2,
-			"t5CraftRatio": 2
+			"t5CraftRatio": 2,
+			"queueCap": 3
 		},
 		prices:[
 			{ name : "antimatter",  val: 500 },
@@ -1307,7 +1316,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			"t2CraftRatio": 2,
 			"t3CraftRatio": 2,
 			"t4CraftRatio": 2,
-			"t5CraftRatio": 2
+			"t5CraftRatio": 2,
+			"queueCap": 3
 		},
 		prices:[
 			{ name : "science",     val: 500000 },
@@ -2552,6 +2562,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		this.effectsBase["oilMax"] = Math.floor(this.game.resPool.get("tanker").value * 500);
 
 		var scienceMaxCap = this.game.bld.getEffect("scienceMax");
+		scienceMaxCap += this.game.getEffect("pyramidSpaceCompendiumRatio") * this.game.space.getEffect("scienceMax"); //lets treat trasnfered science max from space same way
 		if (this.game.ironWill) {
 			scienceMaxCap *= 10;
 		}
@@ -2561,6 +2572,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			scienceMaxCap *= 1 + 0.05 * ttBoostRatio * this.game.religion.transcendenceTier;
 		}
 		scienceMaxCap += this.game.bld.getEffect("scienceMaxCompendia");
+		
 		// there is a lot of ongoing discussing about the necessity of compedia unnerf, and the original intention of ch40krun was never to allow it
 		/* // Quadratic increase, so that deep enough run will eventually unnerf the compendia cap
 		var darkFutureRatio = Math.max(this.game.calendar.year / this.game.calendar.darkFutureBeginning, 1);
