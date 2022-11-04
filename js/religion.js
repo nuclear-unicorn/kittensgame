@@ -183,17 +183,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 
 		if (this.corruption >= 1) {
-			if (alicorns.value > 1) {
-				this.corruption--;
-				alicorns.value--;
-				this.game.resPool.get("necrocorn").value++;
-				this.game.upgrade({
-					zigguratUpgrades: ["skyPalace", "unicornUtopia", "sunspire"]
-				});
-				this.game.msg($I("religion.msg.corruption"), "important", "alicornCorruption");
-			} else {
-				this.corruption = 1;
-			}
+			this.corruptNecrocorns();
 		}
 
 		if (this.game.calendar.day >= 0) {
