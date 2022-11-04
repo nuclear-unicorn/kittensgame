@@ -183,7 +183,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 
 		if (this.corruption >= 1) {
-			this.corruptNecrocorns();
+			var corrupted = this.corruptNecrocorns();
+			if (corrupted > 0) {
+                this.game.msg($I("religion.msg.corruption"), "important", "alicornCorruption");
+            }
 		}
 
 		if (this.game.calendar.day >= 0) {
@@ -217,6 +220,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		if (this.corruption >= 1) {
 			this.corruption = 1;
 		}
+		return alicornsToCorrupt;
 	},
 	necrocornsNaiveFastForward: function(daysOffset, times){
 		var alicorns = this.game.resPool.get("alicorn");
