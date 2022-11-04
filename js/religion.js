@@ -183,16 +183,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 
 		if (this.corruption >= 1) {
-			if (alicorns.value > 1) {
-				this.corruption--;
-				alicorns.value--;
-				this.game.resPool.get("necrocorn").value++;
-				this.game.upgrade({
-					zigguratUpgrades: ["skyPalace", "unicornUtopia", "sunspire"]
-				});
+			var corrupted = this.corruptNecrocorns();
+			if (corrupted > 0) {
 				this.game.msg($I("religion.msg.corruption"), "important", "alicornCorruption");
-			} else {
-				this.corruption = 1;
 			}
 		}
 
@@ -227,6 +220,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		if (this.corruption >= 1) {
 			this.corruption = 1;
 		}
+		return alicornsToCorrupt;
 	},
 	necrocornsNaiveFastForward: function(daysOffset, times){
 		var alicorns = this.game.resPool.get("alicorn");
