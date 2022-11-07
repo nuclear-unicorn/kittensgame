@@ -1818,6 +1818,7 @@ dojo.declare("classes.queue.manager", null,{
         }
         else{
             this.queueItems.shift();
+            this.game._publish("ui/update", this.game);
         }
     },
     listDrop: function(event){
