@@ -211,7 +211,7 @@
 }
 
 body.scheme_sleek  {
-    background: #1c1917; /* Old browsers */
+    background-color: #1c1917; /* Old browsers */
     background: -moz-linear-gradient(left, #0d0d0d 0%, #1c1917 24%, #1c1917 76%, #0d0d0d 100%); /* FF3.6-15 */
     background: -webkit-linear-gradient(left, #0d0d0d 0%, #1c1917 24%, #1c1917 76%, #0d0d0d 100%); /* Chrome10-25,Safari5.1-6 */
     background: linear-gradient(to right, #0d0d0d 0%, #1c1917 24%, #1c1917 76%, #0d0d0d 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
