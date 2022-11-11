@@ -211,10 +211,10 @@
 }
 
 body.scheme_sleek  {
-    background-color: #1c1917; /* Old browsers */
     background: -moz-linear-gradient(left, #0d0d0d 0%, #1c1917 24%, #1c1917 76%, #0d0d0d 100%); /* FF3.6-15 */
     background: -webkit-linear-gradient(left, #0d0d0d 0%, #1c1917 24%, #1c1917 76%, #0d0d0d 100%); /* Chrome10-25,Safari5.1-6 */
     background: linear-gradient(to right, #0d0d0d 0%, #1c1917 24%, #1c1917 76%, #0d0d0d 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    background: #1c1917; /* Old browsers and automatic scrollbar coloring in Firefox */
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0d0d0d', endColorstr='#1c1917', GradientType=1); /* IE6-9 */
     color-scheme: dark;
 }
