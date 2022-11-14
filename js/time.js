@@ -28,7 +28,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             heat: this.heat,
             testShatter: this.testShatter, //temporary
             isAccelerated: this.isAccelerated,
-            cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "unlocked"]),
+            cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "unlocked", "isAutomationEnabled"]),
             vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"]),
             queueItems: this.queue.queueItems,
             queueLength: this.queue.queueLength,
@@ -336,7 +336,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             "timeRatio" : 0.05
         },
         calculateEffects: function(self, game) {
-            if(self.isAutomationEnabled === null){
+            if(self.isAutomationEnabled !== (game.time.testShatter == 1)){
                 self.isAutomationEnabled = (game.time.testShatter == 1);
             }
             game.time.testShatter = (self.isAutomationEnabled)? 1 : 0;
@@ -1818,6 +1818,7 @@ dojo.declare("classes.queue.manager", null,{
         }
         else{
             this.queueItems.shift();
+            this.game._publish("ui/update", this.game);
         }
     },
     listDrop: function(event){
