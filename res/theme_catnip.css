@@ -17,6 +17,7 @@
 /* ******************* GAME ******************* */
 /* ******************************************** */
 body.scheme_catnip {
+	background-color: rgba(235, 244, 195, 1);
 	background: fixed repeat-x left -850px bottom url('img/theme_catnip_texture.png'),
                 radial-gradient(ellipse at left top, rgba(235, 244, 195, 1) 0%, rgba(207, 227, 142, 1) 100%);
 }
