@@ -19,6 +19,7 @@
     "buildings.lumberMill.label": "tomo pi pakala kasi",
     "buildings.mansion.label": "tomo pona",
     "buildings.mine.label": "tomo pi pakala kiwen",
+    "effectsMgr.type.resRatio": "namako {0}",
     "resources.minerals.title": "kiwen",
     "village.job.miner.desc": "+0.25 kiwen pi tenpo lili",
     "workshop.mineralAxes.label": "ilo kipisi kiwen",
