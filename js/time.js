@@ -336,7 +336,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             "timeRatio" : 0.05
         },
         calculateEffects: function(self, game) {
-            if(self.isAutomationEnabled !== (game.time.testShatter == 1)){
+            if(self.isAutomationEnabled === null){
                 self.isAutomationEnabled = (game.time.testShatter == 1);
             }
             game.time.testShatter = (self.isAutomationEnabled)? 1 : 0;
