@@ -559,6 +559,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tabs: ["space"],
 			tech: ["sattelites", "oilProcessing"],
 			upgrades: ["oilDistillation"]
+		},
+		upgrades: {
+			planet: ["cath"]
 		}
 	}, {
         name: "oilProcessing",
