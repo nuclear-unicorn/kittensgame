@@ -313,9 +313,9 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 			},
 			breakIronWill: true
 		}],
+
 		calculateEffects: function(self, game){
-			if(self.reached){
-				game.time.queue.unlockQueueSource("spaceBuilding");
+			if (game.science.get("rocketry").researched){
 				game.time.queue.unlockQueueSource("spaceMission");
 			}
 		}
@@ -1064,6 +1064,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				} else {
 					planet.routeDays = 0;
 					planet.reached = true;
+					this.game.time.queue.unlockQueueSource("spaceBuilding");
 					this.game.msg($I("space.newplanet.log.msg"), "important");
 				}
 			}
