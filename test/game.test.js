@@ -250,3 +250,15 @@ test("Test NR calls", () => {
     expect(newrelic.addPageAction).toHaveBeenCalledTimes(0);
 
 });
+
+//--------------------------------
+//      Map test
+//--------------------------------
+test("Test NR calls", () => {
+
+    game.village.getBiome("plains").level = 1;
+    game.updateCaches();
+    expect(game.globalEffectsCached["catnipRatio"]).toBe(0.01);
+    expect(game.getEffect("catnipRatio")).toBe(0.01);
+
+});

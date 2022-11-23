@@ -90,7 +90,9 @@ WQueue = React.createClass({
         var self = this;
         var items = [];
 
-        var queueItems = self.state.game.time.queue.queueItems;
+        var queueManager = self.state.game.time.queue;
+        var queueItems = queueManager.queueItems;
+        
         for (var i in queueItems){
             var item = queueItems[i];
             buttons = [];
@@ -98,12 +100,12 @@ WQueue = React.createClass({
                 buttons = [
                     $r("a", {
                         href: "#", 
-                        onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i, false),
+                        onClick: dojo.hitch(queueManager, queueManager.remove, item.type, item.name, i, false),
                         //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
                     }, "[-]"),
                     $r("a", {
                         href: "#", 
-                        onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i, item.value),
+                        onClick: dojo.hitch(queueManager, queueManager.remove, item.type, item.name, i, item.value),
                         //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
                     }, "[x]")
                 ]
@@ -111,7 +113,7 @@ WQueue = React.createClass({
                 buttons = [
                     $r("a", {
                         href: "#", 
-                        onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i, false),
+                        onClick: dojo.hitch(queueManager, queueManager.remove, item.type, item.name, i, false),
                         //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
                     }, "[x]")
                 ]

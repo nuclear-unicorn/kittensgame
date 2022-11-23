@@ -1327,7 +1327,11 @@ dojo.declare("classes.village.Map", null, {
 	/**
 	 * terrainPenalty - affects how much cp exploration will cost
 	 * faunaPenalty - affects mob spawn rate (% chance where x1.0 is 100%)
+	 * 
+	 * level: current exploration level
 	 **/
+
+	//TODO: should we use TabManager wrapper or perhaps separate metadata handling logic to MetaTable?
 	biomes: [
 	{
 		name: "village",
@@ -1345,6 +1349,9 @@ dojo.declare("classes.village.Map", null, {
 		unlocked: true,
 		unlocks: {
 			biomes: ["hills"]
+		},
+		effects:{
+			catnipRatio: 0.01
 		}
 	},
 	{
@@ -1634,6 +1641,20 @@ dojo.declare("classes.village.Map", null, {
 
 	updateEffectCached: function(){
 		this.game.globalEffectsCached["mapPriceReduction"] = -this.getPriceReduction();
+
+		//update cached effects based on the explored biomes
+		for (var i in this.biomes){
+			var biome = this.biomes[i];
+			if (!biome.unlocked){
+				continue;
+			}
+			for (var effect in biome.effects) {
+				/*if (!this.game.globalEffectsCached[effect]){
+					this.game.globalEffectsCached[effect] = 0;
+				}*/
+				this.game.globalEffectsCached[effect] += ( biome.effects[effect] * biome.level );
+			}
+		}
 	},
 
 	save: function(){
