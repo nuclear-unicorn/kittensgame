@@ -28,6 +28,7 @@
 
 * [NodeJS](https://nodejs.org/) v10+
 * [yarn](https://classic.yarnpkg.com/en/docs/install/#debian-stable )
+* [vscode](https://code.visualstudio.com/) (optional)
 
 ### Installation
 
@@ -46,6 +47,10 @@ To run the tests
 ```
 yarn test
 ```
+### IDE setup
+
+You can use any IDE of your choosing, but if you want to speed up things, vscode is recommended. 
+`kg-workspace.code-workspace` contains a pre-configured project with a set of useful extensions.
 
 ## Contribution
 
