@@ -100,20 +100,20 @@ WQueue = React.createClass({
                 buttons = [
                     $r("a", {
                         href: "#", 
-                        onClick: dojo.hitch(queueManager, queueManager.remove, item.type, item.name, i, false),
+                        onClick: dojo.hitch(queueManager, queueManager.remove, i, 1),
                         //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
                     }, "[-]"),
                     $r("a", {
                         href: "#", 
-                        onClick: dojo.hitch(queueManager, queueManager.remove, item.type, item.name, i, item.value),
+                        onClick: dojo.hitch(queueManager, queueManager.remove, i, item.value),
                         //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
                     }, "[x]")
                 ]
-            }else{
+            } else {
                 buttons = [
                     $r("a", {
                         href: "#", 
-                        onClick: dojo.hitch(queueManager, queueManager.remove, item.type, item.name, i, false),
+                        onClick: dojo.hitch(queueManager, queueManager.remove, i, 1),
                         //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
                     }, "[x]")
                 ]

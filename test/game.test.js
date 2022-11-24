@@ -18,6 +18,10 @@ beforeEach(() => {
 
     //TODO: use special UI system specifically for unit tests
     game.setUI(new classes.ui.UISystem("gameContainerId"));
+
+    //TODO: this seems to be mandatory to set up some internal props like build.meta.val/on and stuff
+    //We need to make it a part of our default initialization
+    game.resetState();
 });
 
 afterEach(() => {
@@ -254,11 +258,46 @@ test("Test NR calls", () => {
 //--------------------------------
 //      Map test
 //--------------------------------
-test("Test NR calls", () => {
+test("Explored biomes should update effects", () => {
 
     game.village.getBiome("plains").level = 1;
     game.updateCaches();
     expect(game.globalEffectsCached["catnipRatio"]).toBe(0.01);
     expect(game.getEffect("catnipRatio")).toBe(0.01);
 
+});
+
+test("Queue should correctly remove items by index", () => {
+
+    var queue = game.time.queue;
+
+    queue.update();
+    expect(queue.cap).toBe(2);
+
+    queue.addToQueue("field", "buildings", "N/A");
+    queue.addToQueue("field", "buildings", "N/A");
+    queue.addToQueue("pasture", "buildings", "N/A");
+
+    expect(queue.queueItems.length).toBe(2);
+
+    //can't build over the cap
+    queue.addToQueue("field", "buildings", "N/A");
+    expect(queue.queueItems.length).toBe(2);
+
+    //ai cores should increase caps
+    _build("aiCore", 10);
+    game.bld.get("aiCore").on = 10;
+    queue.update();
+
+    //multiple entires of the same type should be allowed
+    expect(queue.cap).toBe(12);
+    queue.addToQueue("field", "buildings", "N/A");
+    expect(queue.queueItems.length).toBe(3);
+    
+    //sequential removals should decrement queue, and then clean items
+    queue.remove(0, 1);
+    expect(queue.queueItems.length).toBe(3);
+    queue.remove(0, 1);
+    expect(queue.queueItems.length).toBe(2);
+    
 });
