@@ -2226,19 +2226,23 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			lastBackup: this.lastBackup
 		};
 
-		var saveDataString = JSON.stringify(saveData);
-		//5mb limit workaround
-		if (saveDataString.length > 5000000 || this.opts.forceLZ) {
-			console.log("compressing the save file...");
-			saveDataString = this.compressLZData(saveDataString, true);
-		}
-
+		var saveDataString = this._saveDataToString(saveData);
 		LCstorage["com.nuclearunicorn.kittengame.savedata"] = saveDataString;
 		console.log("Game saved");
 
 		this.ui.save();
 
 		return saveData;
+	},
+
+	_saveDataToString: function(saveData) {
+		var saveDataString = JSON.stringify(saveData);
+		//5mb limit workaround
+		if (saveDataString.length > 5000000 || this.opts.forceLZ) {
+			console.log("compressing the save file...");
+			saveDataString = this.compressLZData(saveDataString, true);
+		}
+		return saveDataString;
 	},
 
 	_wipe: function(){
@@ -4770,7 +4774,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		if (anachronomancy.researched){
 			saveData.science.techs.push(this.science.get("chronophysics"));
 		}
-		LCstorage["com.nuclearunicorn.kittengame.savedata"] = JSON.stringify(saveData);
+
+		var saveDataString = this._saveDataToString(saveData);
+		LCstorage["com.nuclearunicorn.kittengame.savedata"] = saveDataString;
 
 		// Hack to prevent an autosave from occurring before the reload completes
 		this.isPaused = true;
