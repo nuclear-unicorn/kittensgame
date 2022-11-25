@@ -7,7 +7,40 @@
 
 WQueueItem = React.createClass({
     render: function(){
+        var item = this.props.item;
 
+        if (item.value){
+            buttons = [
+                $r("a", {
+                    href: "#", 
+                    onClick: this.removeOne,
+                }, "[-]"),
+                $r("a", {
+                    href: "#", 
+                    onClick: this.removeAll,
+                }, "[x]")
+            ]
+        } else {
+            buttons = [
+                $r("a", {
+                    href: "#", 
+                    onClick: this.removeOne,
+                }, "[x]")
+            ]
+        }
+        return $r("div", {}, [
+            "[" + item.type + "][" + item.name + "] - " + item.label + ((item.value)? " " + item.value: "")
+        ].concat(buttons));
+    },
+
+    removeOne: function(){
+        var i = this.props.index;
+        this.props.queueManager.remove(i, 1);
+    },
+
+    removeAll: function(){
+        var i = this.props.index;
+        this.props.queueManager.remove(i, this.props.item.value);
     }
 });
 
@@ -101,30 +134,7 @@ WQueue = React.createClass({
         
         for (var i in queueItems){
             var item = queueItems[i];
-            buttons = [];
-            if (item.value){
-                buttons = [
-                    $r("a", {
-                        href: "#", 
-                        onClick: dojo.hitch(queueManager, queueManager.remove, i, 1),
-                    }, "[-]"),
-                    $r("a", {
-                        href: "#", 
-                        onClick: dojo.hitch(queueManager, queueManager.remove, i, item.value),
-                    }, "[x]")
-                ]
-            } else {
-                buttons = [
-                    $r("a", {
-                        href: "#", 
-                        onClick: dojo.hitch(queueManager, queueManager.remove, i, 1),
-                    }, "[x]")
-                ]
-            }
-            items.push($r("div", {}, [
-                "[" + item.type + "][" + item.name + "] - " + item.label + ((item.value)? " " + item.value: "")
-            ].concat(buttons)
-            ));
+            items.push($r(WQueueItem, {item: item, index: i, queueManager: queueManager}));
         }
         return $r("div", {}, 
             items
