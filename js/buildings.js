@@ -2693,7 +2693,12 @@ dojo.declare("classes.game.ui.RefineCatnipButton", com.nuclearunicorn.game.ui.Bu
 
 dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
     getMetadata: function(model){
-    	model.metaAccessor = this.game.bld.getBuildingExt(model.options.building);
+		model.metaAccessor = this.game.bld.getBuildingExt(model.options.building);
+		
+		if (!model.metaAccessor){
+			console.warn("Unable to get building metadata, invalid id or options:", model.options.building);
+			return null;
+		}
 
 		//let's not mess with meta accessor, it is a pain to deal with it
 		var meta = model.metaAccessor.getMeta(),

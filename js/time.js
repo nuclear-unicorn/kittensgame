@@ -1554,6 +1554,9 @@ dojo.declare("classes.queue.manager", null,{
         
     },
 
+    /**
+     * Get maximum amount if individual (not grouped) items in the queue (see #queueLength)
+     */
     calculateCap: function(){
         var aiCore = this.game.bld.getBuildingExt("aiCore");
         return aiCore.meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap + this.game.getEffect("queueCap");
@@ -1585,6 +1588,8 @@ dojo.declare("classes.queue.manager", null,{
         if(this.queueLength() >= this.cap){
             return;
         }
+
+        //TODO: too complex logic, can we streamline it somehow?
         if(this.queueItems.length > 0 && this.queueItems[this.queueItems.length - 1].name == name){
             if(this.queueNonStackable.includes(type)){
                 return;
@@ -1607,7 +1612,8 @@ dojo.declare("classes.queue.manager", null,{
         this.queueItems.push({
             name: name,
             type: type,
-            label: label
+            label: label,
+            value: 1    //always store size of the queue group, even if it is a single item
         });
 
         if (shiftKey && !this.queueNonStabkable.includes(type)){
@@ -1617,10 +1623,17 @@ dojo.declare("classes.queue.manager", null,{
         }
     },
 
+    /**
+     * Removes an item based on the queue group number (index) and amount
+     * @param {*} index 
+     * @param {*} amt 
+     * 
+     * @returns ture if element was removed and false otherwise
+     */
     remove: function(index, amt){
-        if (index < 0 || index > this.queueLength()){
+        if (index < 0 || index >= this.queueItems.length){
             console.warn("queue#remove - invalid index", index);
-            return;
+            return false;
         }
         var item = this.queueItems[index];
         item.value -= amt;
@@ -1628,6 +1641,8 @@ dojo.declare("classes.queue.manager", null,{
         if (!item.value){
             this.queueItems.splice(index, 1);
         }
+
+        return true;
     },
 
     /**

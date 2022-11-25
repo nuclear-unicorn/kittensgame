@@ -267,13 +267,29 @@ test("Explored biomes should update effects", () => {
 
 });
 
-test("Queue should correctly remove items by index", () => {
+test("Queue should correctly add and remove items", () => {
 
     var queue = game.time.queue;
+    var isRemoved;
 
     queue.update();
     expect(queue.cap).toBe(2);
 
+    //simple add and remove operations should work and keep queue clear
+    queue.addToQueue("field", "buildings", "N/A");
+    expect(queue.queueItems.length).toBe(1); 
+    expect(queue.queueLength()).toBe(1);
+
+    isRemoved = queue.remove(0, 1);
+    expect(queue.queueItems.length).toBe(0); 
+    expect(queue.queueLength()).toBe(0);
+    expect(isRemoved).toBe(true);
+
+    //invalid removal indexes should not break anything
+    isRemoved = queue.remove(1, 1);
+    expect(isRemoved).toBe(false);
+
+    //multiple items should stack into one queue entry
     queue.addToQueue("field", "buildings", "N/A");
     queue.addToQueue("field", "buildings", "N/A");
 
