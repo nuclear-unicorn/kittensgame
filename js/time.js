@@ -1536,7 +1536,7 @@ dojo.declare("classes.queue.manager", null,{
                     "voidSpace": false,
                 },
     queueSources: {},
-    queueNonStabkable:[
+    queueNonStackable:[
         "tech", "upgrades", "policies", "zebraUpgrades", "spaceMission"
     ],
     unlockQueueSource: function(source){
@@ -1559,8 +1559,21 @@ dojo.declare("classes.queue.manager", null,{
         return aiCore.meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap + this.game.getEffect("queueCap");
     },
 
+    /**
+     * Get a length of all items in the queue (not a lenght of internal queue array) 
+     * E.g.
+     * 
+     * catnip field (2)
+     * mountain (1)
+     * 
+     * Should return a total length of 3
+     * */
     queueLength: function(){
-        return this.queueItems.length;
+        var length = 0;
+        for (var i in this.queueItems){
+            length += (this.queueItems[i].value || 1);
+        }
+        return length;
     },
 
     addToQueue: function(name, type, label, shiftKey /*add all*/){
@@ -1573,7 +1586,7 @@ dojo.declare("classes.queue.manager", null,{
             return;
         }
         if(this.queueItems.length > 0 && this.queueItems[this.queueItems.length - 1].name == name){
-            if(this.queueNonStabkable.includes(type)){
+            if(this.queueNonStackable.includes(type)){
                 return;
             }
             var valOfItem = (this.queueItems[this.queueItems.length - 1].value || 1) + 1;
@@ -1605,7 +1618,7 @@ dojo.declare("classes.queue.manager", null,{
     },
 
     remove: function(index, amt){
-        if (index < 0 || index > this.queueLength){
+        if (index < 0 || index > this.queueLength()){
             console.warn("queue#remove - invalid index", index);
             return;
         }
@@ -1634,7 +1647,7 @@ dojo.declare("classes.queue.manager", null,{
                 var bld = this.game.bld;
                 for (var i in bld.buildingsData){
                     var building = bld.buildingsData[i];
-                    
+
                     if(!building.unlocked){
                         continue;
                     }
@@ -1958,7 +1971,6 @@ dojo.declare("classes.queue.manager", null,{
         if(!props.controller){
             console.error(el.name + " of " + el.type + " queing is not supported!");
             var deletedElement = this.queueItems.shift();
-            this.queueLength -= deletedElement.value || 1;
             this.game._publish("ui/update", this.game);
         }
         if(buyItem){

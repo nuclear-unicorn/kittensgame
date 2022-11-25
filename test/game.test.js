@@ -276,13 +276,13 @@ test("Queue should correctly remove items by index", () => {
 
     queue.addToQueue("field", "buildings", "N/A");
     queue.addToQueue("field", "buildings", "N/A");
-    queue.addToQueue("pasture", "buildings", "N/A");
 
-    expect(queue.queueItems.length).toBe(2);
+    expect(queue.queueItems.length).toBe(1); 
+    expect(queue.queueLength()).toBe(2);
 
     //can't build over the cap
-    queue.addToQueue("field", "buildings", "N/A");
-    expect(queue.queueItems.length).toBe(2);
+    queue.addToQueue("pasture", "buildings", "N/A");
+    expect(queue.queueItems.length).toBe(1);
 
     //ai cores should increase caps
     _build("aiCore", 10);
@@ -291,6 +291,7 @@ test("Queue should correctly remove items by index", () => {
 
     //multiple entires of the same type should be allowed
     expect(queue.cap).toBe(12);
+    queue.addToQueue("pasture", "buildings", "N/A");
     queue.addToQueue("field", "buildings", "N/A");
     expect(queue.queueItems.length).toBe(3);
     
@@ -299,5 +300,18 @@ test("Queue should correctly remove items by index", () => {
     expect(queue.queueItems.length).toBe(3);
     queue.remove(0, 1);
     expect(queue.queueItems.length).toBe(2);
-    
+
+    /**
+     * queue content: 
+      [{ name: 'pasture', type: 'buildings', label: 'N/A' },
+      { name: 'field', type: 'buildings', label: 'N/A' } ]
+     */
+
+    //test shift key option
+    queue.addToQueue("field", "buildings", "N/A", true /*all available*/);
+    expect(queue.queueLength()).toBe(12);
+    expect(queue.queueItems.length).toBe(2);
+
+    console.error(queue.queueItems);
+    expect(queue.queueItems[1].value).toBe(11);
 });

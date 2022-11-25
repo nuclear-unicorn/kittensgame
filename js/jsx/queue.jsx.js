@@ -28,6 +28,9 @@ WQueueItem = React.createClass({
                 }, "[x]")
             ]
         }
+
+        //TODO: red indicator when can't process
+        //TODO: attach tooltip as if it is a button
         return $r("div", {}, [
             "[" + item.type + "][" + item.name + "] - " + item.label + ((item.value)? " " + item.value: "")
         ].concat(buttons));
