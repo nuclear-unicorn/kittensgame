@@ -1385,7 +1385,7 @@ dojo.declare("classes.village.Map", null, {
 		unlocks: {
 			biomes: ["boneForest"]
 		},
-		effects:{
+		effects: {
 			woodRatio: 0.01
 		}
 	},
@@ -1658,10 +1658,8 @@ dojo.declare("classes.village.Map", null, {
 				continue;
 			}
 			for (var effect in biome.effects) {
-				/*if (!this.game.globalEffectsCached[effect]){
-					this.game.globalEffectsCached[effect] = 0;
-				}*/
-				this.game.globalEffectsCached[effect] += ( biome.effects[effect] * biome.level );
+				var effectVal = biome.effects[effect];
+				this.game.globalEffectsCached[effect] += ( effectVal * (biome.level || 0) );
 			}
 		}
 	},

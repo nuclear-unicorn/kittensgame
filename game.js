@@ -4912,6 +4912,18 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 	},
 
+	/**
+	 * Unlock a set of metadata elements based on the meta type and item id
+	 * e.g:
+	 * {
+	 * 	buildings: [...],
+	 * 	space: [...]
+	 * }
+	 * See #getUnlockByName for a full list of types
+	 * @param {*} list 
+	 * 
+	 * TODO: clarify `unlockable` vs unlocked for buildings vs other stuff
+	 */
 	unlock: function(list) {
 		var game = this; 
 		for (var type in list) {

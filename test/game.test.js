@@ -29,22 +29,57 @@ afterEach(() => {
 });
 
 test("basic sanity check, game must load hoglasave without crashing", () => {
-    var hoglasave = require("./res/save.js");
+    let hoglasave = require("./res/save.js");
     LCstorage["com.nuclearunicorn.kittengame.savedata"] = hoglasave;
 
-    var loadResult = game.load();
+    let loadResult = game.load();
     expect(loadResult).toBe(true);
 });
 
 // HELPER FUNCTIONS TO REDUCE BOILERPLATE
-var _build = function(id, val){
-    var undo = game.registerUndoChange();
-    undo.addEvent("building", {
-        action:"build",
-        metaId: id,
-        val: val
+/**
+ * NOTE: Requires some resources to be available beforehead
+ * 
+ * @param {*} id 
+ * @param {*} val 
+ */
+const _build = (id, val) => {
+    //TODO:  extract controller logic from bld.undo to getController
+    let controller = new classes.ui.btn.BuildingBtnModernController(game);
+    let model = controller.fetchModel({
+        key: id,
+        building: id
     });
+    controller.build(model, val);
 };
+
+//----------------------------------
+//  Basic building and unlocks
+//  Effects and metadata processing
+//----------------------------------
+
+test("Building metadata effects should be correctly extracted", () => {
+
+    game.resPool.get("wood").value = 10000;
+    game.resPool.get("minerals").value = 10000;
+    game.resPool.get("iron").value = 10000;
+
+
+    _build("lumberMill", 10);
+
+    //updating cached effects should correctly update bld metadata
+    game.bld.updateEffectCached();
+    var bld = game.bld.getBuildingExt("lumberMill");
+    expect(bld.meta.val).toBe(10);
+    expect(game.getEffect("woodRatio")).toBe(1);
+
+    //other managers should not interfere with effect calculation of game.bld
+    game.updateCaches();
+    expect(game.getEffect("woodRatio")).toBe(1);
+
+    //let bldMeta = game.bld.get("lumberMill");
+    //TODO: bldMeta effects seems to be polluted with unnecessery stuff, let's clean it up
+});
 
 //--------------------------------
 //      Basic faith stuff
@@ -64,8 +99,8 @@ test("Faith praising should correctly discard faith resoruce and update religion
 test("Pollution values must be sane", () => {
     //TODO: please add other effects there
 
-    var bld = game.bld;
-    var POL_LBASE = bld.getPollutionLevelBase();
+    let bld = game.bld;
+    let POL_LBASE = bld.getPollutionLevelBase();
     
 
     expect(POL_LBASE).toBeGreaterThanOrEqual(100000);
@@ -171,7 +206,7 @@ test("Reset should assign a correct ammount of paragon and preserve certain upgr
     game.resPool.get("faith").value = 100000;
     _build("hut", 100);
 
-    for (var i = 0; i < 100; i++){
+    for (let i = 0; i < 100; i++){
         game.village.sim.addKitten();
     }
 
@@ -204,7 +239,7 @@ test("Reset should assign a correct ammount of paragon and preserve certain upgr
     game.globalEffectsCached = {};
     
     _build("hut", 100);
-    for (var i = 0; i < 100; i++){
+    for (let i = 0; i < 100; i++){
         game.village.sim.addKitten();
     }
 
@@ -215,8 +250,8 @@ test("Reset should assign a correct ammount of paragon and preserve certain upgr
     game.village.sim.assignJob("woodcutter", 100);
     game.updateResources();
 
-    var hgProduction = game.getResourcePerTick("wood");
-    var baselineProduction = game.village.getResProduction()["wood"];
+    let hgProduction = game.getResourcePerTick("wood");
+    let baselineProduction = game.village.getResProduction()["wood"];
 
 
     //HG-boosted production should be reasonably high, but not too high (25%, ~= of expected 0.02 * 10 bonus)
@@ -224,7 +259,7 @@ test("Reset should assign a correct ammount of paragon and preserve certain upgr
     expect(hgProduction).toBeGreaterThanOrEqual(baselineProduction);
 
     //do not forget to include paragon
-    var paragonProductionRatio = game.prestige.getParagonProductionRatio();
+    let paragonProductionRatio = game.prestige.getParagonProductionRatio();
     expect(hgProduction).toBeLessThanOrEqual(baselineProduction * (1 + paragonProductionRatio) * 100);
     //-----------------------------------------------------
 
@@ -262,15 +297,22 @@ test("Explored biomes should update effects", () => {
 
     game.village.getBiome("plains").level = 1;
     game.updateCaches();
-    expect(game.globalEffectsCached["catnipRatio"]).toBe(0.01);
+    //expect(game.globalEffectsCached["catnipRatio"]).toBe(0.01);
     expect(game.getEffect("catnipRatio")).toBe(0.01);
 
+    //buildings effects and biomes should compound and not interfeer with each other
+
+    game.village.getBiome("forest").level = 10;
+    _build("lumberMill", 10);
+    game.updateCaches();
+
+    //expect(game.getEffect("woodRatio")).toBe(0.1);
 });
 
 test("Queue should correctly add and remove items", () => {
 
-    var queue = game.time.queue;
-    var isRemoved;
+    let queue = game.time.queue;
+    let isRemoved;
 
     queue.update();
     expect(queue.cap).toBe(2);
@@ -328,6 +370,6 @@ test("Queue should correctly add and remove items", () => {
     expect(queue.queueLength()).toBe(12);
     expect(queue.queueItems.length).toBe(2);
 
-    console.error(queue.queueItems);
+    //console.error(queue.queueItems);
     expect(queue.queueItems[1].value).toBe(11);
 });
