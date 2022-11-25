@@ -1254,7 +1254,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}
 		}
 	},
-
 	{
 		name: "lumberMill",
 		label: $I("buildings.lumberMill.label"),

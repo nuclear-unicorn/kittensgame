@@ -1634,19 +1634,23 @@ dojo.declare("classes.queue.manager", null,{
                 var bld = this.game.bld;
                 for (var i in bld.buildingsData){
                     var building = bld.buildingsData[i];
-                    if(building.unlocked){
-                        var name = building.name;
-                        var label = building.label;
-                        if(building.stages){
-                            if(building.stages){
-                                label = building.stages[building.stage].label;
-                            }
-                        }
-                        options.push({
-                            name: name,
-                            label: label
-                        });
+                    
+                    if(!building.unlocked){
+                        continue;
                     }
+
+                    var name = building.name;
+                    var label = building.label;
+                    if(building.stages){
+                        if(building.stages){
+                            label = building.stages[building.stage].label;
+                        }
+                    }
+                    options.push({
+                        name: name,
+                        label: label
+                    });
+                    
                 }
                 return options;
 
@@ -1688,6 +1692,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+                
             case "chronoforge":
                 var chronoforgeUpgrades = this.game.time.chronoforgeUpgrades;
                 for (var i in chronoforgeUpgrades){
@@ -1700,6 +1705,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+
             case "voidSpace":
                 var voidSpaceUpgrades = this.game.time.voidspaceUpgrades;
                 for (var i in voidSpaceUpgrades){
@@ -1719,6 +1725,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+
             case "tech":
                 var technologies = this.game.science.techs;
                 for (var i in technologies){
@@ -1731,6 +1738,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+
             case "upgrades":
                 var upgrades = this.game.workshop.upgrades;
                 for (var i in upgrades){
@@ -1743,6 +1751,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+
             case "zebraUpgrades":
                 var zebraUpgrades = this.game.workshop.zebraUpgrades;
                 for (var i in zebraUpgrades){
@@ -1755,6 +1764,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+
             case "spaceMission":
                 var spaceMissions = this.game.space.programs;
                 for (var i in spaceMissions){
@@ -1767,6 +1777,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+
             case "policies":
                 var policies = this.game.science.policies;
                 for (var i in policies){
@@ -1779,6 +1790,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+
             case "religion":
                 var religionUpgrades = this.game.religion.religionUpgrades;
                 if(this.game.challenges.getChallenge("atheism").active){
@@ -1794,6 +1806,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+
             default:
                 return options;
         }

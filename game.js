@@ -5034,7 +5034,21 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
     },
 
 	//-----------------------------------------------------------------
-	
+	//TODO: use me on mobile version
+	checkEldermass: function(){
+		if (this.isEldermass()){
+			if (this.resPool.get("elderBox").value == 0){
+				this.resPool.get("elderBox").value++;
+				this.msg($I("gift.get"), "important");
+			}
+		} else {
+			if (this.resPool.get("elderBox").value > 0 && this.resPool.get("elderBox").value < 1) {
+				this.resPool.get("elderBox").value = 1;
+				this.msg($I("gift.repaired"), "important");
+			}
+		}
+	},
+
 	redeemGift: function(){
 		if (this.resPool.get("elderBox").value == 0) {
 			return;

@@ -1384,6 +1384,9 @@ dojo.declare("classes.village.Map", null, {
 		unlocked: true,
 		unlocks: {
 			biomes: ["boneForest"]
+		},
+		effects:{
+			woodRatio: 0.01
 		}
 	},
 	{
@@ -1403,8 +1406,8 @@ dojo.declare("classes.village.Map", null, {
 		description: "TBD",
 		terrainPenalty: 1.4,
 		unlocked: false,
-		5: "The trees are so tall you don't see where it ends. When the rains start they can go for hundreds of years.",
-		10: "In the fog you can see the mountains. The mountains have eyes and sometime change places."
+		5: "The trees are so tall you don't see where it ends. When the rain starts it can go for hundreds of years.",
+		10: "In the fog you can see the mountains. The mountains have eyes and sometimes change places."
 	},
 	{
 		name: "mountain",
@@ -1424,6 +1427,9 @@ dojo.declare("classes.village.Map", null, {
 		unlocks: {
 			biomes: ["volcano"]
 		},
+		effects:{
+			mineralsRatio: 0.01
+		},
 		unlocked: false
 	},
 	{
@@ -1442,7 +1448,7 @@ dojo.declare("classes.village.Map", null, {
 	{
 		name: "desert",
 		title: "Desert",
-		description: "TBD",
+		description: "Improves solar panel effectiveness by 1% per level",
 		terrainPenalty: 1.5,
 		unlocked: false,
 		lore: {
@@ -1450,7 +1456,10 @@ dojo.declare("classes.village.Map", null, {
 		},
 		evaluateLocks: function(game){
 			return game.village.getBiome("plains").level >= 15;
-		}
+		},
+		effects:{
+			solarFarmRatio: 0.01
+		},
 	},{
 		name: "bloodDesert",
 		title: "Crimson Desert",

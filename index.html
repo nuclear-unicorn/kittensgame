@@ -65,7 +65,7 @@
 
 		<script type="text/javascript">
 
-			var version = "1490";
+			var version = "1492";
 			var buildRevision = 0;
 
 			var loadingProgress = 0,
@@ -263,17 +263,10 @@
 					);
 
 					var config = new classes.KGConfig();
-					if (gamePage.isEldermass()){
-						if (gamePage.resPool.get("elderBox").value == 0){
-							gamePage.resPool.get("elderBox").value++;
-							gamePage.msg($I("gift.get"), "important");
-						}
-					} else {
-						if (gamePage.resPool.get("elderBox").value > 0 && gamePage.resPool.get("elderBox").value < 1) {
-							gamePage.resPool.get("elderBox").value = 1;
-							gamePage.msg($I("gift.repaired"), "important");
-						}
-					}
+
+					//update eldermass gifts on every game load pass
+					//TODO: toggle timer in the background?
+					gamePage.checkEldermass();
 					//---------------------------------
 
 
