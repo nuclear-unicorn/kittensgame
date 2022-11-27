@@ -1,1 +1,13 @@
-{}
+{
+    "console.intro": "Вы кацяня ў лесе з кацiнай мяты.",
+    "console.intro.zebra": "Вы зебра ў саване, поўнай тытанавых шахт.",
+    "achievements.header": "Дасягненнi: {0} з {1}",
+    "achievements.msg.unlock": "Дасягненне атрымана: {0}!",
+    "achievements.msg.starUnlock": "Дасягненне з зорачкай атрымана: {0}!",
+    "achievements.anachronox.title": "Анахронакс",
+    "achievements.anachronox.desc": "Калi ласка, спынicя",
+    "achievements.atlasUnmeowed.title": "Атлант расправіў лапы",
+    "achievements.atlasUnmeowed.desc": "Пабудуй магнета ў ражыме жалезнай волi",
+    "achievements.cathammer.title": "Котхаммер 40К",
+    "achievements.cathammer.desc": "Ў змрочнай ды цёмнай будучынi кацяцтва"
+}
