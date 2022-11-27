@@ -309,6 +309,23 @@ test("Explored biomes should update effects", () => {
     //expect(game.getEffect("woodRatio")).toBe(0.1);
 });
 
+test("Explored biome should produce rewards", () => {
+    var plainsBiome = game.village.getBiome("plains");
+    plainsBiome.level = 1;
+    
+    //check that obtained random reward is within base value +- width
+    var rewardSpec = plainsBiome.rewards[0];
+
+    var rewards = game.village.map.getBiomeRewards(plainsBiome);
+    var amt = rewards["catnip"];
+    expect(amt).toBeGreaterThanOrEqual(rewardSpec.value - rewardSpec.value * rewardSpec.width );
+    expect(amt).toBeLessThanOrEqual(rewardSpec.value + rewardSpec.value * rewardSpec.width );
+});
+
+//--------------------------------
+//      Queue
+//--------------------------------
+
 test("Queue should correctly add and remove items", () => {
 
     let queue = game.time.queue;

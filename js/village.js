@@ -1352,7 +1352,20 @@ dojo.declare("classes.village.Map", null, {
 		},
 		effects:{
 			catnipRatio: 0.01
-		}
+		},
+		/**
+		 * Reward for clearing explored biome.
+		 * We will follow the same notation and same seasonality where it makes sense
+		 */
+		rewards: [{
+			name: "catnip", value: 100, chance: 1, width: 0.21, multiplier: 1.2,
+			seasons:{
+				"spring": 0.25,
+				"summer": 0.05,
+				"autumn": -0.35,
+				"winter": -0.05
+			}
+		}],
 	},
 	{
 		name: "hills",
@@ -1630,6 +1643,26 @@ dojo.declare("classes.village.Map", null, {
 		if (biome.unlocks){
 			this.game.unlock(biome.unlocks);
 		}
+
+		//calculate reward for exploration
+		if (!biome.rewards){
+			return;
+		}
+		var rewards = this.getBiomeRewards(biome);
+		//this.game.msg("Your explorers have brought you", fuzzedNormalAmount, reward.name);
+	},
+
+	getBiomeRewards: function(biome){
+		var rewards = biome.rewards;
+		var resources = {};
+		for (var i in rewards) {
+			var reward = rewards[i];
+			var resourcePassedNormalTradeAmount = this.game.math.binominalRandomInteger(1, reward.chance);
+			var fuzzedNormalAmount = this.game.diplomacy._fuzzGainedAmount(resourcePassedNormalTradeAmount, reward.width);
+
+			resources[reward.name] = fuzzedNormalAmount * reward.value;
+		}
+		return resources;
 	},
 
 	getExplorationPrice: function(x, y){
