@@ -1339,7 +1339,7 @@ dojo.declare("classes.village.Map", null, {
 		desc: "Improves exploration rate of all biomes",
 		terrainPenalty: 1.0,
 		faunaPenalty: 0,
-		unlocked: true
+		unlocked: true,
 	},
 	{
 		name: "plains",
@@ -1366,6 +1366,10 @@ dojo.declare("classes.village.Map", null, {
 				"winter": -0.05
 			}
 		}],
+		/*
+			Set to true whenever the biome is fully explored, allows 
+		*/
+		upgradeUnlocked: false
 	},
 	{
 		name: "hills",
@@ -1660,7 +1664,8 @@ dojo.declare("classes.village.Map", null, {
 			var resourcePassedNormalTradeAmount = this.game.math.binominalRandomInteger(1, reward.chance);
 			var fuzzedNormalAmount = this.game.diplomacy._fuzzGainedAmount(resourcePassedNormalTradeAmount, reward.width);
 
-			resources[reward.name] = fuzzedNormalAmount * reward.value;
+			var multiplier = Math.pow(biome.level, reward.multiplier | 1.2);
+			resources[reward.name] = fuzzedNormalAmount * reward.value * multiplier;
 		}
 		return resources;
 	},

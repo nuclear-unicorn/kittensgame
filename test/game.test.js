@@ -318,8 +318,16 @@ test("Explored biome should produce rewards", () => {
 
     var rewards = game.village.map.getBiomeRewards(plainsBiome);
     var amt = rewards["catnip"];
-    expect(amt).toBeGreaterThanOrEqual(rewardSpec.value - rewardSpec.value * rewardSpec.width );
-    expect(amt).toBeLessThanOrEqual(rewardSpec.value + rewardSpec.value * rewardSpec.width );
+    expect(amt).toBeGreaterThanOrEqual(rewardSpec.value * (1 - rewardSpec.width ));
+    expect(amt).toBeLessThanOrEqual(rewardSpec.value * (1 + rewardSpec.width ));
+
+    plainsBiome.level = 2;
+    var multiplier = Math.pow(plainsBiome.level, rewardSpec.multiplier);
+
+    var rewards = game.village.map.getBiomeRewards(plainsBiome);
+    var amt = rewards["catnip"];
+    expect(amt).toBeGreaterThanOrEqual(rewardSpec.value * (1 - rewardSpec.width ) * multiplier);
+    expect(amt).toBeLessThanOrEqual(rewardSpec.value * (1 + rewardSpec.width ) * multiplier);
 });
 
 //--------------------------------
