@@ -213,5 +213,12 @@
     "effectsMgr.statics.oilReductionRatio.title": "Зніжэнне спажывання алею",
     "effectsMgr.statics.oilWellRatio.title": "Бонус алею",
     "effectsMgr.statics.planetCracker-uraniumPerTickSpace.title": "Планетная драбнільная ўстаноўка - канверсія ўрану",
-    "effectsMgr.statics.priceRatio.title": "Кошты на будынак"
+    "effectsMgr.statics.priceRatio.title": "Кошты на будынак",
+    "effectsMgr.statics.prodTransferBonus.title": "Перанесены бонус за вытворчасць па ўсей кацiнай планеце",
+    "effectsMgr.statics.productionRatio.title": "Вытворчы бонус",
+    "effectsMgr.statics.rankLeaderBonusConversion.title": "Вытворчасць канверсіі на ранг лідэра",
+    "effectsMgr.statics.rationalityBonus.title": "Бонус за рацыянальнасць",
+    "effectsMgr.statics.reactorEnergyRatio.title": "Бонус энергіі рэактара",
+    "effectsMgr.statics.reactorThoriumPerTick.title": "Спажыванне торыя ў рэактары",
+    "effectsMgr.statics.refineRatio.title": "Бонус за ачыстку кацінай мяты"
 }
