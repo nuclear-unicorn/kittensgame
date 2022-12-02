@@ -41,6 +41,7 @@ dojo.declare("com.nuclearunicorn.i18n.Lang", null, {
 			"ru": "Русский",
 			"tr": "TR",
 			"uk": "Українська",
+			"be": "Беларуская",
 			"zh": "中文",
 			"zht": "漢語"
 		};
