@@ -21,5 +21,6 @@
     "village.tab.clear.job.confirmation.msg": "Är du säker?",
     "effectsMgr.heatPerTick.title": "Värmedissipation",
     "workshop.ai.label": "AI",
-    "workshop.caravanserai.flavor": "Sökes: sötare kattungar"
+    "workshop.caravanserai.flavor": "Sökes: sötare kattungar",
+    "workshop.spaceEngineers.label": "Rymdingenjörer"
 }
