@@ -408,6 +408,11 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 				title: $I("console.filter.elders"),
 				enabled: true,
 				unlocked: false
+			},
+			"blackcoin": {
+				title: $I("console.filter.blackcoin"),
+				enabled: true,
+				unlocked: false
 			}
 		}
 	},
