@@ -1488,7 +1488,7 @@
     "ui.option.export": "Exportiere nach:",
     "ui.option.export.dropbox": "Dropbox (Beta)",
     "ui.option.export.simple.file": "Datei (einfacher Name)",
-    "ui.option.export.full.file": "Datei (vollständiger Name)",
+    "ui.option.export.full.file": "Datei (voller Name)",
     "ui.option.export.text": "Text-Export:",
     "ui.option.close.button": "Schließen",
     "ui.option.import.warning": "Achtung! Importierte Daten überschreiben den derzeitigen Spielstand.",
