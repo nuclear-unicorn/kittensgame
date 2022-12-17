@@ -80,6 +80,7 @@
     "effectsMgr.type.resRatio": "namako {0}",
     "craft.msg.notEnoughCatnip": "wile moku soweli mute!",
     "opts.theme.wood": "kasi",
+    "prestige.codexLeviathanianus.label": "lipu monsuta",
     "res.stack.time": "tenpo",
     "resources.catnip.title": "moku soweli",
     "resources.minerals.title": "kiwen",
@@ -96,12 +97,13 @@
     "trade.effectiveness": "wawa esun: +{0}%",
     "trade.race.dragons": "akesi waso",
     "trade.race.griffins": "soweli waso",
-    "trade.race.leviathans": "kala suli nasa",
+    "trade.race.leviathans": "monsuta",
     "trade.race.lizards": "akesi",
     "trade.race.nagas": "akesi linja",
     "trade.race.sharks": "kala utala",
     "trade.race.spiders": "pipi",
     "trade.race.zebras": "soweli pimeja en walo",
+    "trade.leviathans.energy": "wawa:",
     "left.hunt.time": "tenpo",
     "console.filter.trade": "esun",
     "village.job.miner.desc": "+0.25 kiwen pi tenpo lili",
@@ -113,5 +115,6 @@
     "workshop.gmo.label": "moku soweli pona mute",
     "workshop.ironwood.label": "tomo kasi kiwen",
     "workshop.mineralAxes.label": "ilo kipisi kiwen",
-    "workshop.mineralHoes.label": "ilo kasi kiwen"
+    "workshop.mineralHoes.label": "ilo kasi kiwen",
+    "workshop.voidReactors.label": "ilo suno ala"
 }
