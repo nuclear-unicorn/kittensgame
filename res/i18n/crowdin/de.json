@@ -1335,7 +1335,7 @@
     "time.chronoheat": "Chronohitze wird durch das Zerschmettern von Zeitkristallen generiert und verringert sich über Zeit. Jede Einheit über dem Maximum erhöht den Preis der Zeitkristall-Zerschmetterung um 1%<br>",
     "time.fixCryochambers.label": "Kryokammer Reparieren",
     "time.fixCryochambers.desc": "Zerreiße die Raumzeit um eine Kryokammer zurück zu bekommen bevor sie genutzt wurde.",
-    "time.flux": "Zeitlicher Fluss",
+    "time.flux": "Zeitlicher Flux",
     "time.flux.desc": "Temporaler Flux kann im Laufe der Zeit regeneriert werden, wenn die Spielseite geschlossen ist",
     "time.heat": "Hitze",
     "time.redshift": "Du hast {0} Tage der Produktion wiedererlangt",
