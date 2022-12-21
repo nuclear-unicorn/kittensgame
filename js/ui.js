@@ -1149,7 +1149,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
 
         var uiData = LCstorage["com.nuclearunicorn.kittengame.ui"];
         try {
-            uiData = JSON.parse(uiData);
+            uiData = uiData ? JSON.parse(uiData) : {};
 
             this.fontSize = uiData.fontSize || 16;
             this.isChatVisited = uiData.isChatVisited || false;
