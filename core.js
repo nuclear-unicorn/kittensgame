@@ -1475,7 +1475,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 			};
 			this.game.tooltipUpdateFunc();
 
-			var pos = $(container).position();
+			var pos = $(container).offset();
 			pos.left += 300;
 
 			//prevent tooltip from leaving the window area
