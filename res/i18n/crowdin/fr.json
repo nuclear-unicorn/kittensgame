@@ -1954,7 +1954,7 @@
     "workshop.pumpjack.label": "Pompe à pétrole",
     "workshop.pumpjack.desc": "Améliore l'efficacité des Puits de Pétrole de 45%. Chaque Puits de Pétrole consommera 1Wt/t.",
     "workshop.pyrolysis.label": "Pyrolyse",
-    "workshop.pyrolysis.desc": "La production de charbon est augmentée de 20%",
+    "workshop.pyrolysis.desc": "La production du charbon est augmentée de 20%",
     "workshop.qdot.label": "Cellule solaire à point quantique",
     "workshop.qdot.desc": "Les panneaux solaires sont légèrement plus efficaces toute l'année",
     "workshop.railgun.label": "Canon électrique",
