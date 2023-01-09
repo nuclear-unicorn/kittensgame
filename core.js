@@ -1465,6 +1465,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 	},
 
 	attachTooltip: function(htmlProvider) {
+		var game = dojo.byId("game");
 		var tooltip = dojo.byId("tooltip");
 		var btn = this;
 		var container = this.domNode;
@@ -1476,23 +1477,23 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 			this.game.tooltipUpdateFunc();
 
 			var pos = $(container).offset();
+
+			// Compensate tooltip position for game container offset.
+			var posGame = $(game).offset();
+			pos.top -= posGame.top;
+			pos.left -= posGame.left;
+
+			// Shift tooltip to the right.
 			pos.left += 300;
 
-			//prevent tooltip from leaving the window area
-			var maxTooltipTop = $(window).scrollTop() + $(window).height() - $(tooltip).height() - 50; //50px padding-bottom
-			var maxTooltipLeft = $(window).scrollLeft() + $(window).width() - $(tooltip).width() - 25; //25px padding-right
+			// Prevent tooltip from leaving the window area
+			// The 25 here is an arbitrary padding, so that the tooltip doesn't sit right on the window edge.
+			var maxTooltipTop = $(window).scrollTop() + $(window).height() - $(tooltip).outerHeight() - 25;
+			var maxTooltipLeft = $(window).scrollLeft() + $(window).width() - $(tooltip).outerWidth() - 25;
 
-			if (pos.left <= maxTooltipLeft) {
-				pos.top = Math.min(pos.top + 15, maxTooltipTop);
-			} else {
-				pos.left = maxTooltipLeft;
-				var vOffset = 35;
-				if (pos.top + vOffset <= maxTooltipTop) {
-					pos.top += vOffset;
-				} else {
-					pos.top -= $(tooltip).height() + 10;
-				}
-			}
+			// Keep position inside expected bounds.
+			pos.top = Math.min(pos.top, maxTooltipTop);
+			pos.left = Math.min(pos.left, maxTooltipLeft);
 
 			dojo.style(tooltip, "top", pos.top + "px");
 			dojo.style(tooltip, "left", pos.left + "px");
