@@ -572,6 +572,9 @@ dojo.declare("classes.reserveMan", null,{
 		this.game.time.getVSU("usedCryochambers").on += this.reserveCryochambers;
 		this.reserveCryochambers = 0;
 		this.reserveKittens = [];
+		if (this.game.time.getVSU("usedCryochambers").val > 0) {
+			this.game.time.getVSU("usedCryochambers").unlocked = true;
+		}
 		this.game.msg($I("challendge.reservesReclaimed.msg"));
 	},
 
