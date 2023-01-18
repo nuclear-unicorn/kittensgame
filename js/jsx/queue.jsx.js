@@ -5,6 +5,78 @@
     game
 */
 
+WQueueItem = React.createClass({
+
+    componentDidMount: function(){
+        this.attachTooltip();
+    },
+
+    render: function(){
+        var item = this.props.item;
+
+        if (item.value){
+            buttons = [
+                $r("a", {
+                    href: "#", 
+                    onClick: this.removeOne,
+                }, "[-]"),
+                $r("a", {
+                    href: "#", 
+                    onClick: this.removeAll,
+                }, "[x]")
+            ]
+        } else {
+            buttons = [
+                $r("a", {
+                    href: "#", 
+                    onClick: this.removeOne,
+                }, "[x]")
+            ]
+        }
+
+        //TODO: red indicator when can't process
+        //TODO: attach tooltip as if it is a button
+        return $r("div", {}, 
+        [
+            "[" + item.type + "][" + item.name + "] - ", 
+            $r("span", {ref:"itemLabel", className:"queue-label"}, item.label),
+            (
+                item.value ? (" " + item.value ) : ""
+            )
+        ].concat(buttons));
+    },
+
+    removeOne: function(){
+        var i = this.props.index;
+        this.props.queueManager.remove(i, 1);
+    },
+
+    removeAll: function(){
+        var i = this.props.index;
+        this.props.queueManager.remove(i, this.props.item.value);
+    },
+
+    attachTooltip: function(){
+        var item = this.props.item;
+        var game = this.props.game;
+
+        var node = React.findDOMNode(this.refs.itemLabel);
+        //TODO: extract controller and model
+
+        //TBD
+        if (item.type != "buildings"){
+            return;
+        }
+
+        var controller = new classes.ui.btn.BuildingBtnModernController(game);
+        var model = controller.fetchModel({
+            building: item.name,
+            key: item.name,
+        });
+        UIUtils.attachTooltip(game, node, 0, 200, dojo.partial(ButtonModernHelper.getTooltipHTML, controller, model));
+    }
+});
+
 WQueue = React.createClass({
 
     getInitialState: function(){
@@ -90,36 +162,12 @@ WQueue = React.createClass({
         var self = this;
         var items = [];
 
-        var queueItems = self.state.game.time.queue.queueItems;
+        var queueManager = self.state.game.time.queue;
+        var queueItems = queueManager.queueItems;
+        
         for (var i in queueItems){
             var item = queueItems[i];
-            buttons = [];
-            if (item.value){
-                buttons = [
-                    $r("a", {
-                        href: "#", 
-                        onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i, false),
-                        //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
-                    }, "[-]"),
-                    $r("a", {
-                        href: "#", 
-                        onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i, item.value),
-                        //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
-                    }, "[x]")
-                ]
-            }else{
-                buttons = [
-                    $r("a", {
-                        href: "#", 
-                        onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i, false),
-                        //onClick: dojo.hitch(game.time.queue, game.time.queue.remove, item.type, item.name, i),
-                    }, "[x]")
-                ]
-            }
-            items.push($r("div", {}, [
-                "[" + item.type + "][" + item.name + "] - " + item.label + ((item.value)? " " + item.value: "")
-            ].concat(buttons)
-            ));
+            items.push($r(WQueueItem, {item: item, index: i, queueManager: queueManager, game: game}));
         }
         return $r("div", {}, 
             items
@@ -133,6 +181,7 @@ WQueue = React.createClass({
         var options = game.time.queue.getQueueOptions(typeId);
 
         return $r("div", {
+            className: "queue-container"
         }, [
             this.getQueueTypeSelect(),
             this.getQueueItemSelect(options),

@@ -1643,6 +1643,7 @@
     "about.title": "Kittens Game от Nuclear Unicorn",
     "about.title.studio": "Студия",
     "about.version": "версия",
+    "about.engine.version": "версия движка",
     "about.feedback": "Форум обратной связи",
     "about.discord": "Присоединяйтесь к нам в Discord!: ",
     "iron.will.warning.msg": "Это действие завершит режим \"Железная воля\". Вы уверены?",

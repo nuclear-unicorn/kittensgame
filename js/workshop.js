@@ -1105,7 +1105,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "alloy", 	 val: 1750 }
 		],
 		upgrades: {
-			buildings: ["library", "biolab"]
+		buildings: ["library", "biolab"]
 		}
 	},{
 		name: "starlink",
