@@ -439,7 +439,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
 
 		if (!this.calenderDivTooltip){
             var calendarDiv = dojo.byId("calendarDiv");
-            this.calenderDivTooltip = UIUtils.attachTooltip(game, calendarDiv, 0, 50, dojo.hitch(game.calendar, function() {
+            this.calenderDivTooltip = UIUtils.attachTooltip(game, calendarDiv, 0, 200, dojo.hitch(game.calendar, function() {
                 var tooltip = "";
                 var displayThreshold = 100000;
                 if (this.year > displayThreshold) {
