@@ -1510,7 +1510,7 @@ dojo.declare("classes.queue.manager", null,{
     alphabeticalSort: true,
     queueItems : [],
 
-    toggleAlphabeticalSort(){
+    toggleAlphabeticalSort: function(){
         this.alphabeticalSort = !this.alphabeticalSort;
     },
     updateQueueSourcesArr: function(){
@@ -1692,7 +1692,7 @@ dojo.declare("classes.queue.manager", null,{
      * @returns 
      */
     getQueueOptionsAlphabetical: function(type){
-        return this.getQueueOptionsUnsorted(type).sort(function(a, b) { return a.label.localeCompare(b.label)})
+        return this.getQueueOptionsUnsorted(type).sort(function(a, b) { return a.label.localeCompare(b.label);});
     },
     
     /**
