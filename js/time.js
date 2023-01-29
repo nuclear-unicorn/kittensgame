@@ -77,6 +77,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.queue.queueItems = saveData["time"].queueItems || [];
         this.queue.queueLength = saveData["time"].queueLength || this.queue.queueItems.length;
         this.queue.queueSources = saveData["time"].queueSources || this.queue.queueSourcesDefault;
+        this.queue.alphabeticalSort = saveData["time"].queueAlphabeticalSort;
         for (var i in this.queue.queueSourcesDefault){
             if (this.queue.queueSources[i] === undefined || this.queue.queueSources[i].unlocked === undefined){
                 this.queue.queueSources[i] = this.queue.queueSourcesDefault[i];
@@ -1503,11 +1504,30 @@ dojo.declare("classes.tab.TimeTab", com.nuclearunicorn.game.ui.tab, {
 
 dojo.declare("classes.queue.manager", null,{
     game: null,
+    alphabeticalSort: true,
     queueItems : [],
+
+    toggleAlphabeticalSort(){
+        console.warn("testing toggle alphabetical sort!");
+        this.alphabeticalSort = !this.alphabeticalSort;
+    },
     updateQueueSourcesArr: function(){
         for (var i in this.queueSources){
-            var compared = {name: i, label: this.queueSources[i].label};
-            if(!this.queueSourcesArr.includes(compared) && this.queueSources[i].unlocked){
+            if (!this.queueSources.unlocked){
+                continue;
+            }
+            var add_to_arr = true;
+            for (var el in this.queueSourcesArr){
+
+                if(i == "buildings"){
+                    console.warn(this.queueSourcesArr[el].name);
+                }
+                if (this.queueSourcesArr[el].name == i){
+                    add_to_arr = false;
+                    break;
+                }
+            }
+            if(add_to_arr){
                 this.queueSourcesArr.push({name: i, label: this.queueSources[i].label});
             }
         }
@@ -1517,7 +1537,7 @@ dojo.declare("classes.queue.manager", null,{
                     "spaceBuilding","chronoforge", "voidSpace", "zigguratUpgrades",  
                     "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],*/
     //queueSources: ["buildings", "spaceBuilding", "zigguratUpgrades", "transcendenceUpgrades"],
-    queueSourcesArr:[],
+    queueSourcesArr: [{name: "buildings", label: $I("buildings.tabName")}],
     queueSourcesDefault: {
         "buildings": {unlocked: true, label: $I("buildings.tabName")}, 
         "tech": {unlocked: false, label: $I("techs.panel.label")},

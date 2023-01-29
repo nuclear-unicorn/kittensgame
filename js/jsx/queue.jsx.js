@@ -46,7 +46,12 @@ WQueue = React.createClass({
                 self.setState({
                     typeId: typeId
                 });
-                var options = game.time.queue.getQueueOptions(typeId);
+                var options = [];
+                if (game.time.queue.alphabeticalSort){
+                    options = game.time.queue.getQueueOptionsAlphabetical(typeId);
+                }else{
+                    options = game.time.queue.getQueueOptions(typeId);
+                }
                 if (options.length){
                     self.setState({
                         //itemId: options[0].name,
@@ -125,12 +130,20 @@ WQueue = React.createClass({
             items
         );
     },
-
+    toggleAlphabetical: function(){
+        game.time.queue.toggleAlphabeticalSort();
+        this.render();
+    },
     render: function(){
         var self = this;
 
         var typeId = this.state.typeId;
-        var options = game.time.queue.getQueueOptions(typeId);
+        var options = [];
+        if (game.time.queue.alphabeticalSort){
+            options = game.time.queue.getQueueOptionsAlphabetical(typeId);
+        }else{
+            options = game.time.queue.getQueueOptions(typeId);
+        }
 
         return $r("div", {
         }, [
@@ -159,6 +172,16 @@ WQueue = React.createClass({
                     self.forceUpdate();
                 }
             }, "Add to queue"),
+
+            $r("div", {className:"alphabetical-toggle"}, [
+                $r("input", {
+                    type:"checkbox", 
+                    checked: game.time.queue.alphabeticalSort,
+                    onClick: self.toggleAlphabetical,
+                    style:{display:"inline-block"},
+                }),
+                $I("queue.alphabeticalToggle")
+            ]),
 
             this.getQueueItems()
         ]);
