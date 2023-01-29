@@ -77,6 +77,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.queue.queueItems = saveData["time"].queueItems || [];
         this.queue.queueLength = saveData["time"].queueLength || this.queue.queueItems.length;
         this.queue.queueSources = saveData["time"].queueSources || this.queue.queueSourcesDefault;
+        if (this.queue.queueSources === {} || typeof(this.queue.queueSources["buildings"]) != "boolean") {
+            this.queue.queueSources = this.queue.queueSourcesDefault;
+        }
         this.queue.alphabeticalSort = saveData["time"].queueAlphabeticalSort;
         for (var i in this.queue.queueSourcesDefault){
             if (this.queue.queueSources[i] === undefined || this.queue.queueSources[i].unlocked === undefined){
@@ -1508,27 +1511,22 @@ dojo.declare("classes.queue.manager", null,{
     queueItems : [],
 
     toggleAlphabeticalSort(){
-        console.warn("testing toggle alphabetical sort!");
         this.alphabeticalSort = !this.alphabeticalSort;
     },
     updateQueueSourcesArr: function(){
         for (var i in this.queueSources){
-            if (!this.queueSources.unlocked){
+            if (!this.queueSources[i]){
                 continue;
             }
             var add_to_arr = true;
             for (var el in this.queueSourcesArr){
-
-                if(i == "buildings"){
-                    console.warn(this.queueSourcesArr[el].name);
-                }
                 if (this.queueSourcesArr[el].name == i){
                     add_to_arr = false;
                     break;
                 }
             }
             if(add_to_arr){
-                this.queueSourcesArr.push({name: i, label: this.queueSources[i].label});
+                this.queueSourcesArr.push({name: i, label: this.queueLabels[i].label});
             }
         }
         self.queueSourcesArr;
@@ -1537,29 +1535,43 @@ dojo.declare("classes.queue.manager", null,{
                     "spaceBuilding","chronoforge", "voidSpace", "zigguratUpgrades",  
                     "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],*/
     //queueSources: ["buildings", "spaceBuilding", "zigguratUpgrades", "transcendenceUpgrades"],
+    queueLabels: {
+        "buildings" : $I("buildings.tabName"),
+        "tech" : $I("techs.panel.label"),
+        "upgrades" : $I("workshop.upgradePanel.label"),
+        "policies" : $I("workshop.upgradePanel.label"),
+        "religion" : $I("religion.panel.orderOfTheSun.label"),
+        "zebraUpgrades" : $I("workshop.zebraUpgradesPanel.label"),
+        "spaceMission" : $I("space.ground.control.label"),
+        "spaceBuilding" : $I("tab.name.space"),
+        "zigguratUpgrades" : $I("tab.name.space"),
+        "transcendenceUpgrades" : $I("religion.panel.cryptotheology.label"),
+        "chronoforge" : $I("workshop.chronoforge.label"),
+        "voidSpace" : $I("science.voidSpace.label"),
+    },
     queueSourcesArr: [{name: "buildings", label: $I("buildings.tabName")}],
     queueSourcesDefault: {
-        "buildings": {unlocked: true, label: $I("buildings.tabName")}, 
-        "tech": {unlocked: false, label: $I("techs.panel.label")},
-        "upgrades": {unlocked: false, label: $I("workshop.upgradePanel.label")},
-        "policies": {unlocked: false, label: $I("policy.panel.label")},
-        "religion": {unlocked: false, label: $I("religion.panel.orderOfTheSun.label")},
-        "zebraUpgrades": {unlocked: false, label: $I("workshop.zebraUpgradesPanel.label")},
-        "spaceMission": {unlocked: false, label: $I("space.ground.control.label")},
-        "spaceBuilding": {unlocked: false, label: $I("tab.name.space")},
-        "zigguratUpgrades": {unlocked: false, label: $I("religion.panel.ziggurat.label")},
-        "transcendenceUpgrades": {unlocked: false, label: $I("religion.panel.cryptotheology.label")},
-        "chronoforge": {unlocked: false, label: $I("workshop.chronoforge.label")},
-        "voidSpace": {unlocked: false, label: $I("science.voidSpace.label")},
+        "buildings": true, 
+        "tech": false,
+        "upgrades": false,
+        "policies": false,
+        "religion": false,
+        "zebraUpgrades": false,
+        "spaceMission": false,
+        "spaceBuilding": false,
+        "zigguratUpgrades": false,
+        "transcendenceUpgrades": false,
+        "chronoforge": false,
+        "voidSpace": false,
         },
     queueSources: {},
     queueNonStabkable:[
         "tech", "upgrades", "policies", "zebraUpgrades", "spaceMission"
     ],
     unlockQueueSource: function(source){
-        if(this.queueSources[source].unlocked === false){
-            this.queueSources[source].unlocked = true;
-            this.queueSourcesArr.push({name: source, label: this.queueSources[source].label});
+        if(this.queueSources[source] === false){
+            this.queueSources[source] = true;
+            this.queueSourcesArr.push({name: source, label: this.queueLabels[source]});
         }
     },
     cap: 0,
@@ -1656,17 +1668,35 @@ dojo.declare("classes.queue.manager", null,{
      *      name: <queue item name>,
      *      label: <display label>
      * }]
-     * in alphabetical order
+     * based on game.time.queue.alphabeticalSort
+     * 
+     * @param {*} type: queue type (buildings, upgrades, etc.). See game.time.queue.queueSources
+     * @returns 
+     */
+    getQueueOptions: function(type){
+        if (this.alphabeticalSort){
+            return this.getQueueOptionsAlphabetical(type);
+        }else{
+            return this.getQueueOptionsUnsorted(type);
+        }
+    },
+    /**
+     * Return sorted list of sub-options for a building queue
+     * in a form of [{
+     *      name: <queue item name>,
+     *      label: <display label>
+     * }]
+     *
      * 
      * @param {*} type: queue type (buildings, upgrades, etc.). See game.time.queue.queueSources
      * @returns 
      */
     getQueueOptionsAlphabetical: function(type){
-        return this.getQueueOptions(type).sort(function(a, b) { return a.label.localeCompare(b.label)})
+        return this.getQueueOptionsUnsorted(type).sort(function(a, b) { return a.label.localeCompare(b.label)})
     },
     
     /**
-     * Return a list of sub-options for a building queue
+     * Return unsorted list of sub-options for a building queue
      * in a form of [{
      *      name: <queue item name>,
      *      label: <display label>
@@ -1675,7 +1705,7 @@ dojo.declare("classes.queue.manager", null,{
      * @param {*} type: queue type (buildings, upgrades, etc.). See game.time.queue.queueSources
      * @returns 
      */
-    getQueueOptions: function(type){
+    getQueueOptionsUnsorted: function(type){
         var options = [];
         switch (type){
             case "buildings":

@@ -46,12 +46,7 @@ WQueue = React.createClass({
                 self.setState({
                     typeId: typeId
                 });
-                var options = [];
-                if (game.time.queue.alphabeticalSort){
-                    options = game.time.queue.getQueueOptionsAlphabetical(typeId);
-                }else{
-                    options = game.time.queue.getQueueOptions(typeId);
-                }
+                var options = game.time.queue.getQueueOptions(typeId);
                 if (options.length){
                     self.setState({
                         //itemId: options[0].name,
@@ -138,12 +133,7 @@ WQueue = React.createClass({
         var self = this;
 
         var typeId = this.state.typeId;
-        var options = [];
-        if (game.time.queue.alphabeticalSort){
-            options = game.time.queue.getQueueOptionsAlphabetical(typeId);
-        }else{
-            options = game.time.queue.getQueueOptions(typeId);
-        }
+        var options = game.time.queue.getQueueOptions(typeId);
 
         return $r("div", {
         }, [
