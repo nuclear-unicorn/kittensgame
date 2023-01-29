@@ -173,7 +173,10 @@ WQueue = React.createClass({
             items
         );
     },
-
+    toggleAlphabetical: function(){
+        game.time.queue.toggleAlphabeticalSort();
+        this.render();
+    },
     render: function(){
         var self = this;
 
@@ -208,6 +211,16 @@ WQueue = React.createClass({
                     self.forceUpdate();
                 }
             }, "Add to queue"),
+
+            $r("div", {className:"alphabetical-toggle"}, [
+                $r("input", {
+                    type:"checkbox", 
+                    checked: game.time.queue.alphabeticalSort,
+                    onClick: self.toggleAlphabetical,
+                    style:{display:"inline-block"},
+                }),
+                $I("queue.alphabeticalToggle")
+            ]),
 
             this.getQueueItems()
         ]);
