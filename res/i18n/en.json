@@ -1711,6 +1711,8 @@
     "ui.option.notation": "Notation:",
     "ui.option.pollution": "Disable pollution effects",
 
+    "queue.alphabeticalToggle": "Sort queue items by alphabet",
+
     "left.resources": "resources",
     "left.resources.tip": "Ctrl+click resource to hide it, use gear icon for more settings.",
     "left.font.inc": "font+",
