@@ -36,7 +36,7 @@ WQueue = React.createClass({
             }
         }*/
         for (var i in queueSources){
-                options.push($r("option", { value: queueSources[i]}, queueSources[i]));
+            options.push($r("option", { value: queueSources[i].name}, queueSources[i].label));
         }
         return $r("select", {
             value: this.state.queueTypeId,

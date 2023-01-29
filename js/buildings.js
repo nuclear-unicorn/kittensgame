@@ -1741,6 +1741,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game){
 			if (!game.challenges.isActive("atheism")) {
+				if (self.val > 0){
+                    game.time.queue.unlockQueueSource("religion");
+                }
 				var effects = {
 					"culturePerTickBase" : 0.1,
 					"faithPerTickBase" : 0,
@@ -1787,7 +1790,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				if (templars.on){
 					effects["manpowerMax"] = 50 + 25 * templars.on;
 				}
-				game.time.queue.unlockQueueSource("religion");
 			} else {
 				var effects = {
 					"culturePerTickBase" : 0.1
