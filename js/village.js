@@ -211,7 +211,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 						for (var i = 0; i < defaultObject.length; i++) {
 							if (defaultObject[i].name == "faith" || defaultObject[i].name == "gold") {
 								defaultObject[i].val -= defaultObject[i].val
-									* this.game.getLimitedDR(0.09 + 0.01 * burnedParagonRatio * leaderRatio, 1.0); //10% before BP
+									* this.game.getLimitedDR((0.09 + 0.01 * burnedParagonRatio) * leaderRatio, 1.0); //10% before BP
 							}
 						}
 						break;

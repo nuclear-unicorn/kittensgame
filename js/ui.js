@@ -909,8 +909,6 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         var $chat = $("#IRCChatInner iframe");
         $chat.css("height", height - 180);
 
-        //swfobject.embedSWF("lib/lightirc/lightIRC.swf", $chat[0], 600, height - 150, 10, "lib/lightirc/expressInstall.swf", params);
-        /*<iframe src="https://kiwiirc.com/client/irc.canternet.org/?nick=kitten_?#kittensgame" style="border:0; width:100%; height:450px;"></iframe>*/
         this.isChatActive = true;
         //this.isChatVisited = true;
     },
@@ -1149,7 +1147,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
 
         var uiData = LCstorage["com.nuclearunicorn.kittengame.ui"];
         try {
-            uiData = JSON.parse(uiData);
+            uiData = uiData ? JSON.parse(uiData) : {};
 
             this.fontSize = uiData.fontSize || 16;
             this.isChatVisited = uiData.isChatVisited || false;
