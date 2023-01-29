@@ -1636,6 +1636,21 @@ dojo.declare("classes.queue.manager", null,{
      *      name: <queue item name>,
      *      label: <display label>
      * }]
+     * in alphabetical order
+     * 
+     * @param {*} type: queue type (buildings, upgrades, etc.). See game.time.queue.queueSources
+     * @returns 
+     */
+    getQueueOptionsAlphabetical: function(type){
+        return this.getQueueOptions(type).sort(function(a, b) { return a.label.localeCompare(b.label)})
+    },
+    
+    /**
+     * Return a list of sub-options for a building queue
+     * in a form of [{
+     *      name: <queue item name>,
+     *      label: <display label>
+     * }]
      * 
      * @param {*} type: queue type (buildings, upgrades, etc.). See game.time.queue.queueSources
      * @returns 
