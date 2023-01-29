@@ -1471,46 +1471,9 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 	},
 
 	attachTooltip: function(htmlProvider) {
-		var game = dojo.byId("game");
-		var tooltip = dojo.byId("tooltip");
-		var btn = this;
 		var container = this.domNode;
 
-		dojo.connect(container, "onmouseover", this, function() {
-			this.game.tooltipUpdateFunc = function(){
-				btn.updateTooltip(container, tooltip, htmlProvider);
-			};
-			this.game.tooltipUpdateFunc();
-
-			var pos = $(container).offset();
-
-			// Compensate tooltip position for game container offset.
-			var posGame = $(game).offset();
-			pos.top -= posGame.top;
-			pos.left -= posGame.left;
-
-			// Shift tooltip to the right.
-			pos.left += 300;
-
-			// Prevent tooltip from leaving the window area
-			// The 25 here is an arbitrary padding, so that the tooltip doesn't sit right on the window edge.
-			var maxTooltipTop = $(window).scrollTop() + $(window).height() - $(tooltip).outerHeight() - 25;
-			var maxTooltipLeft = $(window).scrollLeft() + $(window).width() - $(tooltip).outerWidth() - 25;
-
-			// Keep position inside expected bounds.
-			pos.top = Math.min(pos.top, maxTooltipTop);
-			pos.left = Math.min(pos.left, maxTooltipLeft);
-
-			dojo.style(tooltip, "top", pos.top + "px");
-			dojo.style(tooltip, "left", pos.left + "px");
-
-			dojo.style(tooltip, "display", "");
-		});
-
-		dojo.connect(container, "onmouseout", this, function(){
-			this.game.tooltipUpdateFunc = null;
-			dojo.style(tooltip, "display", "none");
-		});
+		UIUtils.attachTooltip(this.game, container, 0, 300, htmlProvider);
 	},
 
 	updateTooltip: function(container, tooltip, htmlProvider){
@@ -2396,8 +2359,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab", [com.nuclearunicorn.game.ui.Conte
 });
 
 /**
- * TODO: Please deprecate zillion of other instances of this method
- * TODO2: return offset from a htmlProvider.
+ * TODO: return offset from a htmlProvider.
  * Ideally it should be some structure like
  * {
  * 	x,
@@ -2407,6 +2369,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab", [com.nuclearunicorn.game.ui.Conte
  */
 UIUtils = {
 	attachTooltip: function(game, container, topPosition, leftPosition, htmlProvider) {
+		var gameNode = dojo.byId("game");
 		var tooltip = dojo.byId("tooltip");
 
 		dojo.connect(container, "onmouseover", this, function() {
@@ -2416,12 +2379,23 @@ UIUtils = {
 			game.tooltipUpdateFunc();
 
 			var pos = $(container).offset();
+
+			// Compensate tooltip position for game container offset.
+			var posGame = $(gameNode).offset();
+			pos.top -= posGame.top;
+			pos.left -= posGame.left;
+
 			pos.top += topPosition;
 			pos.left += leftPosition;
 
-			//prevent tooltip from leaving the window area
-			pos.top = Math.min(pos.top, $(window).scrollTop() + $(window).height() - $(tooltip).height() - 50); //50px padding-bottom
-			pos.left = Math.min(pos.left, $(window).scrollLeft() + $(window).width() - $(tooltip).width() - 25); //25px padding-right
+			// Prevent tooltip from leaving the window area
+			// The 25 here is an arbitrary padding, so that the tooltip doesn't sit right on the window edge.
+			var maxTooltipTop = $(window).scrollTop() + $(window).height() - $(tooltip).outerHeight() - 25;
+			var maxTooltipLeft = $(window).scrollLeft() + $(window).width() - $(tooltip).outerWidth() - 25;
+
+			// Keep position inside expected bounds.
+			pos.top = Math.min(pos.top, maxTooltipTop);
+			pos.left = Math.min(pos.left, maxTooltipLeft);
 
 			dojo.style(tooltip, "top", pos.top + "px");
 			dojo.style(tooltip, "left", pos.left + "px");
