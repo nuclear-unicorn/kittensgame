@@ -439,7 +439,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
 
 		if (!this.calenderDivTooltip){
             var calendarDiv = dojo.byId("calendarDiv");
-            this.calenderDivTooltip = UIUtils.attachTooltip(game, calendarDiv, 0, 320, dojo.hitch(game.calendar, function() {
+            this.calenderDivTooltip = UIUtils.attachTooltip(game, calendarDiv, 0, 200, dojo.hitch(game.calendar, function() {
                 var tooltip = "";
                 var displayThreshold = 100000;
                 if (this.year > displayThreshold) {
@@ -464,7 +464,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
 
 		if (!this.calendarSignSpanTooltip){
             var calendarSignSpan = dojo.byId("calendarSign");
-			this.calendarSignSpanTooltip = UIUtils.attachTooltip(game, calendarSignSpan, 0, 320, dojo.hitch(game.calendar, function() {
+			this.calendarSignSpanTooltip = UIUtils.attachTooltip(game, calendarSignSpan, 0, 60, dojo.hitch(game.calendar, function() {
                 var cycle = this.cycles[this.cycle];
                 if (!cycle) {
                     return "";

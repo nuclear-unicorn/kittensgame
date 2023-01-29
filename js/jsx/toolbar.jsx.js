@@ -24,35 +24,7 @@ WToolbarIconContainer = React.createClass({
         var getTooltip = this.props.getTooltip;
         var game = this.props.game;
 
-		var tooltip = dojo.byId("tooltip");
-		dojo.empty(tooltip);
-
-		dojo.connect(container, "onmouseover", this, function(event){
-			 game.tooltipUpdateFunc = function(){
-				tooltip.innerHTML = getTooltip();
-			 };
-			 game.tooltipUpdateFunc();
-
-			 var target = event.originalTarget || event.toElement;
-			 var pos = $(target).offset();
-			 if (!pos){
-				 return;
-			 }
-
-			 dojo.style(tooltip, "left", pos.left + "px");
-			 dojo.style(tooltip, "top",  pos.top + "px");
-
-			 dojo.style(tooltip, "display", "");
-			 dojo.style(container, "fontWeight", "bold");
-
-	    });
-
-		dojo.connect(container, "onmouseout", this, function(){
-			 game.tooltipUpdateFunc = null;
-			 dojo.style(tooltip, "display", "none");
-			 dojo.style(container, "fontWeight", "normal");
-		});
-
+        UIUtils.attachTooltip(game, container, 0, 100, getTooltip);
 	}
 })
 
