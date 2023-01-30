@@ -1544,7 +1544,7 @@ dojo.declare("classes.queue.manager", null,{
         "zebraUpgrades" : $I("workshop.zebraUpgradesPanel.label"),
         "spaceMission" : $I("space.ground.control.label"),
         "spaceBuilding" : $I("tab.name.space"),
-        "zigguratUpgrades" : $I("tab.name.space"),
+        "zigguratUpgrades" : $I("religion.panel.ziggurat.label"),
         "transcendenceUpgrades" : $I("religion.panel.cryptotheology.label"),
         "chronoforge" : $I("workshop.chronoforge.label"),
         "voidSpace" : $I("science.voidSpace.label"),
