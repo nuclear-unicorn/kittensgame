@@ -233,7 +233,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
         var maxYears = this.game.calendar.year >= 1000 || this.game.resPool.get("paragon").value > 0 ? 40 : 10;
         var offset = this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear * maxYears;
-
+        var numberEvents = 0;
         //limit redshift offset by 1 year
         if (daysOffset > offset){
             daysOffset = offset;
@@ -2028,7 +2028,6 @@ dojo.declare("classes.queue.manager", null,{
 
             case "buildings":
                 var bld = new classes.BuildingMeta(itemMetaRaw).getMeta();
-                    oldVal = itemMetaRaw.val;
                 props = {
                     key:            bld.name,
                     name:           bld.label,
