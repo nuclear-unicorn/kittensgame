@@ -238,18 +238,24 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         if (daysOffset > offset){
             daysOffset = offset;
         }
-        if(this.game.getFeatureFlag("QUEUE_REDSHIFT") & this.queue.getFirstItemEta()[1]){
+        if(this.game.getFeatureFlag("QUEUE_REDSHIFT")){
+            var result = this.queue.getFirstItemEtaDay();
             var daysOffsetLeft = daysOffset;
             var redshiftQueueWorked = true;
+            if (!result[1]){
+                numberEvents = this.applyRedshift(daysOffset);
+                daysOffsetLeft = 0;
+            }
             while (daysOffsetLeft > 0){
-                var result = this.queue.getFirstItemEta();
+                result = this.queue.getFirstItemEtaDay();
+                //console.warn(result);
                 if (!result[1]){
                     this.applyRedshift(daysOffsetLeft, true);
                     daysOffsetLeft = 0;
                     break;
                 }
                 if (result[1] & redshiftQueueWorked){
-                    var daysNeeded = Math.ceil(result[0] / 2000);
+                    var daysNeeded = Math.ceil(result[0]);
                     if (daysNeeded > daysOffsetLeft){
                         this.applyRedshift(daysOffsetLeft, true);
                         daysOffsetLeft = 0;
@@ -257,10 +263,11 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     }
                     this.applyRedshift(daysNeeded, true);
                     daysOffsetLeft -= daysNeeded;
-                    redshiftQueueWorked = this.queue.update();
-                    if (!redshiftQueueWorked){
+                    //redshiftQueueWorked = 
+                    this.queue.update();
+                    /*if (!redshiftQueueWorked){
                         console.warn("Redshift queue failed to build", this.queue.queueItems[0]);
-                    }
+                    }*/
                 }else{
                     this.applyRedshift(daysOffsetLeft, true);
                     daysOffsetLeft = 0;
@@ -1560,7 +1567,7 @@ dojo.declare("classes.queue.manager", null,{
      * For now ignores per day and per year production.
      * Corruption is also ignored.
      */
-    getFirstItemEta: function(){
+    getFirstItemEtaDay: function(){
         if (this.queueItems.length == 0){
             return [0, false];
         }
@@ -1585,13 +1592,14 @@ dojo.declare("classes.queue.manager", null,{
             var engineersProduced = this.game.workshop.getEffectEngineer(res.name, true);
             var deltaPerTick = resPerTick + engineersConsumed[res.name] || 0 + engineersProduced;
             eta = Math.max(eta,
-            (price.val - res.value) / (deltaPerTick * this.game.getTicksPerSecondUI())
+            (price.val - res.value) / (deltaPerTick) / this.game.calendar.ticksPerDay
             );
             if (engineersProduced){
-                var countdown = (1 / (this.game.workshop.getEffectEngineer(res.name, false)))/this.game.calendar.ticksPerDay;
-                eta = Math.ceil(Math.ceil(eta/countdown)*countdown);
+                var countdown = (1 / (this.game.workshop.getEffectEngineer(res.name, false))) / this.game.calendar.ticksPerDay;
+                eta = Math.ceil(eta/countdown)*countdown;
             }
         }
+        eta = Math.ceil(eta);
         return [eta, true];
     },
     updateQueueSourcesArr: function(){

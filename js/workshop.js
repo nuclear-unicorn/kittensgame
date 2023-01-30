@@ -2506,7 +2506,6 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				}
 			}
 		}
-		console.warn(result);
 		return result;
 	},
 	getEffectEngineer: function(resName, afterCraft) {
