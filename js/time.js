@@ -82,7 +82,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         }
         this.queue.alphabeticalSort = saveData["time"].queueAlphabeticalSort;
         for (var i in this.queue.queueSourcesDefault){
-            if (this.queue.queueSources[i] === undefined || this.queue.queueSources[i].unlocked === undefined){
+            if (this.queue.queueSources[i] === undefined){
                 this.queue.queueSources[i] = this.queue.queueSourcesDefault[i];
             }
         }
