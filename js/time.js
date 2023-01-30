@@ -82,7 +82,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         }
         this.queue.alphabeticalSort = saveData["time"].queueAlphabeticalSort;
         for (var i in this.queue.queueSourcesDefault){
-            if (this.queue.queueSources[i] === undefined || this.queue.queueSources[i].unlocked === undefined){
+            if (this.queue.queueSources[i] === undefined){
                 this.queue.queueSources[i] = this.queue.queueSourcesDefault[i];
             }
         }
@@ -172,38 +172,16 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         }
     },
 
-    calculateRedshift: function(){
-        var currentTimestamp = Date.now();
-        var delta = this.game.opts.enableRedshift
-            ? currentTimestamp - this.timestamp
-            : 0;
-        //console.log("redshift delta:", delta, "old ts:", this.timestamp, "new timestamp:", currentTimestamp);
-
-        this.timestamp = currentTimestamp;
-        if (delta <= 0){
-            return;
-        }
-        var daysOffset = Math.round(delta / 2000);
-
-        /*avoid shift because of UI lags*/
-        if (daysOffset < 3){
-           return;
-        }
-
-        var maxYears = this.game.calendar.year >= 1000 || this.game.resPool.get("paragon").value > 0 ? 40 : 10;
-        var offset = this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear * maxYears;
-
-        //limit redshift offset by 1 year
-        if (daysOffset > offset){
-            daysOffset = offset;
-        }
-
+    applyRedshift: function(daysOffset, ignoreCalendar){
         //populate cached per tickValues
         this.game.resPool.update();
         this.game.updateResources();
         var resourceLimits = this.game.resPool.fastforward(daysOffset);
 
-        var numberEvents = this.game.calendar.fastForward(daysOffset);
+        var numberEvents = 0;
+        if(!ignoreCalendar){
+            numberEvents = this.game.calendar.fastForward(daysOffset);
+        }
         this.game.bld.fastforward(daysOffset);
         this.game.workshop.fastforward(daysOffset);
         this.game.village.fastforward(daysOffset);
@@ -232,6 +210,75 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 //shatterInCycles is deprecated
                 else {this.shatter(amt);}
             }
+        }
+        return numberEvents;
+    },
+    calculateRedshift: function(){
+        var currentTimestamp = Date.now();
+        var delta = this.game.opts.enableRedshift
+            ? currentTimestamp - this.timestamp
+            : 0;
+        //console.log("redshift delta:", delta, "old ts:", this.timestamp, "new timestamp:", currentTimestamp);
+
+        this.timestamp = currentTimestamp;
+        if (delta <= 0){
+            return;
+        }
+        var daysOffset = Math.round(delta / 2000);
+
+        /*avoid shift because of UI lags*/
+        if (daysOffset < 3){
+           return;
+        }
+
+        var maxYears = this.game.calendar.year >= 1000 || this.game.resPool.get("paragon").value > 0 ? 40 : 10;
+        var offset = this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear * maxYears;
+
+        //limit redshift offset by 1 year
+        if (daysOffset > offset){
+            daysOffset = offset;
+        }
+        if(this.game.getFeatureFlag("QUEUE_REDSHIFT")){
+            var result = this.queue.getFirstItemEtaDay();
+            var daysOffsetLeft = daysOffset;
+            var redshiftQueueWorked = true;
+            if (!result[1]){
+                numberEvents = this.applyRedshift(daysOffset);
+                daysOffsetLeft = 0;
+            }
+            while (daysOffsetLeft > 0){
+                result = this.queue.getFirstItemEtaDay();
+                if (!result[1]){
+                    this.applyRedshift(daysOffsetLeft, true);
+                    daysOffsetLeft = 0;
+                    break;
+                }
+                if (result[1] & redshiftQueueWorked){
+                    var daysNeeded = result[0];// + 5; //let's have a little bit more days in case steamwork automation messes things up.
+                    daysNeeded /= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
+                    daysNeeded = Math.ceil(daysNeeded);
+                    daysNeeded *= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
+                    if (daysNeeded > daysOffsetLeft){
+                        this.applyRedshift(daysOffsetLeft, true);
+                        daysOffsetLeft = 0;
+                        this.queue.update();
+                        break;
+                    }
+                    this.applyRedshift(daysNeeded, true);
+                    daysOffsetLeft -= daysNeeded;
+                    this.queue.update();
+                    /*if (!redshiftQueueWorked){
+                        console.warn("Redshift queue failed to build", this.queue.queueItems[0]);
+                    }*/
+                }else{
+                    this.applyRedshift(daysOffsetLeft, true);
+                    daysOffsetLeft = 0;
+                }
+            }
+            numberEvents = this.game.calendar.fastForward(daysOffset);
+        }
+        else{
+            numberEvents = this.applyRedshift(daysOffset);
         }
 
         this.game.msg($I("time.redshift", [daysOffset]) + (numberEvents ? $I("time.redshift.ext",[numberEvents]) : ""));
@@ -1516,6 +1563,47 @@ dojo.declare("classes.queue.manager", null,{
     toggleAlphabeticalSort: function(){
         this.alphabeticalSort = !this.alphabeticalSort;
     },
+    /**
+     * Returns eta and
+     * if the eta was actually calculated.
+     * For now ignores per day and per year production.
+     * Corruption is also ignored.
+     */
+    getFirstItemEtaDay: function(){
+        if (this.queueItems.length == 0){
+            return [0, false];
+        }
+        var eta = 0;
+        var element = this.queueItems[0];
+        var modelElement = this.getQueueElementModel(element);
+        var prices = modelElement.prices;
+        var engineersConsumed = this.game.workshop.getConsumptionEngineers();
+        for (var ind in prices){
+            var price = prices[ind];
+            var res = this.game.resPool.get(price.name);
+		    if (res.value >= price.val){
+                continue;
+            }
+            if (res.maxValue < price.val){
+                return [eta, false];
+            }
+            var resPerTick = this.game.getResourcePerTick(res.name, true);
+            if (!resPerTick) {
+                return [eta, false];
+            }
+            var engineersProduced = this.game.workshop.getEffectEngineer(res.name, true);
+            var deltaPerTick = resPerTick + (engineersConsumed[res.name] || 0)+ engineersProduced;
+            eta = Math.max(eta,
+            (price.val - res.value) / (deltaPerTick) / this.game.calendar.ticksPerDay
+            );
+            if (engineersProduced){
+                var countdown = (1 / (this.game.workshop.getEffectEngineer(res.name, false))) / this.game.calendar.ticksPerDay;
+                eta = Math.ceil(eta/countdown)*countdown;
+            }
+        }
+        eta = Math.ceil(eta);
+        return [eta, true];
+    },
     updateQueueSourcesArr: function(){
         for (var i in this.queueSources){
             if (!this.queueSources[i]){
@@ -1918,7 +2006,111 @@ dojo.declare("classes.queue.manager", null,{
         this.dropLastItem();
         this.showList();
     },
+    getQueueElementModel: function(el){
+        var itemMetaRaw = this.game.getUnlockByName(el.name, el.type);
+        if (!itemMetaRaw){
+            console.error("invalid queue item:", el);
+            return;
+        }
 
+        var props = {
+            id: itemMetaRaw.name
+        };
+        switch (el.type){
+            case "policies":
+                props.controller = new classes.ui.PolicyBtnController(this.game);
+                var model = props.controller.fetchModel(props);
+                break;
+            case "tech":
+                props.controller = new com.nuclearunicorn.game.ui.TechButtonController(this.game);
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "buildings":
+                var bld = new classes.BuildingMeta(itemMetaRaw).getMeta();
+                    oldVal = itemMetaRaw.val;
+                props = {
+                    key:            bld.name,
+                    name:           bld.label,
+                    description:    bld.description,
+                    building:       bld.name
+                };
+                if (typeof(bld.stages) == "object"){
+                    props.controller = new classes.ui.btn.StagingBldBtnController(this.game);
+                } else {
+                    props.controller = new classes.ui.btn.BuildingBtnModernController(this.game);
+                }
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "spaceMission":
+                props.controller = new com.nuclearunicorn.game.ui.SpaceProgramBtnController(this.game);
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "spaceBuilding":
+                props.controller = new classes.ui.space.PlanetBuildingBtnController(this.game);
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "chronoforge":
+                props.controller = new classes.ui.time.ChronoforgeBtnController(this.game);
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "voidSpace":
+                props.controller = new classes.ui.time.VoidSpaceBtnController(this.game);
+                var model = props.controller.fetchModel(props);
+                if(el.name == "usedCryochambers"){ //a bunch of model black magic
+                    props.controller = new classes.ui.time.FixCryochamberBtnController(this.game);
+                    itemMetaRaw = this.game.getUnlockByName("cryochambers", el.type);
+                    model.prices = this.game.time.getVSU("usedCryochambers").fixPrices;
+                    model.enabled = this.game.resPool.hasRes(model.prices); //check we actually have enough to do one fix!
+                    console.log(model);
+                }
+                break;
+
+            case "zigguratUpgrades":
+                props.controller = new com.nuclearunicorn.game.ui.ZigguratBtnController(this.game);
+                //var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "religion":
+                props.controller = new com.nuclearunicorn.game.ui.ReligionBtnController(this.game);
+                //var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "transcendenceUpgrades":
+                props.controller = new classes.ui.TranscendenceBtnController(this.game);
+                //var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "pacts":
+                props.controller = new com.nuclearunicorn.game.ui.PactsBtnController(this.game);
+                //var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "upgrades":
+                //compare = "researched";
+                props.controller = new com.nuclearunicorn.game.ui.UpgradeButtonController(this.game);
+                //var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "zebraUpgrades":
+                //compare = "researched";
+                props.controller = new com.nuclearunicorn.game.ui.ZebraUpgradeButtonController(this.game);
+                //var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                break;
+        }
+        //return props, model;
+        return model;
+    },
     update: function(){
         this.cap = this.calculateCap();
         if(!this.queueItems.length){
