@@ -1557,8 +1557,8 @@ dojo.declare("classes.queue.manager", null,{
     /**
      * Returns eta and
      * if the eta was actually calculated.
-     * For now ignores engineer production,
-     * per day and per year production.
+     * For now ignores per day and per year production.
+     * Corruption is also ignored.
      */
     getFirstItemEta: function(){
         if (this.queueItems.length == 0){
@@ -1582,10 +1582,15 @@ dojo.declare("classes.queue.manager", null,{
             if (!resPerTick) {
                 return [eta, false];
             }
-            var deltaPerTick = resPerTick + engineersConsumed[res.name] || 0;
+            var engineersProduced = this.game.workshop.getEffectEngineer(res.name, true);
+            var deltaPerTick = resPerTick + engineersConsumed[res.name] || 0 + engineersProduced;
             eta = Math.max(eta,
             (price.val - res.value) / (deltaPerTick * this.game.getTicksPerSecondUI())
             );
+            if (engineersProduced){
+                var countdown = (1 / (this.game.workshop.getEffectEngineer(res.name, false)))/this.game.calendar.ticksPerDay;
+                eta = Math.ceil(Math.ceil(eta/countdown)*countdown);
+            }
         }
         return [eta, true];
     },
