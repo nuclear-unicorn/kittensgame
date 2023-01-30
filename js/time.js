@@ -248,22 +248,24 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             }
             while (daysOffsetLeft > 0){
                 result = this.queue.getFirstItemEtaDay();
-                //console.warn(result);
                 if (!result[1]){
                     this.applyRedshift(daysOffsetLeft, true);
                     daysOffsetLeft = 0;
                     break;
                 }
                 if (result[1] & redshiftQueueWorked){
-                    var daysNeeded = Math.ceil(result[0]);
+                    var daysNeeded = result[0];// + 5; //let's have a little bit more days in case steamwork automation messes things up.
+                    daysNeeded /= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
+                    daysNeeded = Math.ceil(daysNeeded);
+                    daysNeeded *= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
                     if (daysNeeded > daysOffsetLeft){
                         this.applyRedshift(daysOffsetLeft, true);
                         daysOffsetLeft = 0;
+                        this.queue.update();
                         break;
                     }
                     this.applyRedshift(daysNeeded, true);
                     daysOffsetLeft -= daysNeeded;
-                    //redshiftQueueWorked = 
                     this.queue.update();
                     /*if (!redshiftQueueWorked){
                         console.warn("Redshift queue failed to build", this.queue.queueItems[0]);
@@ -1590,7 +1592,7 @@ dojo.declare("classes.queue.manager", null,{
                 return [eta, false];
             }
             var engineersProduced = this.game.workshop.getEffectEngineer(res.name, true);
-            var deltaPerTick = resPerTick + engineersConsumed[res.name] || 0 + engineersProduced;
+            var deltaPerTick = resPerTick + (engineersConsumed[res.name] || 0)+ engineersProduced;
             eta = Math.max(eta,
             (price.val - res.value) / (deltaPerTick) / this.game.calendar.ticksPerDay
             );
