@@ -240,17 +240,27 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         }
         if(this.game.getFeatureFlag("QUEUE_REDSHIFT") & this.queue.getFirstItemEta()[1]){
             var daysOffsetLeft = daysOffset;
+            var redshiftQueueWorked = true;
             while (daysOffsetLeft > 0){
                 var result = this.queue.getFirstItemEta();
-                if (result[1]){
-                    var daysSpent = 
-                    Math.min(
-                    Math.ceil(result[0] / 2000),
-                    daysOffsetLeft
-                    );
-                    this.applyRedshift(daysSpent, true);
-                    daysOffsetLeft -= daysSpent;
-                    this.queue.update();
+                if (!result[1]){
+                    this.applyRedshift(daysOffsetLeft, true);
+                    daysOffsetLeft = 0;
+                    break;
+                }
+                if (result[1] & redshiftQueueWorked){
+                    var daysNeeded = Math.ceil(result[0] / 2000);
+                    if (daysNeeded > daysOffsetLeft){
+                        this.applyRedshift(daysOffsetLeft, true);
+                        daysOffsetLeft = 0;
+                        break;
+                    }
+                    this.applyRedshift(daysNeeded, true);
+                    daysOffsetLeft -= daysNeeded;
+                    redshiftQueueWorked = this.queue.update();
+                    if (!redshiftQueueWorked){
+                        console.warn("Redshift queue failed to build", this.queue.queueItems[0]);
+                    }
                 }else{
                     this.applyRedshift(daysOffsetLeft, true);
                     daysOffsetLeft = 0;
@@ -1545,8 +1555,10 @@ dojo.declare("classes.queue.manager", null,{
         this.alphabeticalSort = !this.alphabeticalSort;
     },
     /**
-     * Returns eta and if the
+     * Returns eta and
      * if the eta was actually calculated.
+     * For now ignores engineer production,
+     * per day and per year production.
      */
     getFirstItemEta: function(){
         if (this.queueItems.length == 0){
@@ -1554,13 +1566,9 @@ dojo.declare("classes.queue.manager", null,{
         }
         var eta = 0;
         var element = this.queueItems[0];
-        //var itemMetaRaw = this.game.getUnlockByName(element.name, element.type);
         var modelElement = this.getQueueElementModel(element);
-        //console.warn(element);
-        //console.warn(itemMetaRaw);
-        //console.warn(modelElement);
         var prices = modelElement.prices;
-        //console.warn(prices);
+        var engineersConsumed = this.game.workshop.getConsumptionEngineers();
         for (var ind in prices){
             var price = prices[ind];
             var res = this.game.resPool.get(price.name);
@@ -1568,17 +1576,15 @@ dojo.declare("classes.queue.manager", null,{
                 continue;
             }
             if (res.maxValue < price.val){
-                console.warn("Capped");
                 return [eta, false];
             }
             var resPerTick = this.game.getResourcePerTick(res.name, true);
             if (!resPerTick) {
-                console.warn("No resource per tick", resPerTick);
-
                 return [eta, false];
             }
+            var deltaPerTick = resPerTick + engineersConsumed[res.name] || 0;
             eta = Math.max(eta,
-            (price.val - res.value) / (resPerTick * this.game.getTicksPerSecondUI())
+            (price.val - res.value) / (deltaPerTick * this.game.getTicksPerSecondUI())
             );
         }
         return [eta, true];
@@ -2093,7 +2099,7 @@ dojo.declare("classes.queue.manager", null,{
     update: function(){
         this.cap = this.calculateCap();
         if(!this.queueItems.length){
-            return;
+            return false;
         }
         var el = this.queueItems[0];
 
@@ -2102,7 +2108,7 @@ dojo.declare("classes.queue.manager", null,{
 
         if (!itemMetaRaw){
             console.error("invalid queue item:", el);
-            return;
+            return false;
         }
 
         var props = {
@@ -2247,6 +2253,8 @@ dojo.declare("classes.queue.manager", null,{
         ){
             this.dropLastItem();
             this.game._publish("ui/update", this.game);
+            return true;
         }
+        return changed;
     }
 });
