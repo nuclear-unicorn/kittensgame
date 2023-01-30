@@ -2112,7 +2112,7 @@ dojo.declare("classes.queue.manager", null,{
     update: function(){
         this.cap = this.calculateCap();
         if(!this.queueItems.length){
-            return false;
+            return;
         }
         var el = this.queueItems[0];
 
@@ -2121,7 +2121,7 @@ dojo.declare("classes.queue.manager", null,{
 
         if (!itemMetaRaw){
             console.error("invalid queue item:", el);
-            return false;
+            return;
         }
 
         var props = {
@@ -2266,8 +2266,6 @@ dojo.declare("classes.queue.manager", null,{
         ){
             this.dropLastItem();
             this.game._publish("ui/update", this.game);
-            return true;
         }
-        return changed;
     }
 });
