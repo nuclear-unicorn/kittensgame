@@ -1526,7 +1526,7 @@ dojo.declare("classes.queue.manager", null,{
                 }
             }
             if(add_to_arr){
-                this.queueSourcesArr.push({name: i, label: this.queueLabels[i].label});
+                this.queueSourcesArr.push({name: i, label: this.queueLabels[i]});
             }
         }
         self.queueSourcesArr;
