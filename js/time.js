@@ -1617,7 +1617,7 @@ dojo.declare("classes.queue.manager", null,{
                 }
             }
             if(add_to_arr){
-                this.queueSourcesArr.push({name: i, label: this.queueLabels[i].label});
+                this.queueSourcesArr.push({name: i, label: this.queueLabels[i]});
             }
         }
         self.queueSourcesArr;
@@ -1630,7 +1630,7 @@ dojo.declare("classes.queue.manager", null,{
         "buildings" : $I("buildings.tabName"),
         "tech" : $I("techs.panel.label"),
         "upgrades" : $I("workshop.upgradePanel.label"),
-        "policies" : $I("workshop.upgradePanel.label"),
+        "policies" : $I("policy.panel.label"),
         "religion" : $I("religion.panel.orderOfTheSun.label"),
         "zebraUpgrades" : $I("workshop.zebraUpgradesPanel.label"),
         "spaceMission" : $I("space.ground.control.label"),
