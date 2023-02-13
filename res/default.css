@@ -89,6 +89,7 @@ img.loader {
     width: 25%;
     max-width: 400px;
     min-width: 300px;
+    padding-left: 5px;
     padding-right: 20px;
 
     overflow-y: auto;
@@ -1132,10 +1133,6 @@ a.link.collapse:hover {
 
 .res-toolbar .link.toggled {
     color: darkred;
-}
-
-.res-toolbar.left {
-    padding-left:5px;
 }
 
 .res-table {
