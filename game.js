@@ -3867,6 +3867,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			){
 				return this.getDetailedResMap(resRef);
 			}
+
+            return '';
 		});
 
 		dojo.connect(container, "onmouseover", this, function(){
