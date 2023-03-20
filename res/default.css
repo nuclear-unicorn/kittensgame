@@ -1760,3 +1760,11 @@ div.leet {
 #crowdjet-expand-container iframe {
     display: none;
 }
+
+.queue-container .queue-label {
+    cursor: pointer;
+}
+
+.queue-container .queue-label:hover {
+    text-decoration: underline;
+}

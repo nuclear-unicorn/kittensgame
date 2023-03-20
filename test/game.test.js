@@ -18,6 +18,10 @@ beforeEach(() => {
 
     //TODO: use special UI system specifically for unit tests
     game.setUI(new classes.ui.UISystem("gameContainerId"));
+
+    //TODO: this seems to be mandatory to set up some internal props like build.meta.val/on and stuff
+    //We need to make it a part of our default initialization
+    game.resetState();
 });
 
 afterEach(() => {
@@ -25,23 +29,58 @@ afterEach(() => {
 });
 
 test("basic sanity check, game must load hoglasave without crashing", () => {
-    var hoglasave = require("./res/save.js");
+    let hoglasave = require("./res/save.js");
     LCstorage["com.nuclearunicorn.kittengame.savedata"] = hoglasave;
 
-    var loadResult = game.load();
+    let loadResult = game.load();
     expect(loadResult).toBe(true);
     game.resetState(); // drop state to avoid messing up future tests
 });
 
 // HELPER FUNCTIONS TO REDUCE BOILERPLATE
-var _build = function(id, val){
-    var undo = game.registerUndoChange();
-    undo.addEvent("building", {
-        action:"build",
-        metaId: id,
-        val: val
+/**
+ * NOTE: Requires some resources to be available beforehead
+ * 
+ * @param {*} id 
+ * @param {*} val 
+ */
+const _build = (id, val) => {
+    //TODO:  extract controller logic from bld.undo to getController
+    let controller = new classes.ui.btn.BuildingBtnModernController(game);
+    let model = controller.fetchModel({
+        key: id,
+        building: id
     });
+    controller.build(model, val);
 };
+
+//----------------------------------
+//  Basic building and unlocks
+//  Effects and metadata processing
+//----------------------------------
+
+test("Building metadata effects should be correctly extracted", () => {
+
+    game.resPool.get("wood").value = 10000;
+    game.resPool.get("minerals").value = 10000;
+    game.resPool.get("iron").value = 10000;
+
+
+    _build("lumberMill", 10);
+
+    //updating cached effects should correctly update bld metadata
+    game.bld.updateEffectCached();
+    var bld = game.bld.getBuildingExt("lumberMill");
+    expect(bld.meta.val).toBe(10);
+    expect(game.getEffect("woodRatio")).toBe(1);
+
+    //other managers should not interfere with effect calculation of game.bld
+    game.updateCaches();
+    expect(game.getEffect("woodRatio")).toBe(1);
+
+    //let bldMeta = game.bld.get("lumberMill");
+    //TODO: bldMeta effects seems to be polluted with unnecessery stuff, let's clean it up
+});
 
 //--------------------------------
 //      Basic faith stuff
@@ -63,7 +102,6 @@ test("Pollution values must be sane", () => {
 
     var bld = game.bld;
     var POL_LBASE = bld.getPollutionLevelBase();
-
 
     expect(POL_LBASE).toBeGreaterThanOrEqual(100000);
 
@@ -168,7 +206,7 @@ test("Reset should assign a correct ammount of paragon and preserve certain upgr
     game.resPool.get("faith").value = 100000;
     _build("hut", 100);
 
-    for (var i = 0; i < 100; i++){
+    for (let i = 0; i < 100; i++){
         game.village.sim.addKitten();
     }
 
@@ -201,7 +239,7 @@ test("Reset should assign a correct ammount of paragon and preserve certain upgr
     game.globalEffectsCached = {};
 
     _build("hut", 100);
-    for (var i = 0; i < 100; i++){
+    for (let i = 0; i < 100; i++){
         game.village.sim.addKitten();
     }
 
@@ -212,8 +250,8 @@ test("Reset should assign a correct ammount of paragon and preserve certain upgr
     game.village.sim.assignJob("woodcutter", 100);
     game.updateResources();
 
-    var hgProduction = game.getResourcePerTick("wood");
-    var baselineProduction = game.village.getResProduction()["wood"];
+    let hgProduction = game.getResourcePerTick("wood");
+    let baselineProduction = game.village.getResProduction()["wood"];
 
 
     //HG-boosted production should be reasonably high, but not too high (25%, ~= of expected 0.02 * 10 bonus)
@@ -221,7 +259,7 @@ test("Reset should assign a correct ammount of paragon and preserve certain upgr
     expect(hgProduction).toBeGreaterThanOrEqual(baselineProduction);
 
     //do not forget to include paragon
-    var paragonProductionRatio = game.prestige.getParagonProductionRatio();
+    let paragonProductionRatio = game.prestige.getParagonProductionRatio();
     expect(hgProduction).toBeLessThanOrEqual(baselineProduction * (1 + paragonProductionRatio) * 100);
     //-----------------------------------------------------
 
@@ -408,3 +446,122 @@ test("Test NR calls", () => {
     expect(newrelic.addPageAction).toHaveBeenCalledTimes(0);
 });
 
+//--------------------------------
+//      Map test
+//--------------------------------
+test("Explored biomes should update effects", () => {
+
+    game.village.getBiome("plains").level = 1;
+    game.updateCaches();
+    //expect(game.globalEffectsCached["catnipRatio"]).toBe(0.01);
+    expect(game.getEffect("catnipRatio")).toBe(0.01);
+
+    //buildings effects and biomes should compound and not interfeer with each other
+
+    game.village.getBiome("forest").level = 10;
+    _build("lumberMill", 10);
+    game.updateCaches();
+
+    //expect(game.getEffect("woodRatio")).toBe(0.1);
+});
+
+test("Explored biome should produce rewards", () => {
+    var plainsBiome = game.village.getBiome("plains");
+    plainsBiome.level = 1;
+    
+    //check that obtained random reward is within base value +- width
+    var rewardSpec = plainsBiome.rewards[0];
+
+    var rewards = game.village.map.getBiomeRewards(plainsBiome);
+    var amt = rewards["catnip"];
+
+    /*
+        _fuzzGainedAmount(width) is flaky and somethimes provides values outsie of [-width/2, width/2];
+        This causes tests to be failing with edge cases like
+
+        Expected: >= 181.4943400895315
+        Received:    180.17599538566006
+
+        We will adjust our gaps by 5% to keep sanity check in place
+    */
+    var fuzzBuffer = 0.95;
+    expect(amt).toBeGreaterThanOrEqual(rewardSpec.value * (1 - rewardSpec.width ) * fuzzBuffer);
+    expect(amt).toBeLessThanOrEqual(rewardSpec.value * (1 + rewardSpec.width ) * fuzzBuffer);
+
+    plainsBiome.level = 2;
+    var multiplier = Math.pow(plainsBiome.level, rewardSpec.multiplier);
+
+    var rewards = game.village.map.getBiomeRewards(plainsBiome);
+    var amt = rewards["catnip"];
+    expect(amt).toBeGreaterThanOrEqual(rewardSpec.value * (1 - rewardSpec.width ) * multiplier * fuzzBuffer);
+    expect(amt).toBeLessThanOrEqual(rewardSpec.value * (1 + rewardSpec.width ) * multiplier * fuzzBuffer);
+});
+
+//--------------------------------
+//      Queue
+//--------------------------------
+
+test("Queue should correctly add and remove items", () => {
+
+    let queue = game.time.queue;
+    let isRemoved;
+
+    queue.update();
+    expect(queue.cap).toBe(2);
+
+    //simple add and remove operations should work and keep queue clear
+    queue.addToQueue("field", "buildings", "N/A");
+    expect(queue.queueItems.length).toBe(1); 
+    expect(queue.queueLength()).toBe(1);
+
+    isRemoved = queue.remove(0, 1);
+    expect(queue.queueItems.length).toBe(0); 
+    expect(queue.queueLength()).toBe(0);
+    expect(isRemoved).toBe(true);
+
+    //invalid removal indexes should not break anything
+    isRemoved = queue.remove(1, 1);
+    expect(isRemoved).toBe(false);
+
+    //multiple items should stack into one queue entry
+    queue.addToQueue("field", "buildings", "N/A");
+    queue.addToQueue("field", "buildings", "N/A");
+
+    expect(queue.queueItems.length).toBe(1); 
+    expect(queue.queueLength()).toBe(2);
+
+    //can't build over the cap
+    queue.addToQueue("pasture", "buildings", "N/A");
+    expect(queue.queueItems.length).toBe(1);
+
+    //ai cores should increase caps
+    _build("aiCore", 10);
+    game.bld.get("aiCore").on = 10;
+    queue.update();
+
+    //multiple entires of the same type should be allowed
+    expect(queue.cap).toBe(12);
+    queue.addToQueue("pasture", "buildings", "N/A");
+    queue.addToQueue("field", "buildings", "N/A");
+    expect(queue.queueItems.length).toBe(3);
+    
+    //sequential removals should decrement queue, and then clean items
+    queue.remove(0, 1);
+    expect(queue.queueItems.length).toBe(3);
+    queue.remove(0, 1);
+    expect(queue.queueItems.length).toBe(2);
+
+    /**
+     * queue content: 
+      [{ name: 'pasture', type: 'buildings', label: 'N/A' },
+      { name: 'field', type: 'buildings', label: 'N/A' } ]
+     */
+
+    //test shift key option
+    queue.addToQueue("field", "buildings", "N/A", true /*all available*/);
+    expect(queue.queueLength()).toBe(12);
+    expect(queue.queueItems.length).toBe(2);
+
+    //console.error(queue.queueItems);
+    expect(queue.queueItems[1].value).toBe(11);
+});

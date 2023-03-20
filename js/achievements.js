@@ -293,6 +293,14 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             title: "Clean Paws",
             description: "Peaceful trading without cat-power",
             difficulty: "C"
+        },{
+            name: "sequenceBreak",
+            title: "Sequence Break",
+            description: "Skip Moon in the space tab",
+            difficulty: "D",
+            condition: function(){
+                return (!this.game.space.getPlanet("moon").reached && this.game.space.getPlanet("dune").reached);
+            }
         }
     ],
 
