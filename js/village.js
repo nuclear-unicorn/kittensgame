@@ -211,7 +211,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 						for (var i = 0; i < defaultObject.length; i++) {
 							if (defaultObject[i].name == "faith" || defaultObject[i].name == "gold") {
 								defaultObject[i].val -= defaultObject[i].val
-									* this.game.getLimitedDR(0.09 + 0.01 * burnedParagonRatio * leaderRatio, 1.0); //10% before BP
+									* this.game.getLimitedDR((0.09 + 0.01 * burnedParagonRatio) * leaderRatio, 1.0); //10% before BP
 							}
 						}
 						break;
@@ -1327,7 +1327,11 @@ dojo.declare("classes.village.Map", null, {
 	/**
 	 * terrainPenalty - affects how much cp exploration will cost
 	 * faunaPenalty - affects mob spawn rate (% chance where x1.0 is 100%)
+	 * 
+	 * level: current exploration level
 	 **/
+
+	//TODO: should we use TabManager wrapper or perhaps separate metadata handling logic to MetaTable?
 	biomes: [
 	{
 		name: "village",
@@ -1335,7 +1339,7 @@ dojo.declare("classes.village.Map", null, {
 		desc: "Improves exploration rate of all biomes",
 		terrainPenalty: 1.0,
 		faunaPenalty: 0,
-		unlocked: true
+		unlocked: true,
 	},
 	{
 		name: "plains",
@@ -1345,7 +1349,27 @@ dojo.declare("classes.village.Map", null, {
 		unlocked: true,
 		unlocks: {
 			biomes: ["hills"]
-		}
+		},
+		effects:{
+			catnipRatio: 0.01
+		},
+		/**
+		 * Reward for clearing explored biome.
+		 * We will follow the same notation and same seasonality where it makes sense
+		 */
+		rewards: [{
+			name: "catnip", value: 100, chance: 1, width: 0.21, multiplier: 1.2,
+			seasons:{
+				"spring": 0.25,
+				"summer": 0.05,
+				"autumn": -0.35,
+				"winter": -0.05
+			}
+		}],
+		/*
+			Set to true whenever the biome is fully explored, allows 
+		*/
+		upgradeUnlocked: false
 	},
 	{
 		name: "hills",
@@ -1377,6 +1401,9 @@ dojo.declare("classes.village.Map", null, {
 		unlocked: true,
 		unlocks: {
 			biomes: ["boneForest"]
+		},
+		effects: {
+			woodRatio: 0.01
 		}
 	},
 	{
@@ -1396,8 +1423,8 @@ dojo.declare("classes.village.Map", null, {
 		description: "TBD",
 		terrainPenalty: 1.4,
 		unlocked: false,
-		5: "The trees are so tall you don't see where it ends. When the rains start they can go for hundreds of years.",
-		10: "In the fog you can see the mountains. The mountains have eyes and sometime change places."
+		5: "The trees are so tall you don't see where it ends. When the rain starts it can go for hundreds of years.",
+		10: "In the fog you can see the mountains. The mountains have eyes and sometimes change places."
 	},
 	{
 		name: "mountain",
@@ -1417,6 +1444,9 @@ dojo.declare("classes.village.Map", null, {
 		unlocks: {
 			biomes: ["volcano"]
 		},
+		effects:{
+			mineralsRatio: 0.01
+		},
 		unlocked: false
 	},
 	{
@@ -1435,7 +1465,7 @@ dojo.declare("classes.village.Map", null, {
 	{
 		name: "desert",
 		title: "Desert",
-		description: "TBD",
+		description: "Improves solar panel effectiveness by 1% per level",
 		terrainPenalty: 1.5,
 		unlocked: false,
 		lore: {
@@ -1443,7 +1473,10 @@ dojo.declare("classes.village.Map", null, {
 		},
 		evaluateLocks: function(game){
 			return game.village.getBiome("plains").level >= 15;
-		}
+		},
+		effects:{
+			solarFarmRatio: 0.01
+		},
 	},{
 		name: "bloodDesert",
 		title: "Crimson Desert",
@@ -1614,6 +1647,27 @@ dojo.declare("classes.village.Map", null, {
 		if (biome.unlocks){
 			this.game.unlock(biome.unlocks);
 		}
+
+		//calculate reward for exploration
+		if (!biome.rewards){
+			return;
+		}
+		var rewards = this.getBiomeRewards(biome);
+		//this.game.msg("Your explorers have brought you", fuzzedNormalAmount, reward.name);
+	},
+
+	getBiomeRewards: function(biome){
+		var rewards = biome.rewards;
+		var resources = {};
+		for (var i in rewards) {
+			var reward = rewards[i];
+			var resourcePassedNormalTradeAmount = this.game.math.binominalRandomInteger(1, reward.chance);
+			var fuzzedNormalAmount = this.game.diplomacy._fuzzGainedAmount(resourcePassedNormalTradeAmount, reward.width);
+
+			var multiplier = Math.pow(biome.level, reward.multiplier | 1.2);
+			resources[reward.name] = fuzzedNormalAmount * reward.value * multiplier;
+		}
+		return resources;
 	},
 
 	getExplorationPrice: function(x, y){
@@ -1634,6 +1688,18 @@ dojo.declare("classes.village.Map", null, {
 
 	updateEffectCached: function(){
 		this.game.globalEffectsCached["mapPriceReduction"] = -this.getPriceReduction();
+
+		//update cached effects based on the explored biomes
+		for (var i in this.biomes){
+			var biome = this.biomes[i];
+			if (!biome.unlocked){
+				continue;
+			}
+			for (var effect in biome.effects) {
+				var effectVal = biome.effects[effect];
+				this.game.globalEffectsCached[effect] += ( effectVal * (biome.level || 0) );
+			}
+		}
 	},
 
 	save: function(){

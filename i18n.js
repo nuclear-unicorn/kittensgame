@@ -17,7 +17,7 @@ dojo.declare("com.nuclearunicorn.i18n.Lang", null, {
 		var config = new classes.KGConfig();
 		this.availableLocales = [this.fallbackLocale];
 
-		console.log("Available locales:", config.statics.locales);
+		//console.info("Available locales:", config.statics.locales);
 		for (var i in config.statics.locales ){
 			this.availableLocales.push(config.statics.locales[i]);
 		}
@@ -41,6 +41,7 @@ dojo.declare("com.nuclearunicorn.i18n.Lang", null, {
 			"ru": "Русский",
 			"tr": "TR",
 			"uk": "Українська",
+			"be": "Беларуская",
 			"zh": "中文",
 			"zht": "漢語"
 		};
@@ -75,6 +76,8 @@ dojo.declare("com.nuclearunicorn.i18n.Lang", null, {
 		}
 		// check if user already selected the locale
 		var lang = LCstorage["com.nuclearunicorn.kittengame.language"];
+		this.fallbackLocale = 'en';
+
 		if (!lang || !this.isAvailable(lang)) {
 
 			//console.log("navigator:", navigator, "platform:", this.platformLocale);
@@ -89,6 +92,7 @@ dojo.declare("com.nuclearunicorn.i18n.Lang", null, {
 					break;
 				}
 			}
+			console.log("Using preferred OS locale:", lang);
 			LCstorage["com.nuclearunicorn.kittengame.language"] = lang;
 		}
 		// at this point we always have correct lang selected
@@ -96,30 +100,32 @@ dojo.declare("com.nuclearunicorn.i18n.Lang", null, {
 		var self = this;
 		this._deferred = $.Deferred();
 		// now we can try to load it
-
 		// fallback
-		$.getJSON( "res/i18n/" + this.fallbackLocale + ".json?_=" + timestamp).done(function(fallbackLocale){
-			self.messages = fallbackLocale;
+
+		console.log("User selected locale:", "'" + lang + "'", "fallback locale", "'" + this.fallbackLocale  + "'");
+		console.log("loading fallback messages");
+		
+		$.getJSON( "res/i18n/" + this.fallbackLocale + ".json?_=" + timestamp).done(function(fallbackLocaleMessages){
+			self.messages = fallbackLocaleMessages;
+
 			if (self.language != self.fallbackLocale ) {
 				// legacy
+				console.log("trying to load legacy locale system");
 				$.getJSON( "res/i18n/" + lang + ".json?_=" + timestamp).
-					then(function(legacyLocale){
-
-						console.log("loaded legacy locale for lang", lang, legacyLocale);
-
-						$.extend(self.messages, legacyLocale);
-
+					then(function(legacyLocaleMessages){
+						console.log("loaded legacy locale for lang", lang, legacyLocaleMessages);
+						$.extend(self.messages, legacyLocaleMessages);
+					}).fail(function(){
+						console.warn("no legacy locale ", "'" + lang + "'", " found, skipping...");
+					}).always(function(){
 						// crowdin
+						console.log("trying to load crowdin locale system");
 						$.getJSON( "res/i18n/crowdin/" + lang + ".json?_=" + timestamp).then(function(crowdinLocale){
 							console.log("loaded crowdin locale for lang", lang, crowdinLocale);
-
 							$.extend(self.messages, crowdinLocale);
-
 							self._deferred.resolve();
-
 						}).fail(function(){
-							console.log("legacyLocale:", legacyLocale);
-							self.messages = legacyLocale;
+							console.warn("no crowdin locale ", "'" + lang + "'", " found, skipping...");
 							self._deferred.resolve();
 						});
 					});

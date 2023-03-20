@@ -1254,7 +1254,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}
 		}
 	},
-
 	{
 		name: "lumberMill",
 		label: $I("buildings.lumberMill.label"),
@@ -1741,6 +1740,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game){
 			if (!game.challenges.isActive("atheism")) {
+				if (self.val > 0){
+                    game.time.queue.unlockQueueSource("religion");
+                }
 				var effects = {
 					"culturePerTickBase" : 0.1,
 					"faithPerTickBase" : 0,
@@ -1787,7 +1789,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				if (templars.on){
 					effects["manpowerMax"] = 50 + 25 * templars.on;
 				}
-				game.time.queue.unlockQueueSource("religion");
 			} else {
 				var effects = {
 					"culturePerTickBase" : 0.1
@@ -2694,7 +2695,12 @@ dojo.declare("classes.game.ui.RefineCatnipButton", com.nuclearunicorn.game.ui.Bu
 
 dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
     getMetadata: function(model){
-    	model.metaAccessor = this.game.bld.getBuildingExt(model.options.building);
+		model.metaAccessor = this.game.bld.getBuildingExt(model.options.building);
+		
+		if (!model.metaAccessor){
+			console.warn("Unable to get building metadata, invalid id or options:", model.options.building);
+			return null;
+		}
 
 		//let's not mess with meta accessor, it is a pain to deal with it
 		var meta = model.metaAccessor.getMeta(),
