@@ -2205,7 +2205,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		if (this.game.challenges.isActive("postApocalypse")
 		&& bld.get("name") == "field"
 		&& this.getPollutionLevel() >= 5
-		&& bld.get("val") >= 95 - this.game.time.getVSU("usedCryochambers").val - this.getPollutionLevel() ) {
+		&& bld.get("val") >= Math.max(95 - this.game.time.getVSU("usedCryochambers").val - this.getPollutionLevel(), 7 + (this.game.ironWill? 8 : 0)) ) {
 			var builtWithUnobtanium = Math.max(bld.get("val") + this.game.time.getVSU("usedCryochambers").val - 100, 0);
 			prices.push({val: 15 * Math.pow(ratio, builtWithUnobtanium),
 						name : "unobtainium",
