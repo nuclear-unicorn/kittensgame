@@ -3861,11 +3861,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 *
 	 */
 	attachResourceTooltip: function(container, resRef){
-
-		var tooltip = dojo.byId("tooltip");
-		dojo.empty(tooltip);
-
-		dojo.connect(container, "onmouseover", this, dojo.partial(function(resRef, tooltip, event){
+		UIUtils.attachTooltip(this, container, 0, 100, function() {
 			if (this.getResourcePerTick(resRef.name, false) != 0
 				|| this.getResourcePerTickConvertion(resRef.name) != 0
 				|| this.workshop.getEffectEngineer(resRef.name) != 0
@@ -3873,27 +3869,19 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				|| (this.getResourceOnYearProduction(resRef.name) != 0 || resRef.name == "antimatter")
 				|| (resRef.name == "kittens" && this.village.sim.kittens.length < this.village.sim.maxKittens)
 			){
-
-				tooltip.innerHTML = this.getDetailedResMap(resRef);
-
-				var target = event.originalTarget || event.toElement;	//fucking chrome
-				var pos = $(target).position();
-				if (!pos){
-				 return;
-				}
-
-				dojo.style(tooltip, "left", pos.left + 100 + "px");
-				dojo.style(tooltip, "top",  pos.top + "px");
-
-				dojo.style(tooltip, "display", "");
-				dojo.style(container, "fontWeight", "bold");
+				return this.getDetailedResMap(resRef);
 			}
-	    }, resRef, tooltip));
 
-		dojo.connect(container, "onmouseout", this, dojo.partial(function(tooltip, container){
-			 dojo.style(tooltip, "display", "none");
-			 dojo.style(container, "fontWeight", "normal");
-		},tooltip, container));
+            return '';
+		});
+
+		dojo.connect(container, "onmouseover", this, function(){
+			dojo.style(container, "fontWeight", "bold");
+		});
+
+		dojo.connect(container, "onmouseout", this, function(){
+			dojo.style(container, "fontWeight", "normal");
+		});
 
 	},
 
