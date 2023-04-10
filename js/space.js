@@ -957,6 +957,15 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				if (!building.effects){
 					return 0;
 				} else {
+					//There are 4 specially calculated effects that aren't supposed to be multiplied by the number of buildings,
+					//because they're properties of the building category as a whole, not any individual building.
+					if (effectName === "hashrate" || effectName === "hashRateLevel" ||
+					    effectName === "nextHashLevelAt" || effectName === "hrProgress")
+					{
+						//For these 4 specially calculated effects, don't multiply by building.on and don't apply spaceRatio.
+						return building.effects[effectName];
+					}
+					//Else, this isn't one of the special effects, so compute it normally.
 					var spaceRatio = (effectName == "spaceRatio" && game.resPool.energyCons > game.resPool.energyProd) ? game.resPool.getEnergyDelta() : 1;
 					return building.effects[effectName] * building.on * spaceRatio;
 				}
