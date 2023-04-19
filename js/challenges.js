@@ -722,6 +722,7 @@ dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Pane
 	challengeName: "",
 
 	constructor: function() {
+		this.listElement = null;
 	},
 
 	//Links this panel up with the correct Challenge internally & sets the title to be "effects of [challengeName]":
@@ -732,15 +733,20 @@ dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Pane
 
 	render: function(container) {
 		var content = this.inherited(arguments);
-		var self = this;
-		var challengeData = this.game.challenges.getChallenge(this.challengeName);
+		this.listElement = dojo.create("ul", { style: "margin-top: 0px; margin-bottom: 0px;" }, content);
+		this.generateEffectsList();
+	},
 
+	//Clears the list of the Challenge's effects, then populates that list.
+	generateEffectsList: function() {
+		dojo.empty(this.listElement);
+		var challengeData = this.game.challenges.getChallenge(this.challengeName);
 		for (var effectName in challengeData.effects) {
 			var amt = this.game.getEffect(effectName);
 			if (amt == 0) {
 				continue; //Don't show anything whose value is zero.
 			}
-			dojo.create("p", { innerHTML: self.game.getEffectMeta(effectName).title + ": " + amt }, content);
+			dojo.create("li", { innerHTML: this.game.getEffectMeta(effectName).title + ": " + amt }, this.listElement);
 		}
 	},
 
@@ -748,6 +754,7 @@ dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Pane
 		this.inherited(arguments);
 		var challengeData = this.game.challenges.getChallenge(this.challengeName);
 		dojo.style(this.panelDiv, "display", challengeData.unlocked ? "" : "none");
+		this.generateEffectsList();
 	}
 });
 
