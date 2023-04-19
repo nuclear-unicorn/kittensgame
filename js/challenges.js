@@ -717,11 +717,47 @@ dojo.declare("classes.ui.ChallengePanel", com.nuclearunicorn.game.ui.Panel, {
 
 });
 
+dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Panel, {
+	//The name of the Challenge that this panel lists the effects of:
+	challengeName: "",
+
+	constructor: function() {
+	},
+
+	//Links this panel up with the correct Challenge internally & sets the title to be "effects of [challengeName]":
+	setChallengeName: function(challengeName) {
+		this.challengeName = challengeName;
+		this.name = $I("challendge.effects.panel.label", [this.game.challenges.getChallenge(challengeName).label]);
+	},
+
+	render: function(container) {
+		var content = this.inherited(arguments);
+		var self = this;
+
+		for (var effectName in this.game.challenges.getChallenge(this.challengeName).effects) {
+			var amt = this.game.getEffect(effectName);
+			if (amt == 0) {
+				continue; //Don't show anything whose value is zero.
+			}
+			dojo.create("p", { innerHTML: self.game.getEffectMeta(effectName).title + ": " + amt }, content);
+		}
+	}
+});
+
 dojo.declare("classes.tab.ChallengesTab", com.nuclearunicorn.game.ui.tab, {
 	render: function(container){
 		this.challengesPanel = new classes.ui.ChallengePanel($I("challendge.panel.label"), this.game.challenges);
 		this.challengesPanel.game = this.game;
 		this.challengesPanel.render(container);
+
+		this.challengeEffects = [];
+		for (var i = 0; i < this.game.challenges.challenges.length; i += 1) {
+			var effectPanel = new classes.ui.ChallengeEffectsPanel("", this.game.challenges);
+			effectPanel.game = this.game;
+			effectPanel.setChallengeName(this.game.challenges.challenges[i].name);
+			effectPanel.render(container);
+			this.challengeEffects.push(effectPanel);
+		}
 
 		//consition panel to be reviewed
 
@@ -782,6 +818,9 @@ dojo.declare("classes.tab.ChallengesTab", com.nuclearunicorn.game.ui.tab, {
 
 	update: function(){
 		this.challengesPanel.update();
+		for (var i = 0; i < this.challengeEffects.length; i += 1) {
+			this.challengeEffects[i].update;
+		}
 		//this.conditionsPanel.update();
 		this.applyPendingBtn.update();
 	}

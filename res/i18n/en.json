@@ -275,6 +275,7 @@
     "calendar.year.full": "Year {0} - {1}, day {2}",
     "calendar.year.tooltip": "Year:",
 
+    "challendge.effects.panel.label": "Effects of {0} Challenge",
     "challendge.panel.label": "Challenges",
     "challendge.pending": "Pending",
     "challendge.reclaimReserves.label": "Reclaim reserves",
