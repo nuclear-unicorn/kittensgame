@@ -2,7 +2,20 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 
 	constructor: function(game){
 		this.game = game;
-		this.registerMeta("stackable", this.challenges, null);
+		//Register the metas with a custom provider.
+		this.registerMeta(false, this.challenges, { getEffect: function(challenge, effectName) {
+			if (!challenge.effects) {
+				//Challenge has no effects defined, so just return 0 for "no effect."
+				return 0;
+			}
+			if (effectName === "tradeKnowledgeRatio") {
+				//This one is specially calculated using a formula that already takes into account Challenge completions.
+				return challenge.effects[effectName];
+			}
+
+			//Default behavior for any stackable meta:
+			return challenge.effects[effectName] * challenge.on;
+		}});
 		this.setEffectsCachedExisting();
 		this.reserves = new classes.reserveMan(game);
 	},
@@ -599,7 +612,7 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 
 	initModel: function(options) {
 		var model = this.inherited(arguments);
-		model.multiplyEffects = true;
+		model.multiplyEffects = true; //When the player holds the SHIFT key, it'll multiply Challenge effects by number of times completed.
 		return model;
 	},
 
