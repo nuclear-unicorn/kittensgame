@@ -733,14 +733,21 @@ dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Pane
 	render: function(container) {
 		var content = this.inherited(arguments);
 		var self = this;
+		var challengeData = this.game.challenges.getChallenge(this.challengeName);
 
-		for (var effectName in this.game.challenges.getChallenge(this.challengeName).effects) {
+		for (var effectName in challengeData.effects) {
 			var amt = this.game.getEffect(effectName);
 			if (amt == 0) {
 				continue; //Don't show anything whose value is zero.
 			}
 			dojo.create("p", { innerHTML: self.game.getEffectMeta(effectName).title + ": " + amt }, content);
 		}
+	},
+
+	update: function() {
+		this.inherited(arguments);
+		var challengeData = this.game.challenges.getChallenge(this.challengeName);
+		dojo.style(this.panelDiv, "display", challengeData.unlocked ? "" : "none");
 	}
 });
 
@@ -819,7 +826,7 @@ dojo.declare("classes.tab.ChallengesTab", com.nuclearunicorn.game.ui.tab, {
 	update: function(){
 		this.challengesPanel.update();
 		for (var i = 0; i < this.challengeEffects.length; i += 1) {
-			this.challengeEffects[i].update;
+			this.challengeEffects[i].update();
 		}
 		//this.conditionsPanel.update();
 		this.applyPendingBtn.update();
