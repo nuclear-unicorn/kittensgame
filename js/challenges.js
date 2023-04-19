@@ -597,6 +597,12 @@ dojo.declare("classes.reserveMan", null,{
 });
 dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.BuildingBtnController, {
 
+	initModel: function(options) {
+		var model = this.inherited(arguments);
+		model.multiplyEffects = true;
+		return model;
+	},
+
 	getMetadata: function(model){
         if (!model.metaCached){
             model.metaCached = this.game.challenges.getChallenge(model.options.id);
