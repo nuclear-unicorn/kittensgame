@@ -769,15 +769,6 @@ dojo.declare("classes.tab.ChallengesTab", com.nuclearunicorn.game.ui.tab, {
 		this.challengesPanel.game = this.game;
 		this.challengesPanel.render(container);
 
-		this.challengeEffects = [];
-		for (var i = 0; i < this.game.challenges.challenges.length; i += 1) {
-			var effectPanel = new classes.ui.ChallengeEffectsPanel("", this.game.challenges);
-			effectPanel.game = this.game;
-			effectPanel.setChallengeName(this.game.challenges.challenges[i].name);
-			effectPanel.render(container);
-			this.challengeEffects.push(effectPanel);
-		}
-
 		//consition panel to be reviewed
 
 		/*this.conditionsPanel = new classes.ui.ConditionPanel($I("challendge.condition.panel.label"), this.game.challenges);
@@ -833,14 +824,24 @@ dojo.declare("classes.tab.ChallengesTab", com.nuclearunicorn.game.ui.tab, {
 		}, this.game);
 		reclaimReservesBtn.render(container);
 		this.reclaimReservesBtn = reclaimReservesBtn;
+
+		//Summary of total Challenge effects:
+		this.challengeEffects = [];
+		for (var i = 0; i < this.game.challenges.challenges.length; i += 1) {
+			var effectPanel = new classes.ui.ChallengeEffectsPanel("", this.game.challenges);
+			effectPanel.game = this.game;
+			effectPanel.setChallengeName(this.game.challenges.challenges[i].name);
+			effectPanel.render(container);
+			this.challengeEffects.push(effectPanel);
+		}
 	},
 
 	update: function(){
 		this.challengesPanel.update();
+		//this.conditionsPanel.update();
+		this.applyPendingBtn.update();
 		for (var i = 0; i < this.challengeEffects.length; i += 1) {
 			this.challengeEffects[i].update();
 		}
-		//this.conditionsPanel.update();
-		this.applyPendingBtn.update();
 	}
 });
