@@ -738,9 +738,14 @@ dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Pane
 	},
 
 	//Clears the list of the Challenge's effects, then populates that list.
+	//The list will be empty if the Challenge in question isn't unlocked yet.
 	generateEffectsList: function() {
 		dojo.empty(this.listElement);
 		var challengeData = this.game.challenges.getChallenge(this.challengeName);
+		if (!challengeData.unlocked) {
+			return; //Challenge isn't unlocked yet, so don't display any effects for it.
+		}
+		//Else, the Challenge is unlocked.
 		for (var effectName in challengeData.effects) {
 			var displayParams = this.game.getEffectDisplayParams(effectName, challengeData.totalEffectsCached[effectName], false /*showIfZero*/);
 			//displayParams could be null if this is the sort of effect that's supposed to be hidden.
@@ -752,14 +757,7 @@ dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Pane
 
 	update: function() {
 		this.inherited(arguments);
-		var challengeData = this.game.challenges.getChallenge(this.challengeName);
-
-		if (challengeData.unlocked) {
-			this.generateEffectsList(); //Only calculate effects if the Challenge is unlocked.
-		}
-		else {
-			dojo.empty(this.listElement);
-		}
+		this.generateEffectsList();
 
 		//Update visible/invisible status:
 		//Show effects panel only if the game is set to show them && there is at least 1 effect to show.
@@ -845,7 +843,6 @@ dojo.declare("classes.tab.ChallengesTab", com.nuclearunicorn.game.ui.tab, {
 						});
 					} else {
 						model.visible = false;
-						console.log("effectsPanels is " + typeof effectsPanels);
 					}
 				},
 				getName: function() {
