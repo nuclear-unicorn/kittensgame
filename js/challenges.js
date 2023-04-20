@@ -753,20 +753,17 @@ dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Pane
 	update: function() {
 		this.inherited(arguments);
 		var challengeData = this.game.challenges.getChallenge(this.challengeName);
-		//Require detailedChallengeInfo.
-		var visible = this.game.detailedChallengeInfo && challengeData.unlocked; //Hide self if Challenge isn't unlocked yet.
 
-		//Skip updating children if we're not going to be visible anyways.
-		if (visible) {
-			this.generateEffectsList();
+		if (challengeData.unlocked) {
+			this.generateEffectsList(); //Only calculate effects if the Challenge is unlocked.
 		}
-
-		if (!this.listElement.hasChildNodes()) {
-			visible = false; //The list is empty; no effects to display.
+		else {
+			dojo.empty(this.listElement);
 		}
 
 		//Update visible/invisible status:
-		dojo.style(this.panelDiv, "display", visible ? "" : "none");
+		//Show effects panel only if the game is set to show them && there is at least 1 effect to show.
+		this.setVisible(Boolean(this.game.detailedChallengeInfo) && this.listElement.hasChildNodes());
 	}
 });
 
@@ -839,6 +836,17 @@ dojo.declare("classes.tab.ChallengesTab", com.nuclearunicorn.game.ui.tab, {
 				this.game.detailedChallengeInfo = !this.game.detailedChallengeInfo;
 			}),
 			controller: new com.nuclearunicorn.game.ui.ButtonController(this.game, {
+				updateVisible: function (model) {
+					var effectsPanels = this.game.challengesTab.challengeEffects; //Array of UI panels that list the Challenge effects
+					if (effectsPanels) {
+						//The button to toggle Challenge effects is visible only if there is at least 1 effect to display right now:
+						model.visible = effectsPanels.some(function(challengeEffectsPanel) {
+							return challengeEffectsPanel.listElement.hasChildNodes();
+						});
+					} else {
+						model.visible = false;
+					}
+				},
 				getName: function() {
 					return this.game.detailedChallengeInfo ? $I("challendge.effects.hide.label") : $I("challendge.effects.show.label");
 				}
