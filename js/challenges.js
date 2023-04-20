@@ -742,11 +742,11 @@ dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Pane
 		dojo.empty(this.listElement);
 		var challengeData = this.game.challenges.getChallenge(this.challengeName);
 		for (var effectName in challengeData.effects) {
-			var amt = this.game.getEffect(effectName);
-			if (amt == 0) {
-				continue; //Don't show anything whose value is zero.
+			var displayParams = this.game.getEffectDisplayParams(effectName, challengeData.totalEffectsCached[effectName], false /*showIfZero*/);
+			//displayParams could be null if this is the sort of effect that's supposed to be hidden.
+			if (displayParams) {
+				dojo.create("li", { innerHTML: displayParams.displayEffectName + ": " + displayParams.displayEffectValue }, this.listElement);
 			}
-			dojo.create("li", { innerHTML: this.game.getEffectMeta(effectName).title + ": " + amt }, this.listElement);
 		}
 	},
 
