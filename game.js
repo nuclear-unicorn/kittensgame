@@ -4188,6 +4188,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			} else if (effectName === "energyConsumption") {
 				effectValue *= this.resPool.getEnergyConsumptionRatio();
 			}
+			displayEffectValue = this.getDisplayValueExt(effectValue) + $I("unit.watt");
 		} else {
 			displayEffectValue = this.getDisplayValueExt(effectValue);
 		}
