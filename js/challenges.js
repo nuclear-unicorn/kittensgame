@@ -845,6 +845,7 @@ dojo.declare("classes.tab.ChallengesTab", com.nuclearunicorn.game.ui.tab, {
 						});
 					} else {
 						model.visible = false;
+						console.log("effectsPanels is " + typeof effectsPanels);
 					}
 				},
 				getName: function() {

@@ -4184,9 +4184,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		} else if ( effectMeta.type === "energy" ){
 			//Multiply the displayed values of energy production & consumption by relevant multipliers.
 			if (effectName === "energyProduction") {
-				effectValue *= this.game.resPool.getEnergyProductionRatio();
+				effectValue *= this.resPool.getEnergyProductionRatio();
 			} else if (effectName === "energyConsumption") {
-				effectValue *= this.game.resPool.getEnergyConsumptionRatio();
+				effectValue *= this.resPool.getEnergyConsumptionRatio();
 			}
 		} else {
 			displayEffectValue = this.getDisplayValueExt(effectValue);
