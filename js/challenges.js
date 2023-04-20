@@ -832,6 +832,21 @@ dojo.declare("classes.tab.ChallengesTab", com.nuclearunicorn.game.ui.tab, {
 		reclaimReservesBtn.render(container);
 		this.reclaimReservesBtn = reclaimReservesBtn;
 
+		var showChallengeEffectsBtn = new com.nuclearunicorn.game.ui.ButtonModern({
+			name: $I("challendge.effects.show.label"),
+			description: $I("challendge.effects.toggle.desc"),
+			handler: dojo.hitch(this, function() {
+				this.game.detailedChallengeInfo = !this.game.detailedChallengeInfo;
+			}),
+			controller: new com.nuclearunicorn.game.ui.ButtonController(this.game, {
+				getName: function() {
+					return this.game.detailedChallengeInfo ? $I("challendge.effects.hide.label") : $I("challendge.effects.show.label");
+				}
+			})
+		}, this.game);
+		showChallengeEffectsBtn.render(container);
+		this.showChallengeEffectsBtn = showChallengeEffectsBtn;
+
 		//Summary of total Challenge effects:
 		this.challengeEffects = [];
 		for (var i = 0; i < this.game.challenges.challenges.length; i += 1) {
@@ -847,6 +862,7 @@ dojo.declare("classes.tab.ChallengesTab", com.nuclearunicorn.game.ui.tab, {
 		this.challengesPanel.update();
 		//this.conditionsPanel.update();
 		this.applyPendingBtn.update();
+		this.showChallengeEffectsBtn.update();
 		for (var i = 0; i < this.challengeEffects.length; i += 1) {
 			this.challengeEffects[i].update();
 		}
