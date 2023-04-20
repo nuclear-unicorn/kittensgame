@@ -753,13 +753,20 @@ dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Pane
 	update: function() {
 		this.inherited(arguments);
 		var challengeData = this.game.challenges.getChallenge(this.challengeName);
-		dojo.style(this.panelDiv, "display", challengeData.unlocked ? "" : "none"); //Hide self if Challenge isn't unlocked yet.
-		this.generateEffectsList();
+		//Require detailedChallengeInfo.
+		var visible = this.game.detailedChallengeInfo && challengeData.unlocked; //Hide self if Challenge isn't unlocked yet.
+
+		//Skip updating children if we're not going to be visible anyways.
+		if (visible) {
+			this.generateEffectsList();
+		}
 
 		if (!this.listElement.hasChildNodes()) {
-			//The list is empty; no effects to display.
-			dojo.style(this.panelDiv, "display", "none");
+			visible = false; //The list is empty; no effects to display.
 		}
+
+		//Update visible/invisible status:
+		dojo.style(this.panelDiv, "display", visible ? "" : "none");
 	}
 });
 
