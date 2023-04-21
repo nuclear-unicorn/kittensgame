@@ -740,18 +740,35 @@ dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Pane
 	//Clears the list of the Challenge's effects, then populates that list.
 	//The list will be empty if the Challenge in question isn't unlocked yet.
 	generateEffectsList: function() {
-		dojo.empty(this.listElement);
 		var challengeData = this.game.challenges.getChallenge(this.challengeName);
 		if (!challengeData.unlocked) {
-			return; //Challenge isn't unlocked yet, so don't display any effects for it.
+			//Challenge isn't unlocked yet, so don't display any effects for it.
+			if (this.listElement.hasChildNodes()) {
+				dojo.empty(this.listElement);
+			}
+			return;
 		}
 		//Else, the Challenge is unlocked.
+		var childNodes = this.listElement.childNodes;
+		var i = 0;
 		for (var effectName in challengeData.effects) {
 			var displayParams = this.game.getEffectDisplayParams(effectName, challengeData.totalEffectsCached[effectName], false /*showIfZero*/);
 			//displayParams could be null if this is the sort of effect that's supposed to be hidden.
-			if (displayParams) {
-				dojo.create("li", { innerHTML: displayParams.displayEffectName + ": " + displayParams.displayEffectValue }, this.listElement);
+			if (!displayParams) {
+				continue;
 			}
+			//Else, non-null therefore display this effect:
+			var textToDisplay = displayParams.displayEffectName + ": " + displayParams.displayEffectValue;
+			if (childNodes.length <= i) {
+				dojo.create("li", { innerHTML: textToDisplay }, this.listElement);
+			} else if(dojo.attr(childNodes[i], "innerHTML") != textToDisplay) {
+				//Modify the value only if we need to.
+				dojo.attr(childNodes[i], "innerHTML", textToDisplay);
+			}
+			i += 1;
+		}
+		while (i < childNodes.length) {
+			dojo.destroy(childNodes[childNodes.length - 1]);
 		}
 	},
 
