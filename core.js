@@ -1180,11 +1180,6 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 		}
 		for (var effectName in effectsList) {
 			var effectMeta = this.game.getEffectMeta(effectName);
-			if(effectMeta.type === "hidden") {continue;}
-			if (effectMeta.resName && !this.game.resPool.get(effectMeta.resName).unlocked) {
-				continue;	//hide resource-related effects if we did not unlocked this effect yet
-			}
-
 			var effectValue = displayEffects[effectName];
 			if (!isEffectMultiplierEnabled && effectMeta.calculation !== "nonProportional") {
 				var nextEffectValue = this.getNextEffectValue(model, effectName);
@@ -1192,51 +1187,12 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 					effectValue = nextEffectValue * (model.metadata.on + 1) - effectValue * model.metadata.on;
 				}
 			}
-			if (!effectValue) {
-				continue;
+
+			var displayParams = this.game.getEffectDisplayParams(effectName, effectValue, false /*showIfZero*/);
+			//The function might have returned null if this is the type of effect that's supposed to be hidden.
+			if (displayParams) {
+				model.effectModels.push(displayParams);
 			}
-
-			var displayEffectName = effectMeta.title;
-
-			var displayEffectValue = "";
-
-			//display resMax values with global ratios like Refrigeration and Paragon
-			if (effectName.substr(-3) === "Max" || effectName.substr(-12) == "MaxChallenge") {
-				var res = this.game.resPool.get(effectMeta.resName || effectName.slice(0, -3));
-				if (res) { // If res is a resource and not just a variable
-					effectValue = this.game.resPool.addResMaxRatios(res, effectValue);
-				}
-			}
-
-			if (effectMeta.type === "perTick" && this.game.opts.usePerSecondValues) {
-				// avoid mantisa if we can, later on this can be changed to show scaled up values, e.g. minutes, hours
-				var tempVal = Math.abs(effectValue * this.game.ticksPerSecond), precision;
-				if (tempVal >= 0.001) {
-					precision = tempVal < 0.01 ? 3 : 2;
-					displayEffectValue = this.game.getDisplayValueExt(
-						effectValue * this.game.ticksPerSecond, false, false, precision) + "/" + $I("unit.sec");
-				} else {
-					displayEffectValue = this.game.getDisplayValueExt(
-						effectValue * this.game.ticksPerSecond * 3600, false, false, 2) + "/" + $I("unit.h");
-				}
-			} else if (effectMeta.type === "perDay"){
-				displayEffectValue = this.game.getDisplayValueExt(effectValue) + "/" + $I("unit.day");
-			} else if (effectMeta.type === "perYear"){
-				displayEffectValue = this.game.getDisplayValueExt(effectValue) + "/" + $I("unit.year");
-			} else if ( effectMeta.type === "ratio" ) {
-				displayEffectValue = this.game.toDisplayPercentage(effectValue, 2 , false) + "%";
-			} else if ( effectMeta.type === "integerRatio" ){
-				displayEffectValue = this.game.getDisplayValueExt(effectValue) + "%";
-			} else if ( effectMeta.type === "energy" ){
-				displayEffectValue = this.game.getDisplayValueExt(effectValue) + $I("unit.watt");
-			} else {
-				displayEffectValue = this.game.getDisplayValueExt(effectValue);
-			}
-
-			model.effectModels.push({
-				displayEffectName: displayEffectName,
-				displayEffectValue: displayEffectValue
-			});
 		}
 	},
 
