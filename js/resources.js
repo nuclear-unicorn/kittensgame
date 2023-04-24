@@ -725,11 +725,11 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		game.updateKarma();
 
 		//--------
-		var energyProdRatio = 1 + game.getEffect("energyProductionRatio");
+		var energyProdRatio = this.getEnergyProductionRatio();
 		this.energyProd = game.getEffect("energyProduction") * energyProdRatio;
 		this.energyWinterProd = this.energyProd;
-		var energyConsRatio = 1 + game.getLimitedDR(game.getEffect("energyConsumptionRatio"), 1) + game.getEffect("energyConsumptionIncrease");
-		this.energyCons = game.getEffect("energyConsumption") * energyConsRatio * (this.game.challenges.isActive("energy") ? 2 : 1);
+		var energyConsRatio = this.getEnergyConsumptionRatio();
+		this.energyCons = game.getEffect("energyConsumption") * energyConsRatio;
 
 		var currentSeason = game.calendar.season;
 		var solarFarm = game.bld.getBuildingExt("pasture");
@@ -738,6 +738,19 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 			var energyLoss = calculateEnergyProduction(game, currentSeason) - calculateEnergyProduction(game, 3);
 			this.energyWinterProd -= solarFarm.get("on") * energyLoss * energyProdRatio;
 		}
+	},
+
+	//All energy production amounts are multiplied by this number.
+	getEnergyProductionRatio: function() {
+		var game = this.game;
+		return 1 + game.getEffect("energyProductionRatio");
+	},
+
+	//All energy consumption amounts are multiplied by this number.
+	getEnergyConsumptionRatio: function() {
+		var game = this.game;
+		return (1 + game.getLimitedDR(game.getEffect("energyConsumptionRatio"), 1) + game.getEffect("energyConsumptionIncrease")) *
+				(game.challenges.isActive("energy") ? 2 : 1);
 	},
 
 	//NB: don't forget to update resources before calling in redshift

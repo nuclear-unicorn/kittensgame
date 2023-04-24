@@ -4182,6 +4182,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		} else if ( effectMeta.type === "integerRatio" ){
 			displayEffectValue = this.getDisplayValueExt(effectValue) + "%";
 		} else if ( effectMeta.type === "energy" ){
+			//Multiply the displayed values of energy production & consumption by relevant multipliers.
+			if (effectName === "energyProduction") {
+				effectValue *= this.resPool.getEnergyProductionRatio();
+			} else if (effectName === "energyConsumption") {
+				effectValue *= this.resPool.getEnergyConsumptionRatio();
+			}
 			displayEffectValue = this.getDisplayValueExt(effectValue) + $I("unit.watt");
 		} else {
 			displayEffectValue = this.getDisplayValueExt(effectValue);
