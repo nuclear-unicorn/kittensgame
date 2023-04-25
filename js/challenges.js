@@ -737,8 +737,11 @@ dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Pane
 		this.generateEffectsList();
 	},
 
-	//Clears the list of the Challenge's effects, then populates that list.
-	//The list will be empty if the Challenge in question isn't unlocked yet.
+	/**
+	 * Populates the list of the Challenge's effects and/or updates it with the most recent information.
+	 * This function goes out of its way to only modify UI elements exactly as needed--no more, no less.
+	 * The list of Challenge effects will be empty if the Challenge in question isn't unlocked yet.
+	 */
 	generateEffectsList: function() {
 		var challengeData = this.game.challenges.getChallenge(this.challengeName);
 		if (!challengeData.unlocked) {
@@ -760,14 +763,16 @@ dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Pane
 			//Else, non-null therefore display this effect:
 			var textToDisplay = displayParams.displayEffectName + ": " + displayParams.displayEffectValue;
 			if (childNodes.length <= i) {
+				//Create a DOM node only if we need to.
 				dojo.create("li", { innerHTML: textToDisplay }, this.listElement);
 			} else if(dojo.attr(childNodes[i], "innerHTML") != textToDisplay) {
-				//Modify the value only if we need to.
+				//Modify an existing DOM node only if we need to.
 				dojo.attr(childNodes[i], "innerHTML", textToDisplay);
 			}
 			i += 1;
 		}
 		while (i < childNodes.length) {
+			//Destroy any unnecessary DOM nodes.
 			dojo.destroy(childNodes[childNodes.length - 1]);
 		}
 	},
