@@ -8,13 +8,24 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				//Challenge has no effects defined, so just return 0 for "no effect."
 				return 0;
 			}
-			if (effectName === "tradeKnowledgeRatio") {
-				//This one is specially calculated using a formula that already takes into account Challenge completions.
-				return challenge.effects[effectName];
+			//Get the base amount for the effect:
+			var amt = challenge.effects[effectName];
+			var stackOptions = (challenge.stackOptions || {})[effectName] || {}; //Get the stack options for this effect.  If it doesn't exist, get an empty object instead.
+			if (stackOptions.noStack) {
+				//This effect doesn't stack.  At all.
+				return amt;
 			}
-
-			//Default behavior for any stackable meta:
-			return challenge.effects[effectName] * challenge.on;
+			//Else, the effect stacks with Challenge completions.
+			amt *= challenge.on;
+			if (stackOptions.LDRLimit) {
+				amt = game.getLimitedDR(amt, stackOptions.LDRLimit);
+			}
+			if (stackOptions.capMagnitude) {
+				//Used for weapon efficiency in the Pacifism Challenge.
+				//Clamp amt so its magnitude is no greater than capMagnitude.
+				amt = Math.max(-stackOptions.capMagnitude, Math.min(stackOptions.capMagnitude, amt));
+			}
+			return amt;
 		}});
 		this.setEffectsCachedExisting();
 		this.reserves = new classes.reserveMan(game);
@@ -22,6 +33,12 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 
 	currentChallenge: null,
 
+	//Challenges have an optional property named "stackOptions".
+	//stackOptions is a table where the keys are the names of effects & the values are objects with parameters
+	//that control how that effect behaves when the challenge has been completed multiple times.
+	//	noStack - If true, the effect is completely independent of how many times the Challenge was completed.
+	//	LDRLimit - Applies Limited Diminishing Returns (LDR) specifying the asymptotic limit.
+	//	capMagnitude - The magnitude of the effect will be clamped to this value, but the sign of the effect will not be changed.
     challenges:[
     {
 		name: "ironWill",
@@ -45,6 +62,12 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"summerSolarFarmRatio": 0.05,
 			"coldChance": 0,
 			"coldHarshness": 0
+		},
+		stackOptions: {
+			"springCatnipRatio": { LDRLimit: 2 },
+			"summerSolarFarmRatio": { LDRLimit: 2 },
+			"coldChance": { LDRLimit: 0.825 },
+			"coldHarshness": { LDRLimit: 1 }
 		},
 		calculateEffects: function(self, game){
 			if (self.active) {
@@ -73,6 +96,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"masterSkillMultiplier": 0.2,
 			"kittenLaziness": 0
         },
+		stackOptions: {
+			"masterSkillMultiplier": { LDRLimit: 4 },
+			"kittenLaziness": { LDRLimit: 0.25 }
+		},
         calculateEffects: function(self, game){
             if (self.active) {
             	self.effects["masterSkillMultiplier"] = 0;
@@ -94,6 +121,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		effects: {
 			"energyConsumptionRatio": -0.02,
 			"energyConsumptionIncrease": 0
+		},
+		stackOptions: {
+			"energyConsumptionRatio": { LDRLimit: 1 }
 		},
 		calculateEffects: function(self, game){
 			if (self.active) {
@@ -129,6 +159,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"manpowerMaxChallenge": 0,
 			"challengeHappiness": 0
 		},
+		stackOptions: {
+			"faithSolarRevolutionBoost": { LDRLimit: 4 }
+		},
 		calculateEffects: function(self, game) {
             if (self.active) {
 				self.effects["faithSolarRevolutionBoost"] = 0;
@@ -161,6 +194,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"shatterVoidCost": 0,
 			"temporalPressCap" : 0
         },
+		stackOptions: {
+			"shatterCostReduction": { LDRLimit: 1 }
+		},
         calculateEffects: function(self, game){
             if (self.active) {
         	    self.effects["shatterCostReduction"] = 0;
@@ -193,6 +229,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
         effects: {
             "corruptionBoostRatioChallenge": 0.1
         },
+		stackOptions: {
+			"corruptionBoostRatioChallenge": { LDRLimit: 2 }
+		},
         calculateEffects: function(self, game){
             if (self.active) {
                 self.effects["corruptionBoostRatioChallenge"] = 0;
@@ -221,6 +260,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"steamworksFakeBought": 0,
 			"tradeKnowledgeRatio": 0
         },
+		stackOptions: {
+			"tradeKnowledgeRatio": { noStack: true },
+			"weaponEfficency": { capMagnitude: 1 }
+		},
         calculateEffects: function(self, game){
             if (self.active) {
                 self.effects["alicornPerTickRatio"] = 0;

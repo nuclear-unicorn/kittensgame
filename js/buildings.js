@@ -371,7 +371,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 						energyProduction *= 0.75;
 					} else if (season == 1) {
 						energyProduction /= 0.75;
-						energyProduction *= (1 + game.getLimitedDR(game.getEffect("summerSolarFarmRatio"), 2));
+						energyProduction *= 1 + game.getEffect("summerSolarFarmRatio"); //LDR specified in challenges.js
 					}
 
 					var seasonRatio = game.getEffect("solarFarmSeasonRatio");
