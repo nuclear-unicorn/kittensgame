@@ -12,8 +12,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			var amt = challenge.effects[effectName];
 			var stackOptions = (challenge.stackOptions || {})[effectName] || {}; //Get the stack options for this effect.  If it doesn't exist, get an empty object instead.
 			if (stackOptions.noStack) {
-				//This effect doesn't stack.  At all.
-				return amt;
+				//This effect doesn't stack.  Apply only if the Challenge has been completed.
+				return challenge.researched ? amt : 0;
 			}
 			//Else, the effect stacks with Challenge completions.
 			amt *= challenge.on;
@@ -34,11 +34,12 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 	currentChallenge: null,
 
 	//Challenges have an optional property named "stackOptions".
-	//stackOptions is a table where the keys are the names of effects & the values are objects with parameters
-	//that control how that effect behaves when the challenge has been completed multiple times.
-	//	noStack - If true, the effect is completely independent of how many times the Challenge was completed.
+	//stackOptions is a table where the keys are the names of effects & the values are objects with parameters that control how that effect behaves when the challenge has been completed multiple times.
+	//	noStack - If true, the effect only cares about whether or not the Challenge has been completed, but it doesn't care about the exact number of completions.
+	//			If noStack is combined with another option, noStack overrides all other options & the effect doesn't stack.
 	//	LDRLimit - Applies Limited Diminishing Returns (LDR) specifying the asymptotic limit.
 	//	capMagnitude - The magnitude of the effect will be clamped to this value, but the sign of the effect will not be changed.
+	//			If capMagnitude is combined with LDRLimit, the LDR will be applied first, then the magnitude will be capped afterwards.
     challenges:[
     {
 		name: "ironWill",
