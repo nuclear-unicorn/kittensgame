@@ -1105,7 +1105,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "alloy", 	 val: 1750 }
 		],
 		upgrades: {
-			buildings: ["library", "biolab"]
+		buildings: ["library", "biolab"]
 		}
 	},{
 		name: "starlink",
@@ -2479,7 +2479,35 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			return false;
 		}
 	},
+	//might need a refractor here.
+	getConsumptionEngineers: function(){
+		var result = {};
+		var kittenResProductionModifier = (this.game.workshop.get("neuralNetworks").researched ? 2 : 1);
+		kittenResProductionModifier *= this.game.religion.getHGScalingBonus();
+		for (var ind in this.crafts){
+			var craft = this.crafts[ind];
+			var kittenResProduction = (this.game.village.getResProduction()["ES" + craft.name] || 0);
+			if (!kittenResProduction){
+				continue;
+			}
+			var tierCraftRatio = this.game.getEffect("t" + craft.tier + "CraftRatio") || 0;
+			if (tierCraftRatio == 0) {
+				tierCraftRatio = 1;
+			}
 
+			// One (bonus / handicap) crafts per engineer per 10 minutes
+			var effectPerTick = kittenResProduction * tierCraftRatio / (600 * this.game.ticksPerSecond * craft.progressHandicap);
+			for (var priceInd in craft.prices){
+				var price = craft.prices[priceInd];
+				if (!result[price.name]){
+					result[price.name] = -price.val * effectPerTick;
+				}else{
+					result[price.name] -= price.val * effectPerTick;
+				}
+			}
+		}
+		return result;
+	},
 	getEffectEngineer: function(resName, afterCraft) {
 		var craft = this.getCraft(resName);
 		if (craft == null) {

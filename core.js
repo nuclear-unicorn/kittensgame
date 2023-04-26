@@ -19,6 +19,9 @@ dojo.declare("com.nuclearunicorn.core.Control", null, {
 /**
  * core.js - a collection of base classes shared among all components of the game.
  * UI controls go there.
+ * 
+ * This should be your starting point to get familiar with the KG codebase. It has the most comments and explanation on some of KG's idiosincracies.
+ * The next file to check is `game.js`
  */
 
 
@@ -94,6 +97,9 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 		}
 	},
 
+	/*
+		TODO: do we need this? can this be simplified?
+	*/
 	setEffectsCachedExisting: function() {
 		// Set effectsCachedExisting based on meta
 		for (var a = 0; a < this.meta.length; a++){

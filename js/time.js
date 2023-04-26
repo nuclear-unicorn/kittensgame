@@ -10,8 +10,10 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     heat: 0,
     isAccelerated: false,
 
-    timestamp: null,    /*NO FUCKING timestamp resources*/
+    timestamp: null,    /*please don't move timestamp to resource*/
+
     queue: null,
+
     constructor: function(game){
         this.game = game;
 
@@ -31,7 +33,6 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "unlocked", "isAutomationEnabled"]),
             vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"]),
             queueItems: this.queue.queueItems,
-            queueLength: this.queue.queueLength,
             queueSources: this.queue.queueSources
         };
         this._forceChronoFurnaceStop(saveData.time.cfu);
@@ -75,7 +76,6 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.gainTemporalFlux(ts);
         this.timestamp = ts;
         this.queue.queueItems = saveData["time"].queueItems || [];
-        this.queue.queueLength = saveData["time"].queueLength || this.queue.queueItems.length;
         this.queue.queueSources = saveData["time"].queueSources || this.queue.queueSourcesDefault;
         if (this.queue.queueSources === {} || typeof(this.queue.queueSources["buildings"]) != "boolean") {
             this.queue.queueSources = this.queue.queueSourcesDefault;
@@ -86,7 +86,10 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 this.queue.queueSources[i] = this.queue.queueSourcesDefault[i];
             }
         }
+
         this.queue.updateQueueSourcesArr();
+
+        //TODO: move me to UI
         if(!this.game.getFeatureFlag("QUEUE")){
             $("#queueLink").hide();
         }
@@ -169,38 +172,16 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         }
     },
 
-    calculateRedshift: function(){
-        var currentTimestamp = Date.now();
-        var delta = this.game.opts.enableRedshift
-            ? currentTimestamp - this.timestamp
-            : 0;
-        //console.log("redshift delta:", delta, "old ts:", this.timestamp, "new timestamp:", currentTimestamp);
-
-        this.timestamp = currentTimestamp;
-        if (delta <= 0){
-            return;
-        }
-        var daysOffset = Math.round(delta / 2000);
-
-        /*avoid shift because of UI lags*/
-        if (daysOffset < 3){
-           return;
-        }
-
-        var maxYears = this.game.calendar.year >= 1000 || this.game.resPool.get("paragon").value > 0 ? 40 : 10;
-        var offset = this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear * maxYears;
-
-        //limit redshift offset by 1 year
-        if (daysOffset > offset){
-            daysOffset = offset;
-        }
-
+    applyRedshift: function(daysOffset, ignoreCalendar){
         //populate cached per tickValues
         this.game.resPool.update();
         this.game.updateResources();
         var resourceLimits = this.game.resPool.fastforward(daysOffset);
 
-        var numberEvents = this.game.calendar.fastForward(daysOffset);
+        var numberEvents = 0;
+        if(!ignoreCalendar){
+            numberEvents = this.game.calendar.fastForward(daysOffset);
+        }
         this.game.bld.fastforward(daysOffset);
         this.game.workshop.fastforward(daysOffset);
         this.game.village.fastforward(daysOffset);
@@ -229,6 +210,75 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 //shatterInCycles is deprecated
                 else {this.shatter(amt);}
             }
+        }
+        return numberEvents;
+    },
+    calculateRedshift: function(){
+        var currentTimestamp = Date.now();
+        var delta = this.game.opts.enableRedshift
+            ? currentTimestamp - this.timestamp
+            : 0;
+        //console.log("redshift delta:", delta, "old ts:", this.timestamp, "new timestamp:", currentTimestamp);
+
+        this.timestamp = currentTimestamp;
+        if (delta <= 0){
+            return;
+        }
+        var daysOffset = Math.round(delta / 2000);
+
+        /*avoid shift because of UI lags*/
+        if (daysOffset < 3){
+           return;
+        }
+
+        var maxYears = this.game.calendar.year >= 1000 || this.game.resPool.get("paragon").value > 0 ? 40 : 10;
+        var offset = this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear * maxYears;
+        var numberEvents = 0;
+        //limit redshift offset by 1 year
+        if (daysOffset > offset){
+            daysOffset = offset;
+        }
+        if(this.game.getFeatureFlag("QUEUE_REDSHIFT")){
+            var result = this.queue.getFirstItemEtaDay();
+            var daysOffsetLeft = daysOffset;
+            var redshiftQueueWorked = true;
+            if (!result[1]){
+                numberEvents = this.applyRedshift(daysOffset);
+                daysOffsetLeft = 0;
+            }
+            while (daysOffsetLeft > 0){
+                result = this.queue.getFirstItemEtaDay();
+                if (!result[1]){
+                    this.applyRedshift(daysOffsetLeft, true);
+                    daysOffsetLeft = 0;
+                    break;
+                }
+                if (result[1] & redshiftQueueWorked){
+                    var daysNeeded = result[0];// + 5; //let's have a little bit more days in case steamwork automation messes things up.
+                    daysNeeded /= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
+                    daysNeeded = Math.ceil(daysNeeded);
+                    daysNeeded *= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
+                    if (daysNeeded > daysOffsetLeft){
+                        this.applyRedshift(daysOffsetLeft, true);
+                        daysOffsetLeft = 0;
+                        this.queue.update();
+                        break;
+                    }
+                    this.applyRedshift(daysNeeded, true);
+                    daysOffsetLeft -= daysNeeded;
+                    this.queue.update();
+                    /*if (!redshiftQueueWorked){
+                        console.warn("Redshift queue failed to build", this.queue.queueItems[0]);
+                    }*/
+                }else{
+                    this.applyRedshift(daysOffsetLeft, true);
+                    daysOffsetLeft = 0;
+                }
+            }
+            numberEvents = this.game.calendar.fastForward(daysOffset);
+        }
+        else{
+            numberEvents = this.applyRedshift(daysOffset);
         }
 
         this.game.msg($I("time.redshift", [daysOffset]) + (numberEvents ? $I("time.redshift.ext",[numberEvents]) : ""));
@@ -1515,6 +1565,47 @@ dojo.declare("classes.queue.manager", null,{
     toggleAlphabeticalSort: function(){
         this.alphabeticalSort = !this.alphabeticalSort;
     },
+    /**
+     * Returns eta and
+     * if the eta was actually calculated.
+     * For now ignores per day and per year production.
+     * Corruption is also ignored.
+     */
+    getFirstItemEtaDay: function(){
+        if (this.queueItems.length == 0){
+            return [0, false];
+        }
+        var eta = 0;
+        var element = this.queueItems[0];
+        var modelElement = this.getQueueElementModel(element);
+        var prices = modelElement.prices;
+        var engineersConsumed = this.game.workshop.getConsumptionEngineers();
+        for (var ind in prices){
+            var price = prices[ind];
+            var res = this.game.resPool.get(price.name);
+		    if (res.value >= price.val){
+                continue;
+            }
+            if (res.maxValue < price.val){
+                return [eta, false];
+            }
+            var resPerTick = this.game.getResourcePerTick(res.name, true);
+            if (!resPerTick) {
+                return [eta, false];
+            }
+            var engineersProduced = this.game.workshop.getEffectEngineer(res.name, true);
+            var deltaPerTick = resPerTick + (engineersConsumed[res.name] || 0)+ engineersProduced;
+            eta = Math.max(eta,
+            (price.val - res.value) / (deltaPerTick) / this.game.calendar.ticksPerDay
+            );
+            if (engineersProduced){
+                var countdown = (1 / (this.game.workshop.getEffectEngineer(res.name, false))) / this.game.calendar.ticksPerDay;
+                eta = Math.ceil(eta/countdown)*countdown;
+            }
+        }
+        eta = Math.ceil(eta);
+        return [eta, true];
+    },
     updateQueueSourcesArr: function(){
         for (var i in this.queueSources){
             if (!this.queueSources[i]){
@@ -1567,7 +1658,7 @@ dojo.declare("classes.queue.manager", null,{
         "voidSpace": false,
         },
     queueSources: {},
-    queueNonStabkable:[
+    queueNonStackable:[
         "tech", "upgrades", "policies", "zebraUpgrades", "spaceMission"
     ],
     unlockQueueSource: function(source){
@@ -1577,91 +1668,102 @@ dojo.declare("classes.queue.manager", null,{
         }
     },
     cap: 0,
-    queueLength: 0,
     baseCap :2,
 
     constructor: function(game){
         this.game = game;
         
     },
+
+    /**
+     * Get maximum amount if individual (not grouped) items in the queue (see #queueLength)
+     */
     calculateCap: function(){
-        return this.game.bld.getBuildingExt("aiCore").meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap + this.game.getEffect("queueCap");
+        var aiCore = this.game.bld.getBuildingExt("aiCore");
+        return aiCore.meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap + this.game.getEffect("queueCap");
     },
 
-    addToQueue: function(name, type, label, shiftKey){
+    /**
+     * Get a length of all items in the queue (not a lenght of internal queue array) 
+     * E.g.
+     * 
+     * catnip field (2)
+     * mountain (1)
+     * 
+     * Should return a total length of 3
+     * */
+    queueLength: function(){
+        var length = 0;
+        for (var i in this.queueItems){
+            length += (this.queueItems[i].value || 1);
+        }
+        return length;
+    },
+
+    addToQueue: function(name, type, label, shiftKey /*add all*/){
         if (!name || !type){
             console.error("queueMgr#addToQueue: unable to add item:", name, type, label);
             return;
         }
 
-        if(this.queueLength >= this.cap){
+        if(this.queueLength() >= this.cap){
             return;
         }
+
+        //TODO: too complex logic, can we streamline it somehow?
         if(this.queueItems.length > 0 && this.queueItems[this.queueItems.length - 1].name == name){
-            if(this.queueNonStabkable.includes(type)){
+            if(this.queueNonStackable.includes(type)){
                 return;
             }
             var valOfItem = (this.queueItems[this.queueItems.length - 1].value || 1) + 1;
             this.queueItems[this.queueItems.length - 1].value = valOfItem;
-            this.queueLength += 1;
+
             if (shiftKey){
-                while(this.queueLength < this.cap){
+                while(this.queueLength() < this.cap){
                     this.addToQueue(name, type, label, false);
                 }
             }
             return;
         }
+        
         if(!label){
             label = "$" + name + "$";
         }
-            this.queueItems.push({
-                name: name,
-                type: type,
-                label: label
-            });
-        this.queueLength += 1;
+
+        this.queueItems.push({
+            name: name,
+            type: type,
+            label: label,
+            value: 1    //always store size of the queue group, even if it is a single item
+        });
+
         if (shiftKey && !this.queueNonStabkable.includes(type)){
-            while(this.queueLength < this.cap){
+            while(this.queueLength() < this.cap){
                 this.addToQueue(name, type, label, false);
             }
         }
     },
 
-    remove: function(type, name, index, full){
-        if(!this.queueItems.length){
-            this.queueLength = 0;
-            return;
+    /**
+     * Removes an item based on the queue group number (index) and amount
+     * @param {*} index 
+     * @param {*} amt 
+     * 
+     * @returns ture if element was removed and false otherwise
+     */
+    remove: function(index, amt){
+        if (index < 0 || index >= this.queueItems.length){
+            console.warn("queue#remove - invalid index", index);
+            return false;
         }
-        if(this.queueLength > index){
-            var item = this.queueItems[index];
-            if(item.name == name && item.type == type){
-                if(!item.value || item.value ===1){
-                    this.queueItems.splice(index, 1);
-                }
-                else{
-                    if (full){
-                        this.queueLength -= item.value;
-                        this.queueItems.splice(index, 1);
-                        return;
-                    }
-                    item.value -=1;
-                    if(item.value == 1){
-                        item.value = null;
-                    }
-                }
-                this.queueLength -= 1;
-                return;
-            }
-            else{
-                console.error("Queue index is pointing to a wrong item!");
-            }
-        } else{
-            console.error("Queue item index is out of bounds!", index, " ",this.queueLength);
+        var item = this.queueItems[index];
+        item.value -= amt;
+
+        if (!item.value){
+            this.queueItems.splice(index, 1);
         }
-        // Array.filter might cause some issues in older browsers, let's use jquery grep
-        /*this.queueItems = $.grep(this.queueItems, function( item, i ) {
-            return (item.name != name && item.type != type);
-        });*/
+
+        return true;
     },
 
     /**
@@ -1714,19 +1816,23 @@ dojo.declare("classes.queue.manager", null,{
                 var bld = this.game.bld;
                 for (var i in bld.buildingsData){
                     var building = bld.buildingsData[i];
-                    if(building.unlocked){
-                        var name = building.name;
-                        var label = building.label;
-                        if(building.stages){
-                            if(building.stages){
-                                label = building.stages[building.stage].label;
-                            }
-                        }
-                        options.push({
-                            name: name,
-                            label: label
-                        });
+
+                    if(!building.unlocked){
+                        continue;
                     }
+
+                    var name = building.name;
+                    var label = building.label;
+                    if(building.stages){
+                        if(building.stages){
+                            label = building.stages[building.stage].label;
+                        }
+                    }
+                    options.push({
+                        name: name,
+                        label: label
+                    });
+                    
                 }
                 return options;
 
@@ -1768,6 +1874,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+                
             case "chronoforge":
                 var chronoforgeUpgrades = this.game.time.chronoforgeUpgrades;
                 for (var i in chronoforgeUpgrades){
@@ -1780,6 +1887,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+
             case "voidSpace":
                 var voidSpaceUpgrades = this.game.time.voidspaceUpgrades;
                 for (var i in voidSpaceUpgrades){
@@ -1799,6 +1907,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+
             case "tech":
                 var technologies = this.game.science.techs;
                 for (var i in technologies){
@@ -1811,6 +1920,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+
             case "upgrades":
                 var upgrades = this.game.workshop.upgrades;
                 for (var i in upgrades){
@@ -1823,6 +1933,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+
             case "zebraUpgrades":
                 var zebraUpgrades = this.game.workshop.zebraUpgrades;
                 for (var i in zebraUpgrades){
@@ -1835,6 +1946,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+
             case "spaceMission":
                 var spaceMissions = this.game.space.programs;
                 for (var i in spaceMissions){
@@ -1847,6 +1959,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+
             case "policies":
                 var policies = this.game.science.policies;
                 for (var i in policies){
@@ -1859,6 +1972,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+
             case "religion":
                 var religionUpgrades = this.game.religion.religionUpgrades;
                 if(this.game.challenges.getChallenge("atheism").active){
@@ -1874,6 +1988,7 @@ dojo.declare("classes.queue.manager", null,{
                     }
                 }
                 return options;
+
             default:
                 return options;
         }
@@ -1893,36 +2008,111 @@ dojo.declare("classes.queue.manager", null,{
         this.dropLastItem();
         this.showList();
     },
-
-    update: function(){
-        /*var queueTypeSelect = document.getElementById('queueTypeSelect');
-        if(queueTypeSelect){
-            if(!this.game.science.get("rocketry").researched){
-                queueTypeSelect.options[2].label = "???";
-            }else{
-                queueTypeSelect.options[2].label = queueTypeSelect.options[2].value;
-            }
-            if(!(this.game.science.get("theology").researched && this.game.bld.get("ziggurat").val > 0)){
-                queueTypeSelect.options.value.label = "???";
-            }else{
-                queueTypeSelect.options.value.label = queueTypeSelect.options.value.value;
-            }
-            if(!this.game.science.get("cryptotheology").researched){
-                queueTypeSelect.options[4].label = "???";
-            }else{
-                queueTypeSelect.options[4].label = queueTypeSelect.options[4].value;
-            }
-        }
-        this.cap = this.calculateCap();
-        if(this.queueItems.length <= 0){
+    getQueueElementModel: function(el){
+        var itemMetaRaw = this.game.getUnlockByName(el.name, el.type);
+        if (!itemMetaRaw){
+            console.error("invalid queue item:", el);
             return;
         }
-        var el = {
-            "name": this.queueItems[0][0],
-            "type": this.queueItems[0][1]
-        };
-        //var el = this.queueItems[0];*/
 
+        var props = {
+            id: itemMetaRaw.name
+        };
+        switch (el.type){
+            case "policies":
+                props.controller = new classes.ui.PolicyBtnController(this.game);
+                var model = props.controller.fetchModel(props);
+                break;
+            case "tech":
+                props.controller = new com.nuclearunicorn.game.ui.TechButtonController(this.game);
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "buildings":
+                var bld = new classes.BuildingMeta(itemMetaRaw).getMeta();
+                props = {
+                    key:            bld.name,
+                    name:           bld.label,
+                    description:    bld.description,
+                    building:       bld.name
+                };
+                if (typeof(bld.stages) == "object"){
+                    props.controller = new classes.ui.btn.StagingBldBtnController(this.game);
+                } else {
+                    props.controller = new classes.ui.btn.BuildingBtnModernController(this.game);
+                }
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "spaceMission":
+                props.controller = new com.nuclearunicorn.game.ui.SpaceProgramBtnController(this.game);
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "spaceBuilding":
+                props.controller = new classes.ui.space.PlanetBuildingBtnController(this.game);
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "chronoforge":
+                props.controller = new classes.ui.time.ChronoforgeBtnController(this.game);
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "voidSpace":
+                props.controller = new classes.ui.time.VoidSpaceBtnController(this.game);
+                var model = props.controller.fetchModel(props);
+                if(el.name == "usedCryochambers"){ //a bunch of model black magic
+                    props.controller = new classes.ui.time.FixCryochamberBtnController(this.game);
+                    itemMetaRaw = this.game.getUnlockByName("cryochambers", el.type);
+                    model.prices = this.game.time.getVSU("usedCryochambers").fixPrices;
+                    model.enabled = this.game.resPool.hasRes(model.prices); //check we actually have enough to do one fix!
+                    console.log(model);
+                }
+                break;
+
+            case "zigguratUpgrades":
+                props.controller = new com.nuclearunicorn.game.ui.ZigguratBtnController(this.game);
+                //var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "religion":
+                props.controller = new com.nuclearunicorn.game.ui.ReligionBtnController(this.game);
+                //var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "transcendenceUpgrades":
+                props.controller = new classes.ui.TranscendenceBtnController(this.game);
+                //var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "pacts":
+                props.controller = new com.nuclearunicorn.game.ui.PactsBtnController(this.game);
+                //var oldVal = itemMetaRaw.val;
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "upgrades":
+                //compare = "researched";
+                props.controller = new com.nuclearunicorn.game.ui.UpgradeButtonController(this.game);
+                //var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "zebraUpgrades":
+                //compare = "researched";
+                props.controller = new com.nuclearunicorn.game.ui.ZebraUpgradeButtonController(this.game);
+                //var oldVal = itemMetaRaw.researched;
+                var model = props.controller.fetchModel(props);
+                break;
+        }
+        //return props, model;
+        return model;
+    },
+    update: function(){
         this.cap = this.calculateCap();
         if(!this.queueItems.length){
             return;
@@ -1931,10 +2121,17 @@ dojo.declare("classes.queue.manager", null,{
 
         var itemMetaRaw = this.game.getUnlockByName(el.name, el.type);
         var compare = "val"; //we should do some sort of refractoring of the switch mechanism
+
+        if (!itemMetaRaw){
+            console.error("invalid queue item:", el);
+            return;
+        }
+
         var props = {
-            id:            itemMetaRaw.name
+            id: itemMetaRaw.name
         };
         var buyItem = true;
+
         switch (el.type){
             case "policies":
                 compare = ["researched", "blocked"];
@@ -1945,12 +2142,14 @@ dojo.declare("classes.queue.manager", null,{
                 };
                 var model = props.controller.fetchModel(props);
                 break;
+                
             case "tech":
                 compare = "researched";
                 props.controller = new com.nuclearunicorn.game.ui.TechButtonController(this.game);
                 var oldVal = itemMetaRaw.researched;
                 var model = props.controller.fetchModel(props);
                 break;
+
             case "buildings":
                 var bld = new classes.BuildingMeta(itemMetaRaw).getMeta();
                     oldVal = itemMetaRaw.val;
@@ -1969,22 +2168,26 @@ dojo.declare("classes.queue.manager", null,{
                 props.controller.build(model, 1);
                 buyItem = false;
                 break;
+
             case "spaceMission":
                 compare = "reached";
                 props.controller = new com.nuclearunicorn.game.ui.SpaceProgramBtnController(this.game);
                 var oldVal = itemMetaRaw.researched;
                 var model = props.controller.fetchModel(props);
                 break;
+
             case "spaceBuilding":
                 props.controller = new classes.ui.space.PlanetBuildingBtnController(this.game);
                 var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 break;
+
             case "chronoforge":
                 props.controller = new classes.ui.time.ChronoforgeBtnController(this.game);
                 var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 break;
+
             case "voidSpace":
                 props.controller = new classes.ui.time.VoidSpaceBtnController(this.game);
                 var oldVal = itemMetaRaw.val;
@@ -1997,32 +2200,38 @@ dojo.declare("classes.queue.manager", null,{
                     console.log(model);
                 }
                 break;
+
             case "zigguratUpgrades":
                 props.controller = new com.nuclearunicorn.game.ui.ZigguratBtnController(this.game);
                 var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 break;
+
             case "religion":
                 props.controller = new com.nuclearunicorn.game.ui.ReligionBtnController(this.game);
                 var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 break;
+
             case "transcendenceUpgrades":
                 props.controller = new classes.ui.TranscendenceBtnController(this.game);
                 var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 break;
+
             case "pacts":
                 props.controller = new com.nuclearunicorn.game.ui.PactsBtnController(this.game);
                 var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 break;
+
             case "upgrades":
                 compare = "researched";
                 props.controller = new com.nuclearunicorn.game.ui.UpgradeButtonController(this.game);
                 var oldVal = itemMetaRaw.researched;
                 var model = props.controller.fetchModel(props);
                 break;
+
             case "zebraUpgrades":
                 compare = "researched";
                 props.controller = new com.nuclearunicorn.game.ui.ZebraUpgradeButtonController(this.game);
@@ -2030,10 +2239,10 @@ dojo.declare("classes.queue.manager", null,{
                 var model = props.controller.fetchModel(props);
                 break;
         }
+        
         if(!props.controller){
             console.error(el.name + " of " + el.type + " queing is not supported!");
             var deletedElement = this.queueItems.shift();
-            this.queueLength -= deletedElement.value || 1;
             this.game._publish("ui/update", this.game);
         }
         if(buyItem){
@@ -2050,20 +2259,16 @@ dojo.declare("classes.queue.manager", null,{
             changed = oldVal != model.metadata[compare];
         }
         if(changed){
-            //this.queueItems.shift();
             this.dropLastItem();
-            this.queueLength -= 1;
             this.game._publish("ui/update", this.game);
         }
+
         if(compare == "research" || compare == "reached" && model.metadata[compare] == true
-        || (compare.includes("blocked") && model.metadata["blocked"] == true) ||
-        (compare.includes("research") && model.metadata["research"] == true)
+            || (compare.includes("blocked") && model.metadata["blocked"] == true) ||
+            (compare.includes("research") && model.metadata["research"] == true)
         ){
             this.dropLastItem();
-            this.queueLength -= 1;
             this.game._publish("ui/update", this.game);
         }
     }
-
-
 });

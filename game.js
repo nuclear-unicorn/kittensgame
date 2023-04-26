@@ -1804,6 +1804,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		QUEUE:{
 			beta: true,
 			main: true
+		},
+		QUEUE_REDSHIFT: {
+			beta: true,
+			main: false
 		}
 	},
 
@@ -4979,6 +4983,18 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 	},
 
+	/**
+	 * Unlock a set of metadata elements based on the meta type and item id
+	 * e.g:
+	 * {
+	 * 	buildings: [...],
+	 * 	space: [...]
+	 * }
+	 * See #getUnlockByName for a full list of types
+	 * @param {*} list 
+	 * 
+	 * TODO: clarify `unlockable` vs unlocked for buildings vs other stuff
+	 */
 	unlock: function(list) {
 		var game = this; 
 		for (var type in list) {
@@ -5101,7 +5117,21 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
     },
 
 	//-----------------------------------------------------------------
-	
+	//TODO: use me on mobile version
+	checkEldermass: function(){
+		if (this.isEldermass()){
+			if (this.resPool.get("elderBox").value == 0){
+				this.resPool.get("elderBox").value++;
+				this.msg($I("gift.get"), "important");
+			}
+		} else {
+			if (this.resPool.get("elderBox").value > 0 && this.resPool.get("elderBox").value < 1) {
+				this.resPool.get("elderBox").value = 1;
+				this.msg($I("gift.repaired"), "important");
+			}
+		}
+	},
+
 	redeemGift: function(){
 		if (this.resPool.get("elderBox").value == 0) {
 			return;
