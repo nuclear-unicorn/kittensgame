@@ -143,9 +143,15 @@
     "buildings.harbor.flavor": "¡Gato a la vista!",
     "buildings.hut.label": "Choza",
     "buildings.hut.desc": "Construye una choza (caben 2 gatitos). Si los gatitos no comen hierba gatera, morirán.<br>Cada gatito consume cerca de 4 hierbas gateras",
+    "buildings.hut.flavor": "Melodía para dos",
     "buildings.hydroplant.label": "Planta hidroeléctrica",
     "buildings.hydroplant.desc": "Una fuente moderna de producción energética",
     "buildings.library.label": "Biblioteca",
     "buildings.library.desc": "Construye una biblioteca para almacenar el sagrado conocimiento felino. Cada nivel de mejora aumenta tu producción científica en 10 %",
-    "buildings.library.flavor": "Está todo en gatonés"
+    "buildings.library.flavor": "Está todo en gatonés",
+    "buildings.logHouse.label": "Casa de troncos",
+    "buildings.logHouse.desc": "Construye una casa (cabe 1 gatito)",
+    "buildings.logHouse.flavor": "La pequeña casa en la pradera",
+    "buildings.lumberMill.label": "Aserradero",
+    "buildings.lumberMill.desc": "Mejora la producción de madera en 10 %"
 }
