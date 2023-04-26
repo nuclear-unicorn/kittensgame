@@ -163,5 +163,21 @@
     "buildings.mine.label": "Mina",
     "buildings.mine.desc": "Desbloquea el trabajo: minero. Cada nivel de mejora aumenta tu producción de mineral en 20 %",
     "buildings.mine.flavor": "Los gatitos no le temen a la oscuridad",
-    "buildings.mint.label": "Casa de Moneda"
+    "buildings.mint.label": "Casa de Moneda",
+    "buildings.mint.desc": "Produce recursos de lujo proporcionales a tu fuerza felina. Consume fuerza felina y algo de oro.",
+    "buildings.observatory.label": "Observatorio",
+    "buildings.observatory.desc": "Aumenta la probabilidad de eventos astronómicos en 0,2 %",
+    "buildings.observatory.flavor": "Para algún día atrapar esa hadita de luz roja",
+    "buildings.oilWell.label": "Pozo petrolero",
+    "buildings.oilWell.desc": "Produce algo de petróleo y aumenta en 1500 el límite máximo de petróleo",
+    "buildings.oilWell.flavor": "Levantarse temprano, trabajar hasta tarde y encontrar petróleo.",
+    "buildings.pasture.label": "Pastizal",
+    "buildings.pasture.desc": "Proporciona una fuente de alimento alternativa que reduce el consumo de hierba gatera.",
+    "buildings.pasture.flavor": "¡Tómese una pinta de leche, señor!",
+    "buildings.quarry.label": "Cantera",
+    "buildings.quarry.desc": "Cada cantera mejora la eficiencia minera en 35 % y produce algo de carbón",
+    "buildings.quarry.flavor": "¡Está lleno de deportistas juveniles! Un momento... esa es otra ''cantera''",
+    "buildings.reactor.label": "Reactor",
+    "buildings.reactor.desc": "Proporciona un aumento de 5 % a la producción mientras esté activo. Requiere uranio para funcionar.",
+    "buildings.reactor.flavor": "¡Los ratones luminosos son más fáciles de atrapar!"
 }
