@@ -153,5 +153,15 @@
     "buildings.logHouse.desc": "Construye una casa (cabe 1 gatito)",
     "buildings.logHouse.flavor": "La pequeña casa en la pradera",
     "buildings.lumberMill.label": "Aserradero",
-    "buildings.lumberMill.desc": "Mejora la producción de madera en 10 %"
+    "buildings.lumberMill.desc": "Mejora la producción de madera en 10 %",
+    "buildings.lumberMill.flavor": "Más te vale no quedarte dormido como un tronco aquí",
+    "buildings.magneto.label": "Magneto",
+    "buildings.magneto.desc": "Mejora tu producción total de recursos en 2 %. Cada máquina a vapor aumenta el efecto en 15 %. Consume petróleo.",
+    "buildings.mansion.label": "Mansión",
+    "buildings.mansion.desc": "Una espaciosa mansión (cabe 1 gatito)",
+    "buildings.mansion.flavor": "El mejor contenedor disponible",
+    "buildings.mine.label": "Mina",
+    "buildings.mine.desc": "Desbloquea el trabajo: minero. Cada nivel de mejora aumenta tu producción de mineral en 20 %",
+    "buildings.mine.flavor": "Los gatitos no le temen a la oscuridad",
+    "buildings.mint.label": "Casa de Moneda"
 }
