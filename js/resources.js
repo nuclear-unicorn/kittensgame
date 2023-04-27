@@ -749,7 +749,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	//All energy consumption amounts are multiplied by this number.
 	getEnergyConsumptionRatio: function() {
 		var game = this.game;
-		return (1 + game.getLimitedDR(game.getEffect("energyConsumptionRatio"), 1) + game.getEffect("energyConsumptionIncrease")) *
+		//LDR for the effect named "energyConsumptionRatio" is specified in challenges.js
+		return (1 + game.getEffect("energyConsumptionRatio") + game.getEffect("energyConsumptionIncrease")) *
 				(game.challenges.isActive("energy") ? 2 : 1);
 	},
 
