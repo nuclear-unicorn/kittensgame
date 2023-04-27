@@ -36,6 +36,10 @@ img.loader {
 
     box-shadow: 1px 0px 2px #888;
     min-width: 1180px;
+
+    display: flex;
+    justify-content: space-between;
+    white-space: nowrap;
 }
 
 #game, #loadingContainer {
@@ -85,6 +89,7 @@ img.loader {
     width: 25%;
     max-width: 400px;
     min-width: 300px;
+    padding-left: 5px;
     padding-right: 20px;
 
     overflow-y: auto;
@@ -353,6 +358,17 @@ select > option:disabled {
     border: 1px solid gray;
 }
 
+.achievement.badge {
+    display: inline-block;
+    width: 45%;
+}
+
+.achievement.badge:nth-child(2n+1) { /* select even elements */
+    margin-left: 10px;
+    float: right;
+}
+
+
 .achievement.unethical {
     border-color: red;
 }
@@ -395,6 +411,13 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
     right: 20px !important;
     bottom: auto !important;
     left: auto !important;
+}
+
+.tooltip-divider {
+    text-align: center;
+    width: 100%;
+    border-bottom: "1px solid gray";
+    padding-bottom: "4px";
 }
 
 .msg {
@@ -543,6 +566,10 @@ table.craftTable tr:hover td {
     color: coral;
 }
 
+.toolbarIcon.pollutionIcon div {
+    color: #404040;
+}
+
 .toolbarIcon .status-indicator-online {
     color: green;
 }
@@ -551,17 +578,77 @@ table.craftTable tr:hover td {
     color: red;
 }
 
+.toolbarIcon .pollutionText {
+    padding-left: 17px;    
+}
+
+.toolbarIcon .happinessText {
+    padding-left: 16px;
+}
+
+.toolbarIcon .energyText {
+    padding-left: 15px;
+}
+
+.toolbarIcon.pollutionIcon {
+    background: no-repeat top left url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='14' fill='%23404040' viewBox='0 0 16 16'%3E%3Cpath d='M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383zm.653.757c-.757.653-1.153 1.44-1.153 2.056v.448l-.445.049C2.064 6.805 1 7.952 1 9.318 1 10.785 2.23 12 3.781 12h8.906C13.98 12 15 10.988 15 9.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 4.825 10.328 3 8 3a4.53 4.53 0 0 0-2.941 1.1z'/%3E%3C/svg%3E");
+}
+
+.toolbarIcon.happiness {
+    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='%23FF7F50' viewBox='0, 0, 400,365.7142857142857'%3E%3Cg %3E%3Cpath id='path0' d='M23.809 26.069 C 9.506 63.687,-3.876 244.068,5.454 273.466 C 42.343 389.691,311.117 402.522,383.842 291.529 C 400.102 266.714,401.966 245.454,395.450 159.135 C 383.595 2.098,363.666 -27.023,299.032 18.249 C 261.840 44.299,133.578 44.945,105.157 19.224 C 74.567 -8.459,35.693 -5.188,23.809 26.069 M95.086 43.441 C 121.604 72.743,266.428 71.037,311.785 40.888 C 351.877 14.240,351.212 13.344,366.764 114.971 C 393.215 287.824,351.297 345.860,200.000 345.860 C 57.492 345.860,12.935 293.440,31.361 147.462 C 47.965 15.915,56.931 1.281,95.086 43.441 '%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
+}
+
+.toolbarIcon.energy {
+    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%23008000' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
+}
+
+.toolbarIcon.energy.warning {
+    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%23ff0000' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
+}
+
+.toolbarIcon.energy.warningWinter {
+    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%23FF7F50' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
+}
+
+.kgnet-login-link {
+    cursor:pointer;
+}
+
+.kgnet-login-link:hover {
+    cursor:pointer;
+    text-decoration: underline;
+}
+
 /* kgnet login form */
 .login-popup {
     position: absolute;
     top: 20px;
-    border: 1px solid gray;
     padding: 5px;
     background: white;
     z-index: 1;
 
     margin-left: -35px;
     font-size: 15px;
+}
+
+.login-popup .last-backup {
+    margin-bottom: 10px;
+    border-bottom: 1px solid gray;
+}
+
+.login-popup .error {
+    max-width: 25rem;
+    display: block;
+    white-space: break-spaces;
+    color: red;
+}
+
+.hazard {
+    background-image: linear-gradient(135deg, #f5ce31 25%, #2b4352 25%, #2b4352 50%, #f5ce31 50%, #f5ce31 75%, #2b4352 75%, #2b4352 100%);
+    background-size: 28.28px 28.28px;
+    display: block;
+    height: 5px;
+    width: 100%;
 }
 
 .login-popup a.link {
@@ -588,11 +675,19 @@ table.craftTable tr:hover td {
     margin-right: 5px;
 }
 
-.tooltip-block, .tooltip-block > div {
-    z-index: 9999;
-    display: inline-block;
+.tooltip-block {
     cursor: pointer;
     padding-left: 3px;
+    display: inline-block;
+}
+
+.tooltip-block > div {
+    z-index: 9999;
+    padding: 5px;
+}
+
+.tooltip-block > div {
+    border: 1px solid lightgray;
 }
 
 .save-record-container {
@@ -613,6 +708,10 @@ table.craftTable tr:hover td {
 .save-record-cell {
     display: table-cell;
     padding-right: 10px;
+}
+
+.save-record input {
+    width: 5rem;
 }
 
 .userProfile .save-record {
@@ -696,6 +795,17 @@ label i {
 label:hover {
     opacity: 0.7;
 }
+
+/* mark archived saves with strikethrough and lighter color */
+
+.save-record.archived .save-record-cell, .save-record.archived .save-record-cell * {
+    text-decoration:line-through;
+    color:#999;
+}
+
+/* -----------------------------------
+            Options
+-----------------------------------*/
 
 #optionsDiv {
     overflow-y: scroll;
@@ -902,6 +1012,11 @@ a:hover {
     padding-right: 2px;
 }
 
+#topBar .links-block a { 
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
 .links-block a:hover{
     text-decoration: underline;
 }
@@ -979,6 +1094,7 @@ progress[value]::-webkit-progress-value {
     background-color: rgb(239, 239, 244);
     border: 1px solid #a8a7ac;
     position: absolute;
+    margin-top: -20px;
     margin-left: 20px;
     padding-right: 10px;
 }
@@ -1017,10 +1133,6 @@ a.link.collapse:hover {
 
 .res-toolbar .link.toggled {
     color: darkred;
-}
-
-.res-toolbar.left {
-    padding-left:5px;
 }
 
 .res-table {
@@ -1131,7 +1243,14 @@ a.link.collapse:hover {
 /*--------------------------------------
                 Village
 ---------------------------------------*/
-
+.currentGovernment a { /* reduction of the hitbox of the "Unassign Leader" and "Promote .." links so that it does not extend completely to the far right of the frame */
+	width: fit-content;
+}
+.currentLeader .name {
+	background: no-repeat top -5px left url("data:image/svg+xml,%3Csvg width='24px' height='24px' viewBox='0 0 24 24' fill='%23000000' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18.53 19.24H5.4C5.24283 19.2414 5.0893 19.1927 4.96164 19.101C4.83399 19.0094 4.73885 18.8794 4.69 18.73L1.5 9C1.45113 8.86009 1.446 8.70861 1.4853 8.56571C1.52459 8.42281 1.60646 8.29525 1.72 8.2C1.83214 8.10161 1.97141 8.03941 2.11953 8.02157C2.26764 8.00372 2.4177 8.03106 2.55 8.1L8.37 11L11.37 5.18C11.4392 5.06398 11.5373 4.9679 11.6547 4.90118C11.7722 4.83446 11.9049 4.79938 12.04 4.79938C12.1751 4.79938 12.3078 4.83446 12.4253 4.90118C12.5427 4.9679 12.6408 5.06398 12.71 5.18L15.71 11.01L21.54 8.11C21.6708 8.0419 21.8191 8.01501 21.9655 8.03286C22.1119 8.05071 22.2494 8.11247 22.36 8.21C22.4557 8.31491 22.5197 8.44486 22.5445 8.58471C22.5693 8.72456 22.5539 8.86858 22.5 9L19.24 18.72C19.1929 18.8713 19.0985 19.0034 18.9707 19.097C18.8429 19.1906 18.6884 19.2407 18.53 19.24ZM6 17.74H18L20.51 10.25L15.64 12.67C15.5528 12.7146 15.4576 12.7415 15.3599 12.749C15.2623 12.7566 15.1641 12.7446 15.071 12.7139C14.978 12.6832 14.892 12.6344 14.818 12.5702C14.744 12.506 14.6835 12.4278 14.64 12.34L12 7.16L9.37 12.34C9.32648 12.4278 9.26596 12.506 9.19197 12.5702C9.11798 12.6344 9.03197 12.6832 8.93895 12.7139C8.84593 12.7446 8.74774 12.7566 8.65007 12.749C8.5524 12.7415 8.45721 12.7146 8.37 12.67L3.48 10.22L6 17.74Z' /%3E%3C/svg%3E");
+	padding-left: 28px;
+	font-weight: bold;
+}
 .census-block {
     border: 1px solid gray;
 	margin-bottom: 5px;
@@ -1149,21 +1268,44 @@ a.link.collapse:hover {
 }
 
 .name.color-brown {
-    color:#856341;
+    color: saddlebrown;
 }
 .name.color-cream {
-    color:lightcoral;
+    color: tan;
 }
 .name.color-black {
-    color:darkgrey;
+    color: dimgray;
 }
 .name.color-fawn {
-    color:gainsboro;
+    color: sandybrown;
 }
 .name.color-white {
-    color:floralwhite
+    color: silver
 }
 
+/*credits go to Volk*/
+.name.variety-none {
+	border: 1px solid transparent;
+}
+.name.variety-dual { /* bicolore */
+	border: 1px solid grey;
+}
+.name.variety-tabby { /* tigré  ou rayé */
+	border: 1px dashed grey;
+}
+.name.variety-torbie { /* marbré strié */
+	border: 1px dashed grey;
+	border-left: dotted;
+	border-right: dotted;
+}
+.name.variety-calico { /* tricolore */
+	border: 1px solid grey;
+	border-top-color: saddlebrown;
+	border-bottom-color: peru;
+}
+.name.variety-spots { /* tacheté */
+	border: 1px dotted grey;
+}
 
 /*--------------------------------------
                 Map
@@ -1614,4 +1756,12 @@ div.leet {
 
 #crowdjet-expand-container iframe {
     display: none;
+}
+
+.queue-container .queue-label {
+    cursor: pointer;
+}
+
+.queue-container .queue-label:hover {
+    text-decoration: underline;
 }

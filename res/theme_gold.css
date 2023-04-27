@@ -42,7 +42,7 @@ body.scheme_gold {
 .scheme_gold .btn.modern.disabled span.btnTitle { /* to change only the properties of the button name for buttons disabled */
     color: #919084;
 }
-.scheme_gold .btn.modern.disabled span.btnTitle.limited { /* to change only the properties of the button name for buttons limited */
+.scheme_gold .btn.modern.disabled.limited span.btnTitle { /* to change only the properties of the button name for buttons limited */
 	color: #C83B00;
 }
 .scheme_gold .btn.modern:not(.disabled) {
@@ -238,7 +238,7 @@ body.scheme_gold {
 .scheme_gold #topBar a.copyright:hover {
 	color: #DFCE99;
 }
-.scheme_gold #headerLinks .links-block { /* a link separator : | on header links */
+.scheme_gold #topBar .links-block { /* a link separator : | on topBar links */
 	color: #404040;
 }
 .scheme_gold #topBar div {
@@ -251,9 +251,9 @@ body.scheme_gold {
 .scheme_gold .toolbarIcon.sorrow.max div {
     color: #C83B00 !important; /* in default.js !important needed */
 }
-.scheme_gold #topBar > div:first-child > span:first-child:after {
+.scheme_gold #topBar > div:first-child > span:last-of-type::after {
     color: #DFCE99;
-    content: '\00a0\00a0\00a0Theme by Volkeyrn\00a0\00a0\00a0';
+    content: '\00a0\00a0\00a0Theme by Volkeyrn';
     text-decoration: none;
 	font-weight: normal;
 }
@@ -310,6 +310,7 @@ body.scheme_gold {
 }
 .scheme_gold .button_tooltip {
     background-color: transparent;
+    backdrop-filter: none; /* default : backdrop-filter: blur(2px); */
 }
 .scheme_gold .button_tooltip div { /* tooltip window == left column: right text | center column :highlighting text */
 	color: #c3c3c3;

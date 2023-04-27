@@ -1,11 +1,63 @@
+v 1.4.9.2
+Major:
+* Queue
+
+Minor:
+* Biomes will now provide effects when explored
+
+v 1.4.9.1
+* Game will not break trying to tokenize K/G/M prefixes for infinite values anymore
+* Apo will now respect noConfirm flag
+* Added visual warning when users did not export saves for a while
+
+v 1.4.9.0
+Major:
+* Holy Genocide
+
+- IW Changes by Zig
+* Dark Revolution
+* Ivory Temples
+* Whispers
+* Minerology Department
+
+v 1.4.8.6
+Major:
+* Biomes
+* Basges
+* Post Apocalypse challenge (Zig)
+
+Minor:
+* Levi filter
+* Fixed IRC embedded link
+* Crowdin will no longer block page in offline mode
+
+v 1.4.8.5 (9 may 2021)
+Major:
+* Added pollution mechanic (Zig and Hunter)
+Minor:
+* Bugfix: Fixing Cryochambers doesn't allow to overcap them anymore
+* Staged buildings now can be made togglable
+* Deleted Resource Order file
+* Other bugfixes
+
+v 1.4.8.4 (6 apr 2021)
+Major:
+* Added pacifism challenge
+* Deleted auto reclaim
+Minor:
+* Optimisation refractors
+
 v 1.4.8.3 (16 nov 2020)
 
 Major:
-* Repeatable challenges (phase 1)
-* Chiral aka KGNet integration
+* Repeatable challenges (rewards on completion, resource reserves)
+* KGNet integration
 
 Minor:
 * Theme bugfixes
+* Instructional text for buildings panel
+* Left/right arrow key navigation (patsy)
+* Various policy and game related fixes (Zig and patsy)
 
 v 1.4.8.2 (15 aug 2020)
 Major:

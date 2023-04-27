@@ -1,0 +1,1360 @@
+/* ************************************************************ */
+/* ***			Catnip 1.0.0 Theme © Volkeyrn               *** */
+/* ************************************************************ */
+
+/* ************* */
+/* *** FONTS *** */
+/* ************* */
+@import url(https://fonts.googleapis.com/css?family=Delius&display=swap);
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:ital,wght@300,400,700,300italic,400italic,700italic&display=swap);
+
+/* source of images for graphic design */
+/* *********************************** */
+/* kgm_theme_catnip_texture.png : https://pngtree.com/freebackground/simple-beautiful-green-grass_912642.html Volkeyrn: permanent premium member */
+/* *********************************** */
+
+/* ******************************************** */
+/* ******************* GAME ******************* */
+/* ******************************************** */
+body.scheme_catnip {
+	background: fixed repeat-x left -850px bottom url('img/theme_catnip_texture.png'),
+                radial-gradient(ellipse at left top, rgba(235, 244, 195, 1) 0%, rgba(207, 227, 142, 1) 100%);
+}
+.scheme_catnip #gamePageContainer,
+.scheme_catnip select,
+.scheme_catnip .btn,
+.scheme_catnip .modern,
+.scheme_catnip .btn.modern,
+.scheme_catnip input[type='button'] {
+	font-family: 'Delius', cursive;
+}
+.scheme_catnip .btn {
+	color: gray;
+	margin-bottom: 7px; /* default margin-bottom: 10px; */
+	background-color: transparent;
+	border: solid 1px transparent;
+    /* default padding: 5px; */
+	/* default width: 170px; */
+}
+.scheme_catnip .btn.modern {
+	/* default font-size: 14px; */
+	/* default font-family: Helvetica; */
+    /* default border: solid 1px transparent; */
+    /* default padding: 0; */
+	border-radius: 5px;/* default border-radius: 3px; */
+	/* default width: 264px; */
+}
+.scheme_catnip .btn.modern.disabled {
+	border: 1px solid rgba(0 ,0 ,0 , 0.1);
+	background-color: rgba(158, 173, 105, 0.65);
+}
+.scheme_catnip .btn.modern.disabled:hover {
+	background-color: rgba(158, 173, 105, 0.75);
+}
+.scheme_catnip .btn.modern.disabled span.btnTitle { /* to change only the properties of the button name for buttons disabled */
+	color: #3c4128;
+}
+.scheme_catnip .btn.modern.disabled.limited span.btnTitle { /* to change only the properties of the button name for buttons limited */
+	color: #9f0800;
+}
+.scheme_catnip .btn.modern:not(.disabled) {
+	border: 1px solid rgba(0 ,0 ,0 , 0.1);
+	background-color: rgba(113, 148 , 64, 0.85);
+}
+.scheme_catnip .btn.modern:not(.disabled):hover {
+	background-color: rgba(113, 148 , 64, 0.98);
+}
+.scheme_catnip .btn.modern:not(.disabled) span.btnTitle { /* to change only the properties of the button name for buttons enabled */
+	color: #fafbf9;
+}
+.scheme_catnip a {
+	color: #3c4128;
+	/* default padding-right: 5px; */
+}
+.scheme_catnip a,
+.scheme_catnip .craft-link {
+    text-decoration: none;
+}
+.scheme_catnip a:hover {
+	color: #00979f;
+	opacity: 1.0; /* default opacity: 0.6 */
+}
+.scheme_catnip div {
+	color: #1e2114;
+}
+.scheme_catnip .disabled div { /* color text for disabled */
+	color: #575a4b;
+}
+.scheme_catnip h1 {
+	/* default margin-top: 30px; */
+	font-size: 18px; /* default font size = font-size: 12px; */
+	text-transform: capitalize;
+	color: #366208;
+	padding-left: 20px;
+	margin-bottom: 8px;
+}
+.scheme_catnip h1:first-child {
+    margin-top: 15px;
+}
+/* .scheme_catnip .btn.modern.small-text { */
+	/* default font-size: 90%; */
+/* } */
+.scheme_catnip .modern .btnContent {
+    padding: 10px 0 10px 1px; /* 1px left for buttons without power background-image */
+}
+/* *** green and red light for machine on/off *** */
+.scheme_catnip .btn.bldEnabled div.btnContent,
+.scheme_catnip .btn.bldlackResConvert div.btnContent {
+	padding: 10px 0 10px 13px; /* 13px left for power background-image */
+	border: none; /* also allows you to remove the height difference with the other buttons (they have no border on div.content) */
+}
+.scheme_catnip .btn.disabled.bldlackResConvert { /* color for lack resources convertion */
+	background: no-repeat padding-box linear-gradient(90deg, rgba(159, 8, 0, 0.65) 0, rgba(159, 8, 0, 0.65) 9px, transparent 12px, transparent 100%), rgba(158, 173, 105, 0.65);
+}
+.scheme_catnip .btn.disabled.bldlackResConvert:hover {
+	background: no-repeat padding-box linear-gradient(90deg, rgba(159, 8, 0, 0.75) 0, rgba(159, 8, 0, 0.75) 9px, transparent 12px, transparent 100%), rgba(158, 173, 105, 0.75);
+}
+.scheme_catnip .btn:not(.disabled).bldlackResConvert {
+	background: no-repeat linear-gradient(90deg, rgba(159, 8, 0, 0.85) 0, rgba(159, 8, 0, 0.85) 9px, transparent 12px, transparent 100%), rgba(113, 148 , 64, 0.85);
+}
+.scheme_catnip .btn:not(.disabled).bldlackResConvert:hover {
+	background: no-repeat linear-gradient(90deg, rgba(159, 8, 0, 0.98) 0, rgba(159, 8, 0, 0.98)0 9px, transparent 12px, transparent 100%), rgba(113, 148 , 64, 0.98);
+}
+.scheme_catnip .btn.disabled.bldEnabled {
+	background: no-repeat padding-box linear-gradient(90deg, rgba(131, 203, 59, 0.65) 0, rgba(131, 203, 59, 0.65) 9px, transparent 12px, transparent 100%), rgba(158, 173, 105, 0.65);
+}
+.scheme_catnip .btn.disabled.bldEnabled:hover {
+	background: no-repeat padding-box linear-gradient(90deg, rgba(131, 203, 75, 0.85) 0, rgba(131, 203, 59, 0.75) 9px, transparent 12px, transparent 100%), rgba(158, 173, 105, 0.98);
+}
+.scheme_catnip .btn:not(.disabled).bldEnabled {
+	background: no-repeat linear-gradient(90deg, rgba(131, 203, 59, 0.85) 0, rgba(131, 203, 59, 0.85) 9px, transparent 12px, transparent 100%), rgba(113, 148 , 64, 0.85);
+}
+.scheme_catnip .btn:not(.disabled).bldEnabled:hover {
+	background: no-repeat linear-gradient(90deg, rgba(131, 203, 59, 0.98) 0, rgba(131, 203, 59, 0.98) 9px, transparent 12px, transparent 100%), rgba(113, 148 , 64, 0.98);
+}
+/* *** end of green light for machine on/off *** */
+.scheme_catnip .dialog {
+	/* default left: 50%; */
+	/* default top: 50%; */
+	/* default padding: 20px; */
+	background: radial-gradient(ellipse at right top, rgba(235, 244, 195, 0.9) 0%, rgba(207, 227, 142, 0.9) 100%);
+	border: 3px solid #575a4b;
+	border-radius: 7px;
+	box-shadow: 0 0 7px 2px rgba(0, 0 , 0, 0.75);
+}
+.scheme_catnip #optionsDiv,
+.scheme_catnip #importDiv,
+.scheme_catnip #exportDiv {
+	background: radial-gradient(ellipse at right top, rgba(235, 244, 195, 0.9) 0%, rgba(207, 227, 142, 0.9) 100%);
+}
+.scheme_catnip .dialog a {
+	text-transform: capitalize;	
+}
+.scheme_catnip .dialog a:hover {
+	color: #00979f;
+}
+.scheme_catnip label i { /* information text in option windows */
+    /* default font size = font-size: 90%; */
+	color: #575a4b;
+	opacity: 0.8;
+}
+.scheme_catnip label {
+	margin-top: 2px;
+}
+.scheme_catnip label:hover {
+	opacity: 1;/* default opacity: 0.7; */
+	color: #00979f;
+}
+.scheme_catnip label:hover i {
+	text-shadow: none;
+}
+.scheme_catnip select { /* dropdown list on settlement tab and options windows */ /* 226d38 */
+	-moz-appearance: none; /* menu list box indicator exceeds button height with firefox because of box-shadow */
+	border-radius: 5px;
+	font-size: 15px;
+	margin-left: 5px;
+	padding-bottom: 2px;
+	background-color: rgba(0, 0, 0, 0.3);
+	border: 1px solid rgba(0 ,0 ,0 , 0.1);
+}
+.scheme_catnip select:hover {
+	background-color: rgba(0, 0, 0, 0.75);
+	color: #fafbf9;
+}
+.scheme_catnip select>option {
+	background-color: #575a4b;
+    color: #fafbf9;
+	padding: 2px 10px; /* -2 pixel vertical */
+}
+.scheme_catnip select > option:disabled {
+	color: #b9bbb0;
+	font-size: 90%;
+}
+.scheme_catnip #optionsDiv input[type="checkbox"] + label:before {
+	content: "\2717"; /* BALLOT X */
+	font: 14px sans-serif;
+	color: #2c311e;
+	margin: 0 6px 0 3px; /* default style margin: 0px 6px 0px 2px;*/
+}
+.scheme_catnip #optionsDiv input[type="checkbox"]:checked + label:before {
+	content: "\2714"; /* HEAVY CHECK MARK */
+	font: 14px sans-serif;
+	color: #1e2114;
+}
+.scheme_catnip .dialog input[type="button"] {
+	margin-left: 17px;
+	margin-top: 18px;
+	margin-bottom: 2px;
+}
+.scheme_catnip .dialog input#batchSize {
+	background-color: rgba(0, 0 , 0, 0.75);
+	color: #fafbf9;
+	border: 1px solid rgba(0 ,0 ,0 , 0.1);
+	border-radius: 3px;
+	padding: 3px 1px 3px 5px;
+    margin-right: 5px;
+	margin-top: 3px;
+	margin-bottom: 3px;
+}
+.scheme_catnip textarea#importData,
+.scheme_catnip textarea#exportData {
+	background-color: rgba(0, 0 , 0, 0.75);
+	color: #fafbf9;
+	border: 1px solid rgba(0 ,0 ,0 , 0.1);
+	border-radius: 3px;
+	padding: 5px;
+	margin-bottom: 10px;
+}
+.scheme_catnip .dialog input#batchSize:focus,
+.scheme_catnip textarea#importData:focus,
+.scheme_catnip textarea#exportData:focus {
+	background-color: rgba(0, 0, 0, 0.5);	
+}
+.scheme_catnip h1#exportTo,
+.scheme_catnip h1#exportToText,
+.scheme_catnip h1#importFrom,
+.scheme_catnip h1#importFromText {
+	margin-top: 20px; /* default margin-top: 30px; */
+	margin-bottom: 0; /* default margin-bottom: 8px; */
+}
+.scheme_catnip input:active,
+.scheme_catnip select:active,
+.scheme_catnip textarea:active {
+    border-color: #fafbf9 !important;
+}
+
+/* *********************************************** */
+/* ******************* TOP BAR ******************* */
+/* *********************************************** */
+.scheme_catnip #topBar {
+    /* default height: 26px; */
+	top: 0; /* default top 2px */
+	background-color: rgba(0, 0, 0, 0.75);
+	box-shadow: 0 1px 1px rgba(0, 0 , 0, 0.5); /* default box-shadow: 1px 0px 2px #888; */
+	/* default min-width: 1180px; */
+	border: none; /* border-bottom: 1px solid gray; */
+}
+/* .scheme_catnip #topBar a {
+    /* default padding-left: 2px; */
+	/* default padding-right: 2px; */
+/* } */
+.scheme_catnip #topBar a {
+	color: #b6bda2;
+}
+.scheme_catnip #topBar a:hover {
+	color: #ebede5;
+}
+.scheme_catnip #topBar a.copyright {
+	color: #cb3b3b;
+}
+.scheme_catnip #topBar a.copyright:hover {
+	color: #ebede5;
+}
+.scheme_catnip #topBar .links-block { /* a link separator: | on topBar links */
+	color: transparent;
+}
+.scheme_catnip #topBar div,
+.scheme_catnip #topBar .toolbarIcon.sorrow div { /* counter of BLS (Black Liquid Sorrow) */
+	color: #fafbf9;
+}
+.scheme_catnip .toolbarIcon.sorrow.max div {
+    color: #cb3b3b !important; /* in default.js !important needed */
+}
+.scheme_catnip #topBar > div:first-child > span:last-of-type::after {
+    color: #83cb3b;
+    content: '\00a0\00a0\00a0Theme by Volkeyrn';
+    text-decoration: none;
+	font-weight: normal;
+}
+.scheme_catnip #autosaveTooltip {
+	color: #00b5bf;
+}
+.scheme_catnip #getTheApp-link { /* Get the app */
+	color: #00b5bf !important;
+	font-weight: normal !important;
+}
+.scheme_catnip #getTheApp-link:hover {
+	color: #ebede5 !important;
+}
+.scheme_catnip .links-block {
+	padding-top: 5px !important;
+}
+.scheme_catnip #topBar div.toolbarIcon.happiness div {
+    color: #cb833b;
+}
+.scheme_catnip #topBar .toolbarIcon.energy div,
+.scheme_catnip .button_tooltip .energyProduction {
+	color: #83cb3b;
+}
+.scheme_catnip #topBar .toolbarIcon.energy.warningWinter div {
+    color: #cb833b;
+}
+.scheme_catnip #topBar .toolbarIcon.energy.warning div,
+.scheme_catnip .button_tooltip .energyConsumption {
+	color: #cb3b3b;
+}
+.scheme_catnip .button_tooltip .energyPenalty {
+	color: #cb3b3b;
+}
+.scheme_catnip .toolbarIcon .status-indicator-online {
+    color: #83cb3b;
+}
+.scheme_catnip .toolbarIcon .status-indicator-offline {
+    color: #cb3b3b;
+}
+
+/* ********************************************** */
+/* ******************* FOOTER ******************* */
+/* ********************************************** */
+.scheme_catnip #footerLinks {
+	font-size: 90%;
+	bottom: 3px; /* default bottom: 10px; */
+	/* default right: 5px; */
+	color: #575657; /* a link separator: | on footer links */
+}
+.scheme_catnip #footerLinks a {
+	color: #292d20;
+}
+.scheme_catnip #footerLinks a:hover {
+	color: #0c0d09;
+}
+.scheme_catnip #crowdjet-expand-container {
+	color: #292d20;
+	font-family: 'Delius', cursive;
+}
+
+/* *********************************************** */
+/* ******************* TOOLTIP ******************* */
+/* *********************************************** */
+/* .scheme_catnip .tooltip-inner {
+	/* default width: 280px; */
+	/* font-size: 13px; /* for center tooltip except title, effects and flavor */
+/* } */
+.scheme_catnip #tooltip,
+.scheme_catnip .tooltip-block > div {
+	/* default padding-left: 3px; */
+	padding-bottom: 5px;
+	background: rgba(38, 40, 31, 0.9);
+	color: #b6bda2; /* tooltip windows == left column: left text */
+	border: none;
+	border-radius: 5px;
+	box-shadow: 0 0 1px 1px rgba(0, 0 , 0, 0.5);
+	/* margin-left: 20px; /* for offset tooltip due to larger buttons .btn.modern */
+}
+.scheme_catnip .tooltip-block > div { /* tooltip on ? top right column */
+	padding: 5px;
+}
+.scheme_catnip .button_tooltip {
+	background-color: transparent;
+	backdrop-filter: none; /* default : backdrop-filter: blur(2px); */
+}
+.scheme_catnip .button_tooltip div { /* tooltip window == left column: right text | center column:highlighting text */
+	color: #ebede5;
+}
+.scheme_catnip .tooltip-inner .desc { /* Tooltip Window: title text */
+    color: #83cb3b;
+	/* default font size = font-size: 15px; */
+	border-bottom: solid 1px rgba(0, 0, 0, 0.15) !important; /* in core.js !important needed */
+	/* default padding-top: 4px; */
+	margin-bottom: 3px;
+}
+.scheme_catnip .tooltip-inner .desc.small {
+	font-size: 70%; /* default font-size: 60%; */
+	opacity: 1; /* default opacity: 0.8; */
+}
+.scheme_catnip .tooltip-inner .desc.small.auto-off {
+	color: #cb3b3b;
+}
+.scheme_catnip .tooltip-inner .desc.small.auto-on {
+	color: #83cb3b;
+}
+.scheme_catnip .tooltip-divider { /* border line before effects text */
+	/* in core.js text-align: center; !important needed */
+	/* in core.js width: 100%; !important needed */
+	border-bottom: solid 1px rgba(0, 0, 0, 0.15) !important; /* in core.js !important needed */
+	padding-bottom: 2px !important; /* in core.js padding-bottom: 4px; !important needed */
+	margin-bottom: 2px !important; /* in core.js margin-bottom: 8px; !important needed */
+	color: #fafbf9 !important; /* text centered: Tooltip name */
+}
+.scheme_catnip .tooltip-divider.resEffectsTxt { /* text centered: res.effects */
+	font-size: 14px;
+	color: #787878 !important;
+	padding-bottom: 0 !important; /* in core.js padding-bottom: 4px; !important needed */
+	margin-bottom: 0 !important; /* in core.js margin-bottom: 8px; !important needed */
+	margin-top: 4px;
+}
+.scheme_catnip .effectName { /* Tooltip Window: effects text */
+	color: #b6bda2 !important;
+	/* default font size = font-size: 14px; */
+}
+.scheme_catnip .rawRes { /* Tooltip Window == text for all missing resources for primary resource */
+    color: #787878;
+	font-style: italic;
+	padding-left: 12px;
+}
+.scheme_catnip .button_tooltip .noRes,
+.scheme_catnip .limited { /* on ressource limited or not attainable */
+	color: #cb3b3b;
+}
+.scheme_catnip #tooltip .flavor { /* Tooltip Window: last bottom text on center column tooltip window */
+    color: #00b5bf;
+	font-size: 13px !important; /* in core.js !important needed */
+	padding-right: 7px;
+}
+
+/* ***************************************************** */
+/* ******************* CENTER COLUMN ******************* */
+/* ***************************************************** */
+/* .scheme_catnip #midColumn { */
+	/* default margin-top: 30px; */
+	/* default width: 630px */
+/* } */
+.scheme_catnip .tabInner {
+    border: none; /* default border: 1px solid gray; */
+	padding: 5px 15px 15px 12px;/* default padding: 15px; */
+	/* default margin-bottom: 20px; */
+}
+.scheme_catnip .tabInner.Workshop {
+	padding-bottom: 70px; /* to view entire dropdownlink of last button */ /* default padding: 15px; */
+}
+.scheme_catnip .tabInner.Bonfire,
+.scheme_catnip .tabInner.Trade,
+.scheme_catnip .tabInner.Time {
+	padding-bottom: 30px; /* default padding: 15px; */
+}
+.scheme_catnip .tabsContainer {
+	padding-bottom: 3px; /* default padding-bottom: 15px; */
+	/* default padding-top: 2px; */
+	padding-left: 5px;
+	/* default top: 5px; */
+	border-top: none;
+	margin-left: 5px;
+}
+.scheme_catnip .tabsContainer a {
+	border-radius: 5px;
+	padding: 0 5px; /* default padding-right: 5px; */
+	background-color: rgba(158, 173, 105, 0.65);
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	margin-left: -7px;
+}
+.scheme_catnip .tabsContainer a:hover {
+	background-color: rgba(158, 173, 105, 0.75);
+	color: #3c4128;
+}
+.scheme_catnip .tabsContainer span:not(.genericWarning) { /* separator | for tab and expandAllBar */
+	color: transparent;
+}
+.scheme_catnip .tabInner div.expandAllBar:not([style*='left']) span { /* style*='left' for text: Trade effectiveness +xxx% */
+	color: #b6bda2;
+}
+.scheme_catnip .tabsContainer a.activeTab {
+	background-color: rgba(0, 0 , 0, 0.75);
+	border-color: rgba(0, 0, 0, 0.5);
+	color: #fafbf9;
+}
+.scheme_catnip span.genericWarning { /* number of kittens free or engineering free on tab */
+	color: #cb3b3b;
+}
+.scheme_catnip .tab.traitLeaderBonus::before {
+	content: "\2605\00a0"; /* BLACK STAR */
+	color: #00979f;
+	font-size: 0.9em;
+}
+.scheme_catnip .tab.engineer::before { /* artisan bonus */
+	content: "\2692\00a0"; /* HAMMER AND PICK */
+	font-size: 0.9em;
+}
+.scheme_catnip .tab.metallurgist::before {
+	content: "\267B\00a0"; /* BLACK UNIVERSAL RECYCLING SYMBOL */
+	font-size: 0.9em;
+}
+.scheme_catnip .tab.chemist::before {
+	content: "\2623\00a0"; /* BIOHAZARD SIGN */
+	font-size: 0.9em;
+}
+.scheme_catnip .tab.merchant::before {
+	content: "\2696\00a0"; /* SCALES */
+	font-size: 0.9em;
+}
+.scheme_catnip .tab.manager::before { /* hunting bonus */
+	content: "\27B4\00a0"; /* BLACK-FEATHERED SOUTH EAST ARROW */
+	font-size: 0.9em;
+}
+.scheme_catnip .tab.scientist::before {
+	content: "\269B\00a0"; /* ATOM SYMBOL */
+	font-size: 0.9em;
+}
+.scheme_catnip .tab.wise::before {
+	content: "\2600\00a0"; /* BLACK SUN WITH RAYS */
+	font-size: 0.9em;
+}
+.scheme_catnip div.bldTopContainer a.activeTab {
+	color: #00979f;
+	opacity: 1; /* default opacity 0.7 on not hover */
+}
+.scheme_catnip div.bldTopContainer > a,
+.scheme_catnip div.bldTopContainer > span { /* under tab */
+	font-size: 90%;
+	font-style: italic;
+}
+.scheme_catnip .bldGroupContainer { /* container for all buttons on center column */
+	padding: 10px; /* default padding 15px */
+	margin-top: 5px; /* default margin 10px */
+	border: none;
+	border-top: 1px solid rgba(0, 0, 0, 0.25)
+}
+.scheme_catnip input[type='button'] {
+	border-radius: 5px !important; /* !important in default.css */
+	border: none !important;  /* !important in default.css */
+	background-color: #99a474 !important;  /* !important in default.css */
+	box-shadow: 0 2px 5px 0 rgb(0, 0, 0, 0.5) !important; /* !important in default.css */
+	color: #1e2114;
+	padding: 5px 20px;
+	margin-left: 10px;
+	font-size: 15px;
+}
+.scheme_catnip input[type='button']:hover {
+	color: #fafbf9;
+	box-shadow: none !important; /* !important in default.css */
+	background-color: rgba(0, 0 , 0, 0.75) !important; /* !important in default.css */
+	cursor: pointer !important; /* !important in default.css */
+}
+/* button observer different from other input buttons */
+.scheme_catnip input[type='button']#observeBtn {
+	/* default margin-top: 15px; */
+	/* default height: 30px; */
+	background-color: #00979f !important;  /* !important in default.css */
+	color: #fafbf9;
+}
+.scheme_catnip input[type='button']#observeBtn:hover {
+	background: rgba(0, 0 , 0, 0.75) !important; /* !important in default.css */
+}
+/* .scheme_catnip .btn .btnContent a { */
+    /* default max-width: 50px; */
+    /* default overflow-x: hidden; */
+    /* default text-overflow: ellipsis; */
+/* } */
+.scheme_catnip .btn.modern a {
+	font-weight: normal;
+	background-color: transparent;
+	padding: 10px 5px 10px 5px !important; /* default:  padding: 10px 6px 10px 6px !important; */
+	text-shadow: none;
+	border-left: 1px solid rgba(0 ,0 ,0 , 0.1); /* default border-left: 1px solid #888; */
+	/* default margin: -10px 0; */
+	/* default min-width: 20px; */
+}
+.scheme_catnip .btn.modern:not(.disabled) a {
+	color: #3c4128;
+}
+.scheme_catnip .btn.modern.disabled a {
+	color: #5a613c
+}
+.scheme_catnip .btn.modern a:hover {
+	background-color: rgba(255, 255, 255, 0.2);
+}
+.scheme_catnip .btn.modern:not(.disabled):active,
+.scheme_catnip input[type='button']:active,
+.scheme_catnip input[type='button']#observeBtn:active {
+    border-color: #fafbf9 !important;
+}
+.scheme_catnip .linkContent { /* dropdown list on button */
+    margin-top: 28px !important; /* for correct vertical align dropdown list */
+    width: auto !important;
+    border-radius: 5px;
+	border: solid 1px rgba(0, 0 , 0, 0.05);
+	background: rgba(113, 148 , 64, 0.98); /* color pick from button not disabled and hover */
+}
+.scheme_catnip .linkContent a {
+    width: 36px !important;
+    margin-top: 0 !important;
+	margin-bottom: 0 !important;
+	border-left: none !important; /* default border-left: 1px solid #888; */
+}
+.scheme_catnip .btn.modern.disabled .linkContent { /* dropdown list on button disabled */
+	background: rgba(158, 173, 105, 0.75);  /* color pick from button disabled and hover */
+}
+.scheme_catnip .btn.modern.disabled .linkContent a {
+	border-left: none !important;
+}
+.scheme_catnip .linkContent a:first-child,
+.scheme_catnip .linkContent a:first-child:hover {
+	border-radius: 0 5px 0 0;
+}
+.scheme_catnip .linkContent a:last-child,
+.scheme_catnip .linkContent a:last-child:hover {
+	border-radius: 0 0 5px 5px;
+}
+/* Apply the right border radius of the button to the rightmost link */
+.scheme_catnip .btn.modern span.btnTitle + a,
+.scheme_catnip .btn.modern:not(.hasSellLink) a.off1Link, /* link minus on buildings buttons */
+.scheme_catnip .btn.modern:not(.hasSellLink) a.unassignLink { /* link minus on kittens jobs buttons */
+	/* buttons border-radius: 5px; */
+	border-radius: 0 5px 5px 0;
+}
+.scheme_catnip .btn.modern .btnContent a.rightestLink { /* for Combust TC button in Time tab and Hold Festival in Settlement tab */
+	border-radius: 0 5px 5px 0;
+}
+.scheme_catnip .btn .btnContent a.small {
+    /* default font-size: 0.7em; */
+    line-height: 18px; /* default line-height: 16px; */
+}
+.scheme_catnip .panelContainer {
+	/* default margin-top: 8px; */
+	min-height: 38px; /* default min-height: 30px; */
+	background-color: rgba(0, 0 , 0, 0.1);
+	border: 1px solid rgba(0, 0, 0, 0.25);
+	border-radius: 5px;	
+}
+.scheme_catnip .tabInner.Trade {
+	padding: 2px 15px 10px 15px;
+}
+.scheme_catnip .tabInner.Trade .panelContainer {
+	margin-top: 4px; /* default margin-top: 8px; */
+}
+.scheme_catnip .tabInner.Trade .btn {
+	margin-bottom: 4px; /* default margin-bottom: 10px; */
+}
+.scheme_catnip .tabInner.Trade div[style^='margin-bottom'] {
+	margin-bottom: 5px !important; /* default margin-bottom: 15px; */
+}
+.scheme_catnip .tabInner.Stats table.statTable {
+	margin: 5px 10px;
+	padding: 10px;
+	border-radius: 5px;
+}
+.scheme_catnip .tabInner.Stats h1:first-of-type {
+	color: #1e2114;
+}
+.scheme_catnip .tabInner.Stats table.statTable:first-of-type {
+	background: rgba(0, 0, 0, 0.1);
+    color: #1e2114;
+	border: 1px solid rgba(0, 0, 0, 0.25);
+}
+.scheme_catnip .tabInner.Stats table.statTable:last-of-type {
+    background-color: rgba(0, 0, 0, 0.75);
+    color: #fafbf9;
+	border: 1px solid rgba(0, 0, 0, 0.25);
+}
+.scheme_catnip .panelContainer div.title {
+	padding: 5px 4px 5px 10px; /* default padding: 4px; */ /* default padding-left: 10px; */
+	margin-bottom: 3px;
+	background-color: rgba(0, 0, 0, 0.1);
+	color: #244205;
+	font-size: 16px !important;
+	border: none;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: 5px 5px 0 0;
+}
+.scheme_catnip .tabInner.Trade .panelContainer div.title {
+	padding: 3px 4px 3px 20px;
+	margin-bottom: 0;
+	font-size: 15px !important;
+}
+.scheme_catnip .panelContainer .toggle {
+	font-size: 13px;
+	margin: 4px 4px 0 0; /* default margin: 4px; */
+	padding-left: 4px; /* default padding-left 6px */
+	padding-right: 4px; /* default padding-right 6px */
+	background-color: rgba(0, 0, 0, 0.1);
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: 5px;
+	color: #1e2114;	
+}
+.scheme_catnip .panelContainer .toggle:hover {
+	background: rgba(0, 0, 0, 0.5);
+	color: #fafbf9;
+}
+/* .scheme_catnip .container { */
+	/* default padding: 10px; */
+/* } */
+.scheme_catnip .container.trade-race {
+	padding: 5px 10px 5px 10px; /* default padding: 10px; */
+}
+.scheme_catnip .container.trade-race .crypto-trade .btn.modern {
+	max-width: 127px; /* (button content width - (2 x button border width) - (1 x button margin-right)) / 2 => (264 - 0 -10)/2 = 127 */
+}
+.scheme_catnip .container div.currentGovernment { /* for padding-bottom too height */
+	padding-bottom: 3px !important;
+}
+/* .scheme_catnip .trade-race > .left { */
+    /* default width: 50%; */
+/* } */
+/* .scheme_catnip .trade-race > .right { */
+    /* default width: 50%; */
+/* } */
+.scheme_catnip .trade-race .buys {
+	color: #cb3b3b;
+	font-size: smaller;
+}
+.scheme_catnip .trade-race .sells {
+	color: #005f05;
+	font-size: smaller;
+}
+.scheme_catnip .trade-race .tradeAmount {
+	color: #585858;
+	font-size: smaller;
+}
+.scheme_catnip .attitude { /* text for attitude races int trade tab */
+	/* default font size = font-size: 90%; */
+	font-size: 100%;
+	color: #3b4128 !important;
+	text-shadow: none !important;
+	text-transform: capitalize;
+}
+.scheme_catnip .attitude:before {
+	/* default content: "("; */
+	content: "\279C\00a0"; /* default content: "("; */ /* HEAVY ROUND-TIPPED RIGHTWARDS ARROW */
+	color: #00979f;
+}
+.scheme_catnip .attitude:after {
+	/* default content: ")"; */
+	content: ""; /* default content: ")"; */
+}
+.scheme_catnip .container.trade-race a[title='Pinned'] {
+	font-size: 14px; /* default.css font-size: 0.7em; */
+	line-height: unset;
+}
+.scheme_catnip .btn.explore {
+	/* default margin-right: 9px; */
+	margin-top: 5px;
+}
+.scheme_catnip .panelContainer div.censusFilters {
+	margin-bottom: 5px; /* for add a margin under the 2 lists (select) in the settlement tab */
+}
+/* ---------- Village ---------- */
+/* container 'Census' -> list of kittens in settlement tab */
+.scheme_catnip .census-block {
+    padding: 5px 10px; /* default padding: 5px; */
+	margin-bottom: 3px;/* default margin-bottom: 5px; */
+    background-color: rgba(0 ,0 ,0 , 0.6);
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 5px;
+}
+.scheme_catnip .census-block:hover {
+	background-color: rgba(0 ,0 ,0 , 0.7);
+}
+.scheme_catnip .census-block.simLeader {
+	background-color: rgba(0, 0 , 0, 0.7);
+}
+.scheme_catnip .census-block a {
+	color: #b6bda2;
+}
+.scheme_catnip .census-block a:hover {
+	color: #ebede5;
+}
+.scheme_catnip .census-block.simLeader a.leaderHref {
+	color: #00b5bf;
+}
+.scheme_catnip .census-block .info { /* info of kitten */
+	font-size: 0.9em;
+	color: #d6dacb;
+}
+.scheme_catnip .census-block .skill { /* jobs unasigned */
+	color: #989898;
+}
+.scheme_catnip .census-block .skill:first-of-type { /* job assigned */
+	color: #00b5bf;
+	font-weight: normal !important;
+}
+.scheme_catnip .census-block.simLeader .info span.name {  /* Leader name */
+	font-size: 1.2em;
+}
+.scheme_catnip .census-block.simLeader .skill:first-of-type { /* Leader job assigned */
+	font-size: 1em; /* default font-size: 0.8em; */
+}
+.scheme_catnip .container .name.color-none {   /* name of kitten */
+	color: #c6ccb7;
+}
+.scheme_catnip .container .name.color-brown {
+	color: #85684f;
+}
+.scheme_catnip .container .name.color-cream {
+	color: #a89060;
+}
+.scheme_catnip .container .name.color-black {
+	color: #000000;
+}
+.scheme_catnip .container .name.color-fawn {
+	color: #ecd6c6;
+}
+.scheme_catnip .container .name.color-white {
+	color: #ffffff;
+}
+.scheme_catnip .container .name.variety-none {
+	border: 1px solid transparent;
+}
+.scheme_catnip .container .name.variety-dual { /* bicolore */
+	border: 1px solid #aaaaaa;
+	padding: 0 5px;
+}
+.scheme_catnip .container .name.variety-tabby { /* tigré  ou rayé */
+	border: 1px dashed #aaaaaa;
+	padding: 0 5px;
+}
+.scheme_catnip .container .name.variety-torbie { /* marbré strié */
+	border: 1px dashed #d3d4d3;
+	border-left: dotted #ab9f8c;
+	border-right: dotted #ab9f8c;
+	padding: 0 5px;
+}
+.scheme_catnip .container .name.variety-calico { /* tricolore */
+	border: 1px solid #aaaaaa;
+	border-top-color: #c69e7a;
+	border-bottom-color: #d5906c;
+	padding: 0 5px;
+}
+.scheme_catnip .container .name.variety-spots { /* tacheté */
+	border: 1px dotted #c49474;
+	padding: 0 5px;
+}
+.scheme_catnip .btn.modern.disabled a.auto-on {
+	color: #005f05;
+}
+.scheme_catnip .btn.modern:not(.disabled) a.auto-on {
+	color: #005f05;
+}
+.scheme_catnip .btn.modern.disabled a.auto-off {
+	color: #cb3b3b;
+}
+.scheme_catnip .btn.modern:not(.disabled) a.auto-off {
+	color: #cb3b3b;
+}
+.scheme_catnip .btn.modern a.bld-off,
+.scheme_catnip .btn.modern a.fugit-off {
+	color: #cb3b3b;
+}
+.scheme_catnip .btn.modern a.bld-on,
+.scheme_catnip .btn.modern a.fugit-on {
+	color: #005f05;
+}
+.scheme_catnip .btn.modern.disabled.craftOn span.btnTitle { /* all buttons with engineer(s) in workshop tab */
+	color: #005f05;
+}
+.scheme_catnip .btn.modern:not(.disabled).craftOn span.btnTitle {
+	color: #005f05;
+}
+.scheme_catnip td.craftStuffPanel > span { /* title of craft stuff panel */
+	color: #366208;
+	font-size: 15px;
+	padding-left: 10px;
+}
+.scheme_catnip td.craftStuffPanel > table { /* craft stuff panel */
+    margin-top: 2px;
+    padding: 10px 20px; /* default padding-top: 20px; */
+    background: rgba(0, 0 , 0, 0.1);
+    color: #3c4128;
+	border: 1px solid rgba(0, 0 , 0, 0.25);
+	border-radius: 5px;
+}
+
+/* ******************************************************** */
+/* ******************* ACHIEVEMENTS TAB ******************* */
+/* ******************************************************** */
+.scheme_catnip .achievement-header {
+	color: #1e2114;
+	font-size: 18px;
+	margin-bottom: 3px;
+	padding-left: 20px;
+}
+.scheme_catnip .achievement {
+    padding: 8px 5px 10px 8px; /* default padding: 5px; */
+	/* default padding-left: 10px; */
+	font-size: 16px;
+	margin-bottom: 3px; /* default margin-bottom: 10px; */
+	background-color: transparent;
+	color: grey;
+	letter-spacing: 1px;
+	border: 1px solid rgba(0, 0, 0, 0.25);
+	border-radius: 5px;
+}
+.scheme_catnip .achievement:not(.unethical).unlocked {
+	background-color: rgba(128, 128, 128, 0.1);
+	color: #366208;
+}
+.scheme_catnip .achievement:not(.unethical).unlocked:hover {
+	background-color: rgba(0, 0, 0, 0.75);
+	color: #83cb3b;
+}
+.scheme_catnip .achievement.unethical {
+	background-color: rgba(203, 59, 59, 0.2);
+	color: #cb3b3b;
+}
+.scheme_catnip .achievement.unethical:hover {
+	background-color: rgba(155, 41, 41, 0.75);
+	color: #fafbf9;
+}
+.scheme_catnip .achievement:not(.unlocked) {
+	background-color: rgba(0, 0, 0, 0.2);
+	color: #505050;
+}
+.scheme_catnip .achievement:not(.unlocked):hover {
+	background-color: rgba(32, 32, 32, 0.8);
+	color: #c0c0c0;
+}
+.scheme_catnip .achievement:after {
+	letter-spacing: normal;
+	margin-top: 2px;
+	font-size: 90%;
+	color: grey;
+	text-shadow: none;
+}
+@media screen {
+	.scheme_catnip .achievement[title]:hover::after {
+	  opacity: 1; /* default opacity: 0.6; */
+	}
+}
+.scheme_catnip .achievement:not(.unethical).unlocked:after {
+	color: #fafbf9;
+}
+.scheme_catnip .achievement.unethical:after {
+	color: #ebb3b3;
+}
+.scheme_catnip .achievement:not(.unlocked):after {
+	color: #909090;
+}
+.scheme_catnip .achievement-header .star {
+	/* default font size = font-size: 18px; */
+	color: #cb833b;
+}
+.scheme_catnip .achievement .star {
+	/* default font size = font-size: 18px; */
+	color: #b0b0b0;
+	text-shadow: none;
+}
+.scheme_catnip .achievement.unlocked .star {
+	color: #cb833b;
+}
+
+/* **************************************************** */
+/* ******************* RIGHT COLUMN ******************* */
+/* **************************************************** */
+.scheme_catnip #rightColumn {
+    /* default padding-left: 8px; */
+	width: calc(50% - 355px);
+	max-width: 440px; /* default max-width: 400px; */
+    /* default min-width: 250px; */
+	top: 30px; /* default top: 20px; */
+	/* default margin-top: 4px */
+}
+.scheme_catnip #toggleCenter,
+.scheme_catnip span.toggleCenter {
+	color: #3c4128;
+	opacity: 0.6; /* default opacity: 0.2; */
+	cursor: pointer;
+}
+.scheme_catnip span.toggleCenter {
+	opacity: 1; /* for have #toggleCenter same color */
+}
+.scheme_catnip #toggleCenter:hover,
+.scheme_catnip div#toggleCenter:hover > span.toggleCenter {
+	color: #00979f;
+	opacity: 1.0;
+}
+.scheme_catnip #calendarDiv {
+	color: #366208;
+	border-radius: 5px;
+	padding: 5px;
+    margin-top: 5px;
+}
+.scheme_catnip #calendarSign {
+   font-size: 120%;
+}
+.scheme_catnip #calendarSign:hover {
+   cursor: default;
+}
+.scheme_catnip .right-tab-header { /* Log | Chat link on right column */
+	/* default margin-top: 10px; */
+	font-size: 80%;
+}
+.scheme_catnip .right-tab-header a {
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 5px;
+	/* default padding: 5px; */
+    /* default padding-left: 30px; */
+    /* default padding-right: 30px; */
+}
+.scheme_catnip .right-tab-header a:not(.active) {
+	background-color: rgba(158, 173, 105, 0.65);
+}
+.scheme_catnip .right-tab-header a:not(.active):hover {
+	background-color: rgba(158, 173, 105, 0.75);
+	color: #3c4128;
+}
+.scheme_catnip .right-tab-header a.active {
+	background-color: rgba(0, 0 , 0, 0.75);
+	border-color: rgba(0, 0, 0, 0.5);
+	color: #fafbf9;
+}
+.scheme_catnip div#observeButton {
+	margin-top: 20px;/* default margin-top: 15px */
+	height: 35px; /* default height: 30px; */
+	margin-bottom: 3px;
+}
+.scheme_catnip #rightTabChat {
+	margin-top: 10px;
+}
+.scheme_catnip div.console-intro { /* Text on right column: "You are a kitten in a catnip forest." */
+	color: #87a84c;
+	border-top: 1px solid rgba(0, 0, 0, 0.25) !important;
+}
+.scheme_catnip #clearLogHref { /* Link in right column: Clear log */
+	font-size: 85%;
+}
+.scheme_catnip #logFiltersBlock > a { /* Link in right column: [+]Log Filters */
+	font-size: 85%;
+	margin-left: 5px;
+}
+.scheme_catnip #pauseBtn { /* Link in right column: pawse */
+	margin-left: 5px;
+}
+.scheme_catnip #gameLog {
+	/* default overflow-y: auto !important; */
+	margin: 15px 10px 5px 10px;
+	padding: 7px 10px 10px 10px !important;
+	/* 3 lines of code below if border or box-shadow to have scrollbar */
+	min-height: 5% !important;
+	height: unset !important;
+	max-height: calc(100% - 100px) !important;
+	background-color: rgba(0, 0, 0, 0.75);
+	border: none;
+	border-radius: 5px;
+	box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+.scheme_catnip #gameLog span.msg:not(.type_date)  {
+	margin-left: 1.2em;
+	list-style-type: '\27A4'; /* BLACK RIGHTWARDS ARROWHEAD */
+	padding-left: 0.3em;
+}
+.scheme_catnip #gameLog span.msg:not(.type_date)::marker {
+	font-size: 10px;
+}
+.scheme_catnip #gameLog span.msg.noBullet {
+	margin-left: 2.3em !important;
+	list-style-type: '\25E6' !important; /* WHITE BULLET */ /* !important in default.css */
+}
+.scheme_catnip #gameLog span.msg.noBullet::marker {
+	font-size: 10px;
+}
+.scheme_catnip .msg {
+	font-size: 90%;
+	font-weight: normal;
+	color: #b6bda2;
+}
+.scheme_catnip .msg.type_notice {
+	color: #00b5bf;
+}
+.scheme_catnip .msg.type_important {
+    color: #cb833b;
+}
+.scheme_catnip .msg.type_alert {
+    color: #cb3b3b;
+}
+.scheme_catnip .msg.type_urgent {
+	color: #833bcb; /* default color: blueviolet; */
+	font-size: 1.1em;
+}
+.scheme_catnip .msg.type_date {
+	/* default margin-top: 15px; */
+	color: #83cb3b;
+	/* default font-size: 90%; */
+	text-transform: none;
+	border-bottom: solid 1px rgba(0, 0, 0, 0.25);
+	padding-left: 5px;
+}
+
+/* *************************************************** */
+/* ******************* LEFT COLUMN ******************* */
+/* *************************************************** */
+.scheme_catnip #leftColumn {
+	margin-top: 10px; /* default margin-top: 4px; */
+	/* default width: 25%; */
+    /* default min-width: 300px; */
+	/* default max-width: 400px; */
+	padding-right: 10px; /* default padding right: 20px */
+}
+/* .scheme_catnip a.link { */
+    /* default padding-right: 10px; */
+/* } */
+.scheme_catnip .res-toolbar.right {
+	padding-right: 20px;
+	/* default margin-right:-18px; */
+}
+.scheme_catnip a.link.collapse {
+	opacity: 0.5; /* default opacity: 0.2; */
+}
+.scheme_catnip a.link.collapse:hover {
+	opacity: 1;/* default opacity: 0.9; */
+	color: #00979f;
+}
+.scheme_catnip #leftColumn .res-toolbar a.link.toggled {
+    color: #00979f;
+}
+.scheme_catnip div.tooltip-block:hover {
+	cursor: default;
+}
+.scheme_catnip div.tooltip-block > span {
+	color: #3c4128;
+}
+.scheme_catnip div.tooltip-block:hover > span {
+	color: #00979f;
+}
+/*.scheme_catnip #leftColumnViewport div[data-reactid=".0.0.1"], /* res-Table */
+.scheme_catnip #leftColumnViewport div[data-reactid=".0.5.1"] { /* craftTAble */
+	background-color: rgba(0, 0 , 0, 0.75);
+	border-radius: 5px;
+	box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.5);
+	margin-top: 5px;
+	margin-left: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+.scheme_catnip #leftColumnViewport div[data-reactid=".0.5.1"] {
+	margin-bottom: 20px;
+}
+.scheme_catnip .res-table {
+	max-width: 352px;/* default max-width: 340px; */
+    border-collapse: collapse; /* gain of 3 pixel by border -> no margin bottom after */
+	margin-left: 2px; /* without 0px margin left for all ressources */
+}
+/* .scheme_catnip .res-toolbar.left { */
+    /* default padding-left: 5px; */
+/* } */
+/* .scheme_catnip .res-cell { */
+	/* default padding-left: 2px; */
+    /* default padding-right: 2px; */
+/* } */
+.scheme_catnip .craftTable {
+	/*margin-bottom: 60px !important; /* for correct margin bottom due of the line above with border-collapse: collapse on .res-Table ! */
+	padding-bottom: 0; /* default padding-bottom: 50px; */
+}
+.scheme_catnip .res-cell.craft-link {
+	color: #b6bda2;
+	/* default width: 20px; */
+	/* default max-width: 60px; */
+}
+/* .scheme_catnip .res-cell.craft-link .plusPrefix { */
+    /* default font-size: 80%; */
+/* } */
+.scheme_catnip .res-cell.craft-link.all { /* column craft all */
+	font-size: 95%; /* default font-size: 85%; */
+	opacity: 1; /* default opacity: 0.4; */
+	color: #a0a0a0;
+}
+.scheme_catnip .res-cell.craft-link:hover,
+.scheme_catnip .res-cell.craft-link.all:hover { /* craft table left column */
+    color: #ebede5;
+	text-decoration: none;
+	opacity: 1;
+}
+.scheme_catnip .craftTable .res-cell.resource-name {
+	color: #e6ebe1;
+}
+.scheme_catnip .res-row {
+	padding-bottom: 2px; /* default padding-bottom: 4px; */
+}
+.scheme_catnip .res-row:hover {
+	background:  rgba(0, 0, 0, 0.2);
+	cursor: default;
+}
+.scheme_catnip .res-row.highlited { /* higlighting ressources when hover button on center windows */
+	background:  rgba(0, 0, 0, 0.2);
+}
+.scheme_catnip .res-row.craft:hover {
+	background:  rgba(0, 0, 0, 0.3);
+}
+.scheme_catnip .craft.res-row.highlited {
+	background:  rgba(0, 0, 0, 0.3);
+}
+.scheme_catnip .res-toolbar {
+	white-space: nowrap;
+}
+/* .scheme_catnip div.res-cell.resource-name {  */
+	/* default width: 60px; */
+	/* default max-width: 85px; */
+/* } */
+.scheme_catnip .res-row.hidden .res-cell.resource-name {
+    text-decoration: none !important; /* default text-decoration: underline; */
+	/* default text-decoration-style: dotted; */
+}
+.scheme_catnip .maxRes,
+.scheme_catnip .resAmount,
+.scheme_catnip .resPerTick,
+.scheme_catnip .res-cell.resource-value,
+.scheme_catnip .craftTable {
+	font-family: 'Open Sans', sans-serif;
+}
+.scheme_catnip .resource_faith .resource-name,
+.scheme_catnip .resource_kittens .resource-name {
+	color: #606060 !important;
+}
+.scheme_catnip .resource_steel .resource-name,
+.scheme_catnip .resource_gear .resource-name,
+.scheme_catnip .resource_alloy .resource-name,
+.scheme_catnip .resource_megalith .resource-name {
+	color: #909090 !important;
+}
+.scheme_catnip .maxRes {
+	color: #606060;
+}
+.scheme_catnip .resAmount {
+    color: #1e2114;
+}
+.scheme_catnip .resLimitWarn {
+	color: #cb833b;
+	opacity: 1; /* default opacity: 0.75 */
+	font-style: italic;
+}
+.scheme_catnip .resLimitNotice {
+	color: #005f05;
+}
+.scheme_catnip .resPerTick {
+	cursor: default;
+	color: #3c4128;
+	font-size: 90%;
+}
+.scheme_catnip .res-row.resLeaderBonus .resPerTick {
+	color: #00979f;	
+}
+.scheme_catnip .res-row.craftEngineer .res-cell.resource-value {
+	color: #83cb3b;
+}
+.scheme_catnip div#advisorsContainer {
+	color: #cb3b3b;
+	/* default padding-top: 10px; */
+}
+.scheme_catnip .res-cell.resource-value {
+	/* default width: 75px; */
+	/* default max-width: 90px; */
+	color: #d6dacb;
+}
+.scheme_catnip .pin-link > a {
+	border-radius: 5px;
+    padding: 3px 5px;
+    margin: 0 5px;
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+	color: #3c4128;
+    background-color: rgba(158, 173, 105, 0.75);
+}
+.scheme_catnip .pin-link > a:hover {
+    background-color: rgba(0, 0, 0, 0.75);
+	color: #fafbf9;
+}
+.scheme_catnip .pin-link > a:active {
+	border-color: #fafbf9;
+}
+.scheme_catnip :not(:first-child) .pin-link {
+	margin-top: 3px;
+}
+.scheme_catnip #fastHuntContainer > a {
+	background-color: rgba(131, 203, 59, 0.5);
+	color: #3c4128;
+}
+.scheme_catnip #fastPraiseContainer > a {
+	color: #1e2114;
+    background-color: #fafbf9;
+}
+.scheme_catnip #fastHuntContainer > a:hover,
+.scheme_catnip #fastPraiseContainer > a:hover  {
+	background-color: rgba(0, 0, 0, 0.75);
+	color: #fafbf9;
+}
+.scheme_catnip .res-cell.positive-weather { /* to change the color for bonus cell according to the season */
+	color: #005f05;
+	font-size: 85%;
+}
+.scheme_catnip .res-cell.negative-weather { /* to change the color for penalty cell according to the season */
+	color: #cb3b3b;
+	font-size: 85%;
+}
+
+/* ************************************************* */
+/* ******************* SCROLLBAR ******************* */
+/* ************************************************* */
+.scheme_catnip ::-webkit-scrollbar-track,
+.scheme_catnip .dialog::-webkit-scrollbar-track,
+.scheme_catnip textarea#importData::-webkit-scrollbar-track,
+.scheme_catnip textarea#exportData::-webkit-scrollbar-track {
+	border-radius: 0;
+	background-color: transparent;
+}
+.scheme_catnip ::-webkit-scrollbar {
+	width: 8px;
+	border-radius: 0;
+	background-color: transparent;
+}
+.scheme_catnip .dialog::-webkit-scrollbar {
+	width: 8px;
+	border-radius: 0;
+	background-color: transparent;
+}
+.scheme_catnip textarea#importData::-webkit-scrollbar,
+.scheme_catnip textarea#exportData::-webkit-scrollbar {
+	width: 8px;
+	border-radius: 0;
+	background-color: transparent;
+}
+.scheme_catnip ::-webkit-scrollbar-thumb {
+	border-radius: 3px;
+	background-color: rgba(0, 0, 0, 0.2);
+}
+.scheme_catnip .dialog::-webkit-scrollbar-thumb {
+	border-radius: 3px;
+	background-color: rgba(0, 0, 0, 0.2);
+}
+.scheme_catnip textarea#importData::-webkit-scrollbar-thumb,
+.scheme_catnip textarea#exportData::-webkit-scrollbar-thumb {
+	border-radius: 3px;
+	background-color: rgba(0, 0, 0, 0.2);
+}
+.scheme_catnip #gameLog::-webkit-scrollbar {
+	width: 6px;
+}
+.scheme_catnip #gameLog::-webkit-scrollbar-thumb {
+	border-radius: 3px;
+	background: linear-gradient(0deg, transparent 0%, transparent 4%, rgba(0, 0, 0, 0.3) 5%, rgba(0, 0, 0, 0.3) 95%, transparent 96%, transparent 100%);
+}
+/* Only FireFox */
+.scheme_catnip #leftColumn,
+.scheme_catnip #rightColumn,
+.scheme_catnip #midColumn,
+.scheme_catnip .dialog,
+.scheme_catnip textarea#importData,
+.scheme_catnip textarea#exportData,
+.scheme_catnip #gameLog {
+	scrollbar-width: thin;
+}
+.scheme_catnip #leftColumn,
+.scheme_catnip #rightColumn,
+.scheme_catnip #midColumn,
+.scheme_catnip .dialog,
+.scheme_catnip textarea#importData,
+.scheme_catnip textarea#exportData {
+	scrollbar-color: rgba(0, 0, 0, 0.2) transparent !important;
+}
+.scheme_catnip #gameLog {
+	scrollbar-color: rgba(0, 0, 0, 0.2) transparent !important;
+}
+.scheme_catnip select {
+   scrollbar-width: auto !important;
+}

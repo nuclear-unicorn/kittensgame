@@ -43,6 +43,18 @@ dojo.declare("classes.managers.VoidManager", com.nuclearunicorn.core.TabManager,
     }
 });
 
+
+/*dojo.declare("classes.ui.space.VoidBuildingController", com.nuclearunicorn.game.ui.PlanetBuildingBtnController, {
+	updateVisible: function(model){
+		var meta = model.metadata;
+		if (this.game.calendar.day < 0){
+			model.visible = meta.unlocked;
+		} else {
+			model.visible = false;
+		}
+	}
+});*/
+
 dojo.declare("classes.ui.RorshachWgt", [mixin.IChildrenAware, mixin.IGameAware], {
     constructor: function(game){
     },

@@ -52,7 +52,7 @@ body.scheme_vintage {
 .scheme_vintage .btn.modern.disabled span.btnTitle { /* to change only the properties of the button name for buttons disabled */
 	color: #909090;
 }
-.scheme_vintage .btn.modern.disabled span.btnTitle.limited { /* to change only the properties of the button name for buttons limited */
+.scheme_vintage .btn.modern.disabled.limited span.btnTitle { /* to change only the properties of the button name for buttons limited */
 	color: #cd564f;
 }
 .scheme_vintage .btn.modern:not(.disabled) {
@@ -281,7 +281,7 @@ body.scheme_vintage {
 .scheme_vintage #topBar a.copyright:hover {
 	color: #f8edd0;
 }
-.scheme_vintage #headerLinks .links-block { /* a link separator : | on header links */
+.scheme_vintage #topBar .links-block { /* a link separator : | on topBar links */
 	color: transparent;
 }
 .scheme_vintage #topBar div,
@@ -291,9 +291,9 @@ body.scheme_vintage {
 .scheme_vintage .toolbarIcon.sorrow.max div {
     color: #cd564f !important; /* in default.js !important needed */
 }
-.scheme_vintage #topBar > div:first-child > span:first-child:after {
+.scheme_vintage #topBar > div:first-child > span:last-of-type::after {
     color: #d4b356;
-    content: '\00a0\00a0\00a0Theme by Volkeyrn\00a0\00a0\00a0';
+    content: '\00a0\00a0\00a0Theme by Volkeyrn';
     text-decoration: none;
 	font-weight: normal;
 }
@@ -365,6 +365,7 @@ body.scheme_vintage {
 }
 .scheme_vintage .button_tooltip {
 	background-color: transparent;
+	backdrop-filter: none; /* default : backdrop-filter: blur(2px); */
 }
 .scheme_vintage .button_tooltip div { /* tooltip window == left column: right text | center column :highlighting text */
 	color: #b0b0b0;

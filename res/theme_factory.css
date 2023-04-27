@@ -12,6 +12,7 @@
 /* ******************************************** */
 body.scheme_factory {
 	background-color: #242324;
+	color-scheme: dark;
 }
 .scheme_factory #gamePageContainer,
 .scheme_factory select,
@@ -45,7 +46,7 @@ body.scheme_factory {
 .scheme_factory .btn.modern.disabled span.btnTitle { /* to change only the properties of the button name for buttons disabled */
 	color: #575657;
 }
-.scheme_factory .btn.modern.disabled span.btnTitle.limited { /* to change only the properties of the button name for buttons limited */
+.scheme_factory .btn.modern.disabled.limited span.btnTitle { /* to change only the properties of the button name for buttons limited */
 	color: #fe5a5a;
 }
 .scheme_factory .btn.modern:not(.disabled),
@@ -291,7 +292,7 @@ body.scheme_factory {
 .scheme_factory #topBar a.copyright:hover {
 	color: #e39827;
 }
-.scheme_factory #headerLinks .links-block { /* a link separator: | on header links */
+.scheme_factory #topBar .links-block { /* a link separator: | on topBar links */
 	color: #575657;
 }
 .scheme_factory #topBar div,
@@ -301,9 +302,9 @@ body.scheme_factory {
 .scheme_factory .toolbarIcon.sorrow.max div {
     color: #fe5a5a !important; /* in default.js !important needed */
 }
-.scheme_factory #topBar > div:first-child > span:first-child:after {
+.scheme_factory #topBar > div:first-child > span:last-of-type::after {
     color: #e39827;
-    content: '\00a0\00a0\00a0Theme by Volkeyrn\00a0\00a0\00a0';
+    content: '\00a0\00a0\00a0Theme by Volkeyrn';
     text-decoration: none;
 	font-weight: normal;
 }
@@ -409,6 +410,7 @@ body.scheme_factory {
 }
 .scheme_factory .button_tooltip {
 	background-color: transparent;
+	backdrop-filter: none; /* default : backdrop-filter: blur(2px); */
 }
 .scheme_factory .button_tooltip div { /* tooltip window == left column: right text | center column:highlighting text */
 	color: #e4e4e4;
@@ -1328,14 +1330,6 @@ body.scheme_factory {
 .scheme_factory .res-row.hidden .res-cell.resource-name {
     text-decoration: none !important; /* default text-decoration: underline; */
 	/* default text-decoration-style: dotted; */
-}
-.scheme_factory .maxRes,
-.scheme_factory .resAmount,
-.scheme_factory .resPerTick,
-.scheme_factory .res-cell.resource-value,
-.scheme_factory .craftTable {
-	/* font-family: 'Source Sans Pro', sans-serif; */
-	/* font-family: 'Libre Franklin', monospace; */
 }
 .scheme_factory .resource_faith .resource-name,
 .scheme_factory .resource_kittens .resource-name,

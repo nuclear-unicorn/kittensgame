@@ -19,6 +19,9 @@ dojo.declare("com.nuclearunicorn.core.Control", null, {
 /**
  * core.js - a collection of base classes shared among all components of the game.
  * UI controls go there.
+ * 
+ * This should be your starting point to get familiar with the KG codebase. It has the most comments and explanation on some of KG's idiosincracies.
+ * The next file to check is `game.js`
  */
 
 
@@ -94,12 +97,17 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 		}
 	},
 
+	/*
+		TODO: do we need this? can this be simplified?
+	*/
 	setEffectsCachedExisting: function() {
 		// Set effectsCachedExisting based on meta
 		for (var a = 0; a < this.meta.length; a++){
-			for (var i = 0; i < this.meta[a].meta.length; i++){
-				for (var effect in this.meta[a].meta[i].effects) {
-					this.effectsCachedExisting[effect] = 0;
+			if (this.meta[a].meta){
+				for (var i = 0; i < this.meta[a].meta.length; i++){
+					for (var effect in this.meta[a].meta[i].effects) {
+						this.effectsCachedExisting[effect] = 0;
+					}
 				}
 			}
 		}
@@ -115,6 +123,10 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 		var effectsBase = this.effectsBase;
 		if (effectsBase){
 			effectsBase = this.game.resPool.addBarnWarehouseRatio(effectsBase);
+		}
+
+		for (var i = 0; i < this.meta.length; i++){
+			this.updateMetaEffectCached(this.meta[i]);
 		}
 
 		for (var name in this.effectsCachedExisting) {
@@ -138,6 +150,22 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 
 			// Add effect in globalEffectsCached, in addition of other managers
 			this.game.globalEffectsCached[name] = typeof(this.game.globalEffectsCached[name]) == "number" ? this.game.globalEffectsCached[name] + effect : effect;
+		}
+	},
+
+	updateMetaEffectCached: function (metadata) {
+		for (var i = 0; i < metadata.meta.length; i++){
+			var meta = metadata.meta[i];
+			meta.totalEffectsCached = {};
+			for (var effectName in this.effectsCachedExisting){
+				var effect;
+				if (metadata.provider){
+					effect = metadata.provider.getEffect(meta, effectName) || 0;
+				} else {
+					effect = meta.effects[effectName] || 0;
+				}
+				meta.totalEffectsCached[effectName] = effect;
+			}
 		}
 	},
 
@@ -190,12 +218,9 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 			// Ideally just a getter handler should be called there returning correct value
 			//
 
-			var effect;
-			if (metadata.provider){
-				effect = metadata.provider.getEffect(meta, name) || 0;
-			} else {
-				effect = meta.effects[name] || 0;
-
+			var effect = 0;
+			if (meta.totalEffectsCached){
+				effect = meta.totalEffectsCached[name] || 0;
 			}
 			totalEffect += effect;
 		}
@@ -285,7 +310,7 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 
 		if (bld.lackResConvert != undefined) {
 			// Exceptions (when convertion is caused by an upgrade)
-			bld.togglable = (bld.name == "biolab") ? false : true;
+			bld.togglable = true;
 		}
 
 		for (var effect in bld.effects) {
@@ -350,23 +375,48 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 				enabled: true,
 				unlocked: false
 			},
+			"unicornSacrifice": {
+				title: $I("console.filter.unicornSacrifice"),
+				enabled: true,
+				unlocked: false
+			},
 			"alicornRift": {
 				title: $I("console.filter.alicornRift"),
 				enabled: true,
 				unlocked: false
 			},
-			"alicornCorruption":{
-				title: "Alicorn Corruption",
+			"alicornSacrifice": {
+				title: $I("console.filter.alicornSacrifice"),
 				enabled: true,
 				unlocked: false
 			},
-			"tc": {
-				title: $I("console.filter.tc"),
+			"alicornCorruption":{
+				title: $I("console.filter.alicornCorruption"),
+				enabled: true,
+				unlocked: false
+			},
+			"tcShatter": {
+				title: $I("console.filter.tcShatter"),
+				enabled: true,
+				unlocked: false
+			},
+			"tcRefine": {
+				title: $I("console.filter.tcRefine"),
 				enabled: true,
 				unlocked: false
 			},
 			"faith": {
 				title: $I("console.filter.faith"),
+				enabled: true,
+				unlocked: false
+			},
+			"elders": {
+				title: $I("console.filter.elders"),
+				enabled: true,
+				unlocked: false
+			},
+			"blackcoin": {
+				title: $I("console.filter.blackcoin"),
 				enabled: true,
 				unlocked: false
 			}
@@ -662,7 +712,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 			var price = model.prices[i];
 
 			var res = this.game.resPool.get(price.name);
-			if (res.isRefundable(this.game)) {
+			if (res.isRefundable(this.game) && !price.isTemporary) {
 				this.game.resPool.addResEvent(price.name, price.val * model.refundPercentage);
 			} else {
 				// No refund at all
@@ -736,27 +786,27 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 	updateEnabled: function(){
 		if ( this.domNode ){
 			var hasClass = dojo.hasClass(this.domNode, "disabled");
+			var hasClassLimited = dojo.hasClass(this.domNode, "limited");
 			if (this.model.enabled){
 				if (hasClass){
 					dojo.removeClass(this.domNode, "disabled");
+				}
+				if (hasClassLimited){
+					dojo.removeClass(this.domNode, "limited");
 				}
 			} else {
 				if (!hasClass){
 					dojo.addClass(this.domNode, "disabled");
 				}
-			}
+				if (!hasClassLimited && this.model.resourceIsLimited){
+					dojo.addClass(this.domNode, "limited");
+				}
+			}			
 		}
-
-
-		if (!this.buttonTitle || !this.model.highlightUnavailable){
-			return;
-		}
-
 		//---------------------------------------------------
 		//		a bit hackish place for price highlight
 		//---------------------------------------------------
 		//---- now highlight some stuff in vanilla js way ---
-		this.buttonTitle.className = "btnTitle" + (this.model.resourceIsLimited ? " limited" : "");
 	},
 
 	update: function() {
@@ -968,7 +1018,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			title: links[0].alt || links[0].title
 		}, linksDiv);
 
-		linksTooltip.style.left = link.offsetLeft;	//hack hack hack
+		linksTooltip.style.left = link.offsetLeft + 'px'; //hack hack hack
 
 		dojo.connect(link, "onclick", this, dojo.partial(function(handler, event){
 			event.stopPropagation();
@@ -1035,6 +1085,10 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 	},
 
 	getEffects: function(model){
+		return undefined;
+	},
+
+	getTotalEffects: function(model){
 		return undefined;
 	},
 
@@ -1125,66 +1179,26 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 		}
 
 		//-----------------------------------------
+		var displayEffects = effectsList;
 		var isEffectMultiplierEnabled = model.multiplyEffects && this.game.ui.isEffectMultiplierEnabled();
-		var valMultiplier = isEffectMultiplierEnabled && model.metadata ? model.metadata.on : 1;
+		if (isEffectMultiplierEnabled) {
+			displayEffects = this.getTotalEffects(model) || effectsList;
+		}
 		for (var effectName in effectsList) {
 			var effectMeta = this.game.getEffectMeta(effectName);
-			if (effectMeta.resName && !this.game.resPool.get(effectMeta.resName).unlocked) {
-				continue;	//hide resource-related effects if we did not unlocked this effect yet
-			}
-
-			var effectValue = effectsList[effectName] * (effectMeta.calculation === "constant" ? 1 : valMultiplier);
-			if (!isEffectMultiplierEnabled && effectMeta.calculation === "nonProportional") {
+			var effectValue = displayEffects[effectName];
+			if (!isEffectMultiplierEnabled && effectMeta.calculation !== "nonProportional") {
 				var nextEffectValue = this.getNextEffectValue(model, effectName);
 				if (nextEffectValue) {
 					effectValue = nextEffectValue * (model.metadata.on + 1) - effectValue * model.metadata.on;
 				}
 			}
-			if (!effectValue) {
-				continue;
+
+			var displayParams = this.game.getEffectDisplayParams(effectName, effectValue, false /*showIfZero*/);
+			//The function might have returned null if this is the type of effect that's supposed to be hidden.
+			if (displayParams) {
+				model.effectModels.push(displayParams);
 			}
-
-			var displayEffectName = effectMeta.title;
-
-			var displayEffectValue = "";
-
-			//display resMax values with global ratios like Refrigeration and Paragon
-			if (effectName.substr(-3) === "Max") {
-				var res = this.game.resPool.get(effectMeta.resName || effectName.slice(0, -3));
-				if (res) { // If res is a resource and not just a variable
-					effectValue = this.game.resPool.addResMaxRatios(res, effectValue);
-				}
-			}
-
-			if (effectMeta.type === "perTick" && this.game.opts.usePerSecondValues) {
-				// avoid mantisa if we can, later on this can be changed to show scaled up values, e.g. minutes, hours
-				var tempVal = Math.abs(effectValue * this.game.ticksPerSecond), precision;
-				if (tempVal >= 0.001) {
-					precision = tempVal < 0.01 ? 3 : 2;
-					displayEffectValue = this.game.getDisplayValueExt(
-						effectValue * this.game.ticksPerSecond, false, false, precision) + "/" + $I("unit.sec");
-				} else {
-					displayEffectValue = this.game.getDisplayValueExt(
-						effectValue * this.game.ticksPerSecond * 3600, false, false, 2) + "/" + $I("unit.h");
-				}
-			} else if (effectMeta.type === "perDay"){
-				displayEffectValue = this.game.getDisplayValueExt(effectValue) + "/" + $I("unit.day");
-			} else if (effectMeta.type === "perYear"){
-				displayEffectValue = this.game.getDisplayValueExt(effectValue) + "/" + $I("unit.year");
-			} else if ( effectMeta.type === "ratio" ) {
-				displayEffectValue = this.game.toDisplayPercentage(effectValue, 2 , false) + "%";
-			} else if ( effectMeta.type === "integerRatio" ){
-				displayEffectValue = this.game.getDisplayValueExt(effectValue) + "%";
-			} else if ( effectMeta.type === "energy" ){
-				displayEffectValue = this.game.getDisplayValueExt(effectValue) + $I("unit.watt");
-			} else {
-				displayEffectValue = this.game.getDisplayValueExt(effectValue);
-			}
-
-			model.effectModels.push({
-				displayEffectName: displayEffectName,
-				displayEffectValue: displayEffectValue
-			});
 		}
 	},
 
@@ -1236,13 +1250,8 @@ ButtonModernHelper = {
 		if (model.tooltipName) {
 			dojo.create("div", {
 				innerHTML: model.name,
-				className: "tooltip-divider",
-				style: {
-					textAlign: "center",
-					width: "100%",
-					borderBottom: "1px solid gray",
-					paddingBottom: "4px"
-			}}, tooltip);
+				className: "tooltip-divider"
+			}, tooltip);
 		}
 
 		// description
@@ -1253,9 +1262,26 @@ ButtonModernHelper = {
 
 
 		if (model.metadata && model.metadata.isAutomationEnabled !== undefined){	//TODO: use proper metadata flag
-			var descDiv = dojo.create("div", {
+			dojo.create("div", {
 				innerHTML: model.metadata.isAutomationEnabled ? $I("btn.aon.tooltip") : $I("btn.aoff.tooltip"),
 				className: "desc small" + (model.metadata.isAutomationEnabled ? " auto-on" : " auto-off")
+			}, tooltip);
+		}
+
+		if (model.metadata && model.metadata.effects && 
+			model.metadata.effects["cathPollutionPerTickProd"] > 0 &&
+			controller.game.science.get("chemistry").researched && !controller.game.opts.disablePollution
+		){
+			dojo.create("div", {
+				innerHTML: $I("btn.pollution.tooltip"),
+				className: "desc small pollution"
+			}, tooltip);
+		}
+
+		if (model.metadata && model.metadata.almostLimited){
+			dojo.create("div", {
+				innerHTML: $I("btn.almostlimited.tooltip"),
+				className: "desc small almostlimited"
 			}, tooltip);
 		}
 
@@ -1266,7 +1292,7 @@ ButtonModernHelper = {
 			dojo.style(descDiv, "paddingBottom", "8px");
 
 			// prices
-			if (prices){
+			if (prices && prices.length){
 				dojo.style(descDiv, "borderBottom", "1px solid gray");
 				ButtonModernHelper.renderPrices(tooltip, model);	//simple prices
 			}
@@ -1380,8 +1406,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 		dojo.addClass(this.domNode, "modern");
 
 		this.renderLinks();
-
-		this.attachTooltip(dojo.partial(ButtonModernHelper.getTooltipHTML, this.controller, this.model));
+		this.attachTooltip(dojo.partial(this.getTooltipHTML(), this.controller, this.model));
 
 		this.buttonContent.title = "";	//no old title for modern buttons :V
 
@@ -1397,46 +1422,14 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 		}
 	},
 
+	getTooltipHTML: function(){
+		return ButtonModernHelper.getTooltipHTML;
+	},
+
 	attachTooltip: function(htmlProvider) {
-		var tooltip = dojo.byId("tooltip");
-		var btn = this;
 		var container = this.domNode;
 
-		dojo.connect(container, "onmouseover", this, function() {
-			this.game.tooltipUpdateFunc = function(){
-				btn.updateTooltip(container, tooltip, htmlProvider);
-			};
-			this.game.tooltipUpdateFunc();
-
-			var pos = $(container).position();
-			pos.left += 300;
-
-			//prevent tooltip from leaving the window area
-			var maxTooltipTop = $(window).scrollTop() + $(window).height() - $(tooltip).height() - 50; //50px padding-bottom
-			var maxTooltipLeft = $(window).scrollLeft() + $(window).width() - $(tooltip).width() - 25; //25px padding-right
-
-			if (pos.left <= maxTooltipLeft) {
-				pos.top = Math.min(pos.top + 15, maxTooltipTop);
-			} else {
-				pos.left = maxTooltipLeft;
-				var vOffset = 35;
-				if (pos.top + vOffset <= maxTooltipTop) {
-					pos.top += vOffset;
-				} else {
-					pos.top -= $(tooltip).height() + 10;
-				}
-			}
-
-			dojo.style(tooltip, "top", pos.top + "px");
-			dojo.style(tooltip, "left", pos.left + "px");
-
-			dojo.style(tooltip, "display", "");
-		});
-
-		dojo.connect(container, "onmouseout", this, function(){
-			this.game.tooltipUpdateFunc = null;
-			dojo.style(tooltip, "display", "none");
-		});
+		UIUtils.attachTooltip(this.game, container, 0, 300, htmlProvider);
 	},
 
 	updateTooltip: function(container, tooltip, htmlProvider){
@@ -1450,8 +1443,8 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 	updateLink: function(buttonLink, modelLink) {
 		if (buttonLink) {
 			buttonLink.link.textContent = modelLink.title;
-			if (modelLink.cssClass) buttonLink.link.className = modelLink.cssClass;
-			if (modelLink.tooltip) buttonLink.link.title = modelLink.tooltip;
+			if (modelLink.cssClass) {buttonLink.link.className = modelLink.cssClass;}
+			if (modelLink.tooltip) {buttonLink.link.title = modelLink.tooltip;}
 			dojo.style(buttonLink.link, "display", modelLink.visible === undefined || modelLink.visible ? "" : "none");
 		}
 	},
@@ -1520,6 +1513,10 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		return model.metadata.effects;
 	},
 
+	getTotalEffects: function(model){
+		return model.metadata.totalEffectsCached;
+	},
+
 	getNextEffectValue: function(model, effectName) {
 		var underlying = model.metadata;
 		if (!underlying.updateEffects) {
@@ -1562,6 +1559,9 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 
 		if (building.on >= amt){
 			building.on -= amt;
+			if(building.stages){
+				model.metaAccessor.meta.on -= amt; //stage hack
+			}
 			this.metadataHasChanged(model);
 			this.game.upgrade(building.upgrades);
 		}
@@ -1571,6 +1571,9 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		var building = model.metadata;
 		if (building.on){
 			building.on = 0;
+			if(building.stages){
+				model.metaAccessor.meta.on = 0; //stage hack
+			}
 			this.metadataHasChanged(model);
 			this.game.upgrade(building.upgrades);
 		}
@@ -1588,6 +1591,9 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 
 		if (building.on + amt <= building.val ){
 			building.on += amt;
+			if(building.stages){
+				model.metaAccessor.meta.on += amt; //stage hack
+			}
 			this.metadataHasChanged(model);
 			this.game.upgrade(building.upgrades);
 		}
@@ -1597,6 +1603,9 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		var building = model.metadata;
 		if (building.on < building.val) {
 			building.on = building.val;
+			if(building.stages){
+				model.metaAccessor.meta.on = building.val; //stage hack
+			}
 			this.metadataHasChanged(model);
 			this.game.upgrade(building.upgrades);
 		}
@@ -1651,7 +1660,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 	decrementValue: function(model) {
 		var building = model.metadata;
 		if (building)
-		building.val--;
+		{building.val--;}
 		if (building.on > building.val){
 			building.on = building.val;
 		}
@@ -1672,6 +1681,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 	handleToggleAutomationLinkClick: function(model) {
 		var building = model.metadata;
 		building.isAutomationEnabled = !building.isAutomationEnabled;
+		this.game.upgrade({buildings: [building.name]});
 	}
 });
 
@@ -1946,12 +1956,19 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 				this.game.ironWill = false;
 				var liberty = this.game.science.getPolicy("liberty");
 				liberty.calculateEffects(liberty, this.game);
+				var zebraOutpostMeta = this.game.bld.getBuildingExt("zebraOutpost").meta;
+				zebraOutpostMeta.calculateEffects(zebraOutpostMeta, this.game);
+				zebraOutpostMeta.jammed = false;
+				this.game.diplomacy.onLeavingIW();
 			}
 
 			if (meta.unlocks) {
 				this.game.unlock(meta.unlocks);
 			}
 
+			if (meta.calculateEffects){
+				meta.calculateEffects(meta, this.game);
+			}
 			if (meta.unlockScheme && meta.val >= meta.unlockScheme.threshold) {
 				this.game.ui.unlockScheme(meta.unlockScheme.name);
 			}
@@ -1969,11 +1986,15 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 
     incrementValue: function(model) {
 		var meta = model.metadata;
+		var allOff = meta.val > 0 && meta.on == 0;
 		meta.val++;
 		meta.on++;
 
-        // manage togglableOnOff when Off
-        if (meta.togglableOnOff && meta.on == 1){
+		// don't turn on the new building if it's .togglable or .togglableOnOff, you already built at least 1, and all were off before,
+		// or if it's .togglableOnOff, it's your first, and you don't have paragon
+		// (because steamworks isn't useful without upgrades so we don't want to confuse new players)
+		if ((meta.togglableOnOff && (allOff || (meta.val == 1 && this.game.resPool.get("paragon").value == 0))) ||
+			(meta.togglable && allOff)) {
             meta.on--;
         }
 	}
@@ -2175,7 +2196,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Panel", [com.nuclearunicorn.game.ui.Con
 
 		this.toggle = dojo.create("div", {
 			innerHTML: this.collapsed ? "+" : "-",
-			className: "toggle",
+			className: "toggle" + (this.collapsed ? " collapsed" : ""),
 			style: {
 				float: "right"
 			}
@@ -2214,6 +2235,12 @@ dojo.declare("com.nuclearunicorn.game.ui.Panel", [com.nuclearunicorn.game.ui.Con
 		this.toggle.innerHTML = isCollapsed ? "+" : "-";
 
 		this.onToggle(isCollapsed);
+		var hasClassCollapsed = dojo.hasClass(this.toggle, "collapsed");
+		if (isCollapsed && !hasClassCollapsed){
+			dojo.addClass(this.toggle, "collapsed");			
+		} else if (!isCollapsed && hasClassCollapsed) {
+			dojo.removeClass(this.toggle, "collapsed");			
+		}
 	},
 
 	onToggle: function(isCollapsed){
@@ -2288,8 +2315,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab", [com.nuclearunicorn.game.ui.Conte
 });
 
 /**
- * TODO: Please deprecate zillion of other instances of this method
- * TODO2: return offset from a htmlProvider.
+ * TODO: return offset from a htmlProvider.
  * Ideally it should be some structure like
  * {
  * 	x,
@@ -2299,6 +2325,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab", [com.nuclearunicorn.game.ui.Conte
  */
 UIUtils = {
 	attachTooltip: function(game, container, topPosition, leftPosition, htmlProvider) {
+		var gameNode = dojo.byId("game");
 		var tooltip = dojo.byId("tooltip");
 
 		dojo.connect(container, "onmouseover", this, function() {
@@ -2308,12 +2335,23 @@ UIUtils = {
 			game.tooltipUpdateFunc();
 
 			var pos = $(container).offset();
+
+			// Compensate tooltip position for game container offset.
+			var posGame = $(gameNode).offset();
+			pos.top -= posGame.top;
+			pos.left -= posGame.left;
+
 			pos.top += topPosition;
 			pos.left += leftPosition;
 
-			//prevent tooltip from leaving the window area
-			pos.top = Math.min(pos.top, $(window).scrollTop() + $(window).height() - $(tooltip).height() - 50); //50px padding-bottom
-			pos.left = Math.min(pos.left, $(window).scrollLeft() + $(window).width() - $(tooltip).width() - 25); //25px padding-right
+			// Prevent tooltip from leaving the window area
+			// The 25 here is an arbitrary padding, so that the tooltip doesn't sit right on the window edge.
+			var maxTooltipTop = $(window).scrollTop() + $(window).height() - $(tooltip).outerHeight() - 25;
+			var maxTooltipLeft = $(window).scrollLeft() + $(window).width() - $(tooltip).outerWidth() - 25;
+
+			// Keep position inside expected bounds.
+			pos.top = Math.min(pos.top, maxTooltipTop);
+			pos.left = Math.min(pos.left, maxTooltipLeft);
 
 			dojo.style(tooltip, "top", pos.top + "px");
 			dojo.style(tooltip, "left", pos.left + "px");

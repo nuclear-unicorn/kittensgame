@@ -421,7 +421,12 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",     val: 500000 },
 			{ name : "timeCrystal", val: 10 },
 			{ name : "relic",     	val: 5 }
-		]
+		],
+		calculateEffects: function(self, game){
+			if(self.researched){
+				game.time.queue.unlockQueueSource("chronoforge");
+			}
+		}
 	},{
 		name: "tachyonAccelerators",
 		label: $I("workshop.tachyonAccelerators.label"),
@@ -657,6 +662,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		effects: {
 			"manpowerJobRatio" : 0.5
 		},
+		calculateEffects: function(self, game){
+			self.effects["manpowerJobRatio"] = 0.5 * Math.max(0, (1 + game.getEffect("weaponEfficency"))); 
+		},
 		prices:[
 			{ name : "wood", val: 200 },
 			{ name : "iron", val: 100 },
@@ -669,6 +677,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		effects: {
 			"manpowerJobRatio" : 0.25
 		},
+		calculateEffects: function(self, game){
+			self.effects["manpowerJobRatio"] = 0.25 * Math.max(0, (1 + game.getEffect("weaponEfficency")));
+		},
 		prices:[
 			{ name : "iron", val: 1500 },
 			{ name : "science", val: 12000 }
@@ -679,6 +690,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		description: $I("workshop.railgun.desc"),
 		effects: {
 			"manpowerJobRatio" : 0.25
+		},
+		calculateEffects: function(self, game){
+			self.effects["manpowerJobRatio"] = 0.25 * Math.max(0, (1 + game.getEffect("weaponEfficency")));
 		},
 		prices:[
 			{ name : "titanium", val: 5000 },
@@ -786,6 +800,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "iron", 	 val: 100 },
 			{ name : "science",  val: 1000 }
 		],
+		upgrades: {
+			buildings: ["smelter"]
+		},
 		flavor: $I("workshop.goldOre.flavor")
 	},{
 		name: "geodesy",
@@ -874,6 +891,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",  val: 5000 },
 			{ name : "beam", 	 val: 35 }
 		],
+		upgrades: {
+			buildings: ["smelter"]
+		},
 		flavor: $I("workshop.coalFurnace.flavor")
 	},{
 		name: "deepMining",
@@ -911,7 +931,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "titanium", val: 2000 },
 			{ name : "science",  val: 100000 }
-		]
+		],
+		upgrades: {
+			buildings: ["smelter"]
+		}
 	},{
 		name: "oxidation",
 		label: $I("workshop.oxidation.label"),
@@ -922,7 +945,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "science",  val: 100000 },
 			{ name : "steel", val: 5000 }
-		]
+		],
+		upgrades: {
+			buildings: ["calciner"]
+		}
 	},{
 		name: "steelPlants",
 		label: $I("workshop.steelPlants.label"),
@@ -974,7 +1000,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "titanium", val: 5000 },
 			{ name : "science",  val: 145000 },
 			{ name : "gear", 	 val: 500 }
-		]
+		],
+		upgrades: {
+			buildings: ["calciner"]
+		}
 	},
 	{
 		name: "fluidizedReactors",
@@ -986,7 +1015,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "science", val: 175000 },
 			{ name : "alloy", val: 200 }
-		]
+		],
+		upgrades: {
+			buildings: ["calciner"]
+		}
 	},
 	{
 		name: "nuclearSmelters",
@@ -997,7 +1029,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "uranium", val: 250 },
 			{ name : "science",  val: 165000 }
-		]
+		],
+		upgrades: {
+			buildings: ["smelter"]
+		},
 	},{
         name: "orbitalGeodesy",
         label: $I("workshop.orbitalGeodesy.label"),
@@ -1070,7 +1105,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "alloy", 	 val: 1750 }
 		],
 		upgrades: {
-			buildings: ["library", "biolab"]
+		buildings: ["library", "biolab"]
 		}
 	},{
 		name: "starlink",
@@ -1196,12 +1231,29 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			buildings: ["factory"]
 		}
 	},{
+		name: "carbonSequestration",
+		label: $I("workshop.carbonSequestration.label"),
+		description: $I("workshop.carbonSequestration.desc"),
+		effects: {
+		},
+		prices:[
+			{ name : "titanium", val: 1250 },
+			{ name : "science",  val: 75000 },
+			{ name : "gear", 	 val: 125 },
+			{ name : "steel", 	 val: 4000 },
+			{ name : "alloy", 	 val: 1000 }
+		],
+		upgrades:{
+			buildings: ["factory"]
+		}
+	},{
 		name: "factoryOptimization",
 		label: $I("workshop.factoryOptimization.label"),
 		description: $I("workshop.factoryOptimization.desc"),
 		effects: {
 			"t1CraftRatio": 10,
-			"t2CraftRatio": 2
+			"t2CraftRatio": 2,
+			"queueCap": 1
 		},
 		prices:[
 			{ name : "titanium", val: 1250 },
@@ -1215,7 +1267,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		effects: {
 			"t1CraftRatio": 10,
 			"t2CraftRatio": 5,
-			"t3CraftRatio": 2
+			"t3CraftRatio": 2,
+			"queueCap": 2
 		},
 		prices:[
 			{ name : "titanium", val: 2500 },
@@ -1230,7 +1283,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			"t1CraftRatio": 2,
 			"t2CraftRatio": 2,
 			"t3CraftRatio": 2,
-			"t4CraftRatio": 2
+			"t4CraftRatio": 2,
+			"queueCap": 2
 		},
 		prices:[
 			{ name : "science",  val: 225000 },
@@ -1245,7 +1299,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			"t2CraftRatio": 5,
 			"t3CraftRatio": 5,
 			"t4CraftRatio": 2,
-			"t5CraftRatio": 2
+			"t5CraftRatio": 2,
+			"queueCap": 3
 		},
 		prices:[
 			{ name : "antimatter",  val: 500 },
@@ -1261,7 +1316,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			"t2CraftRatio": 2,
 			"t3CraftRatio": 2,
 			"t4CraftRatio": 2,
-			"t5CraftRatio": 2
+			"t5CraftRatio": 2,
+			"queueCap": 3
 		},
 		prices:[
 			{ name : "science",     val: 500000 },
@@ -1300,7 +1356,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "titanium", val: 5 },
 			{ name : "science",  val: 25000 },
 			{ name : "starchart",  val: 75 }
-		]
+		],
+		upgrades: {
+			buildings: ["observatory"]
+		},
 	},
 	{
 		name: "titaniumMirrors",
@@ -1772,6 +1831,34 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			"routeSpeed" : 50
 		}
 	},
+	{
+		name: "spiceNavigation",
+		label: $I("workshop.spiceNavigation.label"),
+		description: $I("workshop.spiceNavigation.desc"),
+		prices:[
+			{ name : "science",  val: 350000 },
+			{ name : "starchart",  val: 500000 }
+		],
+		unlocks: {
+			spaceBuilding: ["navigationRelay"],
+		},
+		flavor: $I("workshop.spiceNavigation.flavor")
+	},
+	{
+		name: "longRangeSpaceships",
+		label: $I("workshop.longRangeSpaceships.label"),
+		description: $I("workshop.longRangeSpaceships.desc"),
+		prices:[
+			{ name : "science",  val: 440000 },
+			{ name : "gear", val: 90000 },
+			{ name : "alloy", val: 3500 },
+			{ name : "tanker", val: 500 },
+		],
+		unlocks: {
+			spaceBuilding: ["spaceShuttle"],
+		},
+		flavor: $I("workshop.longRangeSpaceships.flavor")
+	},
 	//------------------- oil --------------------------
     {
 		name: "oilRefinery",
@@ -2083,8 +2170,98 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		progressHandicap: 7500,
 		tier: 5
+	},{
+		name: "tMythril",
+		label: $I("workshop.crafts.tMythril.label"),
+		description: $I("workshop.crafts.tMythril.desc"),
+		//label: "T-Mythril",
+		//description: "Some believe this alloy to be alive...",
+		prices:[
+			{ name: "bloodstone", val: 5 },
+			{ name: "ivory", val: 1000 },
+			{ name: "titanium", val: 500 }
+		],
+		progressHandicap: 10000,
+		tier: 7
 	}],
 
+	zebraUpgrades:[
+		{
+			name: "darkRevolution",
+			label: $I("workshop.zebraUpgrade.darkRevolution.label"),
+			description: $I("workshop.zebraUpgrade.darkRevolution.desc"),
+			effects: {
+			},
+			prices:[
+				{ name : "bloodstone", val: 15 },
+				{ name : "science", val: 100 }
+			],
+			upgrades:{
+				buildings: ["zebraOutpost"]
+			}
+		},{
+			name: "darkBrew",
+			label: $I("workshop.zebraUpgrade.darkBrew.label"),
+			description: $I("workshop.zebraUpgrade.darkBrew.desc"),
+			effects: {
+			},
+			prices:[
+				{ name : "bloodstone", val: 1 },
+				{ name : "parchment", val: 3000 },
+				{ name : "science", val: 100 }
+			]
+		},
+		//resources:
+		//tMythril
+		{
+			name: "whispers",
+			label: $I("workshop.zebraUpgrade.whispers.label"),
+			description: $I("workshop.zebraUpgrade.whispers.desc"),
+			effects: {
+			},
+			prices:[
+				{ name : "tMythril", val: 5 }
+			],
+			upgrades:{
+				buildings: ["ivoryTemple"]
+			}
+		},
+		//minerals
+		{
+			name: "minerologyDepartment",
+			label: $I("workshop.zebraUpgrade.minerologyDepartment.label"),
+			description: $I("workshop.zebraUpgrade.minerologyDepartment.desc"),
+			effects: {		
+			},
+			prices:[
+				{name : "science", val: 75000},
+				{name: 	"compedium", val: 75}
+			],
+			upgrades:{
+				buildings: ["academy"]
+			},
+			unlocks: {
+				zebraUpgrades: ["bloodstoneInstitute"]
+			}
+		},
+		//bloodstone
+		{
+			name: "bloodstoneInstitute",
+			label: $I("workshop.zebraUpgrade.bloodstoneInstitute.label"),
+			description: $I("workshop.zebraUpgrade.bloodstoneInstitute.desc"),
+			effects: {		
+			},
+			prices:[
+				{name : "science", val: 85000},
+				{name: 	"blueprint", val: 50},
+				{name : "bloodstone", val: 25},
+				{name: 	"tMythril", val: 10}
+			],
+			upgrades:{
+				buildings: ["zebraWorkshop"]
+			}
+		},
+	],
 	effectsBase: {
 		"oilMax" : 0,
 		"scienceMax" : 0,
@@ -2097,6 +2274,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		this.game = game;
 		this.metaCache = {};
 		this.registerMeta("research", this.upgrades, null);
+		this.registerMeta("research", this.zebraUpgrades, null);
 		this.setEffectsCachedExisting();
 	},
 
@@ -2122,6 +2300,21 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				return this.crafts[i];
 			}
 		}
+		return null;
+	},
+
+	getZebraUpgrade: function(zebraUpgradeName){
+		var zebraUpgrade = this.metaCache[zebraUpgradeName];
+		if (zebraUpgrade){
+			return zebraUpgrade;
+		}
+		for (var i = this.zebraUpgrades.length - 1; i >= 0; i--) {
+			if (this.zebraUpgrades[i].name === zebraUpgradeName){
+				this.metaCache[zebraUpgrade] = this.zebraUpgrades[i];
+				return this.zebraUpgrades[i];
+			}
+		}
+		console.error("Failed to get upgrade for id '" + zebraUpgradeName + "'");
 		return null;
 	},
 
@@ -2161,6 +2354,11 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				craft.progressHandicap = 1;
 			}
 		}
+		for (var i = 0; i < this.zebraUpgrades.length; i++){
+			var zebraUpgrade = this.zebraUpgrades[i];
+			zebraUpgrade.researched = false;
+			zebraUpgrade.unlocked = false;
+		}
 
 		//ugh
 		this.getCraft("wood").prices = [{name: "catnip", val: 100}];
@@ -2172,7 +2370,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		saveData.workshop = {
 			hideResearched: this.hideResearched,
 			upgrades: this.filterMetadata(this.upgrades, ["name", "unlocked", "researched"]),
-			crafts: this.filterMetadata(this.crafts, ["name", "unlocked", "value", "progress"])
+			crafts: this.filterMetadata(this.crafts, ["name", "unlocked", "value", "progress"]),
+			zebraUpgrades: this.filterMetadata(this.zebraUpgrades, ["name", "unlocked", "researched"])
 		};
 	},
 
@@ -2184,6 +2383,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		this.hideResearched = saveData.workshop.hideResearched;
 		this.loadMetadata(this.upgrades, saveData.workshop.upgrades);
 		this.loadMetadata(this.crafts, saveData.workshop.crafts);
+		this.loadMetadata(this.zebraUpgrades, saveData.workshop.zebraUpgrades);
 
 		for (var i = 0; i < this.upgrades.length; i++){
 			var upgrade = this.upgrades[i];
@@ -2193,6 +2393,17 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				}
 				if (upgrade.unlocks) {
 					this.game.unlock(upgrade.unlocks);
+				}
+			}
+		}
+		for (var i = 0; i < this.zebraUpgrades.length; i++){
+			var zebraUpgrade = this.zebraUpgrades[i];
+			if (zebraUpgrade.researched){
+				if (zebraUpgrade.handler) {
+					zebraUpgrade.handler(this.game);	//just in case update workshop upgrade effects
+				}
+				if (zebraUpgrade.unlocks) {
+					this.game.unlock(zebraUpgrade.unlocks);
 				}
 			}
 		}
@@ -2268,7 +2479,35 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			return false;
 		}
 	},
+	//might need a refractor here.
+	getConsumptionEngineers: function(){
+		var result = {};
+		var kittenResProductionModifier = (this.game.workshop.get("neuralNetworks").researched ? 2 : 1);
+		kittenResProductionModifier *= this.game.religion.getHGScalingBonus();
+		for (var ind in this.crafts){
+			var craft = this.crafts[ind];
+			var kittenResProduction = (this.game.village.getResProduction()["ES" + craft.name] || 0);
+			if (!kittenResProduction){
+				continue;
+			}
+			var tierCraftRatio = this.game.getEffect("t" + craft.tier + "CraftRatio") || 0;
+			if (tierCraftRatio == 0) {
+				tierCraftRatio = 1;
+			}
 
+			// One (bonus / handicap) crafts per engineer per 10 minutes
+			var effectPerTick = kittenResProduction * tierCraftRatio / (600 * this.game.ticksPerSecond * craft.progressHandicap);
+			for (var priceInd in craft.prices){
+				var price = craft.prices[priceInd];
+				if (!result[price.name]){
+					result[price.name] = -price.val * effectPerTick;
+				}else{
+					result[price.name] -= price.val * effectPerTick;
+				}
+			}
+		}
+		return result;
+	},
 	getEffectEngineer: function(resName, afterCraft) {
 		var craft = this.getCraft(resName);
 		if (craft == null) {
@@ -2276,7 +2515,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		}
 
 		var kittenResProduction = (this.game.village.getResProduction()["ES" + resName] || 0) * (this.game.workshop.get("neuralNetworks").researched ? 2 : 1);
-
+		kittenResProduction *= this.game.religion.getHGScalingBonus();
+		
 		var tierCraftRatio = this.game.getEffect("t" + craft.tier + "CraftRatio") || 0;
 		if (tierCraftRatio == 0) {
 			tierCraftRatio = 1;
@@ -2345,47 +2585,34 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		var times = daysOffset * this.game.calendar.ticksPerDay;
 
 		//-------------	 this is a poor place for this kind of functionality ------------
-		var scienceMaxBuilding = this.game.bld.getEffect("scienceMax"),
-			scienceMaxCompendiaCap =  this.game.bld.getEffect("scienceMaxCompendia"),
-			compendiaScienceMax = Math.floor(this.game.resPool.get("compedium").value * 10);
-
-		//iw compedia cap is set to 1000% instead of 100%
-		var iwScienceCapRatio = this.game.ironWill ? 10 : 1;
-
-		var blackLibrary = this.game.religion.getTU("blackLibrary");
-		if (this.game.prestige.getPerk("codexLeviathanianus").researched){
-			var ttBoostRatio = (
-				0.05 * (
-					1 +
-					blackLibrary.val * (
-						blackLibrary.effects["compendiaTTBoostRatio"] +
-						this.game.getEffect("blackLibraryBonus") )
-				)
-			);
-			iwScienceCapRatio *= (1 + ttBoostRatio * this.game.religion.transcendenceTier);
-		}
-
-		/*var darkFutureRatio = Math.max(this.game.calendar.year / this.game.calendar.darkFutureBeginning, 1);
-		// Quadratic increase, so that deep enough run will eventually unnerf the compendia cap
-		var scienceMax = (scienceMaxBuilding * iwScienceCapRatio + scienceMaxCompendiaCap) * darkFutureRatio * darkFutureRatio;*/
-
-		//ch40krun should not be explosed to regular players
-		//there is a lot of ungoing discussing about the necessity of compedia un-nerf, and the original intention was never to allow it
-
-		if (compendiaScienceMax > (scienceMaxBuilding * iwScienceCapRatio + scienceMaxCompendiaCap) /*&& !this.game.opts.ch40krun*/){
-			compendiaScienceMax = (scienceMaxBuilding * iwScienceCapRatio + scienceMaxCompendiaCap);
-		}
 		//-------------	todo: move somewhere to bld? ------------------------------------
 
 		this.effectsBase["oilMax"] = Math.floor(this.game.resPool.get("tanker").value * 500);
-		this.effectsBase["scienceMax"] = compendiaScienceMax;
-		//this.effectsBase["scienceMax"] = Math.min(compendiaScienceMax, scienceMax);
+
+		var scienceMaxCap = this.game.bld.getEffect("scienceMax");
+		scienceMaxCap += this.game.getEffect("pyramidSpaceCompendiumRatio") * this.game.space.getEffect("scienceMax"); //lets treat trasnfered science max from space same way
+		if (this.game.ironWill) {
+			scienceMaxCap *= 10;
+		}
+		if (this.game.prestige.getPerk("codexLeviathanianus").researched) {
+			var blackLibrary = this.game.religion.getTU("blackLibrary");
+			var ttBoostRatio = 1 + blackLibrary.val * (blackLibrary.effects["compendiaTTBoostRatio"] + this.game.getEffect("blackLibraryBonus"));
+			scienceMaxCap *= 1 + 0.05 * ttBoostRatio * this.game.religion.transcendenceTier;
+		}
+		scienceMaxCap += this.game.bld.getEffect("scienceMaxCompendia");
+		
+		// there is a lot of ongoing discussing about the necessity of compedia unnerf, and the original intention of ch40krun was never to allow it
+		/* // Quadratic increase, so that deep enough run will eventually unnerf the compendia cap
+		var darkFutureRatio = Math.max(this.game.calendar.year / this.game.calendar.darkFutureBeginning, 1);
+		scienceMaxCap *= darkFutureRatio * darkFutureRatio; */
+
+		var compendiaScienceMax = Math.floor(this.game.resPool.get("compedium").value * 10);
+		this.effectsBase["scienceMax"] = Math.min(compendiaScienceMax, scienceMaxCap);
+
 		var cultureBonusRaw = Math.floor(this.game.resPool.get("manuscript").value);
 		this.effectsBase["cultureMax"] = this.game.getUnlimitedDR(cultureBonusRaw, 0.01);
 
-		if (this.game.science.getPolicy("tradition").researched){
-			this.effectsBase["cultureMax"] *= 2;
-		}
+		this.effectsBase["cultureMax"] *= 1 + this.game.getEffect("cultureFromManuscripts");
 
 		//sanity check
 		if (this.game.village.getFreeEngineers() < 0){
@@ -2447,6 +2674,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 		for (var i in this.crafts){
 			this.crafts[i].unlocked = true;
+		}
+		for (var i in this.zebraUpgrades){
+			this.zebraUpgrades[i].unlocked = true;
 		}
 		this.game.msg($I("workshop.all.upgrades.unlocked"));
 	}
@@ -2718,6 +2948,41 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButton", com.nuclearunicorn.game.u
 
 });
 
+dojo.declare("com.nuclearunicorn.game.ui.ZebraUpgradeButtonController", com.nuclearunicorn.game.ui.BuildingNotStackableBtnController, {
+
+	defaults: function() {
+		var result = this.inherited(arguments);
+		result.tooltipName = true;
+		result.simplePrices = false;
+		return result;
+	},
+
+	getMetadata: function(model){
+        if (!model.metaCached){
+            model.metaCached = this.game.workshop.getZebraUpgrade(model.options.id);
+        }
+        return model.metaCached;
+    },
+
+	getPrices: function(model) {
+        return this.game.village.getEffectLeader("scientist", this.inherited(arguments));
+    },
+
+	updateVisible: function(model){
+		var upgrade = model.metadata;
+		if (!upgrade.unlocked){
+			model.visible = false;
+		}else{
+			model.visible = true;
+		}
+
+		if (upgrade.researched && this.game.workshop.hideResearched){
+			model.visible = false;
+		}
+	}
+});
+
+
 dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.ui.tab, {
 
 	tdTop: null,
@@ -2781,7 +3046,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 		var content = craftPanel.render(tabContainer);
 
 		var table = dojo.create("table", {}, content);
-		var tr = dojo.create("tr", {}, table);
+		dojo.create("tr", {}, table);
 
 		//buttons go there
 		var td = dojo.create("td", {}, table);
@@ -2809,6 +3074,25 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 
 			this.craftBtns.push(craftBtn);
 		}
+
+	//---------------------------------------------------------------------
+
+	var zebraUpgradesPanel = new com.nuclearunicorn.game.ui.Panel($I("workshop.zebraUpgradesPanel.label"), this.game.workshop);
+	if(this.game.bld.getBuildingExt("zebraWorkshop").meta.val>0){
+		var content = zebraUpgradesPanel.render(tabContainer);
+
+		for (var i = 0; i < this.game.workshop.zebraUpgrades.length; i++){
+			var zebraUpgrade = this.game.workshop.zebraUpgrades[i];
+
+			var zebraUpgradeButton = this.createZebraUpgradeBtn(zebraUpgrade);
+
+			zebraUpgradeButton.updateEnabled();
+			zebraUpgradeButton.updateVisible();
+
+			this.addButton(zebraUpgradeButton);
+			zebraUpgradeButton.render(content);
+		}
+	}
 
 		//resources go there
 		var td = dojo.create("td", { className: "craftStuffPanel", style: {paddingLeft: "50px"}}, table);
@@ -2840,14 +3124,19 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 			if (res.craftable && res.value){
 				var tr = dojo.create("tr", {}, table);
 
-				var td = dojo.create("td", { innerHTML: res.title || res.name + ":" }, tr);
-				var td = dojo.create("td", { innerHTML: this.game.getDisplayValueExt(res.value) }, tr);
+				dojo.create("td", { innerHTML: res.title || res.name + ":" }, tr);
+				dojo.create("td", { innerHTML: this.game.getDisplayValueExt(res.value) }, tr);
 			}
 		}
 	},
 
 	createBtn: function(upgrade) {
 		var controller = new com.nuclearunicorn.game.ui.UpgradeButtonController(this.game);
+		return new com.nuclearunicorn.game.ui.BuildingResearchBtn({id: upgrade.name, controller: controller}, this.game);
+	},
+
+	createZebraUpgradeBtn: function(upgrade) {
+		var controller = new com.nuclearunicorn.game.ui.ZebraUpgradeButtonController(this.game);
 		return new com.nuclearunicorn.game.ui.BuildingResearchBtn({id: upgrade.name, controller: controller}, this.game);
 	},
 

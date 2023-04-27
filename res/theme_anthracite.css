@@ -57,7 +57,7 @@ body.scheme_anthracite.with_background_image,
 .scheme_anthracite .btn.modern.disabled span.btnTitle { /* to change only the properties of the button name for buttons disabled */
 	color: #808080;
 }
-.scheme_anthracite .btn.modern.disabled span.btnTitle.limited { /* to change only the properties of the button name for buttons limited */
+.scheme_anthracite .btn.modern.disabled.limited span.btnTitle { /* to change only the properties of the button name for buttons limited */
 	color: #d42f2b;
 }
 .scheme_anthracite .btn.modern:not(.disabled) {
@@ -233,7 +233,7 @@ body.scheme_anthracite.with_background_image,
 .scheme_anthracite #topBar a.copyright:hover {
 	color: #d0d0d0;
 }
-.scheme_anthracite #headerLinks .links-block { /* a link separator : | on header links */
+.scheme_anthracite #topBar .links-block { /* a link separator : | on topBar links */
 	color: transparent;
 }
 .scheme_anthracite #topBar div,
@@ -243,9 +243,9 @@ body.scheme_anthracite.with_background_image,
 .scheme_anthracite .toolbarIcon.sorrow.max div {
     color: #f0140f !important;
 }
-.scheme_anthracite #topBar > div:first-child > span:first-child:after {
+.scheme_anthracite #topBar > div:first-child > span:last-of-type::after {
     color: #707070;
-    content: '\00a0\00a0\00a0Theme by Volkeyrn\00a0\00a0\00a0';
+    content: '\00a0\00a0\00a0Theme by Volkeyrn';
     text-decoration: none;
 }
 .scheme_anthracite #autosaveTooltip {
@@ -307,6 +307,7 @@ body.scheme_anthracite.with_background_image,
 }
 .scheme_anthracite .button_tooltip {
 	background-color: transparent;
+	backdrop-filter: none; /* default : backdrop-filter: blur(2px); */
 }
 .scheme_anthracite .button_tooltip div { /* tooltip window == left column: right text | center column :highlighting text */
 	color: #b0b0b0;

@@ -31,7 +31,8 @@
         "no-unused-vars": "warn",
         "no-prototype-builtins":"warn",
         "space-infix-ops": "warn",
-        "no-redeclare": "off"
+        "no-redeclare": "off",
+        "curly": "error"
     },
     "globals": {
         "dojo": "readonly",

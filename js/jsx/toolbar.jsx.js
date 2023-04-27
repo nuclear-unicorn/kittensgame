@@ -24,35 +24,7 @@ WToolbarIconContainer = React.createClass({
         var getTooltip = this.props.getTooltip;
         var game = this.props.game;
 
-		var tooltip = dojo.byId("tooltip");
-		dojo.empty(tooltip);
-
-		dojo.connect(container, "onmouseover", this, function(event){
-			 game.tooltipUpdateFunc = function(){
-				tooltip.innerHTML = getTooltip();
-			 };
-			 game.tooltipUpdateFunc();
-
-			 var target = event.originalTarget || event.toElement;
-			 var pos = $(target).offset();
-			 if (!pos){
-				 return;
-			 }
-
-			 dojo.style(tooltip, "left", pos.left + "px");
-			 dojo.style(tooltip, "top",  pos.top + "px");
-
-			 dojo.style(tooltip, "display", "");
-			 dojo.style(container, "fontWeight", "bold");
-
-	    });
-
-		dojo.connect(container, "onmouseout", this, function(){
-			 game.tooltipUpdateFunc = null;
-			 dojo.style(tooltip, "display", "none");
-			 dojo.style(container, "fontWeight", "normal");
-		});
-
+        UIUtils.attachTooltip(game, container, 0, 100, getTooltip);
 	}
 })
 
@@ -67,9 +39,9 @@ WToolbarHappiness = React.createClass({
             getTooltip: this.getTooltip,
             className: "happiness"
         },
-            $r("div", {
+            $r("div", {className:"happinessText",
                 dangerouslySetInnerHTML: {
-                    __html: "(:3)&nbsp;" + Math.floor(game.village.happiness * 100) + "%"
+                    __html: Math.floor(game.village.happiness * 100) + "%"
                 }
             })
         );
@@ -94,6 +66,9 @@ WToolbarHappiness = React.createClass({
 				if(resources[i].name == "elderBox" && this.game.resPool.get("wrappingPaper").value){
 					resHappiness -= happinessPerLuxury; // Present Boxes and Wrapping Paper do not stack.
 				}
+				if(resources[i].type == "uncommon"){
+					resHappiness += this.game.getEffect("consumableLuxuryHappiness");
+				}
 			}
 		}
 		tooltip += $I("village.happiness.rare.resources") + ": +" + this.game.getDisplayValueExt(resHappiness, false, false, 0) + "%<br>";
@@ -105,7 +80,7 @@ WToolbarHappiness = React.createClass({
 
 		if (this.game.calendar.festivalDays > 0){
 			var festivalHappinessEffect = 30 * (1+this.game.getEffect("festivalRatio"));
-			tooltip += $I("village.happiness.festival") + ": +"+festivalHappinessEffect+"%<br>";
+			tooltip += $I("village.happiness.festival") + ": +" + this.game.getDisplayValueExt(festivalHappinessEffect, false, false, 0) + "%<br>";
 		}
 
         var unhappiness = this.game.village.getUnhappiness() / (1 + this.game.getEffect("unhappinessRatio")),
@@ -116,7 +91,7 @@ WToolbarHappiness = React.createClass({
         tooltip += "* " + $I("village.happiness.penalty.base") + ": -" + this.game.getDisplayValueExt(unhappiness, false, false, 0) + "%<br>";
 		tooltip += "* " + $I("village.happiness.penalty.mitigated") + ": " + this.game.getDisplayValueExt(-unhappinessReduction, false, false, 0) + "%<br>";
         tooltip += $I("village.happiness.environment") + ": " + this.game.getDisplayValueExt(environmentEffect, false, false, 0) + "%<br>";
-        var overpopulation = this.game.village.getKittens() - this.game.village.maxKittens;
+        var overpopulation = this.game.village.getOverpopulation();
         if (overpopulation > 0){
             tooltip += $I("village.happiness.overpopulation") + ": -" + overpopulation * 2 + "%<br>";
         }
@@ -146,9 +121,9 @@ WToolbarEnergy = React.createClass({
             getTooltip: this.getTooltip,
             className: "energy" + className
         },
-            $r("div", {
+            $r("div", {className:"energyText",
                 dangerouslySetInnerHTML: {
-                    __html: "&#9889;&nbsp;" + game.getDisplayValueExt(resPool.energyProd - resPool.energyCons) + $I("unit.watt")
+                    __html: game.getDisplayValueExt(resPool.energyProd - resPool.energyCons) + $I("unit.watt")
 				}
             })
         );
@@ -196,6 +171,83 @@ WToolbarMOTD = React.createClass({
 			server.motdFreshMessage = false;
 			return "Message of the day:<br />" + server.motdContent;
 		}
+    }
+});
+WToolbarPollution = React.createClass({
+    freshMessage: false,
+    message: "",
+
+    render: function(){
+        var game = this.props.game;
+        var message = this.getTooltip(true);
+        if(this.message != message){
+            this.freshMessage = this.message != "";
+            this.message = message;
+        }
+        if(game.bld.cathPollution > 100000 || game.science.get("ecology").researched){
+            return $r(WToolbarIconContainer, {
+                game: game,
+                getTooltip: this.getTooltip,
+                className: "pollutionIcon " + (this.freshMessage ? "energy warning": null)
+            },
+                $r("div", {className:"pollutionText"},
+                (game.science.get("ecology").researched ? (this.getPollutionMod()) : "\xa0"))
+            );
+        }
+        return null;
+    },
+    getTooltip: function(notUpdateFreshMessage){
+        var game = this.props.game;
+
+        var message = "";
+        var eqPol = game.bld.getEquilibriumPollution();
+        var eqPolLvl = game.bld.getPollutionLevel(eqPol);
+        var pollution = game.bld.cathPollution;
+        var polLvl = game.bld.getPollutionLevel();
+        var polLvlShow = game.bld.getPollutionLevel(pollution * 2);
+        if (polLvl >= 4){
+            message += $I("pollution.level1") + "<br/>" + $I("pollution.level2") + "<br/>" + $I("pollution.level3", [game.villageTab.getVillageTitle()]) + "<br/>" + $I("pollution.level4");
+        }
+        else if (polLvlShow == 3 || polLvl == 3){
+            message += $I("pollution.level1") + "<br/>" + $I("pollution.level2") + "<br/>" + $I("pollution.level3", [game.villageTab.getVillageTitle()]);
+        }
+        else if (polLvlShow == 2){
+            message += $I("pollution.level1") + "<br/>" + $I("pollution.level2");
+        }
+        else if (polLvlShow == 1){
+            message += $I("pollution.level1");
+        } else {
+            message = $I("pollution.level0");
+        }
+
+        var warnLvl = game.bld.getPollutionLevel(pollution * 4);
+        if (warnLvl >= 1 && warnLvl <= 4 && warnLvl > polLvlShow && warnLvl <= eqPolLvl) {
+            message += "<br/>" + $I("pollution.level" + warnLvl + ".warning");
+        }
+        if (pollution * 1.5 <= eqPol || eqPolLvl > polLvl){
+            message += "<br/>" + $I("pollution.increasing");
+        }
+        else if (pollution >= 0 && game.bld.cathPollutionPerTick <= 0 && eqPolLvl < polLvl){
+            message += "<br/>" + $I("pollution.cleaning");
+        }
+        else if (eqPolLvl == polLvl && eqPol > 0){
+            message += "<br/>" + $I("pollution.equilibrium");
+        }
+        else {
+            message += "<br/>" + $I("pollution.pristine");
+        }
+        if (notUpdateFreshMessage){
+            return message;
+        }
+        message +="<br/>CO₂: " + (game.science.get("ecology").researched ?
+            this.getPollutionMod() : $I("pollution.unspecified"));
+        this.freshMessage = false;
+        return message;
+    },
+
+    getPollutionMod: function(){
+        var game = this.props.game;
+        return game.getDisplayValueExt((game.bld.cathPollution / game.bld.getPollutionLevelBase())*100) + "ppm";
     }
 });
 
@@ -262,6 +314,7 @@ WLoginForm = React.createClass({
         return {
             login: null,
             password: null,
+            error: null,
             isLoading: false
         }
     },
@@ -310,6 +363,9 @@ WLoginForm = React.createClass({
                         target: "_blank",
                         href: "http://kittensgame.com/ui/register"
                     }, "register")
+                ]),
+                this.state.error && $r("div", {className: "row"}, [
+                    $r("span", {className:"error"}, this.state.error)
                 ])
             ]
         )
@@ -352,19 +408,155 @@ WLoginForm = React.createClass({
             if (resp.id){
                 self.props.game.server.setUserProfile(resp);
             }
-		}).always(function(){
+		}).fail(function(resp, status){
+            console.error("something went wrong, resp:", resp, status)
+            self.setState({error: resp.responseText})
+        }).always(function(){
             self.setState({isLoading: false});
         });
     }
 });
 
-WCloudSaves = React.createClass({
+WCloudSaveRecord = React.createClass({
+
+    getInitialState: function(){
+        return {
+            showActions: false,
+            isEditable: false,
+            label: this.props.save.label
+        }
+    },
 
     bytesToSize(bytes) {
         var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
         if (bytes == 0) return '0 Byte';
         var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
         return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+    },
+
+    render: function(){
+        var game = this.props.game;
+        var save = this.props.save;
+
+        var isActiveSave = (save.guid == game.telemetry.guid);
+        var guid = save.guid;
+
+        var self = this;
+
+        return $r("div", {className:"save-record " + (save.archived ? "archived" : "")}, [
+            $r("div", {className:"save-record-cell"},
+                this.state.isEditable ? 
+                    $r("input", {
+                        onClick: function(e){
+                            e.stopPropagation();
+                        },
+                        onChange: function(e){
+                            self.setState({
+                                label: e.target.value
+                            });
+                        },
+                        onKeyPress: function(e){
+                            console.log("foo");
+                            //TODO: set save label
+                            if(e.key === 'Enter'){
+                                game.server.pushSaveMetadata(
+                                    save.guid,
+                                    {
+                                        label: self.state.label
+                                    }
+                                ).then(function(){
+                                    //force sync-up of the game's server state with UI
+                                    //(pushMetadata should return a new save snapshot)
+                                    self.forceUpdate();
+                                });
+                                self.setState({
+                                    isEditable: false
+                                });
+                            }
+                        }
+                     }) :
+                    $r("a", { 
+                        onClick: function(e){
+                            e.stopPropagation();
+                            self.setState({
+                                isEditable: !self.state.isEditable
+                            })
+                        }
+                    }, save.label || guid.substring(guid.length-4, guid.length))
+                ,
+                isActiveSave ? "[" + $I("ui.kgnet.save.current") + "]" : ""
+            ),
+            $r("div", {className:"save-record-cell"},
+                save.index ?
+                ("Year "+ save.index.calendar.year + ", day " + save.index.calendar.day) :
+                "loading..."
+            ),
+            $r("div", {className:"save-record-cell"},
+                new Date(save.timestamp).toLocaleDateString("en-US", {
+                    month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hourCycle: "h24"
+                })
+            ),
+            $r("div", {className:"save-record-cell"}, self.bytesToSize(save.size)),
+            isActiveSave && $r("a", {
+                className: "link",
+                title: "Upload your current game save to the server (this will owerwrite your old cloud save)",
+                onClick: function(e){
+                    e.stopPropagation();
+                    game.ui.confirm("[S]ave", "This will override [SERVER] save. Y/N", function(){
+                        game.server.pushSave();
+                    });
+                }}, $I("ui.kgnet.save.save")),
+            $r("a", {
+                className: "link",
+                title: "Download a cloud save and apply it to your game (your current data will be lost)",
+                onClick: function(e){
+                    e.stopPropagation();
+                    game.ui.confirm("[L]oad", "This will override [LOCAL] save. Y/N", function(){
+                        game.server.loadSave(save.guid);
+                    });
+                }}, $I("ui.kgnet.save.load")),
+            $r("a", {
+                className: "link",
+                onClick: function(e){
+                    e.stopPropagation();
+                    self.setState({
+                        showActions: !self.state.showActions
+                    })
+                }
+            }, ".."),
+            this.state.showActions &&
+                $r("a", {
+                    onClick: function(e){
+                        e.stopPropagation();
+                        self.setState({
+                            isEditable: !self.state.isEditable
+                        })
+                }}, "edit"
+            ),
+            this.state.showActions &&
+                $r("a", { onClick: function(e){
+                    e.stopPropagation();
+                    game.server.pushSaveMetadata(
+                        save.guid,
+                        {
+                            archived: !save.archived
+                        }
+                    ).then(function(){
+                        //force sync-up of the game's server state with UI
+                        //(pushMetadata should return a new save snapshot)
+                        self.forceUpdate();
+                    });
+                }}, "archive")  
+        ]);
+    }
+})
+
+WCloudSaves = React.createClass({
+
+    getInitialState: function(){
+        return {
+            isLoading: false
+        }
     },
 
     render: function(){
@@ -405,37 +597,7 @@ WCloudSaves = React.createClass({
             //body
             //TODO: externalize save record as component?
             saveData && saveData.map(function(save){
-                var isActiveSave = (save.guid == game.telemetry.guid);
-                return $r("div", {className:"save-record"}, [
-                    $r("div", {className:"save-record-cell"},
-                        isActiveSave ? "[current]" : ""
-                    ),
-                    $r("div", {className:"save-record-cell"},
-                        save.index ?
-                        ("Year "+ save.index.calendar.year + ", day " + save.index.calendar.day) :
-                        "loading..."
-                    ),
-                    $r("div", {className:"save-record-cell"},
-                        new Date(save.timestamp).toLocaleDateString("en-US", {
-                            month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hourCycle: "h24"
-                        })
-                    ),
-                    $r("div", {className:"save-record-cell"}, self.bytesToSize(save.size)),
-                    isActiveSave && $r("a", {
-                        className: "link",
-                        title: "Upload your current game save to the server (this will owerwrite your old cloud save)",
-                        onClick: function(e){
-                            e.stopPropagation();
-                            game.server.pushSave();
-                        }}, "Save"),
-                    $r("a", {
-                        className: "link",
-                        title: "Download a cloud save and apply it to your game (your current data will be lost)",
-                            onClick: function(e){
-                            e.stopPropagation();
-                            game.server.loadSave(save.guid);
-                        }}, "Load"),
-                ])
+                return $r(WCloudSaveRecord, {save: save, game: game});
             })),
 
             $r("div", {className:"save-record-container"}, [
@@ -451,9 +613,16 @@ WCloudSaves = React.createClass({
                         title: "Fetch the latest information about your cloud saves from the serer. This is a safe operation and it wont change any data.",
                         onClick: function(e){
                             e.stopPropagation();
-                            game.server.syncSaveData();
+                            self.setState({isLoading: true})
+                            game.server.syncSaveData().always(function(){
+                                self.setState({isLoading: false})
+                            })
                         }
-                    }, "Sync cloud saves")
+                    }, 
+                        (this.state.isLoading && "[loading..]"), 
+                        $I("ui.kgnet.sync")
+                    ),
+                    $r("span", {paddingTop:"10px"}, $I("ui.kgnet.instructional"))
                 ])
             ])
         ])
@@ -470,6 +639,8 @@ WLogin = React.createClass({
     render: function(){
         var game = this.props.game;
 
+        var lastBackup = (new Date().getTime() - game.lastBackup) / (1000 * 60 * 60 * 24);
+
         return $r(WToolbarIconContainer, {
             game: game,
         },
@@ -479,12 +650,20 @@ WLogin = React.createClass({
                 },
                 [
                     $r("span", {
-                        className: "status-indicator-" + (game.server.userProfile ? "online" : "offline")
-                    }, "* " + (game.server.userProfile ? "Online" : "Offline")),
+                        className: "kgnet-login-link status-indicator-" + (game.server.userProfile ? "online" : "offline")
+                        + (lastBackup >= 7 ? " freshMessage" : "")
+                    }, "* " + (game.server.userProfile ?
+                        $I("ui.kgnet.online") : $I("ui.kgnet.login")
+                    )),
                     this.state.isExpanded && $r("div", {
                         className: "login-popup button_tooltip tooltip-block"
                     },
                         $r("div", null,
+                            $r("div", {className: "last-backup"}, [
+                                (lastBackup >= 7) && $r("span", {className: "hazard"}),
+                                "Last backup: ", lastBackup.toFixed(1) + " days ago",
+                                (lastBackup >= 7) && $r("span", {className: "hazard"})
+                            ]),
                             $r(WLoginForm, {game: game}),
                             $r(WCloudSaves, {game: game})
                         )
@@ -508,20 +687,25 @@ WToolbar = React.createClass({
 
     componentDidMount: function(){
         var self = this;
-        dojo.subscribe("ui/update", function(game){
+        this.onUpdateHandler = dojo.subscribe("ui/update", function(game){
             self.setState({game: game});
         });
+    },
+
+    componentWillUnmount(){
+        dojo.unsubscribe(this.onUpdateHandler);
     },
 
     getIcons: function(){
         var icons = [];
         icons.push(
-            $r(WToolbarFPS, {game: this.props.game}),
-            $r(WToolbarMOTD, {game: this.props.game}),
-            $r(WToolbarHappiness, {game: this.props.game}),
-            $r(WToolbarEnergy, {game: this.props.game}),
-            $r(WBLS, {game: this.props.game}),
-            $r(WLogin, {game: this.props.game})
+            $r(WToolbarFPS, {game: this.state.game}),
+            game.opts.disablePollution ? null : $r(WToolbarPollution, {game: this.state.game}),
+            $r(WToolbarHappiness, {game: this.state.game}),
+            $r(WToolbarEnergy, {game: this.state.game}),
+            $r(WBLS, {game: this.state.game}),
+            $r(WToolbarMOTD, {game: this.state.game}),
+            $r(WLogin, {game: this.state.game})
 
         );
         return icons;

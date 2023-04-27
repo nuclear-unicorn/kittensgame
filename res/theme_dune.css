@@ -1,0 +1,1301 @@
+/* ********************************************************* */
+/* ***            Dune 1.0.2 Theme © Volkeyrn            *** */
+/* ********************************************************* */
+
+ @import url(https://fonts.googleapis.com/css?family=Signika+Negative:wght@400,700&display=swap);
+
+/* ******************************************** */
+/* ******************* GAME ******************* */
+/* ******************************************** */
+body.scheme_dune {
+	background-color: #3e1c3b;
+}
+.scheme_dune #game,
+.scheme_dune #loadingContainer {
+    top: 18px;
+}
+.scheme_dune  #gamePageContainer,
+.scheme_dune select,
+.scheme_dune .btn,
+.scheme_dune  .modern,
+.scheme_dune .btn.modern,
+.scheme_dune input[type='button'] {
+	font-family: 'Signika Negative', sans-serif;
+}
+.scheme_dune .btn {
+	color: gray;
+	margin-bottom: 3px; /* default 10px */
+	max-height: 36px;
+	background-color: transparent;
+	border: solid 1px transparent;
+}
+.scheme_dune .btn.modern {
+	/* default font-size: 14px; */
+	border-radius: 7px;
+	width: 300px; /* +10px gained from left column +15px gained from padding default width: 264px; */
+}
+.scheme_dune .btn.modern.disabled {
+	background-color: #281028;
+	border: solid 1px #221122;
+}
+.scheme_dune .btn.modern.disabled:hover {
+	border: solid 1px #3c1a43;
+	cursor: inherit;
+	box-shadow: 0 0 1px 1px #14101a;
+}
+.scheme_dune .btn.modern.disabled span.btnTitle { /* to change only the properties of the button name for buttons disabled */
+	color: #9393b2;
+}
+.scheme_dune .btn.modern.disabled.limited span.btnTitle { /* to change only the properties of the button name for buttons limited */
+	color: #ac0307;
+}
+.scheme_dune .btn.modern:not(.disabled) {
+   	background-color: #3a1d43;
+	border: solid 1px #572854;
+	cursor: pointer;
+}
+.scheme_dune .btn.modern:not(.disabled):hover {
+	background: none;
+	background-color: #572854;
+	cursor: pointer;
+	border: solid 1px #94239d;
+	box-shadow: 0 0 2px 1px #591e5a, 0 0 2px -1px #6c2179;
+}
+.scheme_dune .btn.modern:not(.disabled) span.btnTitle { /* to change only the properties of the button name for buttons enabled */
+	color: #fee0dd;
+	text-shadow: 1px 1px 2px #34124e;
+}
+.scheme_dune .btn.modern:not(.disabled):hover span.btnTitle {
+	color: #fee0dd;
+	text-shadow: 1px 1px 2px #731b46, -1px -1px 2px #731b46;
+}
+.scheme_dune a {
+	color: #16bcb8;
+}
+.scheme_dune a,
+.scheme_dune .craft-link {
+    text-decoration: none;
+}
+.scheme_dune a:hover {
+	color: #fca9fe;
+	opacity: 1.0; /* default opacity: 0.6 */
+}
+.scheme_dune div {
+	color: #e3e3eb;
+}
+.scheme_dune .disabled div { /* color text for disabled */
+	color: #808080;
+}
+.scheme_dune h1 {
+    font-size: 17px; /* default font size = font-size: 12px; */
+    color: #a92ca9;
+	text-shadow: 1px 1px 1px #1e0c1f;
+	padding-left: 30px;
+	text-transform: capitalize;
+}
+.scheme_dune h1:first-child {
+    margin-top: 15px;
+}
+.scheme_dune .btn.modern.small-text {
+	font-size: 100% !important; /* default font-size: 90%; */
+}
+.scheme_dune .modern .btnContent {
+    padding: 10px 0 10px 1px; /* 1px left for buttons without power background-image */
+}
+/* *** green and red light for machine on/off *** */
+.scheme_dune .btn.bldEnabled div.btnContent,
+.scheme_dune .btn.bldlackResConvert div.btnContent {
+	padding: 10px 0 10px 13px; /* 13px left for power background-image (linear-gradient) */
+	border: none; /* also allows you to remove the height difference with the other buttons (they have no border on div.content) */
+}
+.scheme_dune .btn.disabled.bldlackResConvert { /* color for lack resources convertion */
+	background: no-repeat border-box linear-gradient(90deg, #ac0307 0%, #ac0307 10px, #281028 12px, #281028 100%);
+}
+.scheme_dune .btn.disabled.bldlackResConvert:hover {
+	background: no-repeat border-box linear-gradient(90deg, #ac0307 0%, #ac0307 10px, #281028 12px, #281028 100%);
+}
+.scheme_dune .btn:not(.disabled).bldlackResConvert {
+	background: no-repeat border-box linear-gradient(90deg, #ac0307 0%, #ac0307 10px, #3a1d43 12px, #3a1d43 100%);
+}
+.scheme_dune .btn:not(.disabled).bldlackResConvert:hover {
+	background: no-repeat border-box linear-gradient(90deg, #ac0307 0%, #ac0307 10px, #572854 12px, #572854 100%);
+}
+.scheme_dune .btn.disabled.bldEnabled { /* color #5cac03 */
+	background: no-repeat border-box linear-gradient(90deg, #5cac03 0%, #5cac03 10px, #281028 12px, #281028 100%);
+}
+.scheme_dune .btn.disabled.bldEnabled:hover {
+	background: no-repeat border-box linear-gradient(90deg, #5cac03 0%, #5cac03 10px, #281028 12px, #281028 100%);
+}
+.scheme_dune .btn:not(.disabled).bldEnabled {
+	background: no-repeat border-box linear-gradient(90deg, #5cac03 0%, #5cac03 10px, #3a1d43 12px, #3a1d43 100%);
+}
+.scheme_dune .btn:not(.disabled).bldEnabled:hover {
+	background: no-repeat border-box linear-gradient(90deg, #5cac03 0%, #5cac03 10px, #572854 12px, #572854 100%);
+}
+/* *** end of green light for machine on/off *** */
+.scheme_dune .dialog { /* window options, credits and get the app */
+	background-color: #312148;
+	color: #d3d3e0;
+}
+.scheme_dune .dialog {
+    box-shadow: 0 0 5px 3px #6a296a, inset 0 0 3px 2px #6a296a;
+	border: ridge 2px #ffffa8;
+	border-top-width: 3px;
+	border-bottom-width: 3px;
+	border-radius: 19px;
+}
+.scheme_dune .dialog a {
+	text-transform: capitalize;
+}
+.scheme_dune label i { /* information text in option windows */
+    color: #9393b2;
+}
+.scheme_dune label:hover {
+	opacity: 1;/* default opacity: 0.7; */
+	color: #fca9fe;
+}
+.scheme_dune .dialog input[type="button"] {
+	margin-left: 7px;
+	margin-bottom: 10px;
+	font-size: 15px;
+}
+.scheme_dune select { /* dropdown list on settlement tab and options windows */
+    background-color: #3a1d42;
+    color: #fee0dd;
+	font-size: 13px;
+	border-radius: 5px;
+	margin-left: 3px;
+	border: 1px outset #6d2a6e;
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+}
+.scheme_dune select:hover { /* dropdown list on settlement tab and options windows */
+	background-color: #281028;
+	color: #e3e3eb;
+	cursor: pointer;
+}
+.scheme_dune select>option {
+    background-color: #3a1d42;
+    color: #fee0dd;
+	padding: 2px 10px; /* -2 pixel vertical */
+	border-color: #4d1e4d;
+}
+.scheme_dune select > option:disabled {
+	color: #9393b2;
+	font-size: 90%;
+}
+.scheme_dune .dialog input#batchSize {
+	background-color: #281028;
+    color: #bbbbbb;
+    padding: 3px 1px 3px 5px;
+    margin-right: 5px;
+	border: 1px groove #180a18;
+	border-radius: 5px;
+    box-shadow: none;
+	margin-top: 3px;
+	margin-bottom: 3px;
+}
+.scheme_dune #optionsDiv input[type="checkbox"] + label:before {
+    content:  "\25CB"; /* WHITE CIRCLE */
+	font: 16px sans-serif;
+	color: #9393b2;
+	text-shadow: 0 0 1px #000000;
+}
+.scheme_dune #optionsDiv input[type="checkbox"]:checked + label:before {
+	content: "\25CF"; /* BLACK CIRCLE */
+	font: 16px sans-serif;
+	color: #fad5b4;
+	text-shadow: 0 0 1px #000000;
+}
+.scheme_dune textarea#importData,
+.scheme_dune textarea#exportData {
+	background-color: #281028;
+	color: #bbbbbb;	
+	border: solid 2px #180a18;
+	padding: 5px;
+	border-radius: 7px;
+}
+.scheme_dune .dialog input#batchSize:focus,
+.scheme_dune textarea#importData:focus,
+.scheme_dune textarea#exportData:focus {
+	background-color : #380038;
+	color: #fad5b4;
+	border-color: #6d2a6e;
+	border-style: inset;
+	box-shadow: inset 0 0 3px 1px #000000;
+}
+.scheme_dune h1#importFrom,
+.scheme_dune h1#exportTo {
+	margin-top: 20px; /* default margin-top: 30px; */
+	/* default margin-bottom: 8px; */
+}
+.scheme_dune h1#importFromText,
+.scheme_dune h1#exportToText {	
+	margin-top: 15px; /* default margin-top: 30px; */
+	margin-bottom: 0; /* default margin-bottom: 8px; */
+}
+.scheme_dune input:active,
+.scheme_dune select:active,
+.scheme_dune textarea:active {
+    border-color: #ee55ff !important;
+}
+
+/* *********************************************** */
+/* ******************* TOP BAR ******************* */
+/* *********************************************** */
+.scheme_dune #topBar {
+	background: #230e25;
+	border-bottom: 1px solid #642d69;
+	box-shadow: inset 0 -1px 5px #52215a;
+	top: 0; /* for no shadow on top */
+}
+.scheme_dune #topBar a.copyright {
+	color: #ac0307;
+}
+.scheme_dune #topBar a.copyright:hover {
+	color: #fca9fe;
+}
+.scheme_dune #topBar .links-block { /* a link separator : | on topBar links */
+	color: #230e25;
+}
+.scheme_dune #topBar div,
+.scheme_dune .toolbarIcon.sorrow div { /* counter of BLS (Black Liquid Sorrow) */
+	color: #e3e3eb;
+}
+.scheme_dune .toolbarIcon.sorrow.max div {
+    color: #ac0307 !important;
+}
+.scheme_dune #topBar > div:first-child > span:last-of-type::after {
+    color: #9d5de0;
+    content: '\00a0\00a0\00a0Theme by Volkeyrn';
+	text-shadow: none;
+    text-decoration: none;
+	font-weight: normal;
+}
+.scheme_dune #autosaveTooltip {
+	color: #cb45db;
+}
+.scheme_dune #getTheApp-link { /* Get the app */
+	color: #9d5de0 !important;
+	font-weight: normal !important;
+}
+.scheme_dune #getTheApp-link:hover {
+	color: #fca9fe !important;
+}
+.scheme_dune .links-block {
+	padding-top: 0 !important;
+}
+.scheme_dune #topBar .toolbarIcon.happiness div {
+    color: #e7610c;
+}
+.scheme_dune #topBar .toolbarIcon.energy div,
+.scheme_dune .button_tooltip .energyProduction {
+    color: #5cac03;
+}
+.scheme_dune #topBar .toolbarIcon.energy.warningWinter div {
+    color: #e7610c;
+}
+.scheme_dune #topBar .toolbarIcon.energy.warning div,
+.scheme_dune .button_tooltip .energyConsumption,
+.scheme_dune .button_tooltip .energyPenalty {
+	color: #ac0307;
+}
+.scheme_dune .toolbarIcon .status-indicator-online {
+	color: #5cac03;
+}
+.scheme_dune .toolbarIcon .status-indicator-offline {
+	color: #ac0307;
+}
+.scheme_dune #topBar .toolbarIcon.pollutionIcon div {
+    color: #a0a0a0;
+}
+.scheme_dune .toolbarIcon.pollutionIcon {
+    background: no-repeat top left url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='14' fill='%23a0a0a0' viewBox='0 0 16 16'%3E%3Cpath d='M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383zm.653.757c-.757.653-1.153 1.44-1.153 2.056v.448l-.445.049C2.064 6.805 1 7.952 1 9.318 1 10.785 2.23 12 3.781 12h8.906C13.98 12 15 10.988 15 9.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 4.825 10.328 3 8 3a4.53 4.53 0 0 0-2.941 1.1z'/%3E%3C/svg%3E");
+}
+.scheme_dune .toolbarIcon.happiness {
+    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='%23e7610c' viewBox='0, 0, 400,365.7142857142857'%3E%3Cg %3E%3Cpath id='path0' d='M23.809 26.069 C 9.506 63.687,-3.876 244.068,5.454 273.466 C 42.343 389.691,311.117 402.522,383.842 291.529 C 400.102 266.714,401.966 245.454,395.450 159.135 C 383.595 2.098,363.666 -27.023,299.032 18.249 C 261.840 44.299,133.578 44.945,105.157 19.224 C 74.567 -8.459,35.693 -5.188,23.809 26.069 M95.086 43.441 C 121.604 72.743,266.428 71.037,311.785 40.888 C 351.877 14.240,351.212 13.344,366.764 114.971 C 393.215 287.824,351.297 345.860,200.000 345.860 C 57.492 345.860,12.935 293.440,31.361 147.462 C 47.965 15.915,56.931 1.281,95.086 43.441 '%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
+}
+.scheme_dune .toolbarIcon.energy {
+    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%235cac03' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
+}
+.scheme_dune .toolbarIcon.energy.warning {
+    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%23ac0307' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
+}
+.scheme_dune .toolbarIcon.energy.warningWinter {
+    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%23e7610c' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
+}
+
+/* ********************************************** */
+/* ******************* FOOTER ******************* */
+/* ********************************************** */
+.scheme_dune #footerLinks {
+	font-size: 90%;
+	bottom: 3px; /* default bottom: 10px; */
+	color: transparent;
+}
+.scheme_dune #crowdjet-expand-container {
+	color: #16bcb8;
+	font-family: 'Signika Negative', sans-serif;
+}
+.scheme_dune #crowdjet-expand-container:hover {
+	color: #fca9fe;
+}
+/* *********************************************** */
+/* ******************* TOOLTIP ******************* */
+/* *********************************************** */
+.scheme_dune #tooltip,
+.scheme_dune .tooltip-block > div {
+	background-color: rgba(46, 26, 53, 0.9);
+	font-size: 14px;
+	color: #bbbbbb; /* tooltip windows == left column : left text */
+	border: 1px outset #ee55ff;
+	border-radius: 11px !important;
+	box-shadow: none;
+	margin-left: 20px; /* for offset tooltip due to larger buttons .btn.modern */
+}
+.scheme_dune .tooltip-block > div {
+	padding: 5px;
+}
+.scheme_dune .button_tooltip {
+	background-color: transparent;
+	backdrop-filter: none; /* default : backdrop-filter: blur(2px); */
+}
+.scheme_dune .button_tooltip div { /* tooltip window == left column: right text | center column :highlighting text */
+	color: #ffe8e9;
+	font-size: 14px;
+}
+.scheme_dune .tooltip-inner .desc { /* Tooltip description */
+    color: #bbbbbb;
+	font-size: 14px; /* default font size = font-size: 15px; */
+	padding-top: 2px; /* default padding-top: 4px; */
+	padding-bottom: 3px !important;
+	border-radius: 17px 7px 0 0;
+}
+.scheme_dune .tooltip-inner .desc:not(.small) {
+	border-bottom : 1px solid #551759 !important;  /* in core.js !important needed */ /* bottom tooltip description */
+}
+.scheme_dune .tooltip-inner .desc.small {
+	font-size: 75%; /* default font-size: 60%; */
+	opacity: 1; /* default opacity: 0.8; */
+}
+.scheme_dune .tooltip-inner .desc.small.auto-off {
+	color: #e70c25;
+}
+.scheme_dune .tooltip-inner .desc.small.auto-on {
+	color: #93e70c;
+}
+.scheme_dune .tooltip-divider { /* border line before effects text */
+	border-bottom : 1px solid #551759 !important;
+	color: #feaaff !important; /* text centered: Tooltip name */
+}
+.scheme_dune .tooltip-divider.resEffectsTxt { /* text centered: res.effects */
+	font-size: 14px;
+	color: #bbbbbb !important;
+	padding-bottom: 0 !important; /* in core.js padding-bottom: 4px; !important needed */
+	margin-bottom: 0 !important; /* in core.js margin-bottom: 8px; !important needed */
+	margin-top: 4px;
+}
+.scheme_dune .effectName { /* Tooltip Window : effects text */
+	color: #e995c1 !important;
+	font-size: 13px !important; /* default font size = font-size: 14px; */
+}
+.scheme_dune .rawRes { /* Tooltip Window == text for all missing resources for primary resource */
+    color: #808080;
+	font-style: italic;
+	padding-left: 12px;
+}
+.scheme_dune .button_tooltip .noRes,
+.scheme_dune .limited { /* on ressource limited or not attainable */
+	/* color: #de2154; */
+	color: #ac0307;
+}
+.scheme_dune #tooltip .flavor { /* Tooltip Window : last bottom text on center column tooltip window */
+    color: #fad5b4;
+	font-size: 12px !important;
+	padding-right: 7px;
+}
+.scheme_dune .btn.tooltip {
+	left: 50px !important;
+}
+.scheme_dune .button_tooltip.login-popup input[type="email"],
+.scheme_dune .button_tooltip.login-popup input[type="password"] {
+	background-color: #281028;
+    color: #bbbbbb;
+	border: 1px groove #180a18;
+    box-shadow: none;
+    padding: 3px 1px 3px 5px;
+    margin: 0 5px;
+	border-radius: 5px;
+	margin-top: 3px;
+	margin-bottom: 3px;
+}
+.scheme_dune .button_tooltip.login-popup input[type="email"]:focus,
+.scheme_dune .button_tooltip.login-popup input[type="password"]:focus {
+	background-color : #380038;
+	color: #fad5b4;
+	border-color: #6d2a6e;
+	border-style: inset;
+	box-shadow: inset 0 0 3px 1px #000000;
+}
+
+/* ***************************************************** */
+/* ******************* CENTER COLUMN ******************* */
+/* ***************************************************** */
+.scheme_dune #midColumn {
+	width: 650px; /* +20px gained from left column. default width: 630px */
+}
+.scheme_dune #midColumnViewport {
+	margin-top: 3px;
+	margin-right: 5px;
+}
+.scheme_dune .tabInner {
+    border: none; /* border for all under tabs in center column */
+	padding: 2px 5px 5px 5px !important; /* 20px gained for buttons width. default padding: 15px; */
+	margin-bottom: 30px;
+}
+.scheme_dune .tabInner.Bonfire {
+	margin-bottom: 0; /* default margin-bottom: 20px; */
+}
+.scheme_dune .tabInner.Workshop {
+	margin-bottom: 80px; /* to view entire dropdownlink of last button */
+}
+.scheme_dune .tabInner.Time {
+	margin-bottom: 50px; /* to view entire dropdownlink of last button */
+}
+.scheme_dune .tabInner label[for='toggleResearched'],
+.scheme_dune .tabInner .expandAllBar a:last-child {
+	margin-right: 15px !important;
+}
+.scheme_dune .tabsContainer {
+	padding-bottom: 2px; /* default padding-bottom: 15px; */
+	padding-top: 3px; /* default padding-top: 2px; */
+	/* default top: 5px; */
+	font-size: 15px;
+}
+.scheme_dune .tabsContainer span {
+	font-size: 12px;
+}
+.scheme_dune .activeTab {
+	color: #fca9fe;
+	text-shadow: 1px 1px 1px #000000;
+	border-bottom: solid 1px transparent;
+}
+.scheme_dune a.activeTab:hover {
+    color: #fca9fe;
+}
+.scheme_dune .tabsContainer span:not(.genericWarning), /* separator | for tab */
+.scheme_dune .expandAllBar { /* separator | for expandAllBar */
+	color: transparent;
+}
+.scheme_dune .tabInner.Workshop > div > span, /* for text: Craft effectiveness: +xxx% */
+.scheme_dune .expandAllBar:first-child span { /* for text: Trade effectiveness +xxx% */
+	color: #9d5de0;
+}
+.scheme_dune .expandAllBar:not(:first-child) {
+	font-size: smaller; /* smaller font for expand all and collapse all links */
+}
+.scheme_dune span.genericWarning { /* number of kittens free or engineering free on tab */
+	color: #be4151;
+}
+.scheme_dune .tab.traitLeaderBonus::before {
+	content: "\2605"; /* BLACK STAR */
+	color: #fad5b4;
+}
+.scheme_dune .tab.engineer::before { /* artisan bonus */
+	content: "\2692\00a0"; /* HAMMER AND PICK */
+}
+.scheme_dune .tab.metallurgist::before {
+	content: "\267B\00a0"; /* BLACK UNIVERSAL RECYCLING SYMBOL */
+}
+.scheme_dune .tab.chemist::before {
+	content: "\2623\00a0"; /* BIOHAZARD SIGN */
+}
+.scheme_dune .tab.merchant::before {
+	content: "\2696\00a0"; /* SCALES */
+}
+.scheme_dune .tab.manager::before { /* hunting bonus */
+	content: "\27B4\00a0"; /* BLACK-FEATHERED SOUTH EAST ARROW */
+}
+.scheme_dune .tab.scientist::before {
+	content: "\269B\00a0"; /* ATOM SYMBOL */
+}
+.scheme_dune .tab.wise::before {
+	content: "\2600\00a0"; /* BLACK SUN WITH RAYS */
+}
+.scheme_dune .bldTopContainer { /* under tab */
+    font-size: 90%;
+}
+.scheme_dune .bldTopContainer a.activeTab:hover {
+    color: #fca9fe;
+	opacity: 0.7; /* default opacity 0.7 on not hover */
+}
+.scheme_dune .bldGroupContainer { /* container for all buttons on center column */
+    padding-top: 4px; /* default 15px */
+    border-top: 1px solid #551759;
+    margin-top: 4px; /* default 10px */
+}
+.scheme_dune input[type='button'] {
+	background-color: #5d44e7 !important; /* !important in default.css */
+	box-shadow: 1px 1px 3px #000000 !important;
+    border: 1px outset #4d1cbd !important; /* for no offset when border on */ /* !important in default.css */
+    border-radius: 7px !important; /* !important in default.css */
+	color: #fee0dd;
+	padding: 5px 20px;
+	margin-left: 10px;
+	text-shadow: 1px 1px 1px #000000;
+}
+.scheme_dune input[type='button']:hover {
+	background-color: #281028 !important; /* !important in default.css */
+	border: 1px inset #221122 !important; /* !important in default.css */
+	color: #bbbbbb;
+	text-shadow: 1px 1px 1px #000000;
+	box-shadow: inset 1px 1px 3px #000000,
+				 0 1px 0 #472165 !important; /* !important in default.css */
+	cursor: pointer !important; /* !important in default.css */
+}
+/* button observer different from other input buttons  */
+.scheme_dune input[type='button']#observeBtn {
+	font-size: 16px;
+	border-radius: 7px !important; /* !important in default.css */
+	text-shadow: 2px 2px 2px #000000;
+	background-color: #080b25 !important; /* !important in default.css */
+	color: #f4fafe;
+	border: ridge 2px #19b0ff !important; /* !important in default.css */
+	box-shadow: 3px 3px 5px #000000,
+				0 1px #19b0ff,
+				0 0 5px 1px #19b0ff !important; /* !important in default.css */
+	position: absolute;
+	left: 60px;
+}
+.scheme_dune input[type='button']#observeBtn:hover {
+	background-color: #572854 !important; /* !important in default.css */
+	color: #fee0dd;
+	text-shadow: 1px 1px 1px #000000;
+	border: ridge 2px #94239d !important; /* !important in default.css */
+	box-shadow: none !important; /* !important in default.css */
+	cursor: pointer !important;
+}
+.scheme_dune .btn .btnContent a {
+    max-width: 90px; /* default max-width: 50px; */
+    /* default overflow-x: hidden; */
+    /* default text-overflow: ellipsis; */
+}
+.scheme_dune .btn.modern a {
+	color: #16bcb8;
+	opacity: 0.7;
+	font-weight: 300;
+	line-height: 16px;
+	background-color: transparent;
+	padding: 10px 2px 10px 2px !important; /* default :  padding: 10px 6px 10px 6px !important; */
+	text-shadow: none;
+}
+.scheme_dune .btn.modern:not(.disabled) a {
+	color: #16bcb8;
+	border-color: rgba(164, 164, 164, 0.2);
+}
+.scheme_dune .btn.modern.disabled a {
+	border-color: rgba(85, 85, 85, 0.4) !important;
+}
+.scheme_dune .btn.modern a:hover {
+	color: #fca9fe;
+	text-shadow: 1px 1px 1px #000000;
+}
+.scheme_dune .btn.modern:not(.disabled) a:hover {
+	color: #fca9fe;
+	background-color: rgba(0, 0, 0, 0.2);
+}
+.scheme_dune .btn.modern.disabled a:hover {
+	background-color: rgba(0, 0, 0, 0.3);
+}
+.scheme_dune .btn.modern:not(.disabled):active,
+.scheme_dune input[type='button']:active,
+.scheme_dune input[type='button']#observeBtn:active {
+    border-color: #ee55ff !important;
+}
+.scheme_dune .linkContent { /* dropdown list on button */
+    margin-top: 26px !important; /* for correct vertical align dropdown list */
+    width: auto !important;
+	background-color: #572854; /* color pick from button not disabled and hover */
+	border-radius: 0 5px 5px 5px;
+	border-style: solid;
+	border-width: 1px 1px 1px 1px;
+	border-color: #94239d !important;
+}
+.scheme_dune .linkContent a {
+    color: #16bcb8;
+	opacity: 0.7;
+    width: 36px !important;
+    margin-top: 0 !important;
+	margin-bottom: 0 !important;
+	border-left: none; /* default border-left: 1px solid #888; */
+}
+.scheme_dune .btn.modern.disabled .linkContent { /* dropdown list on button disabled */
+	background-color: #281028; /* color pick from button disabled and hover */
+	border-color: #221122 !important;
+}
+.scheme_dune .linkContent a:first-child,
+.scheme_dune .linkContent a:first-child:hover {
+	border-radius: 0 5px 0 0;
+}
+.scheme_dune .linkContent a:last-child,
+.scheme_dune .linkContent a:last-child:hover {
+	border-radius: 0 0 5px 5px;
+}
+/* Apply the right border radius of the button to the rightmost link */
+.scheme_dune .btn.modern span.btnTitle + a,
+.scheme_dune .btn.modern:not(.hasSellLink) a.off1Link, /* link minus on buildings buttons */
+.scheme_dune .btn.modern:not(.hasSellLink) a.unassignLink { /* link minus on kittens jobs buttons */
+	/* buttons border-radius: 7px; */
+	border-radius: 0 7px 7px 0;
+}
+.scheme_dune .btn.modern .btnContent a.rightestLink { /* for Combust TC button in Time tab and Hold Festival in Settlement tab */
+	border-radius: 0 7px 7px 0;
+}
+.scheme_dune .btn.modern.hasSellLink span.btnTitle + a { /* font larger for sell link */
+	font-size: 0.9em; /* default font-size: 0.7em; */
+	/* default line-height: 16px; */
+}
+.scheme_dune .panelContainer {
+	margin-top: 4px;
+}
+.scheme_dune .panelContainer,
+.scheme_dune table.statTable {
+    border: 1px ridge #6d2a6e;
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 7px;
+	box-shadow: none;
+}
+.scheme_dune table.statTable {
+	margin-top: 6px;
+	margin-left: 12px;
+	box-shadow: 2px 2px 5px #000000;
+	padding: 9px;
+	color: #d3d3e0;
+}
+.scheme_dune .tabInner.Stats h1:last-of-type {
+	color: #fad5b4;
+}
+.scheme_dune .tabInner.Stats table.statTable:last-of-type {
+    background-color: rgba(97, 68, 231, 0.1);
+	border: 1px inset #6d2a6e;
+	box-shadow: inset 2px 2px 5px #000000;
+}
+.scheme_dune .tabInner.Stats table.statTable {
+	color: #d3d3e0;
+}
+.scheme_dune .tabInner.Stats table.statTable:first-of-type tr:first-child td:last-child { /* select total kittens value */
+	color: #5cac03;
+}
+.scheme_dune .tabInner.Stats table.statTable td:last-child { /* select value column */
+    color: #fee0dd;
+}
+.scheme_dune .tabInner.Stats table.statTable:first-of-type tr:first-child + tr > td:last-child { /* select kittens dead value */
+    color: #ac0307;
+}
+.scheme_dune .tabInner.Stats table.statTable:last-of-type tr:last-child td:last-child { /* select time played value */
+	color: #9d5de0;
+}
+.scheme_dune .panelContainer .title {
+	padding: 3px 3px 0 20px; /* default padding: 4px; */ /* default padding-left: 10px; */
+	margin-bottom: 3px;
+}
+.scheme_dune .panelContainer div.title {
+    color: #fad5b4;
+	font-size: 16px !important;
+	text-shadow: 1px 1px 1px #000000;
+}
+.scheme_dune .panelContainer .toggle {
+	font-size: 10px;
+	margin: 7px 7px 0 0; /* default margin: 4px; */
+	padding-left:  5px; /* default padding-left 6px */
+    padding-right: 5px; /* default padding-right 6px */
+	border: 1px groove #6d2a6e; /* color #C8C8C8 */
+	background-color: #312148;
+	border-radius: 11px;
+}
+.scheme_dune .panelContainer .toggle:hover {
+	background-color: #572854;
+	border-color: #94239d;
+}
+.scheme_dune .container {
+	padding: 5px; /* default padding: 10px; */
+}
+.scheme_dune .container.trade-race .crypto-trade .btn.modern:last-child { /* button "Sell bcoin" selected */
+	/* div.crypto-trade width=310px max. need to delete margin-right on last button */
+	margin-right: 0;
+}
+.scheme_dune .container.trade-race .crypto-trade .btn.modern:first-child { /* button "Buy bcoin" selected */
+	/* div.crypto-trade width=310px max. need to reduce margin-right on first button */
+	margin-right: 6px;
+}
+.scheme_dune .container.trade-race .crypto-trade .btn.modern {
+	/* div.crypto-trade width=310px max */
+	max-width: 146px; /* (button content width - (2 x button border width) - (1 x button margin-right)) / 2 => (300 -2 -6)/2 = 146 */
+}
+.scheme_dune .container div.currentGovernment { /* for padding-bottom too height */
+	padding-bottom: 3px !important;
+}
+.scheme_dune .trade-race .buys {
+	color: #ac0307;
+	font-size: smaller;
+}
+.scheme_dune .trade-race .sells {
+	color: #5cac03;
+	font-size: smaller;
+}
+.scheme_dune .trade-race .tradeAmount {
+	color: #bbbbbb;
+	font-size: smaller;
+}
+.scheme_dune .attitude { /* text for attitude races int trade tab */
+	/* default font size = font-size: 90%; */
+	color: #8281cf !important;
+	text-shadow: none !important;
+}
+.scheme_dune .attitude:before {
+	content: "\00a0\2194\00a0"; /* default content: "("; */ /* LEFT RIGHT ARROW */
+	color: #9d5de0;
+	font-size: larger;
+	font-weight: bold;
+}
+.scheme_dune .attitude:after {
+	content: ""; /* default content: ")"; */
+}
+.scheme_dune .container.trade-race a[title="Pinned"] {
+	color: #93e70c;
+	font-weight: bold;
+}
+.scheme_dune .panelContainer div.censusFilters {
+	margin-bottom: 3px; /* for add a margin under the 2 lists (select) in the settlement tab */
+}
+/* ---------- Village ---------- */
+/* container 'Census' -> list of kittens in settlement tab */
+.scheme_dune .currentLeader .name {
+	background: no-repeat top -4px left url("data:image/svg+xml,%3Csvg width='24px' height='24px' viewBox='0 0 24 24' fill='%23fad5b4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18.53 19.24H5.4C5.24283 19.2414 5.0893 19.1927 4.96164 19.101C4.83399 19.0094 4.73885 18.8794 4.69 18.73L1.5 9C1.45113 8.86009 1.446 8.70861 1.4853 8.56571C1.52459 8.42281 1.60646 8.29525 1.72 8.2C1.83214 8.10161 1.97141 8.03941 2.11953 8.02157C2.26764 8.00372 2.4177 8.03106 2.55 8.1L8.37 11L11.37 5.18C11.4392 5.06398 11.5373 4.9679 11.6547 4.90118C11.7722 4.83446 11.9049 4.79938 12.04 4.79938C12.1751 4.79938 12.3078 4.83446 12.4253 4.90118C12.5427 4.9679 12.6408 5.06398 12.71 5.18L15.71 11.01L21.54 8.11C21.6708 8.0419 21.8191 8.01501 21.9655 8.03286C22.1119 8.05071 22.2494 8.11247 22.36 8.21C22.4557 8.31491 22.5197 8.44486 22.5445 8.58471C22.5693 8.72456 22.5539 8.86858 22.5 9L19.24 18.72C19.1929 18.8713 19.0985 19.0034 18.9707 19.097C18.8429 19.1906 18.6884 19.2407 18.53 19.24ZM6 17.74H18L20.51 10.25L15.64 12.67C15.5528 12.7146 15.4576 12.7415 15.3599 12.749C15.2623 12.7566 15.1641 12.7446 15.071 12.7139C14.978 12.6832 14.892 12.6344 14.818 12.5702C14.744 12.506 14.6835 12.4278 14.64 12.34L12 7.16L9.37 12.34C9.32648 12.4278 9.26596 12.506 9.19197 12.5702C9.11798 12.6344 9.03197 12.6832 8.93895 12.7139C8.84593 12.7446 8.74774 12.7566 8.65007 12.749C8.5524 12.7415 8.45721 12.7146 8.37 12.67L3.48 10.22L6 17.74Z' /%3E%3C/svg%3E");
+	padding-left: 28px;
+	font-weight: bold;
+}
+.scheme_dune .census-block {
+	background-color: #281028;
+	border-radius: 11px;
+	border-color: #4c234d;
+	border-style: ridge;
+	border-width: 1px 2px;
+	/* default padding: 5px; */
+	margin-bottom: 3px; /* default margin-bottom: 5px; */
+}
+.scheme_dune .census-block:hover {
+	background-color: #380038;
+	border-color: #811e7f;
+}
+.scheme_dune .census-block.simLeader {
+	background-color : #380038;
+	border-color: #fad5b4;
+}
+.scheme_dune .census-block.simLeader:hover {
+	border-color: #fad5b4;
+}
+.scheme_dune .census-block.simLeader a.leaderHref {
+	color: #fad5b4;
+}
+.scheme_dune .census-block .info { /* info of kitten */
+	font-size: 0.9em;
+	color: #9393b2;
+}
+.scheme_dune .census-block .skill { /* jobs unasigned */
+	color: #808080;
+}
+.scheme_dune .census-block .skill:first-of-type { /* job assigned */
+	color: #fad5b4;
+	font-weight: normal !important;
+}
+.scheme_dune .census-block.simLeader .info span.name {  /* Leader name */
+	font-size: 1.3em;
+}
+.scheme_dune .census-block.simLeader .skill:first-of-type { /* Leader job assigned */
+	font-size: 1em; /* default font-size: 0.8em; */
+}
+.scheme_dune .census-block .color-none { /* name of kitten */
+    color: #9393b2;
+}
+.scheme_dune .census-block .color-brown {
+    color: #955628;
+}
+.scheme_dune .census-block .color-cream {
+    color: #c8ad7f;
+}
+.scheme_dune .census-block .color-black {
+    color: #614b3a;
+}
+.scheme_dune .census-block .color-fawn {
+    color: #ad4f09;
+}
+.scheme_dune .census-block .color-white {
+    color: #EEEEEE;
+}
+.scheme_dune .container .name.variety-none {
+	border: 1px solid transparent;
+}
+.scheme_dune .container .name.variety-dual {
+	border: 1px solid black;
+}
+.scheme_dune .container .name.variety-tabby {
+	border: 1px dashed black;
+}
+.scheme_dune .container .name.variety-torbie {
+	border: 1px dashed black;
+	border-left: dotted;
+	border-right: dotted;
+}
+.scheme_dune .container .name.variety-calico {
+	border: 1px solid black;
+	border-top-color: gray;
+	border-bottom-color: gray;
+}
+.scheme_dune .container .name.variety-spots {
+	border: 1px dotted black;
+}
+.scheme_dune .btn.modern a.bld-on,
+.scheme_dune .btn.modern a.auto-on,
+.scheme_dune .btn.modern a.fugit-on {
+	color: #93e70c;
+}
+.scheme_dune .btn.modern:hover a.bld-on,
+.scheme_dune .btn.modern:hover a.auto-on,
+.scheme_dune .btn.modern:hover a.fugit-on {
+	color: #93e70c;
+}
+.scheme_dune .btn.modern a.bld-off,
+.scheme_dune .btn.modern a.auto-off,
+.scheme_dune .btn.modern a.fugit-off {
+	color: #e70c25;
+}
+.scheme_dune .btn.modern:hover a.bld-off,
+.scheme_dune .btn.modern:hover a.auto-off,
+.scheme_dune .btn.modern:hover a.fugit-off {
+	color: #e70c25;
+}
+.scheme_dune .btn.modern.craftOn span.btnTitle { /* all buttons with engineer(s) in workshop tab */
+	color: #83cd0b;
+}
+.scheme_dune .btn.modern.craftOn:hover span.btnTitle {
+	color: #83cd0b;
+	text-shadow: 1px 1px 1px #181920;
+}
+.scheme_dune td.craftStuffPanel > span { /* title of craft stuff panel */
+	color: #fad5b4;
+}
+.scheme_dune td.craftStuffPanel > table { /* craft stuff panel */
+	color: #d3d3e0;
+	background-color : rgba(97, 68, 231, 0.1);
+	border-radius: 7px;
+	border: inset 1px #4e2a90;
+	box-shadow: inset 1px 1px 3px #000000;
+	margin-top: 10px;
+	padding: 10px 20px; /* default padding-top: 20px; */
+}
+
+/* ******************************************************** */
+/* ******************* ACHIEVEMENTS TAB ******************* */
+/* ******************************************************** */
+.scheme_dune .achievement-header {
+	color: #9d5de0;
+	text-shadow: 1px 1px 1px #000000;
+	font-size: 16px;
+	margin-bottom: 3px;
+	padding-left: 20px;
+}
+.scheme_dune .achievement {
+    margin: 3px 5px;
+    background-color: rgba(157, 93, 224, 0.1);
+    color: #e3e3eb;
+    text-shadow: 1px 0 7px #e3e3eb;
+    letter-spacing: 1px;
+	border-color : rgba(157, 93, 224, 0.3);
+	border-radius: 5px;
+}
+.scheme_dune .achievement:hover {
+    background-color: rgba(157, 93, 224, 0.3);
+	border-color : rgba(157, 93, 224, 0.9);
+	color: #fad5b4;
+	text-shadow: 2px 0 7px #fad5b4;
+}
+.scheme_dune .achievement.unethical {
+    text-shadow: 2px 0 7px rgb(172, 3, 7);
+	background-color: rgba(172, 3, 7, 0.1);
+	border-color : rgba(172, 3, 7, 0.3);
+}
+.scheme_dune .achievement.unethical:hover {
+    background-color: rgba(172, 3, 7, 0.3);
+	border-color : rgba(172, 3, 7, 0.9);
+}
+.scheme_dune .achievement:not(.unlocked) {
+    color: #9393b2;
+	background-color: rgba(140, 140, 140, 0.1);
+    text-shadow: none;
+	border-color : rgba(140, 140, 140, 0.4);
+}
+.scheme_dune .achievement:not(.unlocked):hover {
+    background-color: rgba(255, 255, 255, 0.1);
+	border-color : rgba(140, 140, 140, 0.7);
+}
+.scheme_dune .achievement:after {
+    font-size: 85%;
+    color: #e3e3eb;
+    text-shadow: none;
+}
+.scheme_dune .achievement.unethical:after {
+	color: #e3e3eb;
+}
+@media screen {
+	.scheme_dune .achievement[title]:hover::after {
+	  opacity: 0.8; /* default opacity: 0.6; */
+	}
+}
+.scheme_dune .achievement-header .star {
+	/* default font size = font-size: 18px; */
+    color: #e7610c;
+}
+.scheme_dune .achievement .star {
+	/* default font size = font-size: 18px; */
+	color : #9393b2;
+}
+.scheme_dune .achievement.unlocked .star {
+	color : #e7610c;
+	font-weight: bold;
+	text-shadow: 0 1px #000000;
+}
+
+/* **************************************************** */
+/* ******************* RIGHT COLUMN ******************* */
+/* **************************************************** */
+.scheme_dune #rightColumn {
+	width: calc(50% - 345px);
+	max-width: 440px;
+	top: 5px;
+	margin-top: 20px;
+}
+.scheme_dune #toggleCenter,
+.scheme_dune span.toggleCenter {
+	color: #03ddb3;
+	opacity: 0.4; /* default opacity: 0.2; */
+	cursor: pointer;
+}
+.scheme_dune span.toggleCenter {
+	opacity: 1; /* for have #toggleCenter same color */
+}
+.scheme_dune #toggleCenter:hover,
+.scheme_dune div#toggleCenter:hover > span.toggleCenter {
+	color: #fca9fe;
+	opacity: 1.0;
+}
+.scheme_dune #calendarDiv {
+    color: #94239d;
+	padding-left: 5px;
+    margin-top: 5px;
+	text-shadow: 1px 1px 1px #000000;
+}
+.scheme_dune #calendarSign {
+	font-size: 120%;
+}
+.scheme_dune #calendarSign:hover {
+	cursor: default;
+}
+.scheme_dune .right-tab-header { /* Log | Chat link on right column */
+	font-size: 90%;
+}
+.scheme_dune .right-tab-header a.active {
+    color: #fca9fe;
+	text-shadow: 1px 1px 1px #000000;
+	border-top-color: transparent; /* default: border-top: 1px solid rgba(128, 128, 128, 0.4); in default.css */
+}
+.scheme_dune #rightTabChat {
+	margin-top: 20px;
+}
+.scheme_dune div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
+	color: #701e79;
+	text-shadow: 1px 1px 1px #000000;
+	font-size: 90%;
+	font-weight: normal; /* thin if possible with font sizes */
+	border-top: 1px solid #551759 !important;
+	margin-top: 10px;
+}
+.scheme_dune #clearLogHref { /* Link in right column : Clear log */
+	font-size: 80%;
+}
+.scheme_dune #logFiltersBlock > a { /* Link in right column : [+]Log Filters */
+	font-size: 80%;
+	margin-left: 5px;
+}
+.scheme_dune #pauseBtn { /* Link in right column : pawse */
+	margin-left: 5px;
+}
+.scheme_dune #gameLog {
+	/* default overflow-y: auto !important; */
+	margin: 6px 5px 5px 0;
+	background-color : rgba(97, 68, 231, 0.1); /* color #6144e7 */
+	border-radius: 11px;
+	border: inset 1px #4e2a90;
+	box-shadow: inset 1px 1px 3px #000000;
+	padding: 0 4px 4px 4px;
+	/* 3 lines of code below if border with an image */
+	min-height: 5% !important;
+	height: unset !important;
+	max-height: calc(100% - 100px) !important;
+	scrollbar-width: thin; /* only Firefox */
+}
+.scheme_dune #gameLog span.msg:not(.type_date) {
+	font-size: 90%;
+	margin-left: 1.2em;
+	list-style-type: '\25B8'; /* BLACK RIGHT-POINTING SMALL TRIANGLE */
+	padding-left: 0.3em;
+}
+.scheme_dune #gameLog span.msg.noBullet {
+	margin-left: 2.3em !important;
+	list-style-type: disc !important; /* !important in default.css */
+}
+.scheme_dune #gameLog span.msg.noBullet::marker {
+	font-size: 11px;
+}
+.scheme_dune .msg {
+	font-weight: 400; /* thin if possible with font sizes */
+	color: #c0c0d2;
+}
+.scheme_dune .msg.type_notice {
+    color: #0476dc; /* color default : #01A9DB; */
+}
+.scheme_dune .msg.type_important {
+    color: #dc6a04; /* color default : coral; */
+}
+.scheme_dune .msg.type_alert {
+    color: #dc040a; /* color default : red; */
+}
+.scheme_dune .msg.type_urgent {
+	color: #dcd704; /* default color: blueviolet; */
+	font-size: 1.1em;
+}
+.scheme_dune .msg.type_date {
+	color: #a60e6b;
+	/* default font size = font-size: 90%; */
+	text-transform: none;
+	text-shadow: 0 1px 0 #000000;
+	border-bottom: groove 2px #4e2a90;
+	padding-left: 10px;
+}
+
+/* *************************************************** */
+/* ******************* LEFT COLUMN ******************* */
+/* *************************************************** */
+.scheme_dune #leftColumn {
+	margin-top: 10px;
+	max-width: 380px; /* -20px gained on res-table (12px) with border collapse and padding-right (8px). default max-width: 400px; */
+	padding-right: 12px; /* -8px gained on res-toolbar.right padding-right default padding right : 20px */
+}
+.scheme_dune .res-toolbar {
+    font-size: 90%;
+}
+.scheme_dune .res-toolbar.right {
+	padding-right: 20px;
+}
+.scheme_dune a.link.collapse {
+    opacity: 0.5; /* default opacity: 0.2; */
+}
+.scheme_dune a.link.collapse:hover {
+	color: #fca9fe;
+	opacity: 1;
+}
+.scheme_dune div.tooltip-block > span {
+	color: #16bcb8;
+}
+.scheme_dune div.tooltip-block:hover > span {
+	color: #fca9fe;
+	font-weight: bold;
+}
+.scheme_dune .res-toolbar .link.toggled {
+    color: #ba2eba;
+}
+.scheme_dune .res-table {
+	/* default max-width: 340px; */
+    border-collapse: collapse; /* gain of 3 pixel by border -> no margin bottom after */
+	margin-left: 2px; /* without 0px margin left for all ressources */
+}
+.scheme_dune .res-cell {
+	padding-left: 1px; /* default padding-left: 2px; */
+    padding-right: 1px; /* default padding-right: 2px; */
+}
+.scheme_dune .craftTable {
+	 margin-bottom: 10px !important; /* for correct margin bottom due of the line above with border-collapse: collapse on .res-Table ! */
+}
+.scheme_dune .res-cell.craft-link {
+	color: #16bcb8;
+	/* default width: 20px; */
+	/* default max-width: 60px; */
+}
+.scheme_dune .res-cell.craft-link.all {
+	/* default font-size: 80%; */
+	opacity: 0.6; /* default opacity: 0.4; */
+	color: #16bcb8;
+}
+.scheme_dune .res-cell.craft-link:hover,
+.scheme_dune .res-cell.craft-link.all:hover { /* craft table left column */
+    color: #fca9fe;
+	text-decoration: none;
+	font-weight: bold;
+	opacity: 1;
+}
+.scheme_dune .res-row {
+	border-left: solid 1px transparent; /* to avoid shifts on the hover */
+	padding-bottom: 3px; /* default padding-bottom: 4px; */
+}
+.scheme_dune .res-row:hover {
+	background-color : rgba(40, 16, 40, 0.4);
+	cursor: default;
+}
+.scheme_dune .highlited { /* higlighting ressources when hover button on center windows */
+	background-color : rgba(40, 16, 40, 0.4);
+}
+.scheme_dune .resource-name {
+	width: 72px; /* default width: 60px; */
+	max-width: 72px; /* default max-width: 60px; */
+}
+.scheme_dune .resource_faith .resource-name,
+.scheme_dune .resource_kittens .resource-name,
+.scheme_dune .resource_steel .resource-name,
+.scheme_dune .resource_gear .resource-name,
+.scheme_dune .resource_alloy .resource-name,
+.scheme_dune .resource_megalith .resource-name {
+	color: #808080;
+}
+.scheme_dune .resource-name,
+.scheme_dune .maxRes,
+.scheme_dune .resAmount,
+.scheme_dune .resLimitWarn,
+.scheme_dune .resLimitNotice,
+.scheme_dune .resPerTick,
+.scheme_dune .res-cell.resource-value,
+.scheme_dune .res-cell.craft-link {
+	font-size: 14px;
+}
+.scheme_dune .maxRes {
+	color: #7d7da2;
+}
+.scheme_dune .resAmount {
+    color: #b3b3c9;
+}
+.scheme_dune .resLimitWarn {
+    color: #dc6a04;
+	opacity: 1; /* default = 0.75 */
+}
+.scheme_dune .resLimitNotice {
+    color: #9d5de0;
+}
+.scheme_dune .resPerTick {
+	cursor: default;
+	color: #b3b3c9;
+}
+.scheme_dune .resPerTick:hover {
+	font-weight: normal !important;
+}
+.scheme_dune .res-row.resLeaderBonus .resPerTick {
+	color: #fad5b4;
+}
+.scheme_dune .res-row.craftEngineer .res-cell.resource-value {
+	color: #83cd0b;
+}
+.scheme_dune div#advisorsContainer {
+	color: #e70c25;
+	padding-top: 6px;/* default padding-top: 10px; */
+}
+.scheme_dune #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+	text-shadow: -1px -1px 2px #000000;
+}
+.scheme_dune #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+	color: #bbbbbb;
+	text-shadow: none !important;
+	font-size: smaller;
+}
+.scheme_dune #fastPraiseContainer > a { /* Text left column : "Praise the sun!" */
+	text-shadow: -1px -1px 2px #000000;
+}
+.scheme_dune #fastPraiseContainer >a:hover {
+	color: #fad5b4;
+	text-shadow: 1px 1px 4px #fad5b4, -1px -1px 4px #fad5b4;
+}
+.scheme_dune .res-cell.positive-weather { /* to change the color for bonus cell according to the season */
+	font-size: 85%;
+	color: #93e70c;
+}
+.scheme_dune .res-cell.negative-weather { /* to change the color for penalty cell according to the season */
+	font-size: 85%;
+	color: #e70c25;
+}
+
+/* ************************************************* */
+/* ******************* SCROLLBAR ******************* */
+/* ************************************************* */
+.scheme_dune ::-webkit-scrollbar-track,
+.scheme_dune .dialog::-webkit-scrollbar-track,
+.scheme_dune textarea#importData::-webkit-scrollbar-track,
+.scheme_dune textarea#exportData::-webkit-scrollbar-track {
+	border-radius: 0;
+	background-color: transparent;
+}
+.scheme_dune ::-webkit-scrollbar {
+	width: 8px;
+	border-radius: 0;
+	background-color: transparent;
+}
+.scheme_dune .dialog::-webkit-scrollbar {
+	width: 8px;
+	border-radius: 0;
+	background-color: transparent;
+}
+.scheme_dune textarea#importData::-webkit-scrollbar,
+.scheme_dune textarea#exportData::-webkit-scrollbar {
+	width: 8px;
+	border-radius: 0;
+	background-color: transparent;
+}
+.scheme_dune ::-webkit-scrollbar-thumb {
+	border-radius: 3px;
+	background-color: rgba(0, 0, 0, 0.2);
+}
+.scheme_dune .dialog::-webkit-scrollbar-thumb {
+	border-radius: 3px;
+	background-color: rgba(0, 0, 0, 0.2);
+}
+.scheme_dune textarea#importData::-webkit-scrollbar-thumb,
+.scheme_dune textarea#exportData::-webkit-scrollbar-thumb {
+	border-radius: 3px;
+	background-color: rgba(0, 0, 0, 0.2);
+}
+.scheme_dune #gameLog::-webkit-scrollbar {
+	width: 6px;
+}
+.scheme_dune #gameLog::-webkit-scrollbar-thumb {
+	border-radius: 3px;
+	background: linear-gradient(0deg, transparent 0%, transparent 4%, rgba(0, 0, 0, 0.3) 5%, rgba(0, 0, 0, 0.3) 95%, transparent 96%, transparent 100%);
+}
+/* Only FireFox */
+.scheme_dune #leftColumn,
+.scheme_dune #rightColumn,
+.scheme_dune #midColumn,
+.scheme_dune .dialog,
+.scheme_dune textarea#importData,
+.scheme_dune textarea#exportData,
+.scheme_dune #gameLog {
+	scrollbar-width: thin;
+}
+.scheme_dune #leftColumn,
+.scheme_dune #rightColumn,
+.scheme_dune #midColumn,
+.scheme_dune .dialog,
+.scheme_dune textarea#importData,
+.scheme_dune textarea#exportData {
+	scrollbar-color: rgba(0, 0, 0, 0.2) transparent !important;
+}
+.scheme_dune #gameLog {
+	scrollbar-color: rgba(0, 0, 0, 0.2) transparent !important;
+}
+.scheme_dune select {
+   scrollbar-width: auto !important;
+}

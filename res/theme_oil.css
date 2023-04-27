@@ -52,7 +52,7 @@ body.scheme_oil,
 .scheme_oil .btn.modern.disabled span.btnTitle { /* to change only the properties of the button name for buttons disabled */
 	color: #595959;
 }
-.scheme_oil .btn.modern.disabled span.btnTitle.limited { /* to change only the properties of the button name for buttons limited */
+.scheme_oil .btn.modern.disabled.limited span.btnTitle { /* to change only the properties of the button name for buttons limited */
 	color: #a90909;
 }
 .scheme_oil .btn.modern:not(.disabled) {
@@ -208,7 +208,7 @@ body.scheme_oil,
 .scheme_oil #topBar a.copyright:hover {
 	color: #ffc900;
 }
-.scheme_oil #headerLinks .links-block { /* a link separator : | on header links */
+.scheme_oil #topBar .links-block { /* a link separator : | on topBar links */
 	color: #333342;
 }
 .scheme_oil #topBar div,
@@ -218,9 +218,9 @@ body.scheme_oil,
 .scheme_oil .toolbarIcon.sorrow.max div {
     color: #a90909 !important; /* in default.js !important needed */
 }
-.scheme_oil #topBar > div:first-child > span:first-child:after {
+.scheme_oil #topBar > div:first-child > span:last-of-type::after {
     color: #ffc900;
-    content: '\00a0\00a0\00a0Theme by Volkeyrn\00a0\00a0\00a0';
+    content: '\00a0\00a0\00a0Theme by Volkeyrn';
 	text-shadow: none;
     text-decoration: none;
 	font-weight: normal;
@@ -284,6 +284,7 @@ body.scheme_oil,
 }
 .scheme_oil .button_tooltip {
 	background-color: transparent;
+	backdrop-filter: none; /* default : backdrop-filter: blur(2px); */
 }
 .scheme_oil .button_tooltip div { /* tooltip window == left column: right text | center column :highlighting text */
 	color: #a9a9a9;

@@ -47,7 +47,7 @@ body.scheme_greenish {
 .scheme_greenish .btn.modern.disabled span.btnTitle { /* to change only the properties of the button name for buttons disabled */
 	color: #606060;
 }
-.scheme_greenish .btn.modern.disabled span.btnTitle.limited { /* to change only the properties of the button name for buttons limited */
+.scheme_greenish .btn.modern.disabled.limited span.btnTitle { /* to change only the properties of the button name for buttons limited */
 	color: #c5282e;
 }
 .scheme_greenish .btn.modern:not(.disabled) {
@@ -163,6 +163,7 @@ body.scheme_greenish {
 	background-color: #2a8544;
 	border-color: #133d1f;
 	box-shadow: none;
+	cursor: pointer;
 }
 .scheme_greenish select>option {
 	background-color: #ebf8e8;
@@ -191,8 +192,8 @@ body.scheme_greenish {
 }
 .scheme_greenish .dialog input#batchSize {
 	background-color: #ebf8e8;
-	color: #202020;
-	border: 1px inset #b5d0b1;
+	color: #606060;
+	border: 2px groove #b5d0b1;
 	border-radius: 7px;
 	padding: 3px 1px 3px 5px;
     margin-right: 5px;
@@ -202,11 +203,29 @@ body.scheme_greenish {
 .scheme_greenish textarea#importData,
 .scheme_greenish textarea#exportData {
 	background-color: #ebf8e8;
-	color: #202020;
-	border: 1px inset #b5d0b1;
+	color: #606060;
+	border: 2px groove #b5d0b1;
 	border-radius: 7px;
 	padding: 5px;
 	margin-bottom: 3px;
+}
+.scheme_greenish .dialog input#batchSize:focus,
+.scheme_greenish textarea#importData:focus,
+.scheme_greenish textarea#exportData:focus {
+	background: #a7e090;
+	color: #1a2e20;
+	border-style: inset;
+	box-shadow: inset 1px 1px 3px #404040;
+}
+.scheme_greenish h1#importFrom,
+.scheme_greenish h1#exportTo {
+	margin-top: 20px; /* default margin-top: 30px; */
+	/* default margin-bottom: 8px; */
+}
+.scheme_greenish h1#importFromText,
+.scheme_greenish h1#exportToText {	
+	margin-top: 15px; /* default margin-top: 30px; */
+	margin-bottom: 0; /* default margin-bottom: 8px; */
 }
 .scheme_greenish input:active,
 .scheme_greenish select:active,
@@ -235,7 +254,7 @@ body.scheme_greenish {
 .scheme_greenish #topBar a.copyright:hover {
 	color: #a04621;
 }
-.scheme_greenish #headerLinks .links-block { /* a link separator: | on header links */
+.scheme_greenish #topBar .links-block { /* a link separator: | on topBar links */
 	color: #c9ddc6;
 }
 .scheme_greenish #topBar div,
@@ -245,9 +264,9 @@ body.scheme_greenish {
 .scheme_greenish .toolbarIcon.sorrow.max div {
     color: #c5282e !important; /* in default.js !important needed */
 }
-.scheme_greenish #topBar > div:first-child > span:first-child:after {
+.scheme_greenish #topBar > div:first-child > span:last-of-type::after {
     color: #1b8539;
-    content: '\00a0\00a0\00a0Theme by Volkeyrn\00a0\00a0\00a0';
+    content: '\00a0\00a0\00a0Theme by Volkeyrn';
     text-decoration: none;
 	font-weight: normal;
 }
@@ -279,6 +298,30 @@ body.scheme_greenish {
 }
 .scheme_greenish .button_tooltip .energyPenalty {
 	color: #c5282e;
+}
+.scheme_greenish .toolbarIcon .status-indicator-online {
+    color: #1b8539;
+}
+.scheme_greenish .toolbarIcon .status-indicator-offline {
+    color: #c5282e;
+}
+.scheme_greenish #topBar .toolbarIcon.pollutionIcon div {
+    color: #606060;
+}
+.scheme_greenish .toolbarIcon.pollutionIcon {
+    background: no-repeat top left url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='14' fill='%23606060' viewBox='0 0 16 16'%3E%3Cpath d='M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383zm.653.757c-.757.653-1.153 1.44-1.153 2.056v.448l-.445.049C2.064 6.805 1 7.952 1 9.318 1 10.785 2.23 12 3.781 12h8.906C13.98 12 15 10.988 15 9.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 4.825 10.328 3 8 3a4.53 4.53 0 0 0-2.941 1.1z'/%3E%3C/svg%3E");
+}
+.scheme_greenish .toolbarIcon.happiness {
+    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='%23d56d2e' viewBox='0, 0, 400,365.7142857142857'%3E%3Cg %3E%3Cpath id='path0' d='M23.809 26.069 C 9.506 63.687,-3.876 244.068,5.454 273.466 C 42.343 389.691,311.117 402.522,383.842 291.529 C 400.102 266.714,401.966 245.454,395.450 159.135 C 383.595 2.098,363.666 -27.023,299.032 18.249 C 261.840 44.299,133.578 44.945,105.157 19.224 C 74.567 -8.459,35.693 -5.188,23.809 26.069 M95.086 43.441 C 121.604 72.743,266.428 71.037,311.785 40.888 C 351.877 14.240,351.212 13.344,366.764 114.971 C 393.215 287.824,351.297 345.860,200.000 345.860 C 57.492 345.860,12.935 293.440,31.361 147.462 C 47.965 15.915,56.931 1.281,95.086 43.441 '%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
+}
+.scheme_greenish .toolbarIcon.energy {
+    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%231b8539' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
+}
+.scheme_greenish .toolbarIcon.energy.warning {
+    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%23c5282e' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
+}
+.scheme_greenish .toolbarIcon.energy.warningWinter {
+    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%23d56d2e' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
 }
 
 /* ********************************************** */
@@ -313,16 +356,19 @@ body.scheme_greenish {
 }
 .scheme_greenish .button_tooltip {
 	background-color: transparent;
+	backdrop-filter: none; /* default : backdrop-filter: blur(2px); */
 }
 .scheme_greenish .button_tooltip div { /* tooltip window == left column: right text | center column:highlighting text */
 	color: #202020;
 }
-.scheme_greenish .tooltip-inner .desc { /* Tooltip Window: title text */
+.scheme_greenish .tooltip-inner .desc { /* Tooltip description */
     color: #202020;
-	/* default font size = font-size: 15px; */
-	border-bottom: 1px solid #b5d0b1 !important; /* in core.js !important needed */
+	/* default font size = font-size: 15px; */	
 	/* default padding-top: 4px; */
 	margin-bottom: 5px;
+}
+.scheme_greenish .tooltip-inner .desc:not(.small) {
+	border-bottom: 1px solid #b5d0b1 !important; /* in core.js !important needed */ /* bottom tooltip description */
 }
 .scheme_greenish .tooltip-inner .desc.small {
 	font-size: 70%; /* default font-size: 60%; */
@@ -367,6 +413,24 @@ body.scheme_greenish {
 	font-size: 13px !important; /* in core.js !important needed */
 	padding-right: 7px;
 }
+.scheme_greenish .button_tooltip.login-popup input[type="email"],
+.scheme_greenish .button_tooltip.login-popup input[type="password"] {
+	background-color: #ebf8e8;
+	color: #606060;
+	border: 2px groove #b5d0b1;
+    padding: 3px 1px 3px 5px;
+    margin: 0 5px;
+	border-radius: 5px;
+	margin-top: 3px;
+	margin-bottom: 3px;
+}
+.scheme_greenish .button_tooltip.login-popup input[type="email"]:focus,
+.scheme_greenish .button_tooltip.login-popup input[type="password"]:focus {
+	background: #a7e090;
+	color: #1a2e20;
+	border-style: inset;
+	box-shadow: inset 1px 1px 3px #404040;
+}
 
 /* ***************************************************** */
 /* ******************* CENTER COLUMN ******************* */
@@ -398,13 +462,22 @@ body.scheme_greenish {
 .scheme_greenish .tabsContainer a {
 	font-size: 16px;
 }
-.scheme_greenish .tabsContainer span:not(.genericWarning),
-.scheme_greenish .tabInner div.expandAllBar:not([style*='left']) span { /* separator | for tab and expandAllBar */ /* style*='left' for text: Trade effectiveness +xxx% */
-	color: #c9ddc6;
-}
 .scheme_greenish .tabsContainer a.activeTab {
 	color: #a04621;
 	font-weight: bold;
+}
+.scheme_greenish .tabsContainer span:not(.genericWarning), /* separator | for tab */
+.scheme_greenish .expandAllBar { /* separator | for expandAllBar */
+	color: #c9ddc6;
+}
+.scheme_greenish .tabInner.Workshop > div > span { /* for text: Craft effectiveness: +xxx% */
+	color: #d56d2e;
+}
+.scheme_greenish .expandAllBar:first-child span { /* for text: Trade effectiveness +xxx% */
+	color: #2c8d48;
+}
+.scheme_greenish .expandAllBar:not(:first-child) {
+	font-size: smaller; /* smaller font for expand all and collapse all links */
 }
 .scheme_greenish span.genericWarning { /* number of kittens free or engineering free on tab */
 	color: #c5282e;
@@ -573,19 +646,21 @@ body.scheme_greenish {
 	margin: 5px 10px;
 	padding: 10px;
 	border-radius: 7px;
-}
-.scheme_greenish .tabInner.Stats h1:first-of-type {
-	color: #202020;
-}
-.scheme_greenish .tabInner.Stats table.statTable:first-of-type {
-	color: #101010;
+	color: #404040;
 	background-color: rgba(128, 128, 128, 0.2);
 	border: 1px solid #b5d0b1;
 }
-.scheme_greenish .tabInner.Stats table.statTable:last-of-type {
-    color: #233e2b;
-	background-color: #d6f0d1;
-	border: 1px solid #b5d0b1;
+.scheme_greenish .tabInner.Stats table.statTable:first-of-type tr:first-child td:last-child { /* select total kittens value */
+	color: #1b8539;
+}
+.scheme_greenish .tabInner.Stats table.statTable td:last-child { /* select value column */
+    color: #000000;
+}
+.scheme_greenish .tabInner.Stats table.statTable:first-of-type tr:first-child + tr > td:last-child { /* select kittens dead value */
+    color: #c5282e;
+}
+.scheme_greenish .tabInner.Stats table.statTable:last-of-type tr:last-child td:last-child { /* select time played value */
+	color: #1b4885;
 }
 .scheme_greenish .panelContainer div.title {
 	padding: 4px 4px 4px 20px; /* default padding: 4px; */ /* default padding-left: 10px; */
@@ -679,6 +754,11 @@ body.scheme_greenish {
 }
 /* ---------- Village ---------- */
 /* container 'Census' -> list of kittens in settlement tab */
+.scheme_greenish .currentLeader .name {
+	background: no-repeat top -4px left url("data:image/svg+xml,%3Csvg width='24px' height='24px' viewBox='0 0 24 24' fill='%231b4885' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18.53 19.24H5.4C5.24283 19.2414 5.0893 19.1927 4.96164 19.101C4.83399 19.0094 4.73885 18.8794 4.69 18.73L1.5 9C1.45113 8.86009 1.446 8.70861 1.4853 8.56571C1.52459 8.42281 1.60646 8.29525 1.72 8.2C1.83214 8.10161 1.97141 8.03941 2.11953 8.02157C2.26764 8.00372 2.4177 8.03106 2.55 8.1L8.37 11L11.37 5.18C11.4392 5.06398 11.5373 4.9679 11.6547 4.90118C11.7722 4.83446 11.9049 4.79938 12.04 4.79938C12.1751 4.79938 12.3078 4.83446 12.4253 4.90118C12.5427 4.9679 12.6408 5.06398 12.71 5.18L15.71 11.01L21.54 8.11C21.6708 8.0419 21.8191 8.01501 21.9655 8.03286C22.1119 8.05071 22.2494 8.11247 22.36 8.21C22.4557 8.31491 22.5197 8.44486 22.5445 8.58471C22.5693 8.72456 22.5539 8.86858 22.5 9L19.24 18.72C19.1929 18.8713 19.0985 19.0034 18.9707 19.097C18.8429 19.1906 18.6884 19.2407 18.53 19.24ZM6 17.74H18L20.51 10.25L15.64 12.67C15.5528 12.7146 15.4576 12.7415 15.3599 12.749C15.2623 12.7566 15.1641 12.7446 15.071 12.7139C14.978 12.6832 14.892 12.6344 14.818 12.5702C14.744 12.506 14.6835 12.4278 14.64 12.34L12 7.16L9.37 12.34C9.32648 12.4278 9.26596 12.506 9.19197 12.5702C9.11798 12.6344 9.03197 12.6832 8.93895 12.7139C8.84593 12.7446 8.74774 12.7566 8.65007 12.749C8.5524 12.7415 8.45721 12.7146 8.37 12.67L3.48 10.22L6 17.74Z' /%3E%3C/svg%3E");
+	padding-left: 28px;
+	font-weight: bold;
+}
 .scheme_greenish .census-block {
     padding: 5px 10px; /* default padding: 5px; */
     /* default margin-bottom: 5px; */

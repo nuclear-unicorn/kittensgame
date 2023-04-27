@@ -15,10 +15,6 @@
 		<script src="lib/lz-string.js"></script>
 		<script src="lib/dropbox.js"></script>
 
-		<!-- Embeded IRC (TODO: move swfobject to local hosting) -->
-		<script src="lib/swfobject.js"></script>
-		<script src="lib/lightirc/config.js"></script>
-
 		<!-- friends don't let friends use AMD and require.js -->
 		<script src="lib/system.js"></script>
 
@@ -155,12 +151,6 @@
 					}
 				}
 			}
-			// we don't need no css, let the dynamic height be. be, dynamic height, be.
-			function resetGameLogHeight(){
-				$("#devPanel").outerHeight($("#footerLinks").position().top - $("#gameLog").offset().top);
-			}
-			$(resetGameLogHeight);
-			$(window).resize(resetGameLogHeight);
 
 		</script>
 

@@ -2,7 +2,20 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 
 	constructor: function(game){
 		this.game = game;
-		this.registerMeta("stackable", this.challenges, null);
+		//Register the metas with a custom provider.
+		this.registerMeta(false, this.challenges, { getEffect: function(challenge, effectName) {
+			if (!challenge.effects) {
+				//Challenge has no effects defined, so just return 0 for "no effect."
+				return 0;
+			}
+			if (effectName === "tradeKnowledgeRatio") {
+				//This one is specially calculated using a formula that already takes into account Challenge completions.
+				return challenge.effects[effectName];
+			}
+
+			//Default behavior for any stackable meta:
+			return challenge.effects[effectName] * challenge.on;
+		}});
 		this.setEffectsCachedExisting();
 		this.reserves = new classes.reserveMan(game);
 	},
@@ -24,6 +37,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		effectDesc: $I("challendge.winterIsComing.effect.desc"),
 		researched: false,
 		unlocked: true,
+		upgrades: {
+			buildings: ["pasture"]
+		},
 		effects: {
 			"springCatnipRatio": 0.05,
 			"summerSolarFarmRatio": 0.05,
@@ -75,11 +91,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		effectDesc: $I("challendge.energy.effect.desc"),
         researched: false,
 		unlocked: false,
-		upgrades: {
-			buildings: ["library", "biolab", "calciner", "oilWell", "factory", "accelerator", "chronosphere", "aiCore"],
-			spaceBuilding: ["sattelite", "spaceStation", "moonOutpost", "moonBase", "orbitalArray", "containmentChamber"],
-			voidSpace: ["chronocontrol"]
-		},
 		effects: {
 			"energyConsumptionRatio": -0.02,
 			"energyConsumptionIncrease": 0
@@ -133,6 +144,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["manpowerMaxChallenge"] = 0;
 			}
 		},
+		checkCompletionConditionOnReset: function(game){
+			return game.time.getVSU("cryochambers").on > 0;
+		},
 		researched: false,
 		reserveDelay: true,
         unlocked: false
@@ -144,21 +158,31 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
         effects: {
 			"shatterCostReduction": -0.02,
 			"shatterCostIncreaseChallenge": 0,
-			"shatterVoidCost": 0
+			"shatterVoidCost": 0,
+			"temporalPressCap" : 0
         },
         calculateEffects: function(self, game){
             if (self.active) {
         	    self.effects["shatterCostReduction"] = 0;
                 self.effects["shatterCostIncreaseChallenge"] = 0.5;
                 self.effects["shatterVoidCost"] = 0.4;
+                self.effects["temporalPressCap"] = 0;
              }else{
 				self.effects["shatterCostReduction"] = -0.02;
 				self.effects["shatterCostIncreaseChallenge"] = 0;
 				self.effects["shatterVoidCost"] = 0;
+				self.effects["temporalPressCap"] = 5;
 			}
+			game.upgrade(self.upgrades); //this is a hack, might need to think of a better sollution later
 		},
 		researched: false,
-		unlocked: false
+		unlocked: false,
+		upgrades:{
+			chronoforge: ["temporalPress"]
+		},
+		unlocks: {
+			chronoforge: ["temporalPress"]
+		}
 	},{
 		name: "blackSky",
 		label: $I("challendge.blackSky.label"),
@@ -175,11 +199,115 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
             }else{
 				self.effects["corruptionBoostRatioChallenge"] = 0.1;
 			}
+			game.upgrade(self.upgrades);
         },
 		checkCompletionCondition: function(game){
 			return game.space.getBuilding("spaceBeacon").val > (game.challenges.getChallenge("blackSky").on || 0) ;
+		},
+		upgrades:{
+			zigguratUpgrades: ["marker"]
+		},
+	},{
+		name: "pacifism",
+		label: $I("challendge.pacifism.label"),
+		description: $I("challendge.pacifism.desc"),
+		effectDesc: $I("challendge.pacifism.effect.desc"),
+        effects: {
+			"alicornPerTickRatio": 0.1,
+			"tradeKnowledge": 1,
+			"weaponEfficency": 0,
+			"policyFakeBought": 0,
+			"embassyFakeBought": 0,
+			"steamworksFakeBought": 0,
+			"tradeKnowledgeRatio": 0
+        },
+        calculateEffects: function(self, game){
+            if (self.active) {
+                self.effects["alicornPerTickRatio"] = 0;
+                self.effects["tradeKnowledge"] = 0;
+				self.effects["weaponEfficency"] = -0.1; //after 10 completions weapons WILL be useles; no LDR >:3
+                self.effects["policyFakeBought"] = 1;
+				self.effects["embassyFakeBought"] = 1;
+				self.effects["steamworksFakeBought"] = Math.floor(1.5 * self.on || 1)/ (self.on || 1);
+                self.effects["tradeKnowledgeRatio"] = 0;
+            }else{
+				self.effects["alicornPerTickRatio"] = 0.1;
+				self.effects["tradeKnowledge"] = 1;
+                self.effects["weaponEfficency"] = 0;
+                self.effects["policyFakeBought"] = 0;
+				self.effects["embassyFakeBought"] = 0;
+				self.effects["steamworksFakeBought"] = 0;
+                self.effects["tradeKnowledgeRatio"] = self.getTradeBonusEffect(game);
+			}
+			game.upgrade(self.upgrades); //this is a hack, might need to think of a better sollution later
+		},
+		updateTradeKnowledgeRatio: function(self, game){
+			self.effects["tradeKnowledgeRatio"] = self.getTradeBonusEffect(game);
+		},
+		checkCompletionConditionOnReset: function(game){
+			if(game.diplomacy.baseManpowerCost > 0) { // BSK+IW precaution
+				if(!game.village.sim.hadKittenHunters && game.stats.getStatCurrent("totalTrades").val > 0){
+					game.achievements.unlockBadge("cleanPaws"); //hack
+				}
+			}
+			return game.science.getPolicy("outerSpaceTreaty").researched;
+		},
+		upgrades: {
+			upgrades: ["compositeBow", "crossbow", "railgun"]
+		},
+		researched: false,
+		reserveDelay: true,
+		unlocked: false,
+		getTradeBonusEffect: function(game){
+			var self = game.challenges.getChallenge("pacifism");
+			if(!self.on || game.challenges.isActive("pacifism")){
+				return 0;
+			}
+			var tradepost = game.bld.getBuildingExt("tradepost").meta;
+			var tradeKnowledge = game.getEffect("tradeKnowledge");
+			var tradepostLimit = (7 + tradeKnowledge * 3) * (0.99 + tradeKnowledge * 0.01);
+			var tradepostRatioLimit = game.getLimitedDR(0.099 + tradeKnowledge * 0.0075, 0.25);
+			return (tradepost.effects["tradeRatio"] * Math.min(tradepostLimit, tradepost.val * tradepostRatioLimit));
 		}
-	}],
+	},{
+		name: "postApocalypse",
+		label: $I("challendge.postApocalypse.label"),
+		description: $I("challendge.postApocalypse.desc"),
+		effectDesc: $I("challendge.postApocalypse.effect.desc"),
+		researched: false,
+		unlocked: false,
+		flavor: $I("challendge.postApocalypse.flavor"),
+        effects: {
+			"arrivalSlowdown": 0, //additive with pollution
+			"cryochamberSupport": 1
+        },
+		calculateEffects: function(self, game){
+			if(self.active){
+				self.effects["arrivalSlowdown"] = 10;
+				self.effects["cryochamberSupport"] = 1; //this is a quick fix for cryochamber cap when resetting into PA; does not make PA easier so it's ok
+			}else{
+				self.effects["arrivalSlowdown"] = 0;
+				self.effects["cryochamberSupport"] = 1;
+			}
+		},
+		findRuins: function (self, game) {
+			
+		},
+		checkCompletionCondition: function(game){
+			return game.bld.cathPollution == 0;
+		},
+		actionOnCompletion: function(game){
+			game.bld.effectsBase["hutFakeBought"] = 0;
+			game.bld.effectsBase["logHouseFakeBought"] = 0;
+			game.bld.effectsBase["mansionFakeBought"] = 0; //in case of some laggy redshift 
+			game.bld.pollutionEffects["pollutionDissipationRatio"] = 1e-7; //putting it back to default at the end of the challenge is enough
+			//policies unlocked ONLY after winning this challenge!
+			//After the challenge is won player gets two options: make terraforming stations stronger; or get usedCryochamber ONCE.
+			//In case of taking the cryochaimber, both policies become not unlocked and extraction policy becomes NOT researched
+			game.science.getPolicy("terraformingInsight").unlocked = true; //policy which helpes to get more paragon this run
+			game.science.getPolicy("cryochamberExtraction").unlocked = true; //single use policy; gets not researched after player gets the bonus
+		}
+		}],
 
 	game: null,
 
@@ -207,7 +335,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		};
 		var kittens = [];
 		for (var i in this.game.challenges.reserves.reserveKittens){
-			var _kitten = this.game.challenges.reserves.reserveKittens[i].save(this.game.opts.compressSaveFile, this.jobNames);
+			var _kitten = this.game.challenges.reserves.reserveKittens[i].save(this.game.opts.compressSaveFile, this.game.village.jobNames);
 			kittens.push(_kitten);
 		}
 		saveData.challenges.reserves = this.reserves.getSaveData();
@@ -230,6 +358,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			if (this.challenges[i].researched && !this.challenges[i].on) {
 				this.challenges[i].on = 1;
 			}
+			if(this.challenges[i].unlocks && this.challenges[i].on && !this.challenges[i].active){
+				this.game.unlock(this.challenges[i].unlocks);
+			}
 		}
 		if (saveData.challenges.reserves){
 			var kittens = saveData.challenges.reserves.reserveKittens;
@@ -244,8 +375,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 					reserveKittens.unshift(newKitten);
 				}
 				this.game.challenges.reserves.reserveKittens = reserveKittens;
-				var reserveRes = saveData.challenges.reserves.reserveResources;
 				this.game.challenges.reserves.reserveResources = saveData.challenges.reserves.reserveResources;
+				this.game.challenges.reserves.reserveCryochambers = saveData.challenges.reserves.reserveCryochambers||kittens.length;
 		}
 	},
 
@@ -292,30 +423,51 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			if(this.getChallenge(challenge).actionOnCompletion){
 				this.getChallenge(challenge).actionOnCompletion(this.game);
 			}
-			if(!this.anyChallengeActive() && !this.game.ironWill && !this.getChallenge(challenge).reserveDelay){
+			/*if(!this.anyChallengeActive() && !this.game.ironWill && !this.getChallenge(challenge).reserveDelay){
 				this.reserves.addReserves();
+			}*/
+			if (this.getChallenge(challenge).unlocks) {
+				this.game.unlock(this.getChallenge(challenge).unlocks);
 			}
 			this.game.calculateAllEffects();
 		}
 	},
-
+	onRunReset: function(){
+		for(var i = 0; i < this.challenges.length; i++){
+			if(this.challenges[i].active && this.challenges[i].checkCompletionConditionOnReset && this.challenges[i].checkCompletionConditionOnReset(this.game)){
+				this.researchChallenge(this.challenges[i].name);
+			}
+		}
+	},
 	/**
 	 * Apply challenges marked by player as pending
+	 * 
+	 * @isIronWillPending true if we try to apply pending ironWill challenge
 	 */
-	applyPending: function(){
+	applyPending: function(isIronWillPending){
 		var game = this.game;
+		var winterAndPA = (game.challenges.getChallenge("postApocalypse").pending && 
+			game.challenges.getChallenge("winterIsComing").pending &&
+			!isIronWillPending && game.time.getVSU("cryochambers").val);
+		var WPA_warning = $I("challendge.btn.confirmation_postApocalypse_winterIsComing.msg");
 		game.ui.confirm(
 			$I("challendge.btn.confirmation.title"), 
-			$I("challendge.btn.confirmation.msg"), function() 
+			((winterAndPA)? ($I("challendge.btn.confirmation.msg") + WPA_warning) :$I("challendge.btn.confirmation.msg")), function() 
 		{
 			// Reset with any benefit of chronosphere (resources, kittens, etc...)
 			// Should put resources and kittens to reserve HERE!
 			// Kittens won't be put into reserve in post apocalypcis!
-			game.challenges.reserves.calculateReserves();
+			game.challenges.onRunReset();
+			game.challenges.reserves.calculateReserves(isIronWillPending);
 			game.bld.get("chronosphere").val = 0;
 			game.bld.get("chronosphere").on = 0;
-			game.time.getVSU("cryochambers").val = 0;
-			game.time.getVSU("cryochambers").on = 0;
+			if(!game.challenges.getChallenge("postApocalypse").pending || isIronWillPending){
+				game.time.getVSU("cryochambers").val = 0;
+				game.time.getVSU("cryochambers").on = 0;
+			}else if(game.challenges.getChallenge("anarchy").pending && this.game.village.leader){
+				this.game.village.leader.isLeader = false;
+				this.game.village.leader = null;
+			}
 			game.resetAutomatic();
 		}, function() {
 		});
@@ -337,10 +489,12 @@ dojo.declare("classes.reserveMan", null,{
 		this.game = game;
 		this.reserveResources = null;
 		this.reserveKittens = null;
+		this.reserveCryochambers = 0;
 	},
 	resetState: function(){
 		this.reserveResources = {};
 		this.reserveKittens = [];
+		this.reserveCryochambers = 0;
 	},
 	calculateReserveResources: function(){
 		var saveRatio = this.game.bld.get("chronosphere").val > 0 ? this.game.getEffect("resStasisRatio") : 0;
@@ -394,9 +548,15 @@ dojo.declare("classes.reserveMan", null,{
 		this.game.challenges.reserves.reserveKittens = 
 		this.game.challenges.reserves.reserveKittens.concat(reserveKittens);
 	},
-	calculateReserves: function(){
+	/*
+		@isIronWillPending - true if we try to apply ironWill challenge
+	*/
+	calculateReserves: function(isIronWillPending){
 		this.game.challenges.reserves.calculateReserveResources();
-		this.game.challenges.reserves.calculateReserveKittens();
+		if(!this.game.challenges.getChallenge("postApocalypse").pending || isIronWillPending){
+			this.game.challenges.reserves.calculateReserveKittens();
+			this.reserveCryochambers += this.game.time.getVSU("cryochambers").on;
+		}
 	},
 	addReserves: function(){
 		for (var i in this.reserveResources){
@@ -416,21 +576,27 @@ dojo.declare("classes.reserveMan", null,{
 		for(var i in this.reserveKittens){
 			this.game.village.sim.kittens.push(this.reserveKittens[i]);
 		}
-		this.game.time.getVSU("usedCryochambers").val += this.reserveKittens.length;
-		this.game.time.getVSU("usedCryochambers").on += this.reserveKittens.length;
+		this.game.time.getVSU("usedCryochambers").val += this.reserveCryochambers;
+		this.game.time.getVSU("usedCryochambers").on += this.reserveCryochambers;
+		this.reserveCryochambers = 0;
 		this.reserveKittens = [];
+		if (this.game.time.getVSU("usedCryochambers").val > 0) {
+			this.game.time.getVSU("usedCryochambers").unlocked = true;
+		}
+		this.game.msg($I("challendge.reservesReclaimed.msg"));
 	},
 
 	getSaveData: function(){
 		var kittens = [];
 		for (var i in this.game.challenges.reserves.reserveKittens){
-			var _kitten = this.game.challenges.reserves.reserveKittens[i].save(this.game.opts.compressSaveFile, this.jobNames);
+			var _kitten = this.game.challenges.reserves.reserveKittens[i].save(this.game.opts.compressSaveFile, this.game.village.jobNames);
 			kittens.push(_kitten);
 		}
 		return {
 			reserveKittens: kittens,
 			reserveResources: this.game.challenges.reserves.reserveResources,
-			ironWillClaim: this.ironWillClaim
+			ironWillClaim: this.ironWillClaim,
+			reserveCryochambers: this.reserveCryochambers
 		};
 	},
 	reservesExist: function(){
@@ -438,6 +604,12 @@ dojo.declare("classes.reserveMan", null,{
 	}
 });
 dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.BuildingBtnController, {
+
+	initModel: function(options) {
+		var model = this.inherited(arguments);
+		model.multiplyEffects = true; //When the player holds the SHIFT key, it'll multiply Challenge effects by number of times completed.
+		return model;
+	},
 
 	getMetadata: function(model){
         if (!model.metaCached){
@@ -510,7 +682,7 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 
 	togglePending: function(model){
 		if (model.metadata.name == "ironWill") {
-			this.game.challenges.applyPending();
+			this.game.challenges.applyPending(true	/*isIronWillPending*/);
 			return;
 		}
 		model.metadata.pending = !model.metadata.pending;

@@ -146,7 +146,7 @@ dojo.declare("classes.managers.StatsManager", com.nuclearunicorn.core.TabManager
 
     getStatCurrent: function (name) {
         var stat = this.getMeta(name, this.statsCurrent);
-        if (stat.calculate) stat.val = stat.calculate(this.game);
+        if (stat.calculate) {stat.val = stat.calculate(this.game);}
         return stat;
     },
 

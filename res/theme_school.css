@@ -44,7 +44,7 @@ body.scheme_school.with_background_image,
 .scheme_school .btn.modern.disabled span.btnTitle { /* to change only the properties of the button name for buttons disabled */
 	color: #81848C;
 }
-.scheme_school .btn.modern.disabled span.btnTitle.limited { /* to change only the properties of the button name for buttons limited */
+.scheme_school .btn.modern.disabled.limited span.btnTitle { /* to change only the properties of the button name for buttons limited */
 	color: #973B47;
 }
 .scheme_school .btn.modern:not(.disabled) {
@@ -219,7 +219,7 @@ body.scheme_school.with_background_image,
 	top: 0; /* for no shadow on top */
 	box-shadow: 0 2px 5px #000000;
 }
-.scheme_school #headerLinks .links-block { /* a link separator : | on header links */
+.scheme_school #topBar .links-block { /* a link separator : | on topBar links */
 	color: rgba(86, 89, 92, 0.3); /* color #56595C */
 }
 .scheme_school #topBar div,
@@ -236,9 +236,9 @@ body.scheme_school.with_background_image,
 .scheme_school #topBar a.copyright:hover {
 	color: #B5BAC4;
 }
-.scheme_school #topBar > div:first-child > span:first-child:after {
+.scheme_school #topBar > div:first-child > span:last-of-type::after {
     color: #A56B5B;
-    content: '\00a0\00a0\00a0Theme by Volkeyrn\00a0\00a0\00a0';
+    content: '\00a0\00a0\00a0Theme by Volkeyrn';
 	text-shadow: none;
     text-decoration: none;
 	font-weight: normal; /* thin if possible with font sizes */
@@ -309,6 +309,7 @@ body.scheme_school.with_background_image,
 }
 .scheme_school .button_tooltip {
 	background-color: transparent;
+	backdrop-filter: none; /* default : backdrop-filter: blur(2px); */
 	font-size: 13px; /* for tooltip left column */
 }
 .scheme_school .button_tooltip div { /* tooltip window == left column: right text | center column :highlighting text */

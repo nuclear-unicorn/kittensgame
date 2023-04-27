@@ -111,6 +111,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		transient: true,
 		visible: true,
 		color: "#5A0EDE",
+		calculateOnYear: true,
 		isRefundable: function(game) {
 			return game.resPool.energyProd >= game.resPool.energyCons;
 		}
@@ -177,7 +178,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		persists: true
 	},{
 		name : "gflops",
-		title: "gigaflops",
+		title: $I("resources.gflops.title"),
 		type : "common",
 		transient: true,
 		craftable: false,
@@ -185,7 +186,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		persists: false
 	},{
 		name : "hashrates",
-		title: "hashrates",
+		title: $I("resources.hashrates.title"),
 		type : "common",
 		transient: true,
 		craftable: false,
@@ -245,7 +246,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		type : "rare",			//todo: some special FX
 		visible: true,
 		color: "#E00000",
-		persists: false
+		persists: false,
+		calculatePerDay: true,
 	},{
 		name : "tears",
 		title: $I("resources.tears.title"),
@@ -293,6 +295,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		craftable: false,
 		visible: true,
 		color: "#5A0EDE",
+		calculatePerDay: true,
 		/*style: {
 			         animation : "neon-purple 1.5s ease-in-out infinite alternate",
 			"-webkit-animation": "neon-purple 1.5s ease-in-out infinite alternate",
@@ -363,6 +366,22 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		craftable: true,
 		visible: true,
 		color: "red"
+		/*style: {
+			         animation : "neon-red 1.5s ease-in-out infinite alternate",
+			"-webkit-animation": "neon-red 1.5s ease-in-out infinite alternate",
+			   "-moz-animation": "neon-red 1.5s ease-in-out infinite alternate",
+			     "-o-animation": "neon-red 1.5s ease-in-out infinite alternate"
+		}*/
+	},
+	{
+		name: "tMythril",
+		title: $I("resources.tMythril.title"),
+		type : "exotic",
+		transient: true,
+		calculatePerTick: true,
+		craftable: true,
+		visible: true,
+		color: "#00e6b8"
 		/*style: {
 			         animation : "neon-red 1.5s ease-in-out infinite alternate",
 			"-webkit-animation": "neon-red 1.5s ease-in-out infinite alternate",
@@ -558,7 +577,14 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 				value: this.game.religion.faithRatio,
 				unlocked: true,
 				visible: false
-			}
+			},
+			{
+				name: "necrocornDeficit",
+				title: $I("resources.necrocornDeficit.title"),
+				value: this.game.religion.pactsManager.necrocornDeficit,
+				unlocked: true,
+				visible: false,
+				color: "#E00000"}
 		];
 		//TODO: mixin unlocked and visible automatically
 	},
@@ -594,7 +620,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 			res.value = Math.floor(res.value);
 		}
 
-		if (isNaN(res.value) || res.value < 0){
+		if (isNaN(res.value) || res.value < 0.0000000001){
 			res.value = 0;	//safe switch
 		}
 
@@ -641,7 +667,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 			}
 		}
 
-		// Remove from resources
+		// Remove from resources now to calculate others actions with updated resources
 		for (var i in from) {
 			this.addResPerTick(from[i].res, -from[i].amt * amt);
 		}
@@ -660,7 +686,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		for (var i in this.resources){
 			var res = this.resources[i];
 			if (res.name == "sorrow"){
-				res.maxValue = 12 + (game.getEffect("blsLimit") || 0);
+				res.maxValue = 16 + (game.getEffect("blsLimit") || 0);
 				res.value = res.value > res.maxValue ? res.maxValue : res.value;
 				continue;
 			}
@@ -679,15 +705,19 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 			maxValue = this.addResMaxRatios(res, maxValue);
 			
-			var challengeEffect = this.game.getLimitedDR(this.game.getEffect(res.name + "MaxChallenge"), maxValue);
-			maxValue += challengeEffect;
-
+			var challengeEffect = this.game.getEffect(res.name + "MaxChallenge");
+			if(challengeEffect){
+				challengeEffect = this.game.getLimitedDR(this.addResMaxRatios(res, challengeEffect), maxValue - 1 - game.bld.effectsBase[res.name +'Max']||0);
+				maxValue += challengeEffect;
+			}
 			if (maxValue < 0 ){
 				maxValue = 0;
 			}
 
 			res.maxValue = maxValue;
-
+			if(game.loadingSave){ //hack to stop production before game.calculateAllEffects after manual import
+				continue;
+			}
 			var resPerTick = game.getResourcePerTick(res.name, false);
 			this.addResPerTick(res.name, resPerTick);
 
@@ -695,11 +725,11 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		game.updateKarma();
 
 		//--------
-		var energyProdRatio = 1 + game.getEffect("energyProductionRatio");
+		var energyProdRatio = this.getEnergyProductionRatio();
 		this.energyProd = game.getEffect("energyProduction") * energyProdRatio;
 		this.energyWinterProd = this.energyProd;
-		var energyConsRatio = 1 + game.getLimitedDR(game.getEffect("energyConsumptionRatio"), 1) + game.getEffect("energyConsumptionIncrease");
-		this.energyCons = game.getEffect("energyConsumption") * energyConsRatio * (this.game.challenges.isActive("energy") ? 2 : 1);
+		var energyConsRatio = this.getEnergyConsumptionRatio();
+		this.energyCons = game.getEffect("energyConsumption") * energyConsRatio;
 
 		var currentSeason = game.calendar.season;
 		var solarFarm = game.bld.getBuildingExt("pasture");
@@ -710,6 +740,19 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		}
 	},
 
+	//All energy production amounts are multiplied by this number.
+	getEnergyProductionRatio: function() {
+		var game = this.game;
+		return 1 + game.getEffect("energyProductionRatio");
+	},
+
+	//All energy consumption amounts are multiplied by this number.
+	getEnergyConsumptionRatio: function() {
+		var game = this.game;
+		return (1 + game.getLimitedDR(game.getEffect("energyConsumptionRatio"), 1) + game.getEffect("energyConsumptionIncrease")) *
+				(game.challenges.isActive("energy") ? 2 : 1);
+	},
+
 	//NB: don't forget to update resources before calling in redshift
 	fastforward: function(daysOffset) {
 		// Since workshop requires some resource and we don't want exhaust all resources during workshop so we need a way to consume them.
@@ -717,7 +760,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		var limits = {};
 		for (var i in this.resources) {
 			var res = this.resources[i];
-			if (res.perTickCached && !(res.name == "catnip" && res.perTickCached < 0)) {
+			if (res.perTickCached && (res.name != "catnip" || res.perTickCached >= 0)) {
 				if (res.maxValue) {
 					limits[res.name] = Math.max(res.value, res.maxValue);
 				}
@@ -810,7 +853,14 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		if (!this.isNormalCraftableResource(res) && !res.transient) {
 			maxValue *= 1 + this.game.getEffect("globalResourceRatio");
 		}
-
+		//pacts effect
+		if (!this.isNormalCraftableResource(res) && !res.transient) {
+			var pyramidModifier = this.game.getEffect("pyramidGlobalResourceRatio");
+			/*if(pyramidModifier < 0){
+				pyramidModifier = -this.game.getLimitedDR(-pyramidModifier * 1000, 1000)/1000
+			}*/
+			maxValue *= 1 + pyramidModifier;
+		}
 		if (res.tag == "baseMetal") {
 			maxValue *= 1 + this.game.getEffect("baseMetalMaxRatio");
 		}
@@ -934,7 +984,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 			if (delta < 0.25){
 				delta = 0.25;
 			}
-			if (this.game.challenges.getChallenge("energy").researched == true) {
+			if (this.game.challenges.getChallenge("energy").researched && !this.game.challenges.isActive("energy")) {
 				delta = 1 - (1 - delta) / 2;
 			}
 		return delta;

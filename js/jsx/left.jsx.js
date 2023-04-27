@@ -111,7 +111,9 @@ WResourceRow = React.createClass({
         var perTickVal = 
             game.getResourcePerTick(res.name, false) || 
             game.getResourcePerTickConvertion(res.name) ? 
-            game.getDisplayValueExt(perTick, true, false) + postfix : "";
+            game.getDisplayValueExt(perTick, true, false) + postfix : 
+            (res.calculatePerDay)? game.getDisplayValueExt((game.getResourcePerDay(res.name)) *((res.name == "necrocorn")? 1 + game.timeAccelerationRatio():1), true, false) + "/" + $I("unit.d"):
+            (res.calculateOnYear)? game.getDisplayValueExt(game.getResourceOnYearProduction(res.name), true, false) + "/" + $I("unit.y"): "";
             // "(" + game.getDisplayValueExt(perTick, true, false) + postfix + ")" : "";
 
         //----------------------------------------------------------------------------
@@ -317,10 +319,9 @@ WCraftShortcut = React.createClass({
     },
 
     componentDidMount: function(){
-        var res = this.props.resource,
-            recipe = this.props.recipe,
-            ratio = this.props.craftPercent,
-            num = this.props.craftFixed;
+        var recipe = this.props.recipe;
+        var ratio = this.props.craftPercent;
+        var num = this.props.craftFixed;
 
         //no craftAll tooltip    
         if (this.props.craftPercent == 1){
@@ -347,12 +348,12 @@ WCraftShortcut = React.createClass({
 					var priceItemNode = dojo.create("div", {style: {clear: "both"}}, tooltip);
 					var res = game.resPool.get(price.name);
 
-					var nameSpan = dojo.create("span", {
+					dojo.create("span", {
 							innerHTML: res.title || res.name,
 							style: { float: "left"}
 						}, priceItemNode );
 
-					var priceSpan = dojo.create("span", {
+					dojo.create("span", {
 							innerHTML: game.getDisplayValueExt(price.val * num),
 							style: {float: "right", paddingLeft: "6px" }
 						}, priceItemNode );
@@ -414,8 +415,7 @@ WCraftRow = React.createClass({
     },
 
     shouldComponentUpdate: function(nextProp, nextState){
-        var oldRes = this.oldRes || {},
-            newRes = nextProp.resource;
+        var newRes = nextProp.resource;
 
         /*var isEqual = 
             oldRes.value == newRes.value &&
@@ -738,19 +738,56 @@ WLeftPanel = React.createClass({
         var game = this.state.game,
             reqRes = game.getRequiredResources(game.selectedBuilding);
 
+        var catpower = game.resPool.get("manpower");
+        var huntCount = Math.floor(catpower.value / 100);
+
+        var canHunt = ((game.resPool.get("paragon").value > 0) || (game.science.get("archery").researched)) &&
+            (!game.challenges.isActive("pacifism"));
+        var showFastHunt = (catpower.value >= 100);
+
+        //---------- advisor ---------
+        var showAdvisor = false;
+
+        if (game.bld.get("field").on > 0){
+            var calendar = game.calendar,
+                winterDays = calendar.daysPerSeason -
+                (calendar.getCurSeason().name === "winter" ? calendar.day : 0);
+
+            var catnipPerTick = game.winterCatnipPerTick;
+
+            showAdvisor = (game.resPool.get("catnip").value + winterDays * catnipPerTick * calendar.ticksPerDay) <= 0;
+        }
+        //----------------------------
+
         return $r("div", null, [
             $r(WResourceTable, {resources: this.getResources(), reqRes: reqRes}),
 
-            $r("div", {id:"advisorsContainer",style:{paddingTop: "10px"}}),        
-            $r("div", {id:"fastHuntContainer", className:"pin-link", style:{visibility:"hidden"}},
-                $r("a", {href:"#", onClick: game.huntAll.bind(game)},
+            $r("div", {id:"advisorsContainer",style:{
+                paddingTop: "10px", 
+                display: (showAdvisor ? "block" : "none")}
+            }, 
+                $I("general.food.advisor.text")
+            ), 
+            $r("div", {id:"fastHuntContainer", className:"pin-link", style:{
+                display: (canHunt ? "block" : "none"),
+                visibility: (showFastHunt ? "visible" : "hidden")
+            }},
+                $r("a", {href:"#", onClick: this.huntAll},
                     $I("left.hunt") + " (",
-                    $r("span", {id:"fastHuntContainerCount"}),
+                    $r("span", {
+                        id:"fastHuntContainerCount"
+                    },
+                        [
+                            game.getDisplayValueExt(huntCount, false, false, 0),
+                            " ",
+                            (huntCount === 1 ? $I("left.hunt.time") : $I("left.hunt.times"))
+                        ]
+                    ),
                     ")"
                 )
             ),
             $r("div", {id:"fastPraiseContainer", className:"pin-link", style:{visibility:"hidden"}},
-                $r("a", {href:"#", onClick: game.praise.bind(game)},
+                $r("a", {href:"#", onClick: this.praiseAll},
                     $I("left.praise")
                 )
             ),              
@@ -758,6 +795,15 @@ WLeftPanel = React.createClass({
             $r(WCraftTable, {resources: game.resPool.resources, reqRes: reqRes})
         ]);
     },
+
+    huntAll: function(event){
+        this.state.game.huntAll(event);
+    },
+
+    praiseAll: function(event){
+        this.state.game.praise(event);
+    },
+
     componentDidMount: function(){
         var self = this;
         dojo.subscribe("ui/update", function(game){

@@ -48,11 +48,20 @@ try {
             }
         },
         clone: function(mixin){return Object.assign({}, mixin);},
-        hitch: function(){},
+        hitch: function(ctx, method){ return method.bind(ctx, arguments);},
         connect: function(){},
         publish: function(){},
-        subscribe: function(){}
+        subscribe: function(){},
+        mixin: function(obj, mixin){return Object.assign(obj, mixin); }
     };
+
+    var xhrMock = {
+        done: function(){return this},
+        fail: function(){return this},
+    }
+    global.$ = {
+        ajax: function(){ return xhrMock; }
+    }
 
     global.LZString = require("../lib/lz-string.js");
     require("../lib/dropbox_v2.js");

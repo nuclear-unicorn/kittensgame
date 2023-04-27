@@ -8,6 +8,7 @@
     "test": "test"
   },
   "scripts": {
+    "build": "node tools/generate-buildver.js",
     "test": "jest --config jest.config.unittest.json",
     "lint": "eslint *.js js/*.js --quiet",
     "start": "http-server"

@@ -73,7 +73,7 @@ body.scheme_arctic.with_background_image {
 	color: #404040;
 	text-shadow: 0 -1px 1px #c0c0c0;
 }
-.scheme_arctic .btn.modern.disabled span.btnTitle.limited { /* to change only the properties of the button name for buttons limited */
+.scheme_arctic .btn.modern.disabled.limited span.btnTitle { /* to change only the properties of the button name for buttons limited */
 	color: #b72920;
 	text-shadow: 0 -1px 1px #c0c0c0;
 }
@@ -289,7 +289,7 @@ body.scheme_arctic.with_background_image {
 	color: #023152;
 	text-shadow: 0 -1px 1px #93c4cf;
 }
-.scheme_arctic #headerLinks .links-block { /* a link separator : | on header links */
+.scheme_arctic #topBar .links-block { /* a link separator : | on topBar links */
 	color: #d0d0d0;
 }
 .scheme_arctic #topBar div,
@@ -300,10 +300,10 @@ body.scheme_arctic.with_background_image {
 	color: #b72200 !important; /* in default.js !important needed */
 	text-shadow: 0 -1px 1px #ffa894;
 }
-.scheme_arctic #topBar > div:first-child > span:first-child:after {
+.scheme_arctic #topBar > div:first-child > span:last-of-type::after {
     color: #023152;
 	text-shadow: 0 -1px 1px #93c4cf;
-    content: '\00a0\00a0\00a0Theme by Volkeyrn\00a0\00a0\00a0';
+    content: '\00a0\00a0\00a0Theme by Volkeyrn';
 	text-decoration: none;
 	font-weight: normal;
 }
@@ -386,6 +386,7 @@ body.scheme_arctic.with_background_image {
 }
 .scheme_arctic .button_tooltip {
 	background-color: transparent;
+	backdrop-filter: none; /* default : backdrop-filter: blur(2px); */
 }
 .scheme_arctic .button_tooltip div { /* tooltip window == left column: right text | center column :highlighting text */
 	color: #303030;

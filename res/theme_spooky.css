@@ -1,0 +1,1501 @@
+/* ************************************************************ */
+/* ***	       Spooky 1.0.0 Theme © Volkeyrn             *** */
+/* ************************************************************ */
+
+/* *********************************** */
+/* source of images for graphic design */
+/* *********************************** */
+/* theme_spooky_cat_on_pumpkin.png : https://pngtree.com/freepng/cartoon-halloween-poster_3662118.html and https://pngtree.com/freepng/halloween-promotion-sale-template_4969451.html Volkeyrn: permanent premium member */
+/* theme_spooky_flying_bats.png : https://pngtree.com/freepng/black-flying-bats_4281519.html Volkeyrn: permanent premium member */
+/* theme_spooky_graveyard.png : https://pngtree.com/freepng/halloween-elements_1569670.html Volkeyrn: permanent premium member */
+/* theme_spooky_moon.png : https://pngtree.com/freepng/mid-autumn-festival-yellow-moon_5460053.html Volkeyrn: permanent premium member */
+/* theme_spooky_owl_tree.png : https://pngtree.com/freepng/halloween-tree-cartoon-transparent-material_4391464.html Volkeyrn: permanent premium member */
+/* theme_spooky_tree_spider_web.png : https://pngtree.com/freepng/cobweb_1031002.htm and https://pngtree.com/freepng/hand-drawn-halloween-promotion-sns_4977895.html Volkeyrn: permanent premium member */
+/* theme_spooky_border_01.png : https://pngtree.com/freepng/square-halloween-frame-with-the-scary-pumpkin-and-ghost_6728101.html Volkeyrn: permanent premium member */
+/* theme_spooky_border_witch.png : https://pngtree.com/freepng/hexagon-halloween-frame-with-the-witch_6728115.html Volkeyrn: permanent premium member */
+/* theme_spooky_frame_fill_01.png : https://pngtree.com/freepng/square-halloween-frame-with-the-scary-pumpkin-and-ghost_6728101.html Volkeyrn: permanent premium member */
+/* theme_spooky_frame_fill_02.png : https://pngtree.com/freepng/square-halloween-frame-with-the-scary-pumpkin-and-ghost_6728101.html Volkeyrn: permanent premium member */
+/* theme_spooky_frame_03.png : https://pngtree.com/freepng/square-halloween-frame-with-scary-house-pumpkin-at-the-tree-and-ghost_6728117.html Volkeyrn: permanent premium member */
+/* theme_spooky_frame_fill_04.png : https://pngtree.com/freepng/square-halloween-frame-with-scary-house-pumpkin-at-the-tree-and-ghost_6728117.html Volkeyrn: permanent premium member */
+/* theme_spooky_scarecrow.png : https://pngtree.com/freepng/silhouette-pumpkin-carving-character-template-spooky-tree_3622822.html Volkeyrn: permanent premium member */
+/* theme_spooky_cemetery.png : https://pngtree.com/freepng/silhouette-pumpkin-carving-character-template-spooky-tree_3622822.html Volkeyrn: permanent premium member */
+/* theme_spooky_spookytree.png : https://pngtree.com/freepng/silhouette-pumpkin-carving-character-template-spooky-tree_3622822.html Volkeyrn: permanent premium member */
+/* theme_spooky_rabidbat.png : https://pngtree.com/freepng/silhouette-pumpkin-carving-character-template-bat-mummy-ghost_3622820.html Volkeyrn: permanent premium member */
+/* theme_spooky_ghost.png : https://pngtree.com/freepng/silhouette-pumpkin-carving-character-template-bat-mummy-ghost_3622820.html Volkeyrn: permanent premium member */
+
+/* ************* */
+/* *** FONTS *** */
+/* ************* */
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:ital,wght@400,700,400italic,700italic,&display=swap);
+@import url(https://fonts.googleapis.com/css?family=Delius&display=swap);
+@import url(https://fonts.googleapis.com/css?family=Mystery+Quest&display=swap);
+
+/* ******************************************** */
+/* ******************* GAME ******************* */
+/* ******************************************** */
+body.scheme_spooky {
+	background-color: #0b0c23;
+	color-scheme: dark;
+}
+body.scheme_spooky.with_background_image {
+	background: no-repeat local top left url('img/theme_spooky_tree_spider_web.png'),
+				no-repeat local 70% bottom url('img/theme_spooky_cat_on_pumpkin.png'),
+				no-repeat local bottom right url('img/theme_spooky_graveyard.png'),
+				no-repeat local bottom 200px left url('img/theme_spooky_owl_tree.png'),
+				no-repeat scroll top right url('img/theme_spooky_flying_bats.png'),
+				no-repeat scroll top -200px right -250px url('img/theme_spooky_moon.png'),
+				radial-gradient(circle at left top, rgba(255, 255, 255, 0.2) 0%, transparent 25%, transparent 100%),
+				radial-gradient(circle at right top, #00365c, #0b0c23 100%);				
+}
+.scheme_spooky #gamePageContainer,
+.scheme_spooky select,
+.scheme_spooky .btn,
+.scheme_spooky .modern,
+.scheme_spooky .btn.modern,
+.scheme_spooky input[type='button'] {
+	font-family: 'Delius', cursive;
+}
+.scheme_spooky .btn {
+	color: gray;
+	margin-bottom: 7px; /* default margin-bottom: 10px; */
+	background-color: transparent;
+	border: solid 1px transparent;
+    /* default padding: 5px; */
+	/* default width: 170px; */
+}
+.scheme_spooky .btn.modern {
+	/* default font-size: 14px; */
+	/* default font-family: Helvetica; */
+    /* default border: solid 1px transparent; */
+    /* default padding: 0; */
+	border-radius: 5px;/* default border-radius: 3px; */
+	/* default width: 264px; */
+}
+.scheme_spooky .btn.modern:hover {
+	text-shadow: 1px 1px 2px #000000;
+}
+.scheme_spooky .btn.modern.disabled {
+	background: no-repeat padding-box linear-gradient(to bottom, #363636 0%, #0a0a0a 100%);
+	background-color: #0a0a0a;
+	border: 2px solid #0a0a0a;
+	outline: 2px inset #060713;
+}
+.scheme_spooky .btn.modern.disabled:hover {
+	outline-color: #6c6c6c;
+}
+.scheme_spooky .btn.modern.disabled.limited:hover {
+	outline-color: #bb0f0f;
+}
+.scheme_spooky .btn.modern.disabled span.btnTitle { /* to change only the properties of the button name for buttons disabled */
+    color: #7c7c7c;
+}
+.scheme_spooky .btn.modern.disabled.limited span.btnTitle { /* to change only the properties of the button name for buttons limited */
+	color: #bb0f0f;
+}
+.scheme_spooky .btn.modern:not(.disabled) {
+	background: no-repeat padding-box linear-gradient(to bottom, #e57333 0%, #ac301e 100%);
+	background-color: #0a0a0a;
+	border: 2px solid #0a0a0a;
+	outline: 2px inset #060713;
+}
+.scheme_spooky .btn.modern:not(.disabled):hover {
+    background: no-repeat padding-box linear-gradient(to bottom, #8e29d4 0%, #460d87 100%);
+	outline-color: #e57333;
+}
+.scheme_spooky .btn.modern:not(.disabled) span.btnTitle { /* to change only the properties of the button name for buttons enabled */
+	color: #e0e0e0;
+}
+.scheme_spooky .btn.modern:not(.disabled):hover span.btnTitle {
+	color: #ffffff;
+}
+.scheme_spooky a {
+	color: #d0d0d0;
+	/* default padding-right: 5px; */
+}
+.scheme_spooky a,
+.scheme_spooky .craft-link {
+    text-decoration: none;
+}
+.scheme_spooky a:hover {
+	color: #9632e3;
+	opacity: 1.0; /* default opacity: 0.6 */
+}
+.scheme_spooky div {
+	color: #b0b0b0;
+}
+.scheme_spooky .disabled div { /* color text for disabled */
+	color: #808080;
+}
+.scheme_spooky h1 {
+	/* default margin-top: 30px; */
+	font-family: 'Mystery Quest', cursive;
+	font-size: 18px; /* default font size = font-size: 12px; */
+	text-transform: capitalize;
+	text-shadow: 2px 2px 3px #000000;
+	color: #ffffff;
+	padding-left: 20px;
+	margin-bottom: 8px;
+}
+.scheme_spooky h1:first-child {
+    margin-top: 15px;
+}
+/* .scheme_spooky .btn.modern.small-text { */
+	/* default font-size: 90%; */
+/* } */
+.scheme_spooky .modern .btnContent {
+    padding: 10px 0 10px 1px; /* 1px left for buttons without power background-image */
+}
+/* *** green and red light for machine on/off *** */
+.scheme_spooky .btn.bldEnabled div.btnContent,
+.scheme_spooky .btn.bldlackResConvert div.btnContent {
+	padding: 10px 0 10px 13px; /* 13px left for power background-image */
+	border: none; /* also allows you to remove the height difference with the other buttons (they have no border on div.content) */
+}
+.scheme_spooky .btn.disabled.bldlackResConvert { /* color for lack resources convertion */
+	background: no-repeat padding-box linear-gradient(90deg, #bb0f0f 0, #bb0f0f 9px, transparent 10px, transparent 100%),
+	no-repeat padding-box linear-gradient(to bottom, #363636 0%, #0a0a0a 100%);
+}
+.scheme_spooky .btn:not(.disabled).bldlackResConvert {
+	background: no-repeat linear-gradient(90deg, #bb0f0f 0, #bb0f0f 9px, transparent 10px, transparent 100%),
+	no-repeat padding-box linear-gradient(to bottom, #e57333 0%, #ac301e 100%);
+}
+.scheme_spooky .btn:not(.disabled).bldlackResConvert:hover {
+	background: no-repeat linear-gradient(90deg, #bb0f0f 0, #bb0f0f 9px, transparent 10px, transparent 100%),
+	no-repeat padding-box linear-gradient(to bottom, #8e29d4 0%, #460d87 100%);
+}
+.scheme_spooky .btn.disabled.bldEnabled {
+	background: no-repeat padding-box linear-gradient(90deg, #a8e053 0, #a8e053 9px, transparent 10px, transparent 100%),
+	no-repeat padding-box linear-gradient(to bottom, #363636 0%, #0a0a0a 100%);
+}
+.scheme_spooky .btn:not(.disabled).bldEnabled {
+	background: no-repeat linear-gradient(90deg, #a8e053 0, #a8e053 9px, transparent 10px, transparent 100%),
+	no-repeat padding-box linear-gradient(to bottom, #e57333 0%, #ac301e 100%);
+}
+.scheme_spooky .btn:not(.disabled).bldEnabled:hover {
+	background: no-repeat linear-gradient(90deg, #a8e053 0, #a8e053 9px, transparent 10px, transparent 100%),
+	no-repeat padding-box linear-gradient(to bottom, #8e29d4 0%, #460d87 100%);
+}
+/* *** end of green light for machine on/off *** */
+.scheme_spooky .dialog {
+	/* default left: 50%; */
+	/* default top: 50%; */
+	/* default padding: 20px; */
+	background: no-repeat bottom right url('img/theme_spooky_scarecrow.png'), padding-box #33174e;
+	border: 4px solid transparent;
+	box-shadow: none;
+	border-image-source: url('img/theme_spooky_frame_fill_04.png');
+	border-image-width: 14px 14px 14px 14px;
+	border-image-slice: 14 14 14 14;
+	border-image-outset: 8px;
+	border-image-repeat: stretch;
+}
+.scheme_spooky #appDiv {
+	background: padding-box no-repeat bottom right 30px url('img/theme_spooky_spookytree.png'), padding-box #33174e;
+	border: 3px solid transparent;
+	border-image-source: url('img/theme_spooky_frame_03.png');
+	border-image-width: 6px 7px 4px 5px;
+	border-image-slice: 6 7 3 3;
+	border-image-outset: 2px 3px 0 0;
+	border-image-repeat: stretch;
+}
+.scheme_spooky #creditsDiv {
+	background: no-repeat bottom right 10px url('img/theme_spooky_cemetery.png'), padding-box #33174e;
+}
+.scheme_spooky #importDiv {
+	background: no-repeat bottom 40px right url('img/theme_spooky_ghost.png'), padding-box #33174e;
+}
+.scheme_spooky #exportDiv {
+	background: no-repeat bottom 30px right url('img/theme_spooky_rabidbat.png'), padding-box #33174e;
+}
+.scheme_spooky #creditsDiv ul {
+	margin-bottom: 25px; /* default margin-bottom: 16px; */
+}
+.scheme_spooky #creditsDiv li {
+	color: #568dff;
+	text-decoration: none;
+}
+.scheme_spooky #creditsDiv li::marker {
+	color: #c34b27;
+}
+.scheme_spooky .dialog a {
+	text-transform: capitalize;
+}
+.scheme_spooky .dialog div {
+	color: #e0e0e0;
+}
+.scheme_spooky label i { /* information text in option windows */
+    /* default font size = font-size: 90%; */
+	color: #e0e0e0;
+	opacity: 0.6;
+}
+.scheme_spooky label {
+	margin-top: 2px;
+}
+.scheme_spooky label:hover {
+	opacity: 1; /* default opacity: 0.7; */
+	color: #9632e3;
+}
+.scheme_spooky label:hover i {
+	text-shadow: none;
+}
+.scheme_spooky select { /* dropdown list on settlement tab and options windows */ /* 226d38 */
+	border-radius: 5px;
+	margin-left: 5px;
+	padding-bottom: 2px;
+	background: no-repeat padding-box linear-gradient(to bottom, #e57333 0%, #ac301e 100%);
+	background-color: #0a0a0a;
+	border: 1px solid #0a0a0a;
+	outline: 2px inset #060713;
+	color: #e0e0e0;
+}
+.scheme_spooky select:hover {
+	cursor: pointer;
+	background: no-repeat padding-box linear-gradient(to bottom, #8e29d4 0%, #460d87 100%);
+	outline-color: #e57333;
+	color: #ffffff;
+}
+.scheme_spooky select>option {
+	background-color: #28123e;
+    color: #d0d0d0;
+	padding: 2px 10px; /* -2 pixel vertical */
+}
+.scheme_spooky select > option:disabled {
+	color: #808080;
+	font-size: 90%;
+}
+.scheme_spooky #optionsDiv input[type="checkbox"] + label:before {
+	content: "\2718"; /* HEAVY BALLOT X */
+	font: 14px sans-serif;
+	color: #bb0f0f;
+	margin: 0 6px 0 3px; /* default style margin: 0px 6px 0px 2px; */
+}
+.scheme_spooky #optionsDiv input[type="checkbox"]:checked + label:before {
+	content: "\2714"; /* HEAVY CHECK MARK */
+	font: 14px sans-serif;
+	color: #a8e053;
+}
+.scheme_spooky .dialog input[type="button"] {
+	margin-left: 17px;
+	margin-top: 18px;
+	margin-bottom: 2px;
+}
+.scheme_spooky .dialog input#batchSize {
+	background: no-repeat padding-box linear-gradient(to bottom, rgba(30, 14, 46, 0.5) 0%, rgba(30, 14, 46, 0.1) 100%);
+	background-color: rgba(30, 14, 46, 0.5);
+	border: 1px inset rgba(0, 0, 0, 0.5);
+	outline: 1px outset rgba(0, 0, 0, 0.25);
+	box-shadow: inset 1px 1px 3px #000000;
+	color: #a0a0a0;
+	border-radius: 5px;
+	padding: 4px 1px 2px 5px;
+    margin-right: 5px;
+	margin-top: 3px;
+	margin-bottom: 3px;
+}
+.scheme_spooky textarea#importData,
+.scheme_spooky textarea#exportData {
+	background: no-repeat padding-box linear-gradient(to bottom, rgba(30, 14, 46, 0.5) 0%, rgba(30, 14, 46, 0.1) 100%);
+	background-color: rgba(30, 14, 46, 0.5);
+	border: 2px inset rgba(0, 0, 0, 0.5);
+	outline: 2px outset rgba(0, 0, 0, 0.25);
+	box-shadow: inset 2px 2px 5px #000000;
+	color: #a0a0a0;
+	border-radius: 5px;
+	padding: 7px;
+	margin-bottom: 10px;
+}
+.scheme_spooky .dialog input#batchSize:focus,
+.scheme_spooky textarea#importData:focus,
+.scheme_spooky textarea#exportData:focus {
+	background: no-repeat padding-box linear-gradient(to bottom, rgba(99, 29, 148, 0.5) 0%, rgba(99, 29, 148, 0.9) 100%);
+	outline-color: #e57333;
+	color: #ffffff;
+}
+.scheme_spooky h1#exportTo,
+.scheme_spooky h1#exportToText,
+.scheme_spooky h1#importFrom,
+.scheme_spooky h1#importFromText {
+	margin-top: 20px; /* default margin-top: 30px; */
+	margin-bottom: 0; /* default margin-bottom: 8px; */
+}
+.scheme_spooky input:active,
+.scheme_spooky select:active,
+.scheme_spooky textarea:active {
+    border-color: #ff7419 !important;
+}
+
+/* *********************************************** */
+/* ******************* TOP BAR ******************* */
+/* *********************************************** */
+.scheme_spooky #topBar {
+    /* default height: 26px; */
+	top: 0; /* default top 2px */
+	background-color: rgba(0, 0, 0, 0.33);
+	box-shadow: none; /* default box-shadow: 1px 0px 2px #888; */
+	/* default min-width: 1180px; */
+	border-bottom: 1px solid #ff7419; /* default border-bottom: 1px solid gray; */
+}
+/* .scheme_spooky #topBar a {
+    /* default padding-left: 2px; */
+	/* default padding-right: 2px; */
+/* } */
+.scheme_spooky #topBar .gameTitle { /* Kittens Game */
+	font-family: 'Mystery Quest', cursive;
+	font-size: larger;
+	color: #f8894d;
+}
+.scheme_spooky #topBar a {
+	color: #d0d0d0;
+}
+.scheme_spooky #topBar a:hover {
+	color: #982ee4;
+}
+.scheme_spooky #topBar a.copyright {
+	color: #bb0f0f;
+}
+.scheme_spooky #topBar a.copyright:hover {
+	color: #982ee4;
+}
+.scheme_spooky #topBar .links-block { /* a link separator: | on topBar links */
+	color: transparent;
+}
+.scheme_spooky #topBar div,
+.scheme_spooky #topBar .toolbarIcon.sorrow div { /* counter of BLS (Black Liquid Sorrow) */
+	color: #e0e0e0;
+}
+.scheme_spooky .toolbarIcon.sorrow.max div {
+    color: #bb0f0f !important; /* in default.js !important needed */
+}
+.scheme_spooky #topBar > div:first-child > span:last-of-type::after {
+    color: #9632e3;
+    content: '\00a0\00a0 theme by Volkeyrn';
+    text-decoration: none;
+	font-weight: normal;
+}
+.scheme_spooky #autosaveTooltip {
+	color: #9632e3;
+}
+.scheme_spooky #topBar .links-block a:hover {
+	text-shadow: 1px 1px 1px #000000;
+}
+.scheme_spooky #getTheApp-link { /* Get the app */
+	color: #ffca2c !important;
+	font-weight: normal !important;
+	text-shadow: 1px 1px 1px #000000;
+}
+.scheme_spooky #getTheApp-link:hover {
+	color: #982ee4 !important;
+}
+.scheme_spooky .links-block {
+	padding-top: 5px !important;
+}
+.scheme_spooky #topBar div.toolbarIcon.happiness div {
+    color: #f8894d;
+}
+.scheme_spooky #topBar .toolbarIcon.energy div,
+.scheme_spooky .button_tooltip .energyProduction {
+	color: #a8e053;
+}
+.scheme_spooky #topBar .toolbarIcon.energy.warningWinter div {
+    color: #f8894d;
+}
+.scheme_spooky #topBar .toolbarIcon.energy.warning div,
+.scheme_spooky .button_tooltip .energyConsumption {
+	color: #bb0f0f;
+}
+.scheme_spooky .button_tooltip .energyPenalty {
+	color: #bb0f0f;
+}
+.scheme_spooky .toolbarIcon .status-indicator-online {
+    color: #a8e053;
+}
+.scheme_spooky .toolbarIcon .status-indicator-offline {
+    color: #bb0f0f;
+}
+.scheme_spooky #topBar .toolbarIcon.pollutionIcon div {
+    color: #808080;
+}
+.scheme_spooky .toolbarIcon.pollutionIcon {
+    background: no-repeat top left url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='14' fill='%23808080' viewBox='0 0 16 16'%3E%3Cpath d='M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383zm.653.757c-.757.653-1.153 1.44-1.153 2.056v.448l-.445.049C2.064 6.805 1 7.952 1 9.318 1 10.785 2.23 12 3.781 12h8.906C13.98 12 15 10.988 15 9.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 4.825 10.328 3 8 3a4.53 4.53 0 0 0-2.941 1.1z'/%3E%3C/svg%3E");
+}
+.scheme_spooky .toolbarIcon.happiness {
+    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='%23f8894d' viewBox='0, 0, 400,365.7142857142857'%3E%3Cg %3E%3Cpath id='path0' d='M23.809 26.069 C 9.506 63.687,-3.876 244.068,5.454 273.466 C 42.343 389.691,311.117 402.522,383.842 291.529 C 400.102 266.714,401.966 245.454,395.450 159.135 C 383.595 2.098,363.666 -27.023,299.032 18.249 C 261.840 44.299,133.578 44.945,105.157 19.224 C 74.567 -8.459,35.693 -5.188,23.809 26.069 M95.086 43.441 C 121.604 72.743,266.428 71.037,311.785 40.888 C 351.877 14.240,351.212 13.344,366.764 114.971 C 393.215 287.824,351.297 345.860,200.000 345.860 C 57.492 345.860,12.935 293.440,31.361 147.462 C 47.965 15.915,56.931 1.281,95.086 43.441 '%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
+}
+.scheme_spooky .toolbarIcon.energy {
+    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%23a8e053' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
+}
+.scheme_spooky .toolbarIcon.energy.warning {
+    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%23bb0f0f' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
+}
+.scheme_spooky .toolbarIcon.energy.warningWinter {
+    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%23f8894d' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
+}
+
+/* ********************************************** */
+/* ******************* FOOTER ******************* */
+/* ********************************************** */
+.scheme_spooky #footerLinks {
+	font-size: 90%;
+	bottom: 3px; /* default bottom: 10px; */
+	/* default right: 5px; */
+	color: transparent; /* a link separator: | on footer links */
+}
+.scheme_spooky #footerLinks a {
+	color: #d0d0d0;
+}
+.scheme_spooky #footerLinks a:hover,
+.scheme_spooky #crowdjet-expand-container:hover {
+	color: #982ee4;
+}
+.scheme_spooky #crowdjet-expand-container {
+	color: #d0d0d0;
+	font-family: 'Delius', cursive;
+}
+
+/* *********************************************** */
+/* ******************* TOOLTIP ******************* */
+/* *********************************************** */
+.scheme_spooky #tooltip,
+.scheme_spooky .tooltip-block > div {
+	/* default padding-left: 3px; */
+	padding-bottom: 5px;
+	background: transparent;
+	color: #e0e0e0; /* tooltip left column left text */
+	box-shadow: none;
+	border: 3px solid transparent;
+	border-image-source: url('img/theme_spooky_frame_fill_02.png');
+	border-image-width: 3px 4px 5px 4px;
+	border-image-slice: 10 11 14 11 fill;
+	border-image-outset: 0 1px 2px 1px;
+	border-image-repeat: stretch;
+}
+.scheme_spooky .tooltip-block > div { /* tooltip on "?" top right column */
+	padding: 5px;
+}
+.scheme_spooky .button_tooltip {
+	background-color: transparent;
+	backdrop-filter: none; /* default : backdrop-filter: blur(2px); */
+}
+.scheme_spooky .button_tooltip div { /* tooltip left column right text */
+	color: #f8894d;
+}
+/* .scheme_spooky .tooltip-inner {
+	/* default width: 280px; */
+	/* font-size: 13px; /* for center tooltip except title, effects and flavor */
+/* } */
+.scheme_spooky .tooltip-inner .desc { /* Tooltip description */
+    color: #f0f0f0;
+	/* default font size = font-size: 15px; */
+	/* default padding-top: 4px; */
+	margin-bottom: 4px;
+}
+.scheme_spooky .tooltip-inner .desc:not(.small) {
+	border-bottom: solid 1px rgba(0, 0, 0, 0.33)  !important; /* in core.js !important needed */ /* bottom tooltip description */
+}
+.scheme_spooky .tooltip-inner .price-block span:first-of-type {
+	color: #d0d0d0;
+}
+.scheme_spooky .tooltip-inner .price-block span:last-of-type {
+	color: #d0d0d0;
+}
+.scheme_spooky .tooltip-inner .price-block span:first-of-type.rawRes { /* Tooltip Window == text for all missing resources for primary resource */
+    color: #808080;
+	font-style: italic;
+	padding-left: 12px;
+}
+.scheme_spooky .tooltip-inner .desc.small {
+	font-size: 70%; /* default font-size: 60%; */
+	opacity: 1; /* default opacity: 0.8; */
+}
+.scheme_spooky .tooltip-inner .desc.small.auto-off {
+	color: #e01212;
+}
+.scheme_spooky .tooltip-inner .desc.small.auto-on {
+	color: #a8e053;
+}
+.scheme_spooky .tooltip-divider { /* Tooltip Title */
+	/* in core.js text-align: center; !important needed */
+	/* in core.js width: 100%; !important needed */
+	border-bottom: solid 1px rgba(0, 0, 0, 0.33) !important; /* in core.js !important needed */ /* bottom tooltip title */
+	padding-bottom: 2px !important; /* in core.js padding-bottom: 4px; !important needed */
+	margin-bottom: 2px !important; /* in core.js margin-bottom: 8px; !important needed */
+	color: #f8894d !important; /* text centered: Tooltip name */
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+	font-family: 'Mystery Quest', cursive;
+}
+.scheme_spooky .tooltip-divider.resEffectsTxt { /* Tooltip text centered: "Effects" */
+	font-size: 14px;
+	color: #9632e3 !important;
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+	border-bottom: solid 1px rgba(0, 0, 0, 0.33) !important; /* in core.js !important needed */ /* bottom text : "Effects" */
+	/* in core.js padding-bottom: 4px; !important needed */
+	margin-bottom: 4px !important; /* in core.js margin-bottom: 8px; !important needed */
+	margin-top: 4px;
+}
+.scheme_spooky .effectName { /* Tooltip effects text */
+	color: #f8894d !important;
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+	/* default font size = font-size: 14px; */
+}
+.scheme_spooky .tooltip-inner .price-block span:last-of-type.noRes,
+.scheme_spooky .limited { /* on ressource limited or not attainable */
+	color: #bb0f0f;
+}
+.scheme_spooky #tooltip .flavor { /* Tooltip last bottom text on center column tooltip window */
+	color: #53a8e0;
+	font-size: 13px !important; /* in core.js !important needed */
+	padding-right: 7px;
+}
+.scheme_spooky .button_tooltip.login-popup input[type="email"],
+.scheme_spooky .button_tooltip.login-popup input[type="password"] {
+	background: no-repeat padding-box linear-gradient(to bottom, rgba(30, 14, 46, 0.5) 0%, rgba(30, 14, 46, 0.1) 100%);
+	background-color: rgba(30, 14, 46, 0.1);
+	border: 1px inset rgba(0, 0, 0, 0.5);
+	outline: 1px outset rgba(0, 0, 0, 0.25);
+	box-shadow: inset 1px 1px 3px #000000;
+	color: #a0a0a0;
+    padding: 3px 1px 3px 5px;
+    margin: 0 5px;
+	border-radius: 5px;
+	margin-top: 3px;
+	margin-bottom: 3px;
+}
+.scheme_spooky .button_tooltip.login-popup input[type="email"]:focus,
+.scheme_spooky .button_tooltip.login-popup input[type="password"]:focus {
+	background: no-repeat padding-box linear-gradient(to bottom, rgba(99, 29, 148, 0.5) 0%, rgba(99, 29, 148, 0.9) 100%);
+	background-color: rgba(99, 29, 148, 0.5);
+	outline-color: #e57333;
+	color: #ffffff;
+}
+
+/* ***************************************************** */
+/* ******************* CENTER COLUMN ******************* */
+/* ***************************************************** */
+/* .scheme_spooky #midColumn { */
+	/* default margin-top: 30px; */
+	/* default width: 630px */
+/* } */
+.scheme_spooky .tabInner {
+    border: none; /* default border: 1px solid gray; */
+	padding: 5px 15px 15px 12px;/* default padding: 15px; */
+	/* default margin-bottom: 20px; */
+}
+.scheme_spooky .tabInner.Workshop {
+	padding-bottom: 70px; /* to view entire dropdownlink of last button */ /* default padding: 15px; */
+}
+.scheme_spooky .tabInner.Bonfire,
+.scheme_spooky .tabInner.Trade,
+.scheme_spooky .tabInner.Time {
+	padding-bottom: 30px; /* default padding: 15px; */
+}
+.scheme_spooky .tabsContainer {
+	padding-bottom: 3px; /* default padding-bottom: 15px; */
+	/* default padding-top: 2px; */
+	padding-left: 5px;
+	/* default top: 5px; */
+	border-top: none;
+	margin-left: 5px;
+}
+.scheme_spooky .tabsContainer a {
+	padding: 0 5px; /* default padding-right: 5px; */
+	margin-left: -7px;
+}
+.scheme_spooky .tabsContainer a.activeTab {
+	color: #9632e3;
+}
+.scheme_spooky .tabsContainer a.activeTab:hover {
+	color: #9632e3;
+}
+.scheme_spooky .tabsContainer span:not(.genericWarning), /* separator | for tab */
+.scheme_spooky .expandAllBar { /* separator | for expandAllBar */
+	color: transparent;
+}
+.scheme_spooky .tabInner.Workshop > div > span, /* for text: Craft effectiveness: +xxx% */
+.scheme_spooky .expandAllBar:first-child span { /* for text: Trade effectiveness +xxx% */
+	color: #a8e053;
+}
+.scheme_spooky .expandAllBar:not(:first-child) {
+	font-size: smaller; /* smaller font for expand all and collapse all links */
+}
+.scheme_spooky span.genericWarning { /* number of kittens free or engineering free on tab */
+	color: #bb0f0f;
+}
+.scheme_spooky .tab.traitLeaderBonus::before {
+	content: "\2605\00a0"; /* BLACK STAR */
+	color: #53a8e0;
+}
+.scheme_spooky .tab.engineer::before { /* artisan bonus */
+	content: "\2692\00a0"; /* HAMMER AND PICK */
+}
+.scheme_spooky .tab.metallurgist::before {
+	content: "\267B\00a0"; /* BLACK UNIVERSAL RECYCLING SYMBOL */
+}
+.scheme_spooky .tab.chemist::before {
+	content: "\2623\00a0"; /* BIOHAZARD SIGN */
+}
+.scheme_spooky .tab.merchant::before {
+	content: "\2696\00a0"; /* SCALES */
+}
+.scheme_spooky .tab.manager::before { /* hunting bonus */
+	content: "\27B4\00a0"; /* BLACK-FEATHERED SOUTH EAST ARROW */
+}
+.scheme_spooky .tab.scientist::before {
+	content: "\269B\00a0"; /* ATOM SYMBOL */
+}
+.scheme_spooky .tab.wise::before {
+	content: "\2600\00a0"; /* BLACK SUN WITH RAYS */
+}
+.scheme_spooky div.bldTopContainer a.activeTab {
+	color: #9632e3;
+	opacity: 0.8;/* default opacity 0.7 on not hover */
+}
+.scheme_spooky div.bldTopContainer a.activeTab:hover {
+	color: #9632e3;
+	opacity: 0.8;
+}
+.scheme_spooky div.bldTopContainer > a,
+.scheme_spooky div.bldTopContainer > span { /* under tab */
+	font-size: 90%;
+}
+.scheme_spooky .bldGroupContainer { /* container for all buttons on center column */
+	/* default padding 15px */
+	/* default margin 10px */
+	border-top: 5px solid transparent;
+ 	border-image-source: url('img/theme_spooky_border_01.png');
+	border-image-width: 5px 0 0 0;
+	border-image-slice: 15 0 0 0;
+	border-image-outset: 0;
+	border-image-repeat: stretch;
+}
+.scheme_spooky input[type='button'] {
+	background: no-repeat padding-box linear-gradient(to bottom, #608eff 0%, #344391 100%) !important;
+	background-color: #344391 !important;  /* !important in default.css */
+	border: 2px solid #0a0a0a!important;  /* !important in default.css */
+	outline: 2px inset #060713 !important;
+	color: #e0e0e0;
+	border-radius: 5px !important; /* !important in default.css */
+	padding: 5px 20px;
+	margin-left: 10px;
+	font-size: 15px;
+	font-family: 'Mystery Quest', cursive;
+	text-shadow: 1px 1px 2px #000000;
+}
+.scheme_spooky input[type='button']:hover {
+	color: #ffffff;
+	background: no-repeat padding-box linear-gradient(to bottom, #8e29d4 0%, #460d87 100%) !important;
+	background-color: #460d87 !important; /* !important in default.css */
+	outline-color: #e57333 !important;
+	cursor: pointer !important; /* !important in default.css */
+}
+.scheme_spooky input[type='button']#observeBtn {
+	font-size: 17px; /* default font-size: 15px; */
+}
+.scheme_spooky .btn.modern a {
+	font-weight: normal;
+	background-color: transparent;
+	padding: 10px 5px 10px 5px !important; /* default:  padding: 10px 6px 10px 6px !important; */
+	text-shadow: none;
+	border-left: 1px solid rgba(0 ,0 ,0 , 0.2); /* default border-left: 1px solid #888; */
+	/* default margin: -10px 0; */
+	/* default min-width: 20px; */
+}
+.scheme_spooky .btn.modern:not(.disabled) a {
+	color: #bcbcbc;
+}
+.scheme_spooky .btn.modern.disabled a {
+	color: #8c8c8c;
+}
+.scheme_spooky .btn.modern:not(.disabled) a:hover {
+	background-color: rgba(0, 0, 0, 0.2);
+	color: #ffffff;
+}
+.scheme_spooky .btn.modern.disabled a:hover {
+	background-color: rgba(0, 0, 0, 0.3);
+	color: #e0e0e0;
+}
+.scheme_spooky .btn.modern:not(.disabled):active,
+.scheme_spooky input[type='button']:active,
+.scheme_spooky input[type='button']#observeBtn:active {
+    border-color: #ff7419 !important;
+}
+.scheme_spooky .linkContent { /* dropdown list on button */
+    margin-top: 27px !important; /* for correct vertical align dropdown list */
+    width: auto !important;
+    border-radius: 5px;
+	border: solid 1px rgba(0, 0, 0, 0.2);
+	background: no-repeat padding-box linear-gradient(to bottom, #460d87 0%, #8e29d4 100%);; /* color pick from button not disabled and hover */
+}
+.scheme_spooky .linkContent a {
+    width: 36px !important;
+    margin-top: 0 !important;
+	margin-bottom: 0 !important;
+	border-left: none !important; /* default border-left: 1px solid #888; */
+}
+.scheme_spooky .btn.modern.disabled .linkContent { /* dropdown list on button disabled */
+	background: no-repeat padding-box linear-gradient(to bottom, #0a0a0a 0%, #363636 100%);  /* color pick from button disabled and hover */
+}
+.scheme_spooky .btn.modern.disabled .linkContent a {
+	border-left: none !important;
+}
+.scheme_spooky .linkContent a:first-child,
+.scheme_spooky .linkContent a:first-child:hover {
+	border-radius: 0 5px 0 0;
+}
+.scheme_spooky .linkContent a:last-child,
+.scheme_spooky .linkContent a:last-child:hover {
+	border-radius: 0 0 5px 5px;
+}
+/* Apply the right border radius of the button to the rightmost link */
+.scheme_spooky .btn.modern span.btnTitle + a,
+.scheme_spooky .btn.modern:not(.hasSellLink) a.off1Link, /* link minus on buildings buttons */
+.scheme_spooky .btn.modern:not(.hasSellLink) a.unassignLink { /* link minus on kittens jobs buttons */
+	/* buttons border-radius: 5px; */
+	border-radius: 0 5px 5px 0;
+}
+.scheme_spooky .btn.modern .btnContent a.rightestLink { /* for Combust TC button in Time tab and Hold Festival in Settlement tab */
+	border-radius: 0 5px 5px 0;
+}
+.scheme_spooky .btn .btnContent a.small {
+    /* default font-size: 0.7em; */
+    line-height: 18px; /* default line-height: 16px; */
+}
+.scheme_spooky .panelContainer {
+	/* default margin-top: 8px; */
+	min-height: 34px; /* default min-height: 30px; */
+	border: 1px solid transparent;
+	border-bottom: 5px solid transparent;
+ 	border-image-source: url('img/theme_spooky_border_01.png');
+	border-image-width: 0 0 5px 0;
+	border-image-slice: 0 0 15 0;
+	border-image-outset: 0;
+	border-image-repeat: stretch;
+}
+.scheme_spooky .tabInner.Trade {
+	padding: 2px 15px 10px 15px;
+}
+.scheme_spooky .tabInner.Trade .panelContainer {
+	margin-top: 5px; /* default margin-top: 8px; */
+}
+.scheme_spooky .tabInner.Trade .btn {
+	margin-bottom: 8px; /* default margin-bottom: 10px; */
+}
+.scheme_spooky .tabInner.Trade div[style^='margin-bottom'] {
+	margin-bottom: 5px !important; /* default margin-bottom: 15px; */
+}
+.scheme_spooky .tabInner.Stats table.statTable {
+	margin: 5px 10px;
+	padding: 10px;
+	border-radius: 0;
+	color: #b0b0b0;
+	background: padding-box rgba(0, 0, 0, 0.25);
+	border: 3px solid transparent;
+	border-image-source: url('img/theme_spooky_frame_03.png');
+	border-image-width: 6px 7px 3px 3px;
+	border-image-slice: 6 7 3 3;
+	border-image-outset: 2px 3px 0 0;
+	border-image-repeat: stretch;
+}
+.scheme_spooky .tabInner.Stats table.statTable:last-of-type {
+	background: padding-box rgba(51, 23, 78, 0.75);
+}
+.scheme_spooky .tabInner.Stats h1:last-of-type {
+	color: #f8894d;
+	text-shadow: 1px 1px 1px #000000;
+}
+.scheme_spooky .tabInner.Stats table.statTable td:last-child {
+    color: #e0e0e0;
+}
+.scheme_spooky .tabInner.Stats table.statTable:first-of-type tr:first-child td:last-child { /* select total kittens value */
+	color: #a8e053;
+}
+.scheme_spooky .tabInner.Stats table.statTable:first-of-type tr:first-child + tr > td:last-child { /* select kittens dead line */
+    color: #bb0f0f;
+}
+.scheme_spooky .tabInner.Stats table.statTable:last-of-type tr:last-child td:last-child { /* select time played value */
+	color: #4a7def;
+}
+.scheme_spooky .panelContainer div.title {
+	padding: 5px 4px 5px 10px; /* default padding: 4px; */ /* default padding-left: 10px; */
+	margin-bottom: 3px;
+	background: transparent;
+	color: #982ee4;
+	font-size: 16px !important;
+	text-shadow: 1px 1px 1px #000000;
+	border: none;
+	border-bottom: 1px solid transparent;
+	border-radius: 5px 5px 0 0;
+}
+.scheme_spooky .tabInner.Trade .panelContainer div.title {
+	padding: 3px 4px 3px 20px;
+	margin-bottom: 0;
+	font-size: 15px !important;
+}
+.scheme_spooky .panelContainer .toggle {
+	font-size: 8px;
+	margin: 5px 5px 0 0; /* default margin: 4px; */
+	padding-left: 3px; /* default padding-left 6px */
+	padding-right: 3px; /* default padding-right 6px */
+	background: no-repeat padding-box linear-gradient(to bottom, #363636 0%, #0a0a0a 100%);
+	background-color: #0a0a0a;
+	border: 1px solid #0a0a0a;
+	border-radius: 5px;
+	outline: 1px inset #060713;
+	color: transparent;
+}
+.scheme_spooky .panelContainer .toggle.collapsed {
+	background: no-repeat padding-box linear-gradient(to bottom, #e57333 0%, #ac301e 100%);
+}
+.scheme_spooky .panelContainer .toggle:hover {
+	background: no-repeat padding-box linear-gradient(to bottom, #8e29d4 0%, #460d87 100%);
+	outline-color: #e57333;
+}
+/* .scheme_spooky .container { */
+	/* default padding: 10px; */
+/* } */
+.scheme_spooky .container.trade-race {
+	padding: 5px 10px 5px 10px; /* default padding: 10px; */
+}
+.scheme_spooky .container.trade-race .crypto-trade .btn.modern {
+	max-width: 127px; /* (button content width - (2 x button border width) - (1 x button margin-right)) / 2 => (264 - 0 -10)/2 = 127 */
+}
+.scheme_spooky .container div.currentGovernment { /* for padding-bottom too height */
+	padding-bottom: 3px !important;
+}
+/* .scheme_spooky .trade-race > .left { */
+    /* default width: 50%; */
+/* } */
+/* .scheme_spooky .trade-race > .right { */
+    /* default width: 50%; */
+/* } */
+.scheme_spooky .trade-race .buys {
+	color: #bb0f0f;
+	font-size: smaller;
+}
+.scheme_spooky .trade-race .sells {
+	color: #a8e053;
+	font-size: smaller;
+}
+.scheme_spooky .trade-race .tradeAmount {
+	color: #808080;
+	font-size: smaller;
+}
+.scheme_spooky .attitude { /* text for attitude races int trade tab */
+	/* default font size = font-size: 90%; */
+	font-size: 100%;
+	color: #c0c0c0 !important;
+	text-shadow: none !important;
+	text-transform: capitalize;
+}
+.scheme_spooky .attitude:before {
+	/* default content: "("; */
+	content: "\00a0\21C4\00a0"; /* RIGHTWARDS ARROW OVER LEFTWARDS ARROW */
+	color: #f8894d;
+}
+.scheme_spooky .attitude:after {
+	/* default content: ")"; */
+	content: ""; /* default content: ")"; */
+}
+.scheme_spooky .container.trade-race a[title='Pinned'] {
+	font-size: 12px; /* default.css font-size: 0.7em; */
+	line-height: unset;
+	color: #a8e053;
+}
+.scheme_spooky .container.trade-race .btn.modern:not(.disabled) a[title='Pinned'] {
+	text-shadow: 1px 1px 2px #000000;
+}
+.scheme_spooky .btn.explore {
+	/* default margin-right: 9px; */
+	margin-top: 5px;
+}
+.scheme_spooky .panelContainer div.censusFilters {
+	margin-bottom: 5px; /* for add a margin under the 2 lists (select) in the settlement tab */
+}
+/* ---------- Village ---------- */
+/* container 'Census' -> list of kittens in settlement tab */
+.scheme_spooky .currentLeader .name {
+	background: no-repeat top -3px left url("data:image/svg+xml,%3Csvg width='24px' height='24px' viewBox='0 0 24 24' fill='%2353a8e0' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18.53 19.24H5.4C5.24283 19.2414 5.0893 19.1927 4.96164 19.101C4.83399 19.0094 4.73885 18.8794 4.69 18.73L1.5 9C1.45113 8.86009 1.446 8.70861 1.4853 8.56571C1.52459 8.42281 1.60646 8.29525 1.72 8.2C1.83214 8.10161 1.97141 8.03941 2.11953 8.02157C2.26764 8.00372 2.4177 8.03106 2.55 8.1L8.37 11L11.37 5.18C11.4392 5.06398 11.5373 4.9679 11.6547 4.90118C11.7722 4.83446 11.9049 4.79938 12.04 4.79938C12.1751 4.79938 12.3078 4.83446 12.4253 4.90118C12.5427 4.9679 12.6408 5.06398 12.71 5.18L15.71 11.01L21.54 8.11C21.6708 8.0419 21.8191 8.01501 21.9655 8.03286C22.1119 8.05071 22.2494 8.11247 22.36 8.21C22.4557 8.31491 22.5197 8.44486 22.5445 8.58471C22.5693 8.72456 22.5539 8.86858 22.5 9L19.24 18.72C19.1929 18.8713 19.0985 19.0034 18.9707 19.097C18.8429 19.1906 18.6884 19.2407 18.53 19.24ZM6 17.74H18L20.51 10.25L15.64 12.67C15.5528 12.7146 15.4576 12.7415 15.3599 12.749C15.2623 12.7566 15.1641 12.7446 15.071 12.7139C14.978 12.6832 14.892 12.6344 14.818 12.5702C14.744 12.506 14.6835 12.4278 14.64 12.34L12 7.16L9.37 12.34C9.32648 12.4278 9.26596 12.506 9.19197 12.5702C9.11798 12.6344 9.03197 12.6832 8.93895 12.7139C8.84593 12.7446 8.74774 12.7566 8.65007 12.749C8.5524 12.7415 8.45721 12.7146 8.37 12.67L3.48 10.22L6 17.74Z' /%3E%3C/svg%3E");
+	padding-left: 28px;
+	font-weight: bold;
+}
+.scheme_spooky .census-block {
+    padding: 5px 10px; /* default padding: 5px; */
+	margin-bottom: 8px;/* default margin-bottom: 5px; */
+	background: no-repeat padding-box linear-gradient(to bottom, #363636 0%, #0a0a0a 66%, #0a0a0a 100%);
+    background-color: #0a0a0a;
+	border: 2px solid #0a0a0a;
+	outline: 2px inset #060713;
+	border-radius: 5px;
+}
+.scheme_spooky .census-block:hover {
+	outline-color: #6c6c6c;
+}
+.scheme_spooky .census-block.simLeader {
+	outline-color: #8e29d4;
+}
+.scheme_spooky .census-block.simLeader:hover {
+	outline-color: #e57333;
+}
+.scheme_spooky .census-block.simLeader a.leaderHref {
+	color: #53a8e0;
+}
+.scheme_spooky .census-block .info { /* info of kitten */
+	font-size: 0.9em;
+	color: #a0a0a0;
+}
+.scheme_spooky .census-block .skill { /* jobs unasigned */
+	color: #6c6c6c;
+}
+.scheme_spooky .census-block .skill:first-of-type { /* job assigned */
+	color: #53a8e0;
+	font-weight: normal !important;
+}
+.scheme_spooky .census-block.simLeader .info span.name {  /* Leader name */
+	font-size: 1.2em;
+}
+.scheme_spooky .census-block.simLeader .skill:first-of-type { /* Leader job assigned */
+	font-size: 1em; /* default font-size: 0.8em; */
+}
+.scheme_spooky .container .name.color-none { /* name of kitten */
+	color: #d0d0d0;
+}
+.scheme_spooky .container .name.color-brown {
+	color: #824b23;
+}
+.scheme_spooky .container .name.color-cream {
+	color: #ad884a;
+}
+.scheme_spooky .container .name.color-black {
+	color: #505050;
+}
+.scheme_spooky .container .name.color-fawn {
+	color: #713306;
+}
+.scheme_spooky .container .name.color-white {
+	color: #ffffff;
+}
+.scheme_spooky .container .name.variety-none {
+	border: 1px solid transparent;
+}
+.scheme_spooky .container .name.variety-dual { /* bicolore */
+	border: 1px solid grey;
+}
+.scheme_spooky .container .name.variety-tabby { /* tigré  ou rayé */
+	border: 1px dashed grey;
+}
+.scheme_spooky .container .name.variety-torbie { /* marbré strié */
+	border: 1px dashed grey;
+	border-left: dotted;
+	border-right: dotted;
+}
+.scheme_spooky .container .name.variety-calico { /* tricolore */
+	border: 1px solid grey;
+	border-top-color: burlywood;
+	border-bottom-color: burlywood;
+}
+.scheme_spooky .container .name.variety-spots { /* tacheté */
+	border: 1px dotted grey;
+}
+.scheme_spooky .btn.modern.disabled a.auto-on {
+	color: #a8e053;
+}
+.scheme_spooky .btn.modern:not(.disabled) a.auto-on {
+	color: #a8e053;
+	text-shadow: 1px 1px 2px #000000;
+}
+.scheme_spooky .btn.modern.disabled a.auto-off {
+	color: #bb0f0f;
+}
+.scheme_spooky .btn.modern:not(.disabled) a.auto-off {
+	color: #e01212;
+	text-shadow: 1px 1px 2px #000000;
+}
+.scheme_spooky .btn.modern.disabled a.bld-off,
+.scheme_spooky .btn.modern.disabled a.fugit-off {
+	color: #bb0f0f;
+}
+.scheme_spooky .btn.modern:not(.disabled) a.bld-off,
+.scheme_spooky .btn.modern:not(.disabled) a.fugit-off {
+	color: #e01212;
+	text-shadow: 1px 1px 2px #000000;
+}
+.scheme_spooky .btn.modern.disabled a.bld-on,
+.scheme_spooky .btn.modern.disabled a.fugit-on {
+	color: #a8e053;
+}
+.scheme_spooky .btn.modern:not(.disabled) a.bld-on,
+.scheme_spooky .btn.modern:not(.disabled) a.fugit-on {
+	color: #a8e053;
+	text-shadow: 1px 1px 2px #000000;
+}
+.scheme_spooky .btn.modern.disabled.craftOn span.btnTitle { /* all buttons with engineer(s) in workshop tab */
+	color: #a8e053;
+}
+.scheme_spooky .btn.modern:not(.disabled).craftOn span.btnTitle {
+	color: #a8e053;
+}
+.scheme_spooky td.craftStuffPanel > span { /* title of craft stuff panel */
+	color: #a8e053;
+	font-size: 16px;
+	font-family: 'Mystery Quest', cursive;
+	text-shadow: 1px 1px 2px #000000;
+	padding-left: 10px;
+}
+.scheme_spooky td.craftStuffPanel > table { /* craft stuff panel */
+    margin-top: 2px;
+	min-width: 220px;
+    padding: 12px; /* default padding-top: 20px; */
+    background: padding-box rgba(16, 41, 93, 0.75);
+	border: 3px solid transparent;
+	border-image-source: url('img/theme_spooky_frame_03.png');
+	border-image-width: 6px 7px 3px 3px;
+	border-image-slice: 6 7 3 3;
+	border-image-outset: 2px 3px 0 0;
+	border-image-repeat: stretch;
+    color: #c5c3ce;
+	border-radius: 0;
+}
+
+/* ******************************************************** */
+/* ******************* ACHIEVEMENTS TAB ******************* */
+/* ******************************************************** */
+.scheme_spooky .achievement-header {
+	color: #f8894d;
+	font-size: 18px;
+	font-family: 'Mystery Quest', cursive;
+	margin-bottom: 3px;
+	padding-left: 20px;
+}
+.scheme_spooky .achievement {
+    /* default padding: 5px; */
+	/* default padding-left: 10px; */
+	font-size: 16px;
+	margin-bottom: 8px; /* default margin-bottom: 10px; */
+	color: grey;
+	letter-spacing: 1px;
+	background: no-repeat padding-box linear-gradient(to bottom, #363636 0%, #0a0a0a 100%);
+    background-color: #0a0a0a;
+	border: 2px solid #0a0a0a;
+	outline: 2px inset #060713;
+	border-radius: 5px;
+}
+.scheme_spooky .achievement:not(.unethical).unlocked {
+	color: #d0d0d0;
+}
+.scheme_spooky .achievement:not(.unethical).unlocked:hover {
+	outline-color: #e57333;
+	color: #ffffff;
+	text-shadow:  1px 1px 2px #000000, #ffffff 2px 0 10px;
+}
+.scheme_spooky .achievement.unethical {
+	color: #bb0f0f;
+}
+.scheme_spooky .achievement.unethical:hover {
+	outline-color: #bb0f0f;
+	color: #bb0f0f;
+	text-shadow: 1px 1px 2px #000000, #bb0f0f 2px 0 10px;
+}
+.scheme_spooky .achievement:not(.unlocked) {
+	color: #6c6c6c;
+}
+.scheme_spooky .achievement:not(.unlocked):hover {
+	outline-color: #6c6c6c;
+	text-shadow: 1px 1px 2px #000000;
+}
+.scheme_spooky .achievement:after {
+	letter-spacing: normal;
+	font-size: 90%;
+	color: grey;
+	text-shadow: 1px 1px 2px #000000;
+	padding-left: 10px;
+}
+.scheme_spooky .achievement:not(.unethical).unlocked:after {
+	color: #e0e0e0;
+}
+.scheme_spooky .achievement.unethical:after {
+	color: #e0e0e0;
+}
+.scheme_spooky .achievement:not(.unlocked):after {
+	color: #808080;
+}
+.scheme_spooky .achievement-header .star {
+	/* default font size = font-size: 18px; */
+	color: #982ee4;
+}
+.scheme_spooky .achievement .star {
+	/* default font size = font-size: 18px; */
+	color: #a0a0a0;
+	text-shadow: 1px 1px 2px #000000;
+}
+.scheme_spooky .achievement.unlocked .star {
+	color: #982ee4;
+}
+
+/* **************************************************** */
+/* ******************* RIGHT COLUMN ******************* */
+/* **************************************************** */
+.scheme_spooky #rightColumn {
+    /* default padding-left: 8px; */
+	width: calc(50% - 355px);
+	max-width: 440px; /* default max-width: 400px; */
+    /* default min-width: 250px; */
+	top: 30px; /* default top: 20px; */
+	/* default margin-top: 4px */
+}
+.scheme_spooky #toggleCenter,
+.scheme_spooky span.toggleCenter {
+	color: #d0d0d0;
+	opacity: 0.6; /* default opacity: 0.2; */
+	cursor: pointer;
+}
+.scheme_spooky span.toggleCenter {
+	opacity: 1; /* for have #toggleCenter same color */
+}
+.scheme_spooky #toggleCenter:hover,
+.scheme_spooky div#toggleCenter:hover > span.toggleCenter {
+	color: #9632e3;
+	opacity: 1.0;
+}
+.scheme_spooky #calendarDiv {
+	/* color: #5c8dff; */
+	color: #f8894d;
+	text-shadow: 1px 1px 1px #000000;
+	border-radius: 5px;
+	padding: 5px;
+    margin-top: 5px;
+}
+.scheme_spooky #calendarSign {
+   font-size: 120%;
+}
+.scheme_spooky #calendarSign:hover {
+   cursor: default;
+}
+.scheme_spooky .right-tab-header a.active {
+	border-top: none; /* default border-top: 1px solid rgba(128, 128, 128, 0.4); */
+	color: #9632e3;
+	text-shadow: 1px 1px 1px #000000;
+}
+.scheme_spooky .right-tab-header a.active:hover {
+	color: #9632e3;
+}
+.scheme_spooky .right-tab-header a:not(.active) {
+	opacity: 0.7;
+}
+.scheme_spooky .right-tab-header a:not(.active):hover {
+	opacity: 1;
+}
+.scheme_spooky div#observeButton {
+	margin-top: 20px; /* default margin-top: 15px */
+	height: 35px; /* default height: 30px; */
+	margin-bottom: 3px;
+}
+.scheme_spooky .right-tab {
+	border-top: 10px solid transparent;
+ 	border-image-source: url('img/theme_spooky_border_witch.png');
+	border-image-width: 30px 0 0 0;
+	border-image-slice: 30 0 0 0;
+	border-image-outset: 10px 0 0 0;
+	border-image-repeat: stretch;
+}
+.scheme_spooky #rightTabChat {
+	margin-top: 10px;
+}
+.scheme_spooky div.console-intro { /* Text on right column: "You are a kitten in a catnip forest." */
+	color: #1f5dba;
+	text-shadow: 1px 1px 2px #000000;
+	border-top: 1px solid transparent !important; /* default border-top: 1px solid gray; */
+}
+.scheme_spooky #clearLogHref { /* Link in right column: Clear log */
+	font-size: 90%;
+}
+.scheme_spooky #logFiltersBlock > a { /* Link in right column: [+]Log Filters */
+	font-size: 90%;
+	margin-left: 5px;
+}
+.scheme_spooky #pauseBtn { /* Link in right column: pawse */
+	margin-left: 5px;
+}
+.scheme_spooky #gameLog {
+	/* default overflow-y: auto !important; */
+	margin: 15px 10px 5px 10px;
+	padding: 5px 10px 10px 3px !important;
+	/* 3 lines of code below if border or box-shadow to have scrollbar */
+	min-height: 5% !important;
+	height: unset !important;
+	max-height: calc(100% - 100px) !important;
+	background-color: transparent;
+	border: 3px solid transparent;
+	border-image-source: url('img/theme_spooky_frame_fill_01.png');
+	border-image-width: 4px 5px 3px 4px;
+	border-image-slice: 4 5 3 4 fill;
+	border-image-outset: 1px;
+	border-image-repeat: stretch;
+}
+.scheme_spooky #gameLog span.msg:not(.type_date)  {
+	margin-left: 1.2em;
+	list-style-type: '\25CF'; /* BLACK CIRCLE */
+	padding-left: 0.3em;
+	text-shadow: 0 -2px 1px #000000 !important;
+}
+.scheme_spooky #gameLog span.msg:not(.type_date)::marker {
+	font-size: 16px;
+}
+.scheme_spooky #gameLog span.msg.noBullet {
+	margin-left: 2.3em !important;
+	list-style-type: '\25AA' !important; /* black small square */ /* !important in default.css */
+	text-shadow: 0 -2px 1px #000000 !important;
+}
+.scheme_spooky #gameLog span.msg.noBullet::marker {
+	font-size: 10px;
+}
+.scheme_spooky .msg {
+	font-size: 95%;
+	font-weight: normal;
+	color: #b2afbe;
+}
+.scheme_spooky .msg.type_notice {
+	color: #497ae8;
+}
+.scheme_spooky .msg.type_important {
+    color: #f8894d;
+}
+.scheme_spooky .msg.type_alert {
+    color: #bb0f0f;
+}
+.scheme_spooky .msg.type_urgent {
+	color: #ffca2c; /* default color: blueviolet; */
+	font-size: 1.1em;
+}
+.scheme_spooky .msg.type_date {
+	/* default margin-top: 15px; */
+	color: #982ee4;
+	/* default font-size: 90%; */
+	text-transform: none;
+	border-bottom: solid 2px rgba(0, 0, 0, 0.5);
+	padding-left: 5px;
+}
+
+/* *************************************************** */
+/* ******************* LEFT COLUMN ******************* */
+/* *************************************************** */
+.scheme_spooky #leftColumn {
+	margin-top: 10px; /* default margin-top: 4px; */
+	/* default width: 25%; */
+    /* default min-width: 300px; */
+	/* default max-width: 400px; */
+	padding-right: 10px; /* default padding right: 20px */
+}
+/* .scheme_spooky a.link { */
+    /* default padding-right: 10px; */
+/* } */
+.scheme_spooky .res-toolbar.right {
+	padding-right: 20px;
+	/* default margin-right:-18px; */
+}
+.scheme_spooky a.link.collapse {
+	opacity: 0.5; /* default opacity: 0.2; */
+}
+.scheme_spooky a.link.collapse:hover {
+	opacity: 1;/* default opacity: 0.9; */
+	color: #9632e3;
+}
+.scheme_spooky #leftColumn .res-toolbar a.link.toggled {
+    color: #f8894d;
+}
+.scheme_spooky div.tooltip-block:hover {
+	cursor: default;
+}
+.scheme_spooky div.tooltip-block > span {
+	color: #d0d0d0;
+}
+.scheme_spooky div.tooltip-block:hover > span {
+	color: #9632e3;
+}
+.scheme_spooky .res-table {
+	max-width: 352px;/* default max-width: 340px; */
+    border-collapse: collapse; /* gain of 3 pixel by border -> no margin bottom after */
+	margin-left: 2px; /* without 0px margin left for all ressources */
+}
+/* .scheme_spooky .res-toolbar.left { */
+    /* default padding-left: 5px; */
+/* } */
+/* .scheme_spooky .res-cell { */
+	/* default padding-left: 2px; */
+    /* default padding-right: 2px; */
+/* } */
+.scheme_spooky .craftTable {
+	margin-bottom: 18px !important; /* for correct margin bottom due of the line above with border-collapse: collapse on .res-Table ! */
+	/* default padding-bottom: 50px; */
+}
+.scheme_spooky .res-cell.craft-link {
+	color: #d0d0d0;
+	/* default width: 20px; */
+	/* default max-width: 60px; */
+}
+/* .scheme_spooky .res-cell.craft-link .plusPrefix { */
+    /* default font-size: 80%; */
+/* } */
+.scheme_spooky .res-cell.craft-link.all { /* column craft all */
+	font-size: 95%; /* default font-size: 85%; */
+	opacity: 0.6; /* default opacity: 0.4; */
+	color: #d0d0d0;
+}
+.scheme_spooky .res-cell.craft-link:hover,
+.scheme_spooky .res-cell.craft-link.all:hover { /* craft table left column */
+    color: #9632e3;
+	text-decoration: none;
+	opacity: 1;
+}
+.scheme_spooky .res-cell.resource-name {
+	color: #e0e0e0;
+}
+.scheme_spooky .res-row {
+	padding-bottom: 2px; /* default padding-bottom: 4px; */
+}
+.scheme_spooky .res-row:hover {
+	background:  rgba(142, 41, 212, 0.2);
+	cursor: default;
+}
+.scheme_spooky .res-row.highlited { /* higlighting ressources when hover button on center windows */
+	background:  rgba(142, 41, 212, 0.3);
+}
+.scheme_spooky .res-toolbar {
+	white-space: nowrap;
+}
+/* .scheme_spooky div.res-cell.resource-name {  */
+	/* default width: 60px; */
+	/* default max-width: 85px; */
+/* } */
+.scheme_spooky .res-row.hidden .res-cell.resource-name {
+    text-decoration: none !important; /* default text-decoration: underline; */
+	/* default text-decoration-style: dotted; */
+}
+.scheme_spooky .maxRes,
+.scheme_spooky .resAmount,
+.scheme_spooky .resPerTick,
+.scheme_spooky .res-cell.resource-value,
+.scheme_spooky .craftTable {
+	font-family: 'Source Sans Pro', sans-serif;
+}
+.scheme_spooky .resource_faith .resource-name,
+.scheme_spooky .resource_kittens .resource-name,
+.scheme_spooky .resource_steel .resource-name,
+.scheme_spooky .resource_gear .resource-name,
+.scheme_spooky .resource_alloy .resource-name,
+.scheme_spooky .resource_megalith .resource-name {
+	color: #808080 !important;
+}
+.scheme_spooky .maxRes {
+	color: #a0a0a0;
+}
+.scheme_spooky .resAmount {
+    color: #d0d0d0;
+}
+.scheme_spooky .resLimitWarn {
+	color: #ffca2c;
+	opacity: 1; /* default opacity: 0.75 */
+}
+.scheme_spooky .resLimitNotice {
+	color: #f8894d;
+}
+.scheme_spooky .resPerTick {
+	cursor: default;
+	color: #d0d0d0;
+}
+.scheme_spooky .res-row.resLeaderBonus .resPerTick {
+	color: #53a8e0;
+}
+.scheme_spooky .res-row.craftEngineer .res-cell.resource-value {
+	color: #a8e053;
+}
+.scheme_spooky div#advisorsContainer {
+	color: #bb0f0f;
+	/* default padding-top: 10px; */
+}
+.scheme_spooky .res-cell.resource-value {
+	/* default width: 75px; */
+	/* default max-width: 90px; */
+	color: #d0d0d0;
+}
+.scheme_spooky #fastPraiseContainer > a:hover  {
+	color: #ffffff;
+	text-shadow: #ffffff 2px 0 10px;
+}
+.scheme_spooky .res-cell.positive-weather { /* to change the color for bonus cell according to the season */
+	color: #a8e053;
+	font-size: 90%;
+}
+.scheme_spooky .res-cell.negative-weather { /* to change the color for penalty cell according to the season */
+	color: #bb0f0f;
+	font-size: 90%;
+}
+
+/* ************************************************* */
+/* ******************* SCROLLBAR ******************* */
+/* ************************************************* */
+.scheme_spooky ::-webkit-scrollbar-track,
+.scheme_spooky .dialog::-webkit-scrollbar-track,
+.scheme_spooky textarea#importData::-webkit-scrollbar-track,
+.scheme_spooky textarea#exportData::-webkit-scrollbar-track {
+	border-radius: 0;
+	background-color: transparent;
+}
+.scheme_spooky ::-webkit-scrollbar {
+	width: 8px;
+	border-radius: 0;
+	background-color: transparent;
+}
+.scheme_spooky .dialog::-webkit-scrollbar {
+	width: 8px;
+	border-radius: 0;
+	background-color: transparent;
+}
+.scheme_spooky textarea#importData::-webkit-scrollbar,
+.scheme_spooky textarea#exportData::-webkit-scrollbar {
+	width: 8px;
+	border-radius: 0;
+	background-color: transparent;
+}
+.scheme_spooky ::-webkit-scrollbar-thumb {
+	border-radius: 3px;
+	background-color: rgba(0, 0, 0, 0.2);
+}
+.scheme_spooky .dialog::-webkit-scrollbar-thumb {
+	border-radius: 3px;
+	background-color: rgba(0, 0, 0, 0.2);
+}
+.scheme_spooky textarea#importData::-webkit-scrollbar-thumb,
+.scheme_spooky textarea#exportData::-webkit-scrollbar-thumb {
+	border-radius: 3px;
+	background-color: rgba(0, 0, 0, 0.2);
+}
+.scheme_spooky #gameLog::-webkit-scrollbar {
+	width: 6px;
+}
+.scheme_spooky #gameLog::-webkit-scrollbar-thumb {
+	border-radius: 3px;
+	background: linear-gradient(0deg, transparent 0%, transparent 4%, rgba(0, 0, 0, 0.3) 5%, rgba(0, 0, 0, 0.3) 95%, transparent 96%, transparent 100%);
+}
+/* Only FireFox */
+.scheme_spooky #leftColumn,
+.scheme_spooky #rightColumn,
+.scheme_spooky #midColumn,
+.scheme_spooky .dialog,
+.scheme_spooky textarea#importData,
+.scheme_spooky textarea#exportData,
+.scheme_spooky #gameLog {
+	scrollbar-width: thin;
+}
+.scheme_spooky #leftColumn,
+.scheme_spooky #rightColumn,
+.scheme_spooky #midColumn,
+.scheme_spooky .dialog,
+.scheme_spooky textarea#importData,
+.scheme_spooky textarea#exportData {
+	scrollbar-color: rgba(0, 0, 0, 0.2) transparent !important;
+}
+.scheme_spooky #gameLog {
+	scrollbar-color: rgba(0, 0, 0, 0.2) transparent !important;
+}
+.scheme_spooky select {
+   scrollbar-width: auto !important;
+}

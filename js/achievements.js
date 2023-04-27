@@ -1,6 +1,6 @@
 dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager, {
     game: null,
-    councilUnlocked: false,
+    badgesUnlocked: false,
 
     achievements: [
         {
@@ -144,6 +144,9 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             description: $I("achievements.youMonster.desc"),
             condition: function () {
                 return (this.game.deadKittens >= 100);
+            },
+            starCondition: function () {
+                return (this.game.deadKittens >= 666666);
             }
         }, {
             name: "superUnethicalClimax",
@@ -187,7 +190,14 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             },
             starCondition: function () {
                 return (this.game.village.happiness >= 5 && this.game.resPool.get("kittens").value > 35);
-            },
+            }
+        }, {
+            name: "deathStranding",
+            title: $I("achievements.deathStranding.title"),
+            description: $I("achievements.deathStranding.desc"),
+            condition: function () {
+                return this.game.space.getPlanet("furthestRing").reached;
+            }
         }, {
             name: "cathammer",
             title: $I("achievements.cathammer.title"),
@@ -198,185 +208,99 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             },
             starCondition: function () {
                 return (this.game.calendar.trueYear() >= this.game.calendar.darkFutureBeginning);
-            },
+            }
     }],
 
-    hats: [
-        {   id: 1,
-            name: "simpleHat",
-            title: "Simple Hat",
-            description: "The hat to rule them all",
-            difficulty: "F"
-        },
-        {   id: 2,
-            name: "lotusHat",
-            title: "Lotus Hat",
-            description: "Hat in the shape of a lotus",
+    badges: [
+        {   
+            name: "lotus",
+            title: "Lotus Eater",
+            description: "Have more than 50 total resets",
             difficulty: "A",
             condition: function(){
                 return this.game.stats.getStat("totalResets").val >= 50;
             }
         },
-        {   id: 3,
-            name: "ivoryTowerHat",
-            title: "Ivory Tower Hat",
-            description: "A tall hat in a form of a tower",
+        {   
+            name: "ivoryTower",
+            title: "Ivory Tower",
+            description: "Have a reset in a IW atheism",
             difficulty: "S+"
         },
-        {   id: 4,
-            name: "uselessHat",
-            title: "Useless Hat",
-            description: "This hat is totally useless",
+        {   
+            name: "useless",
+            title: "Effective Management",
+            description: "Have a useless leader",
             difficulty: "F",
             condition: function(){
                 var leader = this.game.village.leader;
                 return leader != null && leader.trait.name == "none";
             }
         },
-        {   id: 5,
-            name: "voidHat",
-            title: "Void Hat",
-            description: "Hat is made of void",
-            difficulty: ""
-        },
-        {   id: 6,
-            name: "nullHat",
-            title: "Null Hat",
-            description: "The hat is a lie",
-            difficulty: ""
-        },
-        {   id: 7,
-            name: "betaHat",
-            title: "Beta Hat",
-            description: "The hat is a bit glitchy and rough around the edges",
+        { 
+            name: "beta",
+            title: "Beta Decay",
+            description: "Participate in a beta test",
             difficulty: "B",
             condition: function(){
-                return (this.game.server.donateAmt == 0);
+                if (window && window.location && window.location.href){
+                    return window.location.href.indexOf("beta") >= 0;
+                }
+                return false;
             }
         },{
-            id: 8,
-            name: "silentHat",
-            title: "Silent Hat",
-            description: "This hat is totally silent",
+            name: "silentHill",
+            title: "Silent Hills",
+            description: "Have not MOTD content",
             difficulty: "S",
             condition: function(){
                 return (this.game.server.motdContent == "");
             }
         },{
-            id: 9,
-            name: "treetrunkHat",
-            title: "Treetrunk Hat",
-            description: "A hat made of branches and leaves",
+            name: "evergreen",
+            title: "Wood badge",
+            description: "Craft a wood I think?",
             difficulty: "F"
         },{
-            id: 10,
-            name: "wizardHat",
-            title: "Wizard Hat",
-            description: "Abracadabra!",
-            difficulty: ""
-        },{
-            id: 11,
-            name: "nekomimiHat",
-            title: "Nekomimi Hat",
-            description: "*^_^*",
-            difficulty: ""
-        },{
-            id: 12,
-            name: "eldritchHat",
-            title: "Eldritch Hat",
-            description: "",
-            difficulty: ""
-        },{
-            id: 13,
-            name: "tesseractHat",
-            title: "Tesseract Hat",
-            description: "",
-            difficulty: ""
-        },{
-            id: 14,
-            name: "crimsonHat",
-            title: "Crimson Hat",
-            description: "",
-            difficulty: ""
-        },{
-            id: 15,
-            name: "skeletonHat",
-            title: "Skeleton Hat",
-            description: "",
-            difficulty: ""
-        },{
-            id: 16,
-            name: "gladosHat",
-            title: "Glados Hat",
-            description: "",
-            difficulty: ""
-        },{
-            id: 17,
-            name: "marioHat",
-            title: "Mario Hat",
-            description: "",
-            difficulty: ""
-        },{
-            id: 18,
-            name: "fedoraHat",
-            title: "Fedora",
-            description: "Classy fedora",
-            difficulty: ""
-        },{
-            id: 19,
-            name: "necrocornHat",
-            title: "Necrocorn Hat",
-            description: "",
+            name: "deadSpace",
+            title: "Dead Space",
+            description: "Have kittens wander in the void",
             difficulty: "S",
             condition: function(){
                 var kittens = this.game.resPool.get("kittens");
                 return (kittens.value >= 1000 && kittens.maxValue == 0);
             }
         },{
-            id: 20,
-            name: "alicornHat",
-            title: "Alicorn Hat",
-            description: "",
+            name: "reginaNoctis",
+            title: "Regina Noctis",
+            description: "Have 500 kittens and no alicorns",
             difficulty: "S",
             condition: function(){
                 return (this.game.resPool.get("kittens").value > 500 && this.game.resPool.get("alicorn").value == 0);
             }
         },{
-            id: 21,
-            name: "unicornHat",
-            title: "Unicorn Hat",
-            description: "",
-            difficulty: "A"
-        },{
-            id: 22,
-            name: "dragonHat",
-            title: "Dragon Hat",
-            description: "",
-            difficulty: ""
-        },{
-            id: 23,
-            name: "glitchyHat",
-            title: "Glitchy Hat",
+            name: "ghostInTheMachine",
+            title: "Experience a game bug (TBD see newrelic#errorHandle)",
             description: "♋︎⬧︎⧫︎♏︎❒︎🕯︎⬧︎ ●︎♋︎■︎♑︎◆︎♋︎♑︎♏︎ 🖳︎✆",
             difficulty: "S"
         },{
-            id: 24,
-            name: "topHat",
-            title: "Tophat",
-            description: "",
-            difficulty: ""
-        },{
-            id: 25,
-            name: "jesterHat",
-            title: "Jester Hat",
-            description: "",
-            difficulty: ""
-        },{
-            id: 26,
-            name: "fezHat",
-            title: "Fez Hat",
-            description: "A prism-shaped red fez hat.",
+            name: "abOwo",
+            title: "Ab Owo",
+            description: "Reset in atheism on day 0",
             difficulty: "A"
+        },{
+            name: "cleanPaws",
+            title: "Clean Paws",
+            description: "Peaceful trading without cat-power",
+            difficulty: "C"
+        },{
+            name: "sequenceBreak",
+            title: "Sequence Break",
+            description: "Skip Moon in the space tab",
+            difficulty: "D",
+            condition: function(){
+                return (!this.game.space.getPlanet("moon").reached && this.game.space.getPlanet("dune").reached);
+            }
         }
     ],
 
@@ -388,15 +312,14 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
         return this.getMeta(name, this.achievements);
     },
 
-    getHat: function(name){
-        return this.getMeta(name, this.hats);
+    getBadge: function(name){
+        return this.getMeta(name, this.badges);
     },
 
-    unlockHat: function(name){
-        var hat = this.getHat(name);
-        hat.unlocked = true;
-        console.log("'", hat.name, "' hat is unlocked!");
-        this.game.achievements.councilUnlocked = true;
+    unlockBadge: function(name){
+        var badge = this.getBadge(name);
+        badge.unlocked = true;
+        this.game.achievements.badgesUnlocked = true;
     },
 
     hasUnlocked: function () {
@@ -411,47 +334,26 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
     update: function () {
         for (var i in this.achievements) {
             var ach = this.achievements[i];
-            if (!ach.unlocked && dojo.hitch(this, ach.condition)()) {
+            if (!ach.unlocked && ach.condition && ach.condition.call(this)) {
                 ach.unlocked = true;
                 this.game.msg($I("achievements.msg.unlock", [ach.title]));
                 this.game.achievementTab.visible = true;
 
-                this.updateStatistics();
             }
-            if (ach.starCondition != undefined && !ach.starUnlocked && dojo.hitch(this, ach.starCondition)()) {
+            if (!ach.starUnlocked && ach.starCondition && ach.starCondition.call(this)) {
                 ach.starUnlocked = true;
                 this.game.msg($I("achievements.msg.starUnlock", [ach.title]));
                 this.game.achievementTab.visible = true;
 
-                this.updateStatistics();
             }
         }
 
-        for (var i in this.hats) {
-            var hat = this.hats[i];
-            //console.log("checking the hat", hat, hat.condition, hat.condition && dojo.hitch(this, hat.condition)());
-            if (!hat.unlocked && hat.condition && dojo.hitch(this, hat.condition)()) {
-                console.log("'", hat.name, "' hat is unlocked!");
-                hat.unlocked = true;
-                this.councilUnlocked = true;
+        for (var i in this.badges) {
+            var badge = this.badges[i];
+            if (!badge.unlocked && badge.condition && badge.condition.call(this)) {
+                badge.unlocked = true;
+                this.badgesUnlocked = true;
             }
-        }
-    },
-
-    updateStatistics: function () {
-        if (this.game.kongregate) {
-
-            var achievementsCount = 0;
-            for (var i = 0; i < this.achievements.length; i++) {
-                var ach = this.achievements[i];
-                if (ach.unlocked) {
-                    achievementsCount++;
-
-                    this.game.kongregate.stats.submit("achievement_" + ach.name, 1);
-                }
-            }
-
-            this.game.kongregate.stats.submit("achievements", achievementsCount);
         }
     },
 
@@ -462,18 +364,18 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
 			ach.starUnlocked = false;
 		}
 
-        this.councilUnlocked = false;
-        for (var i = 0; i < this.hats.length; i++){
-            var hat = this.hats[i];
-            hat.unlocked = false;
+        this.badgesUnlocked = false;
+        for (var i = 0; i < this.badges.length; i++){
+            var badge = this.badges[i];
+            badge.unlocked = false;
         }
 	},
 
     save: function (saveData) {
-        saveData.achievements = this.game.bld.filterMetadata(this.achievements, ["name", "unlocked", "starUnlocked"]);
+        saveData.achievements = this.filterMetadata(this.achievements, ["name", "unlocked", "starUnlocked"]);
         saveData.ach = {
-            councilUnlocked : this.councilUnlocked,
-            hats: this.game.bld.filterMetadata(this.hats, ["name", "unlocked"])
+            badgesUnlocked : this.badgesUnlocked,
+            badges: this.filterMetadata(this.badges, ["name", "unlocked"])
         };
     },
 
@@ -481,9 +383,9 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
 		this.loadMetadata(this.achievements, saveData.achievements);
 
         var ach = saveData.ach || {};
-        this.councilUnlocked = ach.councilUnlocked || false;
-        if (ach.hats){
-            this.loadMetadata(this.hats, ach.hats);
+        this.badgesUnlocked = ach.badgesUnlocked || false;
+        if (ach.badges){
+            this.loadMetadata(this.badges, ach.badges);
         }
     },
 
@@ -495,12 +397,16 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
     }
 });
 
-dojo.declare("com.nuclearunicorn.game.ui.tab.AchTab", com.nuclearunicorn.game.ui.tab, {
+dojo.declare("classes.ui.AchievementsPanel", com.nuclearunicorn.game.ui.Panel, {
 
-    constructor: function(){
-    },
+	game: null,
 
-	render: function(content){
+	constructor: function(){
+	},
+
+    render: function(container){
+        var content = this.inherited(arguments);
+        
 		var div = dojo.create("div", {}, content);
 
 		div.innerHTML = "";
@@ -515,13 +421,15 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.AchTab", com.nuclearunicorn.game.ui
                 continue;
             }
 
-            totalAchievements++;
+            if (!ach.unethical){
+                totalAchievements++;
+            }
 
-            if (ach.unlocked) { completedAchievements++; }
+            if (ach.unlocked && !ach.unethical) { completedAchievements++; }
             var className = "achievement";
-            if (ach.unlocked && ach.unethical) className += " unethical";
-            if (ach.unlocked) className += " unlocked";
-            if (ach.starUnlocked) className += " starUnlocked";
+            if (ach.unlocked && ach.unethical) {className += " unethical";}
+            if (ach.unlocked) {className += " unlocked";}
+            if (ach.starUnlocked) {className += " starUnlocked";}
 			var span = dojo.create("span", {
 				className: className,
 				title: ach.unlocked ? ach.description : "???",
@@ -537,13 +445,13 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.AchTab", com.nuclearunicorn.game.ui
 			} else {
 				uncompletedStars++;
 			}
-			var star = dojo.create("div", {
+			dojo.create("div", {
 				className: "star",
 				innerHTML: ach.starUnlocked ? "&#9733;" : "&#9734;",
 				title: ach.starUnlocked ? ach.starDescription : "???"
 			}, span);
 		}
-		divHeader.innerHTML = $I("achievements.header", [completedAchievements, totalAchievements]);
+		divHeader.innerHTML = $I("badges.header", [completedAchievements, totalAchievements]);
 		var stars = "";
 		for (var i = completedStars; i > 0; --i) {
 			stars += "&#9733;";
@@ -555,11 +463,64 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.AchTab", com.nuclearunicorn.game.ui
 			className: "star",
 			innerHTML: stars
 		}, divHeader);
+	}
+
+});
+
+dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
+
+	game: null,
+
+	constructor: function(){
+	},
+
+    render: function(container){
+        var content = this.inherited(arguments);
+        
+		var div = dojo.create("div", {}, content);
+		div.innerHTML = "";
+        var divHeader = dojo.create("div", {className: "achievement-header"}, div);
+        var totalBadges = 0;
+        var completedBadges = 0;
+		for (var i in this.game.achievements.badges){
+			var badge = this.game.achievements.badges[i];
+            
+            totalBadges++;
+
+            if (badge.unlocked) { completedBadges++; }
+            var className = "achievement badge";
+            if (badge.unlocked) {className += " unlocked";}
+			dojo.create("span", {
+				className: className,
+				title: badge.unlocked ? badge.description : "???",
+				innerHTML : badge.unlocked ? badge.title : "???"
+			}, div);
+		}
+        divHeader.innerHTML = $I("badges.header", [completedBadges, totalBadges]);
+	}
+
+});
+
+dojo.declare("com.nuclearunicorn.game.ui.tab.AchTab", com.nuclearunicorn.game.ui.tab, {
+
+    constructor: function(){
+    },
+
+	render: function(container){
+
+        this.achievementsPanel = new classes.ui.AchievementsPanel($I("achievements.panel.label"), this.game.achievements);
+		this.achievementsPanel.game = this.game;
+        this.achievementsPanel.render(container);
+        
+        //basges typo intentional cause I keep mistyping it
+        this.badgesPanel = new classes.ui.BadgesPanel($I("badges.panel.label"), this.game.achievements);
+		this.badgesPanel.game = this.game;
+		this.badgesPanel.render(container);
 
         //---------------------------
         //         Blah
         //---------------------------
-        this.container = content;
+        this.container = container;
 
         this.inherited(arguments);
         this.update();
