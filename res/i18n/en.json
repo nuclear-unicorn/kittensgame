@@ -1570,7 +1570,7 @@
     "trade.msg.elders.departed": "Elder gods have departed",
     "trade.msg.elders.displeased": "Elder gods are displeased",
     "trade.msg.elders.feed": "Feed elders",
-    "trade.msg.elders.feed.desc": "Offer a sacrifice to the elders",
+    "trade.msg.elders.feed.desc": "Offer a sacrifice to the elders.<br>If they like your offering, it will increase trade amounts by 2% and convince the elders to stay longer in the future.",
     "trade.msg.elders.pleased": "Elder gods are pleased",
     "trade.msg.emissary": "An emissary of {0} comes to your village",
     "trade.msg.resources": "You've got {0} {1}",
