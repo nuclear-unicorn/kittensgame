@@ -630,6 +630,12 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}else{
 				self.effects["academyMeteorBonus"] = 0;
 			}
+			if(game.challenges.isActive("anarchy")) {
+				//Kittens can't learn skills in Anarchy anyways; might as well set skillXP to 0 so it's hidden from the tooltip.
+				self.effects["skillXP"] = 0;
+			}else{
+				self.effects["skillXP"] = 0.0005;
+			}
 		},
 		flavor: $I("buildings.academy.flavor"),
 		unlockScheme: {
