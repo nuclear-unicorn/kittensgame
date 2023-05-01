@@ -1127,7 +1127,7 @@ var EmbassyButtonHelper = {
 		}
 		//Don't forget to include spice, which is special:
 		var spiceResource = game.resPool.get("spice");
-		var spiceChance = Math.min(game.diplomacy.getSpiceTradeChance(race),1); //Cap at 100%
+		var spiceChance = Math.min(game.diplomacy.getSpiceTradeChance(race), 1); //Cap at 100%
 		if (spiceResource.unlocked && spiceChance > 0) {
 			chancesToDisplay.push({ title: spiceResource.title, chance: spiceChance });
 		}
@@ -1150,7 +1150,7 @@ var EmbassyButtonHelper = {
 		}}, tooltip);
 		for (var i = 0; i < chancesToDisplay.length; i += 1) {
 			dojo.create("div", {
-				innerHTML: chancesToDisplay[i].title + ": " + game.toDisplayPercentage(chancesToDisplay[i].chance, 2, false) + "%",
+				innerHTML: chancesToDisplay[i].title + ": " + (100 * chancesToDisplay[i].chance).toFixed(1) + "%",
 				className: "effectName"
 			}, tooltip);
 		}
