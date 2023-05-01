@@ -509,11 +509,15 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 
 		//-------------------- 35% chance to get spice + 1% per embassy lvl ------------------
+		var spiceChance = this.getSpiceTradeChance(race);
 		var spiceTradeAmount = this.game.math.binominalRandomInteger(
-			successfullTradeAmount, this.getSpiceTradeChance(race)
+			successfullTradeAmount, spiceChance
 		);
 		boughtResources["spice"] = 25 * spiceTradeAmount +
 			50 * tradeRatio * this.game.math.irwinHallRandom(spiceTradeAmount);
+		if (spiceChance > 1) { //Past 100% chance, additional embassies increase amount of spice gained.
+			boughtResources["spice"] *= spiceChance; //e.g. 150% chance -> guaranteed ×1.5 spice
+		}
 
 		//-------------- 10% chance to get blueprint ---------------
 		boughtResources["blueprint"] = Math.floor(
@@ -1127,9 +1131,11 @@ var EmbassyButtonHelper = {
 		}
 		//Don't forget to include spice, which is special:
 		var spiceResource = game.resPool.get("spice");
-		var spiceChance = Math.min(game.diplomacy.getSpiceTradeChance(race), 1); //Cap at 100%
+		var spiceChance = game.diplomacy.getSpiceTradeChance(race);
 		if (spiceResource.unlocked && spiceChance > 0) {
-			chancesToDisplay.push({ title: spiceResource.title, chance: spiceChance });
+			var spiceMulti = spiceChance > 1 ? spiceChance : undefined; //Past 100% chance, additional embassies increase spice amount.
+			spiceChance = Math.min(spiceChance, 1); //Cap at 100%
+			chancesToDisplay.push({ title: spiceResource.title, chance: spiceChance, multi: spiceMulti });
 		}
 
 		//Don't mention blueprints or titanium because neither of those is affected by embassies.
@@ -1150,7 +1156,7 @@ var EmbassyButtonHelper = {
 		}}, tooltip);
 		for (var i = 0; i < chancesToDisplay.length; i += 1) {
 			dojo.create("div", {
-				innerHTML: chancesToDisplay[i].title + ": " + (100 * chancesToDisplay[i].chance).toFixed(1) + "%",
+				innerHTML: chancesToDisplay[i].title + ": " + (100 * chancesToDisplay[i].chance).toFixed(1) + "%" + (chancesToDisplay[i].multi ? ", ×" + game.getDisplayValueExt(chancesToDisplay[i].multi) : ""),
 				className: "effectName"
 			}, tooltip);
 		}
