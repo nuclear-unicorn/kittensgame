@@ -1047,6 +1047,7 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 	}
 });
 
+//Embassy Buttons have a custom tooltip:
 var EmbassyButtonHelper = {
 	//This is a modified version of ButtonModernHelper.getTooltipHTML from core.js.
 	getTooltipHTML: function(controller, model) {
@@ -1054,7 +1055,6 @@ var EmbassyButtonHelper = {
 		//throw "ButtonModern::getTooltipHTML must be implemented";
 
 		var tooltip = dojo.create("div", { className: "tooltip-inner" }, null);
-
 
 		if (model.tooltipName) {
 			dojo.create("div", {
@@ -1086,8 +1086,12 @@ var EmbassyButtonHelper = {
 				ButtonModernHelper.renderPrices(tooltip, model);	//simple prices
 			}
 
+			//You must have done a bunch of trading already (with any race) before embassies show you this advanced info:
+			var TOTAL_TRADES_TO_SEE_CHANCES = 50;
 			//Ability to render effects is replaced with this because I want to try something a little different for embassies.
-			EmbassyButtonHelper.renderResourceChances(tooltip, controller.game, model.options.race);
+			if (controller.game.stats.getStatCurrent("totalTrades").val >= TOTAL_TRADES_TO_SEE_CHANCES) {
+				EmbassyButtonHelper.renderResourceChances(tooltip, controller.game, model.options.race);
+			}
 
 			// flavor
 
