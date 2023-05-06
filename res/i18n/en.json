@@ -1617,6 +1617,7 @@
     "trade.correct.bcoin": "There was a huge crypto market correction",
     "trade.embassy.label":"Embassy",
     "trade.embassy.desc": "Improve your diplomatic relationships by establishing an embassy",
+    "trade.embassy.chance": "Chance to get resources",
     "trade.embassy.pinned": "Pinned",
     "trade.embassy.unpinned": "Unpinned",
 
