@@ -310,7 +310,7 @@
     "challendge.reservesReclaimed.msg": "Reserves were reclaimed!",
     "challendge.winterIsComing.label": "Winter Has Come",
     "challendge.winterIsComing.desc": "Restart the game with only winter seasons. (Catnip will not benefit from paragon production bonus)<br><br>Goal: Get to Helios.",
-    "challendge.winterIsComing.effect.desc": "Warm seasons are more likely, and cold seasons are less likely.",
+    "challendge.winterIsComing.effect.desc": "No more cold winters.",
     "challendge.btn.chronosphere.desc": " You won't gain reset bonus from chronospheres at the start of the next run. Instead resources will be put into reserves.",
     "challendge.btn.chronosphere.with.ironWill.desc": " You won't gain reset bonus from chronospheres.<br>WARNING: the reset bonus from chronospheres will automatically disable IW.",
     "challendge.btn.confirmation.title": "Challenge confirmation",
