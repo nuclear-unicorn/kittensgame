@@ -431,6 +431,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				this.getChallenge("energy").unlocked = true;
 			}
 		} 
+
+		//Iron Will has special rules.  Just make the UI more obvious when the game is in IW mode:
+		this.getChallenge("ironWill").active = this.game.ironWill;
+
 		//checkCompletionCondition for functions tested for completion here
 		for(var i = 0; i < this.challenges.length; i++){
 			if(this.challenges[i].active && this.challenges[i].checkCompletionCondition && this.challenges[i].checkCompletionCondition(this.game)){
