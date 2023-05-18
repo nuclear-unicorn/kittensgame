@@ -3861,11 +3861,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 *
 	 */
 	attachResourceTooltip: function(container, resRef){
-
-		var tooltip = dojo.byId("tooltip");
-		dojo.empty(tooltip);
-
-		dojo.connect(container, "onmouseover", this, dojo.partial(function(resRef, tooltip, event){
+		UIUtils.attachTooltip(this, container, 0, 100, function() {
 			if (this.getResourcePerTick(resRef.name, false) != 0
 				|| this.getResourcePerTickConvertion(resRef.name) != 0
 				|| this.workshop.getEffectEngineer(resRef.name) != 0
@@ -3873,27 +3869,19 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				|| (this.getResourceOnYearProduction(resRef.name) != 0 || resRef.name == "antimatter")
 				|| (resRef.name == "kittens" && this.village.sim.kittens.length < this.village.sim.maxKittens)
 			){
-
-				tooltip.innerHTML = this.getDetailedResMap(resRef);
-
-				var target = event.originalTarget || event.toElement;	//fucking chrome
-				var pos = $(target).position();
-				if (!pos){
-				 return;
-				}
-
-				dojo.style(tooltip, "left", pos.left + 100 + "px");
-				dojo.style(tooltip, "top",  pos.top + "px");
-
-				dojo.style(tooltip, "display", "");
-				dojo.style(container, "fontWeight", "bold");
+				return this.getDetailedResMap(resRef);
 			}
-	    }, resRef, tooltip));
 
-		dojo.connect(container, "onmouseout", this, dojo.partial(function(tooltip, container){
-			 dojo.style(tooltip, "display", "none");
-			 dojo.style(container, "fontWeight", "normal");
-		},tooltip, container));
+            return '';
+		});
+
+		dojo.connect(container, "onmouseover", this, function(){
+			dojo.style(container, "fontWeight", "bold");
+		});
+
+		dojo.connect(container, "onmouseout", this, function(){
+			dojo.style(container, "fontWeight", "normal");
+		});
 
 	},
 
@@ -4136,6 +4124,83 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		{limit:1e6,divisor:1e6,postfix:["M"," Mega"]},
 		{limit:9e3,divisor:1e3,postfix:["K"," Kilo"]} //WHAT
 	],
+
+	/**
+	 * Determines the display name & display value (formatting it as per second, or as a percentage, etc.) of a given effect.
+	 * @param effectName	The internal name of the effect.
+	 * @param effectValue	The value of the effect.
+	 * @param showIfZero	Boolean.  Determines whether we still show an effect with zero value, or if that effect remains hidden.
+	 * 					I added it just in case someone wants to use it in the future.
+	 * 					If the effect would be hidden for any other reason, then this flag doesn't do anything.
+	 * @return	null if the effect shouldn't be displayed (because it's hidden or because it's zero).
+	 * 			Otherwise, returns a table with the following keys:
+	 * 			displayEffectName = the localized title;
+	 * 			displayEffectValue = the value of the effect, formatted & localized properly
+	 */
+	getEffectDisplayParams: function(effectName, effectValue, showIfZero) {
+		var effectMeta = this.getEffectMeta(effectName);
+		if (effectMeta.type === "hidden") {
+			return null;	//Don't display because it's a hidden effect.
+		}
+		if (effectMeta.resName && !this.resPool.get(effectMeta.resName).unlocked) {
+			return null;	//hide resource-related effects if we did not unlocked this effect yet
+		}
+		if (!effectValue && !showIfZero) {
+			return null;	//Don't display because the size of the value is zero & the flag is set to hide things that are zero.
+		}
+		var displayEffectName = effectMeta.title;
+		var displayEffectValue = "";
+		//This code was copy-pasted from core.js with minor changes.
+		//display resMax values with global ratios like Refrigeration and Paragon
+		if (effectName.substr(-3) === "Max" ) {
+			var res = this.resPool.get(effectMeta.resName || effectName.slice(0, -3));
+			if (res) { // If res is a resource and not just a variable
+				effectValue = this.resPool.addResMaxRatios(res, effectValue);
+			}
+		}
+		if (effectName.substr(-12) === "MaxChallenge") {
+			var res = this.resPool.get(effectMeta.resName || effectName.slice(0, -12));
+			if (res) { // If res is a resource and not just a variable
+				//This is the code used in resources.js to apply LDR to how Challenges affect resource storage.
+				var maxValue = this.resPool.addResMaxRatios(res, this.getEffect(res.name + "Max") || 0);
+				effectValue = this.getLimitedDR(this.resPool.addResMaxRatios(res, effectValue), maxValue - 1 - this.bld.effectsBase[res.name +'Max']||0);
+			}
+		}
+		if (effectMeta.type === "perTick" && this.opts.usePerSecondValues) {
+			// avoid mantisa if we can, later on this can be changed to show scaled up values, e.g. minutes, hours
+			var tempVal = Math.abs(effectValue * this.ticksPerSecond), precision;
+			if (tempVal >= 0.001) {
+				precision = tempVal < 0.01 ? 3 : 2;
+				displayEffectValue = this.getDisplayValueExt(
+				effectValue * this.ticksPerSecond, false, false, precision) + "/" + $I("unit.sec");
+			} else {
+				displayEffectValue = this.getDisplayValueExt(
+					effectValue * this.ticksPerSecond * 3600, false, false, 2) + "/" + $I("unit.h");
+			}
+		} else if (effectMeta.type === "perDay"){
+			displayEffectValue = this.getDisplayValueExt(effectValue) + "/" + $I("unit.day");
+		} else if (effectMeta.type === "perYear"){
+			displayEffectValue = this.getDisplayValueExt(effectValue) + "/" + $I("unit.year");
+		} else if ( effectMeta.type === "ratio" ) {
+			displayEffectValue = this.toDisplayPercentage(effectValue, 2 , false) + "%";
+		} else if ( effectMeta.type === "integerRatio" ){
+			displayEffectValue = this.getDisplayValueExt(effectValue) + "%";
+		} else if ( effectMeta.type === "energy" ){
+			//Multiply the displayed values of energy production & consumption by relevant multipliers.
+			if (effectName === "energyProduction") {
+				effectValue *= this.resPool.getEnergyProductionRatio();
+			} else if (effectName === "energyConsumption") {
+				effectValue *= this.resPool.getEnergyConsumptionRatio();
+			}
+			displayEffectValue = this.getDisplayValueExt(effectValue) + $I("unit.watt");
+		} else {
+			displayEffectValue = this.getDisplayValueExt(effectValue);
+		}
+		return {
+				displayEffectName: displayEffectName,
+				displayEffectValue: displayEffectValue
+			};
+	},
 
 	/**
 	 * Converts raw resource value (e.g. 12345.67890) to a formatted representation (i.e. 12.34K)
@@ -4847,25 +4912,27 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	calculateAllEffects: function() {
 		// TODO: delegate this to managers? Can't be done in load unfortunately.
-		this.upgrade({
-			tech: this.science.techs.map(function(item){return item.name;}),
-			policies: this.science.policies.map(function(item){return item.name;}),
-			perks: this.prestige.perks.map(function(item){return item.name;}),
-			jobs: this.village.jobs.map(function(item){return item.name;}),
-			crafts: this.workshop.crafts.map(function(item){return item.name;}),
-			upgrades: this.workshop.upgrades.map(function(item){return item.name;}),
-			buildings: this.bld.buildingsData.map(function(item){return item.name;}),
-			spaceMission: this.space.programs.map(function(item){return item.name;}),
-			spaceBuilding: this.space.spaceBuildingsMap,
-			planet: this.space.planets.map(function(item){return item.name;}),
-			chronoforge: this.time.chronoforgeUpgrades.map(function(item){return item.name;}),
-			voidSpace: this.time.voidspaceUpgrades.map(function(item){return item.name;}),
-			zigguratUpgrades: this.religion.zigguratUpgrades.map(function(item){return item.name;}),
-			religion: this.religion.religionUpgrades.map(function(item){return item.name;}),
-			transcendenceUpgrades: this.religion.transcendenceUpgrades.map(function(item){return item.name;}),
-			pacts: this.religion.pactsManager.pacts.map(function(item){return item.name;}),
-			challenges: this.challenges.challenges.map(function(item){return item.name;})
-		});
+		var getName = function(item){return item.name;};
+		var metaKeys = {
+				tech: this.science.techs.map(getName),
+				policies: this.science.policies.map(getName),
+				perks: this.prestige.perks.map(getName),
+				jobs: this.village.jobs.map(getName),
+				crafts: this.workshop.crafts.map(getName),
+				upgrades: this.workshop.upgrades.map(getName),
+				buildings: this.bld.buildingsData.map(getName),
+				spaceMission: this.space.programs.map(getName),
+				spaceBuilding: this.space.spaceBuildingsMap,
+				planet: this.space.planets.map(getName),
+				chronoforge: this.time.chronoforgeUpgrades.map(getName),
+				voidSpace: this.time.voidspaceUpgrades.map(getName),
+				zigguratUpgrades: this.religion.zigguratUpgrades.map(getName),
+				religion: this.religion.religionUpgrades.map(getName),
+				transcendenceUpgrades: this.religion.transcendenceUpgrades.map(getName),
+				pacts: this.religion.pactsManager.pacts.map(getName),
+				challenges: this.challenges.challenges.map(getName)
+			};
+		this.upgrade(metaKeys);
 		this.upgrade({policies: ["authocracy"]});
 	},
 

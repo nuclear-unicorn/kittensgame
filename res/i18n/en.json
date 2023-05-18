@@ -275,6 +275,10 @@
     "calendar.year.full": "Year {0} - {1}, day {2}",
     "calendar.year.tooltip": "Year:",
 
+    "challendge.effects.show.label": "Show Challenge effects",
+    "challendge.effects.toggle.desc": "Toggle the summary of all the effects of your Challenges.",
+    "challendge.effects.hide.label": "Hide Challenge effects",
+    "challendge.effects.panel.label": "Effects of {0} Challenge",
     "challendge.panel.label": "Challenges",
     "challendge.pending": "Pending",
     "challendge.reclaimReserves.label": "Reclaim reserves",
@@ -1613,6 +1617,7 @@
     "trade.correct.bcoin": "There was a huge crypto market correction",
     "trade.embassy.label":"Embassy",
     "trade.embassy.desc": "Improve your diplomatic relationships by establishing an embassy",
+    "trade.embassy.chance": "Chance to get resources",
     "trade.embassy.pinned": "Pinned",
     "trade.embassy.unpinned": "Unpinned",
 
