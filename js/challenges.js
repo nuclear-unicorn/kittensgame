@@ -9,7 +9,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				return 0;
 			}
 			//Get the base amount for the effect:
-			var amt = challenge.effects[effectName];
+			var amt = challenge.effects[effectName] || 0;
+			if (effectName == "kittenLaziness" ) { //Calculated in a special way just for the Anarchy Challenge
+				return amt;
+			}
 			var stackOptions = (challenge.stackOptions || {})[effectName] || {}; //Get the stack options for this effect.  If it doesn't exist, get an empty object instead.
 			if (stackOptions.noStack) {
 				//This effect doesn't stack.  Apply only if the Challenge has been completed.
@@ -101,14 +104,15 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"masterSkillMultiplier": { LDRLimit: 4 },
 			"kittenLaziness": { LDRLimit: 0.25 }
 		},
-        calculateEffects: function(self, game){
-            if (self.active) {
-            	self.effects["masterSkillMultiplier"] = 0;
-            	self.effects["kittenLaziness"] = 0.05;
-            }else{
+		calculateEffects: function(self, game){
+			if (self.active) {
+				self.effects["masterSkillMultiplier"] = 0;
+				self.effects["kittenLaziness"] = 0.5 + game.getLimitedDR(0.05 * self.on, self.stackOptions["kittenLaziness"].LDRLimit);
+			}else{
 				self.effects["masterSkillMultiplier"] = 0.2;
+				self.effects["kittenLaziness"] = 0;
 			}
-        },
+		},
 		checkCompletionCondition: function(game){
 			return game.bld.get("aiCore").val > 0;
 		}
