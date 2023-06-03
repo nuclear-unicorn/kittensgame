@@ -1970,6 +1970,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 
 			if (meta.calculateEffects){
 				meta.calculateEffects(meta, this.game);
+				this.game.calendar.cycleEffectsBasics(meta.effects, meta.name); //(Only relevant for space buildings)
 			}
 			if (meta.unlockScheme && meta.val >= meta.unlockScheme.threshold) {
 				this.game.ui.unlockScheme(meta.unlockScheme.name);
