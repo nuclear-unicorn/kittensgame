@@ -1525,9 +1525,11 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 
 		underlying.on++;
 		underlying.updateEffects(underlying, this.game);
+		this.game.calendar.cycleEffectsBasics(underlying.effects, underlying.name);
 		var nextEffectValue = underlying.effects[effectName];
 		underlying.on--;
 		underlying.updateEffects(underlying, this.game);
+		//(cycleEffectsBasics is only relevant for space buildings & it will be applied at a later time so we skip it for now)
 		return nextEffectValue;
 	},
 
@@ -1968,6 +1970,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 
 			if (meta.calculateEffects){
 				meta.calculateEffects(meta, this.game);
+				this.game.calendar.cycleEffectsBasics(meta.effects, meta.name); //(Only relevant for space buildings)
 			}
 			if (meta.unlockScheme && meta.val >= meta.unlockScheme.threshold) {
 				this.game.ui.unlockScheme(meta.unlockScheme.name);
