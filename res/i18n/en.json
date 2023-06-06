@@ -1478,6 +1478,7 @@
     "space.yarnMission.desc": "Yarn is a class M planet with high moderate climate, seas and oxygen atmosphere.",
 
     "stats.buildings": "Buildings Constructed",
+    "stats.challenges.total": "Challenges Completed",
     "stats.clicks.total": "Total Clicks",
     "stats.crafts.current": "Crafting Times",
     "stats.crafts.total": "Crafting Times",
@@ -1493,6 +1494,7 @@
     "stats.time.current": "Time Played",
     "stats.trades.current": "Trades Completed",
     "stats.trades.total": "Trades Completed",
+    "stats.transcendenceTier": "Transcendence Tier",
     "stats.unicorns": "Unicorns Sacrificed",
     "stats.years.total": "Total Years Played",
 

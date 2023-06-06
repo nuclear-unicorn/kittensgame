@@ -69,6 +69,27 @@ dojo.declare("classes.managers.StatsManager", com.nuclearunicorn.core.TabManager
                 return game.stats.getStat("totalYears").val != 0 ? game.stats.getStat("totalKittens").val / Math.ceil(game.stats.getStat("totalYears").val / 100) : 0;
             },
             unlocked: false
+        },{
+            name: "transcendenceTier",
+            title: $I("stats.transcendenceTier"),
+            val: 0,
+            calculate: function(game){
+                return game.religion.transcendenceTier;
+            },
+            unlocked: false
+        },{
+            name: "totalChallengesCompleted",
+            title: $I("stats.challenges.total"),
+            val: 0,
+            calculate: function(game){
+                var total = 0;
+                var challengeList = game.challenges.challenges;
+                for(var i = 0; i < challengeList.length; i += 1) {
+                    total += challengeList[i].on;
+                }
+                return total;
+            },
+            unlocked: false
         }
     ],
 
