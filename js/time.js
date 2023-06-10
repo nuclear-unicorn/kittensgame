@@ -1109,7 +1109,8 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
                     price["val"] *= (1 + (this.game.time.heat - heatMax) * 0.01);  //1% per excessive heat unit
                 }
 
-                price["val"] *= (1 + this.game.getLimitedDR(this.game.getEffect("shatterCostReduction"),1) + this.game.getEffect("shatterCostIncreaseChallenge"));
+                //LDR for the effect "shatterCostReduction" is specified in challenges.js
+                price["val"] *= (1 + this.game.getEffect("shatterCostReduction") + this.game.getEffect("shatterCostIncreaseChallenge"));
             }
             else if(price["name"] == "void"){
                 var heatMax = this.game.getEffect("heatMax");
@@ -1153,7 +1154,8 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 	                    priceLoop *= (1 + (this.game.time.heat + k * heatFactor - heatMax) * 0.01);  //1% per excessive heat unit
 	                }
 
-                    priceLoop *= (1 + this.game.getLimitedDR(this.game.getEffect("shatterCostReduction"),1) +
+                    //LDR for the effect "shatterCostReduction" is specified in challenges.js
+                    priceLoop *= (1 + this.game.getEffect("shatterCostReduction") +
                         this.game.getEffect("shatterCostIncreaseChallenge"));
 
                     pricesTotal.timeCrystal += priceLoop;

@@ -2,13 +2,44 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 
 	constructor: function(game){
 		this.game = game;
-		this.registerMeta("stackable", this.challenges, null);
+		//Register the metas with a custom provider.
+		this.registerMeta(false, this.challenges, { getEffect: function(challenge, effectName) {
+			if (!challenge.effects) {
+				//Challenge has no effects defined, so just return 0 for "no effect."
+				return 0;
+			}
+			//Get the base amount for the effect:
+			var amt = challenge.effects[effectName];
+			var stackOptions = (challenge.stackOptions || {})[effectName] || {}; //Get the stack options for this effect.  If it doesn't exist, get an empty object instead.
+			if (stackOptions.noStack) {
+				//This effect doesn't stack.  Apply only if the Challenge has been completed.
+				return challenge.researched ? amt : 0;
+			}
+			//Else, the effect stacks with Challenge completions.
+			amt *= challenge.on;
+			if (stackOptions.LDRLimit) {
+				amt = game.getLimitedDR(amt, stackOptions.LDRLimit);
+			}
+			if (stackOptions.capMagnitude) {
+				//Used for weapon efficiency in the Pacifism Challenge.
+				//Clamp amt so its magnitude is no greater than capMagnitude.
+				amt = Math.max(-stackOptions.capMagnitude, Math.min(stackOptions.capMagnitude, amt));
+			}
+			return amt;
+		}});
 		this.setEffectsCachedExisting();
 		this.reserves = new classes.reserveMan(game);
 	},
 
 	currentChallenge: null,
 
+	//Challenges have an optional property named "stackOptions".
+	//stackOptions is a table where the keys are the names of effects & the values are objects with parameters that control how that effect behaves when the challenge has been completed multiple times.
+	//	noStack - If true, the effect only cares about whether or not the Challenge has been completed, but it doesn't care about the exact number of completions.
+	//			If noStack is combined with another option, noStack overrides all other options & the effect doesn't stack.
+	//	LDRLimit - Applies Limited Diminishing Returns (LDR) specifying the asymptotic limit.
+	//	capMagnitude - The magnitude of the effect will be clamped to this value, but the sign of the effect will not be changed.
+	//			If capMagnitude is combined with LDRLimit, the LDR will be applied first, then the magnitude will be capped afterwards.
     challenges:[
     {
 		name: "ironWill",
@@ -32,6 +63,12 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"summerSolarFarmRatio": 0.05,
 			"coldChance": 0,
 			"coldHarshness": 0
+		},
+		stackOptions: {
+			"springCatnipRatio": { LDRLimit: 2 },
+			"summerSolarFarmRatio": { LDRLimit: 2 },
+			"coldChance": { LDRLimit: 0.825 },
+			"coldHarshness": { LDRLimit: 1 }
 		},
 		calculateEffects: function(self, game){
 			if (self.active) {
@@ -60,6 +97,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"masterSkillMultiplier": 0.2,
 			"kittenLaziness": 0
         },
+		stackOptions: {
+			"masterSkillMultiplier": { LDRLimit: 4 },
+			"kittenLaziness": { LDRLimit: 0.25 }
+		},
         calculateEffects: function(self, game){
             if (self.active) {
             	self.effects["masterSkillMultiplier"] = 0;
@@ -78,14 +119,12 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		effectDesc: $I("challendge.energy.effect.desc"),
         researched: false,
 		unlocked: false,
-		upgrades: {
-			buildings: ["library", "biolab", "calciner", "oilWell", "factory", "accelerator", "chronosphere", "aiCore"],
-			spaceBuilding: ["sattelite", "spaceStation", "moonOutpost", "moonBase", "orbitalArray", "containmentChamber"],
-			voidSpace: ["chronocontrol"]
-		},
 		effects: {
 			"energyConsumptionRatio": -0.02,
 			"energyConsumptionIncrease": 0
+		},
+		stackOptions: {
+			"energyConsumptionRatio": { LDRLimit: 1 }
 		},
 		calculateEffects: function(self, game){
 			if (self.active) {
@@ -121,6 +160,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"manpowerMaxChallenge": 0,
 			"challengeHappiness": 0
 		},
+		stackOptions: {
+			"faithSolarRevolutionBoost": { LDRLimit: 4 }
+		},
 		calculateEffects: function(self, game) {
             if (self.active) {
 				self.effects["faithSolarRevolutionBoost"] = 0;
@@ -153,6 +195,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"shatterVoidCost": 0,
 			"temporalPressCap" : 0
         },
+		stackOptions: {
+			"shatterCostReduction": { LDRLimit: 1 }
+		},
         calculateEffects: function(self, game){
             if (self.active) {
         	    self.effects["shatterCostReduction"] = 0;
@@ -185,6 +230,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
         effects: {
             "corruptionBoostRatioChallenge": 0.1
         },
+		stackOptions: {
+			"corruptionBoostRatioChallenge": { LDRLimit: 2 }
+		},
         calculateEffects: function(self, game){
             if (self.active) {
                 self.effects["corruptionBoostRatioChallenge"] = 0;
@@ -213,6 +261,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"steamworksFakeBought": 0,
 			"tradeKnowledgeRatio": 0
         },
+		stackOptions: {
+			"tradeKnowledgeRatio": { noStack: true },
+			"weaponEfficency": { capMagnitude: 1 }
+		},
         calculateEffects: function(self, game){
             if (self.active) {
                 self.effects["alicornPerTickRatio"] = 0;
@@ -379,6 +431,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				this.getChallenge("energy").unlocked = true;
 			}
 		} 
+
+		//Iron Will has special rules.  Just make the UI more obvious when the game is in IW mode:
+		this.getChallenge("ironWill").active = this.game.ironWill;
+
 		//checkCompletionCondition for functions tested for completion here
 		for(var i = 0; i < this.challenges.length; i++){
 			if(this.challenges[i].active && this.challenges[i].checkCompletionCondition && this.challenges[i].checkCompletionCondition(this.game)){
@@ -597,6 +653,12 @@ dojo.declare("classes.reserveMan", null,{
 });
 dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.BuildingBtnController, {
 
+	initModel: function(options) {
+		var model = this.inherited(arguments);
+		model.multiplyEffects = true; //When the player holds the SHIFT key, it'll multiply Challenge effects by number of times completed.
+		return model;
+	},
+
 	getMetadata: function(model){
         if (!model.metaCached){
             model.metaCached = this.game.challenges.getChallenge(model.options.id);
@@ -703,6 +765,76 @@ dojo.declare("classes.ui.ChallengePanel", com.nuclearunicorn.game.ui.Panel, {
 
 });
 
+dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Panel, {
+	//The name of the Challenge that this panel lists the effects of:
+	challengeName: "",
+
+	constructor: function() {
+		this.listElement = null;
+	},
+
+	//Links this panel up with the correct Challenge internally & sets the title to be "effects of [challengeName]":
+	setChallengeName: function(challengeName) {
+		this.challengeName = challengeName;
+		this.name = $I("challendge.effects.panel.label", [this.game.challenges.getChallenge(challengeName).label]);
+	},
+
+	render: function(container) {
+		var content = this.inherited(arguments);
+		this.listElement = dojo.create("ul", { style: "margin-top: 0px; margin-bottom: 0px;" }, content);
+		this.generateEffectsList();
+	},
+
+	/**
+	 * Populates the list of the Challenge's effects and/or updates it with the most recent information.
+	 * This function goes out of its way to only modify UI elements exactly as needed--no more, no less.
+	 * The list of Challenge effects will be empty if the Challenge in question isn't unlocked yet.
+	 */
+	generateEffectsList: function() {
+		var challengeData = this.game.challenges.getChallenge(this.challengeName);
+		if (!challengeData.unlocked) {
+			//Challenge isn't unlocked yet, so don't display any effects for it.
+			if (this.listElement.hasChildNodes()) {
+				dojo.empty(this.listElement);
+			}
+			return;
+		}
+		//Else, the Challenge is unlocked.
+		var childNodes = this.listElement.childNodes;
+		var i = 0;
+		for (var effectName in challengeData.effects) {
+			var displayParams = this.game.getEffectDisplayParams(effectName, challengeData.totalEffectsCached[effectName], false /*showIfZero*/);
+			//displayParams could be null if this is the sort of effect that's supposed to be hidden.
+			if (!displayParams) {
+				continue;
+			}
+			//Else, non-null therefore display this effect:
+			var textToDisplay = displayParams.displayEffectName + ": " + displayParams.displayEffectValue;
+			if (childNodes.length <= i) {
+				//Create a DOM node only if we need to.
+				dojo.create("li", { innerHTML: textToDisplay }, this.listElement);
+			} else if(dojo.attr(childNodes[i], "innerHTML") != textToDisplay) {
+				//Modify an existing DOM node only if we need to.
+				dojo.attr(childNodes[i], "innerHTML", textToDisplay);
+			}
+			i += 1;
+		}
+		while (i < childNodes.length) {
+			//Destroy any unnecessary DOM nodes.
+			dojo.destroy(childNodes[childNodes.length - 1]);
+		}
+	},
+
+	update: function() {
+		this.inherited(arguments);
+		this.generateEffectsList();
+
+		//Update visible/invisible status:
+		//Show effects panel only if the game is set to show them && there is at least 1 effect to show.
+		this.setVisible(Boolean(this.game.detailedChallengeInfo) && this.listElement.hasChildNodes());
+	}
+});
+
 dojo.declare("classes.tab.ChallengesTab", com.nuclearunicorn.game.ui.tab, {
 	render: function(container){
 		this.challengesPanel = new classes.ui.ChallengePanel($I("challendge.panel.label"), this.game.challenges);
@@ -764,11 +896,51 @@ dojo.declare("classes.tab.ChallengesTab", com.nuclearunicorn.game.ui.tab, {
 		}, this.game);
 		reclaimReservesBtn.render(container);
 		this.reclaimReservesBtn = reclaimReservesBtn;
+
+		var showChallengeEffectsBtn = new com.nuclearunicorn.game.ui.ButtonModern({
+			name: $I("challendge.effects.show.label"),
+			description: $I("challendge.effects.toggle.desc"),
+			handler: dojo.hitch(this, function() {
+				this.game.detailedChallengeInfo = !this.game.detailedChallengeInfo;
+			}),
+			controller: new com.nuclearunicorn.game.ui.ButtonController(this.game, {
+				updateVisible: function (model) {
+					var effectsPanels = this.game.challengesTab.challengeEffects; //Array of UI panels that list the Challenge effects
+					if (effectsPanels) {
+						//The button to toggle Challenge effects is visible only if there is at least 1 effect to display right now:
+						model.visible = effectsPanels.some(function(challengeEffectsPanel) {
+							return challengeEffectsPanel.listElement.hasChildNodes();
+						});
+					} else {
+						model.visible = false;
+					}
+				},
+				getName: function() {
+					return this.game.detailedChallengeInfo ? $I("challendge.effects.hide.label") : $I("challendge.effects.show.label");
+				}
+			})
+		}, this.game);
+		showChallengeEffectsBtn.render(container);
+		this.showChallengeEffectsBtn = showChallengeEffectsBtn;
+
+		//Summary of total Challenge effects:
+		this.challengeEffects = [];
+		for (var i = 0; i < this.game.challenges.challenges.length; i += 1) {
+			var effectPanel = new classes.ui.ChallengeEffectsPanel("", this.game.challenges);
+			effectPanel.game = this.game;
+			effectPanel.setChallengeName(this.game.challenges.challenges[i].name);
+			effectPanel.render(container);
+			this.challengeEffects.push(effectPanel);
+		}
 	},
 
 	update: function(){
 		this.challengesPanel.update();
 		//this.conditionsPanel.update();
 		this.applyPendingBtn.update();
+		this.showChallengeEffectsBtn.update();
+		for (var i = 0; i < this.challengeEffects.length; i += 1) {
+			this.challengeEffects[i].update();
+		}
 	}
 });

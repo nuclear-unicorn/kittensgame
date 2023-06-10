@@ -371,7 +371,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 						energyProduction *= 0.75;
 					} else if (season == 1) {
 						energyProduction /= 0.75;
-						energyProduction *= (1 + game.getLimitedDR(game.getEffect("summerSolarFarmRatio"), 2));
+						energyProduction *= 1 + game.getEffect("summerSolarFarmRatio"); //LDR specified in challenges.js
 					}
 
 					var seasonRatio = game.getEffect("solarFarmSeasonRatio");
@@ -629,6 +629,12 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				self.effects["academyMeteorBonus"] = 0.01;
 			}else{
 				self.effects["academyMeteorBonus"] = 0;
+			}
+			if(game.challenges.isActive("anarchy")) {
+				//Kittens can't learn skills in Anarchy anyways; might as well set skillXP to 0 so it's hidden from the tooltip.
+				self.effects["skillXP"] = 0;
+			}else{
+				self.effects["skillXP"] = 0.0005;
 			}
 		},
 		flavor: $I("buildings.academy.flavor"),
@@ -2204,7 +2210,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		if (this.game.challenges.isActive("postApocalypse")
 		&& bld.get("name") == "field"
 		&& this.getPollutionLevel() >= 5
-		&& bld.get("val") >= 95 - this.game.time.getVSU("usedCryochambers").val - this.getPollutionLevel() ) {
+		&& bld.get("val") >= Math.max(95 - this.game.time.getVSU("usedCryochambers").val - this.getPollutionLevel(), 7 + (this.game.ironWill? 8 : 0)) ) {
 			var builtWithUnobtanium = Math.max(bld.get("val") + this.game.time.getVSU("usedCryochambers").val - 100, 0);
 			prices.push({val: 15 * Math.pow(ratio, builtWithUnobtanium),
 						name : "unobtainium",
