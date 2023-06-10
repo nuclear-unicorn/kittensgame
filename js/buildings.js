@@ -630,6 +630,12 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}else{
 				self.effects["academyMeteorBonus"] = 0;
 			}
+			if(game.challenges.isActive("anarchy")) {
+				//Kittens can't learn skills in Anarchy anyways; might as well set skillXP to 0 so it's hidden from the tooltip.
+				self.effects["skillXP"] = 0;
+			}else{
+				self.effects["skillXP"] = 0.0005;
+			}
 		},
 		flavor: $I("buildings.academy.flavor"),
 		unlockScheme: {
@@ -1254,7 +1260,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}
 		}
 	},
-
 	{
 		name: "lumberMill",
 		label: $I("buildings.lumberMill.label"),
@@ -2696,7 +2701,12 @@ dojo.declare("classes.game.ui.RefineCatnipButton", com.nuclearunicorn.game.ui.Bu
 
 dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
     getMetadata: function(model){
-    	model.metaAccessor = this.game.bld.getBuildingExt(model.options.building);
+		model.metaAccessor = this.game.bld.getBuildingExt(model.options.building);
+		
+		if (!model.metaAccessor){
+			console.warn("Unable to get building metadata, invalid id or options:", model.options.building);
+			return null;
+		}
 
 		//let's not mess with meta accessor, it is a pain to deal with it
 		var meta = model.metaAccessor.getMeta(),

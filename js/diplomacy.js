@@ -1401,11 +1401,16 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 
 		if (this.leviathansInfo) {
 			var leviathans = this.game.diplomacy.get("leviathans");
-			var markerCap = this.game.diplomacy.getMarkerCap();
-			var leviathansInfoEnergy = leviathans.energy ? leviathans.energy + " / " + markerCap : "N/A";
-			this.leviathansInfo.innerHTML = $I("trade.leviathans.energy") + leviathansInfoEnergy +
-				"<br />" + $I("trade.leviathans.timeToLeave") + this.game.toDisplayDays(leviathans.duration);
-
+			this.leviathansInfo.innerHTML = "";
+			//Energy:
+			if (leviathans.energy) {
+				var markerCap = this.game.diplomacy.getMarkerCap();
+				var leviathansInfoEnergy = leviathans.energy ? leviathans.energy + " / " + markerCap : "N/A";
+				this.leviathansInfo.innerHTML += $I("trade.leviathans.energy") + leviathansInfoEnergy + "<br />";
+			}
+			//Time to leave:
+			this.leviathansInfo.innerHTML += $I("trade.leviathans.timeToLeave") + this.game.toDisplayDays(leviathans.duration);
+			//B-coin price:
 			if (this.game.science.get("antimatter").researched){
 				this.leviathansInfo.innerHTML += "<br /> " + $I("trade.bcoin.price") + " <span style='cursor:pointer' title='" + this.game.calendar.cryptoPrice + "'>" +
 					this.game.getDisplayValueExt(this.game.calendar.cryptoPrice, false, false, 5) + "R</span>";

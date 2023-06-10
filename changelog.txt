@@ -1,9 +1,14 @@
+v 1.4.9.2
+Major:
+* Queue
+
+Minor:
+* Biomes will now provide effects when explored
+
 v 1.4.9.1
 * Game will not break trying to tokenize K/G/M prefixes for infinite values anymore
 * Apo will now respect noConfirm flag
 * Added visual warning when users did not export saves for a while
-
-
 
 v 1.4.9.0
 Major:
