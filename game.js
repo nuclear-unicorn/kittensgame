@@ -3568,7 +3568,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		stack.push({
 			name: $I("res.stack.buildings"),
 			type: "perDay",
-			value: this.getEffect(res.name + "PerDay") - this.religion.pactsManager.getSiphonedCorruption(1)
+			value: this.getEffect(res.name + "PerDay")
 		});
 		if(resName == "necrocorn"){
 			var corruptionStack = [];
