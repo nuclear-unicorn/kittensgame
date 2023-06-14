@@ -234,7 +234,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 	festivalDays: 0,
 
-	futureSeasonTemporalParadox: -1,
+	futureSeasonTemporalParadox: -1, //Holdover from an older version of the code, now unused but left in for backwards compatibility
 
 	cryptoPrice: 1000,
 
@@ -778,12 +778,16 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		this.game.resPool.addResPerTick("relic", this.game.getEffect("relicPerDay") * daysOffset);
 
 		//not sure if it is a good idea
-		//calculate amount of void earned on average per day, then multiply by days and percentage of time in paradox
-		var daysInParadox = 10 + this.game.getEffect("temporalParadoxDay");
-		var daysBetweenParadox = daysInParadox + 100 * Math.max( 1 , 100 / this.game.bld.get("chronosphere").on );
-		var percentTimeInParadox = daysInParadox / daysBetweenParadox;
+		var temporalParadoxChance = this.game.getEffect("temporalParadoxChance");
+		if (temporalParadoxChance > 0)
+		{
+			//calculate amount of void earned on average per day, then multiply by days and percentage of time in paradox
+			var daysInParadox = 10 + this.game.getEffect("temporalParadoxDay");
+			var daysBetweenParadox = daysInParadox + 100 * Math.max( 1 , 1 / temporalParadoxChance );
+			var percentTimeInParadox = daysInParadox / daysBetweenParadox;
 
-		this.game.resPool.addResEvent("void", Math.floor(this.game.resPool.getVoidQuantityStatistically() * daysOffset * percentTimeInParadox));
+			this.game.resPool.addResEvent("void", Math.floor(this.game.resPool.getVoidQuantityStatistically() * daysOffset * percentTimeInParadox));
+		}
 
 		// Adjust crypto price
 		if (this.game.science.get("antimatter").researched) {
@@ -858,26 +862,10 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			buildings: ["pasture"]
 		});
 
-		var numChrono = this.game.bld.get("chronosphere").on;
-		if (numChrono > 0) {
-			if (this.futureSeasonTemporalParadox > 0){
-				// Go to future Temporal Paradox season
-				this.futureSeasonTemporalParadox--;
-			} else {
-				// Temporal Paradox
-				this.day = -10 - this.game.getEffect("temporalParadoxDay");
-				// Calculation of the future Temporal Paradox season
-				var futureSeasonTemporalParadox = 0;
-				var goon = true;
-				while (goon) {
-					if (numChrono > this.game.rand(100)) {
-						goon = false;
-					} else {
-						futureSeasonTemporalParadox++;
-					}
-				}
-				this.futureSeasonTemporalParadox = futureSeasonTemporalParadox;
-			}
+		var temporalParadoxChance = this.game.getEffect("temporalParadoxChance");
+		if (Math.random() < temporalParadoxChance) {
+			// Temporal Paradox
+			this.day = -10 - this.game.getEffect("temporalParadoxDay");
 		}
 	},
 
@@ -1131,7 +1119,7 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 		this.festivalDays = 0;
 		this.cycle = 0;
 		this.cycleYear = 0;
-		this.futureSeasonTemporalParadox = -1;
+		this.futureSeasonTemporalParadox = -1; //Now unused; left in to preserve backwards compatibility
 		this.observeClear();
 	},
 
@@ -1144,7 +1132,7 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 			festivalDays: this.festivalDays,
 			cycle: this.cycle,
 			cycleYear: this.cycleYear,
-			futureSeasonTemporalParadox: this.futureSeasonTemporalParadox,
+			futureSeasonTemporalParadox: this.futureSeasonTemporalParadox, //Now unused; left in to preserve backwards compatibility
 			cryptoPrice: this.cryptoPrice
 		};
 	},
@@ -1159,7 +1147,7 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 			this.festivalDays = saveData.calendar.festivalDays || 0;
 			this.cycle = saveData.calendar.cycle || 0;
 			this.cycleYear = saveData.calendar.cycleYear || 0;
-			this.futureSeasonTemporalParadox = saveData.calendar.futureSeasonTemporalParadox || -1;
+			this.futureSeasonTemporalParadox = saveData.calendar.futureSeasonTemporalParadox || -1; //Now unused; left in to preserve backwards compatibility
 			this.cryptoPrice = saveData.calendar.cryptoPrice || 1000;
 		}
 	}
