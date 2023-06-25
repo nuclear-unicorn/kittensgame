@@ -399,7 +399,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		}
 
 		var diligentKittens = this.game.challenges.isActive("anarchy")
-			? Math.round(this.getKittens() * (0.5 - this.game.getEffect("kittenLaziness"))) //LDR specified in challenges.js
+			? Math.round(this.getKittens() * (1 - this.game.getEffect("kittenLaziness"))) //LDR specified in challenges.js
 			: this.getKittens();
 
 		return diligentKittens - workingKittens;
