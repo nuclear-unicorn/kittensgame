@@ -827,7 +827,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			var coldChance = 175;
 			var warmChance = 175;
 
-			var effect = this.game.getLimitedDR(this.game.getEffect("coldChance") * 1000, 825);
+			var effect = 1000 * this.game.getEffect("coldChance"); //LDR specified in challenges.js
 			coldChance += effect;
 			warmChance -= effect;
 			if (warmChance < 0) {
@@ -1082,10 +1082,10 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 			mod += -0.15;
 		}
 		if (this.game.challenges.getChallenge("winterIsComing").on && this.weather == "cold") {
-			mod *= 1 + this.game.getLimitedDR(this.game.getEffect("coldHarshness"),1);
+			mod *= 1 + this.game.getEffect("coldHarshness"); //LDR specified in challenges.js
 		}
 		if (this.getCurSeason().name == "spring") {
-                        mod *= (1 + this.game.getLimitedDR(this.game.getEffect("springCatnipRatio"), 2));
+                        mod *= 1 + this.game.getEffect("springCatnipRatio"); //LDR specified in challenges.js
                 }
 
 		return mod;
