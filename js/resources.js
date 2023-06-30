@@ -239,7 +239,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		visible: true,
 		persists: false,
 		calculatePerTick: true,
-		aiCanDestroy: true
+		aiCanDestroy: true,
+		calculatePerTickAndDay: true
 	},{
 		name : "necrocorn",
 		title: $I("resources.necrocorn.title"),
