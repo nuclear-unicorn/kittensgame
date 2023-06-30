@@ -247,6 +247,17 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		//------------------------- necrocorns pacts -------------------------
 		this.pactsManager.necrocornConsumptionDays(daysOffset);
 	},
+	
+	gesSiphoningAlicornConsumptionPerDay: function(){
+		if(this.game.science.getPolicy(["siphoning"]).researched){
+			var necrocornDeficitRepaymentModifier = 1;
+			if(this.pactsManager.necrocornDeficit > 0){
+				necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
+			}
+			return this.game.getEffect("necrocornPerDay") * necrocornDeficitRepaymentModifier;
+		}
+		return 0;
+	},
 	necrocornFastForward: function(days, times){
 		//------------------------- necrocorns pacts -------------------------
 		//deficit changing
