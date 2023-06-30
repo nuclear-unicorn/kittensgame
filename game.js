@@ -3600,6 +3600,14 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			});
 		}
 
+		if(resName == "alicorn"){
+			stack.push({
+				name: $I("res.stack.corruptionPerDaySiphoned"),
+				type: "perDay",
+				value: this.religion.gesSiphoningAlicornConsumptionPerDay()
+			});
+		}
+
 		return stack;
 	},
 
@@ -3944,6 +3952,16 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 					resString += "<br>" + $I("res.toCap") + ": " + this.toDisplaySeconds(toCap.toFixed());
 				}
 			}
+		}
+		//TODO: redo this logic to decrease repetition
+		if (res.calculatePerTickAndDay && res.name == "alicorn"){ 
+			var resStackDay = this.getResourcePerDayStack(res.name),
+				resStringDay = this.processResourcePerTickStack(resStackDay, res, 0), //processResourcePerTickStack can work with perDay stack
+				resPerDay = this.getResourcePerDay(res.name);
+				if (this.opts.usePercentageResourceValues){
+					resStringDay += "<br> " + $I("res.netGain") + ": " + this.getDisplayValueExt(resPerDay, true, true);
+				}
+			return resString + resStringDay;
 		}
 		return resString;
 	},
