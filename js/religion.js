@@ -1415,7 +1415,7 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 			valTo: gainCount
 		});
 
-		this.game.msg($I(this.controllerOpts.logTextID, [this.game.getDisplayValueExt(priceCount), this.game.getDisplayValueExt(gainCount)]), this.controllerOpts.logfilterID);
+		this.game.msg($I(this.controllerOpts.logTextID, [this.game.getDisplayValueExt(priceCount), this.game.getDisplayValueExt(gainCount)]), "", this.controllerOpts.logfilterID);
 
 		return true;
 	}
@@ -1968,7 +1968,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 		this function adds appropriate karmaKittens and returns change in karma; temporary logs karma generation
 		TODO: maybe make HG bonus play into this
 		*/
-		var kittens = this.game.resPool.get("kittens").value;
+		var kittens = Math.round(this.game.resPool.get("kittens").value * (1 + this.getEffect("simScalingRatio")));
 		if (kittens > 35 && this.game.getEffect("pactsAvailable") > 0){
 			var oldKarmaKittens = this.game.karmaKittens;
 			var kittensKarmaPerMinneliaRatio = this.game.getEffect("kittensKarmaPerMinneliaRatio");
