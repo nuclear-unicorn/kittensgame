@@ -1648,7 +1648,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 
 	sellInternal: function(model, end){
 		var building = model.metadata;
-		while (  building.val > end && this.hasSellLink(model) ) { //religion upgrades can't sell past 1
+		while (  building.val > end /*&& this.hasSellLink(model)*/ ) { //religion upgrades can't sell past 1
 			this.decrementValue(model);
 
 			model.prices = this.getPrices(model);
