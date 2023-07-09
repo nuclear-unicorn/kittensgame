@@ -2,6 +2,13 @@
  * FOR FULL I18N!
  */
 
+// @ts-check
+/**
+	See https://bitbucket.org/OliverSalzburg/kitten-game/branch/feat/typechecking
+	for current state-of-the-art typescript support
+*/
+
+
 //Localization support
 dojo.declare("com.nuclearunicorn.i18n.Lang", null, {
 	fallbackLocale: "en",
@@ -184,6 +191,11 @@ dojo.declare("com.nuclearunicorn.i18n.Lang", null, {
 i18nLang = new com.nuclearunicorn.i18n.Lang();
 // i18nLang.init();
 
-$I = function(key, args) {
+/** 
+ * @type {(literal: string, args: Array<number | string>) => string}; 
+ */
+var $I = function(key, args) {
 	return i18nLang.msg(key, args);
 };
+
+window.$I = $I;

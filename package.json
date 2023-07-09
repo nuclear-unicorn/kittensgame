@@ -7,10 +7,14 @@
     "lib": "lib",
     "test": "test"
   },
+  "engines": {
+    "node": ">=14.17"
+  },
   "scripts": {
     "build": "node tools/generate-buildver.js",
     "test": "jest --config jest.config.unittest.json",
     "lint": "eslint *.js js/*.js --quiet",
+    "typecheck": "tsc",
     "start": "http-server"
   },
   "husky": {
@@ -35,5 +39,10 @@
     "http-server": "^0.12.3",
     "husky": "^4.2.5",
     "jest": "^26.1.0"
+  },
+  "dependencies": {
+    "@types/dojo": "^1.9.44",
+    "@types/jquery": "^3.5.16",
+    "typescript": "^5.1.6"
   }
 }

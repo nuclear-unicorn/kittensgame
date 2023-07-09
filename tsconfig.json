@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "checkJs": false,
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "outDir": "types-dist",
+        "declarationMap": true,
+        "types": [
+            "./types",
+            "jquery"
+		]
+    },
+    "include": ["js/**/*.js", "game.js", "core.js", "i18n.js"]
+}
