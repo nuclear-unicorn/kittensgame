@@ -1927,6 +1927,10 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 });
 
 dojo.declare("classes.ui.PolicyPanel", com.nuclearunicorn.game.ui.Panel, {
+
+	toggleResearchedSpan: null,
+	toggleBlockedSpan: null,
+
 	render: function(container){
 		var content = this.inherited(arguments),
 			self = this;
@@ -1934,6 +1938,9 @@ dojo.declare("classes.ui.PolicyPanel", com.nuclearunicorn.game.ui.Panel, {
 		msgBox.innerHTML = $I("msg.policy.exclusivity");
 
 		var div = dojo.create("div", { style: { float: "right"}}, content);
+
+		this.toggleResearchedSpan = dojo.create("span", null, div);
+
 		var groupCheckbox = dojo.create("input", {
             id : "policyToggleResearched",
             type: "checkbox",
@@ -1941,16 +1948,17 @@ dojo.declare("classes.ui.PolicyPanel", com.nuclearunicorn.game.ui.Panel, {
             style: {
                 //display: hasCivil ? "" : "none"
             }
-        }, div);
+        }, this.toggleResearchedSpan);
 
         dojo.connect(groupCheckbox, "onclick", this, function(){
             this.game.science.policyToggleResearched = !this.game.science.policyToggleResearched;
 
-            dojo.empty(content);
-            this.game.render(content);
+		  this.update(); //Update policy panel UI
         });
 
-		dojo.create("label", { innerHTML: $I("science.policyToggleResearched.label") + "<br>", for: "policyToggleResearched"}, div);
+		dojo.create("label", { innerHTML: $I("science.policyToggleResearched.label") + "<br>", for: "policyToggleResearched"}, this.toggleResearchedSpan);
+
+		this.toggleBlockedSpan = dojo.create("span", null, div);
 
 		var groupCheckbox1 = dojo.create("input", {
             id : "policyToggleBlocked",
@@ -1959,16 +1967,15 @@ dojo.declare("classes.ui.PolicyPanel", com.nuclearunicorn.game.ui.Panel, {
             style: {
                 //display: hasCivil ? "" : "none"
             }
-        }, div);
+        }, this.toggleBlockedSpan);
 
         dojo.connect(groupCheckbox1, "onclick", this, function(){
             this.game.science.policyToggleBlocked = !this.game.science.policyToggleBlocked;
 
-            dojo.empty(content);
-            this.game.render(content);
+		  this.update(); //Update policy panel UI
         });
 
-        dojo.create("label", { innerHTML: $I("science.policyToggleBlocked.label"), for: "policyToggleBlocked"}, div);
+        dojo.create("label", { innerHTML: $I("science.policyToggleBlocked.label"), for: "policyToggleBlocked"}, this.toggleBlockedSpan);
 
 
 		var controller = new classes.ui.PolicyBtnController(this.game);
@@ -1981,7 +1988,24 @@ dojo.declare("classes.ui.PolicyPanel", com.nuclearunicorn.game.ui.Panel, {
 		});
 
 		dojo.create("div", { style: { clear: "both"}}, content);
-	}
+	},
+
+	update: function() {
+		this.inherited(arguments);
+		
+		var allPolicies = this.game.science.policies;
+
+		//Set this entire panel to only be visible if at least 1 policy is unlocked:
+		dojo.style(this.panelDiv, "display", dojo.some(allPolicies, function(policy) {return policy.unlocked;}) ? "block" : "none" );
+
+		//Set the "toggle researched policies" checkbox to only be visible if at least 1 policy would be affected by it:
+		dojo.style(this.toggleResearchedSpan, "display", dojo.some(allPolicies,
+			function(policy) {return policy.researched;}) ? "block" : "none" );
+
+		//Set the "toggle blocked policies" checkbox to only be visible if at least 1 policy would be affected by it:
+		dojo.style(this.toggleBlockedSpan, "display", dojo.some(allPolicies,
+			function(policy) {return policy.blocked;}) ? "block" : "none" );
+	},
 });
 
 dojo.declare("com.nuclearunicorn.game.ui.TechButtonController", com.nuclearunicorn.game.ui.BuildingNotStackableBtnController, {
