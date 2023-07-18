@@ -337,7 +337,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 //with fast shatter use shatterYearBoost from temporalPress instead
                 var test_shatter = game.time.testShatter;
                 if (game.time.getCFU("temporalPress").isAutomationEnabled && test_shatter == 1){
-                    limit = Math.max(limit, game.getEffect("shatterYearBoost"))
+                    limit = Math.max(limit, game.getEffect("shatterYearBoost"));
                 }
                 var amt = Math.floor(self.heat / 100);
                 if (amt > limit){
