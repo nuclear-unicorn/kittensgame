@@ -174,7 +174,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["shatterCostIncreaseChallenge"] = 0;
 				self.effects["shatterVoidCost"] = 0;
 				self.effects["temporalPressCap"] = 10;
-                self.effects["heatEfficiency"] = 0.01;
+				self.effects["heatEfficiency"] = 0.01;
 			}
 			game.upgrade(self.upgrades); //this is a hack, might need to think of a better sollution later
 		},
