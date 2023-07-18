@@ -332,13 +332,20 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             }
 
             if (self.heat >= 100){
+                var limit = 5;
+                //limit calculations needed per tick; 
+                //with fast shatter use shatterYearBoost from temporalPress instead
+                var test_shatter = game.time.testShatter;
+                if (game.time.getCFU("temporalPress").isAutomationEnabled && test_shatter == 1){
+                    limit = Math.max(limit, game.getEffect("shatterYearBoost"))
+                }
                 var amt = Math.floor(self.heat / 100);
-                if (amt > 5){
-                    amt = 5; //limit calculations needed per tick
+                if (amt > limit){
+                    amt = limit;
                 }
                 self.heat -= 100 * amt;
                 //game.time.shatter(amt);
-                if(game.time.testShatter == 1) {game.time.shatterInGroupCycles(amt);}
+                if(test_shatter == 1) {game.time.shatterInGroupCycles(amt);}
                 //else if(game.time.testShatter == 2) {game.time.shatterInCycles(amt);}
                 //shatterInCycles is deprecated
                 else  {game.time.shatter(amt);}
