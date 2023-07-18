@@ -196,7 +196,6 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             var perTickHeatTransfer = this.game.getEffect("heatPerTick");
             var heatAttemptTransfer = daysOffset * this.game.calendar.ticksPerDay * perTickHeatTransfer;
             var heatTransfer = Math.min(this.heat, heatAttemptTransfer);
-            self.effects["heatEfficiency"] = 0.01 ;
             var blastFurnace = this.getCFU("blastFurnace");
             var efficiency = 1 + this.game.getEffect("heatEfficiency");
             blastFurnace.heat += heatTransfer * efficiency;
