@@ -1968,7 +1968,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 		this function adds appropriate karmaKittens and returns change in karma; temporary logs karma generation
 		TODO: maybe make HG bonus play into this
 		*/
-		var kittens = Math.round(this.game.resPool.get("kittens").value * (1 + this.getEffect("simScalingRatio")));
+		var kittens = Math.round(this.game.resPool.get("kittens").value * (1 + this.game.getEffect("simScalingRatio")));
 		if (kittens > 35 && this.game.getEffect("pactsAvailable") > 0){
 			var oldKarmaKittens = this.game.karmaKittens;
 			var kittensKarmaPerMinneliaRatio = this.game.getEffect("kittensKarmaPerMinneliaRatio");

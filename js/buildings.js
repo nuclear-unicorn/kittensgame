@@ -2616,7 +2616,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			model.refundPercentage = 1.0;	//full refund for undo
 
 			//Whoever came with reverse amt notation was probably high. (Was it me?)
-			props.controller.sellInternal(model, model.metadata.val - amt);
+			props.controller.sellInternal(model, model.metadata.val - amt, false /*requireSellLink*/);
 
 		} else if (data.action == "sell"){
 			//tbd
