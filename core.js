@@ -683,6 +683,25 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		this.game.resPool.payPrices(model.prices);
 		model.prices = this.getPrices(model);
 	},
+	
+	payPriceForUndoRefund: function(model) {
+		//Shamelessly copied from the refund code, except we'll lose resources instead of gaining them!
+		if (!model.prices.length){
+			console.warn("unable pay prices for undo refund a building, no prices specified in metadata :O");
+			return;
+		}
+		for( var i = 0; i < model.prices.length; i++){
+			var price = model.prices[i];
+
+			var res = this.game.resPool.get(price.name);
+			if (res.isRefundable(this.game) && !price.isTemporary) {
+				this.game.resPool.addResEvent(price.name, -price.val * model.refundPercentage);
+			} else {
+				// No refund to undo
+			}
+		}
+		model.prices = this.getPrices(model);
+	},
 
 	clickHandler: function(model, event){
 		model.handler.apply(this, [model, event]);
@@ -1614,7 +1633,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 	},
 
 	/**
-	 * Returns true if building was sold
+	 * Returns the number of buildings sold.
 	 */
 	sell: function(event, model){
 		var building = model.metadata;
@@ -1623,36 +1642,61 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		// But, proceed with normal action as well if true returned.
 		if (building.canSell) {
 			if(!building.canSell(building, this.game)) {
-				return false;
+				return 0;
 			}
 		}
 
+		var start = building.val;
 		var end = building.val - 1;
 		if (end > 0 && event && event.shiftKey) { //no need to confirm if selling just 1
 			end = 0;
 			if (this.game.opts.noConfirm) {
-				this.sellInternal(model, end);
-				return true;
+				this.sellInternal(model, end, true /*requireSellLink*/);
+				return start;
 			} else {
 				var self = this;
+				var amtSold = 0;
 				this.game.ui.confirm($("sell.all.confirmation.title"), $I("sell.all.confirmation.msg"), function() {
-					self.sellInternal(model, end);
-					return true;
+					self.sellInternal(model, end, true /*requireSellLink*/);
+					amtSold = start;
 				});
+				return amtSold;
 			}
 		} else if (end >= 0) {
-			this.sellInternal(model, end);
-			return true;
+			this.sellInternal(model, end, true /*requireSellLink*/);
+			return start - end; //Should be just 1 if you do the algebra
 		}
 	},
 
-	sellInternal: function(model, end){
+	/**
+	 * Performs the game-logic of selling a building.
+	 * @param model	Object representing the building to be sold.
+	 * @param end		Number representing when to stop selling the building.  Expected to be a nonnegative integer.
+	 * @param requireSellLink	Boolean.  If true, in between each iteration we check to see if the building has a sell link.
+	 * 						If the building doesn't have the sell link, we stop selling at that point.
+	 * 						Note that in order to have a sell link, game.opts.hideSell must be false.
+	 * 						If this parameter is false, we don't perform such a check & keep selling until we reach end.
+	 * 						This feature exists so that Order of the Sun upgrades can have additional requirements
+	 * 						for when they can be sold, but also so that those requirements can be bypassed
+	 * 						for purposes such as the implementation of the undo feature.
+	 */
+	sellInternal: function(model, end, requireSellLink){
+		//Check input parameters for validity.
+		if (typeof(requireSellLink) !== "boolean") {
+			console.warn("Boolean parameter \"requireSellLink\" was not specified, defaulting to false.");
+			requireSellLink = false;
+		}
+
 		var building = model.metadata;
-		while (  building.val > end /*&& this.hasSellLink(model)*/ ) { //religion upgrades can't sell past 1
+		while (building.val > end) {
 			this.decrementValue(model);
 
 			model.prices = this.getPrices(model);
 			this.refund(model);
+
+			if (requireSellLink && !this.hasSellLink(model)) { //religion upgrades can't sell past 1
+				break;
+			}
 		}
 
 		this.game.upgrade(building.upgrades);

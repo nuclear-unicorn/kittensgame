@@ -2308,11 +2308,13 @@ dojo.declare("classes.village.KittenSim", null, {
 
 	/**
 	 * Same, but removes the least proficient worker or the first one
+	 * If removing engineers, prioritizes engineers who are currently crafting nothing.
 	 */
 	removeJob: function(job, amt){
 		var jobKittens = [];
 		var optimizeJobs = (this.game.workshop.get("register").researched && this.game.village.leader);
 
+		//Populate an array listing all kittens that have the job we care about.
 		for (var i = this.kittens.length - 1; i >= 0; i--) {
 			var kitten = this.kittens[i];
 			if (kitten.job == job){
@@ -2332,6 +2334,22 @@ dojo.declare("classes.village.KittenSim", null, {
 		}
 
 		amt = amt || 1;
+
+		if (job == "engineer") {
+			//Prioritize removing kittens that are crafting nothing.
+			for (var i = 0; i < jobKittens.length; i += 1) {
+				if (amt < 1) {
+					break; //We don't need to remove any more kittens.
+				}
+				var kitten = this.kittens[jobKittens[i].id];
+				if (!kitten.engineerSpeciality) {
+					jobKittens.splice(i, 1); //Delete element from middle of array
+					this.game.village.unassignJob(kitten);
+					amt -= 1; //Decrement counter of kittens to unassign.
+				}
+			}
+		}
+
 		for (var i = amt - 1; i >= 0; i--) {
 			if (jobKittens.length){
 				var _workingKitten = jobKittens.shift(),

@@ -1272,6 +1272,15 @@ dojo.declare("com.nuclearunicorn.game.ui.SpaceProgramBtnController", com.nuclear
 		model.visible = meta.unlocked;
 	},
 
+	updateEnabled: function(model) {
+		var meta = model.metadata;
+		if (meta.val != 0 && meta.on == 0) { //This checks for if the mission is "in progress"
+			model.enabled = false;
+			return;
+		}
+		this.inherited(arguments);
+	},
+
 	getName: function(model){
 		var meta = model.metadata;
 

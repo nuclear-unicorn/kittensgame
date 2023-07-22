@@ -2616,16 +2616,41 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			model.refundPercentage = 1.0;	//full refund for undo
 
 			//Whoever came with reverse amt notation was probably high. (Was it me?)
-			props.controller.sellInternal(model, model.metadata.val - amt);
+			props.controller.sellInternal(model, model.metadata.val - amt, false /*requireSellLink*/);
 
 		} else if (data.action == "sell"){
-			//tbd
-			console.warn("Not implemented yet");
-		} else if (data.action == "upgrade"){
-			console.warn("Not implemented yet");
-		} else if (data.action == "downgrade"){
-			console.warn("Not implemented yet");
+			//I spent too long trying to understand why Bloodrizer did it the way she did.
+			//The meat of the function requires 2 things: the controller & the model.
+			var props = { //We need these props for later when we get the model.
+				key:            bld.name,
+				name:           bld.label,
+				description:    bld.description,
+				building:       bld.name
+			};
+			if (typeof(bld.stages) == "object"){ //Be sure to get the proper type of controller for the building we're working with
+				props.controller = new classes.ui.btn.StagingBldBtnController(this.game);
+			} else {
+				props.controller = new classes.ui.btn.BuildingBtnModernController(this.game);
+			}
+			var model = props.controller.fetchModel(props); //We need the model to actually change the data of the building
+
+			//The meat of the function: un-sell the buildings.
+			//Since buildings are sold for a 50% refund, we need to un-refund everything
+			for (var i = 0; i < amt; i += 1) {
+				props.controller.incrementValue(model);
+				props.controller.payPriceForUndoRefund(model);
+			}
+			this.game.render();
+		} else if (data.action == "deltagrade"){ //Generic term for upgrading/downgrading
+			bldMetaRaw.stage = Math.max(0, bldMetaRaw.stage - amt);
+
+			//Update because it changed when we changed stages
+			bld = new classes.BuildingMeta(bldMetaRaw).getMeta();
 		}
+
+		this.game.upgrade({ buildings: [bld.name]});
+		this.game.upgrade(bld.upgrades);
+		this.game.render();
 	}/*,
 
 	refund: function(bldId, amt, refundPercentage){
@@ -2763,13 +2788,14 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 	},
 
 	sell: function(event, model){
-		var selled = this.inherited(arguments);
-		if (selled) {
+		var amtSold = this.inherited(arguments);
+
+		if (amtSold > 0) {
 			var undo = this.game.registerUndoChange();
 			undo.addEvent("building", {
 				action: "sell",
 				metaId: model.metadata.name,
-				val: 1
+				val: amtSold
 			});
 		}
 	},
@@ -2872,6 +2898,21 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 
 	deltagrade: function(self, model, delta) {
 		var metadataRaw = self.getMetadataRaw(model);
+		var undo = this.game.registerUndoChange();
+		undo.addEvent("building", {
+			action:"deltagrade",
+			metaId: model.options.building,
+			val: delta
+		});
+
+		if (metadataRaw.val > 0) { //Sell until 0 are left (to refund to the player)
+			undo.addEvent("building", { //The order of these undo events matters A LOT
+				action:"sell",
+				metaId: model.options.building,
+				val: metadataRaw.val
+			});
+			self.sellInternal(model, 0, false /*requireSellLink*/);
+		}
 		metadataRaw.stage += delta;
 		if (!metadataRaw.stage) {metadataRaw.stage = Math.max(0, delta);}
 
