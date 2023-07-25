@@ -1521,6 +1521,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 title: $I("effectsMgr.statics.temporalPressCap.title"),
                 type: "fixed"
 			},
+            "heatEfficiency": {
+                title: $I("effectsMgr.statics.heatEfficiency.title"),
+                type: "ratio"
+			},
             "shatterCostIncreaseChallenge": {
                 title: $I("effectsMgr.statics.shatterCostIncreaseChallenge.title"),
                 type: "ratio"
