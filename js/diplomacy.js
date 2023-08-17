@@ -487,21 +487,12 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		var raceRatio = 1 + race.energy * 0.02;
 		var currentSeason = this.game.calendar.getCurSeason().name;
 
-		var embassyEffect = this.game.ironWill ? 0.0025 : 0.01;
 		for (var i = 0; i < race.sells.length; i++) {
 			var sellResource = race.sells[i];
-			//you must be this tall to trade this rare resource
-			if (!this.game.diplomacy.isValidTrade(sellResource, race)) {
+			var tradeChance = this.getResourceTradeChance(sellResource, race);
+			if (tradeChance == 0) {
 				continue;
 			}
-
-
-			var tradeChance = sellResource.chance *
-				(1 + (
-					race.embassyPrices ?
-					this.game.getLimitedDR(race.embassyLevel * embassyEffect, 0.75) :
-					0)
-				);
 
 			var resourcePassedNormalTradeAmount = this.game.math.binominalRandomInteger(normalTradeAmount, tradeChance);
 			var resourcePassedBonusTradeAmount = this.game.math.binominalRandomInteger(bonusTradeAmount, tradeChance);
@@ -518,12 +509,15 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 
 		//-------------------- 35% chance to get spice + 1% per embassy lvl ------------------
+		var spiceChance = this.getSpiceTradeChance(race);
 		var spiceTradeAmount = this.game.math.binominalRandomInteger(
-			successfullTradeAmount,
-			0.35 * (1 + (race.embassyPrices ?  race.embassyLevel * embassyEffect : 0))
+			successfullTradeAmount, spiceChance
 		);
 		boughtResources["spice"] = 25 * spiceTradeAmount +
 			50 * tradeRatio * this.game.math.irwinHallRandom(spiceTradeAmount);
+		if (spiceChance > 1) { //Past 100% chance, additional embassies increase amount of spice gained.
+			boughtResources["spice"] *= spiceChance; //e.g. 150% chance -> guaranteed ×1.5 spice
+		}
 
 		//-------------- 10% chance to get blueprint ---------------
 		boughtResources["blueprint"] = Math.floor(
@@ -653,6 +647,24 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			return;
 		}
 		return min;
+	},
+	getSpiceTradeChance: function(race) {
+		var embassyEffect = this.game.ironWill ? 0.0025 : 0.01;
+		return 0.35 * (1 + (race.embassyPrices ?  race.embassyLevel * embassyEffect : 0));
+	},
+	getResourceTradeChance: function(sellResourceOpts, race) {
+		var embassyEffect = this.game.ironWill ? 0.0025 : 0.01;
+		//you must be this tall to trade this rare resource
+		if (!this.game.diplomacy.isValidTrade(sellResourceOpts, race)) {
+			return 0;
+		}
+		//Else, chance is based on embassy level:
+		return sellResourceOpts.chance *
+				(1 + (
+					race.embassyPrices ?
+					this.game.getLimitedDR(race.embassyLevel * embassyEffect, 0.75) :
+					0)
+				);
 	},
 	getMarkerCap: function(){
 		return Math.floor(
@@ -1035,6 +1047,126 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 	}
 });
 
+//Embassy Buttons have a custom tooltip:
+var EmbassyButtonHelper = {
+	//This is a modified version of ButtonModernHelper.getTooltipHTML from core.js.
+	getTooltipHTML: function(controller, model) {
+		controller.fetchExtendedModel(model);
+		//throw "ButtonModern::getTooltipHTML must be implemented";
+
+		var tooltip = dojo.create("div", { className: "tooltip-inner" }, null);
+
+		if (model.tooltipName) {
+			dojo.create("div", {
+				innerHTML: model.name,
+				className: "tooltip-divider"
+			}, tooltip);
+		}
+
+		// description
+		var descDiv = dojo.create("div", {
+			innerHTML: model.description,
+			className: "desc"
+		}, tooltip);
+
+		//Remove the ability to display some properties because embassies don't have those.  You can add them back in if needed.
+		//Automation is removed.
+		//Cath pollution is removed.
+		//"Almost limited" is removed.
+
+		var prices = model.priceModels;
+		var effects = model.effectModels;
+		var flavor = model.flavor;
+		if (prices && prices != "" || effects || flavor && flavor != ""){
+			dojo.style(descDiv, "paddingBottom", "8px");
+
+			// prices
+			if (prices && prices.length){
+				dojo.style(descDiv, "borderBottom", "1px solid gray");
+				ButtonModernHelper.renderPrices(tooltip, model);	//simple prices
+			}
+
+			//You must have done a bunch of trading already (with any race) before embassies show you this advanced info:
+			var TOTAL_TRADES_TO_SEE_CHANCES = 50;
+			//Ability to render effects is replaced with this because I want to try something a little different for embassies.
+			if (controller.game.stats.getStatCurrent("totalTrades").val >= TOTAL_TRADES_TO_SEE_CHANCES) {
+				EmbassyButtonHelper.renderResourceChances(tooltip, controller.game, model.options.race);
+			}
+
+			// flavor
+
+			if (flavor && flavor != "") {
+				dojo.create("div", {
+					innerHTML: flavor,
+					className: "flavor",
+					style: {
+						paddingTop: "20px",
+						fontSize: "12px",
+						fontStyle: "italic"
+				}}, tooltip);
+			}
+
+		} else {
+			dojo.style(descDiv, "paddingBottom", "4px");
+		}
+
+		return tooltip.outerHTML;
+	},
+
+	//Create a section in the embassy tooltip that displays the chance to get resources.
+	//But we only show resources that are actually affected by embassies.  We also only show unlocked resources.
+	renderResourceChances: function(tooltip, game, race) {
+		//Build a list of each resource whose chance depends on embassies:
+		var chancesToDisplay = [];
+		for (var i = 0; i < race.sells.length; i += 1) {
+			var sellOptions = race.sells[i]; //Example: {name: "slab", value: 5, chance: 0.75, width: 0.15, minLevel: 5}
+			var sellResource = game.resPool.get(sellOptions.name); //Actual resources object.
+			if (!sellResource.unlocked) {
+				continue; //Don't display a resource that's not unlocked yet.
+			}
+			if (sellOptions.chance >= 1) {
+				continue; //Chance is fixed at 100%, therefore not based on embassies, so don't display.
+			}
+			var sellChance = Math.min(game.diplomacy.getResourceTradeChance(sellOptions, race), 1); //Cap at 100%
+			if (sellChance == 0 ) {
+				continue; //Don't display a resource that we can't get from them.
+			}
+			chancesToDisplay.push({ title: sellResource.title, chance: sellChance });
+		}
+		//Don't forget to include spice, which is special:
+		var spiceResource = game.resPool.get("spice");
+		var spiceChance = game.diplomacy.getSpiceTradeChance(race);
+		if (spiceResource.unlocked && spiceChance > 0) {
+			var spiceMulti = spiceChance > 1 ? spiceChance : undefined; //Past 100% chance, additional embassies increase spice amount.
+			spiceChance = Math.min(spiceChance, 1); //Cap at 100%
+			chancesToDisplay.push({ title: spiceResource.title, chance: spiceChance, multi: spiceMulti });
+		}
+
+		//Don't mention blueprints or titanium because neither of those is affected by embassies.
+
+		if (chancesToDisplay.length < 1) {
+			return; //Skip modifying the tooltip if there's nothing to show.
+		}
+		//Else, update the tooltip to show what embassies affect.
+		dojo.create("div", {
+			innerHTML: $I("trade.embassy.chance") + ":",
+			className: "tooltip-divider" + " resEffectsTxt",
+			style: {
+				textAlign: "center",
+				width: "100%",
+				borderBottom: "1px solid gray",
+				paddingBottom: "4px",
+				marginBottom: "8px"
+		}}, tooltip);
+		for (var i = 0; i < chancesToDisplay.length; i += 1) {
+			dojo.create("div", {
+				innerHTML: chancesToDisplay[i].title + ": " + (100 * chancesToDisplay[i].chance).toFixed(1) + "%" + (chancesToDisplay[i].multi ? ", ×" + game.getDisplayValueExt(chancesToDisplay[i].multi) : ""),
+				className: "effectName"
+			}, tooltip);
+		}
+	}
+};
+
 
 dojo.declare("classes.diplomacy.ui.EmbassyButton", com.nuclearunicorn.game.ui.ButtonModern, {
 	pinLinkHref: null,
@@ -1057,6 +1189,10 @@ dojo.declare("classes.diplomacy.ui.EmbassyButton", com.nuclearunicorn.game.ui.Bu
 				console.log("toggled pin for race:", this.game.diplomacy.races);
 			}
 		});
+	},
+
+	getTooltipHTML: function() {
+		return EmbassyButtonHelper.getTooltipHTML;
 	},
 
 	update: function(){

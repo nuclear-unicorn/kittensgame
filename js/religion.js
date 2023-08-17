@@ -247,6 +247,17 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		//------------------------- necrocorns pacts -------------------------
 		this.pactsManager.necrocornConsumptionDays(daysOffset);
 	},
+	
+	gesSiphoningAlicornConsumptionPerDay: function(){
+		if(this.game.science.getPolicy(["siphoning"]).researched){
+			var necrocornDeficitRepaymentModifier = 1;
+			if(this.pactsManager.necrocornDeficit > 0){
+				necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
+			}
+			return this.game.getEffect("necrocornPerDay") * necrocornDeficitRepaymentModifier;
+		}
+		return 0;
+	},
 	necrocornFastForward: function(days, times){
 		//------------------------- necrocorns pacts -------------------------
 		//deficit changing
@@ -509,11 +520,11 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"corruptionRatio" : 0.000001
 		},
 		calculateEffects: function(self, game) {
-			self.effects["corruptionRatio"] = 0.000001 * (1 + game.getLimitedDR(game.getEffect("corruptionBoostRatioChallenge"), 2));
+			self.effects["corruptionRatio"] = 0.000001 * (1 + game.getEffect("corruptionBoostRatioChallenge")); //LDR specified in challenges.js
 		},
 		unlocked: false,
 		getEffectiveValue: function(game) {
-			return this.val * (1 + game.getLimitedDR(game.getEffect("corruptionBoostRatioChallenge"), 2));
+			return this.val * (1 + game.getEffect("corruptionBoostRatioChallenge")); //LDR specified in challenges.js
 		}
 	},{
 		name: "unicornGraveyard",
@@ -1067,7 +1078,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	},
 	getSolarRevolutionRatio: function() {
 		var uncappedBonus = this.getRU("solarRevolution").on ? this.game.getUnlimitedDR(this.faith, 1000) / 100 : 0;
-		return this.game.getLimitedDR(uncappedBonus, 10 + this.game.getEffect("solarRevolutionLimit") + (this.game.challenges.getChallenge("atheism").researched ? (this.game.religion.transcendenceTier) : 0)) * (1 + this.game.getLimitedDR(this.game.getEffect("faithSolarRevolutionBoost"), 4));
+		return this.game.getLimitedDR(uncappedBonus, 10 + this.game.getEffect("solarRevolutionLimit") + (this.game.challenges.getChallenge("atheism").researched ? (this.game.religion.transcendenceTier) : 0)) * (1 + this.game.getEffect("faithSolarRevolutionBoost")/*(LDR specified in challenges.js)*/);
 	},
 
 	getApocryphaBonus: function(){
@@ -1957,7 +1968,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 		this function adds appropriate karmaKittens and returns change in karma; temporary logs karma generation
 		TODO: maybe make HG bonus play into this
 		*/
-		var kittens = this.game.resPool.get("kittens").value;
+		var kittens = Math.round(this.game.resPool.get("kittens").value * (1 + this.game.getEffect("simScalingRatio")));
 		if (kittens > 35 && this.game.getEffect("pactsAvailable") > 0){
 			var oldKarmaKittens = this.game.karmaKittens;
 			var kittensKarmaPerMinneliaRatio = this.game.getEffect("kittensKarmaPerMinneliaRatio");

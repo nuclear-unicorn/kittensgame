@@ -1526,6 +1526,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 title: $I("effectsMgr.statics.temporalPressCap.title"),
                 type: "fixed"
 			},
+            "heatEfficiency": {
+                title: $I("effectsMgr.statics.heatEfficiency.title"),
+                type: "ratio"
+			},
             "shatterCostIncreaseChallenge": {
                 title: $I("effectsMgr.statics.shatterCostIncreaseChallenge.title"),
                 type: "ratio"
@@ -3577,7 +3581,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		stack.push({
 			name: $I("res.stack.buildings"),
 			type: "perDay",
-			value: this.getEffect(res.name + "PerDay") - this.religion.pactsManager.getSiphonedCorruption(1)
+			value: this.getEffect(res.name + "PerDay")
 		});
 		if(resName == "necrocorn"){
 			var corruptionStack = [];
@@ -3602,6 +3606,14 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				name: $I("res.stack.time"),
 				type: "ratio",
 				value: this.timeAccelerationRatio()
+			});
+		}
+
+		if(resName == "alicorn"){
+			stack.push({
+				name: $I("res.stack.corruptionPerDaySiphoned"),
+				type: "perDay",
+				value: this.religion.gesSiphoningAlicornConsumptionPerDay()
 			});
 		}
 
@@ -3949,6 +3961,16 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 					resString += "<br>" + $I("res.toCap") + ": " + this.toDisplaySeconds(toCap.toFixed());
 				}
 			}
+		}
+		//TODO: redo this logic to decrease repetition
+		if (res.calculatePerTickAndDay && res.name == "alicorn"){ 
+			var resStackDay = this.getResourcePerDayStack(res.name),
+				resStringDay = this.processResourcePerTickStack(resStackDay, res, 0), //processResourcePerTickStack can work with perDay stack
+				resPerDay = this.getResourcePerDay(res.name);
+				if (this.opts.usePercentageResourceValues){
+					resStringDay += "<br> " + $I("res.netGain") + ": " + this.getDisplayValueExt(resPerDay, true, true);
+				}
+			return resString + resStringDay;
 		}
 		return resString;
 	},
@@ -4917,25 +4939,27 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	calculateAllEffects: function() {
 		// TODO: delegate this to managers? Can't be done in load unfortunately.
-		this.upgrade({
-			tech: this.science.techs.map(function(item){return item.name;}),
-			policies: this.science.policies.map(function(item){return item.name;}),
-			perks: this.prestige.perks.map(function(item){return item.name;}),
-			jobs: this.village.jobs.map(function(item){return item.name;}),
-			crafts: this.workshop.crafts.map(function(item){return item.name;}),
-			upgrades: this.workshop.upgrades.map(function(item){return item.name;}),
-			buildings: this.bld.buildingsData.map(function(item){return item.name;}),
-			spaceMission: this.space.programs.map(function(item){return item.name;}),
-			spaceBuilding: this.space.spaceBuildingsMap,
-			planet: this.space.planets.map(function(item){return item.name;}),
-			chronoforge: this.time.chronoforgeUpgrades.map(function(item){return item.name;}),
-			voidSpace: this.time.voidspaceUpgrades.map(function(item){return item.name;}),
-			zigguratUpgrades: this.religion.zigguratUpgrades.map(function(item){return item.name;}),
-			religion: this.religion.religionUpgrades.map(function(item){return item.name;}),
-			transcendenceUpgrades: this.religion.transcendenceUpgrades.map(function(item){return item.name;}),
-			pacts: this.religion.pactsManager.pacts.map(function(item){return item.name;}),
-			challenges: this.challenges.challenges.map(function(item){return item.name;})
-		});
+		var getName = function(item){return item.name;};
+		var metaKeys = {
+				tech: this.science.techs.map(getName),
+				policies: this.science.policies.map(getName),
+				perks: this.prestige.perks.map(getName),
+				jobs: this.village.jobs.map(getName),
+				crafts: this.workshop.crafts.map(getName),
+				upgrades: this.workshop.upgrades.map(getName),
+				buildings: this.bld.buildingsData.map(getName),
+				spaceMission: this.space.programs.map(getName),
+				spaceBuilding: this.space.spaceBuildingsMap,
+				planet: this.space.planets.map(getName),
+				chronoforge: this.time.chronoforgeUpgrades.map(getName),
+				voidSpace: this.time.voidspaceUpgrades.map(getName),
+				zigguratUpgrades: this.religion.zigguratUpgrades.map(getName),
+				religion: this.religion.religionUpgrades.map(getName),
+				transcendenceUpgrades: this.religion.transcendenceUpgrades.map(getName),
+				pacts: this.religion.pactsManager.pacts.map(getName),
+				challenges: this.challenges.challenges.map(getName)
+			};
+		this.upgrade(metaKeys);
 		this.upgrade({policies: ["authocracy"]});
 	},
 

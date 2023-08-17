@@ -365,9 +365,11 @@ WCraftShortcut = React.createClass({
 
     hasMinAmt: function(recipe){
 		var minAmt = Number.MAX_VALUE;
-		for (var j = 0; j < recipe.prices.length; j++){
-			var totalRes = game.resPool.get(recipe.prices[j].name).value;
-			var allAmt = Math.floor(totalRes / recipe.prices[j].val);
+        var craftPrices = game.workshop.getCraftPrice(recipe); //Get price as modified by upgrades
+
+		for (var j = 0; j < craftPrices.length; j++){
+			var totalRes = game.resPool.get(craftPrices[j].name).value;
+			var allAmt = Math.floor(totalRes / craftPrices[j].val);
 			if (allAmt < minAmt){
 				minAmt = allAmt;
 			}

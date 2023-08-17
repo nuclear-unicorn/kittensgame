@@ -275,6 +275,10 @@
     "calendar.year.full": "Year {0} - {1}, day {2}",
     "calendar.year.tooltip": "Year:",
 
+    "challendge.effects.show.label": "Show Challenge effects",
+    "challendge.effects.toggle.desc": "Toggle the summary of all the effects of your Challenges.",
+    "challendge.effects.hide.label": "Hide Challenge effects",
+    "challendge.effects.panel.label": "Effects of {0} Challenge",
     "challendge.panel.label": "Challenges",
     "challendge.pending": "Pending",
     "challendge.reclaimReserves.label": "Reclaim reserves",
@@ -424,6 +428,7 @@
     "effectsMgr.statics.harborRatio.title": "Harbor ship expansion",
     "effectsMgr.statics.hashrate.title": "Hashrate",
     "effectsMgr.statics.hashrateLevel.title": "Hashrate level",
+    "effectsMgr.statics.heatEfficiency.title": "Heat transfer efficiency",
     "effectsMgr.statics.heatMax.title": "Max heat",
     "effectsMgr.statics.heatMaxExpansion.title": "Max heat expansion",
     "effectsMgr.statics.heatPerTick.title": "Heat transfer",
@@ -559,7 +564,7 @@
     "effectsMgr.statics.uraniumRatio.title": "Uranium savings",
     "effectsMgr.statics.voidResonance.title": "Order of the Void bonus",
     "effectsMgr.statics.warehouseRatio.title": "Warehouse expansion",
-    "effectsMgr.statics.weaponEfficency.title": "Weapon efficency",
+    "effectsMgr.statics.weaponEfficency.title": "Weapon efficiency",
     "effectsMgr.statics.woodJobRatio.title": "Woodcutter tools",
     "effectsMgr.statics.zebraAppeasedGoldPenalty.title" : "Gold penalty",
     "effectsMgr.statics.zebraPreparations.title": "Zebra Preparation",
@@ -1475,6 +1480,7 @@
     "space.yarnMission.desc": "Yarn is a class M planet with high moderate climate, seas and oxygen atmosphere.",
 
     "stats.buildings": "Buildings Constructed",
+    "stats.challenges.total": "Challenges Completed",
     "stats.clicks.total": "Total Clicks",
     "stats.crafts.current": "Crafting Times",
     "stats.crafts.total": "Crafting Times",
@@ -1490,6 +1496,7 @@
     "stats.time.current": "Time Played",
     "stats.trades.current": "Trades Completed",
     "stats.trades.total": "Trades Completed",
+    "stats.transcendenceTier": "Transcendence Tier",
     "stats.unicorns": "Unicorns Sacrificed",
     "stats.years.total": "Total Years Played",
 
@@ -1614,6 +1621,7 @@
     "trade.correct.bcoin": "There was a huge crypto market correction",
     "trade.embassy.label":"Embassy",
     "trade.embassy.desc": "Improve your diplomatic relationships by establishing an embassy",
+    "trade.embassy.chance": "Chance to get resources",
     "trade.embassy.pinned": "Pinned",
     "trade.embassy.unpinned": "Unpinned",
 

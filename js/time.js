@@ -150,7 +150,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         //if we have spare chronoheat
         if (this.heat > 0) {
             var perTick = Math.min(this.game.getEffect("heatPerTick"), this.heat);
-            this.getCFU("blastFurnace").heat += perTick;
+            var efficiency = 1 + this.game.getEffect("heatEfficiency");
+            this.getCFU("blastFurnace").heat += perTick * efficiency;
             this.heat -= perTick;
             if (this.heat < 0) {
                 this.heat = 0;
@@ -195,9 +196,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             var perTickHeatTransfer = this.game.getEffect("heatPerTick");
             var heatAttemptTransfer = daysOffset * this.game.calendar.ticksPerDay * perTickHeatTransfer;
             var heatTransfer = Math.min(this.heat, heatAttemptTransfer);
-
             var blastFurnace = this.getCFU("blastFurnace");
-            blastFurnace.heat += heatTransfer;
+            var efficiency = 1 + this.game.getEffect("heatEfficiency");
+            blastFurnace.heat += heatTransfer * efficiency;
             this.heat -= heatTransfer;
 
             // Shatter time crystals from the heated forge
@@ -331,13 +332,20 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             }
 
             if (self.heat >= 100){
+                var limit = 5;
+                //limit calculations needed per tick; 
+                //with fast shatter use shatterYearBoost from temporalPress instead
+                var test_shatter = game.time.testShatter;
+                if (game.time.getCFU("temporalPress").isAutomationEnabled && test_shatter == 1){
+                    limit = Math.max(limit, game.getEffect("shatterYearBoost"));
+                }
                 var amt = Math.floor(self.heat / 100);
-                if (amt > 5){
-                    amt = 5; //limit calculations needed per tick
+                if (amt > limit){
+                    amt = limit;
                 }
                 self.heat -= 100 * amt;
                 //game.time.shatter(amt);
-                if(game.time.testShatter == 1) {game.time.shatterInGroupCycles(amt);}
+                if(test_shatter == 1) {game.time.shatterInGroupCycles(amt);}
                 //else if(game.time.testShatter == 2) {game.time.shatterInCycles(amt);}
                 //shatterInCycles is deprecated
                 else  {game.time.shatter(amt);}
@@ -449,7 +457,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             }
             self.effects["shatterYearBoost"] = (self.isAutomationEnabled)? 5 * game.calendar.yearsPerCycle : game.calendar.yearsPerCycle; //25 or 5 currently
             self.limitBuild = game.getEffect("temporalPressCap");
-            self.priceRatio = Math.max(1.05, 1.1 - game.challenges.getChallenge("1000Years").on * 0.001); //first 50 completions of 1000Years make priceRatio cheaper
+            self.priceRatio = Math.max(1.01, 1.1 - game.challenges.getChallenge("1000Years").on * 0.001); //first 90 completions of 1000Years make priceRatio cheaper
         },
         isAutomationEnabled: null,
         unlocked: false
@@ -1109,7 +1117,8 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
                     price["val"] *= (1 + (this.game.time.heat - heatMax) * 0.01);  //1% per excessive heat unit
                 }
 
-                price["val"] *= (1 + this.game.getLimitedDR(this.game.getEffect("shatterCostReduction"),1) + this.game.getEffect("shatterCostIncreaseChallenge"));
+                //LDR for the effect "shatterCostReduction" is specified in challenges.js
+                price["val"] *= (1 + this.game.getEffect("shatterCostReduction") + this.game.getEffect("shatterCostIncreaseChallenge"));
             }
             else if(price["name"] == "void"){
                 var heatMax = this.game.getEffect("heatMax");
@@ -1153,7 +1162,8 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 	                    priceLoop *= (1 + (this.game.time.heat + k * heatFactor - heatMax) * 0.01);  //1% per excessive heat unit
 	                }
 
-                    priceLoop *= (1 + this.game.getLimitedDR(this.game.getEffect("shatterCostReduction"),1) +
+                    //LDR for the effect "shatterCostReduction" is specified in challenges.js
+                    priceLoop *= (1 + this.game.getEffect("shatterCostReduction") +
                         this.game.getEffect("shatterCostIncreaseChallenge"));
 
                     pricesTotal.timeCrystal += priceLoop;
