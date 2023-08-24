@@ -3574,8 +3574,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			return;
 		}
 		if (resName == "necrocorn"){
-			console.error(this.getEffect("necrocornPerDay") + this.religion.pactsManager.getSiphonedCorruption(1));
-			console.error("ncr");
 			stack.push({
 				name: $I("res.stack.buildings"),
 				type: "perDay",
