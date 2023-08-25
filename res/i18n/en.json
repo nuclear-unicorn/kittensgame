@@ -773,7 +773,7 @@
     "policy.republic.label" : "Republic",
     "policy.republic.desc" : "Best for large societies. Highly promoted leaders will provide a small bonus to the production of all kittens.",
     "policy.siphoning.label" : "Siphoning",
-    "policy.siphoning.desc" : "Pacts consume alicorns and slow down corruption instead of consuming necrocorns. Lack of either is compensated by consuming necrocorns.",
+    "policy.siphoning.desc" : "Pacts consume alicorns and slow down corruption instead of consuming necrocorns. Lack of alicorns or corruption is compensated by consuming necrocorns.",
     "policy.socialism.label" : "Socialism",
     "policy.socialism.desc" : "Has no effect",
     "policy.spaceBasedTerraforming.label" : "Space-based terraforming",
