@@ -102,7 +102,6 @@ try {
     require("../js/math");
     require("../game");
     require("../js/jsx/left.jsx");
-    require("../js/jsx/map.jsx");
     require("../js/ui");
     require("../js/toolbar");
 

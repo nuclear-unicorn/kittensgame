@@ -1795,23 +1795,28 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	featureFlags: {
 		VILLAGE_MAP: {
 			beta: true,
-			main: false
+			main: false,
+			mobile: false
 		},
 		SPACE_EXPL: {
 			beta: true,
-			main: false
+			main: false,
+			mobile: false
 		},
 		MAUSOLEUM_PACTS:{
 			beta: true,
-			main: true
+			main: true,
+			mobile: true
 		},
 		QUEUE:{
 			beta: true,
-			main: true
+			main: true,
+			mobile: true
 		},
 		QUEUE_REDSHIFT: {
 			beta: true,
-			main: false
+			main: false,
+			mobile: true
 		}
 	},
 

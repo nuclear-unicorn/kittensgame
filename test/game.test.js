@@ -53,6 +53,15 @@ const _build = (id, val) => {
     controller.build(model, val);
 };
 
+const _get = (id) => {
+    let controller = new classes.ui.btn.StagingBldBtnController(game);
+    let model = controller.fetchModel({
+        key: id,
+        building: id
+    });
+    return model;
+}
+
 //----------------------------------
 //  Basic building and unlocks
 //  Effects and metadata processing
@@ -408,4 +417,34 @@ test("Queue should correctly add and remove items", () => {
 
     //console.error(queue.queueItems);
     expect(queue.queueItems[1].value).toBe(11);
+});
+
+//--------------------------------
+//      Spaceport test
+//--------------------------------
+
+test("Spaceports should be unlocked correctly and have a custom price logic applied", () => {
+    game.science.get("advExogeology").researched = true;
+    game.update();
+
+
+    let controller = new classes.ui.btn.StagingBldBtnController(game);
+    let model = controller.fetchModel({
+        key: "warehouse",
+        building: "warehouse"
+    });
+    controller.deltagrade(model, 1);
+    expect(game.bld.get("warehouse").stage).toBe(1);
+    expect(_get("warehouse").prices.find(price => price.name == "starcharts").val).toBe(100000);
+
+
+    //do not check prices
+    game.devMode = true;
+    _build("warehouse",10);
+    expect(game.bld.get("warehouse").val).toBe(10);
+
+    game.update();
+    expect(Math.round(_get("warehouse").prices.find(price => price.name == "titanium").val)).toBe(40456);
+    //starchart price should skyroket due to the custom price ratio
+    expect(Math.round(_get("warehouse").prices.find(price => price.name == "starcharts").val)).toBe(44481378);
 });

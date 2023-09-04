@@ -1978,6 +1978,12 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
         }
 	},
 
+	/**
+	 * Ultimate entry point to building construction
+	 * @param {*} model 
+	 * @param {*} maxBld 
+	 * 
+	 */
 	build: function(model, maxBld){
 		var meta = model.metadata;
 		var counter = 0;
@@ -1985,48 +1991,55 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 			maxBld = meta.limitBuild - meta.val;
 		}
 
-        if (model.enabled && this.hasResources(model) || this.game.devMode ){
-	        while (this.hasResources(model) && maxBld > 0){
-				this.incrementValue(model);
-				this.payPrice(model);
+		
+        if (!model.enabled && !this.game.devMode){
+			return 0;
+		}
+		
+		while ((this.game.devMode || this.hasResources(model)) && maxBld > 0){
+			this.incrementValue(model);
+			this.payPrice(model);
 
-	            counter++;
-	            maxBld--;
-	        }
+			counter++;
+			maxBld--;
+		}
+		
+		if (!counter){
+			return 0;
+		}
 
-	        if (counter > 1) {
-		        this.game.msg($I("construct.all.msg", [meta.label, counter]), "notice");
-			}
+		if (counter > 1) {
+			this.game.msg($I("construct.all.msg", [meta.label, counter]), "notice");
+		}
 
-			if (meta.breakIronWill) {
-				this.game.ironWill = false;
-				var liberty = this.game.science.getPolicy("liberty");
-				liberty.calculateEffects(liberty, this.game);
-				var zebraOutpostMeta = this.game.bld.getBuildingExt("zebraOutpost").meta;
-				zebraOutpostMeta.calculateEffects(zebraOutpostMeta, this.game);
-				zebraOutpostMeta.jammed = false;
-				this.game.diplomacy.onLeavingIW();
-			}
+		if (meta.breakIronWill) {
+			this.game.ironWill = false;
+			var liberty = this.game.science.getPolicy("liberty");
+			liberty.calculateEffects(liberty, this.game);
+			var zebraOutpostMeta = this.game.bld.getBuildingExt("zebraOutpost").meta;
+			zebraOutpostMeta.calculateEffects(zebraOutpostMeta, this.game);
+			zebraOutpostMeta.jammed = false;
+			this.game.diplomacy.onLeavingIW();
+		}
 
-			if (meta.unlocks) {
-				this.game.unlock(meta.unlocks);
-			}
+		if (meta.unlocks) {
+			this.game.unlock(meta.unlocks);
+		}
 
-			if (meta.calculateEffects){
-				meta.calculateEffects(meta, this.game);
-				this.game.calendar.cycleEffectsBasics(meta.effects, meta.name); //(Only relevant for space buildings)
-			}
-			if (meta.unlockScheme && meta.val >= meta.unlockScheme.threshold) {
-				this.game.ui.unlockScheme(meta.unlockScheme.name);
-			}
+		if (meta.calculateEffects){
+			meta.calculateEffects(meta, this.game);
+			this.game.calendar.cycleEffectsBasics(meta.effects, meta.name); //(Only relevant for space buildings)
+		}
+		if (meta.unlockScheme && meta.val >= meta.unlockScheme.threshold) {
+			this.game.ui.unlockScheme(meta.unlockScheme.name);
+		}
 
-			if (meta.upgrades) {
-				if (meta.updateEffects) {
-					meta.updateEffects(meta, this.game);
-				}
-				this.game.upgrade(meta.upgrades);
+		if (meta.upgrades) {
+			if (meta.updateEffects) {
+				meta.updateEffects(meta, this.game);
 			}
-        }
+			this.game.upgrade(meta.upgrades);
+		}
 
 		return counter;
     },

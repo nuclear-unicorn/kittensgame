@@ -773,38 +773,79 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	},
 	{
 		name: "warehouse",
-		label: $I("buildings.warehouse.label"),
-		description: $I("buildings.warehouse.desc"),
-		prices: [
-			{ name : "beam", val: 1.5 },
-			{ name : "slab", val: 2 }
-		],
-		priceRatio: 1.15,
-		effects: {
-			"catnipMax": 0,
-			"woodMax": 0,
-			"mineralsMax": 0,
-			"coalMax": 0,
-			"ironMax": 0,
-			"titaniumMax": 0,
-			"goldMax": 0
+		stages: [
+			{
+				label: $I("buildings.warehouse.label"),
+				description: $I("buildings.warehouse.desc"),
+				flavor: $I("buildings.warehouse.flavor"),
+				prices: [
+					{ name : "beam", val: 1.5 },
+					{ name : "slab", val: 2 }
+				],
+				priceRatio: 1.15,
+				effects: {
+					"catnipMax": 0,
+					"woodMax": 0,
+					"mineralsMax": 0,
+					"coalMax": 0,
+					"ironMax": 0,
+					"titaniumMax": 0,
+					"goldMax": 0
+					},
+				stageUnlocked: true,
+				togglable: false
 			},
-		calculateEffects: function(self, game){
-			var effects = {
-				"catnipMax": 0,
-				"woodMax": 150,
-				"mineralsMax": 200,
-				"coalMax": 30,
-				"ironMax": 25,
-				"titaniumMax": 10,
-				"goldMax": 5
-			};
-
-			if (game.workshop.get("silos").researched){
-				effects["catnipMax"] = 750;
+			{
+				label: $I("buildings.spaceport.label"),
+				description: $I("buildings.spaceport.desc"),
+				flavor: $I("buildings.spaceport.flavor"),
+				prices: [
+					{ name: "titanium", val: 10000 },
+					{ name: "eludium", val: 500 },
+					{ name: "kerosene", val: 1000 },
+					{ name: "blueprint", val: 500 },
+					{ name: "starcharts", val: 100000 },
+				],
+				priceRatio: 1.15,
+				effects: {
+					"moonBaseStorageBonus": 0,
+					"planetCrackerStorageBonus": 0,
+					"cryostationStorageBonus": 0,
+					"energyConsumption": 0,
+					"starchartPerTickCon": 0
+				},
+				stageUnlocked: true,
+				togglable: true
 			}
-
-			self.effects = game.resPool.addBarnWarehouseRatio(effects);
+		],
+		calculateEffects: function(self, game){
+			var stageMeta = self.stages[self.stage];
+            if (self.stage == 0){
+                var effects = {
+					"catnipMax": 0,
+					"woodMax": 150,
+					"mineralsMax": 200,
+					"coalMax": 30,
+					"ironMax": 25,
+					"titaniumMax": 10,
+					"goldMax": 5
+				};
+	
+				if (game.workshop.get("silos").researched){
+					effects["catnipMax"] = 750;
+				}
+	
+				self.effects = game.resPool.addBarnWarehouseRatio(effects);
+            } else if (self.stage == 1){
+                var effects = {
+					"moonBaseStorageBonus": 0.01,
+					"planetCrackerStorageBonus": 0.01 ,
+					"cryostationStorageBonus": 0.01,
+					"energyConsumption": 40	
+                };
+                stageMeta.effects = effects;
+            }
+			
 		},
 		flavor: $I("buildings.warehouse.flavor"),
 		unlockScheme: {
@@ -2217,6 +2258,17 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 						isTemporary: true //can't exploit buy manipulating pollution in postApocalypse
 					});
 		}
+		/**
+		 * Spaceport will use a much steper price ratio for starcharts to be a dedicated starchart sinker
+		 */
+		if (bld.get("name") == "warehouse" && bld.get("stage") == 1){
+			for (var i = 0; i < prices.length; i++) {
+				if (prices[i].name == "starcharts"){
+					prices[i].val = prices[i].val * Math.pow(1.6, bld.get("val"));
+				}
+			}
+		}
+
 		return prices;
 	 },
 
@@ -2771,7 +2823,7 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 		return !this.game.opts.hideSell;
 	},
 
-    build: function(model, maxBld){
+    build: function(model, opts){
 		var counter = this.inherited(arguments);
 
 		//update stats
@@ -2876,28 +2928,33 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 
 	downgrade: function(model) {
 		if (this.game.opts.noConfirm) {
-			this.deltagrade(this, model, -1);
+			this.deltagrade(model, -1);
 		} else {
 			var self = this;
 			this.game.ui.confirm("", $I("buildings.downgrade.confirmation.msg"), function() {
-				self.deltagrade(self, model, -1);
+				self.deltagrade.apply(self, model, -1);
 			});
 		}
 	},
 
 	upgrade: function(model) {
 		if (this.game.opts.noConfirm) {
-			this.deltagrade(this, model, +1);
+			this.deltagrade(model, +1);
 		} else {
 			var self = this;
 			this.game.ui.confirm("", $I("buildings.upgrade.confirmation.msg"), function() {
-				self.deltagrade(self, model, +1);
+				self.deltagrade.apply(self, model, +1);
 			});
 		}
 	},
 
-	deltagrade: function(self, model, delta) {
-		var metadataRaw = self.getMetadataRaw(model);
+	/**
+	 * Upgrade or downgrade building 
+	 * @param {*} model 
+	 * @param {*} delta 
+	 */
+	deltagrade: function(model, delta) {
+		var metadataRaw = this.getMetadataRaw(model);
 		var undo = this.game.registerUndoChange();
 		undo.addEvent("building", {
 			action:"deltagrade",
@@ -2911,7 +2968,7 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 				metaId: model.options.building,
 				val: metadataRaw.val
 			});
-			self.sellInternal(model, 0, false /*requireSellLink*/);
+			this.sellInternal(model, 0, false /*requireSellLink*/);
 		}
 		metadataRaw.stage += delta;
 		if (!metadataRaw.stage) {metadataRaw.stage = Math.max(0, delta);}
@@ -2919,10 +2976,10 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 		metadataRaw.val = 0;	//TODO: fix by using separate value flags
 		metadataRaw.on = 0;
 		if (metadataRaw.calculateEffects){
-			metadataRaw.calculateEffects(metadataRaw, self.game);
+			metadataRaw.calculateEffects(metadataRaw, this.game);
 		}
-		self.game.upgrade(metadataRaw.upgrades);
-		self.game.render();
+		this.game.upgrade(metadataRaw.upgrades);
+		this.game.render();
 	},
 
 	getMetadataRaw: function(model) {
