@@ -1062,6 +1062,19 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 title: $I("effectsMgr.statics.queueCap"),
                 type: "fixed"
 			},
+			//Spaceports
+			"moonBaseStorageBonus": {
+				title: $I( "effectsMgr.statics.moonBaseStorageBonus.title" ),
+				type: "ratio"
+			},
+			"planetCrackerStorageBonus": {
+				title: $I( "effectsMgr.statics.planetCrackerStorageBonus.title" ),
+				type: "ratio"
+			},
+			"cryostationStorageBonus": {
+				title: $I( "effectsMgr.statics.cryostationStorageBonus.title" ),
+				type: "ratio"
+			},
 			// cycleEffects
 			"spaceElevator-prodTransferBonus": {
                 title: $I("effectsMgr.statics.spaceElevator-prodTransferBonus.title"),
