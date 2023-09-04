@@ -804,15 +804,14 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					{ name: "eludium", val: 500 },
 					{ name: "kerosene", val: 1000 },
 					{ name: "blueprint", val: 500 },
-					{ name: "starcharts", val: 100000 },
+					{ name: "starchart", val: 100000 },
 				],
 				priceRatio: 1.15,
 				effects: {
 					"moonBaseStorageBonus": 0,
 					"planetCrackerStorageBonus": 0,
 					"cryostationStorageBonus": 0,
-					"energyConsumption": 0,
-					"starchartPerTickCon": 0
+					"energyConsumption": 0
 				},
 				stageUnlocked: true,
 				togglable: true
@@ -2263,7 +2262,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		 */
 		if (bld.get("name") == "warehouse" && bld.get("stage") == 1){
 			for (var i = 0; i < prices.length; i++) {
-				if (prices[i].name == "starcharts"){
+				if (prices[i].name == "starchart"){
 					prices[i].val = prices[i].val * Math.pow(1.6, bld.get("val"));
 				}
 			}
