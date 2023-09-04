@@ -834,7 +834,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					effects["catnipMax"] = 750;
 				}
 	
-				self.effects = game.resPool.addBarnWarehouseRatio(effects);
+				stageMeta.effects = game.resPool.addBarnWarehouseRatio(effects);
             } else if (self.stage == 1){
                 var effects = {
 					"moonBaseStorageBonus": 0.01,
