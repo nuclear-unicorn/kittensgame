@@ -2932,7 +2932,7 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 		} else {
 			var self = this;
 			this.game.ui.confirm("", $I("buildings.downgrade.confirmation.msg"), function() {
-				self.deltagrade.apply(self, model, -1);
+				self.deltagrade.apply(self, [model, -1]);
 			});
 		}
 	},
@@ -2943,7 +2943,7 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 		} else {
 			var self = this;
 			this.game.ui.confirm("", $I("buildings.upgrade.confirmation.msg"), function() {
-				self.deltagrade.apply(self, model, +1);
+				self.deltagrade.apply(self, [model, +1]);
 			});
 		}
 	},
