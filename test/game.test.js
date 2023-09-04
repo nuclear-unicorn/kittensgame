@@ -435,7 +435,7 @@ test("Spaceports should be unlocked correctly and have a custom price logic appl
     });
     controller.deltagrade(model, 1);
     expect(game.bld.get("warehouse").stage).toBe(1);
-    expect(_get("warehouse").prices.find(price => price.name == "starcharts").val).toBe(100000);
+    expect(_get("warehouse").prices.find(price => price.name == "starchart").val).toBe(100000);
 
 
     //do not check prices
@@ -446,5 +446,5 @@ test("Spaceports should be unlocked correctly and have a custom price logic appl
     game.update();
     expect(Math.round(_get("warehouse").prices.find(price => price.name == "titanium").val)).toBe(40456);
     //starchart price should skyroket due to the custom price ratio
-    expect(Math.round(_get("warehouse").prices.find(price => price.name == "starcharts").val)).toBe(44481378);
+    expect(Math.round(_get("warehouse").prices.find(price => price.name == "starchart").val)).toBe(44481378);
 });
