@@ -4972,6 +4972,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				pacts: this.religion.pactsManager.pacts.map(getName),
 				challenges: this.challenges.challenges.map(getName)
 			};
+		this.upgrade({ buildings: ["warehouse"]});
 		this.upgrade(metaKeys);
 		this.upgrade({policies: ["authocracy"]});
 	},
