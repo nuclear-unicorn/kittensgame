@@ -435,7 +435,7 @@ test("Spaceports should be unlocked correctly and have a custom price logic appl
     });
     controller.deltagrade(model, 1);
     expect(game.bld.get("warehouse").stage).toBe(1);
-    expect(_get("warehouse").prices.find(price => price.name == "starcharts").val).toBe(100000);
+    expect(_get("warehouse").prices.find(price => price.name == "starchart").val).toBe(100000);
 
 
     //do not check prices
