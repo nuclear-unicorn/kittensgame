@@ -1239,7 +1239,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 	}
 });
 
-ButtonModernHelper = {
+var ButtonModernHelper = {
 	getTooltipHTML : function(controller, model){
 		controller.fetchExtendedModel(model);
 		//throw "ButtonModern::getTooltipHTML must be implemented";
@@ -1395,6 +1395,8 @@ ButtonModernHelper = {
 		}
 	}
 };
+
+window.ButtonModernHelper = ButtonModernHelper;
 
 /*
  * Restyled button with slightly more sophisticated tooltip mechanism
@@ -2326,7 +2328,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab", [com.nuclearunicorn.game.ui.Conte
  * 	html
  * }
  */
-UIUtils = {
+window.UIUtils = {
 	attachTooltip: function(game, container, topPosition, leftPosition, htmlProvider) {
 		var gameNode = dojo.byId("game");
 		var tooltip = dojo.byId("tooltip");

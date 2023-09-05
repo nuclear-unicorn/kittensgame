@@ -9,8 +9,9 @@
 */
 
 
+
 //Localization support
-dojo.declare("com.nuclearunicorn.i18n.Lang", null, {
+dojo.declare("classes.i18n.Lang", null, {
 	fallbackLocale: "en",
 	availableLocales: null,
 	availableLocaleLabels: null,
@@ -188,7 +189,7 @@ dojo.declare("com.nuclearunicorn.i18n.Lang", null, {
 	}
 });
 
-i18nLang = new com.nuclearunicorn.i18n.Lang();
+var i18nLang = new classes.i18n.Lang();
 // i18nLang.init();
 
 /** 
@@ -199,3 +200,4 @@ var $I = function(key, args) {
 };
 
 window.$I = $I;
+window.i18nLang = i18nLang;

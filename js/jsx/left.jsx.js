@@ -13,7 +13,7 @@
     game
 */
 
-WCollapsiblePanel = React.createClass({
+window.WCollapsiblePanel = React.createClass({
     getInitialState: function(){
         return {isCollapsed: false};
     },
@@ -41,7 +41,7 @@ WCollapsiblePanel = React.createClass({
     },
 });
 
-WResourceRow = React.createClass({
+window.WResourceRow = React.createClass({
 
     getDefaultProperties: function(){
         return {resource: null, isEditMode: false, isRequired: false, showHiddenResources: false};
@@ -278,7 +278,7 @@ WResourceRow = React.createClass({
     }
 });
 
-WCraftShortcut = React.createClass({
+window.WCraftShortcut = React.createClass({
     getDefaultProperties: function(){
         return {resource: null, craftFixed: null, craftPercent: null};
     },
@@ -404,7 +404,7 @@ WCraftShortcut = React.createClass({
                     CRAFT RESOURCE ROW
 =======================================================*/
 
-WCraftRow = React.createClass({
+window.WCraftRow = React.createClass({
 
     getDefaultProperties: function(){
         return {resource: null, isEditMode: false};
@@ -527,7 +527,7 @@ WCraftRow = React.createClass({
                      RESORUCES
 =======================================================*/
 
-WResourceTable = React.createClass({
+window.WResourceTable = React.createClass({
     getDefaultProperties: function(){
         return {resources: null};
     },
@@ -619,7 +619,7 @@ WResourceTable = React.createClass({
                         CRAFT
 =======================================================*/
 
-WCraftTable = React.createClass({
+window.WCraftTable = React.createClass({
     getDefaultProperties: function(){
         return {resources: null, game: null};
     },
@@ -681,7 +681,7 @@ WCraftTable = React.createClass({
     }
 });
 
-WPins = React.createClass({
+window.WPins = React.createClass({
     getPins: function(){
         var pins = [];
         for (var i in this.props.game.diplomacy.races){
@@ -717,7 +717,7 @@ WPins = React.createClass({
     }
 });
 
-WLeftPanel = React.createClass({
+window.WLeftPanel = React.createClass({
     getDefaultProperties: function(){
         return {game: null};
     },
@@ -812,7 +812,7 @@ WLeftPanel = React.createClass({
     }
 });
 
-WTooltip = React.createClass({
+window.WTooltip = React.createClass({
     getInitialState: function() {
         return {
             showTooltip: false

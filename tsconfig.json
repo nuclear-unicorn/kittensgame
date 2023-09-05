@@ -11,5 +11,6 @@
             "jquery"
 		]
     },
-    "include": ["js/**/*.js", "game.js", "core.js", "i18n.js"]
+    //"include": ["js/**/*.js", "game.js", "core.js", "i18n.js"]
+    "include": ["config.js"]
 }

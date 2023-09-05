@@ -41,8 +41,8 @@
     "jest": "^26.1.0"
   },
   "dependencies": {
-    "@types/dojo": "^1.9.44",
     "@types/jquery": "^3.5.16",
+    "systemjs-babel": "^0.3.2",
     "typescript": "^5.1.6"
   }
 }

@@ -30,7 +30,12 @@
 		<script src="lib/md5.js"></script>
 
 		<!-- friends don't let friends use AMD and require.js -->
-		<script src="lib/system.js"></script>
+		<script src="lib/system.js">
+			System.config({
+				baseURL: ''
+			});
+		</script>
+		<script src="lib/systemjs-babel.js"></script>
 
 		<!-- Global site tag (gtag.js) - Google Analytics -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id=G-0QBDX221PR"></script>
@@ -120,42 +125,39 @@
 
 				$("#tooltip").hide();
 
-				SystemJS.config({
-					baseURL: ''
-				});
 
 				var modules = [
-					"js/resources",
-					"js/calendar",
-					"js/buildings",
-					"js/village",
-					"js/science",
-					"js/workshop",
-					"js/diplomacy",
-					"js/religion",
-					"js/achievements",
+					"./js/resources",
+					"./js/calendar",
+					"./js/buildings",
+					"./js/village",
+					"./js/science",
+					"./js/workshop",
+					"./js/diplomacy",
+					"./js/religion",
+					"./js/achievements",
 
 
-					"js/jsx/left.jsx",
-					"js/jsx/mid.jsx",
-					"js/jsx/toolbar.jsx",
-					"js/jsx/chiral.jsx",
-					"js/jsx/map.jsx",
-					"js/jsx/queue.jsx",
+					"./js/jsx/left.jsx",
+					"./js/jsx/mid.jsx",
+					"./js/jsx/toolbar.jsx",
+					"./js/jsx/chiral.jsx",
+					"./js/jsx/map.jsx",
+					"./js/jsx/queue.jsx",
 
 					//required for defining IReactAware, will be relied upon by js/space
-					"js/ui",
+					"./js/ui",
 
-					"js/space",
-					"js/prestige",
-					"js/time",
-					"js/stats",
-					"js/challenges",
-					"js/void",
-					"js/math",
-					"game",
+					"./js/space",
+					"./js/prestige",
+					"./js/time",
+					"./js/stats",
+					"./js/challenges",
+					"./js/void",
+					"./js/math",
+					"./game",
 
-					"js/toolbar"
+					"./js/toolbar"
 				];
 				progressMax = modules.length + 3;
 				console.log("Loading...");
@@ -175,7 +177,7 @@
 					console.log("build revison is" + buildRevision);
 					$("#versionLink").html(displayedVersion + ".r" + buildRevision);
 				});
-				def = _import("config", def);
+				def = _import("./config", def);
 				def.then(function() {
 					var schemes = new classes.KGConfig().statics.schemes;
 					for (var i = 0; i < schemes.length; ++i) {
@@ -186,7 +188,7 @@
 					}
 				});
 
-				def = _import("i18n", def);
+				def = _import("./i18n", def);
 				def.then(function () {
 					console.log("Loading locale system");
 					var langPromise = i18nLang.init(now);
@@ -210,7 +212,7 @@
 							$I("ui.loading.msg.15"),
 						];
 
-						def = _import("core", def);
+						def = _import("./core", def);
 						def.then(function () {
 							console.log("Loading game modules");
 							for (var i in modules){

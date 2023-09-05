@@ -514,11 +514,6 @@
   resolved "https://registry.npmjs.org/@types/color-name/-/color-name-1.1.1.tgz"
   integrity sha512-rr+OQyAjxze7GgWrSaJwydHStIhHq2lvY3BOC2Mj7KnzI7XK0Uw1TOOdI9lDoajEbSWLiYgoo4f1R51erQfhPQ==
 
-"@types/dojo@^1.9.44":
-  version "1.9.44"
-  resolved "https://registry.yarnpkg.com/@types/dojo/-/dojo-1.9.44.tgz#df7377ff959d4352c5a6dd637392a5034add0d19"
-  integrity sha512-PXRBomRsnsKOntYqDmamJE9pJ95Bkcuynrvb46PHunClyek+AkuQQdF+MQpaUZUk/FhP+DQrleedtIWAfJe7Rg==
-
 "@types/graceful-fs@^4.1.2":
   version "4.1.3"
   resolved "https://registry.npmjs.org/@types/graceful-fs/-/graceful-fs-4.1.3.tgz"
@@ -3702,6 +3697,11 @@ symbol-tree@^3.2.4:
   version "3.2.4"
   resolved "https://registry.npmjs.org/symbol-tree/-/symbol-tree-3.2.4.tgz"
   integrity sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==
+
+systemjs-babel@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/systemjs-babel/-/systemjs-babel-0.3.2.tgz#d4fc5f23e41c283f07dc53abb5137ea23f038930"
+  integrity sha512-lk7tV3l/9qVADN8wFNG1QtzvalveYkfCKGa6UKcyetAL1en0xjV/Pycd7P94mBzkKCQpAB2b8pu+hkYcbK+p1w==
 
 table@^5.2.3:
   version "5.4.6"
