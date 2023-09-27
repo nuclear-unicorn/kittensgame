@@ -851,7 +851,8 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			style: {
 				position: "relative",
 				display: this.model.visible ? "block" : "none"
-			}
+			},
+			tabIndex: 0
 		}, btnContainer);
 
 		if (this.model.twoRow) {
@@ -879,6 +880,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		this.updateVisible();
 
 		dojo.connect(this.domNode, "onclick", this, "onClick");
+		dojo.connect(this.domNode, "onkeypress", this, "onKeyPress");
 
 		this.afterRender();
 	},
@@ -904,6 +906,12 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			}
 		});
 
+	},
+
+	onKeyPress: function(event){
+		if (event.key == "Enter"){
+			this.onClick(event);
+		}
 	},
 
 	afterRender: function(){
@@ -2256,6 +2264,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Panel", [com.nuclearunicorn.game.ui.Con
 
 		this.toggle = dojo.create("div", {
 			innerHTML: this.collapsed ? "+" : "-",
+			tabIndex: 0,
 			className: "toggle" + (this.collapsed ? " collapsed" : ""),
 			style: {
 				float: "right"
@@ -2277,6 +2286,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Panel", [com.nuclearunicorn.game.ui.Con
 		dojo.connect(this.toggle, "onclick", this, function(){
 			this.collapse(!this.collapsed);
 		});
+		dojo.connect(this.toggle, "onkeypress", this, "onKeyPress");
 
 		this.panelDiv = panel;
 
@@ -2286,6 +2296,13 @@ dojo.declare("com.nuclearunicorn.game.ui.Panel", [com.nuclearunicorn.game.ui.Con
 		this.inherited(arguments, [this.contentDiv] /* dojo majic */);
 
 		return this.contentDiv;
+	},
+
+
+	onKeyPress: function(event){
+		if (event.key == "Enter"){
+			this.collapse(!this.collapsed);
+		}
 	},
 
 	collapse: function(isCollapsed){
