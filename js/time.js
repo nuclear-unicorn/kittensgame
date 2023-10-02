@@ -452,9 +452,17 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             "energyConsumption": 5
         },
         calculateEffects: function(self, game){
-            if (self.isAutomationEnabled == null && game.challenges.getChallenge("1000Years").on > 1) {
-                self.isAutomationEnabled = false;
+            if (game.challenges.getChallenge("1000Years").on > 1) {
+                //Completing the challenge 2 or more times unlocks the automation feature
+                self.description = $I("time.cfu.temporalPress.desc") + "<br>" + $I("time.cfu.temporalPress.desc.automation");
+                if (self.isAutomationEnabled == null) { //force non-null value
+                    self.isAutomationEnabled = false;
+                }
+            } else {
+                self.description = $I("time.cfu.temporalPress.desc");
+                self.isAutomationEnabled = null;
             }
+
             self.effects["shatterYearBoost"] = (self.isAutomationEnabled)? 5 * game.calendar.yearsPerCycle : game.calendar.yearsPerCycle; //25 or 5 currently
             self.limitBuild = game.getEffect("temporalPressCap");
             self.priceRatio = Math.max(1.01, 1.1 - game.challenges.getChallenge("1000Years").on * 0.001); //first 90 completions of 1000Years make priceRatio cheaper
