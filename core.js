@@ -1461,6 +1461,10 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 
 	updateLink: function(buttonLink, modelLink) {
 		if (buttonLink) {
+			if (!modelLink) { //This only ever happens if I mess around with console commands
+				dojo.destroy(buttonLink.link);
+				return;
+			}
 			buttonLink.link.textContent = modelLink.title;
 			if (modelLink.cssClass) {buttonLink.link.className = modelLink.cssClass;}
 			if (modelLink.tooltip) {buttonLink.link.title = modelLink.tooltip;}
