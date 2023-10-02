@@ -1107,8 +1107,12 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			self.effects["steelPerTickProd"] = 0;
 
 			var steelRatio = game.getEffect("calcinerSteelRatio");
-			if (steelRatio != 0){
-
+			if (steelRatio == 0) {
+				self.description = $I("buildings.calciner.desc");
+				self.isAutomationEnabled = null;
+			} else {
+				self.description = $I("buildings.calciner.desc") + "<br>" +
+					$I("buildings.calciner.desc.automation", [(100 * steelRatio).toFixed()]);
 				if (self.isAutomationEnabled == null) {
 					self.isAutomationEnabled = true;
 				}

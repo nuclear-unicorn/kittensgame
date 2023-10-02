@@ -140,6 +140,7 @@
     "buildings.broadcasttower.desc": "Generates culture and happiness. More effective with high energy production.",
     "buildings.calciner.label": "Calciner",
     "buildings.calciner.desc": "A highly effective source of metal. Consumes 1.5 minerals and 0.02 oil per tick. Produces iron and a small amount of titanium",
+    "buildings.calciner.desc.automation": "Automation converts {0}% of iron output into steel.",
     "buildings.chapel.label": "Chapel",
     "buildings.chapel.desc": "Produces a bit of culture and faith per tick. May be improved with religious upgrades",
     "buildings.chronosphere.label": "Chronosphere",
