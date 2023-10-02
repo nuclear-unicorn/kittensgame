@@ -1219,17 +1219,28 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				}
 			}
 			self.effects["manuscriptPerTickProd"] = amt;
+
+			//Update description to explain what automation does:
+			if (game.workshop.get("factoryAutomation").researched) {
+				self.description = $I("buildings.steamworks.desc") + "<br>" + $I("buildings.steamworks.desc.automation");
+			} else {
+				self.description = $I("buildings.steamworks.desc");
+			}
 		},
 		jammed: false,
 		togglableOnOff: true,
 		isAutomationEnabled: null,
 		action: function(self, game) {
-			if (self.on < 1 || self.jammed || !game.workshop.get("factoryAutomation").researched) {
+			if (game.workshop.get("factoryAutomation").researched) {
+				if (self.isAutomationEnabled == null) { //force non-null value
+					self.isAutomationEnabled = true;
+				}
+			} else {
+				self.isAutomationEnabled = null;
 				return;
 			}
-
-			if (self.isAutomationEnabled == null) {
-				self.isAutomationEnabled = true;
+			if (self.on < 1 || self.jammed) {
+				return;
 			}
 
 			var wood = game.resPool.get("wood");
