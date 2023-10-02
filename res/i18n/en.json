@@ -149,6 +149,7 @@
     "buildings.dataCenter.desc": "Increases total effect of compendia on your max science",
     "buildings.factory.label": "Factory",
     "buildings.factory.desc": "Improves craft effectiveness",
+    "buildings.factory.desc.automation": "Automation cleans pollution from the air.",
     "buildings.field.label": "Catnip Field",
     "buildings.field.desc": "Plant some catnip to grow in the village. Fields have +50% production in Spring and -75% production in Winter",
     "buildings.field.flavor": "'Nip as far as the eye can see.",

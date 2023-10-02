@@ -1434,8 +1434,10 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 
 			effects["energyConsumption"] = 2;
 			if(game.workshop.get("carbonSequestration").researched){
+				self.description = $I("buildings.factory.desc") + "<br>" + $I("buildings.factory.desc.automation");
 				self.isAutomationEnabled = (self.isAutomationEnabled === null) ? true : self.isAutomationEnabled;
 			} else {
+				self.description = $I("buildings.factory.desc");
 				self.isAutomationEnabled = null;
 			}
 			effects["energyConsumption"] *= (self.isAutomationEnabled)? 2 : 1;
