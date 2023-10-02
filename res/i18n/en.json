@@ -199,6 +199,7 @@
     "buildings.quarry.flavor": "It's full of mice! Wait, wrong 'quarry'",
     "buildings.reactor.label": "Reactor",
     "buildings.reactor.desc": "Provides a 5% boost to production while active. Requires uranium to operate.",
+    "buildings.reactor.desc.automation": "Automation consumes thorium to produce more energy.",
     "buildings.reactor.flavor": "Glowing mice are much easier to catch!",
     "buildings.refineCatnip.label": "Refine catnip",
     "buildings.refineCatnip.desc": "Refine catnip into catnip wood",

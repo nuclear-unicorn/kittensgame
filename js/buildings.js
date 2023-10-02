@@ -1469,8 +1469,14 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		isAutomationEnabled: null,
 		calculateEffects: function(self, game) {
 			self.effects["uraniumPerTick"] = -0.001 * (1 - game.getEffect("uraniumRatio"));
-			if (self.isAutomationEnabled == null && game.workshop.get("thoriumReactors").researched) {
-				self.isAutomationEnabled = true;
+			if (game.workshop.get("thoriumReactors").researched) {
+				self.description = $I("buildings.reactor.desc") + "<br>" + $I("buildings.reactor.desc.automation");
+				if (self.isAutomationEnabled == null ) {
+					self.isAutomationEnabled = true; //force non-null value
+				}
+			} else {
+				self.description = $I("buildings.reactor.desc");
+				self.isAutomationEnabled = null;
 			}
 		},
 		action: function(self, game) {
