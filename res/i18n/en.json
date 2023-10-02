@@ -187,6 +187,7 @@
     "buildings.observatory.flavor": "Yearning to one day catch the red light fairy",
     "buildings.oilWell.label": "Oil Well",
     "buildings.oilWell.desc": "Produces a bit of oil, +1500 to maximum oil limit",
+    "buildings.oilWell.desc.automation": "Automation consumes energy for more oil production.",
     "buildings.oilWell.flavor": "Rise early, work hard, strike oil.",
     "buildings.pasture.label": "Pasture",
     "buildings.pasture.desc": "Provides an alternative source of food, which reduces catnip consumption.",

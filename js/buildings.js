@@ -1340,10 +1340,18 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		isAutomationEnabled: null,
 		calculateEffects: function(self, game) {
+			//The upgrade that optionally increases oil prod at the cost of energy:
 			var hasPumpjack = game.workshop.get("pumpjack").researched;
 			self.togglable = hasPumpjack;
-			if (self.isAutomationEnabled == null && hasPumpjack) {
-				self.isAutomationEnabled = true;
+
+			if (hasPumpjack) {
+				self.description = $I("buildings.oilWell.desc") + "<br>" + $I("buildings.oilWell.desc.automation");
+				if (self.isAutomationEnabled == null) { //force non-null value
+					self.isAutomationEnabled = true;
+				}
+			} else {
+				self.description = $I("buildings.oilWell.desc");
+				self.isAutomationEnabled = null;
 			}
 
 			var oilRatio = 1 + game.getEffect("oilWellRatio");
