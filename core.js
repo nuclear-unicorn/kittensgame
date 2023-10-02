@@ -1275,7 +1275,7 @@ ButtonModernHelper = {
 
 		// description
 		var descDiv = dojo.create("div", {
-			innerHTML: model.description,
+			innerHTML: controller.getDescription(model),
 			className: "desc"
 		}, tooltip);
 
