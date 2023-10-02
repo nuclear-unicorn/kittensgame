@@ -300,7 +300,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     },{
         name: "blastFurnace",
         label: $I("time.cfu.blastFurnace.label"),
-        description: $I("time.cfu.blastFurnace.desc"),
+        description: $I("time.cfu.blastFurnace.desc") + "<br>" + $I("time.cfu.blastFurnace.desc2"),
         prices: [
             { name : "timeCrystal", val: 25 },
             { name : "relic", val: 5 }

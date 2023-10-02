@@ -1527,6 +1527,7 @@
     "time.AccelerateTimeBtn.tooltip.accelerated": "Accelerated time flow",
     "time.cfu.blastFurnace.label": "Chrono Furnace",
     "time.cfu.blastFurnace.desc": "Operates on chronoheat. Increases the maximum heat limit by 100.",
+    "time.cfu.blastFurnace.desc2": "Automation skips one year into the future for each 100% of fuel consumed.",
     "time.cfu.ressourceRetrieval.label": "Resource Retrieval",
     "time.cfu.ressourceRetrieval.desc": "Retrieve part of your yearly resources when you burn TC",
     "time.cfu.temporalAccelerator.label": "Temporal Accelerator",
