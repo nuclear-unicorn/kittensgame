@@ -388,7 +388,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     },{
         name: "temporalAccelerator",
         label: $I("time.cfu.temporalAccelerator.label"),
-        description: $I("time.cfu.temporalAccelerator.desc") +"\n" + $I("time.cfu.temporalAccelerator.desc2"),
+        description: $I("time.cfu.temporalAccelerator.desc") + "<br>" + $I("time.cfu.temporalAccelerator.desc2"),
         prices: [
             { name : "timeCrystal", val: 10 },
             { name : "relic", val: 1000 }
