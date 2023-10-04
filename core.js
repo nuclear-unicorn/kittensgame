@@ -1283,12 +1283,12 @@ ButtonModernHelper = {
 
 		// description
 		var descDiv = dojo.create("div", {
-			innerHTML: model.description,
+			innerHTML: controller.getDescription(model),
 			className: "desc"
 		}, tooltip);
 
 
-		if (model.metadata && model.metadata.isAutomationEnabled !== undefined){	//TODO: use proper metadata flag
+		if (model.metadata && typeof(model.metadata.isAutomationEnabled) == "boolean"){ //undefined or null don't count here
 			dojo.create("div", {
 				innerHTML: model.metadata.isAutomationEnabled ? $I("btn.aon.tooltip") : $I("btn.aoff.tooltip"),
 				className: "desc small" + (model.metadata.isAutomationEnabled ? " auto-on" : " auto-off")
@@ -1469,6 +1469,10 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 
 	updateLink: function(buttonLink, modelLink) {
 		if (buttonLink) {
+			if (!modelLink) { //This only ever happens if I mess around with console commands
+				dojo.destroy(buttonLink.link);
+				return;
+			}
 			buttonLink.link.textContent = modelLink.title;
 			if (modelLink.cssClass) {buttonLink.link.className = modelLink.cssClass;}
 			if (modelLink.tooltip) {buttonLink.link.title = modelLink.tooltip;}
@@ -1507,7 +1511,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 				}
 			};
 		}
-		if (typeof(model.metadata.isAutomationEnabled) != "undefined" && model.metadata.isAutomationEnabled !== null) {
+		if (typeof(model.metadata.isAutomationEnabled) == "boolean") {
 			model.toggleAutomationLink = {
 				title: model.metadata.isAutomationEnabled ? "A" : "*",
 				tooltip: model.metadata.isAutomationEnabled ? $I("btn.aon.tooltip") : $I("btn.aoff.tooltip"),
