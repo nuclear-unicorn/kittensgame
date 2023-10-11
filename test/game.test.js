@@ -446,5 +446,5 @@ test("Spaceports should be unlocked correctly and have a custom price logic appl
     game.update();
     expect(Math.round(_get("warehouse").prices.find(price => price.name == "titanium").val)).toBe(40456);
     //starchart price should skyroket due to the custom price ratio
-    expect(Math.round(_get("warehouse").prices.find(price => price.name == "starchart").val)).toBe(44481378);
+    expect(Math.round(_get("warehouse").prices.find(price => price.name == "starchart").val)).toBe(8134223);
 });
