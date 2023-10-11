@@ -837,9 +837,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				stageMeta.effects = game.resPool.addBarnWarehouseRatio(effects);
             } else if (self.stage == 1){
                 var effects = {
-					"moonBaseStorageBonus": 0.008,
-					"planetCrackerStorageBonus": 0.008 ,
-					"cryostationStorageBonus": 0.008,
+					"moonBaseStorageBonus": 0.0075,
+					"planetCrackerStorageBonus": 0.0075 ,
+					"cryostationStorageBonus": 0.0075,
 					"energyConsumption": 40	
                 };
                 stageMeta.effects = effects;
