@@ -837,9 +837,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				stageMeta.effects = game.resPool.addBarnWarehouseRatio(effects);
             } else if (self.stage == 1){
                 var effects = {
-					"moonBaseStorageBonus": 0.01,
-					"planetCrackerStorageBonus": 0.01 ,
-					"cryostationStorageBonus": 0.01,
+					"moonBaseStorageBonus": 0.008,
+					"planetCrackerStorageBonus": 0.008 ,
+					"cryostationStorageBonus": 0.008,
 					"energyConsumption": 40	
                 };
                 stageMeta.effects = effects;
@@ -2297,7 +2297,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		if (bld.get("name") == "warehouse" && bld.get("stage") == 1){
 			for (var i = 0; i < prices.length; i++) {
 				if (prices[i].name == "starchart"){
-					prices[i].val = prices[i].val * Math.pow(1.6, bld.get("val"));
+					prices[i].val = prices[i].val * Math.pow(1.35, bld.get("val"));
 				}
 			}
 		}
