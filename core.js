@@ -1578,8 +1578,14 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		return false;
 	},
 
+	//Called whenever we turn the building on or off.
+	//The function was previously empty, so I repurposed it for possible non-proportional calculations.
 	metadataHasChanged: function(model) {
-		// do nothing
+		var meta = model.metadata;
+		if (meta.calculateEffects){
+			meta.calculateEffects(meta, this.game);
+			this.game.calendar.cycleEffectsBasics(meta.effects, meta.name); //(Only relevant for space buildings)
+		}
 	},
 
 	off: function(model, amt) {

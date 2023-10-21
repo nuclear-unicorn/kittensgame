@@ -836,15 +836,21 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	
 				stageMeta.effects = game.resPool.addBarnWarehouseRatio(effects);
             } else if (self.stage == 1){
-                var effects = {
-					"moonBaseStorageBonus": 0.0075,
-					"planetCrackerStorageBonus": 0.0075 ,
-					"cryostationStorageBonus": 0.0075,
-					"energyConsumption": 40	
-                };
+			var effects = {
+					"moonBaseStorageBonus": 0.0085,
+					"planetCrackerStorageBonus": 0.0085,
+					"cryostationStorageBonus": 0.0085,
+					"energyConsumption": 5
+			};
+			if(self.on >= 10) {
+				//The first 10 Spaceports each cost 5Wt to run.
+				//The 11th Spaceport costs 6Wt to run.
+				//The 12th Spaceport costs 7Wt to run.
+				//etc.
+				effects[ "energyConsumption" ] = 0.5 * (self.on - 9) + 45 / self.on;
+			}
                 stageMeta.effects = effects;
             }
-			
 		},
 		upgrades: {
 			spaceBuilding: ["moonBase", "planetCracker", "cryostation"]
