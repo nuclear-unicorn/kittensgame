@@ -1783,6 +1783,46 @@ dojo.declare("classes.queue.manager", null,{
     },
 
     /**
+     * Pushes item back in the queue based on the queue group number (index)
+     * @param {*} index 
+     * 
+     * @returns true if element was moved successfully and false otherwise
+     */
+    pushBack: function(index){
+        console.log("pushback", index);
+        if (index < 0 || index >= this.queueItems.length - 1 ){
+            console.warn("queue#remove - invalid index", index);
+            return false;
+        }
+
+        var item = this.queueItems[index];
+        this.queueItems[index] = this.queueItems[index + 1];
+        this.queueItems[index + 1] = item;
+
+        return true;
+    },
+
+    /**
+     * Pushes item to the front in the queue based on the queue group number (index)
+     * @param {*} index 
+     * 
+     * @returns true if element was moved successfully and false otherwise
+     */
+    pushFront: function(index){
+        console.log("pushfront", index);
+        if (index < 1 || index >= this.queueItems.length){
+            console.warn("queue#remove - invalid index", index);
+            return false;
+        }
+        
+        var item = this.queueItems[index];
+        this.queueItems[index] = this.queueItems[index - 1];
+        this.queueItems[index - 1] = item;
+
+        return true;
+    },
+
+    /**
      * Return a list of sub-options for a building queue
      * in a form of [{
      *      name: <queue item name>,

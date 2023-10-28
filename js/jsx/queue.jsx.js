@@ -13,26 +13,33 @@ WQueueItem = React.createClass({
 
     render: function(){
         var item = this.props.item;
+        var buttons = [
+            $r("a", {
+                href: "#", 
+                onClick: this.removeOne,
+            }, "[-]")];
 
-        if (item.value){
-            buttons = [
-                $r("a", {
-                    href: "#", 
-                    onClick: this.removeOne,
-                }, "[-]"),
-                $r("a", {
-                    href: "#", 
-                    onClick: this.removeAll,
-                }, "[x]")
-            ]
-        } else {
-            buttons = [
-                $r("a", {
-                    href: "#", 
-                    onClick: this.removeOne,
-                }, "[x]")
-            ]
+        if (item.value) {
+            buttons.push($r("a", {
+                href: "#", 
+                onClick: this.removeAll,
+            }, "[x]"));
         }
+
+        if (!this.props.isLast) {
+            buttons.push($r("a", {
+                href: "#", 
+                onClick: this.pushBack,
+            }, "[↓]"));
+        }
+
+        if (this.props.index > 0) {
+                buttons.push($r("a", {
+                href: "#", 
+                onClick: this.pushFront,
+            }, "[↑]"));
+        }
+
 
         //TODO: red indicator when can't process
         //TODO: attach tooltip as if it is a button
@@ -44,6 +51,16 @@ WQueueItem = React.createClass({
                 item.value ? (" " + item.value ) : ""
             )
         ].concat(buttons));
+    },
+
+    pushBack: function(){
+        var i = this.props.index;
+        this.props.queueManager.pushBack(i);
+    },
+
+    pushFront: function(){
+        var i = this.props.index;
+        this.props.queueManager.pushFront(i);
     },
 
     removeOne: function(){
@@ -167,7 +184,13 @@ WQueue = React.createClass({
         
         for (var i in queueItems){
             var item = queueItems[i];
-            items.push($r(WQueueItem, {item: item, index: i, queueManager: queueManager, game: game}));
+            items.push($r(WQueueItem, {
+                item: item,
+                index: i,
+                isLast: i == queueItems.length - 1,
+                queueManager: queueManager,
+                game: game
+            }));
         }
         return $r("div", {}, 
             items
