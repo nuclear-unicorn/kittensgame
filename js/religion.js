@@ -269,19 +269,19 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		var necrocornVal = this.game.resPool.get("necrocorn").value;
 		var corruptionWithExisting = this.game.religion.getCorruptionPerTickProduction(true);
 		var worstPerTickDelta = corruptionWithExisting * days *this.game.calendar.ticksPerDay + corruptionWithExisting;
-		if(!this.game.science.getPolicy(["siphoning"]).researched){
-			if(
-				(worstPerTickDelta >= 0)
-				||(worstPerTickDelta < 0 && necrocornVal + worstPerTickDelta * days > 0)&&
-				(this.game.resPool.get("alicorns").value - 1 + necrocornPerDay * days >= 0)){ //naive solution here
-				this.necrocornsNaiveFastForward(days, times);
-				return;
-			}
+		//if(!this.game.science.getPolicy(["siphoning"]).researched){
+		if(
+			(worstPerTickDelta >= 0)
+			||(worstPerTickDelta < 0 && necrocornVal + worstPerTickDelta * days > 0)&&
+			(this.game.resPool.get("alicorns").value - 1 + necrocornPerDay * days >= 0)){ //naive solution here
+			this.necrocornsNaiveFastForward(days, times);
+			return;
 		}
+		//}
 		var corruptionWithoutExisting = this.game.religion.getCorruptionPerTickProduction(false);
 		//here we chech if the necrocorns will get into cycles of being produced and spent, which also works with syphening
-		if(corruptionWithExisting * days/this.game.calendar.ticksPerDay + necrocornPerDay < 0 &&
-		corruptionWithoutExisting * days/this.game.calendar.ticksPerDay + necrocornPerDay > 0
+		if(corruptionWithExisting * this.game.calendar.ticksPerDay + necrocornPerDay < 0 &&
+		corruptionWithoutExisting * this.game.calendar.ticksPerDay + necrocornPerDay > 0
 		){
 			var alicornsResult = this.game.resPool.get("alicorns").value - 1 + necrocornPerDay * days;
 			var alicornsSpent = necrocornPerDay * days;
