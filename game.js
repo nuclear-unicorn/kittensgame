@@ -1828,7 +1828,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		},
 		QUEUE_REDSHIFT: {
 			beta: true,
-			main: false,
+			main: true,
 			mobile: true
 		}
 	},
@@ -3591,11 +3591,19 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			//console.error("Unable to fetch resource stack for resName '" + resName + "'");
 			return;
 		}
-		stack.push({
-			name: $I("res.stack.buildings"),
-			type: "perDay",
-			value: this.getEffect(res.name + "PerDay")
-		});
+		if (resName == "necrocorn"){
+			stack.push({
+				name: $I("res.stack.buildings"),
+				type: "perDay",
+				value: this.getEffect("necrocornPerDay") + this.religion.pactsManager.getSiphonedCorruption(1)
+			});
+		}else{
+			stack.push({
+				name: $I("res.stack.buildings"),
+				type: "perDay",
+				value: this.getEffect(res.name + "PerDay")
+			});
+		}
 		if(resName == "necrocorn"){
 			var corruptionStack = [];
 			corruptionStack.push({
@@ -3981,9 +3989,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				resStringDay = this.processResourcePerTickStack(resStackDay, res, 0), //processResourcePerTickStack can work with perDay stack
 				resPerDay = this.getResourcePerDay(res.name);
 				if (this.opts.usePercentageResourceValues){
+					resStringDay = "<br>" + resStringDay;
 					resStringDay += "<br> " + $I("res.netGain") + ": " + this.getDisplayValueExt(resPerDay, true, true);
 				}
-			return resString + resStringDay;
+			var totalPerDayDelta =  "<br>" + $I("res.netGainPerDay") + ": " + 
+			this.getDisplayValueExt(resPerTick * this.calendar.ticksPerDay + this.getEffect("alicornPerDay"))
+			;
+			return resString + resStringDay + totalPerDayDelta;
 		}
 		return resString;
 	},
