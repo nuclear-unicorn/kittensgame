@@ -2173,6 +2173,13 @@ dojo.declare("classes.queue.manager", null,{
         }
         var el = this.queueItems[0];
 
+        if (!el){
+            console.warn("null queue item, skipping");
+            this.queueItems.shift();
+            this.game._publish("ui/update", this.game);
+            return;
+        }
+
         var itemMetaRaw = this.game.getUnlockByName(el.name, el.type);
         var compare = "val"; //we should do some sort of refractoring of the switch mechanism
 
