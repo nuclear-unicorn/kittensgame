@@ -106,8 +106,10 @@
     "religion.ru.goldenSpire.desc": "Templele pot înmagazina cu 50% mai multă credință",
     "religion.ru.solarchant.label": "Cântec solar",
     "religion.transcendBtn.label": "Trascende",
+    "religion.zu.unicornTomb.label": "Cimitirul de unicorni",
     "unit.hour": "ora",
     "res.stack.time": "Timp",
+    "res.stack.upgrades": "Imbunatatiri",
     "reset.confirmation.msg60": "Vei primi extra fericire bonus.",
     "resources.compedium.title": "compendiu",
     "resources.kerosene.title": "kerosen",
@@ -145,5 +147,6 @@
     "workshop.pneumaticPress.label": "Presă pneumatică",
     "workshop.pyrolysis.label": "Piroliză",
     "workshop.steelPlants.label": "Plante de oțel",
+    "workshop.titaniumAxe.label": "Topor de Titan",
     "workshop.titaniumSaw.label": "Ferastrau din titaniu"
 }
