@@ -1225,6 +1225,11 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio"
 			},
 
+			"bskSattelitePenalty" : {
+				title: $I("effectsMgr.statics.bskSattelitePenalty.title"),
+				type: "ratio"
+			},
+
 			"blsCorruptionRatio": {
 				title: $I("effectsMgr.statics.blsCorruptionRatio.title"),
 				type: "ratio"

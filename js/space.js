@@ -276,6 +276,11 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				else {
 					self.effects["energyConsumption"] = 1;
 				}
+
+				if (game.challenges.isActive("blackSky")) {
+					self.effects['starchartPerTickBaseSpace'] *= 1 / (1 + game.getEffect('bskSattelitePenalty'));
+				}
+
 				game.upgrade(self.upgrades); //this way observatories won't have to use action
 			},
 			upgrades: {
