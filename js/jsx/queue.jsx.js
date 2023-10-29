@@ -182,7 +182,8 @@ WQueue = React.createClass({
         var queueManager = self.state.game.time.queue;
         var queueItems = queueManager.queueItems;
         
-        for (var i in queueItems){
+        for (var index in queueItems){
+            var i = parseInt(index);
             var item = queueItems[i];
             items.push($r(WQueueItem, {
                 item: item,
