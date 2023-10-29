@@ -45,7 +45,7 @@ WQueueItem = React.createClass({
         //TODO: attach tooltip as if it is a button
         return $r("div", {}, 
         [
-            "[" + item.type + "][" + item.name + "] - ", 
+            "[" + item.type + "] - ", 
             $r("span", {ref:"itemLabel", className:"queue-label"}, item.label),
             (
                 item.value ? (" " + item.value ) : ""
@@ -182,9 +182,15 @@ WQueue = React.createClass({
         var queueManager = self.state.game.time.queue;
         var queueItems = queueManager.queueItems;
         
-        for (var index in queueItems){
-            var i = parseInt(index);
+        for (var i = 0; i < queueItems.length; i++){
             var item = queueItems[i];
+
+            //null element safe switch
+            if (!item){
+                items.push($r("div", {}, "<unknown>"));
+                continue;
+            }
+
             items.push($r(WQueueItem, {
                 item: item,
                 index: i,
