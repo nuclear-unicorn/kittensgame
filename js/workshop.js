@@ -663,7 +663,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			"manpowerJobRatio" : 0.5
 		},
 		calculateEffects: function(self, game){
-			self.effects["manpowerJobRatio"] = 0.5 * Math.max(0, (1 + game.getEffect("weaponEfficency"))); 
+			self.effects["manpowerJobRatio"] = 0.5 * (1 + game.getEffect("weaponEfficency")); //weaponEfficency can't go beyond -1, see challenges.js for more info
 		},
 		prices:[
 			{ name : "wood", val: 200 },
@@ -678,7 +678,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			"manpowerJobRatio" : 0.25
 		},
 		calculateEffects: function(self, game){
-			self.effects["manpowerJobRatio"] = 0.25 * Math.max(0, (1 + game.getEffect("weaponEfficency")));
+			self.effects["manpowerJobRatio"] = 0.25 * (1 + game.getEffect("weaponEfficency")); //weaponEfficency can't go beyond -1, see challenges.js for more info
 		},
 		prices:[
 			{ name : "iron", val: 1500 },
@@ -692,7 +692,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			"manpowerJobRatio" : 0.25
 		},
 		calculateEffects: function(self, game){
-			self.effects["manpowerJobRatio"] = 0.25 * Math.max(0, (1 + game.getEffect("weaponEfficency")));
+			self.effects["manpowerJobRatio"] = 0.25 * (1 + game.getEffect("weaponEfficency")); //weaponEfficency can't go beyond -1, see challenges.js for more info
 		},
 		prices:[
 			{ name : "titanium", val: 5000 },

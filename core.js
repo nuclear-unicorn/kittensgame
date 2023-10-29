@@ -683,6 +683,25 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		this.game.resPool.payPrices(model.prices);
 		model.prices = this.getPrices(model);
 	},
+	
+	payPriceForUndoRefund: function(model) {
+		//Shamelessly copied from the refund code, except we'll lose resources instead of gaining them!
+		if (!model.prices.length){
+			console.warn("unable pay prices for undo refund a building, no prices specified in metadata :O");
+			return;
+		}
+		for( var i = 0; i < model.prices.length; i++){
+			var price = model.prices[i];
+
+			var res = this.game.resPool.get(price.name);
+			if (res.isRefundable(this.game) && !price.isTemporary) {
+				this.game.resPool.addResEvent(price.name, -price.val * model.refundPercentage);
+			} else {
+				// No refund to undo
+			}
+		}
+		model.prices = this.getPrices(model);
+	},
 
 	clickHandler: function(model, event){
 		model.handler.apply(this, [model, event]);
@@ -832,7 +851,8 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			style: {
 				position: "relative",
 				display: this.model.visible ? "block" : "none"
-			}
+			},
+			tabIndex: 0
 		}, btnContainer);
 
 		if (this.model.twoRow) {
@@ -860,6 +880,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		this.updateVisible();
 
 		dojo.connect(this.domNode, "onclick", this, "onClick");
+		dojo.connect(this.domNode, "onkeypress", this, "onKeyPress");
 
 		this.afterRender();
 	},
@@ -885,6 +906,12 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			}
 		});
 
+	},
+
+	onKeyPress: function(event){
+		if (event.key == "Enter"){
+			this.onClick(event);
+		}
 	},
 
 	afterRender: function(){
@@ -1256,12 +1283,12 @@ ButtonModernHelper = {
 
 		// description
 		var descDiv = dojo.create("div", {
-			innerHTML: model.description,
+			innerHTML: controller.getDescription(model),
 			className: "desc"
 		}, tooltip);
 
 
-		if (model.metadata && model.metadata.isAutomationEnabled !== undefined){	//TODO: use proper metadata flag
+		if (model.metadata && typeof(model.metadata.isAutomationEnabled) == "boolean"){ //undefined or null don't count here
 			dojo.create("div", {
 				innerHTML: model.metadata.isAutomationEnabled ? $I("btn.aon.tooltip") : $I("btn.aoff.tooltip"),
 				className: "desc small" + (model.metadata.isAutomationEnabled ? " auto-on" : " auto-off")
@@ -1442,6 +1469,10 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 
 	updateLink: function(buttonLink, modelLink) {
 		if (buttonLink) {
+			if (!modelLink) { //This only ever happens if I mess around with console commands
+				dojo.destroy(buttonLink.link);
+				return;
+			}
 			buttonLink.link.textContent = modelLink.title;
 			if (modelLink.cssClass) {buttonLink.link.className = modelLink.cssClass;}
 			if (modelLink.tooltip) {buttonLink.link.title = modelLink.tooltip;}
@@ -1480,7 +1511,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 				}
 			};
 		}
-		if (typeof(model.metadata.isAutomationEnabled) != "undefined" && model.metadata.isAutomationEnabled !== null) {
+		if (typeof(model.metadata.isAutomationEnabled) == "boolean") {
 			model.toggleAutomationLink = {
 				title: model.metadata.isAutomationEnabled ? "A" : "*",
 				tooltip: model.metadata.isAutomationEnabled ? $I("btn.aon.tooltip") : $I("btn.aoff.tooltip"),
@@ -1547,8 +1578,14 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		return false;
 	},
 
+	//Called whenever we turn the building on or off.
+	//The function was previously empty, so I repurposed it for possible non-proportional calculations.
 	metadataHasChanged: function(model) {
-		// do nothing
+		var meta = model.metadata;
+		if (meta.calculateEffects){
+			meta.calculateEffects(meta, this.game);
+			this.game.calendar.cycleEffectsBasics(meta.effects, meta.name); //(Only relevant for space buildings)
+		}
 	},
 
 	off: function(model, amt) {
@@ -1614,7 +1651,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 	},
 
 	/**
-	 * Returns true if building was sold
+	 * Returns the number of buildings sold.
 	 */
 	sell: function(event, model){
 		var building = model.metadata;
@@ -1623,26 +1660,29 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		// But, proceed with normal action as well if true returned.
 		if (building.canSell) {
 			if(!building.canSell(building, this.game)) {
-				return false;
+				return 0;
 			}
 		}
 
+		var start = building.val;
 		var end = building.val - 1;
 		if (end > 0 && event && event.shiftKey) { //no need to confirm if selling just 1
 			end = 0;
 			if (this.game.opts.noConfirm) {
 				this.sellInternal(model, end, true /*requireSellLink*/);
-				return true;
+				return start;
 			} else {
 				var self = this;
+				var amtSold = 0;
 				this.game.ui.confirm($("sell.all.confirmation.title"), $I("sell.all.confirmation.msg"), function() {
 					self.sellInternal(model, end, true /*requireSellLink*/);
-					return true;
+					amtSold = start;
 				});
+				return amtSold;
 			}
 		} else if (end >= 0) {
 			this.sellInternal(model, end, true /*requireSellLink*/);
-			return true;
+			return start - end; //Should be just 1 if you do the algebra
 		}
 	},
 
@@ -1956,6 +1996,12 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
         }
 	},
 
+	/**
+	 * Ultimate entry point to building construction
+	 * @param {*} model 
+	 * @param {*} maxBld 
+	 * 
+	 */
 	build: function(model, maxBld){
 		var meta = model.metadata;
 		var counter = 0;
@@ -1963,48 +2009,55 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 			maxBld = meta.limitBuild - meta.val;
 		}
 
-        if (model.enabled && this.hasResources(model) || this.game.devMode ){
-	        while (this.hasResources(model) && maxBld > 0){
-				this.incrementValue(model);
-				this.payPrice(model);
+		
+        if (!model.enabled && !this.game.devMode){
+			return 0;
+		}
+		
+		while ((this.game.devMode || this.hasResources(model)) && maxBld > 0){
+			this.incrementValue(model);
+			this.payPrice(model);
 
-	            counter++;
-	            maxBld--;
-	        }
+			counter++;
+			maxBld--;
+		}
+		
+		if (!counter){
+			return 0;
+		}
 
-	        if (counter > 1) {
-		        this.game.msg($I("construct.all.msg", [meta.label, counter]), "notice");
-			}
+		if (counter > 1) {
+			this.game.msg($I("construct.all.msg", [meta.label, counter]), "notice");
+		}
 
-			if (meta.breakIronWill) {
-				this.game.ironWill = false;
-				var liberty = this.game.science.getPolicy("liberty");
-				liberty.calculateEffects(liberty, this.game);
-				var zebraOutpostMeta = this.game.bld.getBuildingExt("zebraOutpost").meta;
-				zebraOutpostMeta.calculateEffects(zebraOutpostMeta, this.game);
-				zebraOutpostMeta.jammed = false;
-				this.game.diplomacy.onLeavingIW();
-			}
+		if (meta.breakIronWill) {
+			this.game.ironWill = false;
+			var liberty = this.game.science.getPolicy("liberty");
+			liberty.calculateEffects(liberty, this.game);
+			var zebraOutpostMeta = this.game.bld.getBuildingExt("zebraOutpost").meta;
+			zebraOutpostMeta.calculateEffects(zebraOutpostMeta, this.game);
+			zebraOutpostMeta.jammed = false;
+			this.game.diplomacy.onLeavingIW();
+		}
 
-			if (meta.unlocks) {
-				this.game.unlock(meta.unlocks);
-			}
+		if (meta.unlocks) {
+			this.game.unlock(meta.unlocks);
+		}
 
-			if (meta.calculateEffects){
-				meta.calculateEffects(meta, this.game);
-				this.game.calendar.cycleEffectsBasics(meta.effects, meta.name); //(Only relevant for space buildings)
-			}
-			if (meta.unlockScheme && meta.val >= meta.unlockScheme.threshold) {
-				this.game.ui.unlockScheme(meta.unlockScheme.name);
-			}
+		if (meta.calculateEffects){
+			meta.calculateEffects(meta, this.game);
+			this.game.calendar.cycleEffectsBasics(meta.effects, meta.name); //(Only relevant for space buildings)
+		}
+		if (meta.unlockScheme && meta.val >= meta.unlockScheme.threshold) {
+			this.game.ui.unlockScheme(meta.unlockScheme.name);
+		}
 
-			if (meta.upgrades) {
-				if (meta.updateEffects) {
-					meta.updateEffects(meta, this.game);
-				}
-				this.game.upgrade(meta.upgrades);
+		if (meta.upgrades) {
+			if (meta.updateEffects) {
+				meta.updateEffects(meta, this.game);
 			}
-        }
+			this.game.upgrade(meta.upgrades);
+		}
 
 		return counter;
     },
@@ -2221,6 +2274,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Panel", [com.nuclearunicorn.game.ui.Con
 
 		this.toggle = dojo.create("div", {
 			innerHTML: this.collapsed ? "+" : "-",
+			tabIndex: 0,
 			className: "toggle" + (this.collapsed ? " collapsed" : ""),
 			style: {
 				float: "right"
@@ -2242,6 +2296,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Panel", [com.nuclearunicorn.game.ui.Con
 		dojo.connect(this.toggle, "onclick", this, function(){
 			this.collapse(!this.collapsed);
 		});
+		dojo.connect(this.toggle, "onkeypress", this, "onKeyPress");
 
 		this.panelDiv = panel;
 
@@ -2251,6 +2306,13 @@ dojo.declare("com.nuclearunicorn.game.ui.Panel", [com.nuclearunicorn.game.ui.Con
 		this.inherited(arguments, [this.contentDiv] /* dojo majic */);
 
 		return this.contentDiv;
+	},
+
+
+	onKeyPress: function(event){
+		if (event.key == "Enter"){
+			this.collapse(!this.collapsed);
+		}
 	},
 
 	collapse: function(isCollapsed){

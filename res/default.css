@@ -139,12 +139,16 @@ div#gameLog {
 }
 
 .bldTopContainer > a, .bldTopContainer > span {
-    opacity: 0.7;
+    color: #666666;
     text-decoration: none;
 }
 
 .activeTab {
     color: black;
+}
+
+.bldTopContainer > a.activeTab {
+    color: #444444;
 }
 
 .resourceRow {

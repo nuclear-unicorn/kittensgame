@@ -399,7 +399,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		}
 
 		var diligentKittens = this.game.challenges.isActive("anarchy")
-			? Math.round(this.getKittens() * (0.5 - this.game.getLimitedDR(this.game.getEffect("kittenLaziness"), 0.25)))
+			? Math.round(this.getKittens() * (1 - this.game.getEffect("kittenLaziness"))) //LDR specified in challenges.js
 			: this.getKittens();
 
 		return diligentKittens - workingKittens;
@@ -942,7 +942,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			bonus = 0.125;
 			break;
 		default:
-			bonus = 0.1875 * (1 + this.game.getLimitedDR(this.game.getEffect("masterSkillMultiplier"), 4));
+			bonus = 0.1875 * (1 + this.game.getEffect("masterSkillMultiplier")); //LDR specified in challenges.js
 		}
 		return bonus * (1 + this.game.getEffect("skillMultiplier"));
 	},

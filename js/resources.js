@@ -687,7 +687,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		for (var i in this.resources){
 			var res = this.resources[i];
 			if (res.name == "sorrow"){
-				res.maxValue = 16 + (game.getEffect("blsLimit") || 0);
+				res.maxValue = 17 + (game.getEffect("blsLimit") || 0);
 				res.value = res.value > res.maxValue ? res.maxValue : res.value;
 				continue;
 			}
@@ -750,7 +750,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	//All energy consumption amounts are multiplied by this number.
 	getEnergyConsumptionRatio: function() {
 		var game = this.game;
-		return (1 + game.getLimitedDR(game.getEffect("energyConsumptionRatio"), 1) + game.getEffect("energyConsumptionIncrease")) *
+		//LDR for the effect named "energyConsumptionRatio" is specified in challenges.js
+		return (1 + game.getEffect("energyConsumptionRatio") + game.getEffect("energyConsumptionIncrease")) *
 				(game.challenges.isActive("energy") ? 2 : 1);
 	},
 
