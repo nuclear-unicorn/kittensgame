@@ -365,9 +365,11 @@ WCraftShortcut = React.createClass({
 
     hasMinAmt: function(recipe){
 		var minAmt = Number.MAX_VALUE;
-		for (var j = 0; j < recipe.prices.length; j++){
-			var totalRes = game.resPool.get(recipe.prices[j].name).value;
-			var allAmt = Math.floor(totalRes / recipe.prices[j].val);
+        var craftPrices = game.workshop.getCraftPrice(recipe); //Get price as modified by upgrades
+
+		for (var j = 0; j < craftPrices.length; j++){
+			var totalRes = game.resPool.get(craftPrices[j].name).value;
+			var allAmt = Math.floor(totalRes / craftPrices[j].val);
 			if (allAmt < minAmt){
 				minAmt = allAmt;
 			}
@@ -571,7 +573,9 @@ WResourceTable = React.createClass({
                 $r("div", {className:"res-toolbar right"}, 
                     $r("a", {
                         className: "link" + (this.state.isEditMode ? " toggled" : ""), 
-                        onClick: this.toggleEdit
+                        onClick: this.toggleEdit,
+                        onKeyDown: this.onKeyDown,
+                        tabIndex: 0
                     }, "⚙"),
                     $r(WTooltip, {body:"?"}, 
                         $I("left.resources.tip"))
@@ -600,6 +604,12 @@ WResourceTable = React.createClass({
                 $I("res.show.hidden")
             ])
         ]);
+    },
+
+    onKeyDown: function(event){
+        if (event.keyCode == 13){
+            this.toggleEdit();
+        }
     },
 
     toggleEdit: function(){
@@ -661,7 +671,9 @@ WCraftTable = React.createClass({
                 $r("div", {className:"res-toolbar right"}, 
                     $r("a", {
                         className: "link" + (this.state.isEditMode ? " toggled" : ""), 
-                        onClick: this.toggleEdit
+                        onClick: this.toggleEdit,
+                        onKeyDown: this.onKeyDown,
+                        tabIndex: 0
                     }, "⚙")
                 )
             ]),
@@ -670,6 +682,12 @@ WCraftTable = React.createClass({
                 $r("div", {className:"res-table craftTable"}, resRows)
             ])
         ]);
+    },
+
+    onKeyDown: function(event){
+        if (event.keyCode == 13){
+            this.toggleEdit();
+        }
     },
 
     toggleEdit: function(){
@@ -826,9 +844,12 @@ WTooltip = React.createClass({
     },
 
     render: function(){
-        return $r("div", {className: "tooltip-block", 
+        return $r("div", {
+            tabIndex: 0,
+            className: "tooltip-block", 
             onMouseOver: this.onMouseOver, 
-            onMouseOut: this.onMouseOut
+            onMouseOut: this.onMouseOut,
+            onKeyDown: this.onKeyDown
         }, [
             this.props.body || $r("div", {className: "tooltip-icon"}, "[?]"),
             this.state.showTooltip ? $r("div", {className: "tooltip-content"}, 
@@ -839,6 +860,12 @@ WTooltip = React.createClass({
 
     onMouseOver: function(){
         this.setState({showTooltip: true});
+    },
+
+    onKeyDown: function(e){
+        if (e.keyCode == 13){
+            this.setState({showTooltip: !this.state.showTooltip});
+        }
     },
 
     onMouseOut: function(){

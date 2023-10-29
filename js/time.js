@@ -150,7 +150,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         //if we have spare chronoheat
         if (this.heat > 0) {
             var perTick = Math.min(this.game.getEffect("heatPerTick"), this.heat);
-            this.getCFU("blastFurnace").heat += perTick;
+            var efficiency = 1 + this.game.getEffect("heatEfficiency");
+            this.getCFU("blastFurnace").heat += perTick * efficiency;
             this.heat -= perTick;
             if (this.heat < 0) {
                 this.heat = 0;
@@ -195,9 +196,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             var perTickHeatTransfer = this.game.getEffect("heatPerTick");
             var heatAttemptTransfer = daysOffset * this.game.calendar.ticksPerDay * perTickHeatTransfer;
             var heatTransfer = Math.min(this.heat, heatAttemptTransfer);
-
             var blastFurnace = this.getCFU("blastFurnace");
-            blastFurnace.heat += heatTransfer;
+            var efficiency = 1 + this.game.getEffect("heatEfficiency");
+            blastFurnace.heat += heatTransfer * efficiency;
             this.heat -= heatTransfer;
 
             // Shatter time crystals from the heated forge
@@ -299,7 +300,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     },{
         name: "blastFurnace",
         label: $I("time.cfu.blastFurnace.label"),
-        description: $I("time.cfu.blastFurnace.desc"),
+        description: $I("time.cfu.blastFurnace.desc") + "<br>" + $I("time.cfu.blastFurnace.desc2"),
         prices: [
             { name : "timeCrystal", val: 25 },
             { name : "relic", val: 5 }
@@ -331,13 +332,20 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             }
 
             if (self.heat >= 100){
+                var limit = 5;
+                //limit calculations needed per tick; 
+                //with fast shatter use shatterYearBoost from temporalPress instead
+                var test_shatter = game.time.testShatter;
+                if (game.time.getCFU("temporalPress").isAutomationEnabled && test_shatter == 1){
+                    limit = Math.max(limit, game.getEffect("shatterYearBoost"));
+                }
                 var amt = Math.floor(self.heat / 100);
-                if (amt > 5){
-                    amt = 5; //limit calculations needed per tick
+                if (amt > limit){
+                    amt = limit;
                 }
                 self.heat -= 100 * amt;
                 //game.time.shatter(amt);
-                if(game.time.testShatter == 1) {game.time.shatterInGroupCycles(amt);}
+                if(test_shatter == 1) {game.time.shatterInGroupCycles(amt);}
                 //else if(game.time.testShatter == 2) {game.time.shatterInCycles(amt);}
                 //shatterInCycles is deprecated
                 else  {game.time.shatter(amt);}
@@ -380,7 +388,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     },{
         name: "temporalAccelerator",
         label: $I("time.cfu.temporalAccelerator.label"),
-        description: $I("time.cfu.temporalAccelerator.desc") +"\n" + $I("time.cfu.temporalAccelerator.desc2"),
+        description: $I("time.cfu.temporalAccelerator.desc") + "<br>" + $I("time.cfu.temporalAccelerator.desc2"),
         prices: [
             { name : "timeCrystal", val: 10 },
             { name : "relic", val: 1000 }
@@ -444,12 +452,20 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             "energyConsumption": 5
         },
         calculateEffects: function(self, game){
-            if (self.isAutomationEnabled == null && game.challenges.getChallenge("1000Years").on > 1) {
-                self.isAutomationEnabled = false;
+            if (game.challenges.getChallenge("1000Years").on > 1) {
+                //Completing the challenge 2 or more times unlocks the automation feature
+                self.description = $I("time.cfu.temporalPress.desc") + "<br>" + $I("time.cfu.temporalPress.desc.automation");
+                if (self.isAutomationEnabled == null) { //force non-null value
+                    self.isAutomationEnabled = false;
+                }
+            } else {
+                self.description = $I("time.cfu.temporalPress.desc");
+                self.isAutomationEnabled = null;
             }
+
             self.effects["shatterYearBoost"] = (self.isAutomationEnabled)? 5 * game.calendar.yearsPerCycle : game.calendar.yearsPerCycle; //25 or 5 currently
             self.limitBuild = game.getEffect("temporalPressCap");
-            self.priceRatio = Math.max(1.05, 1.1 - game.challenges.getChallenge("1000Years").on * 0.001); //first 50 completions of 1000Years make priceRatio cheaper
+            self.priceRatio = Math.max(1.01, 1.1 - game.challenges.getChallenge("1000Years").on * 0.001); //first 90 completions of 1000Years make priceRatio cheaper
         },
         isAutomationEnabled: null,
         unlocked: false
@@ -1109,7 +1125,8 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
                     price["val"] *= (1 + (this.game.time.heat - heatMax) * 0.01);  //1% per excessive heat unit
                 }
 
-                price["val"] *= (1 + this.game.getLimitedDR(this.game.getEffect("shatterCostReduction"),1) + this.game.getEffect("shatterCostIncreaseChallenge"));
+                //LDR for the effect "shatterCostReduction" is specified in challenges.js
+                price["val"] *= (1 + this.game.getEffect("shatterCostReduction") + this.game.getEffect("shatterCostIncreaseChallenge"));
             }
             else if(price["name"] == "void"){
                 var heatMax = this.game.getEffect("heatMax");
@@ -1153,7 +1170,8 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 	                    priceLoop *= (1 + (this.game.time.heat + k * heatFactor - heatMax) * 0.01);  //1% per excessive heat unit
 	                }
 
-                    priceLoop *= (1 + this.game.getLimitedDR(this.game.getEffect("shatterCostReduction"),1) +
+                    //LDR for the effect "shatterCostReduction" is specified in challenges.js
+                    priceLoop *= (1 + this.game.getEffect("shatterCostReduction") +
                         this.game.getEffect("shatterCostIncreaseChallenge"));
 
                     pricesTotal.timeCrystal += priceLoop;
@@ -1760,6 +1778,46 @@ dojo.declare("classes.queue.manager", null,{
         if (!item.value){
             this.queueItems.splice(index, 1);
         }
+
+        return true;
+    },
+
+    /**
+     * Pushes item back in the queue based on the queue group number (index)
+     * @param {*} index 
+     * 
+     * @returns true if element was moved successfully and false otherwise
+     */
+    pushBack: function(index){
+        console.log("pushback", index);
+        if (index < 0 || index >= this.queueItems.length - 1 ){
+            console.warn("queue#remove - invalid index", index);
+            return false;
+        }
+
+        var item = this.queueItems[index];
+        this.queueItems[index] = this.queueItems[index + 1];
+        this.queueItems[index + 1] = item;
+
+        return true;
+    },
+
+    /**
+     * Pushes item to the front in the queue based on the queue group number (index)
+     * @param {*} index 
+     * 
+     * @returns true if element was moved successfully and false otherwise
+     */
+    pushFront: function(index){
+        console.log("pushfront", index);
+        if (index < 1 || index >= this.queueItems.length){
+            console.warn("queue#remove - invalid index", index);
+            return false;
+        }
+        
+        var item = this.queueItems[index];
+        this.queueItems[index] = this.queueItems[index - 1];
+        this.queueItems[index - 1] = item;
 
         return true;
     },
