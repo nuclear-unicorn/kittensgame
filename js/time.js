@@ -1789,7 +1789,6 @@ dojo.declare("classes.queue.manager", null,{
      * @returns true if element was moved successfully and false otherwise
      */
     pushBack: function(index){
-        console.log("pushback", index);
         if (index < 0 || index >= this.queueItems.length - 1 ){
             console.warn("queue#remove - invalid index", index);
             return false;
@@ -1809,7 +1808,6 @@ dojo.declare("classes.queue.manager", null,{
      * @returns true if element was moved successfully and false otherwise
      */
     pushFront: function(index){
-        console.log("pushfront", index);
         if (index < 1 || index >= this.queueItems.length){
             console.warn("queue#remove - invalid index", index);
             return false;
