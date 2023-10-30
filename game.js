@@ -1833,8 +1833,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		},
 		QUEUE_REDSHIFT: {
 			beta: true,
-			main: false,
-			mobile: false
+			main: true,
+			mobile: true
 		}
 	},
 

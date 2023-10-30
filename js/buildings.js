@@ -2864,6 +2864,9 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 
     build: function(model, opts){
 		var counter = this.inherited(arguments);
+		if (!counter) {
+			return; //Skip stats & undo if nothing was built
+		}
 
 		//update stats
 		this.game.stats.getStat("buildingsConstructed").val += counter;
