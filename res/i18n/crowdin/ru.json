@@ -193,6 +193,7 @@
     "buildings.smelter.flavor": "Следи за усами!",
     "buildings.solarfarm.label": "Солнечная батарея",
     "buildings.solarfarm.desc": "Альтернативный источник энергии. Мощность зависит от сезона.",
+    "buildings.spaceport.label": "Космопорт",
     "buildings.steamworks.label": "Паровая машина",
     "buildings.steamworks.desc": "Существенно снижает добычу угля, если активна. Бесполезна сама по себе, но может делать много классных вещей, если её улучшить.",
     "buildings.steamworks.flavor": "Я просто сплю здесь, а как будто работаю",
