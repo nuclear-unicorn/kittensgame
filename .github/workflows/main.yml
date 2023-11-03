@@ -1,4 +1,4 @@
-name: Deploy
+name: KG Deploy code
 on:
   push:
     branches: [ "master", "dev/*" ]
@@ -34,6 +34,7 @@ jobs:
         with:
           username: ${{ secrets.KG_SSH_USER }}
           host: ${{ secrets.KG_SSH_HOST }}
+          key: ${{ secrets.KG_SSH_KEY }}
           script: /var/www/kittensgame.com/html/deploy.sh
         
         
