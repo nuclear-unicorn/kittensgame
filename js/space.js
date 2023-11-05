@@ -808,17 +808,20 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					{name: "relic", val: 25 }
 				],
 				effects: {
-					"energyProduction": 1
+					"energyProduction": 1,
+					"energyConsumption": 0
 				},
-				calculateEffects: function(self, game) {
+				action: function(self, game){
 					var yearBonus = game.calendar.darkFutureYears();
 					if (yearBonus < 0){
 						yearBonus = 0;
 					}
-
-					self.effects["energyProduction"] =
-						(1 + game.getUnlimitedDR(yearBonus, 0.075) * 0.01) *
-						(1 + game.getEffect("umbraBoostRatio"));
+					var energyRatio = (1 + game.getUnlimitedDR(yearBonus, 0.075) * 0.01) *
+					(1 + game.getEffect("umbraBoostRatio")) * 
+					(1 + game.getEffect("hrHarvesterPenalty"));
+					
+					self.effects["energyProduction"] = Math.max(energyRatio,0);
+					self.effects["energyConsumption"] = Math.abs(Math.min(energyRatio,0));
 				}
 			},{
 				name: "navigationRelay",
@@ -844,6 +847,48 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					{name: "eludium", val: 500 }
 				],
 				effects: {} // TBD
+			}, {
+				name: "quantumMesh",
+				label: $I("space.planet.umbra.quantumMesh.label"),
+				description: $I("space.planet.umbra.quantumMesh.desc"),
+				unlocked: false,
+				unlockRatio: 0.6,
+				priceRatio: 1.25,
+				isAutomationEnabled: null,
+				togglable: true,
+				prices: [
+					{name: "antimatter", val: 10000 },
+					{name: "relic", val: 100 }
+				],
+				effects: {
+					"antimatterProduction": 0.5,
+					"antimatterMax": 100,
+					"hrHarvesterPenalty": 0,
+				},
+				action: function(self, game) {
+					var quantumMeshBonusRatio = 1;
+					var amProduction = (0.5 + game.religion.getTU("singularity").val * 0.005);
+					if (self.isAutomationEnabled == null){
+						self.isAutomationEnabled = false;
+					}
+					if (self.isAutomationEnabled) {
+						var activeBuildingPenalty = Math.min(self.on, game.space.getBuilding("hrHarvester").on) * 0.05;
+						var yearBonus = game.calendar.darkFutureYears();
+						if (yearBonus < 0){
+							yearBonus = 0;
+						}
+						quantumMeshBonusRatio = 1 + (game.getUnlimitedDR(yearBonus, 0.075) * 0.01) *
+						(1 + game.getEffect("umbraBoostRatio")) * (game.space.getBuilding("hrHarvester").on);
+						
+						self.effects["hrHarvesterPenalty"] = -activeBuildingPenalty;
+						self.effects["antimatterMax"] = 200 + 200 * quantumMeshBonusRatio * 0.00015;
+						self.effects["antimatterProduction"] = amProduction + amProduction * quantumMeshBonusRatio * 0.0005;
+					} else{
+						self.effects["hrHarvesterPenalty"] = 0;
+						self.effects["antimatterMax"] = 200;
+						self.effects["antimatterProduction"] = amProduction;
+					}
+				}
 			}
 		]
 	},{
@@ -964,12 +1009,13 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				if (!building.effects){
 					return 0;
 				} else {
-					//There are 4 specially calculated effects that aren't supposed to be multiplied by the number of buildings,
+					//There are 5 specially calculated effects that aren't supposed to be multiplied by the number of buildings,
 					//because they're properties of the building category as a whole, not any individual building.
 					if (effectName === "hashrate" || effectName === "hashRateLevel" ||
-					    effectName === "nextHashLevelAt" || effectName === "hrProgress")
+					    effectName === "nextHashLevelAt" || effectName === "hrProgress" || 
+						effectName === "hrHarvesterPenalty")
 					{
-						//For these 4 specially calculated effects, don't multiply by building.on and don't apply spaceRatio.
+						//For these 5 specially calculated effects, don't multiply by building.on and don't apply spaceRatio.
 						return building.effects[effectName];
 					}
 					//Else, this isn't one of the special effects, so compute it normally.
@@ -1031,7 +1077,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 		for (var i = 0; i < planets.length; i++){
 			var planet = planets[i];
 			if (planet.buildings){
-				planet.buildings = this.filterMetadata(planet.buildings, ["name", "val", "on", "unlocked"]);
+				planet.buildings = this.filterMetadata(planet.buildings, ["name", "val", "on", "unlocked","isAutomationEnabled"]);
 			}
 		}
 

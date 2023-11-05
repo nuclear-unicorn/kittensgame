@@ -410,6 +410,7 @@
     "effectsMgr.statics.energyConsumptionRatio.title": "Energy consumption reduction",
     "effectsMgr.statics.energyProduction.title": "Energy production",
     "effectsMgr.statics.energyProductionRatio.title": "Energy production bonus",
+    "effectsMgr.statics.hrHarvesterPenalty.title": "HR Harvester Penalty",
     "effectsMgr.statics.entangler-gflopsConsumption.title": "Entanglement St. - GFlops conversion",
     "effectsMgr.statics.entangler-hrProgress.title": "Hash collision",
     
@@ -1475,6 +1476,8 @@
     "space.planet.umbra.navigationRelay.desc": "Increase your crew cap by one",
     "space.planet.umbra.spaceShuttle.label": "Space Shuttle",
     "space.planet.umbra.spaceShuttle.desc": "Staffed with science crew",
+    "space.planet.umbra.quantumMesh.label": "Quantum Mesh",
+    "space.planet.umbra.quantumMesh.desc": "Captures antimatter from the matter fields imbalanced by the black hole<br><br>Automation: Increases Quantum Mesh effectiveness by reducing HR Harvester energy production",
     "space.planet.yarn.label": "Yarn",
     "space.planet.yarn.hydroponics.label": "Hydroponics",
     "space.planet.yarn.hydroponics.desc": "State of the art automated hydroponic system. Increase catnip limit by 10%. Increase catnip production by 2.5%",
