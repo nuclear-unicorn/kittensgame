@@ -5130,6 +5130,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				}
 			}
 		}
+
+		//Update caches again to include the latest changes:
+		this.updateCaches();
 	},
 
 	toggleFilters: function(){
