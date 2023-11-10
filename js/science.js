@@ -117,6 +117,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		description: $I("science.construction.desc"),
 		effectDesc: $I("science.construction.effectDesc"),
 		prices: [{name : "science", val: 1300}],
+		effects: {
+			"queueCap": 1
+		},
 		unlocks: {
 			buildings: ["logHouse", "warehouse", "lumberMill", "ziggurat"],
 			tech: ["engineering"],
