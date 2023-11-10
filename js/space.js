@@ -854,7 +854,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				unlocked: false,
 				unlockRatio: 0.6,
 				priceRatio: 1.25,
-				isAutomationEnabled: null,
+				isAutomationEnabled: false,
 				togglable: true,
 				prices: [
 					{name: "antimatter", val: 10000 },
@@ -862,7 +862,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				],
 				effects: {
 					"antimatterProduction": 0.5,
-					"antimatterMax": 100,
+					"antimatterMax": 200,
 					"hrHarvesterPenalty": 0,
 				},
 				action: function(self, game) {
@@ -881,11 +881,9 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 						(1 + game.getEffect("umbraBoostRatio")) * (game.space.getBuilding("hrHarvester").on);
 						
 						self.effects["hrHarvesterPenalty"] = -activeBuildingPenalty;
-						self.effects["antimatterMax"] = 200 + 200 * quantumMeshBonusRatio * 0.00015;
 						self.effects["antimatterProduction"] = amProduction + amProduction * quantumMeshBonusRatio * 0.0005;
 					} else{
 						self.effects["hrHarvesterPenalty"] = 0;
-						self.effects["antimatterMax"] = 200;
 						self.effects["antimatterProduction"] = amProduction;
 					}
 				}
@@ -1407,6 +1405,12 @@ dojo.declare("classes.ui.space.PlanetBuildingBtnController", com.nuclearunicorn.
 		}
 
 		return prices;
+	},
+
+	handleToggleAutomationLinkClick: function(model) { //specify game.upgrade for planet buildings
+		var building = model.metadata;
+		building.isAutomationEnabled = !building.isAutomationEnabled;
+		this.game.upgrade({spaceBuilding: [building.name]});
 	}
 });
 
