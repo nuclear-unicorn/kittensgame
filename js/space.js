@@ -276,6 +276,11 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				else {
 					self.effects["energyConsumption"] = 1;
 				}
+
+				if (game.challenges.isActive("blackSky")) {
+					self.effects['starchartPerTickBaseSpace'] *= 1 / (1 + game.getEffect('bskSattelitePenalty'));
+				}
+
 				game.upgrade(self.upgrades); //this way observatories won't have to use action
 			},
 			upgrades: {
@@ -393,15 +398,16 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				"energyConsumption" : 0
 			},
 			calculateEffects: function(self, game){
+				var spaceportRatio = 1 + game.getEffect( "moonBaseStorageBonus" );
 				var effects = {
-					"catnipMax"         : 45000,
-					"woodMax"           : 25000,
-					"mineralsMax"       : 30000,
-					"coalMax"           : 3500,
-					"ironMax"           : 9000,
-					"titaniumMax"       : 1250,
-					"oilMax"            : 3500,
-					"unobtainiumMax"    : 150,
+					"catnipMax"         : 45000 * spaceportRatio,
+					"woodMax"           : 25000 * spaceportRatio,
+					"mineralsMax"       : 30000 * spaceportRatio,
+					"coalMax"           : 3500 * spaceportRatio,
+					"ironMax"           : 9000 * spaceportRatio,
+					"titaniumMax"       : 1250 * spaceportRatio,
+					"oilMax"            : 3500 * spaceportRatio,
+					"unobtainiumMax"    : 150 * spaceportRatio,
 					"energyConsumption" : 0
 				};
 				effects["energyConsumption"] = game.workshop.get("amBases").researched ? 5 : 10;
@@ -440,7 +446,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 			calculateEffects: function (self, game){
 				self.effects = {
 					"uraniumPerTickSpace" : 0.3 * (1 + game.getEffect("crackerRatio")),
-					"uraniumMax" : 1750
+					"uraniumMax" : 1750 * (1 + game.getEffect("planetCrackerStorageBonus"))
 				};
 			}
         },{
@@ -661,16 +667,17 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				"unobtainiumMax": 0
 			},
             calculateEffects: function(self, game){
+				var ratio = 1 + game.getEffect("cryostationStorageBonus");
 				self.effects = {
-					"woodMax"       : 200000,
-					"mineralsMax"   : 200000,
-					"coalMax"       : 25000,
-					"ironMax"       : 50000,
-					"titaniumMax"   : 7500,
-					//"oilMax"        : 25000,
-					"oilMax"        : 7500,
-					"uraniumMax"    : 5000,
-					"unobtainiumMax": 750
+					"woodMax"       : 200000 * ratio,
+					"mineralsMax"   : 200000 * ratio,
+					"coalMax"       : 25000 * ratio,
+					"ironMax"       : 50000 * ratio,
+					"titaniumMax"   : 7500 * ratio,
+					//"oilMax"        : 25000 * ratio,
+					"oilMax"        : 7500 * ratio,
+					"uraniumMax"    : 5000 * ratio,
+					"unobtainiumMax": 750 * ratio
 				};
             },
 			unlockScheme: {

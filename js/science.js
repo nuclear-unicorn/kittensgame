@@ -641,7 +641,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		],
 		unlocks: {
 			upgrades: ["eludiumCracker", "eludiumReflectors", "eludiumHuts", "mWReactor" /*, "eludiumDrill"*/],
-			crafts: ["eludium"]
+			crafts: ["eludium"],
+			stages: [{bld:"warehouse", stage:1}],
 		}
 	},
 	{

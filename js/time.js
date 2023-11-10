@@ -300,7 +300,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     },{
         name: "blastFurnace",
         label: $I("time.cfu.blastFurnace.label"),
-        description: $I("time.cfu.blastFurnace.desc"),
+        description: $I("time.cfu.blastFurnace.desc") + "<br>" + $I("time.cfu.blastFurnace.desc2"),
         prices: [
             { name : "timeCrystal", val: 25 },
             { name : "relic", val: 5 }
@@ -388,7 +388,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     },{
         name: "temporalAccelerator",
         label: $I("time.cfu.temporalAccelerator.label"),
-        description: $I("time.cfu.temporalAccelerator.desc") +"\n" + $I("time.cfu.temporalAccelerator.desc2"),
+        description: $I("time.cfu.temporalAccelerator.desc") + "<br>" + $I("time.cfu.temporalAccelerator.desc2"),
         prices: [
             { name : "timeCrystal", val: 10 },
             { name : "relic", val: 1000 }
@@ -452,9 +452,17 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             "energyConsumption": 5
         },
         calculateEffects: function(self, game){
-            if (self.isAutomationEnabled == null && game.challenges.getChallenge("1000Years").on > 1) {
-                self.isAutomationEnabled = false;
+            if (game.challenges.getChallenge("1000Years").on > 1) {
+                //Completing the challenge 2 or more times unlocks the automation feature
+                self.description = $I("time.cfu.temporalPress.desc") + "<br>" + $I("time.cfu.temporalPress.desc.automation");
+                if (self.isAutomationEnabled == null) { //force non-null value
+                    self.isAutomationEnabled = false;
+                }
+            } else {
+                self.description = $I("time.cfu.temporalPress.desc");
+                self.isAutomationEnabled = null;
             }
+
             self.effects["shatterYearBoost"] = (self.isAutomationEnabled)? 5 * game.calendar.yearsPerCycle : game.calendar.yearsPerCycle; //25 or 5 currently
             self.limitBuild = game.getEffect("temporalPressCap");
             self.priceRatio = Math.max(1.01, 1.1 - game.challenges.getChallenge("1000Years").on * 0.001); //first 90 completions of 1000Years make priceRatio cheaper
@@ -1775,6 +1783,44 @@ dojo.declare("classes.queue.manager", null,{
     },
 
     /**
+     * Pushes item back in the queue based on the queue group number (index)
+     * @param {*} index 
+     * 
+     * @returns true if element was moved successfully and false otherwise
+     */
+    pushBack: function(index){
+        if (index < 0 || index >= this.queueItems.length - 1 ){
+            console.warn("queue#remove - invalid index", index);
+            return false;
+        }
+
+        var item = this.queueItems[index];
+        this.queueItems[index] = this.queueItems[index + 1];
+        this.queueItems[index + 1] = item;
+
+        return true;
+    },
+
+    /**
+     * Pushes item to the front in the queue based on the queue group number (index)
+     * @param {*} index 
+     * 
+     * @returns true if element was moved successfully and false otherwise
+     */
+    pushFront: function(index){
+        if (index < 1 || index >= this.queueItems.length){
+            console.warn("queue#remove - invalid index", index);
+            return false;
+        }
+        
+        var item = this.queueItems[index];
+        this.queueItems[index] = this.queueItems[index - 1];
+        this.queueItems[index - 1] = item;
+
+        return true;
+    },
+
+    /**
      * Return a list of sub-options for a building queue
      * in a form of [{
      *      name: <queue item name>,
@@ -2126,6 +2172,13 @@ dojo.declare("classes.queue.manager", null,{
             return;
         }
         var el = this.queueItems[0];
+
+        if (!el){
+            console.warn("null queue item, skipping");
+            this.queueItems.shift();
+            this.game._publish("ui/update", this.game);
+            return;
+        }
 
         var itemMetaRaw = this.game.getUnlockByName(el.name, el.type);
         var compare = "val"; //we should do some sort of refractoring of the switch mechanism
