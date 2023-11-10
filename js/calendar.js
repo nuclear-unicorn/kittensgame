@@ -402,6 +402,12 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			this.season += 1;
 			newSeason = true;
 
+			//Temporal paradox
+			var temporalParadoxChance = this.game.getEffect("temporalParadoxChance");
+			if (Math.random() < temporalParadoxChance) {
+				this.day = -10 - this.game.getEffect("temporalParadoxDay");
+			}
+
 			if (this.season >= this.seasonsPerYear) {
 				this.season = 0;
 				this.year += this.game.challenges.isActive("1000Years") && this.year >= 500 ? 0 : 1;
@@ -861,12 +867,6 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		this.game.upgrade({
 			buildings: ["pasture"]
 		});
-
-		var temporalParadoxChance = this.game.getEffect("temporalParadoxChance");
-		if (Math.random() < temporalParadoxChance) {
-			// Temporal Paradox
-			this.day = -10 - this.game.getEffect("temporalParadoxDay");
-		}
 	},
 
 	getMilleniaChanged: function (startYear, endYear) {
