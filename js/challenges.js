@@ -235,16 +235,20 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		researched: false,
 		unlocked: false,
         effects: {
-            "corruptionBoostRatioChallenge": 0.1
+			"corruptionBoostRatioChallenge": 0.1,
+			"bskSattelitePenalty": 0
         },
 		stackOptions: {
-			"corruptionBoostRatioChallenge": { LDRLimit: 2 }
+			"corruptionBoostRatioChallenge": { LDRLimit: 2 },
+			"bskSattelitePenalty": { LDRLimit: 30 }
 		},
         calculateEffects: function(self, game){
             if (self.active) {
                 self.effects["corruptionBoostRatioChallenge"] = 0;
+                self.effects["bskSattelitePenalty"] = 0.1 * (game.ironWill ? 0 : (self.on || 0));
             }else{
 				self.effects["corruptionBoostRatioChallenge"] = 0.1;
+				self.effects["bskSattelitePenalty"] = 0;
 			}
 			game.upgrade(self.upgrades);
         },

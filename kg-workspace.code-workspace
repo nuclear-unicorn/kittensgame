@@ -5,6 +5,22 @@
 		}
 	],
 	"settings": {
-		"jestrunner.configPath": "jest.config.unittest.json"
+		"jestrunner.configPath": "jest.config.unittest.json",
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+			"**/Thumbs.db": true,
+			"**/.apivcs": true,
+			"**/.designer.json": true,
+			"**/.exchange_modules_tmp": true,
+			"**/.exchange.xml": true,
+			"**/.gitignore": true,
+			"**/.mvn": true,
+			"**/.vscode": true,
+			".mule": true
+		}
 	}
 }
