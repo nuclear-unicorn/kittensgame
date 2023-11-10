@@ -1150,7 +1150,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					}
 				}
 
-				if (bld.action && bld.val > 0){
+				if (bld.action && (bld.val > 0 || bld.name == "quantumMesh")){
 					var amt = bld.action(bld, this.game);
 					if (typeof(amt) != "undefined") {
 						bld.lackResConvert = amt != 1 && bld.on != 0;
