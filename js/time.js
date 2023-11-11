@@ -1417,7 +1417,12 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
 
 	updateVisible: function(model) {
 		model.visible = this.game.workshop.get("chronoforge").researched && this.game.time.getVSU("usedCryochambers").val != 0;
-	}
+	},
+
+    //This is a bit of a hack to get the correct description to appear in the queue tooltips...
+    getDescription: function(model) {
+        return $I("time.fixCryochambers.desc");
+    }
 });
 
 dojo.declare("classes.ui.VoidSpaceWgt", [mixin.IChildrenAware, mixin.IGameAware], {
@@ -2083,7 +2088,13 @@ dojo.declare("classes.queue.manager", null,{
         this.dropLastItem();
         this.showList();
     },
-    getQueueElementModel: function(el){
+    getQueueElementModel: function(el) {
+        var controllerAndModel = this.getQueueElementControllerAndModel(el);
+        if (controllerAndModel) {
+            return controllerAndModel.model;
+        }
+    },
+    getQueueElementControllerAndModel: function(el){
         var itemMetaRaw = this.game.getUnlockByName(el.name, el.type);
         if (!itemMetaRaw){
             console.error("invalid queue item:", el);
@@ -2142,7 +2153,7 @@ dojo.declare("classes.queue.manager", null,{
                     itemMetaRaw = this.game.getUnlockByName("cryochambers", el.type);
                     model.prices = this.game.time.getVSU("usedCryochambers").fixPrices;
                     model.enabled = this.game.resPool.hasRes(model.prices); //check we actually have enough to do one fix!
-                    console.log(model);
+                    //console.log(model);
                 }
                 break;
 
@@ -2184,8 +2195,7 @@ dojo.declare("classes.queue.manager", null,{
                 var model = props.controller.fetchModel(props);
                 break;
         }
-        //return props, model;
-        return model;
+        return { controller: props.controller, model: model };
     },
     update: function(){
         this.cap = this.calculateCap();
@@ -2279,7 +2289,7 @@ dojo.declare("classes.queue.manager", null,{
                     itemMetaRaw = this.game.getUnlockByName("cryochambers", el.type);
                     model.prices = this.game.time.getVSU("usedCryochambers").fixPrices;
                     model.enabled = this.game.resPool.hasRes(model.prices); //check we actually have enough to do one fix!
-                    console.log(model);
+                    //console.log(model);
                 }
                 break;
 
