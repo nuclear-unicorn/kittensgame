@@ -1268,8 +1268,9 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 
 ButtonModernHelper = {
 	getTooltipHTML : function(controller, model){
+		//Some aspects of the metadata may have changed, so fetch the latest version of the model:
+		model = controller.fetchModel(model.options);
 		controller.fetchExtendedModel(model);
-		//throw "ButtonModern::getTooltipHTML must be implemented";
 
 		var tooltip = dojo.create("div", { className: "tooltip-inner" }, null);
 
@@ -1283,7 +1284,7 @@ ButtonModernHelper = {
 
 		// description
 		var descDiv = dojo.create("div", {
-			innerHTML: controller.getDescription(model),
+			innerHTML: model.description,
 			className: "desc"
 		}, tooltip);
 
