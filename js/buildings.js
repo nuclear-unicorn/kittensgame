@@ -2734,6 +2734,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			this.game.render();
 		} else if (data.action == "deltagrade"){ //Generic term for upgrading/downgrading
 			bldMetaRaw.stage = Math.max(0, bldMetaRaw.stage - amt);
+			this.game.time.queue.onDeltagrade(bld.name);
 
 			//Update because it changed when we changed stages
 			bld = new classes.BuildingMeta(bldMetaRaw).getMeta();
@@ -3012,14 +3013,15 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 			});
 			this.sellInternal(model, 0, false /*requireSellLink*/);
 		}
-		metadataRaw.stage += delta;
-		if (!metadataRaw.stage) {metadataRaw.stage = Math.max(0, delta);}
+		if (metadataRaw.stage) { metadataRaw.stage = Math.max(0, metadataRaw.stage + delta); }
+		else { metadataRaw.stage = Math.max(0, delta); }
 
 		metadataRaw.val = 0;	//TODO: fix by using separate value flags
 		metadataRaw.on = 0;
 		if (metadataRaw.calculateEffects){
 			metadataRaw.calculateEffects(metadataRaw, this.game);
 		}
+		this.game.time.queue.onDeltagrade(model.options.building);
 		this.game.upgrade(metadataRaw.upgrades);
 		this.game.render();
 	},

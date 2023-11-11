@@ -2365,5 +2365,27 @@ dojo.declare("classes.queue.manager", null,{
                 //console.log( "Dropped " + el.name + " from the queue because it can't be built anymore." );
             }
         }
+    },
+
+    //This function is to be called whenever a building is deltagraded.
+    //This function iterates through all queue items with the same internal ID as the
+    //deltagraded building & updates their labels to match the new version.
+    //@param itemName   String.  The ID of whichever building was deltagraded.
+    onDeltagrade: function(itemName) {
+        var buildingsManager = this.game.bld;
+        dojo.forEach(this.queueItems, function(item) {
+            if(!item || item.name !== itemName) {
+                return;
+            }
+            //Else, we have here a valid queue item matching the name of what was deltagraded.
+            if(item.type === "buildings") {
+                var building = buildingsManager.getBuildingExt(itemName).meta;
+                var newLabel = building.label;
+                if(building.stages){
+                    newLabel = building.stages[building.stage].label;
+                }
+                item.label = newLabel;
+            }
+        });
     }
 });
