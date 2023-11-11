@@ -1853,8 +1853,12 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 		}
 
 		var building = this.model.metadata;
-		if (building && building.val){
-
+		if (!building) {
+			//Everything else we want to do here depends on the building property.
+			//If we don't have that, then skip
+			return;
+		}
+		if (building.val){
 			// -------------- sell ----------------
 			if (this.sellHref){
 				dojo.style(this.sellHref.link, "display", (building.val > 0) ? "" : "none");
@@ -1879,10 +1883,10 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 			if (this.add) {
 				dojo.toggleClass(this.add["add1"].link, "enabled", building.on < building.val);
 			}
-
 			this.updateLink(this.toggle, this.model.togglableOnOffLink);
-			this.updateLink(this.toggleAutomation, this.model.toggleAutomationLink);
 		}
+		//Update this specific link even if there are 0 of the building in question:
+		this.updateLink(this.toggleAutomation, this.model.toggleAutomationLink);
 	}
 });
 
