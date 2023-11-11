@@ -2262,9 +2262,8 @@ dojo.declare("classes.queue.manager", null,{
                 break;
 
             case "spaceMission":
-                compare = "reached";
                 props.controller = new com.nuclearunicorn.game.ui.SpaceProgramBtnController(this.game);
-                var oldVal = itemMetaRaw.researched;
+                var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 break;
 
@@ -2356,14 +2355,15 @@ dojo.declare("classes.queue.manager", null,{
             //console.log( "Successfully built " + el.name + " using the queue." );
         } else {
             //console.log( "Tried to build " + el.name + " using the queue, but failed." );
-        }
-
-        if(compare == "research" || compare == "reached" && model.metadata[compare] == true
-            || (compare.includes("blocked") && model.metadata["blocked"] == true) ||
-            (compare.includes("research") && model.metadata["research"] == true)
-        ){
-            this.dropLastItem();
-            this.game._publish("ui/update", this.game);
+            if( (compare == "researched" && model.metadata[compare] == true ) ||
+                (compare.includes("blocked") && model.metadata["blocked"] == true) ||
+                (compare.includes("researched") && model.metadata["researched"] == true) ||
+                (el.type === "spaceMission" && model.metadata[compare])
+            ){
+                this.dropLastItem();
+                this.game._publish("ui/update", this.game);
+                //console.log( "Dropped " + el.name + " from the queue because it can't be built anymore." );
+            }
         }
     }
 });
