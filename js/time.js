@@ -1779,7 +1779,7 @@ dojo.declare("classes.queue.manager", null,{
             value: 1    //always store size of the queue group, even if it is a single item
         });
 
-        if (shiftKey && !this.queueNonStabkable.includes(type)){
+        if (shiftKey && !this.queueNonStackable.includes(type)){
             while(this.queueLength() < this.cap){
                 this.addToQueue(name, type, label, false);
             }
