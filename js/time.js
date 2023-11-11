@@ -240,6 +240,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             daysOffset = offset;
         }
         if(this.game.getFeatureFlag("QUEUE_REDSHIFT")){
+            //console.log( "Calculating queue redshift for the following queue:", this.queue.queueItems );
             var result = this.queue.getFirstItemEtaDay();
             var daysOffsetLeft = daysOffset;
             var redshiftQueueWorked = true;
@@ -256,6 +257,13 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 }
                 if (result[1] & redshiftQueueWorked){
                     var daysNeeded = result[0];// + 5; //let's have a little bit more days in case steamwork automation messes things up.
+                    if (daysNeeded < 1) {
+                        //There are legitimate cases in which the number of days needed would be less than 1.
+                        //However, if we were to allow daysNeeded to be 0, there'd be risk of an infinite loop,
+                        //so we set the minimum value to 1.
+                        //console.log( "Estimated days needed for queue item", this.queue.queueItems[ 0 ], "is too small; setting to a minimum value." );
+                        daysNeeded = 1;
+                    }
                     daysNeeded /= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
                     daysNeeded = Math.ceil(daysNeeded);
                     daysNeeded *= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
@@ -277,6 +285,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 }
             }
             numberEvents = this.game.calendar.fastForward(daysOffset);
+            //console.log( "Queue redshift calculations finished.  This is the new queue:", this.queue.queueItems );
         }
         else{
             numberEvents = this.applyRedshift(daysOffset);
@@ -1593,6 +1602,11 @@ dojo.declare("classes.queue.manager", null,{
         }
         var eta = 0;
         var element = this.queueItems[0];
+        if (!element) {
+            //This is probably a null queue item.  Treat it as if it were a valid building that can be built for free.
+            //Later on when we update the queue, this null item should be removed & we'll go on to the next.
+            return [0, true];
+        }
         var modelElement = this.getQueueElementModel(element);
         var prices = modelElement.prices;
         var engineersConsumed = this.game.workshop.getConsumptionEngineers();
@@ -1600,17 +1614,20 @@ dojo.declare("classes.queue.manager", null,{
             var price = prices[ind];
             var res = this.game.resPool.get(price.name);
 		    if (res.value >= price.val){
+                //We already have enough of this resource.
                 continue;
             }
             if (res.maxValue < price.val){
+                //We don't have enough storage space to ever be able to afford the price.
                 return [eta, false];
             }
             var resPerTick = this.game.getResourcePerTick(res.name, true);
-            if (!resPerTick) {
-                return [eta, false];
-            }
             var engineersProduced = this.game.workshop.getEffectEngineer(res.name, true);
             var deltaPerTick = resPerTick + (engineersConsumed[res.name] || 0)+ engineersProduced;
+            if (deltaPerTick <= 0) {
+                //We are losing this resource over time (or not producing any), so we'll never be able to afford the price.
+                return [eta, false];
+            }
             eta = Math.max(eta,
             (price.val - res.value) / (deltaPerTick) / this.game.calendar.ticksPerDay
             );
@@ -1710,9 +1727,12 @@ dojo.declare("classes.queue.manager", null,{
      * */
     queueLength: function(){
         var length = 0;
-        for (var i in this.queueItems){
-            length += (this.queueItems[i].value || 1);
-        }
+        dojo.forEach(this.queueItems, function(item) {
+            if(item) {
+                length += item.value || 1;
+            }
+            //Else, the item is null or invalid, so don't count it.
+        });
         return length;
     },
 
@@ -1727,12 +1747,13 @@ dojo.declare("classes.queue.manager", null,{
         }
 
         //TODO: too complex logic, can we streamline it somehow?
-        if(this.queueItems.length > 0 && this.queueItems[this.queueItems.length - 1].name == name){
+        var lastItem = this.queueItems[this.queueItems.length - 1];
+        if(this.queueItems.length > 0 && lastItem && lastItem.name == name){
             if(this.queueNonStackable.includes(type)){
                 return;
             }
-            var valOfItem = (this.queueItems[this.queueItems.length - 1].value || 1) + 1;
-            this.queueItems[this.queueItems.length - 1].value = valOfItem;
+            var valOfItem = (lastItem.value || 1) + 1;
+            lastItem.value = valOfItem;
 
             if (shiftKey){
                 while(this.queueLength() < this.cap){
@@ -2322,6 +2343,9 @@ dojo.declare("classes.queue.manager", null,{
         if(changed){
             this.dropLastItem();
             this.game._publish("ui/update", this.game);
+            //console.log( "Successfully built " + el.name + " using the queue." );
+        } else {
+            //console.log( "Tried to build " + el.name + " using the queue, but failed." );
         }
 
         if(compare == "research" || compare == "reached" && model.metadata[compare] == true
