@@ -1,9 +1,15 @@
 name: KG Deploy code
 on:
   push:
-    branches: [ "master", "dev/*" ]
+    branches:
+      - master
+      - dev/alpha
+      - dev/beta
   pull_request:
-    branches: [ "master", "dev/*" ]
+    branches: 
+      - master
+      - dev/alpha
+      - dev/beta
 
 jobs:
   build:
