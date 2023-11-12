@@ -328,11 +328,16 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 	cycleEffectsBasics: function(effects, building_name) {
 		if (this.game.prestige.getPerk("numerology").researched){
 			var list_effects_cycle = this.cycles[this.cycle].effects;
+			var dragonAstrologers = this.game.science.getPolicy("dragonRelationsAstrologers").researched;
 
 			for (var effect in effects) {
 				var effect_cycle = building_name + "-" + effect;
-				if (typeof list_effects_cycle[effect_cycle] !== "undefined") {
-					effects[effect] *= list_effects_cycle[effect_cycle];
+				var effect_modifier = list_effects_cycle[effect_cycle];
+				if (typeof effect_modifier !== "undefined") {					
+					if (dragonAstrologers && effect_modifier < 1) {
+						effect_modifier += (1 - effect_modifier) * this.game.getEffect("negativeCycleRatioPolicy");
+					}
+					effects[effect] *= effect_modifier;
 				}
 			}
 		}

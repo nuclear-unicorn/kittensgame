@@ -1425,6 +1425,46 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
             title: $I("effectsMgr.statics.globalRelationsBonus.title"),
                 type: "fixed"
             },
+			"harborLimitRatioPolicy":{
+				title: $I("effectsMgr.statics.harborLimitRatioPolicy.title"),
+				type: "ratio"
+			},
+			"tankerCapacityRatioBonus":{
+			title: $I("effectsMgr.statics.tankerCapacityRatioBonus.title"),
+				type: "ratio"
+			},
+			"calcinerSteelRatioBonus":{
+				title: $I("effectsMgr.statics.calcinerSteelRatioBonus.title"),
+				type: "ratio"
+			},
+			"magnetoBoostBonusPolicy":{
+				title: $I("effectsMgr.statics.magnetoBoostBonusPolicy.title"),
+				type: "ratio"
+			},
+			"mansionCostReduction":{
+				title: $I("effectsMgr.statics.mansionCostReduction.title"),
+				type: "ratio"
+			},
+			"zigguratCostReduction":{
+				title: $I("effectsMgr.statics.zigguratCostReduction.title"),
+				type: "ratio"
+			},
+			"mineralsSuperRatio":{
+                title: $I("effectsMgr.statics.mineralsSuperRatio.title"),
+                type: "ratio"
+            },
+			"goldSuperRatio":{
+                title: $I("effectsMgr.statics.goldSuperRatio.title"),
+                type: "ratio"
+            },
+			"oilSuperRatio":{
+                title: $I("effectsMgr.statics.oilSuperRatio.title"),
+                type: "ratio"
+            },
+			"negativeCycleRatioPolicy":{
+                title: $I("effectsMgr.statics.negativeCycleRatioPolicy.title"),
+                type: "ratio"
+            },
             //philosophy
             "luxuryDemandRatio":{
                 title: $I("effectsMgr.statics.luxuryDemandRatio.title"),

@@ -2587,7 +2587,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		//-------------	 this is a poor place for this kind of functionality ------------
 		//-------------	todo: move somewhere to bld? ------------------------------------
 
-		this.effectsBase["oilMax"] = Math.floor(this.game.resPool.get("tanker").value * 500);
+		this.effectsBase["oilMax"] = Math.floor(this.game.resPool.get("tanker").value * 500 * (1 + this.game.getEffect("tankerCapacityRatioBonus")));
 
 		var scienceMaxCap = this.game.bld.getEffect("scienceMax");
 		scienceMaxCap += this.game.getEffect("pyramidSpaceCompendiumRatio") * this.game.space.getEffect("scienceMax"); //lets treat trasnfered science max from space same way

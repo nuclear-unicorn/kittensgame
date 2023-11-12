@@ -898,7 +898,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				var shipVal = game.resPool.get("ship").value;
 
 				//100% to 225% with slow falldown on the 75%
-				var limit = 2.25 + game.getEffect("shipLimit") * game.bld.get("reactor").on;
+				var limit = 2.25 + game.getEffect("shipLimit") * game.bld.get("reactor").on * (1 + game.getEffect("harborLimitRatioPolicy"));
 				var ratio = 1 + game.getLimitedDR(cargoShips.effects["harborRatio"] * shipVal, limit);
 
 				effects["catnipMax"] *= ratio;
@@ -1153,7 +1153,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 						self.effects["ironPerTickCon"] *= amt;
 
 						// Automated production, metallurgist leader won't help here
-						self.effects["steelPerTickProd"] *= amt * (1 + game.getCraftRatio() * game.getEffect("calcinerSteelCraftRatio") + game.bld.get("reactor").on * game.getEffect("calcinerSteelReactorBonus"));
+						self.effects["steelPerTickProd"] *= amt * (1 + game.getCraftRatio() * game.getEffect("calcinerSteelCraftRatio") + game.bld.get("reactor").on * game.getEffect("calcinerSteelReactorBonus")) *
+						(1 + game.getEffect("calcinerSteelRatioBonus"));
 
 						return amt;
 					}
@@ -1225,6 +1226,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				}
 			}
 			self.effects["manuscriptPerTickProd"] = amt;
+			self.effects["magnetoBoostRatio"] = 0.15 + game.getEffect("magnetoBoostBonusPolicy");
 
 			//Update description to explain what automation does:
 			if (game.workshop.get("factoryAutomation").researched) {
@@ -1236,7 +1238,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		jammed: false,
 		togglableOnOff: true,
 		isAutomationEnabled: null,
-		action: function(self, game) {
+		action: function(self, game) {						
 			if (game.workshop.get("factoryAutomation").researched) {
 				if (self.isAutomationEnabled == null) { //force non-null value
 					self.isAutomationEnabled = true;

@@ -383,7 +383,19 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				            "winter": -0.5};
 				}
 			}
-		 }
+		}
+
+		if(this.game.science.getPolicy("spiderRelationsChemists").researched) {
+			var spiders = this.get("spiders");
+			var sells = [];
+			for (var i = 0; i < spiders.sells.length; i++) {
+				sells.push(spiders.sells[i]["name"]);
+			}
+
+			if (!sells.includes("kerosene")){
+			spiders.sells.push({name: "kerosene", value: 5, chance: 0.1, width: 0.1, minLevel: 10});
+			}			
+		}
 	},
 
 	onLeavingIW: function(){
@@ -1036,6 +1048,7 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 	incrementValue: function(model) {
 		this.inherited(arguments);
 		model.options.race.embassyLevel++;
+		this.game.science.unlockRelations();
 	},
 
 	hasSellLink: function(model){
