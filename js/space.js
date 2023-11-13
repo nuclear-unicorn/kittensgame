@@ -803,6 +803,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				description: $I("space.planet.umbra.hrHarvester.desc"),
 				unlocked: true,
 				priceRatio: 1.15,
+				togglable: false,
 				prices: [
 					{name: "antimatter", val: 1250 },
 					{name: "relic", val: 25 }
@@ -810,6 +811,15 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				effects: {
 					"energyProduction": 1,
 					"energyConsumption": 0
+				},
+				upgrades: {
+					spaceBuilding: ["quantumMesh"]
+				},
+				calculateEffects: function(self, game) {
+					if (self.togglable != false){
+						self.togglable = false;
+					}
+					self.action(self, game);
 				},
 				action: function(self, game){
 					var yearBonus = game.calendar.darkFutureYears();
@@ -865,9 +875,15 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					"antimatterMax": 200,
 					"hrHarvesterPenalty": 0,
 				},
+				upgrades: {
+					spaceBuilding: ["hrHarvester"]
+				},
+				calculateEffects: function(self, game){
+					self.action(self, game);
+				},
 				action: function(self, game) {
 					var quantumMeshBonusRatio = 1;
-					var amProduction = (0.5 + game.religion.getTU("singularity").val * 0.005);
+					var amProduction = Math.min(0.5 + game.religion.getTU("singularity").val * 0.005, 2);
 					if (self.isAutomationEnabled == null){
 						self.isAutomationEnabled = false;
 					}
