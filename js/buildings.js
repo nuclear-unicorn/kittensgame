@@ -2764,7 +2764,7 @@ dojo.declare("classes.game.ui.GatherCatnipButtonController", com.nuclearunicorn.
 		}
 
 		this.game.bld.gatherCatnip();
-		callback(true);
+		callback({ itemBought: true, reason: "item-is-free" /*It costs no resources to gather catnip, so we can't fail to buy it*/});
 	}
 });
 

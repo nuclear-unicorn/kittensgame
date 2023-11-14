@@ -984,19 +984,20 @@ dojo.declare("classes.ui.time.AccelerateTimeBtnController", com.nuclearunicorn.g
             tooltip: this.game.time.isAccelerated ? $I("time.AccelerateTimeBtn.tooltip.accelerated") : $I("time.AccelerateTimeBtn.tooltip.normal"),
             cssClass: this.game.time.isAccelerated ? "fugit-on" : "fugit-off",
             handler: function(btn, callback) {
-                if (self.game.resPool.get("temporalFlux").value <= 0) {
-                    self.game.time.isAccelerated = false;
-                    self.game.resPool.get("temporalFlux").value = 0;
-                } else {
-                    self.game.time.isAccelerated = !self.game.time.isAccelerated;
-                }
-                callback(true);
+                self.buyItem(null, null, callback);
             }
         };
         return model;
     },
 
-    buyItem: function() {
+    buyItem: function(model, event, callback) {
+        if (self.game.resPool.get("temporalFlux").value <= 0) {
+            self.game.time.isAccelerated = false;
+            self.game.resPool.get("temporalFlux").value = 0;
+        } else {
+            self.game.time.isAccelerated = !self.game.time.isAccelerated;
+        }
+        callback({ itemBought: true, reason: "item-is-free" /*It costs flux, but you can still toggle it freely*/ });
     }
 });
 
@@ -1199,15 +1200,20 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 	},
 
     buyItem: function(model, event, callback){
-        if (model.enabled && this.hasResources(model)) {
-            var price = this.getPrices(model);
-            for (var i in price){
-                this.game.resPool.addResEvent(price[i].name, -price[i].val);
-            }
-            this.doShatter(model, 1);
-            callback(true);
+        if (!this.hasResources(model)) {
+			callback({ itemBought: false, reason: "cannot-afford" });
+			return true;
+		}
+		if (!model.enabled) {
+			callback({ itemBought: false, reason: "not-enabled" });
+			return true;
+		}
+        var price = this.getPrices(model);
+        for (var i in price){
+            this.game.resPool.addResEvent(price[i].name, -price[i].val);
         }
-        callback(false);
+        this.doShatter(model, 1);
+        callback({ itemBought: true, reason: "paid-for" });
         return true;
     },
 
@@ -1376,7 +1382,7 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
 
 	buyItem: function(model, event, callback) {
 		if (!model.enabled) {
-			callback(false);
+			callback({ itemBought: false, reason: "not-enabled" });
 			return;
 		}
 
@@ -1395,8 +1401,10 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
         if(fixHappened){
             var cry = this.game.time.getVSU("cryochambers");
             cry.calculateEffects(cry, this.game);
+            callback({ itemBought: true, reason: "paid-for" });
+        } else {
+			callback({ itemBought: false, reason: "cannot-afford" });
         }
-		callback(fixHappened);
 	},
 
     doFixCryochamber: function(model){
@@ -2257,8 +2265,8 @@ dojo.declare("classes.queue.manager", null,{
                     props.controller = new classes.ui.btn.BuildingBtnModernController(this.game);
                 }
                 var model = props.controller.fetchModel(props);
-                props.controller.build(model, 1);
-                buyItem = false;
+                //props.controller.build(model, 1);
+                //buyItem = false;
                 break;
 
             case "spaceMission":
@@ -2336,8 +2344,9 @@ dojo.declare("classes.queue.manager", null,{
             var deletedElement = this.queueItems.shift();
             this.game._publish("ui/update", this.game);
         }
+        var resultOfBuyingItem;
         if(buyItem){
-            props.controller.buyItem(model, 1,  function(result) {});
+            props.controller.buyItem(model, 1, function(args) { resultOfBuyingItem = args; });
         }
         var changed = false;
         if (Array.isArray(compare)){

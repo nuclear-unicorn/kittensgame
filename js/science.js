@@ -1900,20 +1900,23 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 		return confirmed;
 	},
 	buyItem: function(model, event, callback) {
-		if ((!model.metadata.researched && this.hasResources(model)) || this.game.devMode){
-			if(!this.shouldBeBough(model, this.game)){
-				callback(false);
-				return;
-			}
-			this.payPrice(model);
-
-			this.onPurchase(model);
-
-			callback(true);
-			this.game.render();
+		var isInDevMode = this.game.devMode;
+		if (!this.hasResources(model) && !isInDevMode) {
+			callback({ itemBought: false, reason: "cannot-afford" });
 			return;
 		}
-		callback(false);
+		if (model.metadata.researched && !isInDevMode) {
+			callback({ itemBought: false, reason: "already-bought" });
+			return;
+		}
+		if(!this.shouldBeBough(model, this.game)){
+			callback({ itemBought: false, reason: "*sigh* there are many reasons why you would be unable to purchase a policy & I cannot list them all here" });
+			return;
+		}
+		this.payPrice(model);
+		this.onPurchase(model);
+		callback({ itemBought: true, reason: (this.game.devMode ? "dev-mode" : "paid-for") });
+		this.game.render();
 	},
 	onPurchase: function(model){
 		this.inherited(arguments);

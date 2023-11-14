@@ -708,18 +708,24 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	},
 
 	buyItem: function(model, event, callback){
-		if (model.enabled && this.hasResources(model)) {
-			this.clickHandler(model, event);
-
-			this.payPrice(model);
-
-			if (model.priceRatio){
-				this.adjustPrice(model.priceRatio);
-			}
-
-			callback(true);
+		if (!this.hasResources(model)) {
+			callback({ itemBought: false, reason: "cannot-afford" });
+			return;
 		}
-		callback(false);
+		if (!model.enabled) {
+			callback({ itemBought: false, reason: "not-enabled" });
+			return;
+		}
+		//Else, we meet all requirements to buy this item:
+		this.clickHandler(model, event);
+		this.payPrice(model);
+
+		if (model.priceRatio){
+			this.adjustPrice(model.priceRatio);
+		}
+
+		//A lot of normal UI buttons that don't involve building things use this method, so check if things are free:
+		callback({ itemBought: true, reason: ((model.prices && model.prices.length) ? "paid-for" : "item-is-free") });
 	},
 
 	refund: function(model){
@@ -901,7 +907,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		this.animate();
 		var self = this;
 		this.controller.buyItem(this.model, event, function(result) {
-			if (result) {
+			if (typeof(result) == "object" && result.itemBought) {
 				self.update();
 			}
 		});
@@ -1959,45 +1965,55 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 	},
 
 	buyItem: function(model, event, callback) {
-		if (model.enabled && this.hasResources(model) || this.game.devMode) {
-			var meta = model.metadata;
-			if (this.game.ironWill && meta.effects && meta.effects["maxKittens"] > 0 && this.game.science.get("archery").researched) {
-				var self = this;
-				this.game.ui.confirm("", $I("iron.will.break.confirmation.msg"), function() {
-					self._buyItem_step2(model, event, callback);
-				}, function() {
-					callback(false);
-				});
-			} else {
-				this._buyItem_step2(model, event, callback);
-			}
+		var isInDevMode = this.game.devMode;
+		if (!this.hasResources(model) && !isInDevMode) {
+			callback({ itemBought: false, reason: "cannot-afford" });
+			return;
+		}
+		if (!model.enabled && !isInDevMode) {
+			callback({ itemBought: false, reason: "not-enabled" });
+			return;
+		}
+		//Else, we meet all the requirements for being able to buy this item:
+		var meta = model.metadata;
+		if (this.game.ironWill && meta.effects && meta.effects["maxKittens"] > 0 && this.game.science.get("archery").researched) {
+			//Show a confirmation message if we're building something that would break Iron Will mode.
+			var self = this;
+			this.game.ui.confirm("", $I("iron.will.break.confirmation.msg"), function() {
+				self._buyItem_step2(model, event, callback);
+			}, function() {
+				callback({ itemBought: false, reason: "player-denied" /*The player decided not to buy this after all.*/ });
+			});
 		} else {
-			callback(false);
+			this._buyItem_step2(model, event, callback);
 		}
 	},
 
 	_buyItem_step2: function(model, event, callback) {
+		//This is what we pass to the callback function if we succeed:
+		var resultIfBuySuccessful = { itemBought: true, reason: (this.game.devMode ? "dev-mode" : "paid-for") };
+
 		var meta = model.metadata;
 		if (!meta.noStackable && event.shiftKey) {
 			var maxBld = 10000;
 			if (this.game.opts.noConfirm) {
 				this.build(model, maxBld);
-				callback(true);
+				callback(resultIfBuySuccessful);
 			} else {
 				var self = this;
 				this.game.ui.confirm($I("construct.all.confirmation.title"), $I("construct.all.confirmation.msg"), function() {
 					self.build(model, maxBld);
-					callback(true);
+					callback(resultIfBuySuccessful);
 				}, function() {
-					callback(false);
+					callback({ itemBought: false, reason: "player-denied" /*The player decided not to buy this after all.*/});
 				});
 			}
 		} else if (!meta.noStackable && (event.ctrlKey || event.metaKey /*osx tears*/)) {
 			this.build(model, this.game.opts.batchSize || 10);
-			callback(true);
+			callback(resultIfBuySuccessful);
 		} else {
             this.build(model, 1);
-            callback(true);
+		  callback(resultIfBuySuccessful);
         }
 	},
 
@@ -2124,16 +2140,22 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingNotStackableBtnController", com
 	},
 
 	buyItem: function(model, event, callback) {
-		if ((!model.metadata.researched && this.hasResources(model)) || this.game.devMode){
-			this.payPrice(model);
-
-			this.onPurchase(model);
-			
-			callback(true);
-			this.game.render();
+		var isInDevMode = this.game.devMode;
+		if (model.metadata.researched && !isInDevMode) {
+			callback({ itemBought: false, reason: "already-bought" });
 			return;
 		}
-		callback(false);
+		if (!this.hasResources(model) && !isInDevMode) {
+			callback({ itemBought: false, reason: "cannot-afford" });
+			return;
+		}
+		//Else, we can buy it:
+		this.payPrice(model);
+		this.onPurchase(model);
+		
+		callback({ itemBought: true, reason: (isInDevMode ? "dev-mode" : "paid-for") });
+		this.game.render();
+		return;
 	},
 
 	onPurchase: function(model){
