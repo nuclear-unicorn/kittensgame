@@ -2167,39 +2167,31 @@ dojo.declare("classes.queue.manager", null,{
 
             case "zigguratUpgrades":
                 props.controller = new com.nuclearunicorn.game.ui.ZigguratBtnController(this.game);
-                //var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 break;
 
             case "religion":
                 props.controller = new com.nuclearunicorn.game.ui.ReligionBtnController(this.game);
-                //var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 break;
 
             case "transcendenceUpgrades":
                 props.controller = new classes.ui.TranscendenceBtnController(this.game);
-                //var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 break;
 
             case "pacts":
                 props.controller = new com.nuclearunicorn.game.ui.PactsBtnController(this.game);
-                //var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 break;
 
             case "upgrades":
-                //compare = "researched";
                 props.controller = new com.nuclearunicorn.game.ui.UpgradeButtonController(this.game);
-                //var oldVal = itemMetaRaw.researched;
                 var model = props.controller.fetchModel(props);
                 break;
 
             case "zebraUpgrades":
-                //compare = "researched";
                 props.controller = new com.nuclearunicorn.game.ui.ZebraUpgradeButtonController(this.game);
-                //var oldVal = itemMetaRaw.researched;
                 var model = props.controller.fetchModel(props);
                 break;
         }
@@ -2211,7 +2203,6 @@ dojo.declare("classes.queue.manager", null,{
             return;
         }
         var el = this.queueItems[0];
-
         if (!el){
             console.warn("null queue item, skipping");
             this.queueItems.shift();
@@ -2219,161 +2210,59 @@ dojo.declare("classes.queue.manager", null,{
             return;
         }
 
-        var itemMetaRaw = this.game.getUnlockByName(el.name, el.type);
-        var compare = "val"; //we should do some sort of refractoring of the switch mechanism
-
-        if (!itemMetaRaw){
-            console.error("invalid queue item:", el);
+        var controllerAndModel = this.getQueueElementControllerAndModel(el);
+        if(!controllerAndModel || !controllerAndModel.controller || !controllerAndModel.model){
+            console.error(el.name + " of " + el.type + " queing is not supported!");
+            this.queueItems.shift();
+            this.game._publish("ui/update", this.game);
             return;
         }
 
-        var props = {
-            id: itemMetaRaw.name
-        };
-        var buyItem = true;
+        var resultOfBuyingItem = null;
+        //TODO: use null event instead of empty object
+        controllerAndModel.controller.buyItem(controllerAndModel.model, {}, function(args) { resultOfBuyingItem = args; });
 
-        switch (el.type){
-            case "policies":
-                compare = ["researched", "blocked"];
-                props.controller = new classes.ui.PolicyBtnController(this.game);
-                var oldVal = {
-                    researched: itemMetaRaw.researched,
-                    blocked: itemMetaRaw.blocked
-                };
-                var model = props.controller.fetchModel(props);
-                break;
-                
-            case "tech":
-                compare = "researched";
-                props.controller = new com.nuclearunicorn.game.ui.TechButtonController(this.game);
-                var oldVal = itemMetaRaw.researched;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "buildings":
-                var bld = new classes.BuildingMeta(itemMetaRaw).getMeta();
-                    oldVal = itemMetaRaw.val;
-                props = {
-                    key:            bld.name,
-                    name:           bld.label,
-                    description:    bld.description,
-                    building:       bld.name
-                };
-                if (typeof(bld.stages) == "object"){
-                    props.controller = new classes.ui.btn.StagingBldBtnController(this.game);
-                } else {
-                    props.controller = new classes.ui.btn.BuildingBtnModernController(this.game);
-                }
-                var model = props.controller.fetchModel(props);
-                //props.controller.build(model, 1);
-                //buyItem = false;
-                break;
-
-            case "spaceMission":
-                props.controller = new com.nuclearunicorn.game.ui.SpaceProgramBtnController(this.game);
-                var oldVal = itemMetaRaw.val;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "spaceBuilding":
-                props.controller = new classes.ui.space.PlanetBuildingBtnController(this.game);
-                var oldVal = itemMetaRaw.val;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "chronoforge":
-                props.controller = new classes.ui.time.ChronoforgeBtnController(this.game);
-                var oldVal = itemMetaRaw.val;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "voidSpace":
-                props.controller = new classes.ui.time.VoidSpaceBtnController(this.game);
-                var oldVal = itemMetaRaw.val;
-                var model = props.controller.fetchModel(props);
-                if(el.name == "usedCryochambers"){ //a bunch of model black magic
-                    props.controller = new classes.ui.time.FixCryochamberBtnController(this.game);
-                    itemMetaRaw = this.game.getUnlockByName("cryochambers", el.type);
-                    model.prices = this.game.time.getVSU("usedCryochambers").fixPrices;
-                    model.enabled = this.game.resPool.hasRes(model.prices); //check we actually have enough to do one fix!
-                    //console.log(model);
-                }
-                break;
-
-            case "zigguratUpgrades":
-                props.controller = new com.nuclearunicorn.game.ui.ZigguratBtnController(this.game);
-                var oldVal = itemMetaRaw.val;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "religion":
-                props.controller = new com.nuclearunicorn.game.ui.ReligionBtnController(this.game);
-                var oldVal = itemMetaRaw.val;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "transcendenceUpgrades":
-                props.controller = new classes.ui.TranscendenceBtnController(this.game);
-                var oldVal = itemMetaRaw.val;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "pacts":
-                props.controller = new com.nuclearunicorn.game.ui.PactsBtnController(this.game);
-                var oldVal = itemMetaRaw.val;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "upgrades":
-                compare = "researched";
-                props.controller = new com.nuclearunicorn.game.ui.UpgradeButtonController(this.game);
-                var oldVal = itemMetaRaw.researched;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "zebraUpgrades":
-                compare = "researched";
-                props.controller = new com.nuclearunicorn.game.ui.ZebraUpgradeButtonController(this.game);
-                var oldVal = itemMetaRaw.researched;
-                var model = props.controller.fetchModel(props);
-                break;
+        if (typeof(resultOfBuyingItem) !== "object" || !resultOfBuyingItem) {
+            console.error("Invalid result after attempting to buy item via queue", resultOfBuyingItem);
+            return;
         }
-        
-        if(!props.controller){
-            console.error(el.name + " of " + el.type + " queing is not supported!");
-            var deletedElement = this.queueItems.shift();
-            this.game._publish("ui/update", this.game);
-        }
-        var resultOfBuyingItem;
-        if(buyItem){
-            props.controller.buyItem(model, 1, function(args) { resultOfBuyingItem = args; });
-        }
-        var changed = false;
-        if (Array.isArray(compare)){
-            for (var i in compare){
-                if (oldVal[compare[i]] != model.metadata[compare[i]]){
-                    changed = true;
-                }
-            }
-        }else{
-            changed = oldVal != model.metadata[compare];
-        }
-        if(changed){
+
+        var reason = resultOfBuyingItem.reason; //String explaining *why* we failed to buy the item
+
+        //Depending on the result, do something different:
+        if (resultOfBuyingItem.itemBought){
+            //Item successfully purchased!  Remove it from the queue because we did it :D
             this.dropLastItem();
             this.game._publish("ui/update", this.game);
-            //console.log( "Successfully built " + el.name + " using the queue." );
+            console.log("Successfully built " + el.name + " using the queue because " + reason);
         } else {
-            //console.log( "Tried to build " + el.name + " using the queue, but failed." );
-            if( (compare == "researched" && model.metadata[compare] == true ) ||
-                (compare.includes("blocked") && model.metadata["blocked"] == true) ||
-                (compare.includes("researched") && model.metadata["researched"] == true) ||
-                (el.type === "spaceMission" && model.metadata[compare])
-            ){
+            if (this._isReasonToSkipItem(reason)) {
                 this.dropLastItem();
                 this.game._publish("ui/update", this.game);
-                //console.log( "Dropped " + el.name + " from the queue because it can't be built anymore." );
+                console.log("Dropped " + el.name + " from the queue because " + reason);
+            } else {
+                console.log("Tried to build " + el.name + " using the queue, but failed because " + reason);
             }
         }
+    },
+
+    //Determines whether or not we should silently remove an item from the queue
+    //based on the reason WHY we can't buy it.
+    //@param reason     String containing a code passed to the callback function
+    //@return           Boolean.  If true, the item should be removed from the queue.
+    //                  If false, the queue should wait until we are able to purchase the item.
+    _isReasonToSkipItem: function(reason) {
+        if (reason == "paid-for" || reason == "item-is-free" || reason == "dev-mode") {
+            //These are used as reasons why we DID purchase the item.
+            //If we DID purchase the item, of course we want it removed from the queue!
+            return true;
+        }
+        if (reason == "already-bought" || reason == "player-denied") {
+            //These are good reasons the queue should skip over the item entirely.
+            return true;
+        }
+        //Else, most likely we just can't afford the item yet.
+        return false;
     },
 
     //This function is to be called whenever a building is deltagraded.
