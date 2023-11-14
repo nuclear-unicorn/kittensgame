@@ -707,6 +707,38 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		model.handler.apply(this, [model, event]);
 	},
 
+	/* This is probably the most important function in the button's code--when you click the button, it does the thing.
+	 * This function also handles logic such as "what if you click the button but can't afford it right now."
+	 * The name "buy item" is somewhat misleading, as ALL buttons in the UI (at least, all that inherit from this class)
+	 * use this function.  Buttons like the "send hunters" button or the "reset game" button use their clickHandler to do the thing.
+	 * Other buttons such as those for buildings or techs override the buyItem function to put their own custom logic in, but
+	 * all implementations of buyItem follow the same principles.
+	 * @param model	Object.  The model of this item.  For those unfamiliar with the Kittens Game game engine, the model
+	 * 				specifies data such as the name of the item, whether it's visible, whether it's enabled, its prices,
+	 * 				its effects, the metadata associated with this building, etc.
+	 * @param event	(OPTIONAL) Object.  If given, contains information such as whether the shift key was pressed.  This is
+	 * 				used by buildings to determine if we're buying 1, buying 10, buying all, etc.  If null, uses default behavior.
+	 * @param callback	Function.  This is how we communicate the results of trying to buy the item.  The callback function is called
+	 * 				with a single parameter, an object containing two fields:
+	 * 					itemBought	Boolean.  True if one or more items were bought, false if nothing happened.
+	 * 					reason		String.  Used as an enumeration encoding *why* the result happened the way it did.
+	 * 								If itemBought is true, can be one of the following values:
+	 * 									"paid-for"		We met the requirements & bought the item legitimately.
+	 * 									"dev-mode"		We bought this item in dev mode ignoring the cost & requirements.
+	 * 									"item-is-free"		The item has no cost or requirements.
+	 * 								If itemBought is false, can be one of the following values:
+	 * 									"not-unlocked"		The item is not unlocked yet.
+	 * 									"already-bought"	For one-time purchases, the item is already bought.
+	 * 													For purchases with a limit, we are at that limit.
+	 * 									"blocked"			A conflicting item has already been bought.
+	 * 													Also used by some policies to indicate additional unmet requirements.
+	 * 									"player-denied"	This item requires the player to confirm their choice, but
+	 * 													the player decided not to confirm the purchase.
+	 * 									"cannot-afford"	The player can't afford the price of this item right now.
+	 * 									"not-enabled"		For some unspecified reason, this item is not available.
+	 * 				If the callback function returns anything, the return value from that function is ignored.
+	 * @return		No return value.  We communicate with the rest of the program using the callback function.
+	 */
 	buyItem: function(model, event, callback){
 		if (!this.hasResources(model)) {
 			callback({ itemBought: false, reason: "cannot-afford" });

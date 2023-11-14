@@ -2252,14 +2252,14 @@ dojo.declare("classes.queue.manager", null,{
             //Item successfully purchased!  Remove it from the queue because we did it :D
             this.dropLastItem();
             this.game._publish("ui/update", this.game);
-            console.log("Successfully built " + el.name + " using the queue because " + reason);
+            //console.log("Successfully built " + el.name + " using the queue because " + reason);
         } else {
             if (this._isReasonToSkipItem(reason)) {
                 this.dropLastItem();
                 this.game._publish("ui/update", this.game);
-                console.log("Dropped " + el.name + " from the queue because " + reason);
+                //console.log("Dropped " + el.name + " from the queue because " + reason);
             } else {
-                console.log("Tried to build " + el.name + " using the queue, but failed because " + reason);
+                //console.log("Tried to build " + el.name + " using the queue, but failed because " + reason);
             }
         }
     },
