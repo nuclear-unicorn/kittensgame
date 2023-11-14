@@ -749,6 +749,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 			return;
 		}
 		//Else, we meet all requirements to buy this item:
+		if (!event) { event = {}; /*event is an optional parameter*/ }
 		this.clickHandler(model, event);
 		this.payPrice(model);
 
@@ -2031,6 +2032,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 	},
 
 	_buyItem_step2: function(model, event, callback) {
+		if (!event) { event = {}; /*event is an optional parameter*/ }
 		//This is what we pass to the callback function if we succeed:
 		var resultIfBuySuccessful = { itemBought: true, reason: (this.game.devMode ? "dev-mode" : "paid-for") };
 

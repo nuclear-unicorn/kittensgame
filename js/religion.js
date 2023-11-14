@@ -1381,6 +1381,7 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 			callback({ itemBought: false, reason: "not-enabled" });
 			return;
 		}
+		if (!event) { event = {}; /*event is an optional parameter*/ }
 		var batchSize = event.shiftKey ? 10000 :
 			event.ctrlKey || event.metaKey ? this.game.opts.batchSize : 1;
 		var didWeSucceed = this._transform(model, batchSize);
@@ -1486,7 +1487,7 @@ dojo.declare("classes.ui.religion.RefineTearsBtnController", com.nuclearunicorn.
 				&& self._canAfford(model, count) >= count,
 			title: "x" + count,
 			handler: function (event) {
-				self.buyItem(model, {}, this.update.bind(this), count);
+				self.buyItem(model, null, this.update.bind(this), count);
 			}
 		};
 	},
@@ -1512,6 +1513,7 @@ dojo.declare("classes.ui.religion.RefineTearsBtnController", com.nuclearunicorn.
 			callback({ itemBought: false, reason: "already-bought" });
 			return;
 		}
+		if (!event) { event = {}; /*event is an optional parameter*/ }
 		for (var batchSize = count || (event.ctrlKey ? this.game.opts.batchSize : 1);
 			 batchSize > 0
 			 && this.hasResources(model)

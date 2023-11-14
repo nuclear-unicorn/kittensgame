@@ -1396,6 +1396,7 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
 			return;
         }
 
+		if (!event) { event = {}; /*event is an optional parameter*/ }
 		var fixCount = event.shiftKey
 			? 1000
 			: event.ctrlKey || event.metaKey /*osx tears*/
@@ -2237,8 +2238,7 @@ dojo.declare("classes.queue.manager", null,{
         }
 
         var resultOfBuyingItem = null;
-        //TODO: use null event instead of empty object
-        controllerAndModel.controller.buyItem(controllerAndModel.model, {}, function(args) { resultOfBuyingItem = args; });
+        controllerAndModel.controller.buyItem(controllerAndModel.model, null, function(args) { resultOfBuyingItem = args; });
 
         if (typeof(resultOfBuyingItem) !== "object" || !resultOfBuyingItem) {
             console.error("Invalid result after attempting to buy item via queue", resultOfBuyingItem);
