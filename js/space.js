@@ -812,14 +812,10 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					"energyProduction": 1,
 					"energyConsumption": 0
 				},
-				upgrades: {
-					spaceBuilding: ["quantumMesh"]
-				},
 				calculateEffects: function(self, game) {
 					if (self.togglable != false){
 						self.togglable = false;
 					}
-					self.action(self, game);
 				},
 				action: function(self, game){
 					var yearBonus = game.calendar.darkFutureYears();
@@ -874,12 +870,6 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					"antimatterProduction": 0.5,
 					"antimatterMax": 200,
 					"hrHarvesterPenalty": 0,
-				},
-				upgrades: {
-					spaceBuilding: ["hrHarvester"]
-				},
-				calculateEffects: function(self, game){
-					self.action(self, game);
 				},
 				action: function(self, game) {
 					var quantumMeshBonusRatio = 1;
