@@ -1376,6 +1376,8 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 			return;
 		}
 		if (!model.enabled) {
+			//As far as I can tell, this shouldn't ever happen because being
+			//unable to afford it is the only reason for it to be disabled.
 			callback({ itemBought: false, reason: "not-enabled" });
 			return;
 		}
@@ -1401,6 +1403,8 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 			return;
 		}
 		if (!model.enabled) {
+			//As far as I can tell, this shouldn't ever happen because being
+			//unable to afford it is the only reason for it to be disabled.
 			callback({ itemBought: false, reason: "not-enabled" });
 			return;
 		}
@@ -1497,6 +1501,8 @@ dojo.declare("classes.ui.religion.RefineTearsBtnController", com.nuclearunicorn.
 			return;
 		}
 		if (!model.enabled) {
+			//As far as I can tell, this shouldn't ever happen because being
+			//unable to afford it is the only reason for it to be disabled.
 			callback({ itemBought: false, reason: "not-enabled" });
 			return;
 		}

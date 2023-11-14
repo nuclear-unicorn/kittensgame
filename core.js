@@ -1971,7 +1971,16 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 			return;
 		}
 		if (!model.enabled && !isInDevMode) {
-			callback({ itemBought: false, reason: "not-enabled" });
+			//Give a more detailed reason of why we can't buy it at this time:
+			var whyArentWeEnabled = "not-enabled"; //(default reason--unspecified)
+			var meta = model.metadata;
+			if (typeof(meta.limitBuild) == "number" && meta.limitBuild <= meta.val) {
+				whyArentWeEnabled = "already-bought";
+			} else if (meta.on && meta.noStackable){
+				whyArentWeEnabled = "already-bought";
+			}
+
+			callback({ itemBought: false, reason: whyArentWeEnabled });
 			return;
 		}
 		//Else, we meet all the requirements for being able to buy this item:

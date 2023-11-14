@@ -1874,43 +1874,50 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 		}
 	},
 
-	shouldBeBough: function(model, game){ //fail checks:
+	//Returns an object with two fields:
+	//	itemBought:	Boolean.  Are we able to buy this policy at this time?
+	//	reason:		String.  If we can't buy it, why not?  If we can buy it, returns
+	//				"paid-for" regardless of whether we can actually afford it or not.
+	shouldBeBought: function(model, game){ //fail checks:
 		if(this.game.village.leader && model.metadata.requiredLeaderJob && this.game.village.leader.job != model.metadata.requiredLeaderJob){
 			var jobTitle = this.game.village.getJob(model.metadata.requiredLeaderJob).title;
 			this.game.msg($I("msg.policy.wrongLeaderJobForResearch", [model.metadata.label, jobTitle]), "important");
-			return false;
+			return { itemBought: false, reason: "blocked" };
 		}else if(model.metadata.name == "transkittenism" && this.game.bld.getBuildingExt("aiCore").meta.effects["aiLevel"] >= 15){
 			this.game.msg($I("msg.policy.aiNotMerges"),"alert", "ai");
-			return false;
+			return { itemBought: false, reason: "blocked" };
 		}else if(model.metadata.blocked != true) {
              for(var i = 0; i < model.metadata.blocks.length; i++){
                 if(this.game.science.getPolicy(model.metadata.blocks[i]).researched){
                     model.metadata.blocked = true;
-                    return false;
+				return { itemBought: false, reason: "blocked" };
                 }
 			}
 			var confirmed = false; //confirmation:
 			if(game.opts.noConfirm){
-				return true;
+				return { itemBought: true, reason: "paid-for" };
 			}
 			game.ui.confirm($I("policy.confirmation.title"), $I("policy.confirmation.title"), function() {
 				confirmed = true;
 			});
+			return confirmed ? { itemBought: true, reason: "paid-for" } : { itemBought: false, reason: "player-denied" };
 		}
-		return confirmed;
+		//Else, the policy was blocked:
+		return { itemBought: false, reason: "blocked" };
 	},
 	buyItem: function(model, event, callback) {
 		var isInDevMode = this.game.devMode;
-		if (!this.hasResources(model) && !isInDevMode) {
-			callback({ itemBought: false, reason: "cannot-afford" });
-			return;
-		}
 		if (model.metadata.researched && !isInDevMode) {
 			callback({ itemBought: false, reason: "already-bought" });
 			return;
 		}
-		if(!this.shouldBeBough(model, this.game)){
-			callback({ itemBought: false, reason: "*sigh* there are many reasons why you would be unable to purchase a policy & I cannot list them all here" });
+		if (!this.hasResources(model) && !isInDevMode) {
+			callback({ itemBought: false, reason: "cannot-afford" });
+			return;
+		}
+		var result = this.shouldBeBought(model, this.game);
+		if(!result.itemBought){
+			callback(result); //Tell them *why* we failed to buy the item.
 			return;
 		}
 		this.payPrice(model);

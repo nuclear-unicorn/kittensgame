@@ -1205,6 +1205,8 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 			return true;
 		}
 		if (!model.enabled) {
+            //As far as I can tell, this shouldn't ever happen because being
+            //unable to afford it is the only reason for it to be disabled.
 			callback({ itemBought: false, reason: "not-enabled" });
 			return true;
 		}
@@ -1381,10 +1383,18 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
     },
 
 	buyItem: function(model, event, callback) {
-		if (!model.enabled) {
-			callback({ itemBought: false, reason: "not-enabled" });
+        if (this.game.time.getVSU("usedCryochambers").val == 0) {
+			callback({ itemBought: false, reason: "already-bought" });
+			return;
+        }
+		if (!model.visible) {
+			callback({ itemBought: false, reason: "not-unlocked" });
 			return;
 		}
+        if (!this.hasResources(model)) {
+			callback({ itemBought: false, reason: "cannot-afford" });
+			return;
+        }
 
 		var fixCount = event.shiftKey
 			? 1000
@@ -1403,7 +1413,7 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
             cry.calculateEffects(cry, this.game);
             callback({ itemBought: true, reason: "paid-for" });
         } else {
-			callback({ itemBought: false, reason: "cannot-afford" });
+			callback({ itemBought: false, reason: "not-enabled" });
         }
 	},
 
@@ -1430,6 +1440,14 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
     //This is a bit of a hack to get the correct description to appear in the queue tooltips...
     getDescription: function(model) {
         return $I("time.fixCryochambers.desc");
+    },
+
+    getPrices: function(model) {
+        if (!model.prices) {
+            //Initialize model.prices if it hasn't been initialized already.
+            model.prices = this.game.time.getVSU("usedCryochambers").fixPrices;
+        }
+        return model.prices;
     }
 });
 
@@ -1439,7 +1457,7 @@ dojo.declare("classes.ui.VoidSpaceWgt", [mixin.IChildrenAware, mixin.IGameAware]
 		this.addChild(new com.nuclearunicorn.game.ui.ButtonModern({
             name: $I("time.fixCryochambers.label"),
             description: $I("time.fixCryochambers.desc"),
-            prices: game.time.getVSU("usedCryochambers").fixPrices,
+            //The prices field will be set when getPrices is called.
             /*prices: [
 				{name: "temporalFlux", val: 3000},
 				{name: "timeCrystal", val: 100},
@@ -2160,8 +2178,8 @@ dojo.declare("classes.queue.manager", null,{
                     props.controller = new classes.ui.time.FixCryochamberBtnController(this.game);
                     itemMetaRaw = this.game.getUnlockByName("cryochambers", el.type);
                     model.prices = this.game.time.getVSU("usedCryochambers").fixPrices;
-                    model.enabled = this.game.resPool.hasRes(model.prices); //check we actually have enough to do one fix!
-                    //console.log(model);
+                    props.controller.updateVisible(model);
+                    props.controller.updateEnabled(model);
                 }
                 break;
 
@@ -2257,7 +2275,7 @@ dojo.declare("classes.queue.manager", null,{
             //If we DID purchase the item, of course we want it removed from the queue!
             return true;
         }
-        if (reason == "already-bought" || reason == "player-denied") {
+        if (reason == "already-bought" || reason == "blocked" || reason == "player-denied") {
             //These are good reasons the queue should skip over the item entirely.
             return true;
         }
