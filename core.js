@@ -1560,7 +1560,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		var nextEffectValue = underlying.effects[effectName];
 		underlying.on--;
 		underlying.updateEffects(underlying, this.game);
-		//(cycleEffectsBasics is only relevant for space buildings & it will be applied at a later time so we skip it for now)
+		this.game.calendar.cycleEffectsBasics(underlying.effects, underlying.name);
 		return nextEffectValue;
 	},
 
