@@ -383,7 +383,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				            "winter": -0.5};
 				}
 			}
-		 }
+		}
+
 	},
 
 	onLeavingIW: function(){
@@ -1036,6 +1037,7 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 	incrementValue: function(model) {
 		this.inherited(arguments);
 		model.options.race.embassyLevel++;
+		this.game.science.unlockRelations();
 	},
 
 	hasSellLink: function(model){
