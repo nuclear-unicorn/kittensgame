@@ -2010,10 +2010,14 @@ dojo.declare("classes.queue.manager", null,{
                 for (var i in voidSpaceUpgrades){
                     var building = voidSpaceUpgrades[i];
                     if(building.name == "usedCryochambers"){
-                        options.push({
-                            name: building.name,
-                            label: $I("time.fixCryochambers.label")
-                        });
+                        //ONLY allow queueing of Fix Cryochamber if we have unlocked that feature normally.
+                        if (this.game.workshop.get("chronoforge").researched && building.val != 0)
+                        {
+                            options.push({
+                                name: building.name,
+                                label: $I("time.fixCryochambers.label")
+                            });
+                        }
                         continue;
                     }
                     if (building.unlocked){
