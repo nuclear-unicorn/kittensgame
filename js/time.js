@@ -137,6 +137,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 			var bld = this.voidspaceUpgrades[i];
 			this.resetStateStackable(bld);
 		}
+
+        this.queue.resetState();
     },
 
     update: function(){
@@ -1738,6 +1740,14 @@ dojo.declare("classes.queue.manager", null,{
     constructor: function(game){
         this.game = game;
         
+    },
+
+    resetState: function() {
+        this.cap = this.baseCap;
+        this.alphabeticalSort = true;
+        this.queueItems = [];
+        this.queueSources = dojo.clone(this.queueSourcesDefault);
+        this.queueSourcesArr = [{name: "buildings", label: $I("buildings.tabName")}];
     },
 
     /**
