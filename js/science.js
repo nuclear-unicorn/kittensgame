@@ -1311,6 +1311,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		upgrades: {
 			buildings: ["pasture", "aqueduct"]
 		},
+		calculateEffects: function(self,game){
+			game.science.unlockRelations(); //Hack: Check relations by being upgraded by diplomacy on load
+		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("lizards", 15);
 		}
@@ -1492,6 +1495,21 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["spiderRelationsGeologists"],
 		evaluateLocks: function(game){
 			return game.science.checkRelation("spiders", 10);
+		},
+		calculateEffects: function(self, game){
+			var spiders = game.diplomacy.get("spiders");
+			var spiderRelations = self.researched;
+			var sells = [];
+			for (var i = 0; i < spiders.sells.length; i++) {
+				var sell = spiders.sells[i]["name"];
+				sells.push(sell);
+				if(!spiderRelations && sell == "kerosene"){
+					spiders.sells.splice(i); //Remove kerosene on load
+				}
+			}
+			if(spiderRelations && !spiders.sells.includes("kerosene")) {
+				spiders.sells.push({name: "kerosene", value: 5, chance: 0.1, width: 0.1, minLevel: 10});
+			}
 		}
 	}, {
 		name: "dragonRelationsPhysicists",
@@ -1924,12 +1942,12 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 	},
 
 	checkRelation: function(race, embassyNeeded){
-		var race = this.game.diplomacy.get(race);
-		return (race.embassyLevel >= embassyNeeded && race.standing + this.game.getEffect("standingRatio") +
-		this.game.diplomacy.calculateStandingFromPolicies(race.name, this.game) >= 0);
+		var race = this.game.diplomacy.get(race); //Standing Ratio removed for now as standing calculations don't seem to work correctly on load. Also could be interpreted as making them work if they don't like you.
+		return (race.embassyLevel >= embassyNeeded /*&& race.standing + this.game.getEffect("standingRatio") +
+		this.game.diplomacy.calculateStandingFromPolicies(race.name, this.game) >= 0*/);
 	},
 
-	unlockRelations: function(){ //Called every time we buy an embassy to unlock Relations.
+	unlockRelations: function(){ //Called on load and every time we buy an embassy to unlock Relations.
 		if (this.game.prestige.getPerk("diplomacy").researched){
 			for (var i = this.policies.length - 1; i >= 0; i--) {
 				if (this.policies[i].isRelation && !this.policies[i].unlocked){
@@ -2161,6 +2179,10 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 
 			this.onPurchase(model);
 
+			var meta = model.metadata;
+			if (meta.calculateEffects){
+				model.metadata.calculateEffects(meta, this.game);
+			}
 			callback(true);
 			this.game.render();
 			return;
@@ -2188,7 +2210,6 @@ dojo.declare("classes.ui.PolicyPanel", com.nuclearunicorn.game.ui.Panel, {
 	toggleBlockedSpan: null,
 
 	render: function(container){
-		this.game.science.unlockRelations(); //Hack: check relations upon switching to science tab
 		var content = this.inherited(arguments),
 			self = this;
 		var msgBox = dojo.create("span", { style: { display: "inline-block", marginBottom: "10px", width: "50%"}}, content);

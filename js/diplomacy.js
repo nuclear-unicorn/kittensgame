@@ -385,17 +385,6 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			}
 		}
 
-		if(this.game.science.getPolicy("spiderRelationsChemists").researched) {
-			var spiders = this.get("spiders");
-			var sells = [];
-			for (var i = 0; i < spiders.sells.length; i++) {
-				sells.push(spiders.sells[i]["name"]);
-			}
-
-			if (!sells.includes("kerosene")){
-			spiders.sells.push({name: "kerosene", value: 5, chance: 0.1, width: 0.1, minLevel: 10});
-			}			
-		}
 	},
 
 	onLeavingIW: function(){

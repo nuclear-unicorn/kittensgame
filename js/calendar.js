@@ -334,7 +334,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 				var effect_cycle = building_name + "-" + effect;
 				var effect_modifier = list_effects_cycle[effect_cycle];
 				if (typeof effect_modifier !== "undefined") {					
-					if (dragonAstrologers && effect_modifier < 1) {
+					if (dragonAstrologers && effect_modifier < 1) { //Dragon astrologers halve the negative cycle effects
 						effect_modifier += (1 - effect_modifier) * this.game.getEffect("negativeCycleRatioPolicy");
 					}
 					effects[effect] *= effect_modifier;

@@ -147,6 +147,9 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		effects:{
 			"standingRatio" : 0.1
 		},
+		upgrades:{
+			policies: ["lizardRelationsEcologists"]
+		},
 		unlocks: {
 			"perks": ["zebraDiplomacy"]
 		}

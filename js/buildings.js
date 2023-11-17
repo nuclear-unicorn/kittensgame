@@ -1238,7 +1238,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		jammed: false,
 		togglableOnOff: true,
 		isAutomationEnabled: null,
-		action: function(self, game) {						
+		action: function(self, game) {
 			if (game.workshop.get("factoryAutomation").researched) {
 				if (self.isAutomationEnabled == null) { //force non-null value
 					self.isAutomationEnabled = true;
