@@ -1375,6 +1375,7 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 			var batchSize = event.shiftKey ? 10000 :
 				event.ctrlKey || event.metaKey ? this.game.opts.batchSize : 1;
 			callback(this._transform(model, batchSize));
+			return;
 		}
 		callback(false);
 	},
@@ -1387,6 +1388,7 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 		var amt = Math.floor(this._canAfford(model) / divider);
 		if (model.enabled && amt >= 1) {
 			callback(this._transform(model, amt));
+			return;
 		}
 		callback(false);
 	},
@@ -1487,6 +1489,7 @@ dojo.declare("classes.ui.religion.RefineTearsBtnController", com.nuclearunicorn.
 			}
 
 			callback(true);
+			return;
 		}
 		callback(false);
 	},
