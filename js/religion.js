@@ -1371,12 +1371,26 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 	},
 
 	buyItem: function(model, event, callback) {
-		if (model.enabled && this.hasResources(model)) {
-			var batchSize = event.shiftKey ? 10000 :
-				event.ctrlKey || event.metaKey ? this.game.opts.batchSize : 1;
-			callback(this._transform(model, batchSize));
+		if (!this.hasResources(model)) {
+			callback({ itemBought: false, reason: "cannot-afford" });
+			return;
 		}
-		callback(false);
+		if (!model.enabled) {
+			//As far as I can tell, this shouldn't ever happen because being
+			//unable to afford it is the only reason for it to be disabled.
+			callback({ itemBought: false, reason: "not-enabled" });
+			return;
+		}
+		if (!event) { event = {}; /*event is an optional parameter*/ }
+		var batchSize = event.shiftKey ? 10000 :
+			event.ctrlKey || event.metaKey ? this.game.opts.batchSize : 1;
+		var didWeSucceed = this._transform(model, batchSize);
+		if (didWeSucceed) {
+			callback({ itemBought: true, reason: "paid-for" });
+		} else {
+			//_transform(model, amt) returns false if we can't afford it
+			callback({ itemBought: false, reason: "cannot-afford" });
+		}
 	},
 
 	_canAfford: function(model) {
@@ -1385,10 +1399,23 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 
 	transform: function(model, divider, event, callback) {
 		var amt = Math.floor(this._canAfford(model) / divider);
-		if (model.enabled && amt >= 1) {
-			callback(this._transform(model, amt));
+		if (amt < 1) {
+			callback({ itemBought: false, reason: "cannot-afford" });
+			return;
 		}
-		callback(false);
+		if (!model.enabled) {
+			//As far as I can tell, this shouldn't ever happen because being
+			//unable to afford it is the only reason for it to be disabled.
+			callback({ itemBought: false, reason: "not-enabled" });
+			return;
+		}
+		var didWeSucceed = this._transform(model, amt);
+		if (didWeSucceed) {
+			callback({ itemBought: true, reason: "paid-for" });
+		} else {
+			//_transform(model, amt) returns false if we can't afford it
+			callback({ itemBought: false, reason: "cannot-afford" });
+		}
 	},
 
 	_transform: function(model, amt) {
@@ -1460,7 +1487,7 @@ dojo.declare("classes.ui.religion.RefineTearsBtnController", com.nuclearunicorn.
 				&& self._canAfford(model, count) >= count,
 			title: "x" + count,
 			handler: function (event) {
-				self.buyItem(model, {}, this.update.bind(this), count);
+				self.buyItem(model, null, this.update.bind(this), count);
 			}
 		};
 	},
@@ -1470,25 +1497,32 @@ dojo.declare("classes.ui.religion.RefineTearsBtnController", com.nuclearunicorn.
 	},
 
 	buyItem: function(model, event, callback, count){
-		if (model.enabled && this.hasResources(model)) {
-			if (this.game.resPool.get("sorrow").value >= this.game.resPool.get("sorrow").maxValue){
-				this.game.msg($I("religion.refineTearsBtn.refine.msg.failure"));
-				callback(false);
-				return;
-			}
-
-			for (var batchSize = count || (event.ctrlKey ? this.game.opts.batchSize : 1);
-				 batchSize > 0
-				 && this.hasResources(model)
-				 && this.game.resPool.get("sorrow").value < this.game.resPool.get("sorrow").maxValue;
-				 batchSize--) {
-				this.payPrice(model);
-				this.refine();
-			}
-
-			callback(true);
+		if (!this.hasResources(model)) {
+			callback({ itemBought: false, reason: "cannot-afford" });
+			return;
 		}
-		callback(false);
+		if (!model.enabled) {
+			//As far as I can tell, this shouldn't ever happen because being
+			//unable to afford it is the only reason for it to be disabled.
+			callback({ itemBought: false, reason: "not-enabled" });
+			return;
+		}
+		if (this.game.resPool.get("sorrow").value >= this.game.resPool.get("sorrow").maxValue){
+			//We can't refine because we're at the limit.
+			this.game.msg($I("religion.refineTearsBtn.refine.msg.failure"));
+			callback({ itemBought: false, reason: "already-bought" });
+			return;
+		}
+		if (!event) { event = {}; /*event is an optional parameter*/ }
+		for (var batchSize = count || (event.ctrlKey ? this.game.opts.batchSize : 1);
+			 batchSize > 0
+			 && this.hasResources(model)
+			 && this.game.resPool.get("sorrow").value < this.game.resPool.get("sorrow").maxValue;
+			 batchSize--) {
+			this.payPrice(model);
+			this.refine();
+		}
+		callback({ itemBought: true, reason: "paid-for" });
 	},
 
 	refine: function(){
@@ -1585,15 +1619,16 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 	buyItem: function(model, event, callback) {
 		this.game.updateCaches();
 		this.updateEnabled(model);
-		if ((this.hasResources(model)) || this.game.devMode){
-			if(!this.shouldBeBough(model, this.game)){
-				callback(false);
-				return;
-			}
-			this._buyItem_step2(model, event, callback);
-		}else{
-			callback(false);
+
+		if (!this.hasResources(model) && !this.game.devMode) {
+			callback({ itemBought: false, reason: "cannot-afford" });
+			return;
 		}
+		if(!this.shouldBeBough(model, this.game)){
+			callback({ itemBought: false, reason: "already-bought" /*No more pacts available*/ });
+			return;
+		}
+		this._buyItem_step2(model, event, callback);
 	},
 
 	build: function(model, maxBld){

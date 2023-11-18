@@ -2908,8 +2908,12 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 	},
 
 	buyItem: function(model, event, callback) {
-		this.game.workshop.craft(model.craft.name, 1);
-		callback(true);
+		var wasCraftSuccessful = this.game.workshop.craft(model.craft.name, 1);
+		if (wasCraftSuccessful) {
+			callback({ itemBought: true, reason: "paid-for" });
+		} else {
+			callback({ itemBought: false, reason: "cannot-afford" });
+		}
 	}
 });
 

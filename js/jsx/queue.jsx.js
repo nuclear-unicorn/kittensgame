@@ -10,6 +10,11 @@ WQueueItem = React.createClass({
     componentDidMount: function(){
         this.attachTooltip();
     },
+    componentDidUpdate: function(prevProps, prevState){
+        if (this.props.item !== prevProps.item) {
+            this.attachTooltip();
+        }
+    },
 
     render: function(){
         var item = this.props.item;
@@ -78,19 +83,13 @@ WQueueItem = React.createClass({
         var game = this.props.game;
 
         var node = React.findDOMNode(this.refs.itemLabel);
-        //TODO: extract controller and model
 
-        //TBD
-        if (item.type != "buildings"){
+        //Extract the correct type of controller & its model for this specific item:
+        var controllerAndModel = game.time.queue.getQueueElementControllerAndModel(item);
+        if (!controllerAndModel) {
             return;
         }
-
-        var controller = new classes.ui.btn.BuildingBtnModernController(game);
-        var model = controller.fetchModel({
-            building: item.name,
-            key: item.name,
-        });
-        UIUtils.attachTooltip(game, node, 0, 200, dojo.partial(ButtonModernHelper.getTooltipHTML, controller, model));
+        UIUtils.attachTooltip(game, node, 0, 200, dojo.partial(ButtonModernHelper.getTooltipHTML, controllerAndModel.controller, controllerAndModel.model));
     }
 });
 

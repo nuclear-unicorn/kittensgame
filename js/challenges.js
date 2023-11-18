@@ -713,30 +713,8 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 	},
 
 	buyItem: function(model, event, callback) {
-		/*if (model.metadata.name == this.game.challenges.currentChallenge
-		 || (!model.enabled && !this.game.devMode)) {
-			callback(false);
-			return;
-		}
-
-		var game = this.game;
-		game.ui.confirm($I("challendge.btn.confirmation.title"), $I("challendge.btn.confirmation.msg"), function() {
-			// Set the challenge for after reset
-			game.challenges.currentChallenge = model.metadata.name == "ironWill"
-				? null
-				: model.metadata.name;
-			// Reset with any benefit of chronosphere (resources, kittens, etc...)
-			game.bld.get("chronosphere").val = 0;
-			game.bld.get("chronosphere").on = 0;
-			game.time.getVSU("cryochambers").val = 0;
-			game.time.getVSU("cryochambers").on = 0;
-			game.resetAutomatic();
-			callback(true);
-		}, function() {
-			callback(false);
-		});*/
-
 		this.togglePending(model);
+		callback({ itemBought: true, reason: "item-is-free" /*We just toggled the pending state; simple, really*/});
 	},
 
 	togglePending: function(model){
