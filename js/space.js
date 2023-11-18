@@ -276,6 +276,11 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				else {
 					self.effects["energyConsumption"] = 1;
 				}
+
+				if (game.challenges.isActive("blackSky")) {
+					self.effects['starchartPerTickBaseSpace'] *= 1 / (1 + game.getEffect('bskSattelitePenalty'));
+				}
+
 				game.upgrade(self.upgrades); //this way observatories won't have to use action
 			},
 			upgrades: {
@@ -1299,7 +1304,7 @@ dojo.declare("com.nuclearunicorn.game.ui.SpaceProgramBtnController", com.nuclear
 		if (model.metadata.val == 0) {
 			this.inherited(arguments);
 		} else {
-			callback(false);
+			callback({ itemBought: false, reason: "already-bought" });
 		}
 	},
 

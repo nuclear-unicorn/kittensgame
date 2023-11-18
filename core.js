@@ -707,19 +707,58 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		model.handler.apply(this, [model, event]);
 	},
 
+	/* This is probably the most important function in the button's code--when you click the button, it does the thing.
+	 * This function also handles logic such as "what if you click the button but can't afford it right now."
+	 * The name "buy item" is somewhat misleading, as ALL buttons in the UI (at least, all that inherit from this class)
+	 * use this function.  Buttons like the "send hunters" button or the "reset game" button use their clickHandler to do the thing.
+	 * Other buttons such as those for buildings or techs override the buyItem function to put their own custom logic in, but
+	 * all implementations of buyItem follow the same principles.
+	 * @param model	Object.  The model of this item.  For those unfamiliar with the Kittens Game game engine, the model
+	 * 				specifies data such as the name of the item, whether it's visible, whether it's enabled, its prices,
+	 * 				its effects, the metadata associated with this building, etc.
+	 * @param event	(OPTIONAL) Object.  If given, contains information such as whether the shift key was pressed.  This is
+	 * 				used by buildings to determine if we're buying 1, buying 10, buying all, etc.  If null, uses default behavior.
+	 * @param callback	Function.  This is how we communicate the results of trying to buy the item.  The callback function is called
+	 * 				with a single parameter, an object containing two fields:
+	 * 					itemBought	Boolean.  True if one or more items were bought, false if nothing happened.
+	 * 					reason		String.  Used as an enumeration encoding *why* the result happened the way it did.
+	 * 								If itemBought is true, can be one of the following values:
+	 * 									"paid-for"		We met the requirements & bought the item legitimately.
+	 * 									"dev-mode"		We bought this item in dev mode ignoring the cost & requirements.
+	 * 									"item-is-free"		The item has no cost or requirements.
+	 * 								If itemBought is false, can be one of the following values:
+	 * 									"not-unlocked"		The item is not unlocked yet.
+	 * 									"already-bought"	For one-time purchases, the item is already bought.
+	 * 													For purchases with a limit, we are at that limit.
+	 * 									"blocked"			A conflicting item has already been bought.
+	 * 													Also used by some policies to indicate additional unmet requirements.
+	 * 									"player-denied"	This item requires the player to confirm their choice, but
+	 * 													the player decided not to confirm the purchase.
+	 * 									"cannot-afford"	The player can't afford the price of this item right now.
+	 * 									"not-enabled"		For some unspecified reason, this item is not available.
+	 * 				If the callback function returns anything, the return value from that function is ignored.
+	 * @return		No return value.  We communicate with the rest of the program using the callback function.
+	 */
 	buyItem: function(model, event, callback){
-		if (model.enabled && this.hasResources(model)) {
-			this.clickHandler(model, event);
-
-			this.payPrice(model);
-
-			if (model.priceRatio){
-				this.adjustPrice(model.priceRatio);
-			}
-
-			callback(true);
+		if (!this.hasResources(model)) {
+			callback({ itemBought: false, reason: "cannot-afford" });
+			return;
 		}
-		callback(false);
+		if (!model.enabled) {
+			callback({ itemBought: false, reason: "not-enabled" });
+			return;
+		}
+		//Else, we meet all requirements to buy this item:
+		if (!event) { event = {}; /*event is an optional parameter*/ }
+		this.clickHandler(model, event);
+		this.payPrice(model);
+
+		if (model.priceRatio){
+			this.adjustPrice(model.priceRatio);
+		}
+
+		//A lot of normal UI buttons that don't involve building things use this method, so check if things are free:
+		callback({ itemBought: true, reason: ((model.prices && model.prices.length) ? "paid-for" : "item-is-free") });
 	},
 
 	refund: function(model){
@@ -901,7 +940,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		this.animate();
 		var self = this;
 		this.controller.buyItem(this.model, event, function(result) {
-			if (result) {
+			if (typeof(result) == "object" && result.itemBought) {
 				self.update();
 			}
 		});
@@ -1268,8 +1307,9 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 
 ButtonModernHelper = {
 	getTooltipHTML : function(controller, model){
+		//Some aspects of the metadata may have changed, so fetch the latest version of the model:
+		model = controller.fetchModel(model.options);
 		controller.fetchExtendedModel(model);
-		//throw "ButtonModern::getTooltipHTML must be implemented";
 
 		var tooltip = dojo.create("div", { className: "tooltip-inner" }, null);
 
@@ -1560,7 +1600,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		var nextEffectValue = underlying.effects[effectName];
 		underlying.on--;
 		underlying.updateEffects(underlying, this.game);
-		//(cycleEffectsBasics is only relevant for space buildings & it will be applied at a later time so we skip it for now)
+		this.game.calendar.cycleEffectsBasics(underlying.effects, underlying.name);
 		return nextEffectValue;
 	},
 
@@ -1853,8 +1893,12 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 		}
 
 		var building = this.model.metadata;
-		if (building && building.val){
-
+		if (!building) {
+			//Everything else we want to do here depends on the building property.
+			//If we don't have that, then skip
+			return;
+		}
+		if (building.val){
 			// -------------- sell ----------------
 			if (this.sellHref){
 				dojo.style(this.sellHref.link, "display", (building.val > 0) ? "" : "none");
@@ -1879,10 +1923,10 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 			if (this.add) {
 				dojo.toggleClass(this.add["add1"].link, "enabled", building.on < building.val);
 			}
-
 			this.updateLink(this.toggle, this.model.togglableOnOffLink);
-			this.updateLink(this.toggleAutomation, this.model.toggleAutomationLink);
 		}
+		//Update this specific link even if there are 0 of the building in question:
+		this.updateLink(this.toggleAutomation, this.model.toggleAutomationLink);
 	}
 });
 
@@ -1954,45 +1998,65 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 	},
 
 	buyItem: function(model, event, callback) {
-		if (model.enabled && this.hasResources(model) || this.game.devMode) {
+		var isInDevMode = this.game.devMode;
+		if (!this.hasResources(model) && !isInDevMode) {
+			callback({ itemBought: false, reason: "cannot-afford" });
+			return;
+		}
+		if (!model.enabled && !isInDevMode) {
+			//Give a more detailed reason of why we can't buy it at this time:
+			var whyArentWeEnabled = "not-enabled"; //(default reason--unspecified)
 			var meta = model.metadata;
-			if (this.game.ironWill && meta.effects && meta.effects["maxKittens"] > 0 && this.game.science.get("archery").researched) {
-				var self = this;
-				this.game.ui.confirm("", $I("iron.will.break.confirmation.msg"), function() {
-					self._buyItem_step2(model, event, callback);
-				}, function() {
-					callback(false);
-				});
-			} else {
-				this._buyItem_step2(model, event, callback);
+			if (typeof(meta.limitBuild) == "number" && meta.limitBuild <= meta.val) {
+				whyArentWeEnabled = "already-bought";
+			} else if (meta.on && meta.noStackable){
+				whyArentWeEnabled = "already-bought";
 			}
+
+			callback({ itemBought: false, reason: whyArentWeEnabled });
+			return;
+		}
+		//Else, we meet all the requirements for being able to buy this item:
+		var meta = model.metadata;
+		if (this.game.ironWill && meta.effects && meta.effects["maxKittens"] > 0 && this.game.science.get("archery").researched) {
+			//Show a confirmation message if we're building something that would break Iron Will mode.
+			var self = this;
+			this.game.ui.confirm("", $I("iron.will.break.confirmation.msg"), function() {
+				self._buyItem_step2(model, event, callback);
+			}, function() {
+				callback({ itemBought: false, reason: "player-denied" /*The player decided not to buy this after all.*/ });
+			});
 		} else {
-			callback(false);
+			this._buyItem_step2(model, event, callback);
 		}
 	},
 
 	_buyItem_step2: function(model, event, callback) {
+		if (!event) { event = {}; /*event is an optional parameter*/ }
+		//This is what we pass to the callback function if we succeed:
+		var resultIfBuySuccessful = { itemBought: true, reason: (this.game.devMode ? "dev-mode" : "paid-for") };
+
 		var meta = model.metadata;
 		if (!meta.noStackable && event.shiftKey) {
 			var maxBld = 10000;
 			if (this.game.opts.noConfirm) {
 				this.build(model, maxBld);
-				callback(true);
+				callback(resultIfBuySuccessful);
 			} else {
 				var self = this;
 				this.game.ui.confirm($I("construct.all.confirmation.title"), $I("construct.all.confirmation.msg"), function() {
 					self.build(model, maxBld);
-					callback(true);
+					callback(resultIfBuySuccessful);
 				}, function() {
-					callback(false);
+					callback({ itemBought: false, reason: "player-denied" /*The player decided not to buy this after all.*/});
 				});
 			}
 		} else if (!meta.noStackable && (event.ctrlKey || event.metaKey /*osx tears*/)) {
 			this.build(model, this.game.opts.batchSize || 10);
-			callback(true);
+			callback(resultIfBuySuccessful);
 		} else {
             this.build(model, 1);
-            callback(true);
+		  callback(resultIfBuySuccessful);
         }
 	},
 
@@ -2119,16 +2183,22 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingNotStackableBtnController", com
 	},
 
 	buyItem: function(model, event, callback) {
-		if ((!model.metadata.researched && this.hasResources(model)) || this.game.devMode){
-			this.payPrice(model);
-
-			this.onPurchase(model);
-			
-			callback(true);
-			this.game.render();
+		var isInDevMode = this.game.devMode;
+		if (model.metadata.researched && !isInDevMode) {
+			callback({ itemBought: false, reason: "already-bought" });
 			return;
 		}
-		callback(false);
+		if (!this.hasResources(model) && !isInDevMode) {
+			callback({ itemBought: false, reason: "cannot-afford" });
+			return;
+		}
+		//Else, we can buy it:
+		this.payPrice(model);
+		this.onPurchase(model);
+		
+		callback({ itemBought: true, reason: (isInDevMode ? "dev-mode" : "paid-for") });
+		this.game.render();
+		return;
 	},
 
 	onPurchase: function(model){

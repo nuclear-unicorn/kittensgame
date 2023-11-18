@@ -1,0 +1,46 @@
+name: KG Deploy code
+on:
+  push:
+    branches:
+      - master
+      - dev/alpha
+      - dev/beta
+  pull_request:
+    branches: 
+      - master
+      - dev/alpha
+      - dev/beta
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Yarn setup
+        uses: DerYeger/yarn-setup-action@master
+        with:
+          node-version: 16
+      
+      - name: Install dependencies
+        run: yarn
+        
+      - name: Lint
+        run: yarn lint
+
+      - name: Test
+        run: yarn test
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          username: ${{ secrets.KG_SSH_USER }}
+          host: ${{ secrets.KG_SSH_HOST }}
+          key: ${{ secrets.KG_SSH_KEY }}
+          script: /var/www/kittensgame.com/html/deploy.sh
+        
+        
