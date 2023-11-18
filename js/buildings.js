@@ -3022,6 +3022,7 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 			metadataRaw.calculateEffects(metadataRaw, this.game);
 		}
 		this.game.time.queue.onDeltagrade(model.options.building);
+
 		this.game.upgrade(metadataRaw.upgrades);
 		this.game.render();
 	},
