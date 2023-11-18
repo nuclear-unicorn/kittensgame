@@ -6,7 +6,7 @@ on:
       - dev/alpha
       - dev/beta
   pull_request:
-    branches: 
+    branches:
       - master
       - dev/alpha
       - dev/beta
@@ -21,10 +21,10 @@ jobs:
         uses: DerYeger/yarn-setup-action@master
         with:
           node-version: 16
-      
+
       - name: Install dependencies
         run: yarn
-        
+
       - name: Lint
         run: yarn lint
 
@@ -33,6 +33,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
     needs: build
     steps:
       - name: executing remote ssh commands using password
@@ -42,5 +43,3 @@ jobs:
           host: ${{ secrets.KG_SSH_HOST }}
           key: ${{ secrets.KG_SSH_KEY }}
           script: /var/www/kittensgame.com/html/deploy.sh
-        
-        
