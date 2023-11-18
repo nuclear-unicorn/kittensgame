@@ -1874,55 +1874,54 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 		}
 	},
 
-	//Returns an object with two fields:
-	//	itemBought:	Boolean.  Are we able to buy this policy at this time?
+	//Returns an object with one field:
 	//	reason:		String.  If we can't buy it, why not?  If we can buy it, returns
 	//				"paid-for" regardless of whether we can actually afford it or not.
 	shouldBeBought: function(model, game){ //fail checks:
 		if(this.game.village.leader && model.metadata.requiredLeaderJob && this.game.village.leader.job != model.metadata.requiredLeaderJob){
 			var jobTitle = this.game.village.getJob(model.metadata.requiredLeaderJob).title;
 			this.game.msg($I("msg.policy.wrongLeaderJobForResearch", [model.metadata.label, jobTitle]), "important");
-			return { itemBought: false, reason: "blocked" };
+			return { reason: "blocked" };
 		}else if(model.metadata.name == "transkittenism" && this.game.bld.getBuildingExt("aiCore").meta.effects["aiLevel"] >= 15){
 			this.game.msg($I("msg.policy.aiNotMerges"),"alert", "ai");
-			return { itemBought: false, reason: "blocked" };
+			return { reason: "blocked" };
 		}else if(model.metadata.blocked != true) {
              for(var i = 0; i < model.metadata.blocks.length; i++){
                 if(this.game.science.getPolicy(model.metadata.blocks[i]).researched){
                     model.metadata.blocked = true;
-				return { itemBought: false, reason: "blocked" };
+				return { reason: "blocked" };
                 }
 			}
 			var confirmed = false; //confirmation:
 			if(game.opts.noConfirm){
-				return { itemBought: true, reason: "paid-for" };
+				return { reason: "paid-for" };
 			}
 			game.ui.confirm($I("policy.confirmation.title"), $I("policy.confirmation.title"), function() {
 				confirmed = true;
 			});
-			return confirmed ? { itemBought: true, reason: "paid-for" } : { itemBought: false, reason: "player-denied" };
+			return confirmed ? { reason: "paid-for" } : { reason: "player-denied" };
 		}
 		//Else, the policy was blocked:
-		return { itemBought: false, reason: "blocked" };
+		return { reason: "blocked" };
 	},
 	buyItem: function(model, event, callback) {
 		var isInDevMode = this.game.devMode;
 		if (model.metadata.researched && !isInDevMode) {
-			callback({ itemBought: false, reason: "already-bought" });
+			callback(false /*itemBought*/, { reason: "already-bought" });
 			return;
 		}
 		if (!this.hasResources(model) && !isInDevMode) {
-			callback({ itemBought: false, reason: "cannot-afford" });
+			callback(false /*itemBought*/, { reason: "cannot-afford" });
 			return;
 		}
-		var result = this.shouldBeBought(model, this.game);
-		if(!result.itemBought){
-			callback(result); //Tell them *why* we failed to buy the item.
+		var extendedInfo = this.shouldBeBought(model, this.game);
+		if(extendedInfo.reason !== "paid-for"){
+			callback(false /*itemBought*/, extendedInfo); //Tell them *why* we failed to buy the item.
 			return;
 		}
 		this.payPrice(model);
 		this.onPurchase(model);
-		callback({ itemBought: true, reason: (this.game.devMode ? "dev-mode" : "paid-for") });
+		callback(true /*itemBought*/, { reason: (this.game.devMode ? "dev-mode" : "paid-for") });
 		this.game.render();
 	},
 	onPurchase: function(model){
