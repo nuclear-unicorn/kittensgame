@@ -481,8 +481,12 @@ test("Spaceports should be unlocked correctly and have a custom price logic appl
 test("buyItem internals should work properly for Resource Retrieval", () => {
     const controller = new classes.ui.time.ChronoforgeBtnController(game);
     const model = controller.fetchModel({ id: "ressourceRetrieval" });
+    let wasItemBought = null;
     let callbackResult = null;
-    const callbackFunction = function(result) { callbackResult = result; };
+    const callbackFunction = function(success, extendedInfo) {
+        wasItemBought = success;
+        callbackResult = extendedInfo;
+    };
 
     //Before we get started, this test assumes certain things about Resource Retrievals:
     //We assume there is a limit of 100.
@@ -495,7 +499,7 @@ test("buyItem internals should work properly for Resource Retrieval", () => {
     controller.buyItem(model, null, callbackFunction);
     expect(model.metadata.on).toBe(0);
     expect(model.metadata.val).toBe(0);
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "cannot-afford");
 
     //Enter dev mode:
@@ -504,7 +508,7 @@ test("buyItem internals should work properly for Resource Retrieval", () => {
     controller.buyItem(model, null, callbackFunction);
     expect(model.metadata.on).toBe(1);
     expect(model.metadata.val).toBe(1);
-    expect(callbackResult).toHaveProperty("itemBought", true);
+    expect(wasItemBought).toBe(true);
     expect(callbackResult).toHaveProperty("reason", "dev-mode");
 
     //Now exit dev mode & try to buy the next building legitimately.
@@ -515,7 +519,7 @@ test("buyItem internals should work properly for Resource Retrieval", () => {
     expect(game.resPool.get("timeCrystal").value).toBe(50);
     expect(model.metadata.on).toBe(2);
     expect(model.metadata.val).toBe(2);
-    expect(callbackResult).toHaveProperty("itemBought", true);
+    expect(wasItemBought).toBe(true);
     expect(callbackResult).toHaveProperty("reason", "paid-for");
 
     //Test that holding the CTRL key builds batchSize of the item.
@@ -527,7 +531,7 @@ test("buyItem internals should work properly for Resource Retrieval", () => {
     expect(game.resPool.get("timeCrystal").value).toBeCloseTo(78442.3093, 4);
     expect(model.metadata.on).toBe(8);
     expect(model.metadata.val).toBe(8);
-    expect(callbackResult).toHaveProperty("itemBought", true);
+    expect(wasItemBought).toBe(true);
     expect(callbackResult).toHaveProperty("reason", "paid-for");
 
     //Test that holding the SHIFT key builds as many of the item as you can afford & overrides CTRL key.
@@ -538,26 +542,26 @@ test("buyItem internals should work properly for Resource Retrieval", () => {
     expect(model.metadata.on).toBe(21);
     expect(model.metadata.val).toBe(21);
     expect(game.resPool.get("timeCrystal").value).toBeCloseTo(203642.5938, 4);
-    expect(callbackResult).toHaveProperty("itemBought", true);
+    expect(wasItemBought).toBe(true);
     expect(callbackResult).toHaveProperty("reason", "paid-for");
 
     //Test that we get the same result no matter the event parameters if we can't afford any.
     //We'll test each combination of 2 Boolean parameters for a total of 2^2 = 4 combinations
     controller.updateEnabled(model);
     controller.buyItem(model, { ctrlKey: true, shiftKey: true }, callbackFunction);     //11
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "cannot-afford");
     controller.updateEnabled(model);
     controller.buyItem(model, { ctrlKey: false, shiftKey: true }, callbackFunction);    //01
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "cannot-afford");
     controller.updateEnabled(model);
     controller.buyItem(model, { ctrlKey: true, shiftKey: false }, callbackFunction);    //10
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "cannot-afford");
     controller.updateEnabled(model);
     controller.buyItem(model, { ctrlKey: false, shiftKey: false }, callbackFunction);   //00
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "cannot-afford");
 
     //Double-check that nothing was built in any of those 4 tests:
@@ -570,7 +574,7 @@ test("buyItem internals should work properly for Resource Retrieval", () => {
     controller.buyItem(model, { ctrlKey: false, shiftKey: true }, callbackFunction);
     expect(model.metadata.on).toBe(100);
     expect(model.metadata.val).toBe(100);
-    expect(callbackResult).toHaveProperty("itemBought", true);
+    expect(wasItemBought).toBe(true);
     expect(callbackResult).toHaveProperty("reason", "paid-for");
 
     //Test that we can't buy any more even if we have unlimited resources.
@@ -578,15 +582,19 @@ test("buyItem internals should work properly for Resource Retrieval", () => {
     controller.buyItem(model, null, callbackFunction);
     expect(model.metadata.on).toBe(100);
     expect(model.metadata.val).toBe(100);
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "already-bought");
 });
 
 test("buyItem internals should work properly for Calendar", () => {
     const controller = new com.nuclearunicorn.game.ui.TechButtonController(game);
     const model = controller.fetchModel({ id: "calendar" });
+    let wasItemBought = null;
     let callbackResult = null;
-    const callbackFunction = function(result) { callbackResult = result; };
+    const callbackFunction = function(success, extendedInfo) {
+        wasItemBought = success;
+        callbackResult = extendedInfo;
+    };
 
     //Before we get started, this test assumes certain things about Calendar:
     //We assume it costs 30 science.
@@ -596,7 +604,7 @@ test("buyItem internals should work properly for Calendar", () => {
     controller.updateEnabled(model);
     controller.buyItem(model, null, callbackFunction);
     expect(model.metadata.researched).toBe(false);
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "cannot-afford");
 
     //Give ourselves plenty of science & try again; this time it should succeed:
@@ -604,7 +612,7 @@ test("buyItem internals should work properly for Calendar", () => {
     controller.updateEnabled(model);
     controller.buyItem(model, null, callbackFunction);
     expect(model.metadata.researched).toBe(true);
-    expect(callbackResult).toHaveProperty("itemBought", true);
+    expect(wasItemBought).toBe(true);
     expect(callbackResult).toHaveProperty("reason", "paid-for");
     expect(game.resPool.get("science").value).toBe(70);
 
@@ -612,7 +620,7 @@ test("buyItem internals should work properly for Calendar", () => {
     controller.updateEnabled(model);
     controller.buyItem(model, null, callbackFunction);
     expect(model.metadata.researched).toBe(true);
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "already-bought");
     expect(game.resPool.get("science").value).toBe(70);
 });
@@ -620,8 +628,12 @@ test("buyItem internals should work properly for Calendar", () => {
 test("buyItem internals should work properly for Liberty & Tradition", () => {
     const controller = new classes.ui.PolicyBtnController(game);
     let model = controller.fetchModel({ id: "liberty" });
+    let wasItemBought = null;
     let callbackResult = null;
-    const callbackFunction = function(result) { callbackResult = result; };
+    const callbackFunction = function(success, extendedInfo) {
+        wasItemBought = success;
+        callbackResult = extendedInfo;
+    };
     
     //Before we get started, this test assumes certain things about Liberty:
     //We assume it costs 150 culture.
@@ -634,7 +646,7 @@ test("buyItem internals should work properly for Liberty & Tradition", () => {
     controller.updateEnabled(model);
     controller.buyItem(model, null, callbackFunction);
     expect(model.metadata.researched).toBe(false);
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "cannot-afford");
 
     //Give ourselves plenty of culture & try again; this time it should succeed:
@@ -642,7 +654,7 @@ test("buyItem internals should work properly for Liberty & Tradition", () => {
     controller.updateEnabled(model);
     controller.buyItem(model, null, callbackFunction);
     expect(model.metadata.researched).toBe(true);
-    expect(callbackResult).toHaveProperty("itemBought", true);
+    expect(wasItemBought).toBe(true);
     expect(callbackResult).toHaveProperty("reason", "paid-for");
     expect(game.resPool.get("culture").value).toBe(350);
 
@@ -650,7 +662,7 @@ test("buyItem internals should work properly for Liberty & Tradition", () => {
     controller.updateEnabled(model);
     controller.buyItem(model, null, callbackFunction);
     expect(model.metadata.researched).toBe(true);
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "already-bought");
     expect(game.resPool.get("culture").value).toBe(350);
 
@@ -660,7 +672,7 @@ test("buyItem internals should work properly for Liberty & Tradition", () => {
     controller.updateEnabled(model);
     controller.buyItem(model, null, callbackFunction);
     expect(model.metadata.researched).toBe(false);
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "blocked");
     expect(game.resPool.get("culture").value).toBe(350);
 });
@@ -668,8 +680,12 @@ test("buyItem internals should work properly for Liberty & Tradition", () => {
 test("buyItem internals should work properly for Fix Cryochamber", () => {
     const controller = new classes.ui.time.FixCryochamberBtnController(game);
     let model = controller.fetchModel({});
+    let wasItemBought = null;
     let callbackResult = null;
-    const callbackFunction = function(result) { callbackResult = result; };
+    const callbackFunction = function(success, extendedInfo) {
+        wasItemBought = success;
+        callbackResult = extendedInfo;
+    };
     const cryochambers = game.time.getVSU("cryochambers");
     const usedCryochambers = game.time.getVSU("usedCryochambers");
 
@@ -677,7 +693,7 @@ test("buyItem internals should work properly for Fix Cryochamber", () => {
     controller.updateEnabled(model);
     controller.updateVisible(model);
     controller.buyItem(model, null, callbackFunction);
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "already-bought");
     expect(cryochambers.val).toBe(0);
     expect(usedCryochambers.val).toBe(0);
@@ -689,7 +705,7 @@ test("buyItem internals should work properly for Fix Cryochamber", () => {
     controller.updateEnabled(model);
     controller.updateVisible(model);
     controller.buyItem(model, null, callbackFunction);
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "not-unlocked");
     expect(cryochambers.val).toBe(0);
     expect(usedCryochambers.val).toBe(5);
@@ -700,7 +716,7 @@ test("buyItem internals should work properly for Fix Cryochamber", () => {
     controller.updateEnabled(model);
     controller.updateVisible(model);
     controller.buyItem(model, null, callbackFunction);
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "cannot-afford");
     expect(cryochambers.val).toBe(0);
     expect(usedCryochambers.val).toBe(5);
@@ -713,7 +729,7 @@ test("buyItem internals should work properly for Fix Cryochamber", () => {
     controller.updateEnabled(model);
     controller.updateVisible(model);
     controller.buyItem(model, null, callbackFunction);
-    expect(callbackResult).toHaveProperty("itemBought", true);
+    expect(wasItemBought).toBe(true);
     expect(callbackResult).toHaveProperty("reason", "paid-for");
     expect(cryochambers.val).toBe(1);
     expect(usedCryochambers.val).toBe(4);
@@ -727,8 +743,12 @@ test("buyItem internals should work properly for Fix Cryochamber", () => {
 test("buyItem internals should work properly for crafting steel", () => {
     const controller = new com.nuclearunicorn.game.ui.CraftButtonController(game);
     const model = controller.fetchModel({ craft: "steel" });
+    let wasItemBought = null;
     let callbackResult = null;
-    const callbackFunction = function(result) { callbackResult = result; };
+    const callbackFunction = function(success, extendedInfo) {
+        wasItemBought = success;
+        callbackResult = extendedInfo;
+    };
     
     //Before we get started, this test assumes certain things about crafting steel:
     //We assume it costs 100 iron, 100 coal per craft.
@@ -740,9 +760,9 @@ test("buyItem internals should work properly for crafting steel", () => {
 
     //Crafting should fail when we can't afford it:
     controller.buyItem(model, null, callbackFunction);
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(game.resPool.get("steel").value).toBe(0);
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "cannot-afford");
 
     //Crafting should succeed when we can afford it:
@@ -750,7 +770,7 @@ test("buyItem internals should work properly for crafting steel", () => {
     game.resPool.addResEvent("coal", 199);
     controller.buyItem(model, null, callbackFunction);
     expect(game.resPool.get("steel").value).toBe(1);
-    expect(callbackResult).toHaveProperty("itemBought", true);
+    expect(wasItemBought).toBe(true);
     expect(callbackResult).toHaveProperty("reason", "paid-for");
 
     //Crafting should fail again because we consumed resources & don't have enough anymore:
@@ -758,15 +778,19 @@ test("buyItem internals should work properly for crafting steel", () => {
     expect(game.resPool.get("steel").value).toBe(1);
     expect(game.resPool.get("iron").value).toBe(99);
     expect(game.resPool.get("coal").value).toBe(99);
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "cannot-afford");
 });
 
 test("buyItem internals should work properly for shattering time crystals", () => {
     const controller = new classes.ui.time.ShatterTCBtnController(game);
     const model = controller.fetchModel({ prices: [{name: "timeCrystal", val: 1}] });
+    let wasItemBought = null;
     let callbackResult = null;
-    const callbackFunction = function(result) { callbackResult = result; };
+    const callbackFunction = function(success, extendedInfo) {
+        wasItemBought = success;
+        callbackResult = extendedInfo;
+    };
 
     //For shattering TCs, we'll watch what happens with the calendar year:
     expect(game.calendar.year).toBe(0);
@@ -775,7 +799,7 @@ test("buyItem internals should work properly for shattering time crystals", () =
     controller.updateEnabled(model);
     controller.buyItem(model, null, callbackFunction);
     expect(game.calendar.year).toBe(0);
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "cannot-afford");
 
     game.resPool.addResEvent("timeCrystal", 3);
@@ -784,7 +808,7 @@ test("buyItem internals should work properly for shattering time crystals", () =
     controller.updateEnabled(model);
     controller.buyItem(model, null, callbackFunction);
     expect(game.calendar.year).toBe(1);
-    expect(callbackResult).toHaveProperty("itemBought", true);
+    expect(wasItemBought).toBe(true);
     expect(callbackResult).toHaveProperty("reason", "paid-for");
 
     //Shattering should have cost us the correct amount of time crystals.
@@ -792,8 +816,12 @@ test("buyItem internals should work properly for shattering time crystals", () =
 });
 
 test("buyItem internals should work properly for items with no cost", () => {
+    let wasItemBought = null;
     let callbackResult = null;
-    const callbackFunction = function(result) { callbackResult = result; };
+    const callbackFunction = function(success, extendedInfo) {
+        wasItemBought = success;
+        callbackResult = extendedInfo;
+    };
     let handlerResult = null;
     const handlerFunction = function(model) { handlerResult = model.name; };
     let controller = new com.nuclearunicorn.game.ui.ButtonModernController(game);
@@ -802,14 +830,14 @@ test("buyItem internals should work properly for items with no cost", () => {
     //If we force-disable the model, we shouldn't be able to buy it:
     model.enabled = false;
     controller.buyItem(model, null, callbackFunction);
-    expect(callbackResult).toHaveProperty("itemBought", false);
+    expect(wasItemBought).toBe(false);
     expect(callbackResult).toHaveProperty("reason", "not-enabled");
     expect(handlerResult).toBe(null); //Proof that the handler wasn't called
 
     //Buying a free item should be free & call the handler:
     model.enabled = true;
     controller.buyItem(model, null, callbackFunction);
-    expect(callbackResult).toHaveProperty("itemBought", true);
+    expect(wasItemBought).toBe(true);
     expect(callbackResult).toHaveProperty("reason", "item-is-free");
     expect(handlerResult).toBe("A");
 
@@ -819,7 +847,7 @@ test("buyItem internals should work properly for items with no cost", () => {
     //Gathering catnip should be free & always succeed:
     expect(game.resPool.get("catnip").value).toBe(0);
     controller.buyItem(model, null, callbackFunction);
-    expect(callbackResult).toHaveProperty("itemBought", true);
+    expect(wasItemBought).toBe(true);
     expect(callbackResult).toHaveProperty("reason", "item-is-free");
     expect(game.resPool.get("catnip").value).toBe(1);
 
@@ -829,11 +857,11 @@ test("buyItem internals should work properly for items with no cost", () => {
     //Toggle pending challenge should be free & always succeed:
     expect(model.metadata.pending).toBe(false);
     controller.buyItem(model, null, callbackFunction);
-    expect(callbackResult).toHaveProperty("itemBought", true);
+    expect(wasItemBought).toBe(true);
     expect(callbackResult).toHaveProperty("reason", "item-is-free");
     expect(model.metadata.pending).toBe(true);
     controller.buyItem(model, null, callbackFunction);
-    expect(callbackResult).toHaveProperty("itemBought", true);
+    expect(wasItemBought).toBe(true);
     expect(callbackResult).toHaveProperty("reason", "item-is-free");
     expect(model.metadata.pending).toBe(false);
 });

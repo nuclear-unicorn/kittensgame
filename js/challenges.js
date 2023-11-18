@@ -714,7 +714,7 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 
 	buyItem: function(model, event, callback) {
 		this.togglePending(model);
-		callback({ itemBought: true, reason: "item-is-free" /*We just toggled the pending state; simple, really*/});
+		callback(true /*itemBought*/, {reason: "item-is-free" /*We just toggled the pending state; simple, really*/});
 	},
 
 	togglePending: function(model){
