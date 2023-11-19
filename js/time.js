@@ -999,7 +999,7 @@ dojo.declare("classes.ui.time.AccelerateTimeBtnController", com.nuclearunicorn.g
         } else {
             self.game.time.isAccelerated = !self.game.time.isAccelerated;
         }
-        callback({ itemBought: true, reason: "item-is-free" /*It costs flux, but you can still toggle it freely*/ });
+        callback(true /*itemBought*/, { reason: "item-is-free" /*It costs flux, but you can still toggle it freely*/ });
     }
 });
 
@@ -1203,13 +1203,13 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 
     buyItem: function(model, event, callback){
         if (!this.hasResources(model)) {
-			callback({ itemBought: false, reason: "cannot-afford" });
+			callback(false /*itemBought*/, { reason: "cannot-afford" });
 			return true;
 		}
 		if (!model.enabled) {
             //As far as I can tell, this shouldn't ever happen because being
             //unable to afford it is the only reason for it to be disabled.
-			callback({ itemBought: false, reason: "not-enabled" });
+			callback(false /*itemBought*/, { reason: "not-enabled" });
 			return true;
 		}
         var price = this.getPrices(model);
@@ -1217,7 +1217,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
             this.game.resPool.addResEvent(price[i].name, -price[i].val);
         }
         this.doShatter(model, 1);
-        callback({ itemBought: true, reason: "paid-for" });
+        callback(true /*itemBought*/, { reason: "paid-for" });
         return true;
     },
 
@@ -1386,15 +1386,15 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
 
 	buyItem: function(model, event, callback) {
         if (this.game.time.getVSU("usedCryochambers").val == 0) {
-			callback({ itemBought: false, reason: "already-bought" });
+			callback(false /*itemBought*/, { reason: "already-bought" });
 			return;
         }
 		if (!model.visible) {
-			callback({ itemBought: false, reason: "not-unlocked" });
+			callback(false /*itemBought*/, { reason: "not-unlocked" });
 			return;
 		}
         if (!this.hasResources(model)) {
-			callback({ itemBought: false, reason: "cannot-afford" });
+			callback(false /*itemBought*/, { reason: "cannot-afford" });
 			return;
         }
 
@@ -1414,9 +1414,9 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
         if(fixHappened){
             var cry = this.game.time.getVSU("cryochambers");
             cry.calculateEffects(cry, this.game);
-            callback({ itemBought: true, reason: "paid-for" });
+            callback(true /*itemBought*/, { reason: "paid-for" });
         } else {
-			callback({ itemBought: false, reason: "not-enabled" });
+			callback(false /*itemBought*/, { reason: "not-enabled" });
         }
 	},
 
@@ -2251,10 +2251,15 @@ dojo.declare("classes.queue.manager", null,{
             return;
         }
 
+        var wasItemBought = false;
         var resultOfBuyingItem = null;
-        controllerAndModel.controller.buyItem(controllerAndModel.model, null, function(args) { resultOfBuyingItem = args; });
+        controllerAndModel.controller.buyItem(controllerAndModel.model, null,
+            function(success, extendedInfo) {
+                wasItemBought = success;
+                resultOfBuyingItem = extendedInfo;
+            });
 
-        if (typeof(resultOfBuyingItem) !== "object" || !resultOfBuyingItem) {
+        if (typeof(wasItemBought) !== "boolean" || typeof(resultOfBuyingItem) !== "object") {
             console.error("Invalid result after attempting to buy item via queue", resultOfBuyingItem);
             return;
         }
@@ -2262,7 +2267,7 @@ dojo.declare("classes.queue.manager", null,{
         var reason = resultOfBuyingItem.reason; //String explaining *why* we failed to buy the item
 
         //Depending on the result, do something different:
-        if (resultOfBuyingItem.itemBought){
+        if (wasItemBought){
             //Item successfully purchased!  Remove it from the queue because we did it :D
             this.dropLastItem();
             this.game._publish("ui/update", this.game);

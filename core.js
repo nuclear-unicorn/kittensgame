@@ -719,8 +719,8 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	 * @param event	(OPTIONAL) Object.  If given, contains information such as whether the shift key was pressed.  This is
 	 * 				used by buildings to determine if we're buying 1, buying 10, buying all, etc.  If null, uses default behavior.
 	 * @param callback	Function.  This is how we communicate the results of trying to buy the item.  The callback function is called
-	 * 				with a single parameter, an object containing two fields:
-	 * 					itemBought	Boolean.  True if one or more items were bought, false if nothing happened.
+	 * 				with two parameters.  The first is itemBought, a Boolean encoding whether one or more items were bought.
+	 * 				The second is an object containing the following field:
 	 * 					reason		String.  Used as an enumeration encoding *why* the result happened the way it did.
 	 * 								If itemBought is true, can be one of the following values:
 	 * 									"paid-for"		We met the requirements & bought the item legitimately.
@@ -741,11 +741,11 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	 */
 	buyItem: function(model, event, callback){
 		if (!this.hasResources(model)) {
-			callback({ itemBought: false, reason: "cannot-afford" });
+			callback(false /*itemBought*/, {reason: "cannot-afford" });
 			return;
 		}
 		if (!model.enabled) {
-			callback({ itemBought: false, reason: "not-enabled" });
+			callback(false /*itemBought*/, {reason: "not-enabled" });
 			return;
 		}
 		//Else, we meet all requirements to buy this item:
@@ -758,7 +758,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		}
 
 		//A lot of normal UI buttons that don't involve building things use this method, so check if things are free:
-		callback({ itemBought: true, reason: ((model.prices && model.prices.length) ? "paid-for" : "item-is-free") });
+		callback(true /*itemBought*/, {reason: ((model.prices && model.prices.length) ? "paid-for" : "item-is-free") });
 	},
 
 	refund: function(model){
@@ -939,8 +939,12 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 	onClick: function(event){
 		this.animate();
 		var self = this;
-		this.controller.buyItem(this.model, event, function(result) {
-			if (typeof(result) == "object" && result.itemBought) {
+		this.controller.buyItem(this.model, event, function(itemBought, extendedInfo) {
+			if (typeof(itemBought) !== "boolean" || typeof(extendedInfo) !== "object") {
+				console.error("Invalid arguments passed to callback function.");
+				return;
+			}
+			if (itemBought) {
 				self.update();
 			}
 		});
@@ -2000,7 +2004,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 	buyItem: function(model, event, callback) {
 		var isInDevMode = this.game.devMode;
 		if (!this.hasResources(model) && !isInDevMode) {
-			callback({ itemBought: false, reason: "cannot-afford" });
+			callback(false /*itemBought*/, {reason: "cannot-afford" });
 			return;
 		}
 		if (!model.enabled && !isInDevMode) {
@@ -2013,7 +2017,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 				whyArentWeEnabled = "already-bought";
 			}
 
-			callback({ itemBought: false, reason: whyArentWeEnabled });
+			callback(false /*itemBought*/, {reason: whyArentWeEnabled });
 			return;
 		}
 		//Else, we meet all the requirements for being able to buy this item:
@@ -2024,7 +2028,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 			this.game.ui.confirm("", $I("iron.will.break.confirmation.msg"), function() {
 				self._buyItem_step2(model, event, callback);
 			}, function() {
-				callback({ itemBought: false, reason: "player-denied" /*The player decided not to buy this after all.*/ });
+				callback(false /*itemBought*/, {reason: "player-denied" /*The player decided not to buy this after all.*/ });
 			});
 		} else {
 			this._buyItem_step2(model, event, callback);
@@ -2034,29 +2038,29 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 	_buyItem_step2: function(model, event, callback) {
 		if (!event) { event = {}; /*event is an optional parameter*/ }
 		//This is what we pass to the callback function if we succeed:
-		var resultIfBuySuccessful = { itemBought: true, reason: (this.game.devMode ? "dev-mode" : "paid-for") };
+		var resultIfBuySuccessful = { reason: (this.game.devMode ? "dev-mode" : "paid-for") };
 
 		var meta = model.metadata;
 		if (!meta.noStackable && event.shiftKey) {
 			var maxBld = 10000;
 			if (this.game.opts.noConfirm) {
 				this.build(model, maxBld);
-				callback(resultIfBuySuccessful);
+				callback(true /*itemBought*/, resultIfBuySuccessful);
 			} else {
 				var self = this;
 				this.game.ui.confirm($I("construct.all.confirmation.title"), $I("construct.all.confirmation.msg"), function() {
 					self.build(model, maxBld);
-					callback(resultIfBuySuccessful);
+					callback(true /*itemBought*/, resultIfBuySuccessful);
 				}, function() {
-					callback({ itemBought: false, reason: "player-denied" /*The player decided not to buy this after all.*/});
+					callback(false /*itemBought*/, {reason: "player-denied" /*The player decided not to buy this after all.*/});
 				});
 			}
 		} else if (!meta.noStackable && (event.ctrlKey || event.metaKey /*osx tears*/)) {
 			this.build(model, this.game.opts.batchSize || 10);
-			callback(resultIfBuySuccessful);
+			callback(true /*itemBought*/, resultIfBuySuccessful);
 		} else {
             this.build(model, 1);
-		  callback(resultIfBuySuccessful);
+		  callback(true /*itemBought*/, resultIfBuySuccessful);
         }
 	},
 
@@ -2185,18 +2189,18 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingNotStackableBtnController", com
 	buyItem: function(model, event, callback) {
 		var isInDevMode = this.game.devMode;
 		if (model.metadata.researched && !isInDevMode) {
-			callback({ itemBought: false, reason: "already-bought" });
+			callback(false /*itemBought*/, {reason: "already-bought" });
 			return;
 		}
 		if (!this.hasResources(model) && !isInDevMode) {
-			callback({ itemBought: false, reason: "cannot-afford" });
+			callback(false /*itemBought*/, {reason: "cannot-afford" });
 			return;
 		}
 		//Else, we can buy it:
 		this.payPrice(model);
 		this.onPurchase(model);
 		
-		callback({ itemBought: true, reason: (isInDevMode ? "dev-mode" : "paid-for") });
+		callback(true /*itemBought*/, {reason: (isInDevMode ? "dev-mode" : "paid-for") });
 		this.game.render();
 		return;
 	},
