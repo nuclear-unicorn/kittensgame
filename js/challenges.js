@@ -585,7 +585,7 @@ dojo.declare("classes.reserveMan", null,{
 			}
 
 			if (value > 0) {
-				reserveResources[res.name] = Math.max(reserveResources[res.name] || 0, value);
+				reserveResources[res.name] = Math.max(reserveResources[res.name] || 0, Math.min(value, Number.MAX_VALUE));
 			}
 		}
 		this.game.challenges.reserves.reserveResources = reserveResources;
@@ -625,7 +625,7 @@ dojo.declare("classes.reserveMan", null,{
 			}
 			var resCap = this.game.resPool.get(i).maxValue;
 			if(!resCap){
-				this.game.resPool.get(i).value += this.reserveResources[i];
+				this.game.resPool.get(i).value = Math.min(this.game.resPool.get(i).value + this.reserveResources[i], Number.MAX_VALUE);
 			}else{
 				this.game.resPool.get(i).value = Math.max(this.game.resPool.get(i).value, this.reserveResources[i]);
 			}
@@ -713,30 +713,8 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 	},
 
 	buyItem: function(model, event, callback) {
-		/*if (model.metadata.name == this.game.challenges.currentChallenge
-		 || (!model.enabled && !this.game.devMode)) {
-			callback(false);
-			return;
-		}
-
-		var game = this.game;
-		game.ui.confirm($I("challendge.btn.confirmation.title"), $I("challendge.btn.confirmation.msg"), function() {
-			// Set the challenge for after reset
-			game.challenges.currentChallenge = model.metadata.name == "ironWill"
-				? null
-				: model.metadata.name;
-			// Reset with any benefit of chronosphere (resources, kittens, etc...)
-			game.bld.get("chronosphere").val = 0;
-			game.bld.get("chronosphere").on = 0;
-			game.time.getVSU("cryochambers").val = 0;
-			game.time.getVSU("cryochambers").on = 0;
-			game.resetAutomatic();
-			callback(true);
-		}, function() {
-			callback(false);
-		});*/
-
 		this.togglePending(model);
+		callback(true /*itemBought*/, {reason: "item-is-free" /*We just toggled the pending state; simple, really*/});
 	},
 
 	togglePending: function(model){

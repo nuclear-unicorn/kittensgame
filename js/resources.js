@@ -609,11 +609,10 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		}
 
 		var prevValue = res.value || 0;
-
-		//if already overcap, allow to remain that way unless removing resources.
-		var limit = Math.max(res.value, res.maxValue || Number.POSITIVE_INFINITY);
-		res.value += addedValue;
+		res.value = Math.min(prevValue + addedValue, Number.MAX_VALUE);
 		if (!preventLimitCheck) {
+			//if already overcap, allow to remain that way unless removing resources.
+			var limit = Math.max(prevValue, res.maxValue || Number.MAX_VALUE);
 			res.value = Math.min(res.value, limit);
 		}
 
@@ -688,7 +687,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 			var res = this.resources[i];
 			if (res.name == "sorrow"){
 				res.maxValue = 17 + (game.getEffect("blsLimit") || 0);
-				res.value = res.value > res.maxValue ? res.maxValue : res.value;
+				res.value = Math.min(res.value, res.maxValue);
 				continue;
 			}
 
@@ -704,18 +703,16 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 			var maxValue = game.getEffect(res.name + "Max") || 0;
 
-			maxValue = this.addResMaxRatios(res, maxValue);
+			maxValue = Math.min(this.addResMaxRatios(res, maxValue), Number.MAX_VALUE);
 			
 			var challengeEffect = this.game.getEffect(res.name + "MaxChallenge");
 			if(challengeEffect){
+				// Negative effect, no need to cap again to Number.MAX_VALUE
 				challengeEffect = this.game.getLimitedDR(this.addResMaxRatios(res, challengeEffect), maxValue - 1 - game.bld.effectsBase[res.name +'Max']||0);
 				maxValue += challengeEffect;
 			}
-			if (maxValue < 0 ){
-				maxValue = 0;
-			}
 
-			res.maxValue = maxValue;
+			res.maxValue = Math.max(maxValue, 0);
 			if(game.loadingSave){ //hack to stop production before game.calculateAllEffects after manual import
 				continue;
 			}
@@ -946,7 +943,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 				var price = prices[i];
 
 				var res = this.get(price.name);
-				if (res.maxValue > 0 && price.val > res.maxValue && price.val > res.value){
+				if (price.val == Infinity || res.maxValue > 0 && price.val > res.maxValue && price.val > res.value){
 					return true;
 				}
 				if (res.craftable && price.val > res.value){ //account for chronosphere resets etc

@@ -22,7 +22,7 @@ console.log("==== starting jest bootloader ====");
 */
 try {
     global.React = require("../lib/react.min.js");
-    require("../lib/jQuery");
+    global.$ = require("../lib/jQuery");
 
     //todo: make portable dojo for jest bootloader
     var createNamespace = require("./declare");
@@ -47,7 +47,11 @@ try {
                 predicate(array[i]);
             }
         },
-        clone: function(mixin){return Object.assign({}, mixin);},
+        clone: function(mixin){
+            if(mixin instanceof Array) { //Recursively deep-copying arrays?  What could go wrong?
+                return mixin.map(function(elem) { return global.dojo.clone(elem); });
+            }
+            return Object.assign({}, mixin);},
         hitch: function(ctx, method){ return method.bind(ctx, arguments);},
         connect: function(){},
         publish: function(){},
@@ -59,9 +63,10 @@ try {
         done: function(){return this},
         fail: function(){return this},
     }
-    global.$ = {
+    /*global.$ = {
         ajax: function(){ return xhrMock; }
-    }
+    }*/
+    global.$.ajax = function(){ return xhrMock; };
 
     global.LZString = require("../lib/lz-string.js");
     require("../lib/dropbox_v2.js");
