@@ -1031,13 +1031,14 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 
 	buyItem: function(model, event, callback) {
 		this.inherited(arguments);
+		this.game.upgrade({policies: ["lizardRelationsDiplomats"]}); //Upgrade, since the policy is based on number of embassies.
+		this.game.science.unlockRelations(); //Check if we can unlock new relation policies based on number of embassies.
 		this.game.ui.render();
 	},
 
 	incrementValue: function(model) {
 		this.inherited(arguments);
-		model.options.race.embassyLevel++;
-		this.game.science.unlockRelations();
+		model.options.race.embassyLevel++;		
 	},
 
 	hasSellLink: function(model){

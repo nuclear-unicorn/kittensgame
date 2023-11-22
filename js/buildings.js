@@ -967,17 +967,22 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"mineralsRatio": 0.35,
 			"coalPerTickBase": 0.015,
 			"uraniumPerTickBase": 0,
-			"cathPollutionPerTickProd": 0.25
+			"cathPollutionPerTickProd": 0.25,
+			"slabCraftRatio": 0
 		},
 		calculateEffects: function(self, game){
 			var effects = {
 				"mineralsRatio": 0.35,
 				"coalPerTickBase": 0.015,
 				"uraniumPerTickBase": 0,
-				"cathPollutionPerTickProd": 0.25
+				"cathPollutionPerTickProd": 0.25,
+				"slabCraftRatio": 0
 			};
 			if (game.workshop.get("orbitalGeodesy").researched){
 				effects["uraniumPerTickBase"] = 0.0005; //4% of accelerator output
+			}
+			if (game.science.getPolicy("nagaRelationsMasons").researched){
+				effects["slabCraftRatio"] = game.getEffect("quarrySlabCraftBonus");
 			}
 			self.effects = effects;
 			self.togglable = game.science.get("ecology").researched;
@@ -1817,6 +1822,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			{ name : "manuscript", val: 10 }
 		],
 		priceRatio: 1.15,
+		upgrades: {
+			buildings: ["ziggurat"]
+		},
 		effects: {
 			"culturePerTickBase" : 0,
 			"faithPerTickBase" : 0,
@@ -1915,6 +1923,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			{ name : "megalith", val: 50 }
 		],
 		priceRatio: 1.25,
+		upgrades: {
+			buildings: ["temple"]
+		},
 		effects: {
 			"cultureMaxRatio": 0.08
 		},
@@ -1922,6 +1933,21 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			var effects = {
 				cultureMaxRatio: 0.08
 			};
+			if(game.science.getPolicy("nagaRelationsCultists").researched) {
+				game.upgrade(
+					self.upgrades
+				);
+				var multiplier = game.getEffect("zigguratTempleEffectPolicy");
+				var templeEffects = Object.assign({}, game.bld.getBuildingExt("temple").meta.effects);
+				
+				for (var key in templeEffects) {
+					templeEffects[key] *= multiplier;
+				}
+				//Object.keys(templeEffects).forEach(key => {
+				//	templeEffects[key] *= multiplier;
+				//});
+				effects = Object.assign(effects, templeEffects);
+			}
 			effects["cultureMaxRatio"] = 0.08 + game.getEffect("cultureMaxRatioBonus");
 			self.effects = effects;
 			if(self.val){

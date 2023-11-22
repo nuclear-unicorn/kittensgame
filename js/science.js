@@ -1307,12 +1307,12 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
 		isRelation: true,
-        blocks:["lizardRelationsPriests"],
+        blocks:["lizardRelationsPriests", "lizardRelationsDiplomats"],
 		upgrades: {
 			buildings: ["pasture", "aqueduct"]
 		},
 		calculateEffects: function(self,game){
-			game.science.unlockRelations(); //Hack: Check relations by being upgraded by diplomacy on load
+			game.science.unlockRelations(); //Hack: Check relations by being upgraded by diplomacy and on load
 		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("lizards", 15);
@@ -1330,7 +1330,34 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
 		isRelation: true,
-        blocks:["lizardRelationsEcologists"],
+        blocks:["lizardRelationsEcologists", "lizardRelationsDiplomats"],
+		evaluateLocks: function(game){
+			return game.science.checkRelation("lizards", 15);
+		}
+	}, {
+		name: "lizardRelationsDiplomats",
+        label: $I("policy.lizardRelationsDiplomats.label"),
+        description: $I("policy.lizardRelationsDiplomats.desc"),
+        prices: [
+            {name : "culture", val: 2100}
+        ],
+        effects:{
+			"culturePolicyRatio": 0
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["lizardRelationsEcologists", "lizardRelationsPriests"],
+		calculateEffects: function(self, game){
+			var raceList = game.diplomacy.races;
+			var embassyCount = 0;
+			for (var i = 0; i < raceList.length; i++ ) {
+				if (raceList[i].embassyLevel) {
+					embassyCount += raceList[i].embassyLevel;
+				}
+			}
+			self.effects["culturePolicyRatio"] = game.getLimitedDR(0.05 + 0.001 * embassyCount, 0.3);
+		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("lizards", 15);
 		}
@@ -1342,13 +1369,33 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 2200}
         ],
         effects:{
-            "parchmentGlobalCraftRatio" : 0.1,
-			"manuscriptGlobalCraftRatio" : 0.1
+            "parchmentTradeChanceIncrease" : 0.5,
+			"manuscriptTradeChanceIncrease" : 0.3
         },
         unlocked: false,
         blocked: false,
 		isRelation: true,
         blocks:["sharkRelationsShipwrights"],
+		calculateEffects: function(self, game){
+			var sharks = game.diplomacy.get("sharks");
+				for (var i = 0; i < sharks.sells.length; i++) {
+					var sell = sharks.sells[i]["name"];
+					if (sell == "parchment") {
+						if (self.researched) {
+							sharks.sells[i].chance = 0.25 + self.effects["parchmentTradeChanceIncrease"];
+						} else {
+							sharks.sells[i].chance = 0.25;
+						}
+					}
+					if (sell == "manuscript"){
+						if (self.researched) {
+							sharks.sells[i].chance = 0.15 + self.effects["manuscriptTradeChanceIncrease"];
+						} else {
+							sharks.sells[i].chance = 0.15;
+						}
+					}
+				}
+		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("sharks", 15);
 		}
@@ -1435,11 +1482,14 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 4200}
         ],
         effects:{
-            "mansionCostReduction" : 0.3
+            "quarrySlabCraftBonus" : 0.05
         },
         unlocked: false,
         blocked: false,
 		isRelation: true,
+		upgrades: {
+			buildings: ["quarry"]
+		},
         blocks:["nagaRelationsCultists"],
 		evaluateLocks: function(game){
 			return game.science.checkRelation("nagas", 10);
@@ -1452,11 +1502,14 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 4200}
         ],
         effects:{
-            "zigguratCostReduction" : 0.3
+            "zigguratTempleEffectPolicy" : 0.2
         },
         unlocked: false,
         blocked: false,
 		isRelation: true,
+		upgrades: {
+			buildings: ["ziggurat"]
+		},
         blocks:["nagaRelationsMasons"],
 		evaluateLocks: function(game){
 			return game.science.checkRelation("nagas", 10);

@@ -678,7 +678,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//none
 		},
 		upgrades: {
-			buildings: ["temple"]
+			buildings: ["temple", "ziggurat"]
 		},
 		calculateEffects: function(self, game) {
 			self.noStackable = (game.religion.getRU("transcendence").on == 0);
@@ -698,7 +698,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//none
 		},
 		upgrades: {
-			buildings: ["temple"]
+			buildings: ["temple", "ziggurat"]
 		},
 		calculateEffects: function(self, game) {
 			self.noStackable = (game.religion.getRU("transcendence").on == 0);
@@ -719,7 +719,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//none
 		},
 		upgrades: {
-			buildings: ["temple"]
+			buildings: ["temple", "ziggurat"]
 		},
 		calculateEffects: function(self, game) {
 			self.noStackable = (game.religion.getRU("transcendence").on == 0);
@@ -739,7 +739,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//none
 		},
 		upgrades: {
-			buildings: ["temple"]
+			buildings: ["temple", "ziggurat"]
 		},
 		calculateEffects: function(self, game) {
 			self.noStackable = (game.religion.getRU("transcendence").on == 0);
@@ -775,7 +775,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//none
 		},
 		upgrades: {
-			buildings: ["temple"]
+			buildings: ["temple", "ziggurat"]
 		},
 		calculateEffects: function(self, game) {
 			self.noStackable = (game.religion.getRU("transcendence").on == 0);
@@ -795,7 +795,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//none
 		},
 		upgrades: {
-			buildings: ["temple"]
+			buildings: ["temple", "ziggurat"]
 		},
 		calculateEffects: function(self, game) {
 			self.noStackable = (game.religion.getRU("transcendence").on == 0);

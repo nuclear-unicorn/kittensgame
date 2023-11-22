@@ -1441,14 +1441,14 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.magnetoBoostBonusPolicy.title"),
 				type: "ratio"
 			},
-			"mansionCostReduction":{
+			/*"mansionCostReduction":{
 				title: $I("effectsMgr.statics.mansionCostReduction.title"),
 				type: "ratio"
 			},
 			"zigguratCostReduction":{
 				title: $I("effectsMgr.statics.zigguratCostReduction.title"),
 				type: "ratio"
-			},
+			},*/
 			"mineralsSuperRatio":{
                 title: $I("effectsMgr.statics.mineralsSuperRatio.title"),
                 type: "ratio"
@@ -1465,6 +1465,22 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 title: $I("effectsMgr.statics.negativeCycleRatioPolicy.title"),
                 type: "ratio"
             },
+			"parchmentTradeChanceIncrease":{
+				title: $I("effectsMgr.statics.parchmentTradeChanceIncrease.title"),
+                type: "ratio" 
+			},
+			"manuscriptTradeChanceIncrease":{
+				title: $I("effectsMgr.statics.manuscriptTradeChanceIncrease.title"),
+                type: "ratio" 
+			},
+			"quarrySlabCraftBonus":{
+				title: $I("effectsMgr.statics.quarrySlabCraftBonus.title"),
+                type: "ratio" 
+			},
+			"zigguratTempleEffectPolicy":{
+				title: $I("effectsMgr.statics.zigguratTempleEffectPolicy.title"),
+				type: "hidden" 
+			},
             //philosophy
             "luxuryDemandRatio":{
                 title: $I("effectsMgr.statics.luxuryDemandRatio.title"),
