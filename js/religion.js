@@ -609,7 +609,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			}
 		},
 		cashPreDeficitEffects: function (game) {
-			var transcendenceTierModifier = Math.max(game.religion.transcendenceTier - 25, 1);
+			var transcendenceTierModifier = Math.max(game.religion.transcendenceTier - 24, 1);
 			var self = game.religion.getZU("blackPyramid");
 			for(var counter in self.simpleEffectNames){
 				self.effectsPreDeficit["pyramid" + self.simpleEffectNames[counter]] = game.getEffect("pact" + self.simpleEffectNames[counter]) * transcendenceTierModifier;
