@@ -525,7 +525,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		unlocked: false,
 		getEffectiveValue: function(game) {
 			return this.val * (1 + game.getEffect("corruptionBoostRatioChallenge")); //LDR specified in challenges.js
-		}
+		},
+		flavor: $I("religion.zu.marker.flavor")
 	},{
 		name: "unicornGraveyard",
 		label: $I("religion.zu.unicornGraveyard.label"),
