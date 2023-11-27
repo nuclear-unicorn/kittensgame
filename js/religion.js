@@ -1160,13 +1160,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				religion.tcratio += needNextLevel;
 				religion.transcendenceTier += 1;
 
-				var atheism = game.challenges.getChallenge("atheism");
-				atheism.calculateEffects(atheism, game);
-				var blackObelisk = religion.getTU("blackObelisk");
-				blackObelisk.calculateEffects(blackObelisk, game);
+				//In the future, we might add more things that care about Transcendence Tier.
+				game.calculateAllEffects();
 				if(game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val){
 					var blackPyramid = game.religion.getZU("blackPyramid");
-					blackPyramid.calculateEffects(blackPyramid, game);
 					blackPyramid.cashPreDeficitEffects(game);
 				}
 				game.msg($I("religion.transcend.msg.success", [religion.transcendenceTier]));
