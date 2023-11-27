@@ -506,6 +506,12 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 					resName: resname,
 					type: "ratio"
 				};
+			case type == "MaxRatio":
+				return {
+					title: $I("effectsMgr.type.resMaxRatio", [restitle]),
+					resName: resname,
+					type: "ratio"
+				};
 			default:
 				return 0;
 		}
@@ -754,12 +760,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 type: "ratio"
             },
 
-            "catnipMaxRatio" : {
-                title: $I("effectsMgr.statics.catnipMaxRatio.title"),
-				type: "ratio",
-				resName:"catnip"
-            },
-
             "hunterRatio" : {
                 title: $I("effectsMgr.statics.hunterRatio.title"),
                 type: "ratio"
@@ -885,11 +885,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 type: "ratio"
             },
 
-            "cultureMaxRatio" : {
-                title: $I("effectsMgr.statics.cultureMaxRatio.title"),
-                type: "ratio"
-            },
-
             "lunarOutpostRatio" : {
                 title: $I("effectsMgr.statics.lunarOutpostRatio.title"),
                 type: "ratio"
@@ -942,11 +937,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 
             "ivoryMeteorRatio" :  {
                 title: $I("effectsMgr.statics.ivoryMeteorRatio.title"),
-                type: "ratio"
-            },
-
-            "goldMaxRatio" :  {
-                title: $I("effectsMgr.statics.goldMaxRatio.title"),
                 type: "ratio"
             },
 
