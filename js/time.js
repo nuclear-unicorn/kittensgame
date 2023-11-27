@@ -1603,15 +1603,10 @@ dojo.declare("classes.tab.TimeTab", com.nuclearunicorn.game.ui.tab, {
         this.inherited(arguments);
 
         var hasCF = this.game.workshop.get("chronoforge").researched;
-        if (hasCF){
-            this.cfPanel.setVisible(true);
-        }
+        this.cfPanel.setVisible(hasCF);
 
 		var hasVS = (this.game.science.get("voidSpace").researched || this.game.time.getVSU("usedCryochambers").val > 0);
-        if (hasVS){
-            this.vsPanel.setVisible(true);
-        }
-
+        this.vsPanel.setVisible(hasVS);
     }
 });
 

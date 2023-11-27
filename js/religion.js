@@ -2300,16 +2300,13 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 			dojo.forEach(this.rUpgradeButtons,  function(e, i){ e.update(); });	
 		}
 		var hasCT = this.game.science.get("cryptotheology").researched && this.game.religion.transcendenceTier > 0;
-		if (hasCT){
-			this.ctPanel.setVisible(true);
-		}
+		this.ctPanel.setVisible(hasCT);
 
 		dojo.forEach(this.zgUpgradeButtons, function(e, i){ e.update(); });
 		var canSeePacts = !this.game.religion.getPact("fractured").researched && this.game.religion.getZU("blackPyramid").val > 0 && (this.game.religion.getTU("mausoleum").val > 0 || this.game.science.getPolicy("radicalXenophobia").researched);
 		canSeePacts = canSeePacts && this.game.getFeatureFlag("MAUSOLEUM_PACTS");
-		if(canSeePacts){
-			this.ptPanel.setVisible(true);
-		}
+		this.ptPanel.setVisible(canSeePacts);
+		
 		//dojo.forEach(this.pactUpgradeButtons, function(e, i){ e.update(); });
 		/*if(this.necrocornDeficitMsgBox){
 			if(this.game.religion.necrocornDeficit > 0){
