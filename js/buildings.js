@@ -693,7 +693,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				self.togglable = true;
 				self.effects["catnipPerTickCon"] = -1;
 				self.effects["oilPerTickProd"] = 0.02 * (1 + game.getEffect("biofuelRatio"));
-				self.effects["energyConsumption"] = 1;
+				self.effects["energyConsumption"] = 1 * (1 + game.getEffect("biolabEnergyRatio"));
 			}else{
 				self.togglable = false;
 				self.effects["catnipPerTickCon"] = 0;
@@ -1678,7 +1678,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"catnipPerTickCon" : -1,
 			"spicePerTickCon" : -0.1,
 			"festivalRatio" : 0.01,
-			"festivalArrivalRatio" : 0.001
+			"festivalArrivalRatio" : 0.001,
+			"manpowerRatio" : 0
 		},
 		effectsCalculated: {},
 		togglable: true,
@@ -1688,7 +1689,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				"catnipPerTickCon" : -1 * (1 + game.getEffect("breweryConsumptionRatio")),
 				"spicePerTickCon" : -0.1 * (1 + game.getEffect("breweryConsumptionRatio")),
 				"festivalRatio" : 0.01,
-				"festivalArrivalRatio" : 0.001
+				"festivalArrivalRatio" : 0.001,
+				"manpowerRatio" : game.getEffect("breweryPolicyManpowerRatio")
 			};
 			self.effectsCalculated = dojo.clone(self.effects);
 		},
@@ -1702,6 +1704,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			self.effects["spicePerTickCon"] = self.effectsCalculated["spicePerTickCon"] * amt;
 			self.effects["festivalRatio"] = self.effectsCalculated["festivalRatio"] * amt;
 			self.effects["festivalArrivalRatio"] = self.effectsCalculated["festivalArrivalRatio"] * amt;
+			self.effects["manpowerRatio"] = self.effectsCalculated["manpowerRatio"] * amt;
 			return amt;
 		},
 		flavor: $I("buildings.brewery.flavor"),

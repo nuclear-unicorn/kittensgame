@@ -535,6 +535,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		//Update Trade Stats
 		this.game.stats.getStat("totalTrades").val += successfullTradeAmount;
 		this.game.stats.getStatCurrent("totalTrades").val += successfullTradeAmount;
+		this.game.upgrade({policies : ["sharkRelationsMerchants"]});
 
 		return boughtResources;
 	},

@@ -1481,6 +1481,22 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.zigguratTempleEffectPolicy.title"),
 				type: "hidden" 
 			},
+			"refinePolicyRatio":{
+				title: $I("effectsMgr.statics.refinePolicyRatio.title"),
+				type: "ratio"
+			},
+			"biolabEnergyRatio":{
+				title: $I("effectsMgr.statics.biolabEnergyRatio.title"),
+				type: "ratio"
+			},
+			"breweryPolicyManpowerRatio":{
+				title: $I("effectsMgr.statics.breweryPolicyManpowerRatio.title"),
+				type: "ratio"
+			},
+			"religionUpgradesDiscount":{
+				title: $I("effectsMgr.statics.religionUpgradesDiscount.title"),
+				type: "ratio"
+			},
             //philosophy
             "luxuryDemandRatio":{
                 title: $I("effectsMgr.statics.luxuryDemandRatio.title"),
@@ -3742,7 +3758,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	getResCraftRatio: function(craftedResName) {
 		if (craftedResName == "wood") {
-			var refineRatio = this.getEffect("refineRatio");
+			var policyRefineRatio = this.getEffect("refinePolicyRatio");
+			var refineRatio =  (policyRefineRatio) + (1 + policyRefineRatio) * this.getEffect("refineRatio");
 			return this.ironWill
 				? ((1 + refineRatio) * (1 + this.getEffect("woodRatio"))) - 1
 				: refineRatio;
