@@ -538,6 +538,15 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio"
 			},
 
+			"manpowerMaxRatio" : {
+				title: $I("effectsMgr.statics.manpowerMaxRatio.title"),
+				type: "ratio"
+			},
+
+			"scienceMaxRatio" : {
+				title: $I("effectsMgr.statics.scienceMaxRatio.title"),
+				type: "ratio"
+			},
 			"coalRatioGlobal" : {
 				title: $I("effectsMgr.statics.coalRatioGlobal.title"),
 				resName: "coal",
@@ -603,6 +612,16 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"skillXP" : {
 				title: $I("effectsMgr.statics.skillXP.title"),
 				type: "perTick"
+			},
+
+			"artifactXP" : {
+				title: $I("effectsMgr.statics.artifactXP.title"),
+				type: "perTick"
+			},
+
+			"artifactXPRatio" : {
+				title: $I("effectsMgr.statics.artifactXPRatio.title"),
+				type: "ratio"
 			},
 
 			"refineRatio": {
@@ -1655,6 +1674,11 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.pactSpaceCompendiumRatio.title"),
 				type: "ratio"
 			},
+			//atrifacts
+			"maxArtifacts":{
+				title: $I("effectsMgr.statics.maxArtifacts.title"),
+			},
+			
 			//pollution
 			"cathPollutionPerTickProd":{
 				type: "hidden"
@@ -3785,6 +3809,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		//for example, here kitten resources are calculated per effect, this logic could be unified
 
 		this.village.maxKittens = Math.floor(this.getEffect("maxKittens"));
+		this.village.maxArtifacts = Math.floor(this.getEffect("maxArtifacts"));
 
 		this.village.update();
 		this.workshop.update();
@@ -3809,6 +3834,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var kittens = this.resPool.get("kittens");
 		kittens.value = this.village.getKittens();	//just a simple way to display them
 		kittens.maxValue = this.village.sim.maxKittens; //for HG
+
+		var artifacts = this.resPool.get("artifact");
+		artifacts.value = this.village.artifactSim.artifacts.length;
+		artifacts.maxValue = this.village.artifactSim.maxArtifacts;
 
 		this.timer.update();
 	},

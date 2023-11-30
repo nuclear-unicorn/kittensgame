@@ -1312,6 +1312,25 @@ a.link.collapse:hover {
 }
 
 /*--------------------------------------
+                Artifact
+--------------------------------------*/
+
+.artifact-block {
+    border: 1px solid gray;
+	margin-bottom: 5px;
+	padding: 5px;
+}
+
+
+.artifact-block .info {
+    padding-bottom: 5px;
+}
+
+.artifact-block .skill{
+    font-size: 0.8em;
+}
+
+/*--------------------------------------
                 Map
 --------------------------------------*/
 
