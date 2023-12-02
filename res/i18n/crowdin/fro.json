@@ -78,6 +78,7 @@
     "resources.wood.title": "bois",
     "science.agriculture.label": "Agricvltvre",
     "science.calendar.label": "Calendrier",
+    "science.calendar.effectDesc": "I am a cat",
     "science.chemistry.label": "Alchimie",
     "stats.kittens.dead": "Chastons occis",
     "tab.name.science": "Science",
