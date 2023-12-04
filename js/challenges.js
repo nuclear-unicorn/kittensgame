@@ -324,7 +324,118 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			var tradepostRatioLimit = game.getLimitedDR(0.099 + tradeKnowledge * 0.0075, 0.25);
 			return (tradepost.effects["tradeRatio"] * Math.min(tradepostLimit, tradepost.val * tradepostRatioLimit));
 		}
-	},{
+	}, {
+		name: "unicornTears",
+		label: $I("challendge.unicornTears.label"),
+		description: $I("challendge.unicornTears.desc"),
+		effectDesc: $I("challendge.unicornTears.effect.desc"),
+		researched: false,
+		unlocked: false,
+		effects: {
+			"zigguratIvoryPriceRatio": -0.025,
+			"markerCostIncrease": 0
+		},
+		calculateEffects: function(self, game) {
+			if (self.active) {
+				self.effects["markerCostIncrease"] = 0.75;
+				self.effects["zigguratIvoryPriceRatio"] = 0;
+			} else {
+				self.effects["markerCostIncrease"] = 0;
+				self.effects["zigguratIvoryPriceRatio"] = -0.025;
+			}
+		},
+		stackOptions: {
+			"zigguratIvoryPriceRatio": { LDRLimit: 0.15 },
+			"markerCostIncrease": { LDRLimit: 9 }
+		},
+		checkCompletionCondition: function(game) {
+			return game.resPool.get("necrocorn").value >= 1;
+		},
+		actionOnCompletion: function(game) {
+			//Block any policies that are useless outside the Unicorn Tears Challenge:
+			var ritualCalendar = game.science.getPolicy("ritualCalendar");
+			if (!ritualCalendar.researched) {
+				ritualCalendar.blocked = true;
+			}
+			var persistence = game.science.getPolicy("persistence");
+			if (!persistence.researched) {
+				persistence.blocked = true;
+			}
+		},
+		//A list of buildings in the bonfire tab whose prices we won't add unicorn tears to:
+		//Any building that has a truthy value associated with it will be unaffected.
+		dontChangeThesePrices: {
+			"field": true,
+			"pasture": true, //Also affects Solar Farms
+			"hut": true,
+			"library": true, //Also affects Data Centers
+			"observatory": true, //Because the Challenge is already slow enough without good starchart income
+			"barn": true,
+			"warehouse": true,
+			"smelter": true,
+			"calciner": true,
+			"oilWell": true,
+			"amphitheatre": true, //Also affects Broadcast Towers
+			"workshop": true, //Because we want players to actually have fun
+			"unicornPasture": true,
+			"ziggurat": true
+		},
+		//A list of buildings in the bonfire tab where the first one costs 0 unicorn tears, but subsequent ones cost more tears.
+		isFirstOneFree: {
+			"mine": true,
+			"lumberMill": true,
+			"biolab": true,
+			"temple": true,
+			"tradepost": true
+		},
+		/**
+		 * Decides whether or not to add some unicorn tears to the base price of a building.
+		 * @param bldName	String.  The name of a building in the bonfire tab.
+		 * @param game		The game object; needed to check for more complex conditions.
+		 * @return	Boolean value.
+		 */
+		getShouldBldCostExtraTears: function(bldName, game) {
+			if (typeof(game) !== "object") {
+				throw "Missing parameter \"game\" in getShouldBldCostExtraTears";
+			}
+			if (bldName === "steamworks") {
+				//The reason for this is that there's a circular dependency where if Steamworks cost tears, then...
+				//...obtaining tears requires Theology, which costs manuscripts, which are produced by Steamworks...
+				//...alternatively, build a Mint to get crafting material, but the Mint tech requires already having manuscripts.
+				return !game.challenges.isActive("pacifism"); //Avoid circular dependency
+			}
+			return !this.dontChangeThesePrices[bldName];
+		},
+		/**
+		 * If a building has unicorn tears added to its base price, this function returns that base price.
+		 * Calculated as if the Challenge is currently active.
+		 * @param game		The game object; not used for anything right now but included just in case a future dev wants this.
+		 * @return	Positive real number.
+		 */
+		getBaseTearsCost: function(game) {
+			if (typeof(game) !== "object") {
+				throw "Missing parameter \"game\" in getBaseTearsCost";
+			}
+			if (this.on < 4 ) {
+				return this.on + 2;
+			}
+			//Else:
+			return 6 + Math.sqrt(this.on - 4); //After about this point, the reward has LDR, so we increase the difficulty more slowly...
+		},
+		/**
+		 * For some buildings, they DO cost unicorn tears, but only if you've already built 1 of that building.
+		 * So the first one won't have its price changed.
+		 * @param bldName	String.  The name of a building in the bonfire tab.
+		 * @param game		The game object; not used for anything right now but included just in case a future dev wants this.
+		 * @return	Boolean value.
+		 */
+		getIsFirstBldExempt: function(bldName, game) {
+			if (typeof(game) !== "object") {
+				throw "Missing parameter \"game\" in getIsFirstBldExempt";
+			}
+			return this.isFirstOneFree[bldName];
+		}
+	}, {
 		name: "postApocalypse",
 		label: $I("challendge.postApocalypse.label"),
 		description: $I("challendge.postApocalypse.desc"),
@@ -362,7 +473,13 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			game.science.getPolicy("terraformingInsight").unlocked = true; //policy which helpes to get more paragon this run
 			game.science.getPolicy("cryochamberExtraction").unlocked = true; //single use policy; gets not researched after player gets the bonus
 		}
-		}],
+	}],
+
+	effectsBase: {
+		"unicornsMax": 0, //Used by the Unicorn Tears Challenge
+		"tearsMax": 0,
+		"zigguratTearsMax": 0
+	},
 
 	game: null,
 
@@ -450,6 +567,28 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		for(var i = 0; i < this.challenges.length; i++){
 			if(this.challenges[i].active && this.challenges[i].checkCompletionCondition && this.challenges[i].checkCompletionCondition(this.game)){
 				this.researchChallenge(this.challenges[i].name);
+			}
+		}
+		
+		//Hack for the Unicorn Tears Challenge.
+		var effectsBase = this.effectsBase;
+		if (this.isActive("unicornTears")) {
+			effectsBase["unicornsMax"] = 10;
+			effectsBase["tearsMax"] = 1;
+
+			//Don't call game.upgrade every tick--only call it when we actually need to apply a change.
+			if (effectsBase["zigguratTearsMax"] != 2) {
+				effectsBase["zigguratTearsMax"] = 2;
+				this.game.upgrade({buildings: ["ziggurat"]});
+			}
+		} else {
+			effectsBase["unicornsMax"] = 0;
+			effectsBase["tearsMax"] = 0;
+
+			//Don't call game.upgrade every tick--only call it when we actually need to apply a change.
+			if (effectsBase["zigguratTearsMax"] != 0) {
+				effectsBase["zigguratTearsMax"] = 0;
+				this.game.upgrade({buildings: ["ziggurat"]});
 			}
 		}
 	},

@@ -944,6 +944,20 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 title: $I("effectsMgr.statics.alicornChance.title"),
                 type: "ratio"
             },
+		"zigguratTearsMax" : {
+			title: $I("effectsMgr.statics.zigguratTearsMax.title"),
+			type: "fixed",
+			resName: "tears" //Allows displayed value to benefit from paragon storage bonus
+		},
+		"unicornTombTearsMax" : {
+			title: $I("effectsMgr.statics.unicornTombTearsMax.title"),
+			type: "fixed",
+			resName: "tears" //Allows displayed value to benefit from paragon storage bonus
+		},
+		"unicornSacrificeRatio": {
+			title: $I("effectsMgr.statics.unicornSacrificeRatio.title"),
+			type: "ratio"
+		},
 
 			"tcRefineRatio" :  {
                 title: $I("effectsMgr.statics.tcRefineRatio.title"),
@@ -1575,6 +1589,18 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			},
 			"weaponEfficency":{
 				title: $I("effectsMgr.statics.weaponEfficency.title"),
+				type: "ratio"
+			},
+			"zigguratIvoryPriceRatio": {
+				title: $I("effectsMgr.statics.zigguratIvoryPriceRatio.title"),
+				type: "ratio"
+			},
+			"markerCostIncrease": {
+				title: $I("effectsMgr.statics.markerCostIncrease.title"),
+				type: "ratio"
+			},
+			"autoSacrificeUnicornsThreshold": {
+				title: $I("effectsMgr.statics.autoSacrificeUnicornsThreshold.title"),
 				type: "ratio"
 			},
 			"cryochamberSupport":{

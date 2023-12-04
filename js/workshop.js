@@ -1569,7 +1569,11 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.unicornSelection.label"),
 		description: $I("workshop.unicornSelection.desc"),
 		effects: {
-			"unicornsGlobalRatio": 0.25
+			"unicornsGlobalRatio": 0.25,
+			"unicornsMaxRatio": 0
+		},
+		calculateEffects: function(self, game) {
+			self.effects["unicornsMaxRatio"] = game.challenges.isActive("unicornTears") ? 0.5 : 0;
 		},
 		prices:[
 			{ name : "titanium", val: 1500 },

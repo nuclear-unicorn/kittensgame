@@ -1896,7 +1896,19 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		priceRatio: 1.75,
 		effects: {
 			"catnipDemandRatio": -0.0015,
-			"unicornsPerTickBase" : 0.001
+			"unicornsPerTickBase" : 0.001,
+			"unicornsMax": 0
+		},
+		calculateEffects: function(self, game) {
+			self.effects["unicornsPerTickBase"] = 0.001;
+			if (game.challenges.isActive("unicornTears")) {
+				self.effects["unicornsMax"] = 50;
+				if (game.challenges.isActive("atheism")) { //Increased effect when in a combo of Atheism + Unicorn Tears
+					self.effects["unicornsPerTickBase"] *= 5; //To compensate for lack of Solar Revolution bonus
+				}
+			} else {
+				self.effects["unicornsMax"] = 0;
+			}
 		},
 		flavor: $I("buildings.unicornPasture.flavor")
 	},
@@ -1914,17 +1926,34 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		],
 		priceRatio: 1.25,
 		effects: {
-			"cultureMaxRatio": 0.08
+			"cultureMaxRatio": 0.08,
+			"unicornsMax": 0,
+			"tearsMax": 0
 		},
 		calculateEffects: function(self, game) {
 			var effects = {
-				cultureMaxRatio: 0.08
+				cultureMaxRatio: 0.08 + game.getEffect("cultureMaxRatioBonus"),
+				unicornsMax: 0,
+				tearsMax: 0
 			};
-			effects["cultureMaxRatio"] = 0.08 + game.getEffect("cultureMaxRatioBonus");
+
+			if (game.challenges.isActive("unicornTears")) {
+				effects["unicornsMax"] = 600;
+				effects["tearsMax"] = game.getEffect("zigguratTearsMax");
+			}
+
 			self.effects = effects;
 			if(self.val){
 				game.time.queue.unlockQueueSource("zigguratUpgrades");
 			}
+		},
+		canSell: function(self, game){
+			if (game.science.getPolicy("holyGround").researched == true){
+				game.msg($I("buildings.ziggurat.attemptsell"));
+				return false;
+			}
+			//Else, nothing preventing us from selling.
+			return true;
 		}
 	},{
 		name: "chronosphere",
@@ -2256,6 +2285,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		var bldName = bld.get("name");
 		var bldVal = bld.get("val");
 		var ratio = this.getPriceRatioWithAccessor(bld);
+		var bldRequiresTears = false;
 
 		var prices = [];
 
@@ -2270,6 +2300,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				val: bldPrices[i].val * Math.pow(ratio, bldVal + fakeBought) * priceModifier * resPriceModifier,
 				name: bldPrices[i].name
 			});
+			if (bldPrices[i].name == "tears") {
+				bldRequiresTears = true; //This building requires unicorn tears in its base price
+			}
 		}
 
 		if (this.game.challenges.isActive("blackSky")
@@ -2298,6 +2331,27 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 						name : "unobtainium",
 						isTemporary: true //can't exploit buy manipulating pollution in postApocalypse
 					});
+		}
+		//In the Unicorn Tears Challenge, add unicorn tears to the cost of buildings, unless that building already costs tears.
+		if (this.game.challenges.isActive("unicornTears") && !bldRequiresTears) {
+			var unicornTearsChallenge = this.game.challenges.getChallenge("unicornTears");
+			var baseTearsCost = 0;
+
+			if (unicornTearsChallenge.getShouldBldCostExtraTears(bldName, this.game)) {
+				baseTearsCost = unicornTearsChallenge.getBaseTearsCost(this.game);
+			}
+			if (unicornTearsChallenge.getIsFirstBldExempt(bldName, this.game) && bldVal == 0) {
+				baseTearsCost = 0; //Building is so important that the first one costs 0 tears.
+			}
+
+			//For any building we altered, calculate a price for it:
+			if (baseTearsCost > 0) {
+				prices.push({
+					val: baseTearsCost * Math.pow(ratio, bldVal + fakeBought),
+					name: "tears",
+					isTemporary: true //Can't exploit selling all your buildings before completing the Challenge to get tears back
+				});
+			}
 		}
 		/**
 		 * Spaceport will use a much steper price ratio for starcharts to be a dedicated starchart sinker
