@@ -1370,7 +1370,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         ],
         effects:{
             "parchmentTradeChanceIncrease" : 0.5,
-			"manuscriptTradeChanceIncrease" : 0.3
+			"manuscriptTradeChanceIncrease" : 0.3,
+			"ironBuyRatioIncrease": 1
         },
         unlocked: false,
         blocked: false,
@@ -1395,6 +1396,16 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 						}
 					}
 				}
+				for (i = 0; i < sharks.buys.length; i++) {
+					var buy = sharks.buys[i]["name"];
+					if(buy == "iron") {
+						if(self.researched){
+							sharks.buys[i].val = 100 * (1 + self.effects["ironBuyRatioIncrease"]);
+						} else {
+							sharks.buys[i].val = 100;
+						}
+					}
+				}
 		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("sharks", 20);
@@ -1415,7 +1426,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["sharkRelationsScribes", "sharkRelationsBotanists"],
 		calculateEffects: function(self, game) {
 			var trades = game.stats.getStatCurrent("totalTrades").val;
-			self.effects["tradeRatio"] = Math.min(Math.max(Math.floor(Math.log10(trades) - 1, 0)) * 0.05, 0.5);
+			self.effects["tradeRatio"] = Math.min(Math.floor(Math.log10(Math.max(trades, 100)) - 1) * 0.05, 0.5);
 			
 		},
 		evaluateLocks: function(game){
@@ -1451,7 +1462,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         label: $I("policy.griffinRelationsMetallurgists.label"),
         description: $I("policy.griffinRelationsMetallurgists.desc"),
         prices: [
-            {name : "culture", val: 5500}
+            {name : "culture", val: 16000}
         ],
         effects:{
             "calcinerSteelRatioBonus": 0.25,
@@ -1468,7 +1479,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         label: $I("policy.griffinRelationsScouts.label"),
         description: $I("policy.griffinRelationsScouts.desc"),
         prices: [
-            {name : "culture", val: 5500}
+            {name : "culture", val: 16000}
         ],
         effects:{
             "hunterRatio" : 1
@@ -1485,7 +1496,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         label: $I("policy.griffinRelationsMachinists.label"),
         description: $I("policy.griffinRelationsMachinists.desc"),
         prices: [
-            {name : "culture", val: 5500}
+            {name : "culture", val: 16000}
         ],
         effects:{
             "magnetoBoostBonusPolicy" : 0.02
@@ -1505,7 +1516,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         label: $I("policy.nagaRelationsMasons.label"),
         description: $I("policy.nagaRelationsMasons.desc"),
         prices: [
-            {name : "culture", val: 4200}
+            {name : "culture", val: 8000}
         ],
         effects:{
             "quarrySlabCraftBonus" : 0.05
@@ -1525,7 +1536,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         label: $I("policy.nagaRelationsCultists.label"),
         description: $I("policy.nagaRelationsCultists.desc"),
         prices: [
-            {name : "culture", val: 4200}
+            {name : "culture", val: 8000}
         ],
         effects:{
             "zigguratTempleEffectPolicy" : 0.2
@@ -1558,7 +1569,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		isRelation: true,
         blocks:["spiderRelationsChemists"],
 		evaluateLocks: function(game){
-			return game.science.checkRelation("spiders", 20);
+			return game.science.checkRelation("spiders", 10);
 		}
 	}, {
 		name: "spiderRelationsChemists",
@@ -1573,7 +1584,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		isRelation: true,
         blocks:["spiderRelationsGeologists"],
 		evaluateLocks: function(game){
-			return game.science.checkRelation("spiders", 20);
+			return game.science.checkRelation("spiders", 10);
 		},
 		calculateEffects: function(self, game){
 			var spiders = game.diplomacy.get("spiders");
@@ -1605,7 +1616,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		isRelation: true,
         blocks:["dragonRelationsAstrologers"],
 		evaluateLocks: function(game){
-			return game.science.checkRelation("dragons", 20);
+			return game.science.checkRelation("dragons", 10);
 		}
 	}, {
 		name: "dragonRelationsAstrologers",
@@ -1623,7 +1634,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		isRelation: true,
         blocks:["dragonRelationsPhysicists"],
 		evaluateLocks: function(game){
-			return game.science.checkRelation("dragons", 20);
+			return game.science.checkRelation("dragons", 10);
 		}
 	},
     //----------------   Philosophy   --------------------

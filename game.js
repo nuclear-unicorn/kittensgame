@@ -1497,6 +1497,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.religionUpgradesDiscount.title"),
 				type: "ratio"
 			},
+			"ironBuyRatioIncrease":{
+				title: $I("effectsMgr.statics.ironBuyRatioIncrease.title"),
+				type: "ratio"
+			},
             //philosophy
             "luxuryDemandRatio":{
                 title: $I("effectsMgr.statics.luxuryDemandRatio.title"),
