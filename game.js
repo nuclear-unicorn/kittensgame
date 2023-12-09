@@ -958,6 +958,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			title: $I("effectsMgr.statics.unicornSacrificeRatio.title"),
 			type: "ratio"
 		},
+		"buildAdditionalZiggurats": {
+			title: $I("effectsMgr.statics.buildAdditionalZiggurats.title"),
+			type: "fixed"
+		},
 
 			"tcRefineRatio" :  {
                 title: $I("effectsMgr.statics.tcRefineRatio.title"),

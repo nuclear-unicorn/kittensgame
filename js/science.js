@@ -1470,13 +1470,15 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		],
 		onResearch: function(game) {
 			var ziggurats = game.bld.get("ziggurat");
-			ziggurats.on += 5;
-			ziggurats.val += 5;
+			var amt = this.effects["buildAdditionalZiggurats"];
+			ziggurats.on += amt;
+			ziggurats.val += amt;
 			game.upgrade({ buildings: ["ziggurat"]});
 			//Repurpose an existing console log message:
-			game.msg($I("construct.all.msg", [ziggurats.label, 5]));
+			game.msg($I("construct.all.msg", [ziggurats.label, amt]));
 		},
 		effects: {
+			"buildAdditionalZiggurats": 5,
 			"unicornSacrificeRatio": 0.05
 		},
 		unlocked: false,
