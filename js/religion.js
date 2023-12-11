@@ -2268,7 +2268,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 
 			var sacrificeBtn = new classes.ui.religion.MultiLinkBtn({
 				name: $I("religion.sacrificeBtn.label"),
-				description: sacrificeRatio == 1 ? $I("religion.sacrificeBtn.desc") : $I("religion.sacrificeBtn.desc2", [game.getDisplayValueExt(sacrificeRatio)]),
+				description: sacrificeRatio == 1 ? $I("religion.sacrificeBtn.desc") : $I("religion.sacrificeBtn.desc.multiple", [game.getDisplayValueExt(sacrificeRatio)]),
 				prices: [{ name: "unicorns", val: 2500}],
 				controller: new classes.ui.religion.TransformBtnController(game, {
 					gainMultiplier: function() {
