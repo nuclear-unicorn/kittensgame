@@ -10,13 +10,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			}
 			//Get the base amount for the effect:
 			var amt = challenge.effects[effectName] || 0;
-			if (effectName == "kittenLaziness" ) { //Calculated in a special way just for the Anarchy Challenge
-				return amt;
-			}
 			var stackOptions = (challenge.stackOptions || {})[effectName] || {}; //Get the stack options for this effect.  If it doesn't exist, get an empty object instead.
 			if (stackOptions.noStack) {
-				//This effect doesn't stack.  Apply only if the Challenge has been completed.
-				return challenge.researched ? amt : 0;
+				//This effect doesn't stack.  The Challenge calculates it itself.
+				return amt;
 			}
 			//Else, the effect stacks with Challenge completions.
 			amt *= challenge.on;
@@ -38,7 +35,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 
 	//Challenges have an optional property named "stackOptions".
 	//stackOptions is a table where the keys are the names of effects & the values are objects with parameters that control how that effect behaves when the challenge has been completed multiple times.
-	//	noStack - If true, the effect only cares about whether or not the Challenge has been completed, but it doesn't care about the exact number of completions.
+	//	noStack - If true, the effect is used directly from the Challenge data with no modifications at all.
 	//			If noStack is combined with another option, noStack overrides all other options & the effect doesn't stack.
 	//	LDRLimit - Applies Limited Diminishing Returns (LDR) specifying the asymptotic limit.
 	//	capMagnitude - The magnitude of the effect will be clamped to this value, but the sign of the effect will not be changed.
@@ -102,7 +99,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
         },
 		stackOptions: {
 			"masterSkillMultiplier": { LDRLimit: 4 },
-			"kittenLaziness": { LDRLimit: 0.25 }
+			"kittenLaziness": { LDRLimit: 0.25, noStack: true }
 		},
 		calculateEffects: function(self, game){
 			if (self.active) {
@@ -333,19 +330,27 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		unlocked: false,
 		effects: {
 			"zigguratIvoryPriceRatio": -0.025,
+			"bonfireBaseTearsCost": 0,
 			"markerCostIncrease": 0
 		},
 		calculateEffects: function(self, game) {
 			if (self.active) {
+				self.effects["bonfireBaseTearsCost"] = (self.on < 4) ? (self.on + 2) : (6 + Math.sqrt(this.on - 4));
+				//First Challenge (0 prior completions): 2
+				//Second Challenge i.e. first repeat (1 prior completion): 3
+				//Third Challenge i.e. second repeat (2 prior completions): 4
+				//After that: 5, 6, 7, 7.4, 7.7, 8, 8.2, 8.4, 8.6, 8.8, 9, 9.2, 9.3, etc., increasing with square root.
 				self.effects["markerCostIncrease"] = 0.75;
 				self.effects["zigguratIvoryPriceRatio"] = 0;
 			} else {
+				self.effects["bonfireBaseTearsCost"] = 0;
 				self.effects["markerCostIncrease"] = 0;
 				self.effects["zigguratIvoryPriceRatio"] = -0.025;
 			}
 		},
 		stackOptions: {
 			"zigguratIvoryPriceRatio": { LDRLimit: 0.15 },
+			"bonfireBaseTearsCost": { noStack: true },
 			"markerCostIncrease": { LDRLimit: 9 }
 		},
 		checkCompletionCondition: function(game) {
@@ -405,22 +410,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				return !game.challenges.isActive("pacifism"); //Avoid circular dependency
 			}
 			return !this.dontChangeThesePrices[bldName];
-		},
-		/**
-		 * If a building has unicorn tears added to its base price, this function returns that base price.
-		 * Calculated as if the Challenge is currently active.
-		 * @param game		The game object; not used for anything right now but included just in case a future dev wants this.
-		 * @return	Positive real number.
-		 */
-		getBaseTearsCost: function(game) {
-			if (typeof(game) !== "object") {
-				throw "Missing parameter \"game\" in getBaseTearsCost";
-			}
-			if (this.on < 4 ) {
-				return this.on + 2;
-			}
-			//Else:
-			return 6 + Math.sqrt(this.on - 4); //After about this point, the reward has LDR, so we increase the difficulty more slowly...
 		},
 		/**
 		 * For some buildings, they DO cost unicorn tears, but only if you've already built 1 of that building.

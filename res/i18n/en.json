@@ -366,6 +366,7 @@
     "effectsMgr.statics.blsCorruptionRatio.title": "BLS corruption bonus",
     "effectsMgr.statics.blsLimit.title": "Max BLS",
     "effectsMgr.statics.blsProductionBonus.title": "BLS production bonus",
+    "effectsMgr.statics.bonfireBaseTearsCost.title": "Bonfire base tears cost",
     "effectsMgr.statics.boostFromLeader.title": "Boost From Leader",
     "effectsMgr.statics.breweryConsumptionRatio.title": "Brewery consumption ratio",
     "effectsMgr.statics.broadcastTowerRatio.title": "Broadcast Tower bonus",
