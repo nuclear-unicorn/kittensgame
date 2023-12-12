@@ -1932,7 +1932,7 @@
     "workshop.nuclearPlants.label": "Ядерные сталеплавильни",
     "workshop.nuclearPlants.desc": "Сталеплавильни эффективнее ещё на 2% бонуса к изготовлению за каждый реактор.",
     "workshop.nuclearSmelters.label": "Ядерные плавильни",
-    "workshop.nuclearSmelters.desc": "Плавильни начнут выплавлять титан.",
+    "workshop.nuclearSmelters.desc": "В плавильне теперь можно производить титан",
     "workshop.offsetPress.label": "Офсетная печать",
     "workshop.offsetPress.desc": "Печатный пресс эффективнее в 4 раза.",
     "workshop.offsetPress.flavor": "Бумага заходит, фото котов выходит.",
