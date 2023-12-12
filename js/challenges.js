@@ -331,6 +331,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		effects: {
 			"zigguratIvoryPriceRatio": -0.025,
 			"bonfireBaseTearsCost": 0,
+			"workshopBaseTearsCost": 0,
 			"markerCostIncrease": 0
 		},
 		calculateEffects: function(self, game) {
@@ -340,10 +341,31 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				//Second Challenge i.e. first repeat (1 prior completion): 3
 				//Third Challenge i.e. second repeat (2 prior completions): 4
 				//After that: 5, 6, 7, 7.4, 7.7, 8, 8.2, 8.4, 8.6, 8.8, 9, 9.2, 9.3, etc., increasing with square root.
+				switch(self.on) {
+				case 0:
+					self.effects["workshopBaseTearsCost"] = 0;
+					break;
+				case 1:
+					self.effects["workshopBaseTearsCost"] = 0.01;
+					break;
+				case 2:
+					self.effects["workshopBaseTearsCost"] = 0.5;
+					break;
+				default:
+					self.effects["workshopBaseTearsCost"] = 1;
+				}
+				//First Challenge (0 prior completions): 0 * 0 = 0
+				//Second Challenge i.e. first repeat (1 prior completion): 0.01 * 1 = 0.01
+				//Third Challenge i.e. second repeat (2 prior completions): 0.5 * 2 = 1
+				//Fourth Challenge (3 prior completions): 1 * 3 = 3
+				//After that: 1 * N = N, where N is the number of prior completions
 				self.effects["markerCostIncrease"] = 0.75;
 				self.effects["zigguratIvoryPriceRatio"] = 0;
+
+				self.effects["workshopBaseTearsCost"] = 0; //I'll turn it off for now because it isn't a very fun mechanic.
 			} else {
 				self.effects["bonfireBaseTearsCost"] = 0;
+				self.effects["workshopBaseTearsCost"] = 0;
 				self.effects["markerCostIncrease"] = 0;
 				self.effects["zigguratIvoryPriceRatio"] = -0.025;
 			}
@@ -384,7 +406,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"amphitheatre": [true, false], //Amphitheatre doesn't cost tears, Broadcast Tower does
 			"workshop": true, //Because we want players to actually have fun
 			"unicornPasture": true,
-			"ziggurat": true
+			"ziggurat": true,
+			"goldOre": true, //Technically, these are workshop upgrades; remind me to update the documentation later.
+			"coalFurnace": true,
+			"printingPress": false //I'll need to change this to true (& possibly some others) to make this compatible with Pacifism
 		},
 		//A list of buildings in the bonfire tab where the first one costs 0 unicorn tears, but subsequent ones cost more tears.
 		isFirstOneFree: {

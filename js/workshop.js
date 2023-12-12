@@ -2703,8 +2703,18 @@ dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearun
     },
 
 	getPrices: function(model) {
-        return this.game.village.getEffectLeader("scientist", this.inherited(arguments));
-    },
+		var retVal = this.game.village.getEffectLeader("scientist", this.inherited(arguments));
+		if (this.game.challenges.isActive("unicornTears")) {
+			var unicornTearsChallenge = this.game.challenges.getChallenge("unicornTears");
+			if (unicornTearsChallenge.getShouldBldCostExtraTears(model.metadata.name, this.game, undefined /*bldStage*/)) {
+				var tearsCost = this.game.getEffect("workshopBaseTearsCost");
+				if (tearsCost > 0) {
+					retVal.push({ val: tearsCost, name: "tears" });
+				}
+			}
+		}
+		return retVal;
+	},
 
 	updateVisible: function(model){
 		var upgrade = model.metadata;
