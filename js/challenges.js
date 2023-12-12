@@ -361,8 +361,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				//After that: 1 * N = N, where N is the number of prior completions
 				self.effects["markerCostIncrease"] = 0.75;
 				self.effects["zigguratIvoryPriceRatio"] = 0;
-
-				self.effects["workshopBaseTearsCost"] = 0; //I'll turn it off for now because it isn't a very fun mechanic.
 			} else {
 				self.effects["bonfireBaseTearsCost"] = 0;
 				self.effects["workshopBaseTearsCost"] = 0;

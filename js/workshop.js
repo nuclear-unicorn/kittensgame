@@ -2709,6 +2709,9 @@ dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearun
 			if (unicornTearsChallenge.getShouldBldCostExtraTears(model.metadata.name, this.game, undefined /*bldStage*/)) {
 				var tearsCost = this.game.getEffect("workshopBaseTearsCost");
 				if (tearsCost > 0) {
+					var alreadyPurchased = 0;
+					dojo.forEach(this.game.workshop.meta[0].meta, function(elem) { alreadyPurchased += 1 * elem.researched; });
+					tearsCost *= alreadyPurchased;
 					retVal.push({ val: tearsCost, name: "tears" });
 				}
 			}
