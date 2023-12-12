@@ -369,24 +369,26 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		},
 		//A list of buildings in the bonfire tab whose prices we won't add unicorn tears to:
 		//Any building that has a truthy value associated with it will be unaffected.
+		//For staged buildings, you can specify the stages separately from each other by providing an array.
 		dontChangeThesePrices: {
 			"field": true,
-			"pasture": true, //Also affects Solar Farms
+			"pasture": [/*Pastures don't cost tears*/ true, /*Solar Farms DO cost tears*/ false],
 			"hut": true,
-			"library": true, //Also affects Data Centers
+			"library": [/*Libraries don't cost tears*/ true, /*Data Centers DO cost tears*/ false],
 			"observatory": true, //Because the Challenge is already slow enough without good starchart income
 			"barn": true,
-			"warehouse": true,
+			"warehouse": [true, false], //Warehouse doesn't cost tears, Spaceport does
 			"smelter": true,
 			"calciner": true,
 			"oilWell": true,
-			"amphitheatre": true, //Also affects Broadcast Towers
+			"amphitheatre": [true, false], //Amphitheatre doesn't cost tears, Broadcast Tower does
 			"workshop": true, //Because we want players to actually have fun
 			"unicornPasture": true,
 			"ziggurat": true
 		},
 		//A list of buildings in the bonfire tab where the first one costs 0 unicorn tears, but subsequent ones cost more tears.
 		isFirstOneFree: {
+			"library": true, //Make it so the first Data Center doesn't require tears.
 			"mine": true,
 			"lumberMill": true,
 			"biolab": true,
@@ -397,9 +399,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		 * Decides whether or not to add some unicorn tears to the base price of a building.
 		 * @param bldName	String.  The name of a building in the bonfire tab.
 		 * @param game		The game object; needed to check for more complex conditions.
+		 * @param bldStage	Number (optional).  Compares a specific stage of the building.  Ignored if wrong type.
 		 * @return	Boolean value.
 		 */
-		getShouldBldCostExtraTears: function(bldName, game) {
+		getShouldBldCostExtraTears: function(bldName, game, bldStage) {
 			if (typeof(game) !== "object") {
 				throw "Missing parameter \"game\" in getShouldBldCostExtraTears";
 			}
@@ -409,16 +412,25 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				//...alternatively, build a Mint to get crafting material, but the Mint tech requires already having manuscripts.
 				return !game.challenges.isActive("pacifism"); //Avoid circular dependency
 			}
-			return !this.dontChangeThesePrices[bldName];
+			var rawVal = this.dontChangeThesePrices[bldName];
+			if (typeof(rawVal) == "boolean") {
+				return !rawVal;
+			}
+			if (rawVal instanceof Array && typeof(bldStage) == "number") {
+				return !rawVal[bldStage];
+			}
+			//Else, rawVal is not defined, so default to making the building cost tears.
+			return true;
 		},
 		/**
 		 * For some buildings, they DO cost unicorn tears, but only if you've already built 1 of that building.
 		 * So the first one won't have its price changed.
 		 * @param bldName	String.  The name of a building in the bonfire tab.
 		 * @param game		The game object; not used for anything right now but included just in case a future dev wants this.
+		 * @param bldStage	Number (optional).  Currently not supported yet.
 		 * @return	Boolean value.
 		 */
-		getIsFirstBldExempt: function(bldName, game) {
+		getIsFirstBldExempt: function(bldName, game, bldStage) {
 			if (typeof(game) !== "object") {
 				throw "Missing parameter \"game\" in getIsFirstBldExempt";
 			}

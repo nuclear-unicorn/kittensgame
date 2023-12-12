@@ -2288,6 +2288,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	 	var bldPrices = bld.get("prices");
 		var bldName = bld.get("name");
 		var bldVal = bld.get("val");
+		var bldStage = bld.get("stage");
 		var ratio = this.getPriceRatioWithAccessor(bld);
 		var bldRequiresTears = false;
 
@@ -2341,10 +2342,10 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			var unicornTearsChallenge = this.game.challenges.getChallenge("unicornTears");
 			var baseTearsCost = 0;
 
-			if (unicornTearsChallenge.getShouldBldCostExtraTears(bldName, this.game)) {
+			if (unicornTearsChallenge.getShouldBldCostExtraTears(bldName, this.game, bldStage)) {
 				baseTearsCost = this.game.getEffect("bonfireBaseTearsCost");
 			}
-			if (unicornTearsChallenge.getIsFirstBldExempt(bldName, this.game) && bldVal == 0) {
+			if (unicornTearsChallenge.getIsFirstBldExempt(bldName, this.game, bldStage) && bldVal == 0) {
 				baseTearsCost = 0; //Building is so important that the first one costs 0 tears.
 			}
 
@@ -2360,7 +2361,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		/**
 		 * Spaceport will use a much steper price ratio for starcharts to be a dedicated starchart sinker
 		 */
-		if (bldName == "warehouse" && bld.get("stage") == 1){
+		if (bldName == "warehouse" && bldStage == 1){
 			for (var i = 0; i < prices.length; i++) {
 				if (prices[i].name == "starchart"){
 					prices[i].val = prices[i].val * Math.pow(1.35, bldVal);
