@@ -287,6 +287,8 @@
     "challendge.ironWill.effect.desc": "Nic",
     "challendge.pacifism.label": "Pacyfizm",
     "challendge.pacifism.desc": "Zrestartuj grę bez możliwości polowania. Niektóre doktryny będą niedostępne.<br><br>Cel: Zbadaj doktrynę Traktatu Kosmicznego i zresetuj grę.",
+    "challendge.postApocalypse.label": "Postapokalipsa",
+    "challendge.postApocalypse.desc": "Znalazłeś uszkodzoną oś czasu ze skrajnym zanieczyszczeniem. Tylko wysłanie Twoich najsilniejszych kociąt pomoże posprzątać ten bałagan. Zanieczyszczenie ma negatywne skutki. <br>UWAGA: Masz ograniczony czas na ustalenie produkcji żywności po rozpoczęciu tego wyzwania.",
     "challendge.winterIsComing.label": "Nadchodzi zima",
     "challendge.winterIsComing.desc": "Zrestartuj grę z samymi zimami.<br><br>Cel: Dotarcie do Heliosa.",
     "challendge.winterIsComing.effect.desc": "Pogoda się globalnie polepsza.",
