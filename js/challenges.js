@@ -754,6 +754,169 @@ dojo.declare("classes.ui.ChallengePanel", com.nuclearunicorn.game.ui.Panel, {
 
 });
 
+dojo.declare("classes.ui.ReservesPanel", com.nuclearunicorn.game.ui.Panel, {
+
+	statics: { //i.e. shared between all instances of this class
+		maxKittensToDisplayIndividually: 30 //If there are more than this many kittens, don't show any more.
+	},
+
+	constructor: function() {
+		this.reclaimReservesBtn = null;
+		this.reclaimInstructionsText = null;
+	},
+
+	render: function(container) {
+		var content = this.inherited(arguments);
+		
+		this.reclaimInstructionsText = dojo.create("span", {
+			innerHTML: $I("challendge.reserves.panel.summary"), style: "display: inline-block; margin-bottom: 16px" }, content);
+		
+		this.reclaimReservesBtn = new com.nuclearunicorn.game.ui.ButtonModern({
+			name: $I("challendge.reclaimReserves.label"),
+			description: $I("challendge.reclaimReserves.desc"),
+			handler: dojo.hitch(this, function(){
+				this.game.challenges.reserves.addReserves();
+			}),
+			controller: new com.nuclearunicorn.game.ui.ButtonController(this.game, {
+				updateVisible: function (model) {
+					model.visible = (!this.game.challenges.anyChallengeActive() && !this.game.ironWill &&
+					this.game.challenges.reserves.reservesExist());
+				},
+			})
+		}, this.game);
+		this.reclaimReservesBtn.render(content);
+
+		this.reclaimInstructionsText = dojo.create("span", {
+			innerHTML: $I("challendge.reserves.panel.reclaim.instructions"), style: "margin-bottom: 16px" }, content);
+		//Set visible if & only if we are in at least 1 challenge & have reserves to claim.
+		dojo.style(this.reclaimInstructionsText, "display",
+			(this.game.challenges.reserves.reservesExist() && (this.game.challenges.anyChallengeActive() || this.game.ironWill)) ?
+			"block" : "none");
+
+		var table = dojo.create("table", {}, content);
+		var resPanel = dojo.create("td", { className: "craftStuffPanel", style: "width: 40%" }, table);
+		var kittensPanel = dojo.create("td", { className: "craftStuffPanel", style: "width: 60%" }, table);
+
+		this.renderReservedResources(resPanel);
+		this.renderReservedKittens(kittensPanel);
+	},
+
+	//If there are no resources, displays a message saying as such.
+	renderReservedResources: function(panelContainer) {
+		var resRes = this.game.challenges.reserves.reserveResources;
+		var numReservedTypes = Object.keys(resRes).length; //How many different types of resources are in reserves.
+		if (numReservedTypes < 1) {
+			dojo.create("span", { innerHTML: $I("challendge.reserves.resources.none") }, panelContainer);
+			return;
+		}
+		
+		//Create a list of all resources stored in reserves:
+		dojo.create("span", { innerHTML: $I("challendge.reserves.resources.label") }, panelContainer);
+
+		if (!this.game.prestige.getPerk("ascoh").researched) {
+			//Give the player a vague sense of how many resources are in reserves based on how many *types* of resources there are:
+			var keyToUse = "challendge.reserves.resources.lessThan10";
+			if (numReservedTypes >= 30) {
+				var keyToUse = "challendge.reserves.resources.30orMore";
+			} else if (numReservedTypes >= 20) {
+				var keyToUse = "challendge.reserves.resources.20orMore";
+			} else if (numReservedTypes >= 10) {
+				var keyToUse = "challendge.reserves.resources.10orMore";
+			}
+			dojo.create("span", { innerHTML: $I(keyToUse) }, panelContainer);
+			return;
+		}
+
+		//Create a list of all resources stored in reserves:
+		var resTable = dojo.create("table", {}, panelContainer);
+		for (var resName in resRes) {
+			var resObj = this.game.resPool.get(resName);
+			var resAmt = resRes[resName];
+
+			//Shamelessly copied from left.jsx.js:
+			//This is the code that makes all resoruces be displayed in their color.
+			var resNameCss = {};
+			if (resObj.type == "uncommon"){
+				resNameCss = {
+					color: "Coral"
+				};
+			}
+			if (resObj.type == "rare"){
+				resNameCss = {
+					color: "orange",
+					textShadow: "1px 0px 10px Coral"
+				};
+			}
+			if (resObj.color){
+				resNameCss = {
+					color: resObj.color,
+				};
+			} 
+			if (resObj.style){
+				for (var styleKey in resObj.style){
+					resNameCss[styleKey] = resObj.style[styleKey];
+				}
+			}
+
+			var tr = dojo.create("tr", {}, resTable);
+			dojo.create("td", { innerHTML: resObj.title || resName + ":", style: resNameCss }, tr);
+			dojo.create("td", { innerHTML: this.game.getDisplayValueExt(resAmt) }, tr);
+		}
+	},
+
+	//If there are no kittens or cryochambers, displays nothing.
+	renderReservedKittens: function(panelContainer) {
+		var numResCryos = this.game.challenges.reserves.reserveCryochambers; //Number of cryochambers
+		var resKit = this.game.challenges.reserves.reserveKittens; //Array of kittens
+		var numDisplayedSoFar = 0;
+
+		if (numResCryos) {
+			dojo.create("span", { innerHTML: $I("challendge.reserves.cryochambers.label", [numResCryos]) }, panelContainer);
+		}
+		
+		if (resKit.length && this.game.prestige.getPerk("ascoh").researched) {
+			//Create a list of all the cryochambers we have stored in reserved & all kittens in them:
+			var kittensTable = dojo.create("table", {}, panelContainer);
+			var census = new classes.ui.village.Census(this.game);
+			for (var i = 0; i < resKit.length; i += 1) {
+				var kitten = resKit[i];
+	
+				var tr = dojo.create("tr", {}, kittensTable);
+				if (numDisplayedSoFar >= this.statics.maxKittensToDisplayIndividually) {
+					dojo.create("td", { innerHTML: "..." }, tr);
+					dojo.create("td", { innerHTML: "..." }, tr);
+					dojo.create("td", { innerHTML: "..." }, tr);
+					break;
+				}
+				//Otherwise, we still can display more kittens:
+				dojo.create("td", { innerHTML: census.getStyledName(kitten, false /*is leader panel*/), style: "padding-right: 8px" }, tr);
+				dojo.create("td", { innerHTML: kitten.trait.title }, tr);
+				dojo.create("td", { innerHTML: (kitten.rank == 0 ? "" : " (" + $I("village.census.rank") + " " + kitten.rank + ")") }, tr);
+				numDisplayedSoFar += 1;
+			}
+		}
+	},
+
+	update: function() {
+		var hasReserves = this.game.challenges.reserves.reservesExist();
+		this.inherited(arguments);
+
+		//If the player doesn't have Chronophysics, they probably don't have Chronospheres & therefore won't use reserves.
+		//But if they have reserves, show this panel anyways.
+		this.setVisible(Boolean(hasReserves || this.game.science.get("chronophysics").researched));
+
+		if (this.reclaimReservesBtn) {
+			this.reclaimReservesBtn.update();
+		}
+		if (this.reclaimInstructionsText) {
+			//Set visible if & only if we are in at least 1 challenge & have reserves to claim.
+			dojo.style(this.reclaimInstructionsText, "display",
+				(hasReserves && (this.game.challenges.anyChallengeActive() || this.game.ironWill)) ?
+				"block" : "none");
+		}
+	}
+});
+
 dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Panel, {
 	//The name of the Challenge that this panel lists the effects of:
 	challengeName: "",
@@ -869,22 +1032,12 @@ dojo.declare("classes.tab.ChallengesTab", com.nuclearunicorn.game.ui.tab, {
 		applyPendingBtn.render(container);
 		this.applyPendingBtn = applyPendingBtn;
 
-
-		var reclaimReservesBtn = new com.nuclearunicorn.game.ui.ButtonModern({
-			name: $I("challendge.reclaimReserves.label"),
-			description: $I("challendge.reclaimReserves.desc"),
-			handler: dojo.hitch(this, function(){
-				this.game.challenges.reserves.addReserves();
-			}),
-			controller: new com.nuclearunicorn.game.ui.ButtonController(this.game, {
-				updateVisible: function (model) {
-					model.visible = (!this.game.challenges.anyChallengeActive() && !this.game.ironWill &&
-					this.game.challenges.reserves.reservesExist());
-				},
-			})
-		}, this.game);
-		reclaimReservesBtn.render(container);
-		this.reclaimReservesBtn = reclaimReservesBtn;
+		this.reservesPanel = new classes.ui.ReservesPanel($I("challendge.reserves.panel.label"), this.game.challenges);
+		this.reservesPanel.game = this.game;
+		this.reservesPanel.render(container);
+		dojo.create("div", { style: {
+				marginBottom: "15px"
+		} }, container);
 
 		var showChallengeEffectsBtn = new com.nuclearunicorn.game.ui.ButtonModern({
 			name: $I("challendge.effects.show.label"),
@@ -927,6 +1080,7 @@ dojo.declare("classes.tab.ChallengesTab", com.nuclearunicorn.game.ui.tab, {
 		this.challengesPanel.update();
 		//this.conditionsPanel.update();
 		this.applyPendingBtn.update();
+		this.reservesPanel.update();
 		this.showChallengeEffectsBtn.update();
 		for (var i = 0; i < this.challengeEffects.length; i += 1) {
 			this.challengeEffects[i].update();
