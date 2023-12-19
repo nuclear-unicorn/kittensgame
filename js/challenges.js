@@ -979,7 +979,7 @@ dojo.declare("classes.ui.ReservesPanel", com.nuclearunicorn.game.ui.Panel, {
 					}
 				}
 				dojo.create("td", { innerHTML: traitLabel }, tr);
-				dojo.create("td", { innerHTML: (rank == 0 ? "" : " (" + $I("village.census.rank") + " " + rank + ")") }, tr);
+				dojo.create("td", { innerHTML: (rank == 0 ? "" : " (" + $I("village.census.rank") + " " + rank + ")"), style: "white-space: nowrap; overflow: clip" }, tr);
 				numDisplayedSoFar += 1;
 			}
 		}
