@@ -472,6 +472,16 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 	isActive: function(name){
 		return !!this.getChallenge(name).active;
 	},
+	/**
+	 * Returns the number of Challenges currently marked as pending.
+	 */
+	getCountPending: function() {
+		var count = 0;
+		dojo.forEach(this.challenges, function(challenge) {
+				count += challenge.pending ? 1 : 0;
+			});
+		return count;
+	},
 
 	researchChallenge: function(challenge) {
 		if (this.isActive(challenge)){
@@ -677,13 +687,12 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
         return model.metaCached;
     },
 
-    getDescription: function(model) {
-		if (this.game.bld.get("chronosphere").val > 0) {
-			var msgChronosphere = model.metadata.name == "ironWill" ? $I("challendge.btn.chronosphere.with.ironWill.desc") : $I("challendge.btn.chronosphere.desc");
-		} else {
-			var msgChronosphere = "";
+	getDescription: function(model) {
+		if (model.metadata.name == "ironWill") { //Show the "your game will be reset" bit for Iron Will only
+			var msgChronosphere = (this.game.bld.get("chronosphere").val > 0) ? $I("challendge.btn.chronosphere.with.ironWill.desc") : "";
+			return this.inherited(arguments) + $I("challendge.btn.desc", [model.metadata.effectDesc, msgChronosphere]);
 		}
-		return this.inherited(arguments) + $I("challendge.btn.desc", [model.metadata.effectDesc, msgChronosphere]) ;
+		return this.inherited(arguments) + $I("challendge.btn.desc.new", [model.metadata.effectDesc]);
 	},
 
 	getName: function(model){
@@ -738,10 +747,13 @@ dojo.declare("classes.ui.ChallengePanel", com.nuclearunicorn.game.ui.Panel, {
 	game: null,
 
 	constructor: function(){
+		this.resetMessage = null;
 	},
 
-    render: function(container){
+	render: function(container){
 		var content = this.inherited(arguments);
+		this.updateResetMessage();
+
 		var self = this;
 		var controller = new classes.ui.ChallengeBtnController(self.game);
 		dojo.forEach(this.game.challenges.challenges, function(challenge, i){
@@ -749,7 +761,34 @@ dojo.declare("classes.ui.ChallengePanel", com.nuclearunicorn.game.ui.Panel, {
 			button.render(content);
 			self.addChild(button);
 		});
+	},
 
+	update: function() {
+		this.inherited(arguments);
+		this.updateResetMessage();
+	},
+
+	updateResetMessage: function() {
+		var numPending = this.game.challenges.getCountPending();
+
+		if (!this.resetMessage) {
+			//Create the reset message if it doesn't exist.
+			this.resetMessage = dojo.create("span", { style: "display: inline-block; margin-bottom: 16px" }, this.contentDiv);
+		}
+
+		//Set the text inside the reset message.
+		var msgText = $I("challendge.panel.pending", [numPending]);
+		if (this.game.bld.get("chronosphere").val > 0) {
+			msgText += $I("challendge.btn.chronosphere.desc");
+		}
+
+		//Don't update every frame, just update if something has changed since last update:
+		if (this.resetMessage.innerHTML != msgText) {
+			this.resetMessage.innerHTML = msgText;
+		}
+
+		//Hide the reset message if zero Challenges are pending:
+		dojo.style(this.resetMessage, "display", numPending > 0 ? "inline-block" : "none");
 	}
 
 });
@@ -776,6 +815,7 @@ dojo.declare("classes.ui.ReservesPanel", com.nuclearunicorn.game.ui.Panel, {
 			description: $I("challendge.reclaimReserves.desc"),
 			handler: dojo.hitch(this, function(){
 				this.game.challenges.reserves.addReserves();
+				this.game.ui.render();
 			}),
 			controller: new com.nuclearunicorn.game.ui.ButtonController(this.game, {
 				updateVisible: function (model) {
@@ -811,7 +851,7 @@ dojo.declare("classes.ui.ReservesPanel", com.nuclearunicorn.game.ui.Panel, {
 		}
 		
 		//Create a list of all resources stored in reserves:
-		dojo.create("span", { innerHTML: $I("challendge.reserves.resources.label") }, panelContainer);
+		var label = dojo.create("span", { innerHTML: $I("challendge.reserves.resources.label") }, panelContainer);
 
 		if (!this.game.prestige.getPerk("ascoh").researched) {
 			//Give the player a vague sense of how many resources are in reserves based on how many *types* of resources there are:
@@ -823,45 +863,83 @@ dojo.declare("classes.ui.ReservesPanel", com.nuclearunicorn.game.ui.Panel, {
 			} else if (numReservedTypes >= 10) {
 				var keyToUse = "challendge.reserves.resources.10orMore";
 			}
-			dojo.create("span", { innerHTML: $I(keyToUse) }, panelContainer);
+			label.innerHTML += " " + $I(keyToUse);
 			return;
 		}
 
 		//Create a list of all resources stored in reserves:
 		var resTable = dojo.create("table", {}, panelContainer);
-		for (var resName in resRes) {
-			var resObj = this.game.resPool.get(resName);
-			var resAmt = resRes[resName];
-
-			//Shamelessly copied from left.jsx.js:
-			//This is the code that makes all resoruces be displayed in their color.
-			var resNameCss = {};
-			if (resObj.type == "uncommon"){
-				resNameCss = {
-					color: "Coral"
-				};
+		var numCraftables = 0;
+		var numNonCraftables = 0;
+		//Iterate through resources in the order that they're stored in the resource manager:
+		for (var i in this.game.resPool.resources) {
+			var resObj = this.game.resPool.resources[i]; //Object with all data about that resource
+			var resAmt = resRes[resObj.name] || 0; //Amount of that resource in reserves.
+			if (!resAmt) {
+				continue; //Skip resources whose value (stored in reserves) is zero
 			}
-			if (resObj.type == "rare"){
-				resNameCss = {
-					color: "orange",
-					textShadow: "1px 0px 10px Coral"
-				};
+			//The first time through, skip all craftable resources.
+			if (resObj.craftable && resObj.name != "wood") {
+				continue;
 			}
-			if (resObj.color){
-				resNameCss = {
-					color: resObj.color,
-				};
-			} 
-			if (resObj.style){
-				for (var styleKey in resObj.style){
-					resNameCss[styleKey] = resObj.style[styleKey];
-				}
-			}
-
-			var tr = dojo.create("tr", {}, resTable);
-			dojo.create("td", { innerHTML: resObj.title || resName + ":", style: resNameCss }, tr);
-			dojo.create("td", { innerHTML: this.game.getDisplayValueExt(resAmt) }, tr);
+			this.createSingleResourceRow(resObj, resAmt, resRes, resTable);
+			numNonCraftables += 1;
 		}
+		var breakRow = dojo.create("tr", {}, resTable);
+		dojo.create("td", { innerHTML: "<hr />" }, breakRow);
+		for (var i in this.game.resPool.resources) {
+			var resObj = this.game.resPool.resources[i]; //Object with all data about that resource
+			var resAmt = resRes[resObj.name] || 0; //Amount of that resource in reserves.
+			if (!resAmt) {
+				continue; //Skip resources whose value (stored in reserves) is zero
+			}
+			//The second time through, skip all non-craftable resources.
+			if (!resObj.craftable || resObj.name == "wood") {
+				continue;
+			}
+			this.createSingleResourceRow(resObj, resAmt, resRes, resTable);
+			numCraftables += 1;
+		}
+
+		if (numCraftables == 0 || numNonCraftables == 0) {
+			//Show a horizontal line in the table ONLY IF there are craftables & non-craftables to separate from each other.
+			dojo.destroy(breakRow);
+		}
+	},
+
+	//Helper function for internal use.
+	createSingleResourceRow: function(resourceObj, resourceAmount, reservedResources, tableContainer) {
+		if (typeof(resourceAmount) !== "number") {
+			console.error("Invalid resourceAmount passed to createSingleResourceRow!");
+		}
+		//Shamelessly copied from left.jsx.js:
+		//This is the code that makes all resoruces be displayed in their color.
+		var resNameCss = {};
+		if (resourceObj.type == "uncommon"){
+			resNameCss = {
+				color: "Coral"
+			};
+		}
+		if (resourceObj.type == "rare"){
+			resNameCss = {
+				color: "orange",
+				textShadow: "1px 0px 10px Coral"
+			};
+		}
+		if (resourceObj.color){
+			resNameCss = {
+				color: resourceObj.color,
+			};
+		} 
+		if (resourceObj.style){
+			for (var styleKey in resourceObj.style){
+				resNameCss[styleKey] = resourceObj.style[styleKey];
+			}
+		}
+
+		var tr = dojo.create("tr", {}, tableContainer);
+		dojo.create("td", { innerHTML: resourceObj.title || resourceObj.name + ":", style: resNameCss }, tr);
+		dojo.create("td", { innerHTML: this.game.getDisplayValueExt(resourceAmount) }, tr);
 	},
 
 	//If there are no kittens or cryochambers, displays nothing.
@@ -890,8 +968,18 @@ dojo.declare("classes.ui.ReservesPanel", com.nuclearunicorn.game.ui.Panel, {
 				}
 				//Otherwise, we still can display more kittens:
 				dojo.create("td", { innerHTML: census.getStyledName(kitten, false /*is leader panel*/), style: "padding-right: 8px" }, tr);
-				dojo.create("td", { innerHTML: kitten.trait.title }, tr);
-				dojo.create("td", { innerHTML: (kitten.rank == 0 ? "" : " (" + $I("village.census.rank") + " " + kitten.rank + ")") }, tr);
+				var traitLabel = kitten.trait.title;
+				var rank = kitten.rank;
+				//Note that if we are fractured, the name will be randomized, & we'll obscure other info as well.
+				if (this.game.religion.getPact("fractured").val && this.game.getFeatureFlag("MAUSOLEUM_PACTS")) {
+					traitLabel = "???"; //Unknown trait
+					rank = this.game.rand(4) * 2; //Random rank in range [0,7] with a bias towards even numbers.
+					if (this.game.rand(100) < 25) {
+						rank += 1;
+					}
+				}
+				dojo.create("td", { innerHTML: traitLabel }, tr);
+				dojo.create("td", { innerHTML: (rank == 0 ? "" : " (" + $I("village.census.rank") + " " + rank + ")") }, tr);
 				numDisplayedSoFar += 1;
 			}
 		}
@@ -1011,21 +1099,10 @@ dojo.declare("classes.tab.ChallengesTab", com.nuclearunicorn.game.ui.tab, {
 			}),
 			controller: new com.nuclearunicorn.game.ui.ButtonController(this.game, {
 				updateVisible: function (model) {
-					model.visible = false;
-					for (var i = 0; i < this.game.challenges.challenges.length; i++){
-						if (this.game.challenges.challenges[i].pending){
-							model.visible = true;
-						}
-					}
+					model.visible = this.game.challenges.getCountPending() > 0;
 				}, 
 				getName: function(){
-					var numPending = 0;
-					for (var i = 0; i < this.game.challenges.challenges.length; i++){
-						if (this.game.challenges.challenges[i].pending){
-							numPending++;
-						}
-					}
-					return $I("challendge.applyPending.label", [numPending]);
+					return $I("challendge.applyPending.label", [this.game.challenges.getCountPending()]);
 				}
 			})
 		}, this.game);
