@@ -978,7 +978,7 @@ dojo.declare("classes.ui.ReservesPanel", com.nuclearunicorn.game.ui.Panel, {
 						rank += 1;
 					}
 				}
-				dojo.create("td", { innerHTML: traitLabel }, tr);
+				dojo.create("td", { innerHTML: traitLabel, style: "white-space: nowrap; overflow: clip" }, tr);
 				dojo.create("td", { innerHTML: (rank == 0 ? "" : " (" + $I("village.census.rank") + " " + rank + ")"), style: "white-space: nowrap; overflow: clip" }, tr);
 				numDisplayedSoFar += 1;
 			}
