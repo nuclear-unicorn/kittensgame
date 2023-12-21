@@ -2250,5 +2250,7 @@
     "workshop.zebraUpgrade.darkRevolution.flavor": "Se acabaron los maullidos por aquí...",
     "workshop.zebraUpgrade.minerologyDepartment.label": "Departamento de mineralogía",
     "workshop.zebraUpgrade.minerologyDepartment.desc": "Ahora la academia imparte mineralogía en pos de una mejor producción de meteoritos",
-    "workshop.zebraUpgrade.whispers.label": "Susurros"
+    "workshop.zebraUpgrade.whispers.label": "Susurros",
+    "workshop.zebraUpgrade.whispers.desc": "Desbloquea rituales de Ascensión alada en los templos de marfil. La Ascensión alada produce t-mithril y aumenta la producción de minerales.",
+    "workshop.zebraUpgradesPanel.label": "Mejoras cebra"
 }
