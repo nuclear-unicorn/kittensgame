@@ -10,7 +10,7 @@
   "scripts": {
     "build": "node tools/generate-buildver.js",
     "test": "jest --config jest.config.unittest.json",
-    "lint": "eslint *.js js/*.js --quiet",
+    "lint": "eslint *.js js/*.js --quiet && prettier --check js/* res/*.css test/* *.html *.js *.json *.md",
     "start": "http-server"
   },
   "husky": {
@@ -34,6 +34,7 @@
     "eslint": "^7.4.0",
     "http-server": "^0.12.3",
     "husky": "^4.2.5",
-    "jest": "^26.1.0"
+    "jest": "^26.1.0",
+    "prettier": "3.1.1"
   }
 }
