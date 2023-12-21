@@ -1,147 +1,186 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Jasmine Spec Runner v2.5.2</title>
+  <head>
+    <meta charset="utf-8" />
+    <title>Jasmine Spec Runner v2.5.2</title>
 
-  <link rel="shortcut icon" type="image/png" href="lib/jasmine-2.5.2/jasmine_favicon.png">
-  <link rel="stylesheet" href="lib/jasmine-2.5.2/jasmine.css">
+    <link
+      rel="shortcut icon"
+      type="image/png"
+      href="lib/jasmine-2.5.2/jasmine_favicon.png"
+    />
+    <link rel="stylesheet" href="lib/jasmine-2.5.2/jasmine.css" />
 
-  <script src="lib/jasmine-2.5.2/jasmine.js"></script>
-  <script src="lib/jasmine-2.5.2/jasmine-html.js"></script>
+    <script src="lib/jasmine-2.5.2/jasmine.js"></script>
+    <script src="lib/jasmine-2.5.2/jasmine-html.js"></script>
 
-  <!-- load the game subsystem -->
-  <script src="lib/jQuery.js"></script>
-  <script src="lib/dojo.js"></script>
-  <script src="lib/lz-string.js"></script>
-  <script src="lib/dropbox.js"></script>
-  <script src="lib/system.js"></script>
+    <!-- load the game subsystem -->
+    <script src="lib/jQuery.js"></script>
+    <script src="lib/dojo.js"></script>
+    <script src="lib/lz-string.js"></script>
+    <script src="lib/dropbox.js"></script>
+    <script src="lib/system.js"></script>
 
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    <script>
+      (function (i, s, o, g, r, a, m) {
+        i["GoogleAnalyticsObject"] = r;
+        (i[r] =
+          i[r] ||
+          function () {
+            (i[r].q = i[r].q || []).push(arguments);
+          }),
+          (i[r].l = 1 * new Date());
+        (a = s.createElement(o)), (m = s.getElementsByTagName(o)[0]);
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m);
+      })(
+        window,
+        document,
+        "script",
+        "//www.google-analytics.com/analytics.js",
+        "ga"
+      );
 
-    ga('create', 'UA-29812134-1', 'bloodrizer.ru');
-    ga('send', 'pageview');
-  </script>
+      ga("create", "UA-29812134-1", "bloodrizer.ru");
+      ga("send", "pageview");
+    </script>
 
-  <link rel="stylesheet" href="res/default.css" type="text/css">
-  <link rel="stylesheet" href="res/theme_dark.css" type="text/css">
-  <link rel="stylesheet" href="res/theme_grassy.css" type="text/css">
-  <link rel="stylesheet" href="res/theme_sleek.css" type="text/css">
-  <link rel="stylesheet" href="res/theme_gold.css" type="text/css">
-  <link rel="stylesheet" href="res/theme_space.css" type="text/css">
+    <link rel="stylesheet" href="res/default.css" type="text/css" />
+    <link rel="stylesheet" href="res/theme_dark.css" type="text/css" />
+    <link rel="stylesheet" href="res/theme_grassy.css" type="text/css" />
+    <link rel="stylesheet" href="res/theme_sleek.css" type="text/css" />
+    <link rel="stylesheet" href="res/theme_gold.css" type="text/css" />
+    <link rel="stylesheet" href="res/theme_space.css" type="text/css" />
 
-  <script type="text/javascript">
-
-    var version = "_" + Date.now();
-    function _import(i, def, modules){
-      if (!def){
-        return System.import(modules[i] + ".js?v=" + version);
-      } else {
-        return def.then(function(){
+    <script type="text/javascript">
+      var version = "_" + Date.now();
+      function _import(i, def, modules) {
+        if (!def) {
           return System.import(modules[i] + ".js?v=" + version);
+        } else {
+          return def.then(function () {
+            return System.import(modules[i] + ".js?v=" + version);
+          });
+        }
+      }
+
+      dojo.addOnLoad(function () {
+        window.jasmine = jasmineRequire.core(jasmineRequire);
+        jasmineRequire.html(jasmine);
+        var env = jasmine.getEnv();
+        var jasmineInterface = jasmineRequire.interface(jasmine, env);
+        extend(window, jasmineInterface);
+        var queryString = new jasmine.QueryString({
+          getWindowLocation: function () {
+            return window.location;
+          }
         });
-      }
-    }
 
-    dojo.addOnLoad(function(){
+        var catchingExceptions = queryString.getParam("catch");
+        env.catchExceptions(
+          typeof catchingExceptions === "undefined" ? true : catchingExceptions
+        );
 
-      window.jasmine = jasmineRequire.core(jasmineRequire);
-      jasmineRequire.html(jasmine);
-      var env = jasmine.getEnv();
-      var jasmineInterface = jasmineRequire.interface(jasmine, env);
-      extend(window, jasmineInterface);
-      var queryString = new jasmine.QueryString({
-        getWindowLocation: function() { return window.location; }
+        var throwingExpectationFailures = queryString.getParam("throwFailures");
+        env.throwOnExpectationFailure(throwingExpectationFailures);
+
+        var random = queryString.getParam("random");
+        env.randomizeTests(random);
+        var seed = queryString.getParam("seed");
+        if (seed) {
+          env.seed(seed);
+        }
+        var htmlReporter = new jasmine.HtmlReporter({
+          env: env,
+          onRaiseExceptionsClick: function () {
+            queryString.navigateWithNewParam(
+              "catch",
+              !env.catchingExceptions()
+            );
+          },
+          onThrowExpectationsClick: function () {
+            queryString.navigateWithNewParam(
+              "throwFailures",
+              !env.throwingExpectationFailures()
+            );
+          },
+          onRandomClick: function () {
+            queryString.navigateWithNewParam("random", !env.randomTests());
+          },
+          addToExistingQueryString: function (key, value) {
+            return queryString.fullStringWithNewParam(key, value);
+          },
+          getContainer: function () {
+            return document.body;
+          },
+          createElement: function () {
+            return document.createElement.apply(document, arguments);
+          },
+          createTextNode: function () {
+            return document.createTextNode.apply(document, arguments);
+          },
+          timer: new jasmine.Timer()
+        });
+
+        env.addReporter(jasmineInterface.jsApiReporter);
+        env.addReporter(htmlReporter);
+        var specFilter = new jasmine.HtmlSpecFilter({
+          filterString: function () {
+            return queryString.getParam("spec");
+          }
+        });
+        env.specFilter = function (spec) {
+          return specFilter.matches(spec.getFullName());
+        };
+        window.setTimeout = window.setTimeout;
+        window.setInterval = window.setInterval;
+        window.clearTimeout = window.clearTimeout;
+        window.clearInterval = window.clearInterval;
+
+        function extend(destination, source) {
+          for (var property in source) destination[property] = source[property];
+          return destination;
+        }
+
+        SystemJS.config({
+          baseURL: ""
+        });
+
+        var modules = [
+          "core",
+          "js/resources",
+          "js/calendar",
+          "js/buildings",
+          "js/village",
+          "js/science",
+          "js/workshop",
+          "js/diplomacy",
+          "js/religion",
+          "js/achievements",
+          "js/space",
+          "js/prestige",
+          "js/time",
+          "js/stats",
+          "js/challenges",
+          "game",
+          "js/ui",
+          "js/toolbar",
+
+          "test/spec/game-spec"
+        ];
+        var def = System.import("core.js");
+
+        for (var i in modules) {
+          def = _import(i, def, modules);
+        }
+        def.then(function () {
+          htmlReporter.initialize();
+          env.execute();
+        });
       });
+    </script>
+  </head>
 
-      var catchingExceptions = queryString.getParam("catch");
-      env.catchExceptions(typeof catchingExceptions === "undefined" ? true : catchingExceptions);
-
-      var throwingExpectationFailures = queryString.getParam("throwFailures");
-      env.throwOnExpectationFailure(throwingExpectationFailures);
-
-      var random = queryString.getParam("random");
-      env.randomizeTests(random);
-      var seed = queryString.getParam("seed");
-      if (seed) {
-        env.seed(seed);
-      }
-      var htmlReporter = new jasmine.HtmlReporter({
-        env: env,
-        onRaiseExceptionsClick: function() { queryString.navigateWithNewParam("catch", !env.catchingExceptions()); },
-        onThrowExpectationsClick: function() { queryString.navigateWithNewParam("throwFailures", !env.throwingExpectationFailures()); },
-        onRandomClick: function() { queryString.navigateWithNewParam("random", !env.randomTests()); },
-        addToExistingQueryString: function(key, value) { return queryString.fullStringWithNewParam(key, value); },
-        getContainer: function() { return document.body; },
-        createElement: function() { return document.createElement.apply(document, arguments); },
-        createTextNode: function() { return document.createTextNode.apply(document, arguments); },
-        timer: new jasmine.Timer()
-      });
-
-      env.addReporter(jasmineInterface.jsApiReporter);
-      env.addReporter(htmlReporter);
-      var specFilter = new jasmine.HtmlSpecFilter({
-        filterString: function() { return queryString.getParam("spec"); }
-      });
-      env.specFilter = function(spec) {
-        return specFilter.matches(spec.getFullName());
-      };
-      window.setTimeout = window.setTimeout;
-      window.setInterval = window.setInterval;
-      window.clearTimeout = window.clearTimeout;
-      window.clearInterval = window.clearInterval;
-
-      function extend(destination, source) {
-        for (var property in source) destination[property] = source[property];
-        return destination;
-      }
-
-      SystemJS.config({
-        baseURL: ''
-      });
-
-      var modules = [
-        "core",
-        "js/resources",
-        "js/calendar",
-        "js/buildings",
-        "js/village",
-        "js/science",
-        "js/workshop",
-        "js/diplomacy",
-        "js/religion",
-        "js/achievements",
-        "js/space",
-        "js/prestige",
-        "js/time",
-        "js/stats",
-        "js/challenges",
-        "game",
-        "js/ui",
-        "js/toolbar",
-
-        "test/spec/game-spec"
-      ];
-      var def = System.import('core.js');
-
-      for (var i in modules){
-        def = _import(i, def, modules);
-      }
-      def.then(function() {
-
-        htmlReporter.initialize();
-        env.execute();
-
-      });
-    });
-  </script>
-
-</head>
-
-<body>
-</body>
+  <body></body>
 </html>

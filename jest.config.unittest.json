@@ -1,10 +1,7 @@
 {
   "rootDir": "./",
-  "setupFiles": [
-    "<rootDir>/test/setup.js"
-  ],
-  "testPathIgnorePatterns": [
-  ],
+  "setupFiles": ["<rootDir>/test/setup.js"],
+  "testPathIgnorePatterns": [],
   "verbose": true,
   "testEnvironment": "jsdom"
 }

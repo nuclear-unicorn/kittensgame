@@ -9,357 +9,476 @@
 /******************** GAME ********************/
 /**********************************************/
 body.scheme_space {
-	 background-color: rgb(2, 5, 14);
+  background-color: rgb(2, 5, 14);
 }
 body.scheme_space.with_background_image {
-	background: repeat fixed top left url('img/theme_space_stars_background.png'), /* source: https://pngtree.com/freebackground/blue-starry-night-sky-background_925273.html */
-	linear-gradient(90deg, rgba(2, 5, 14, 1) 0%, rgba(8, 22, 68, 1) 25%, rgba(2, 5, 14, 1) 100%);
+  background:
+    repeat fixed top left url("img/theme_space_stars_background.png"),
+    /* source: https://pngtree.com/freebackground/blue-starry-night-sky-background_925273.html */
+      linear-gradient(
+        90deg,
+        rgba(2, 5, 14, 1) 0%,
+        rgba(8, 22, 68, 1) 25%,
+        rgba(2, 5, 14, 1) 100%
+      );
 }
-.scheme_space  #gamePageContainer,
+.scheme_space #gamePageContainer,
 .scheme_space select,
 .scheme_space .btn,
 .scheme_space .modern,
 .scheme_space .btn.modern,
-.scheme_space input[type='button'] {
-	 font-family: 'Oxanium', cursive;
+.scheme_space input[type="button"] {
+  font-family: "Oxanium", cursive;
 }
 .scheme_space .btn {
-	color: black;
-	margin-bottom: 5px; /* default 10px */
-	max-height: 36px;
-	background-color: gray;
-	border: solid 1px gray
+  color: black;
+  margin-bottom: 5px; /* default 10px */
+  max-height: 36px;
+  background-color: gray;
+  border: solid 1px gray;
 }
 .scheme_space .btn.modern {
-	border-radius: 5px; /* default border-radius: 3px; */
-	width: 274px; /* +10px gained from tabInner padding. default width: 264px; */
+  border-radius: 5px; /* default border-radius: 3px; */
+  width: 274px; /* +10px gained from tabInner padding. default width: 264px; */
 }
 .scheme_space .btn.modern.disabled {
-	background-color: rgba(140, 140, 140, 0.1);
-    text-shadow: none;
-	border-color : rgba(140, 140, 140, 0.2);
+  background-color: rgba(140, 140, 140, 0.1);
+  text-shadow: none;
+  border-color: rgba(140, 140, 140, 0.2);
 }
 .scheme_space .btn.modern.disabled:hover {
-	background-color: rgba(255, 255, 255, 0.1);
-	cursor: inherit;
+  background-color: rgba(255, 255, 255, 0.1);
+  cursor: inherit;
 }
 .scheme_space .btn.modern.disabled.limited {
-	background-color: rgba(146, 0, 23, 0.1);
-	border-color : rgba(146, 0, 23, 0.3);
+  background-color: rgba(146, 0, 23, 0.1);
+  border-color: rgba(146, 0, 23, 0.3);
 }
 .scheme_space .btn.modern.disabled.limited:hover {
-	background-color: rgba(234, 21, 44, 0.1);
+  background-color: rgba(234, 21, 44, 0.1);
 }
-.scheme_space .btn.modern.disabled span.btnTitle { /* to change only the properties of the button name for buttons disabled */
-	color: #9496A0;
+.scheme_space .btn.modern.disabled span.btnTitle {
+  /* to change only the properties of the button name for buttons disabled */
+  color: #9496a0;
 }
-.scheme_space .btn.modern.disabled.limited span.btnTitle { /* to change only the properties of the button name for buttons limited */
-	color: #EA152C;
+.scheme_space .btn.modern.disabled.limited span.btnTitle {
+  /* to change only the properties of the button name for buttons limited */
+  color: #ea152c;
 }
 .scheme_space .btn.modern:not(.disabled) {
-	background-color: rgba(18, 231, 209, 0.1);
-	border: solid 1px rgba(20, 240, 216, 0.2);
- 	cursor: pointer !important;
+  background-color: rgba(18, 231, 209, 0.1);
+  border: solid 1px rgba(20, 240, 216, 0.2);
+  cursor: pointer !important;
 }
 .scheme_space .btn.modern:not(.disabled):hover {
-	background-color: rgba(22, 126, 157, 0.6);
-	border: solid 1px rgba(20, 240, 216, 0.6);
- 	cursor: pointer !important;
+  background-color: rgba(22, 126, 157, 0.6);
+  border: solid 1px rgba(20, 240, 216, 0.6);
+  cursor: pointer !important;
 }
-.scheme_space .btn.modern:not(.disabled) span.btnTitle { /* to change only the properties of the button name for buttons enabled */
-	color: #9FA5D6;
+.scheme_space .btn.modern:not(.disabled) span.btnTitle {
+  /* to change only the properties of the button name for buttons enabled */
+  color: #9fa5d6;
 }
 .scheme_space .btn.modern:not(.disabled):hover span.btnTitle {
-	color: #ffffff;
-	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9), rgba(20, 240, 216) 1px 0 7px;
+  color: #ffffff;
+  text-shadow:
+    1px 1px 1px rgba(0, 0, 0, 0.9),
+    rgba(20, 240, 216) 1px 0 7px;
 }
 .scheme_space a {
-	color: #89A4CD;
+  color: #89a4cd;
 }
 .scheme_space a,
 .scheme_space .craft-link {
-    text-decoration: none;
+  text-decoration: none;
 }
 .scheme_space a:hover {
-	color: #12E7D1;
-	opacity: 1.0;
+  color: #12e7d1;
+  opacity: 1;
 }
 .scheme_space div {
-	color: #DDDDDD;
+  color: #dddddd;
 }
-.scheme_space .disabled div { /* color text on button disabled */
-	color: #9FA5D6;
+.scheme_space .disabled div {
+  /* color text on button disabled */
+  color: #9fa5d6;
 }
 .scheme_space h1 {
-    font-size: 100%;
-    color: #C23574;
-	text-shadow: 1px 1px rgba(4, 10, 32);
-	font-weight: 400;
+  font-size: 100%;
+  color: #c23574;
+  text-shadow: 1px 1px rgba(4, 10, 32);
+  font-weight: 400;
 }
 .scheme_space h1:first-child {
-    margin-top: 0;
+  margin-top: 0;
 }
 .scheme_space .modern .btnContent {
-    padding: 10px 0 9px 1px; /* 1px left for buttons without power background-image */
+  padding: 10px 0 9px 1px; /* 1px left for buttons without power background-image */
 }
 /* *** green and red light for machine on/off *** */
 .scheme_space .btn.bldEnabled div.btnContent,
 .scheme_space .btn.bldlackResConvert div.btnContent {
-	padding: 10px 0 9px 13px; /* 13px left for power background-image (linear-gradient) */
-	border: none; /* also allows you to remove the height difference with the other buttons (they have no border on div.content) */
+  padding: 10px 0 9px 13px; /* 13px left for power background-image (linear-gradient) */
+  border: none; /* also allows you to remove the height difference with the other buttons (they have no border on div.content) */
 }
-.scheme_space .btn.disabled.bldlackResConvert { /* color for lack resources convertion */
-	background: no-repeat border-box linear-gradient(90deg, #EA152C 0%, #EA152C 11px, rgba(140, 140, 140, 0.1) 12px, rgba(140, 140, 140, 0.1) 100%);
+.scheme_space .btn.disabled.bldlackResConvert {
+  /* color for lack resources convertion */
+  background: no-repeat border-box
+    linear-gradient(
+      90deg,
+      #ea152c 0%,
+      #ea152c 11px,
+      rgba(140, 140, 140, 0.1) 12px,
+      rgba(140, 140, 140, 0.1) 100%
+    );
 }
 .scheme_space .btn.disabled.bldlackResConvert:hover {
-	background: no-repeat border-box linear-gradient(90deg, #EA152C 0%, #EA152C 11px, rgba(255, 255, 255, 0.1) 12px, rgba(255, 255, 255, 0.1) 100%);
+  background: no-repeat border-box
+    linear-gradient(
+      90deg,
+      #ea152c 0%,
+      #ea152c 11px,
+      rgba(255, 255, 255, 0.1) 12px,
+      rgba(255, 255, 255, 0.1) 100%
+    );
 }
 .scheme_space .btn.disabled.limited.bldlackResConvert {
-	background: no-repeat border-box linear-gradient(90deg, #EA152C 0%, #EA152C 11px, rgba(146, 0, 23, 0.1) 12px, rgba(146, 0, 23, 0.1) 100%);
+  background: no-repeat border-box
+    linear-gradient(
+      90deg,
+      #ea152c 0%,
+      #ea152c 11px,
+      rgba(146, 0, 23, 0.1) 12px,
+      rgba(146, 0, 23, 0.1) 100%
+    );
 }
 .scheme_space .btn.disabled.limited.bldlackResConvert:hover {
-	background: no-repeat border-box linear-gradient(90deg, #EA152C 0%, #EA152C 11px, rgba(234, 21, 44, 0.1) 12px, rgba(234, 21, 44, 0.1) 100%);
+  background: no-repeat border-box
+    linear-gradient(
+      90deg,
+      #ea152c 0%,
+      #ea152c 11px,
+      rgba(234, 21, 44, 0.1) 12px,
+      rgba(234, 21, 44, 0.1) 100%
+    );
 }
 .scheme_space .btn:not(.disabled).bldlackResConvert {
-	background: no-repeat border-box linear-gradient(90deg, #EA152C 0%, #EA152C 11px, rgba(18, 231, 209, 0.1) 12px, rgba(18, 231, 209, 0.1) 100%);
+  background: no-repeat border-box
+    linear-gradient(
+      90deg,
+      #ea152c 0%,
+      #ea152c 11px,
+      rgba(18, 231, 209, 0.1) 12px,
+      rgba(18, 231, 209, 0.1) 100%
+    );
 }
 .scheme_space .btn:not(.disabled).bldlackResConvert:hover {
-	background: no-repeat border-box linear-gradient(90deg, #EA152C 0%, #EA152C 11px, rgba(22, 126, 157, 0.6) 12px, rgba(22, 126, 157, 0.6) 100%);
+  background: no-repeat border-box
+    linear-gradient(
+      90deg,
+      #ea152c 0%,
+      #ea152c 11px,
+      rgba(22, 126, 157, 0.6) 12px,
+      rgba(22, 126, 157, 0.6) 100%
+    );
 }
 .scheme_space .btn.disabled.bldEnabled {
-	background: no-repeat border-box linear-gradient(90deg, #35C283 0%, #35C283 11px, rgba(140, 140, 140, 0.1) 12px, rgba(140, 140, 140, 0.1) 100%);
+  background: no-repeat border-box
+    linear-gradient(
+      90deg,
+      #35c283 0%,
+      #35c283 11px,
+      rgba(140, 140, 140, 0.1) 12px,
+      rgba(140, 140, 140, 0.1) 100%
+    );
 }
 .scheme_space .btn.disabled.bldEnabled:hover {
-	background: no-repeat border-box linear-gradient(90deg, #35C283 0%, #35C283 11px, rgba(255, 255, 255, 0.1) 12px, rgba(255, 255, 255, 0.1) 100%);
+  background: no-repeat border-box
+    linear-gradient(
+      90deg,
+      #35c283 0%,
+      #35c283 11px,
+      rgba(255, 255, 255, 0.1) 12px,
+      rgba(255, 255, 255, 0.1) 100%
+    );
 }
 .scheme_space .btn.disabled.limited.bldEnabled {
-	background: no-repeat border-box linear-gradient(90deg, #35C283 0%, #35C283 11px, rgba(146, 0, 23, 0.1) 12px, rgba(146, 0, 23, 0.1) 100%);
+  background: no-repeat border-box
+    linear-gradient(
+      90deg,
+      #35c283 0%,
+      #35c283 11px,
+      rgba(146, 0, 23, 0.1) 12px,
+      rgba(146, 0, 23, 0.1) 100%
+    );
 }
 .scheme_space .btn.disabled.limited.bldEnabled:hover {
-	background: no-repeat border-box linear-gradient(90deg, #35C283 0%, #35C283 11px, rgba(234, 21, 44, 0.1) 12px, rgba(234, 21, 44, 0.1) 100%);
+  background: no-repeat border-box
+    linear-gradient(
+      90deg,
+      #35c283 0%,
+      #35c283 11px,
+      rgba(234, 21, 44, 0.1) 12px,
+      rgba(234, 21, 44, 0.1) 100%
+    );
 }
 .scheme_space .btn:not(.disabled).bldEnabled {
-	background: no-repeat border-box linear-gradient(90deg, #35C283 0%, #35C283 11px, rgba(18, 231, 209, 0.1) 12px, rgba(18, 231, 209, 0.1) 100%);
+  background: no-repeat border-box
+    linear-gradient(
+      90deg,
+      #35c283 0%,
+      #35c283 11px,
+      rgba(18, 231, 209, 0.1) 12px,
+      rgba(18, 231, 209, 0.1) 100%
+    );
 }
 .scheme_space .btn:not(.disabled).bldEnabled:hover {
-	background: no-repeat border-box linear-gradient(90deg, #35C283 0%, #35C283 11px, rgba(22, 126, 157, 0.6) 12px, rgba(22, 126, 157, 0.6) 100%);
+  background: no-repeat border-box
+    linear-gradient(
+      90deg,
+      #35c283 0%,
+      #35c283 11px,
+      rgba(22, 126, 157, 0.6) 12px,
+      rgba(22, 126, 157, 0.6) 100%
+    );
 }
 /* *** end of green light for machine on/off *** */
-.scheme_space .dialog { /* window options version credits */
-	color: #bbbbbb;
-	top: 40%;
-	background-color: #061030;
-	border: ridge 3px #14F0D8;
-	border-radius: 15px;
-	box-shadow: 2px 2px 20px #C23574, -2px -2px 20px #C23574;
+.scheme_space .dialog {
+  /* window options version credits */
+  color: #bbbbbb;
+  top: 40%;
+  background-color: #061030;
+  border: ridge 3px #14f0d8;
+  border-radius: 15px;
+  box-shadow:
+    2px 2px 20px #c23574,
+    -2px -2px 20px #c23574;
 }
 .scheme_space .dialog a {
-    text-transform: capitalize;
+  text-transform: capitalize;
 }
 .scheme_space .dialog a:hover {
-	color: #C23574;
-	text-shadow: 1px 1px 1px #02050E;
-}
-.scheme_space .dialog input[type='button'] {
-	font-size: 14px;
-	margin-left: 12px;
-}
-.scheme_space label i { /* information text in option windows */
-    color: #747c90;
-}
-.scheme_space label:hover {
-	opacity: 1;/* default opacity: 0.7; */
-	color: #f0f5f8;
-	text-shadow: 1px 1px 1px #02050E;
-}
-.scheme_space select { /* dropdown list on settlement tab and options windows */
-    background-color: rgba(18, 231, 209, 0.1);
-	border-color : transparent; 	
-	color: #9FA5D6;
-	padding-top: 2px;
-    padding-bottom: 2px;
-	border-radius: 3px;
-	font-size: 14px;
-	box-shadow: 0 0 3px #02050E;
-	margin-left: 3px;
-}
-.scheme_space select:hover {
-	cursor: pointer !important;
-	background-color: rgba(22, 126, 157, 0.6);
-	border-color: rgba(20, 240, 216, 0.6);
-	color: #ffffff;
-	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9), rgba(20, 240, 216) 1px 0 7px;
-}
-.scheme_space select>option {
-	background-color: #110F31;
-	color: #9FA5D6;
-	text-shadow: none;	
-	padding: 2px 10px; /* -2 pixel vertical */
-}
-@-moz-document url-prefix() { /* Firefox only */
-	.scheme_space select>option {
-		font-family: 'Roboto Slab', serif; /* font serif because firefox can't use cursive on select */
-	}
-}
-.scheme_space select > option:disabled {
-	color: #838493;
+  color: #c23574;
+  text-shadow: 1px 1px 1px #02050e;
 }
 .scheme_space .dialog input[type="button"] {
-	margin-left: 7px;
-	margin-bottom: 10px;
+  font-size: 14px;
+  margin-left: 12px;
+}
+.scheme_space label i {
+  /* information text in option windows */
+  color: #747c90;
+}
+.scheme_space label:hover {
+  opacity: 1; /* default opacity: 0.7; */
+  color: #f0f5f8;
+  text-shadow: 1px 1px 1px #02050e;
+}
+.scheme_space select {
+  /* dropdown list on settlement tab and options windows */
+  background-color: rgba(18, 231, 209, 0.1);
+  border-color: transparent;
+  color: #9fa5d6;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  border-radius: 3px;
+  font-size: 14px;
+  box-shadow: 0 0 3px #02050e;
+  margin-left: 3px;
+}
+.scheme_space select:hover {
+  cursor: pointer !important;
+  background-color: rgba(22, 126, 157, 0.6);
+  border-color: rgba(20, 240, 216, 0.6);
+  color: #ffffff;
+  text-shadow:
+    1px 1px 1px rgba(0, 0, 0, 0.9),
+    rgba(20, 240, 216) 1px 0 7px;
+}
+.scheme_space select > option {
+  background-color: #110f31;
+  color: #9fa5d6;
+  text-shadow: none;
+  padding: 2px 10px; /* -2 pixel vertical */
+}
+@-moz-document url-prefix() {
+  /* Firefox only */
+  .scheme_space select > option {
+    font-family: "Roboto Slab", serif; /* font serif because firefox can't use cursive on select */
+  }
+}
+.scheme_space select > option:disabled {
+  color: #838493;
+}
+.scheme_space .dialog input[type="button"] {
+  margin-left: 7px;
+  margin-bottom: 10px;
 }
 .scheme_space #optionsDiv input[type="checkbox"] + label:before {
-    content: "\2727"; /* WHITE FOUR POINTED STAR */
-	font: 12px sans-serif;
-	text-shadow: 1px 1px 1px #02050E;
-	color: #999999;
+  content: "\2727"; /* WHITE FOUR POINTED STAR */
+  font: 12px sans-serif;
+  text-shadow: 1px 1px 1px #02050e;
+  color: #999999;
 }
 .scheme_space #optionsDiv input[type="checkbox"]:checked + label:before {
-	content: "\2726"; /* BLACK FOUR POINTED STAR */
-	font: 12px sans-serif;
-	text-shadow: 1px 1px 1px #02050E;
-	color: #f0f5f8;
+  content: "\2726"; /* BLACK FOUR POINTED STAR */
+  font: 12px sans-serif;
+  text-shadow: 1px 1px 1px #02050e;
+  color: #f0f5f8;
 }
 .scheme_space .dialog input#batchSize {
-	background-color: rgba(140, 140, 140, 0.2);
-    color: #9FA5D6;
-    padding: 3px 1px 3px 5px;
-    margin-right: 5px;
-	border: 1px groove rgba(0, 0, 0, 0.2);
-	border-radius: 5px;
-    box-shadow: inset -1px -1px 1px #505050,
-                inset 1px 1px 3px #02050E;
-	margin-top: 3px;
-	margin-bottom: 3px;
+  background-color: rgba(140, 140, 140, 0.2);
+  color: #9fa5d6;
+  padding: 3px 1px 3px 5px;
+  margin-right: 5px;
+  border: 1px groove rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  box-shadow:
+    inset -1px -1px 1px #505050,
+    inset 1px 1px 3px #02050e;
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
 .scheme_space textarea#importData,
 .scheme_space textarea#exportData {
-	background-color: #110F31;
-	color: #9FA5D6;
-	box-shadow: inset 0 0 3px 1px #02050E;
-	border: groove 2px #89A4CD;
-	border-radius: 5px;
+  background-color: #110f31;
+  color: #9fa5d6;
+  box-shadow: inset 0 0 3px 1px #02050e;
+  border: groove 2px #89a4cd;
+  border-radius: 5px;
 }
 .scheme_space .dialog input#batchSize:focus,
 .scheme_space textarea#importData:focus,
 .scheme_space textarea#exportData:focus {
-	background-color: rgba(22, 126, 157, 0.6);	
-	color:#ffffff;
+  background-color: rgba(22, 126, 157, 0.6);
+  color: #ffffff;
 }
 .scheme_space .dialog input#batchSize:focus {
-	border-color:  rgba(20, 240, 216, 0.6);
+  border-color: rgba(20, 240, 216, 0.6);
 }
 .scheme_space h1#importFrom,
 .scheme_space h1#exportTo {
-	margin-top: 20px; /* default margin-top: 30px; */
-	/* default margin-bottom: 8px; */
+  margin-top: 20px; /* default margin-top: 30px; */
+  /* default margin-bottom: 8px; */
 }
 .scheme_space h1#importFromText,
-.scheme_space h1#exportToText {	
-	margin-top: 15px; /* default margin-top: 30px; */
-	margin-bottom: 0; /* default margin-bottom: 8px; */
+.scheme_space h1#exportToText {
+  margin-top: 15px; /* default margin-top: 30px; */
+  margin-bottom: 0; /* default margin-bottom: 8px; */
 }
 
 /*************************************************/
 /******************** TOP BAR ********************/
 /*************************************************/
 .scheme_space #topBar {
-	background-color: rgb(10, 26, 78);
-	background: radial-gradient(circle, rgba(10, 26, 78, 1) 0%, rgba(2, 5, 14, 1) 100%);
-    border-bottom: 1px solid #0A2450;
-    box-shadow: none;
-	top: 0; /* no space when background-color of top bar different from game */
+  background-color: rgb(10, 26, 78);
+  background: radial-gradient(
+    circle,
+    rgba(10, 26, 78, 1) 0%,
+    rgba(2, 5, 14, 1) 100%
+  );
+  border-bottom: 1px solid #0a2450;
+  box-shadow: none;
+  top: 0; /* no space when background-color of top bar different from game */
 }
 .scheme_space #topBar a:hover {
-	text-shadow: none;
+  text-shadow: none;
 }
-.scheme_space #topBar .links-block { /* a link separator : | on topBar links */
-	color: #0A2450;
+.scheme_space #topBar .links-block {
+  /* a link separator : | on topBar links */
+  color: #0a2450;
 }
 .scheme_space #topBar div,
-.scheme_space .toolbarIcon.sorrow div {	/* counter of BLS (Black Liquid Sorrow) */
-	color: #EFEDE8;
+.scheme_space .toolbarIcon.sorrow div {
+  /* counter of BLS (Black Liquid Sorrow) */
+  color: #efede8;
 }
 .scheme_space .toolbarIcon.sorrow.max div {
-    color: #EA152C !important;
+  color: #ea152c !important;
 }
 .scheme_space #topBar a.copyright {
-	color: #C23574;
+  color: #c23574;
 }
 .scheme_space #topBar a.copyright:hover {
-	color: #12E7D1;
+  color: #12e7d1;
 }
 .scheme_space #topBar > div:first-child > span:last-of-type::after {
-    color: #12E7D1;
-    content: '\00a0\00a0\00a0Theme by Volkeyrn';
-	text-shadow: none;
-    text-decoration: none;
+  color: #12e7d1;
+  content: "\00a0\00a0\00a0Theme by Volkeyrn";
+  text-shadow: none;
+  text-decoration: none;
 }
 .scheme_space #autosaveTooltip {
-	color: #14F0D8;
+  color: #14f0d8;
 }
-.scheme_space #getTheApp-link { /* Get the app */
-	color: #167E9D !important;
+.scheme_space #getTheApp-link {
+  /* Get the app */
+  color: #167e9d !important;
 }
 .scheme_space #getTheApp-link:hover {
-	color: #12E7D1 !important;
+  color: #12e7d1 !important;
 }
 .scheme_space #topBar .toolbarIcon.happiness div {
-    color: #F4691A;
+  color: #f4691a;
 }
 .scheme_space #topBar .toolbarIcon.energy div,
 .scheme_space .button_tooltip .energyProduction {
-    color: #35C283;
+  color: #35c283;
 }
 .scheme_space #topBar .toolbarIcon.energy.warningWinter div {
-    color: #F4691A;
+  color: #f4691a;
 }
 .scheme_space #topBar .toolbarIcon.energy.warning div,
 .scheme_space .button_tooltip .energyConsumption {
-	color: #EA152C;
+  color: #ea152c;
 }
 .scheme_space .button_tooltip .energyPenalty {
-	color: #C23574;
+  color: #c23574;
 }
 .scheme_space .toolbarIcon .status-indicator-online {
-    color: #35C283;
+  color: #35c283;
 }
 .scheme_space .toolbarIcon .status-indicator-offline {
-    color: #EA152C;
+  color: #ea152c;
 }
 .scheme_space #topBar .toolbarIcon.pollutionIcon div {
-    color: #999999;
+  color: #999999;
 }
 .scheme_space .toolbarIcon.pollutionIcon {
-    background: no-repeat top left url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='14' fill='%23999999' viewBox='0 0 16 16'%3E%3Cpath d='M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383zm.653.757c-.757.653-1.153 1.44-1.153 2.056v.448l-.445.049C2.064 6.805 1 7.952 1 9.318 1 10.785 2.23 12 3.781 12h8.906C13.98 12 15 10.988 15 9.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 4.825 10.328 3 8 3a4.53 4.53 0 0 0-2.941 1.1z'/%3E%3C/svg%3E");
+  background: no-repeat top left
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='14' fill='%23999999' viewBox='0 0 16 16'%3E%3Cpath d='M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383zm.653.757c-.757.653-1.153 1.44-1.153 2.056v.448l-.445.049C2.064 6.805 1 7.952 1 9.318 1 10.785 2.23 12 3.781 12h8.906C13.98 12 15 10.988 15 9.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 4.825 10.328 3 8 3a4.53 4.53 0 0 0-2.941 1.1z'/%3E%3C/svg%3E");
 }
 .scheme_space .toolbarIcon.happiness {
-    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='%23F4691A' viewBox='0, 0, 400,365.7142857142857'%3E%3Cg %3E%3Cpath id='path0' d='M23.809 26.069 C 9.506 63.687,-3.876 244.068,5.454 273.466 C 42.343 389.691,311.117 402.522,383.842 291.529 C 400.102 266.714,401.966 245.454,395.450 159.135 C 383.595 2.098,363.666 -27.023,299.032 18.249 C 261.840 44.299,133.578 44.945,105.157 19.224 C 74.567 -8.459,35.693 -5.188,23.809 26.069 M95.086 43.441 C 121.604 72.743,266.428 71.037,311.785 40.888 C 351.877 14.240,351.212 13.344,366.764 114.971 C 393.215 287.824,351.297 345.860,200.000 345.860 C 57.492 345.860,12.935 293.440,31.361 147.462 C 47.965 15.915,56.931 1.281,95.086 43.441 '%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
+  background: no-repeat top left
+    url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='%23F4691A' viewBox='0, 0, 400,365.7142857142857'%3E%3Cg %3E%3Cpath id='path0' d='M23.809 26.069 C 9.506 63.687,-3.876 244.068,5.454 273.466 C 42.343 389.691,311.117 402.522,383.842 291.529 C 400.102 266.714,401.966 245.454,395.450 159.135 C 383.595 2.098,363.666 -27.023,299.032 18.249 C 261.840 44.299,133.578 44.945,105.157 19.224 C 74.567 -8.459,35.693 -5.188,23.809 26.069 M95.086 43.441 C 121.604 72.743,266.428 71.037,311.785 40.888 C 351.877 14.240,351.212 13.344,366.764 114.971 C 393.215 287.824,351.297 345.860,200.000 345.860 C 57.492 345.860,12.935 293.440,31.361 147.462 C 47.965 15.915,56.931 1.281,95.086 43.441 '%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
 }
 .scheme_space .toolbarIcon.energy {
-    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%2335C283' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
+  background: no-repeat top left
+    url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%2335C283' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
 }
 .scheme_space .toolbarIcon.energy.warning {
-    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%23EA152C' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
+  background: no-repeat top left
+    url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%23EA152C' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
 }
 .scheme_space .toolbarIcon.energy.warningWinter {
-    background: no-repeat top left url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%23F4691A' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
+  background: no-repeat top left
+    url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='13' fill='%23F4691A' viewBox='0 0 16 16'%3E%3Cpath d='M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z'/%3E%3C/svg%3E");
 }
 
 /************************************************/
 /******************** FOOTER ********************/
 /************************************************/
 .scheme_space #footerLinks {
-	font-size: 90%;
-	bottom: 6px;
-	color: #0A2450; /* a link separator : | on header and footer links */
+  font-size: 90%;
+  bottom: 6px;
+  color: #0a2450; /* a link separator : | on header and footer links */
 }
 .scheme_space #crowdjet-expand-container {
-	color: #89A4CD;
-	font-family: 'Oxanium', cursive;
+  color: #89a4cd;
+  font-family: "Oxanium", cursive;
 }
 .scheme_space #crowdjet-expand-container:hover {
-	color: #12E7D1;
+  color: #12e7d1;
 }
 
 /*************************************************/
@@ -367,733 +486,808 @@ body.scheme_space.with_background_image {
 /*************************************************/
 .scheme_space #tooltip,
 .scheme_space .tooltip-block > div {
-    color: #1a98bd; /* tooltip windows == left column : left text */
-	background-color: rgba(6, 19, 54, 0.8);
-	font-size: 95%;
-	border: 1px solid rgba(11, 74, 104, 0.8);
-	border-radius: 5px !important;
+  color: #1a98bd; /* tooltip windows == left column : left text */
+  background-color: rgba(6, 19, 54, 0.8);
+  font-size: 95%;
+  border: 1px solid rgba(11, 74, 104, 0.8);
+  border-radius: 5px !important;
 }
-.scheme_space .tooltip-block > div { /* tooltip on ? top right column */
-	padding: 5px;
+.scheme_space .tooltip-block > div {
+  /* tooltip on ? top right column */
+  padding: 5px;
 }
 .scheme_space .button_tooltip {
-	background-color: transparent;
-	backdrop-filter: none; /* default : backdrop-filter: blur(2px); */
+  background-color: transparent;
+  backdrop-filter: none; /* default : backdrop-filter: blur(2px); */
 }
-.scheme_space .button_tooltip div { /* tooltip window == left column: right text | center column :highlighting text */
-	color: #DDDDDD;
-	font-size: 95%;
+.scheme_space .button_tooltip div {
+  /* tooltip window == left column: right text | center column :highlighting text */
+  color: #dddddd;
+  font-size: 95%;
 }
-.scheme_space .tooltip-inner .desc {   /* Tooltip description */
-    color: #1a98bd;
-	font-size: 95%;	
-	margin-bottom: 5px;
+.scheme_space .tooltip-inner .desc {
+  /* Tooltip description */
+  color: #1a98bd;
+  font-size: 95%;
+  margin-bottom: 5px;
 }
 .scheme_space .tooltip-inner .desc:not(.small) {
-	border-bottom : 1px solid #0A2450 !important; /* border line under title */ /* bottom tooltip description */
+  border-bottom: 1px solid #0a2450 !important; /* border line under title */ /* bottom tooltip description */
 }
 .scheme_space .tooltip-inner .desc.small {
-	font-size: 75%; /* default font-size: 60%; */
-	opacity: 1; /* default opacity: 0.8; */
+  font-size: 75%; /* default font-size: 60%; */
+  opacity: 1; /* default opacity: 0.8; */
 }
 .scheme_space .tooltip-inner .desc.small.auto-off {
-	color: #EA152C;
+  color: #ea152c;
 }
 .scheme_space .tooltip-inner .desc.small.auto-on {
-	color: #35C283;
+  color: #35c283;
 }
-.scheme_space .tooltip-divider { /* border line before effects text */
-	border-bottom : 1px solid #0A2450 !important;
+.scheme_space .tooltip-divider {
+  /* border line before effects text */
+  border-bottom: 1px solid #0a2450 !important;
 }
-.scheme_space .effectName { /* Tooltip Window : effects text */
-    color: #F4691A !important;
-	font-size: 90% !important;
+.scheme_space .effectName {
+  /* Tooltip Window : effects text */
+  color: #f4691a !important;
+  font-size: 90% !important;
 }
-.scheme_space #tooltip .flavor { /* Tooltip Window : last bottom text on center column tooltip window */
-    color: #0FC3B1;
+.scheme_space #tooltip .flavor {
+  /* Tooltip Window : last bottom text on center column tooltip window */
+  color: #0fc3b1;
 }
-.scheme_space .rawRes { /* Tooltip Window == text for all missing resources for primary resource */
-    color: #888888;
-	font-style: italic;
-	padding-left: 10px;
+.scheme_space .rawRes {
+  /* Tooltip Window == text for all missing resources for primary resource */
+  color: #888888;
+  font-style: italic;
+  padding-left: 10px;
 }
 .scheme_space .button_tooltip .noRes,
-.scheme_space .limited { /* on ressource limited or not attainable */
-    color: #EA152C;
+.scheme_space .limited {
+  /* on ressource limited or not attainable */
+  color: #ea152c;
 }
 .scheme_space .button_tooltip.login-popup input[type="email"],
 .scheme_space .button_tooltip.login-popup input[type="password"] {
-	background-color: rgba(140, 140, 140, 0.2);
-    color: #9FA5D6;
-	border: 1px groove rgba(0, 0, 0, 0.2);
-    box-shadow: inset -1px -1px 1px #505050,
-                inset 1px 1px 3px #02050E;
-    padding: 3px 1px 3px 5px;
-    margin: 0 5px;
-	border-radius: 5px;
-	margin-top: 3px;
-	margin-bottom: 3px;
+  background-color: rgba(140, 140, 140, 0.2);
+  color: #9fa5d6;
+  border: 1px groove rgba(0, 0, 0, 0.2);
+  box-shadow:
+    inset -1px -1px 1px #505050,
+    inset 1px 1px 3px #02050e;
+  padding: 3px 1px 3px 5px;
+  margin: 0 5px;
+  border-radius: 5px;
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
 .scheme_space .button_tooltip.login-popup input[type="email"]:focus,
 .scheme_space .button_tooltip.login-popup input[type="password"]:focus {
-	background-color: rgba(22, 126, 157, 0.6);
-	border-color:  rgba(20, 240, 216, 0.6);
-	color:#ffffff;
+  background-color: rgba(22, 126, 157, 0.6);
+  border-color: rgba(20, 240, 216, 0.6);
+  color: #ffffff;
 }
 
 /*******************************************************/
 /******************** CENTER COLUMN ********************/
 /*******************************************************/
 .scheme_space .tab {
-    font-size: 14px;
+  font-size: 14px;
 }
 .scheme_space .tabInner {
-	border: none; /* border for all under tabs in center column */
-	/* default padding: 15px; */
-	margin-bottom: 30px; /* default margin-bottom: 20px; */
+  border: none; /* border for all under tabs in center column */
+  /* default padding: 15px; */
+  margin-bottom: 30px; /* default margin-bottom: 20px; */
 }
 .scheme_space .tabInner.Workshop div.panelContainer:last-child,
 .scheme_space .tabInner.Space div.panelContainer:last-child,
-.scheme_space .tabInner.Time div.panelContainer:last-child { /* last panelContainer on Workshop, Space and Time Tab */
-	margin-bottom: 54px; /* to view entire dropdownlink of last button */
+.scheme_space .tabInner.Time div.panelContainer:last-child {
+  /* last panelContainer on Workshop, Space and Time Tab */
+  margin-bottom: 54px; /* to view entire dropdownlink of last button */
 }
 .scheme_space .tabInner.Bonfire {
-	margin-bottom: 0; /* default margin-bottom: 20px; */
+  margin-bottom: 0; /* default margin-bottom: 20px; */
 }
 .scheme_space .tabsContainer a {
-	font-size: 14px;
+  font-size: 14px;
 }
 .scheme_space .tabsContainer {
-	font-size: 10px;
-	padding-bottom: 5px; /* default padding-bottom: 15px; */
+  font-size: 10px;
+  padding-bottom: 5px; /* default padding-bottom: 15px; */
 }
 .scheme_space .tabsContainer span:not(.genericWarning), /* separator | for tab */
-.scheme_space .expandAllBar { /* separator | for expandAllBar */
-	color: #0A2450;
+.scheme_space .expandAllBar {
+  /* separator | for expandAllBar */
+  color: #0a2450;
 }
 .scheme_space .tabInner.Workshop > div > span, /* for text: Craft effectiveness: +xxx% */
-.scheme_space .expandAllBar:first-child span { /* for text: Trade effectiveness +xxx% */
-	color: #DDDDDD;
+.scheme_space .expandAllBar:first-child span {
+  /* for text: Trade effectiveness +xxx% */
+  color: #dddddd;
 }
 .scheme_space .expandAllBar:not(:first-child) {
-	font-size: smaller; /* smaller font for expand all and collapse all links */
+  font-size: smaller; /* smaller font for expand all and collapse all links */
 }
 .scheme_space .activeTab {
-	color: #12E7D1;
-	text-shadow: 1px 1px 1px #000000;
+  color: #12e7d1;
+  text-shadow: 1px 1px 1px #000000;
 }
 .scheme_space a.activeTab {
-    border-bottom: solid 1px #0B4A68 ! important;
+  border-bottom: solid 1px #0b4a68 !important;
 }
 .scheme_space a.activeTab:hover {
-    color: #12E7D1;
+  color: #12e7d1;
 }
 .scheme_space .tab.traitLeaderBonus::before {
-	content: "\2605"; /* BLACK STAR */
-	color: #1B9CC2;
+  content: "\2605"; /* BLACK STAR */
+  color: #1b9cc2;
 }
-.scheme_space .tab.engineer::before { /* artisan bonus */
-	content: "\2692\00a0"; /* HAMMER AND PICK */
+.scheme_space .tab.engineer::before {
+  /* artisan bonus */
+  content: "\2692\00a0"; /* HAMMER AND PICK */
 }
 .scheme_space .tab.metallurgist::before {
-	content: "\267B\00a0"; /* BLACK UNIVERSAL RECYCLING SYMBOL */
+  content: "\267B\00a0"; /* BLACK UNIVERSAL RECYCLING SYMBOL */
 }
 .scheme_space .tab.chemist::before {
-	content: "\2623\00a0"; /* BIOHAZARD SIGN */
+  content: "\2623\00a0"; /* BIOHAZARD SIGN */
 }
 .scheme_space .tab.merchant::before {
-	content: "\2696\00a0"; /* SCALES */
+  content: "\2696\00a0"; /* SCALES */
 }
-.scheme_space .tab.manager::before { /* hunting bonus */
-	content: "\27B4\00a0"; /* BLACK-FEATHERED SOUTH EAST ARROW */
+.scheme_space .tab.manager::before {
+  /* hunting bonus */
+  content: "\27B4\00a0"; /* BLACK-FEATHERED SOUTH EAST ARROW */
 }
 .scheme_space .tab.scientist::before {
-	content: "\269B\00a0"; /* ATOM SYMBOL */
+  content: "\269B\00a0"; /* ATOM SYMBOL */
 }
 .scheme_space .tab.wise::before {
-	content: "\2600\00a0"; /* BLACK SUN WITH RAYS */
+  content: "\2600\00a0"; /* BLACK SUN WITH RAYS */
 }
-.scheme_space span.genericWarning { /* number of kittens free or engineering free on tab */
-	color: #C23574;
+.scheme_space span.genericWarning {
+  /* number of kittens free or engineering free on tab */
+  color: #c23574;
 }
-.scheme_space .bldTopContainer { /* under tab */
-    font-size: 90%;
+.scheme_space .bldTopContainer {
+  /* under tab */
+  font-size: 90%;
 }
 .scheme_space .bldTopContainer a.activeTab:hover {
-    color: #12E7D1;
-	opacity: 0.7; /* default opacity 0.7 on not hover */
+  color: #12e7d1;
+  opacity: 0.7; /* default opacity 0.7 on not hover */
 }
-.scheme_space .bldGroupContainer { /* container for all buttons on center column */
-    padding-top: 10px; /* default 15px */
-    border-top: 1px solid #0A2450;
+.scheme_space .bldGroupContainer {
+  /* container for all buttons on center column */
+  padding-top: 10px; /* default 15px */
+  border-top: 1px solid #0a2450;
 }
-.scheme_space input[type='button'] {
-	background-color: rgba(18, 231, 209, 0.1) !important;
-    cursor: pointer !important;
-    box-shadow: 0 0 5px #02050e !important;
-    border: solid 2px transparent !important; /* for no offset when border on */
-    border-radius: 3px !important;
-    color: #DDDDDD;
-    padding: 5px 20px;
+.scheme_space input[type="button"] {
+  background-color: rgba(18, 231, 209, 0.1) !important;
+  cursor: pointer !important;
+  box-shadow: 0 0 5px #02050e !important;
+  border: solid 2px transparent !important; /* for no offset when border on */
+  border-radius: 3px !important;
+  color: #dddddd;
+  padding: 5px 20px;
 }
-.scheme_space input[type='button']:hover {
-	background-color: rgba(22, 126, 157, 0.6) !important;
-	border: ridge 2px rgba(20, 240, 216, 0.6) !important;
-	color: #ffffff;
-	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9), rgba(20, 240, 216) 1px 0 7px;
-	cursor: pointer !important;
+.scheme_space input[type="button"]:hover {
+  background-color: rgba(22, 126, 157, 0.6) !important;
+  border: ridge 2px rgba(20, 240, 216, 0.6) !important;
+  color: #ffffff;
+  text-shadow:
+    1px 1px 1px rgba(0, 0, 0, 0.9),
+    rgba(20, 240, 216) 1px 0 7px;
+  cursor: pointer !important;
 }
 /* button observer different from other input buttons */
-.scheme_space input[type='button']#observeBtn {
-	background-color: rgba(18, 231, 209, 0.1) !important;
-	border-radius: 9px !important;
+.scheme_space input[type="button"]#observeBtn {
+  background-color: rgba(18, 231, 209, 0.1) !important;
+  border-radius: 9px !important;
 }
-.scheme_space input[type='button']#observeBtn:hover {
-	background-color: rgba(22, 126, 157, 0.6) !important;
-	box-shadow: 1px 1px 10px #C23574, -1px -1px 10px #C23574 !important;
-	border: ridge 3px #14F0D8;
-	color: #ffffff;
-	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9), rgba(20, 240, 216) 1px 0 7px;
+.scheme_space input[type="button"]#observeBtn:hover {
+  background-color: rgba(22, 126, 157, 0.6) !important;
+  box-shadow:
+    1px 1px 10px #c23574,
+    -1px -1px 10px #c23574 !important;
+  border: ridge 3px #14f0d8;
+  color: #ffffff;
+  text-shadow:
+    1px 1px 1px rgba(0, 0, 0, 0.9),
+    rgba(20, 240, 216) 1px 0 7px;
 }
 .scheme_space .btn.modern a {
-	color: #89A4CD;
-	line-height: 16px;
-	background-color: transparent;
-	padding: 10px 3px 9px 3px !important; /* -1 pixel on vertical for correct align left border */
+  color: #89a4cd;
+  line-height: 16px;
+  background-color: transparent;
+  padding: 10px 3px 9px 3px !important; /* -1 pixel on vertical for correct align left border */
 }
-.scheme_space .container .btn.modern a { /* for correct align a link on button in container */
-	line-height: 17px;
+.scheme_space .container .btn.modern a {
+  /* for correct align a link on button in container */
+  line-height: 17px;
 }
 .scheme_space .btn.modern a:hover {
-	color: #FFFFFF;
-	text-shadow: none;
+  color: #ffffff;
+  text-shadow: none;
 }
 .scheme_space .btn.modern:not(.disabled) a {
-	border-color: rgba(20, 240, 216, 0.1);
+  border-color: rgba(20, 240, 216, 0.1);
 }
 .scheme_space .btn.modern.disabled a {
-	border-color: #171441;
+  border-color: #171441;
 }
 .scheme_space .btn.modern.disabled.limited a {
-	border-color: rgba(65, 23, 20, 0.5);
+  border-color: rgba(65, 23, 20, 0.5);
 }
 .scheme_space .btn.modern:not(.disabled) a:hover {
-	background-color: rgba(31, 47, 101, 0.3);
+  background-color: rgba(31, 47, 101, 0.3);
 }
 .scheme_space .btn.modern.disabled a:hover {
-	background-color: rgba(31, 47, 101, 0.5);
+  background-color: rgba(31, 47, 101, 0.5);
 }
 .scheme_space .btn.modern.disabled.limited a:hover {
-	background-color: rgba(101, 31, 47, 0.3);
+  background-color: rgba(101, 31, 47, 0.3);
 }
-.scheme_space .linkContent { /* dropdown list on button */
-    margin-top: 25px !important; /* for correct vertical align dropdown list */
-    width: auto !important;
-	background-color: #0f516e; /* color pick from button enabled and hover */
-	border-radius: 0 5px 5px 5px;
+.scheme_space .linkContent {
+  /* dropdown list on button */
+  margin-top: 25px !important; /* for correct vertical align dropdown list */
+  width: auto !important;
+  background-color: #0f516e; /* color pick from button enabled and hover */
+  border-radius: 0 5px 5px 5px;
 }
-.scheme_space .container .linkContent { /* dropdown list on button in container */
-	margin-top: 26px !important;
+.scheme_space .container .linkContent {
+  /* dropdown list on button in container */
+  margin-top: 26px !important;
 }
-.scheme_space .btn.modern.disabled .linkContent { /* dropdown list on button disabled */
- 	background-color: #202a4c; /* color pick from button disabled and hover */
+.scheme_space .btn.modern.disabled .linkContent {
+  /* dropdown list on button disabled */
+  background-color: #202a4c; /* color pick from button disabled and hover */
 }
-.scheme_space .btn.modern.disabled.limited .linkContent { /* dropdown list on button limited */
-	background-color: #1c0e29; /* color pick from button limited and hover */
+.scheme_space .btn.modern.disabled.limited .linkContent {
+  /* dropdown list on button limited */
+  background-color: #1c0e29; /* color pick from button limited and hover */
 }
 .scheme_space .linkContent a {
-    color: #081644;
-    width: 36px !important;
-    margin-top: 0 !important;
-	margin-bottom: 0 !important;
+  color: #081644;
+  width: 36px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 .scheme_space .linkContent a:first-child,
 .scheme_space .linkContent a:first-child:hover {
-	border-radius: 0 5px 0 0;
+  border-radius: 0 5px 0 0;
 }
 .scheme_space .linkContent a:last-child,
 .scheme_space .linkContent a:last-child:hover {
-	border-radius: 0 0 5px 5px;
+  border-radius: 0 0 5px 5px;
 }
 /* Apply the right border radius of the button to the rightmost link */
 .scheme_space .btn.modern span.btnTitle + a,
 .scheme_space .btn.modern:not(.hasSellLink) a.off1Link, /* link minus on buildings buttons */
-.scheme_space .btn.modern:not(.hasSellLink) a.unassignLink { /* link minus on kittens jobs buttons */
-	border-radius: 0 5px 5px 0; /* buttons border-radius: 5px; */
+.scheme_space .btn.modern:not(.hasSellLink) a.unassignLink {
+  /* link minus on kittens jobs buttons */
+  border-radius: 0 5px 5px 0; /* buttons border-radius: 5px; */
 }
-.scheme_space .btn.modern .btnContent a.rightestLink { /* for Combust TC button in Time tab and Hold Festival in Settlement tab */
-	border-radius: 0 5px 5px 0;
+.scheme_space .btn.modern .btnContent a.rightestLink {
+  /* for Combust TC button in Time tab and Hold Festival in Settlement tab */
+  border-radius: 0 5px 5px 0;
 }
 .scheme_space .panelContainer {
-    background-color: rgba(4, 10, 32, 0.4) !important;
-    border: 1px groove #0A2450;
-	border-radius: 5px;
+  background-color: rgba(4, 10, 32, 0.4) !important;
+  border: 1px groove #0a2450;
+  border-radius: 5px;
 }
 .scheme_space .panelContainer div.title {
-    color: #C23574;
-	text-shadow: 1px 1px rgba(4, 10, 32);
-	font-weight: 400;
+  color: #c23574;
+  text-shadow: 1px 1px rgba(4, 10, 32);
+  font-weight: 400;
 }
 .scheme_space .panelContainer .toggle {
-	padding-top: 2px;
-	background-color: rgba(18, 231, 209, 0.1);
-	border-color : transparent;
-	border-radius: 5px;
+  padding-top: 2px;
+  background-color: rgba(18, 231, 209, 0.1);
+  border-color: transparent;
+  border-radius: 5px;
 }
 .scheme_space .panelContainer .toggle:hover {
-	background-color: rgba(22, 126, 157, 0.6);
-	border-color: rgba(20, 240, 216, 0.6);
-	color: #ffffff;
-	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9), rgba(20, 240, 216) 1px 0 7px;
+  background-color: rgba(22, 126, 157, 0.6);
+  border-color: rgba(20, 240, 216, 0.6);
+  color: #ffffff;
+  text-shadow:
+    1px 1px 1px rgba(0, 0, 0, 0.9),
+    rgba(20, 240, 216) 1px 0 7px;
 }
 .scheme_space .container.trade-race .crypto-trade .btn.modern {
-	max-width: 131px; /* (button content width - (2 x button border width) - (1 x button margin-right)) / 2 => (274 -2 -10)/2 = 131 */
+  max-width: 131px; /* (button content width - (2 x button border width) - (1 x button margin-right)) / 2 => (274 -2 -10)/2 = 131 */
 }
 .scheme_space .trade-race .buys {
-	color: #F4691A;
-	font-size: smaller;
+  color: #f4691a;
+  font-size: smaller;
 }
 .scheme_space .trade-race .sells {
-	color: #35C283;
-	font-size: smaller;
+  color: #35c283;
+  font-size: smaller;
 }
 .scheme_space .trade-race .tradeAmount {
-	color: #7F7F7F;
-	font-size: smaller;
+  color: #7f7f7f;
+  font-size: smaller;
 }
-.scheme_space .attitude { /* text for attitude races int trade tab */
-	color: #909090 !important;
-	text-shadow: none !important;
-	text-transform: capitalize;
+.scheme_space .attitude {
+  /* text for attitude races int trade tab */
+  color: #909090 !important;
+  text-shadow: none !important;
+  text-transform: capitalize;
 }
 .scheme_space .attitude:before {
-	content: "\00a0\00a0\22B2\22B3\00a0\00a0"; /* default content: "("; */ /* NORMAL SUBGROUP OF and CONTAINS AS NORMAL SUBGROUP */
-	color: #e0e0e0;
+  content: "\00a0\00a0\22B2\22B3\00a0\00a0"; /* default content: "("; */ /* NORMAL SUBGROUP OF and CONTAINS AS NORMAL SUBGROUP */
+  color: #e0e0e0;
 }
 .scheme_space .attitude:after {
-    content: ""; /* default content: ")"; */
+  content: ""; /* default content: ")"; */
 }
-.scheme_space .container.trade-race a[title='Pinned'] {
-	color: #35c283;
+.scheme_space .container.trade-race a[title="Pinned"] {
+  color: #35c283;
 }
-.scheme_space .container.trade-race a[title='Pinned']:hover {
-	color: #35c283;
+.scheme_space .container.trade-race a[title="Pinned"]:hover {
+  color: #35c283;
 }
 .scheme_space .tabInner.Stats table.statTable {
-	color: #9FA5D6;
+  color: #9fa5d6;
 }
-.scheme_space .tabInner.Stats table.statTable:first-of-type tr:first-child td:last-child { /* select total kittens value */
-	color: #35C283;
+.scheme_space
+  .tabInner.Stats
+  table.statTable:first-of-type
+  tr:first-child
+  td:last-child {
+  /* select total kittens value */
+  color: #35c283;
 }
-.scheme_space .tabInner.Stats table.statTable td:last-child { /* select value column */
-    color: #DDDDDD;
+.scheme_space .tabInner.Stats table.statTable td:last-child {
+  /* select value column */
+  color: #dddddd;
 }
-.scheme_space .tabInner.Stats table.statTable:first-of-type tr:first-child + tr > td:last-child { /* select kittens dead value */
-    color: #EA152C;
+.scheme_space
+  .tabInner.Stats
+  table.statTable:first-of-type
+  tr:first-child
+  + tr
+  > td:last-child {
+  /* select kittens dead value */
+  color: #ea152c;
 }
-.scheme_space .tabInner.Stats table.statTable:last-of-type tr:last-child td:last-child { /* select time played value */
-	color: #14F0D8;
+.scheme_space
+  .tabInner.Stats
+  table.statTable:last-of-type
+  tr:last-child
+  td:last-child {
+  /* select time played value */
+  color: #14f0d8;
 }
 /* ---------- Village ---------- */
 /* container 'Census' -> list of kittens in settlement tab */
 .scheme_space .currentLeader .name {
-	background: no-repeat top -6px left url("data:image/svg+xml,%3Csvg width='24px' height='24px' viewBox='0 0 24 24' fill='%231b9cc2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18.53 19.24H5.4C5.24283 19.2414 5.0893 19.1927 4.96164 19.101C4.83399 19.0094 4.73885 18.8794 4.69 18.73L1.5 9C1.45113 8.86009 1.446 8.70861 1.4853 8.56571C1.52459 8.42281 1.60646 8.29525 1.72 8.2C1.83214 8.10161 1.97141 8.03941 2.11953 8.02157C2.26764 8.00372 2.4177 8.03106 2.55 8.1L8.37 11L11.37 5.18C11.4392 5.06398 11.5373 4.9679 11.6547 4.90118C11.7722 4.83446 11.9049 4.79938 12.04 4.79938C12.1751 4.79938 12.3078 4.83446 12.4253 4.90118C12.5427 4.9679 12.6408 5.06398 12.71 5.18L15.71 11.01L21.54 8.11C21.6708 8.0419 21.8191 8.01501 21.9655 8.03286C22.1119 8.05071 22.2494 8.11247 22.36 8.21C22.4557 8.31491 22.5197 8.44486 22.5445 8.58471C22.5693 8.72456 22.5539 8.86858 22.5 9L19.24 18.72C19.1929 18.8713 19.0985 19.0034 18.9707 19.097C18.8429 19.1906 18.6884 19.2407 18.53 19.24ZM6 17.74H18L20.51 10.25L15.64 12.67C15.5528 12.7146 15.4576 12.7415 15.3599 12.749C15.2623 12.7566 15.1641 12.7446 15.071 12.7139C14.978 12.6832 14.892 12.6344 14.818 12.5702C14.744 12.506 14.6835 12.4278 14.64 12.34L12 7.16L9.37 12.34C9.32648 12.4278 9.26596 12.506 9.19197 12.5702C9.11798 12.6344 9.03197 12.6832 8.93895 12.7139C8.84593 12.7446 8.74774 12.7566 8.65007 12.749C8.5524 12.7415 8.45721 12.7146 8.37 12.67L3.48 10.22L6 17.74Z' /%3E%3C/svg%3E");
-	padding-left: 28px;
-	font-weight: bold;
+  background: no-repeat top -6px left url("data:image/svg+xml,%3Csvg width='24px' height='24px' viewBox='0 0 24 24' fill='%231b9cc2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18.53 19.24H5.4C5.24283 19.2414 5.0893 19.1927 4.96164 19.101C4.83399 19.0094 4.73885 18.8794 4.69 18.73L1.5 9C1.45113 8.86009 1.446 8.70861 1.4853 8.56571C1.52459 8.42281 1.60646 8.29525 1.72 8.2C1.83214 8.10161 1.97141 8.03941 2.11953 8.02157C2.26764 8.00372 2.4177 8.03106 2.55 8.1L8.37 11L11.37 5.18C11.4392 5.06398 11.5373 4.9679 11.6547 4.90118C11.7722 4.83446 11.9049 4.79938 12.04 4.79938C12.1751 4.79938 12.3078 4.83446 12.4253 4.90118C12.5427 4.9679 12.6408 5.06398 12.71 5.18L15.71 11.01L21.54 8.11C21.6708 8.0419 21.8191 8.01501 21.9655 8.03286C22.1119 8.05071 22.2494 8.11247 22.36 8.21C22.4557 8.31491 22.5197 8.44486 22.5445 8.58471C22.5693 8.72456 22.5539 8.86858 22.5 9L19.24 18.72C19.1929 18.8713 19.0985 19.0034 18.9707 19.097C18.8429 19.1906 18.6884 19.2407 18.53 19.24ZM6 17.74H18L20.51 10.25L15.64 12.67C15.5528 12.7146 15.4576 12.7415 15.3599 12.749C15.2623 12.7566 15.1641 12.7446 15.071 12.7139C14.978 12.6832 14.892 12.6344 14.818 12.5702C14.744 12.506 14.6835 12.4278 14.64 12.34L12 7.16L9.37 12.34C9.32648 12.4278 9.26596 12.506 9.19197 12.5702C9.11798 12.6344 9.03197 12.6832 8.93895 12.7139C8.84593 12.7446 8.74774 12.7566 8.65007 12.749C8.5524 12.7415 8.45721 12.7146 8.37 12.67L3.48 10.22L6 17.74Z' /%3E%3C/svg%3E");
+  padding-left: 28px;
+  font-weight: bold;
 }
 .scheme_space div.censusFilters {
-	margin-bottom: 3px;
+  margin-bottom: 3px;
 }
 .scheme_space .census-block {
-	background-color: rgba(137, 164, 205, 0.05);
-	border-radius: 5px;
-	border: solid 1px rgba(0, 0, 0, 0.1);
+  background-color: rgba(137, 164, 205, 0.05);
+  border-radius: 5px;
+  border: solid 1px rgba(0, 0, 0, 0.1);
 }
 .scheme_space .census-block:hover {
-	background-color: rgba(137, 164, 205, 0.1);
-	border: solid 1px rgba(137, 164, 205, 1);
+  background-color: rgba(137, 164, 205, 0.1);
+  border: solid 1px rgba(137, 164, 205, 1);
 }
 .scheme_space .census-block.simLeader {
-	background-color: rgba(18, 231, 209, 0.05);
-	border: solid 1px rgba(20, 240, 216, 0.4);
+  background-color: rgba(18, 231, 209, 0.05);
+  border: solid 1px rgba(20, 240, 216, 0.4);
 }
 .scheme_space .census-block.simLeader:hover {
-	background-color: rgba(18, 231, 209, 0.1);
-	border: solid 1px rgba(20, 240, 216, 1);
+  background-color: rgba(18, 231, 209, 0.1);
+  border: solid 1px rgba(20, 240, 216, 1);
 }
 .scheme_space .census-block.simLeader a.leaderHref {
-	color: #1B9CC2;
+  color: #1b9cc2;
 }
-.scheme_space .census-block .info { /* info of kitten */
-	font-size: 0.9em;
-	color: #909090;
+.scheme_space .census-block .info {
+  /* info of kitten */
+  font-size: 0.9em;
+  color: #909090;
 }
-.scheme_space .census-block .skill { /* jobs unasigned */
-	color: #606060;
+.scheme_space .census-block .skill {
+  /* jobs unasigned */
+  color: #606060;
 }
-.scheme_space .census-block .skill:first-of-type { /* job assigned */
-	color: #1B9CC2;
-	font-weight: normal !important;
+.scheme_space .census-block .skill:first-of-type {
+  /* job assigned */
+  color: #1b9cc2;
+  font-weight: normal !important;
 }
-.scheme_space .census-block.simLeader .info span.name {  /* Leader name */
-	font-size: 1.2em;
+.scheme_space .census-block.simLeader .info span.name {
+  /* Leader name */
+  font-size: 1.2em;
 }
-.scheme_space .census-block.simLeader .skill:first-of-type { /* Leader job assigned */
-	font-size: 1em; /* default font-size: 0.8em; */
+.scheme_space .census-block.simLeader .skill:first-of-type {
+  /* Leader job assigned */
+  font-size: 1em; /* default font-size: 0.8em; */
 }
-.scheme_space .container .name.color-none { /* name of kitten */
-	color: #aaaaaa;
+.scheme_space .container .name.color-none {
+  /* name of kitten */
+  color: #aaaaaa;
 }
 .scheme_space .container .name.color-brown {
-	color: #824b23;
+  color: #824b23;
 }
 .scheme_space .container .name.color-cream {
-	color: #ad884a;
+  color: #ad884a;
 }
 .scheme_space .container .name.color-black {
-	color: #000000;
+  color: #000000;
 }
 .scheme_space .container .name.color-fawn {
-	color: #713306;
+  color: #713306;
 }
 .scheme_space .container .name.color-white {
-	color: #ffffff;
+  color: #ffffff;
 }
 .scheme_space .container .name.variety-none {
-	border: 1px solid transparent;
+  border: 1px solid transparent;
 }
 .scheme_space .container .name.variety-dual {
-	border: 1px solid black;
+  border: 1px solid black;
 }
 .scheme_space .container .name.variety-tabby {
-	border: 1px dashed black;
+  border: 1px dashed black;
 }
 .scheme_space .container .name.variety-torbie {
-	border: 1px dashed black;
-	border-left: dotted;
-	border-right: dotted;
+  border: 1px dashed black;
+  border-left: dotted;
+  border-right: dotted;
 }
 .scheme_space .container .name.variety-calico {
-	border: 1px solid black;
-	border-top-color: gray;
-	border-bottom-color: gray;
+  border: 1px solid black;
+  border-top-color: gray;
+  border-bottom-color: gray;
 }
 .scheme_space .container .name.variety-spots {
-	border: 1px dotted black;
+  border: 1px dotted black;
 }
 .scheme_space .btn.modern a.bld-on,
 .scheme_space .btn.modern a.auto-on,
 .scheme_space .btn.modern a.fugit-on {
-	color: #35c283;
+  color: #35c283;
 }
 .scheme_space .btn.modern:not(.disabled):hover a.bld-on,
 .scheme_space .btn.modern:not(.disabled):hover a.auto-on,
 .scheme_space .btn.modern:not(.disabled):hover a.fugit-on {
-	color: #81dcb3;
+  color: #81dcb3;
 }
 .scheme_space .btn.modern a.bld-off,
 .scheme_space .btn.modern a.auto-off,
 .scheme_space .btn.modern a.fugit-off {
-	color: #EA152C;
+  color: #ea152c;
 }
 .scheme_space .btn.modern:not(.disabled):hover a.bld-off,
 .scheme_space .btn.modern:not(.disabled):hover a.auto-off,
 .scheme_space .btn.modern:not(.disabled):hover a.fugit-off {
-	color: #ef4a5c;
+  color: #ef4a5c;
 }
-.scheme_space .btn.modern.craftOn span.btnTitle { /* all buttons with engineer(s) in workshop tab */
-	color: #35c283;
+.scheme_space .btn.modern.craftOn span.btnTitle {
+  /* all buttons with engineer(s) in workshop tab */
+  color: #35c283;
 }
-.scheme_space .btn.modern.craftOn:hover span.btnTitle { /* all buttons with engineer(s) in workshop tab */
-	color: #81dcb3;
+.scheme_space .btn.modern.craftOn:hover span.btnTitle {
+  /* all buttons with engineer(s) in workshop tab */
+  color: #81dcb3;
 }
-.scheme_space td.craftStuffPanel > span { /* title of craft stuff panel */
-	color: #C23574;
-	font-size: 15px;
-	text-shadow: 1px 1px rgba(4, 10, 32);
+.scheme_space td.craftStuffPanel > span {
+  /* title of craft stuff panel */
+  color: #c23574;
+  font-size: 15px;
+  text-shadow: 1px 1px rgba(4, 10, 32);
 }
-.scheme_space td.craftStuffPanel > table { /* craft stuff panel */
-	background-color: rgba(137, 164, 205, 0.1);
-	border: groove 1px #0A2450;
-	border-radius: 3px;
-	margin-top: 2px;
-	padding: 10px 20px; /* default padding-top: 20px; */
+.scheme_space td.craftStuffPanel > table {
+  /* craft stuff panel */
+  background-color: rgba(137, 164, 205, 0.1);
+  border: groove 1px #0a2450;
+  border-radius: 3px;
+  margin-top: 2px;
+  padding: 10px 20px; /* default padding-top: 20px; */
 }
 
 /**********************************************************/
 /******************** ACHIEVEMENTS TAB ********************/
 /**********************************************************/
 .scheme_space .achievement {
-    display: block;
-    margin: 10px;
-    height: 38px;
-    background-color: rgba(18, 231, 209, 0.1);
-    color: white;
-    text-shadow: rgba(18, 231, 209) 2px 0 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: default !important;
-	border-color : #14F0D8;
-	border-radius: 5px;
+  display: block;
+  margin: 10px;
+  height: 38px;
+  background-color: rgba(18, 231, 209, 0.1);
+  color: white;
+  text-shadow: rgba(18, 231, 209) 2px 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: default !important;
+  border-color: #14f0d8;
+  border-radius: 5px;
 }
 .scheme_space .achievement.badge {
-    margin: 10px 0 0 0;
+  margin: 10px 0 0 0;
 }
 .scheme_space .achievement-header {
-	color: #C23574;
-	text-shadow: 1px 1px rgba(4, 10, 32);
-	font-size: 18px;
+  color: #c23574;
+  text-shadow: 1px 1px rgba(4, 10, 32);
+  font-size: 18px;
 }
 .scheme_space .achievement.unethical {
-    text-shadow: rgb(255, 67, 91) 2px 0 10px;
-	background-color: rgba(146, 0, 23, 0.1);
-	border-color : rgba(146, 0, 23, 0.5);
+  text-shadow: rgb(255, 67, 91) 2px 0 10px;
+  background-color: rgba(146, 0, 23, 0.1);
+  border-color: rgba(146, 0, 23, 0.5);
 }
 .scheme_space .achievement.unethical:hover {
-    background-color: rgba(222, 0, 35, 0.4);
+  background-color: rgba(222, 0, 35, 0.4);
 }
 .scheme_space .achievement:hover {
-    background-color: rgba(22, 126, 157, 0.6);
+  background-color: rgba(22, 126, 157, 0.6);
 }
 .scheme_space .achievement:not(.unlocked) {
-    color: rgba(220, 220, 220, 0.5);
-	background-color: rgba(140, 140, 140, 0.1);
-    text-shadow: none;
-	border-color : rgba(140, 140, 140, 0.4);
+  color: rgba(220, 220, 220, 0.5);
+  background-color: rgba(140, 140, 140, 0.1);
+  text-shadow: none;
+  border-color: rgba(140, 140, 140, 0.4);
 }
 .scheme_space .achievement:not(.unlocked):hover {
-    background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 .scheme_space .achievement:after {
-    display: block;
-    margin-top: 2px;
-    font-size: 90%;
-	color: #14F0D8;
-    text-shadow: none;
-    text-transform: capitalize;
-    letter-spacing: normal;
-    font-weight: normal !important;
+  display: block;
+  margin-top: 2px;
+  font-size: 90%;
+  color: #14f0d8;
+  text-shadow: none;
+  text-transform: capitalize;
+  letter-spacing: normal;
+  font-weight: normal !important;
 }
 .scheme_space .achievement.unethical:after {
-	color: #FFFFFF !important;
+  color: #ffffff !important;
 }
 .scheme_space .achievement-header .star {
-	/* default font size = font-size: 18px; */
-    color: #F4691A; /* orange or dominant color of the theme */
+  /* default font size = font-size: 18px; */
+  color: #f4691a; /* orange or dominant color of the theme */
 }
 .scheme_space .achievement .star {
-	/* default font size = font-size: 18px; */
-	color : #888888;
+  /* default font size = font-size: 18px; */
+  color: #888888;
 }
 .scheme_space .achievement.unlocked .star {
-	color : #F4691A; /* orange or dominant color of the theme */
-	text-shadow: 0 1px rgba(1, 4, 15, 1);
+  color: #f4691a; /* orange or dominant color of the theme */
+  text-shadow: 0 1px rgba(1, 4, 15, 1);
 }
 
 /******************************************************/
 /******************** RIGHT COLUMN ********************/
 /******************************************************/
 .scheme_space #rightColumn {
-	width: calc(50% - 355px);
-	max-width: 440px;
-	top: 24px; /* default top: 20px; */
+  width: calc(50% - 355px);
+  max-width: 440px;
+  top: 24px; /* default top: 20px; */
 }
 .scheme_space #toggleCenter,
 .scheme_space span.toggleCenter {
-	color: #89A4CD;
-	opacity: 0.4; /* default opacity: 0.2; */
-	cursor: pointer;
+  color: #89a4cd;
+  opacity: 0.4; /* default opacity: 0.2; */
+  cursor: pointer;
 }
 .scheme_space span.toggleCenter {
-	opacity: 1; /* for have #toggleCenter same color */
+  opacity: 1; /* for have #toggleCenter same color */
 }
 .scheme_space #toggleCenter:hover,
 .scheme_space div#toggleCenter:hover > span.toggleCenter {
-	color: #12E7D1;
-	opacity: 1.0;
+  color: #12e7d1;
+  opacity: 1;
 }
 .scheme_space #calendarDiv {
-    color: #C23574;
-	padding-left: 5px;
-    margin-top: 5px;
-	text-shadow: 1px 1px 1px rgba(1, 4, 15, 1);
-	font-weight: normal;
+  color: #c23574;
+  padding-left: 5px;
+  margin-top: 5px;
+  text-shadow: 1px 1px 1px rgba(1, 4, 15, 1);
+  font-weight: normal;
 }
 .scheme_space #calendarSign {
-   font-size: 120%;
+  font-size: 120%;
 }
 .scheme_space #calendarSign:hover {
-   cursor: default;
+  cursor: default;
 }
-.scheme_space .right-tab-header { /* Log | Chat link on right column */
-    color : #0A2450; /* for separator tab | */
-	font-size: 90%;
+.scheme_space .right-tab-header {
+  /* Log | Chat link on right column */
+  color: #0a2450; /* for separator tab | */
+  font-size: 90%;
 }
 .scheme_space .right-tab-header a.active {
-    color: #14F0D8;
-	border-top: 1px solid #0A2450;
+  color: #14f0d8;
+  border-top: 1px solid #0a2450;
 }
 .scheme_space #rightTabChat {
-	margin-top: 14px;
+  margin-top: 14px;
 }
-.scheme_space div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
-	color: #167E9D;
-	font-size: 90%;
-	border-top: 1px solid #0A2450 !important;
-	margin-top: 10px;
+.scheme_space div.console-intro {
+  /* Text on right column : "You are a kitten in a catnip forest." */
+  color: #167e9d;
+  font-size: 90%;
+  border-top: 1px solid #0a2450 !important;
+  margin-top: 10px;
 }
-.scheme_space #clearLogHref { /* Link in right column : Clear log */
-	font-size: 80%;
+.scheme_space #clearLogHref {
+  /* Link in right column : Clear log */
+  font-size: 80%;
 }
-.scheme_space #logFiltersBlock > a { /* Link in right column : [+]Log Filters */
-	font-size: 80%;
-	margin-left: 5px;
+.scheme_space #logFiltersBlock > a {
+  /* Link in right column : [+]Log Filters */
+  font-size: 80%;
+  margin-left: 5px;
 }
-.scheme_space #pauseBtn { /* Link in right column : pawse */
-	margin-left: 5px;
+.scheme_space #pauseBtn {
+  /* Link in right column : pawse */
+  margin-left: 5px;
 }
 .scheme_space #gameLog {
-	margin: 6px 5px 5px 0;
-	background: transparent;
-	scrollbar-width: thin; /* only Firefox */
+  margin: 6px 5px 5px 0;
+  background: transparent;
+  scrollbar-width: thin; /* only Firefox */
 }
 .scheme_space #gameLog span.msg:not(.type_date) {
-	font-size: 80%;
-	margin-left: 1.2em;
-	list-style-type: disc;
-	padding-left: 0.3em;
+  font-size: 80%;
+  margin-left: 1.2em;
+  list-style-type: disc;
+  padding-left: 0.3em;
 }
 .scheme_space #gameLog span.noBullet {
-	margin-left: 2.3em !important;
-	list-style-type: '\000B7' !important; /* CenterDot */
+  margin-left: 2.3em !important;
+  list-style-type: "\000B7" !important; /* CenterDot */
 }
 .scheme_space .msg {
-	color: #aaaaaa;
+  color: #aaaaaa;
 }
 .scheme_space .msg.type_notice {
-    color: #1B9CC2;
+  color: #1b9cc2;
 }
 .scheme_space .msg.type_important {
-    color: #F4691A;
+  color: #f4691a;
 }
 .scheme_space .msg.type_alert {
-    color: #EA152C;
+  color: #ea152c;
 }
 .scheme_space .msg.type_urgent {
-	color: #14F0D8;
-	font-size: 1.1em;
+  color: #14f0d8;
+  font-size: 1.1em;
 }
 .scheme_space .msg.type_date {
-    color: #14F0D8;
-	border-bottom: solid 1px #0B4A68;
-	margin-bottom: 3px;
+  color: #14f0d8;
+  border-bottom: solid 1px #0b4a68;
+  margin-bottom: 3px;
 }
 
 /*****************************************************/
 /******************** LEFT COLUMN ********************/
 /*****************************************************/
 .scheme_space .res-toolbar.right {
-	padding-right: 10px;
+  padding-right: 10px;
 }
 .scheme_space a.link.collapse {
-	opacity: 0.4; /* default opacity: 0.2; */
+  opacity: 0.4; /* default opacity: 0.2; */
 }
 .scheme_space a.link.collapse:hover {
-	opacity: 1;/* default opacity: 0.9; */
-	color: #12E7D1;
+  opacity: 1; /* default opacity: 0.9; */
+  color: #12e7d1;
 }
 .scheme_space #leftColumn .res-toolbar a.link.toggled {
-    color: #12E7D1;
+  color: #12e7d1;
 }
 .scheme_space div.tooltip-block > span {
-	color: #89A4CD;
+  color: #89a4cd;
 }
 .scheme_space div.tooltip-block:hover > span {
-	color: #12E7D1;
+  color: #12e7d1;
 }
 .scheme_space .res-table {
-    max-width: 352px;    /* +12 pixel */
-    border-collapse: collapse; /* gain of 3 pixel by border -> no margin bottom after */
-	margin-left: 2px; /* without 0px margin left for all ressources */
+  max-width: 352px; /* +12 pixel */
+  border-collapse: collapse; /* gain of 3 pixel by border -> no margin bottom after */
+  margin-left: 2px; /* without 0px margin left for all ressources */
 }
 .scheme_space .craftTable {
-	margin-bottom: 20px !important; /* for correct margin bottom due of the line above with border-collapse: collapse on .res-Table !*/
-	/* default padding-bottom: 50px; */
+  margin-bottom: 20px !important; /* for correct margin bottom due of the line above with border-collapse: collapse on .res-Table !*/
+  /* default padding-bottom: 50px; */
 }
 .scheme_space .res-cell.craft-link {
-    color: #89A4CD;
+  color: #89a4cd;
 }
 .scheme_space .res-cell.craft-link.all {
-	font-size: 90%; /* default font-size: 85%; */
-	opacity: 1; /* default opacity: 0.4; */
-	color: #999999;
+  font-size: 90%; /* default font-size: 85%; */
+  opacity: 1; /* default opacity: 0.4; */
+  color: #999999;
 }
-.scheme_space .res-cell.craft-link:hover { /* craft table left column */
-    color: #C23574;
-	text-decoration: none;
-    text-shadow: 1px 1px #040A20;
+.scheme_space .res-cell.craft-link:hover {
+  /* craft table left column */
+  color: #c23574;
+  text-decoration: none;
+  text-shadow: 1px 1px #040a20;
 }
 .scheme_space .res-row:hover {
-    background-color: rgba(20, 240, 216, 0.2);
-	cursor: default;
+  background-color: rgba(20, 240, 216, 0.2);
+  cursor: default;
 }
-.scheme_space .highlited { /* higlighting ressources when hover button on center windows */
-	background-color: rgba(20, 240, 216, 0.2);
+.scheme_space .highlited {
+  /* higlighting ressources when hover button on center windows */
+  background-color: rgba(20, 240, 216, 0.2);
 }
 .scheme_space .maxRes {
-	color: #999999;
+  color: #999999;
 }
 .scheme_space .resAmount {
-    color: #DDDDDD;
+  color: #dddddd;
 }
 .scheme_space .resLimitWarn {
-    color: #F4691A;
-	font-weight : 500;
-	font-style: italic;
-	opacity: 1; /* default = 0.75 */
+  color: #f4691a;
+  font-weight: 500;
+  font-style: italic;
+  opacity: 1; /* default = 0.75 */
 }
 .scheme_space .resLimitNotice {
-    color: #0FC3B1;
+  color: #0fc3b1;
 }
 .scheme_space .resPerTick {
-    font-size: 90%;
-	color: #DDDDDD;
-	cursor: default;
+  font-size: 90%;
+  color: #dddddd;
+  cursor: default;
 }
 .scheme_space .res-row.resLeaderBonus .resPerTick {
-	color: #1B9CC2;
-	opacity: 0.7;
+  color: #1b9cc2;
+  opacity: 0.7;
 }
 .scheme_space .res-row.craftEngineer .res-cell.resource-value {
-	color: #35c283;
-	opacity: 0.8;
+  color: #35c283;
+  opacity: 0.8;
 }
 .scheme_unicor div#advisorsContainer {
-	color: #C23574;
+  color: #c23574;
 }
-.scheme_space #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
-	font-size: 110%;
+.scheme_space #fastHuntContainer > a {
+  /* Text left column : "Send hunters (xx times)" */
+  font-size: 110%;
 }
-.scheme_space #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
-	color: #F4691A;
+.scheme_space #fastHuntContainerCount {
+  /* Text left column : "xx times" from Send hunters */
+  color: #f4691a;
 }
-.scheme_space #fastPraiseContainer > a { /* Text left column : "Praise the sun!" */
-	font-size: 110%;
+.scheme_space #fastPraiseContainer > a {
+  /* Text left column : "Praise the sun!" */
+  font-size: 110%;
 }
 .scheme_space #fastPraiseContainer > a:hover {
-	color: #FFFFFF;
-	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9), 3px 1px 6px #C23574, -3px -1px 6px #C23574;
+  color: #ffffff;
+  text-shadow:
+    1px 1px 1px rgba(0, 0, 0, 0.9),
+    3px 1px 6px #c23574,
+    -3px -1px 6px #c23574;
 }
 .scheme_space #fastHuntContainer > a:hover {
-	text-shadow: 1px 1px #101010;
+  text-shadow: 1px 1px #101010;
 }
-.scheme_space .res-cell.positive-weather { /* to change the color for bonus cell according to the season */
-	font-size: 90% !important;
-	color: #35C283 !important;
+.scheme_space .res-cell.positive-weather {
+  /* to change the color for bonus cell according to the season */
+  font-size: 90% !important;
+  color: #35c283 !important;
 }
-.scheme_space .res-cell.negative-weather { /* to change the color for penalty cell according to the season */
-	font-size: 90% !important;
-	color: #EA152C !important;
+.scheme_space .res-cell.negative-weather {
+  /* to change the color for penalty cell according to the season */
+  font-size: 90% !important;
+  color: #ea152c !important;
 }
 .scheme_space .resource_kittens .resource-name,
 .scheme_space .resource_faith .resource-name,
@@ -1101,7 +1295,7 @@ body.scheme_space.with_background_image {
 .scheme_space .resource_gear .resource-name,
 .scheme_space .resource_alloy .resource-name,
 .scheme_space .resource_megalith .resource-name {
-	color: #808080 !important;
+  color: #808080 !important;
 }
 
 /***************************************************/
@@ -1111,44 +1305,52 @@ body.scheme_space.with_background_image {
 .scheme_space .dialog::-webkit-scrollbar-track,
 .scheme_space textarea#importData::-webkit-scrollbar-track,
 .scheme_space textarea#exportData::-webkit-scrollbar-track {
-	border-radius: 0;
-	background-color: transparent;
+  border-radius: 0;
+  background-color: transparent;
 }
 .scheme_space ::-webkit-scrollbar {
-	width: 8px;
-	border-radius: 0;
-	background-color: transparent;
+  width: 8px;
+  border-radius: 0;
+  background-color: transparent;
 }
 .scheme_space .dialog::-webkit-scrollbar {
-	width: 8px;
-	border-radius: 0;
-	background-color: transparent;
+  width: 8px;
+  border-radius: 0;
+  background-color: transparent;
 }
 .scheme_space textarea#importData::-webkit-scrollbar,
 .scheme_space textarea#exportData::-webkit-scrollbar {
-	width: 8px;
-	border-radius: 0;
-	background-color: transparent;
+  width: 8px;
+  border-radius: 0;
+  background-color: transparent;
 }
 .scheme_space ::-webkit-scrollbar-thumb {
-	border-radius: 3px;
-	background-color: rgba(18, 231, 209, 0.1);
+  border-radius: 3px;
+  background-color: rgba(18, 231, 209, 0.1);
 }
 .scheme_space .dialog::-webkit-scrollbar-thumb {
-	border-radius: 3px;
-	background-color: rgba(18, 231, 209, 0.1);
+  border-radius: 3px;
+  background-color: rgba(18, 231, 209, 0.1);
 }
 .scheme_space textarea#importData::-webkit-scrollbar-thumb,
 .scheme_space textarea#exportData::-webkit-scrollbar-thumb {
-	border-radius: 3px;
-	background-color: rgba(18, 231, 209, 0.1);
+  border-radius: 3px;
+  background-color: rgba(18, 231, 209, 0.1);
 }
 .scheme_space #gameLog::-webkit-scrollbar {
-	width: 6px;
+  width: 6px;
 }
 .scheme_space #gameLog::-webkit-scrollbar-thumb {
-	border-radius: 3px;
-	background: linear-gradient(0deg, transparent 0%, transparent 4%, rgba(18, 231, 209, 0.2) 5%, rgba(18, 231, 209, 0.2) 95%, transparent 96%, transparent 100%);
+  border-radius: 3px;
+  background: linear-gradient(
+    0deg,
+    transparent 0%,
+    transparent 4%,
+    rgba(18, 231, 209, 0.2) 5%,
+    rgba(18, 231, 209, 0.2) 95%,
+    transparent 96%,
+    transparent 100%
+  );
 }
 /* Only FireFox */
 .scheme_space #leftColumn,
@@ -1158,7 +1360,7 @@ body.scheme_space.with_background_image {
 .scheme_space textarea#importData,
 .scheme_space textarea#exportData,
 .scheme_space #gameLog {
-	scrollbar-width: thin;
+  scrollbar-width: thin;
 }
 .scheme_space #leftColumn,
 .scheme_space #rightColumn,
@@ -1166,11 +1368,11 @@ body.scheme_space.with_background_image {
 .scheme_space .dialog,
 .scheme_space textarea#importData,
 .scheme_space textarea#exportData {
-	scrollbar-color: rgba(18, 231, 209, 0.1) transparent !important;
+  scrollbar-color: rgba(18, 231, 209, 0.1) transparent !important;
 }
 .scheme_space #gameLog {
-	scrollbar-color: rgba(18, 231, 209, 0.1) transparent !important;
+  scrollbar-color: rgba(18, 231, 209, 0.1) transparent !important;
 }
 .scheme_space select {
-   scrollbar-width: auto !important;
+  scrollbar-width: auto !important;
 }
