@@ -1429,10 +1429,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.harborLimitRatioPolicy.title"),
 				type: "ratio"
 			},
-			"tankerCapacityRatioBonus":{
-			title: $I("effectsMgr.statics.tankerCapacityRatioBonus.title"),
-				type: "ratio"
-			},
 			"calcinerSteelRatioBonus":{
 				title: $I("effectsMgr.statics.calcinerSteelRatioBonus.title"),
 				type: "ratio"
@@ -1495,6 +1491,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			},
 			"nagaBlueprintTradeChance":{
 				title: $I("effectsMgr.statics.nagaBlueprintTradeChance.title"),
+				type: "ratio"
+			},			
+			"starchartPolicyRatio":{
+				title: $I("effectsMgr.statics.starchartPolicyRatio.title"),
 				type: "ratio"
 			},
             //philosophy

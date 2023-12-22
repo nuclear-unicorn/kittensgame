@@ -1301,18 +1301,25 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         ],
         effects:{
             "cathPollutionRatio" : -0.1,
-			"solarFarmRatio" : 0.1,
-			"hydroPlantRatio": 0.1
+			"solarFarmRatio" : 0,
+			"hydroPlantRatio": 0
         },
         unlocked: false,
         blocked: false,
 		isRelation: true,
         blocks:["lizardRelationsPriests", "lizardRelationsDiplomats"],
-		upgrades: {
-			buildings: ["pasture", "aqueduct"]
-		},
 		calculateEffects: function(self,game){
-			game.science.unlockRelations(); //Hack: Check relations by being upgraded by diplomacy and on load
+			var cathPollution = Math.floor(game.bld.cathPollution);
+			if (cathPollution < 1e8) {
+				var boostRatio = Math.round(((1e8 - cathPollution) * 5 / 1e9) * 1e2) / 1e2;
+				self.effects["solarFarmRatio"] = boostRatio;
+				self.effects["hydroPlantRatio"] = boostRatio;
+			} else {
+				self.effects["solarFarmRatio"] = 0;
+				self.effects["hydroPlantRatio"] = 0;
+			}
+			game.upgrade({buildings: ["pasture", "aqueduct"]});
+			
 		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("lizards", 20);
@@ -1331,6 +1338,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocked: false,
 		isRelation: true,
         blocks:["lizardRelationsEcologists", "lizardRelationsDiplomats"],
+		calculateEffects: function(self,game) {
+			game.science.unlockRelations(); //Hack: Check relations by being upgraded by diplomacy and on load
+		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("lizards", 20);
 		}
@@ -1632,12 +1642,16 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 30000}
         ],
 		effects:{
-            "reactorEnergyRatio" : 0.25
+            "reactorEnergyRatio" : 0.25,
+			"harborLimitRatioPolicy": 0.5
         },
         unlocked: false,
         blocked: false,
 		isRelation: true,
         blocks:["dragonRelationsAstrologers"],
+		upgrades: {
+			buildings: ["harbor"]
+		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("dragons", 10);
 		}
@@ -1649,13 +1663,18 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 30000}
         ],
 		effects:{
-			"starEventChance": 0.02,
-            "negativeCycleRatioPolicy" : 0.5
+			"starEventChance": 0.006,
+			"starchartPolicyRatio": 0.05
         },
         unlocked: false,
         blocked: false,
 		isRelation: true,
         blocks:["dragonRelationsPhysicists"],
+		calculateEffects: function(self, game) {
+			var cycle = game.calendar.cycleYear + 1;
+			self.effects["starEventChance"] = cycle * 0.006;
+			self.effects["starchartPolicyRatio"] = cycle * 0.05;
+		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("dragons", 10);
 		}

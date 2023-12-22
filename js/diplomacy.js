@@ -1036,8 +1036,7 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 
 	buyItem: function(model, event, callback) {
 		this.inherited(arguments);
-		this.game.upgrade({policies: ["lizardRelationsDiplomats"]}); //Upgrade, since the policy is based on number of embassies.
-		this.game.upgrade({policies: ["nagaRelationsArchitects"]});
+		this.game.upgrade({policies: ["lizardRelationsDiplomats", "nagaRelationsArchitects"]}); //Upgrade, since the policy is based on number of embassies.
 		this.game.science.unlockRelations(); //Check if we can unlock new relation policies based on number of embassies.
 		this.game.ui.render();
 	},
