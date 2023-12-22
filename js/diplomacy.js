@@ -521,8 +521,12 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 
 		//-------------- 10% chance to get blueprint ---------------
+		var blueprintTradeChance = 0.1;
+		if (race.name == "nagas") {
+			blueprintTradeChance += this.game.getEffect("nagaBlueprintTradeChance");
+		}
 		boughtResources["blueprint"] = Math.floor(
-			this.game.math.binominalRandomInteger(successfullTradeAmount, 0.1)
+			this.game.math.binominalRandomInteger(successfullTradeAmount, blueprintTradeChance)
 		);
 
 		//-------------- 15% + 0.35% chance per ship to get titanium ---------------
@@ -1033,6 +1037,7 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 	buyItem: function(model, event, callback) {
 		this.inherited(arguments);
 		this.game.upgrade({policies: ["lizardRelationsDiplomats"]}); //Upgrade, since the policy is based on number of embassies.
+		this.game.upgrade({policies: ["nagaRelationsArchitects"]});
 		this.game.science.unlockRelations(); //Check if we can unlock new relation policies based on number of embassies.
 		this.game.ui.render();
 	},

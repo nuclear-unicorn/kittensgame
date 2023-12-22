@@ -1452,8 +1452,6 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			buildings: ["biolab", "brewery"],
 			
 		},
-		calculateEffects: function(self, game) {
-		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("sharks", 20);
 		}
@@ -1527,7 +1525,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		upgrades: {
 			buildings: ["quarry"]
 		},
-        blocks:["nagaRelationsCultists"],
+        blocks:["nagaRelationsCultists", "nagaRelationsArchitects"],
 		evaluateLocks: function(game){
 			return game.science.checkRelation("nagas", 20);
 		}
@@ -1547,7 +1545,32 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		upgrades: {
 			buildings: ["ziggurat"]
 		},
-        blocks:["nagaRelationsMasons"],
+        blocks:["nagaRelationsMasons", "nagaRelationsArchitects"],
+		evaluateLocks: function(game){
+			return game.science.checkRelation("nagas", 20);
+		}
+	}, {
+		name: "nagaRelationsArchitects",
+        label: $I("policy.nagaRelationsArchitects.label"),
+        description: $I("policy.nagaRelationsArchitects.desc"),
+        prices: [
+            {name : "culture", val: 8000}
+        ],
+        effects:{
+			"nagaBlueprintTradeChance": 0,
+            "blueprintCraftRatio" : 0
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["nagaRelationsMasons", "nagaRelationsCultists"],
+		calculateEffects: function(self, game) {
+			var nagaEmbassies = game.diplomacy.get("nagas").embassyLevel;
+			self.effects["nagaBlueprintTradeChance"] = Math.min(nagaEmbassies * 0.005, 0.2);
+			if (nagaEmbassies > 40) {
+				self.effects["blueprintCraftRatio"] = (nagaEmbassies - 40) * 0.05;
+			}
+		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("nagas", 20);
 		}

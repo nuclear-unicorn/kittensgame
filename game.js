@@ -1441,14 +1441,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.magnetoBoostBonusPolicy.title"),
 				type: "ratio"
 			},
-			/*"mansionCostReduction":{
-				title: $I("effectsMgr.statics.mansionCostReduction.title"),
-				type: "ratio"
-			},
-			"zigguratCostReduction":{
-				title: $I("effectsMgr.statics.zigguratCostReduction.title"),
-				type: "ratio"
-			},*/
 			"mineralsSuperRatio":{
                 title: $I("effectsMgr.statics.mineralsSuperRatio.title"),
                 type: "ratio"
@@ -1499,6 +1491,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			},
 			"ironBuyRatioIncrease":{
 				title: $I("effectsMgr.statics.ironBuyRatioIncrease.title"),
+				type: "ratio"
+			},
+			"nagaBlueprintTradeChance":{
+				title: $I("effectsMgr.statics.nagaBlueprintTradeChance.title"),
 				type: "ratio"
 			},
             //philosophy
