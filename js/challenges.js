@@ -332,7 +332,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"zigguratIvoryPriceRatio": -0.025,
 			"bonfireBaseTearsCost": 0,
 			"workshopBaseTearsCost": 0,
-			"markerCostIncrease": 0
+			"markerCostIncrease": 0,
+			"unicornsMax": 0,
+			"tearsMax": 0,
+			"zigguratTearsMax": 0
 		},
 		calculateEffects: function(self, game) {
 			if (self.active) {
@@ -361,17 +364,27 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				//After that: 1 * N = N, where N is the number of prior completions
 				self.effects["markerCostIncrease"] = 0.75;
 				self.effects["zigguratIvoryPriceRatio"] = 0;
+				self.effects["unicornsMax"] = 10;
+				self.effects["tearsMax"] = 1;
+				self.effects["zigguratTearsMax"] = 2;
+
 			} else {
 				self.effects["bonfireBaseTearsCost"] = 0;
 				self.effects["workshopBaseTearsCost"] = 0;
 				self.effects["markerCostIncrease"] = 0;
 				self.effects["zigguratIvoryPriceRatio"] = -0.025;
+				self.effects["unicornsMax"] = 0;
+				self.effects["tearsMax"] = 0;
+				self.effects["zigguratTearsMax"] = 0;
 			}
 		},
 		stackOptions: {
 			"zigguratIvoryPriceRatio": { LDRLimit: 0.15 },
 			"bonfireBaseTearsCost": { noStack: true },
-			"markerCostIncrease": { LDRLimit: 9 }
+			"markerCostIncrease": { LDRLimit: 9 },
+			"unicornsMax": { noStack: true },
+			"tearsMax": { noStack: true },
+			"zigguratTearsMax": { noStack: true }
 		},
 		checkCompletionCondition: function(game) {
 			return game.resPool.get("necrocorn").value >= 1;
@@ -499,12 +512,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		}
 	}],
 
-	effectsBase: {
-		"unicornsMax": 0, //Used by the Unicorn Tears Challenge
-		"tearsMax": 0,
-		"zigguratTearsMax": 0
-	},
-
 	game: null,
 
 	resetState: function(){
@@ -591,28 +598,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		for(var i = 0; i < this.challenges.length; i++){
 			if(this.challenges[i].active && this.challenges[i].checkCompletionCondition && this.challenges[i].checkCompletionCondition(this.game)){
 				this.researchChallenge(this.challenges[i].name);
-			}
-		}
-		
-		//Hack for the Unicorn Tears Challenge.
-		var effectsBase = this.effectsBase;
-		if (this.isActive("unicornTears")) {
-			effectsBase["unicornsMax"] = 10;
-			effectsBase["tearsMax"] = 1;
-
-			//Don't call game.upgrade every tick--only call it when we actually need to apply a change.
-			if (effectsBase["zigguratTearsMax"] != 2) {
-				effectsBase["zigguratTearsMax"] = 2;
-				this.game.upgrade({buildings: ["ziggurat"]});
-			}
-		} else {
-			effectsBase["unicornsMax"] = 0;
-			effectsBase["tearsMax"] = 0;
-
-			//Don't call game.upgrade every tick--only call it when we actually need to apply a change.
-			if (effectsBase["zigguratTearsMax"] != 0) {
-				effectsBase["zigguratTearsMax"] = 0;
-				this.game.upgrade({buildings: ["ziggurat"]});
 			}
 		}
 	},
