@@ -944,16 +944,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 title: $I("effectsMgr.statics.alicornChance.title"),
                 type: "ratio"
             },
-		"zigguratTearsMax" : {
-			title: $I("effectsMgr.statics.zigguratTearsMax.title"),
-			type: "fixed",
-			resName: "tears" //Allows displayed value to benefit from paragon storage bonus
-		},
-		"unicornTombTearsMax" : {
-			title: $I("effectsMgr.statics.unicornTombTearsMax.title"),
-			type: "fixed",
-			resName: "tears" //Allows displayed value to benefit from paragon storage bonus
-		},
 		"unicornSacrificeRatio": {
 			title: $I("effectsMgr.statics.unicornSacrificeRatio.title"),
 			type: "ratio"

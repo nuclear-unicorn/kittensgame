@@ -417,7 +417,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			this.game.bld.cathPollution += overcap * CATH_POLLUTION_PER_OVERCAP * (1 + this.game.getEffect("cathPollutionRatio"));
 			this.game.msg($I("religion.sacrificeBtn.sacrifice.msg.overcap", [this.game.getDisplayValueExt(overcap)]), "", "unicornSacrifice", true /*noBullet*/);
 		}
-		this.game.msg($I("religion.sacrificeBtn.sacrifice.auto.msg", [this.game.getDisplayValueExt(unicornsToSacrifice), this.game.getDisplayValueExt(tearsActualGained)]), "", "unicornSacrifice" );
+		this.game.msg($I("religion.sacrificeBtn.sacrifice.msg.auto", [this.game.getDisplayValueExt(unicornsToSacrifice), this.game.getDisplayValueExt(tearsActualGained)]), "", "unicornSacrifice" );
 	},
 
 	zigguratUpgrades: [{
@@ -435,26 +435,24 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"tearsMax": 0
 		},
 		calculateEffects: function(self, game) {
-			var effects = {
-				"unicornsRatioReligion" : 0.05,
-				"faithMax": 0,
-				"tearsMax": 0
-			};
 			if (game.challenges.isActive("unicornTears")) {
-				effects["tearsMax"] = game.getEffect("unicornTombTearsMax");
+				self.effects["faithMax"] = 0;
+				self.effects["tearsMax"] = 1;
 			} else {
 				if (game.challenges.getChallenge("unicornTears").researched) {
 					var tt = game.religion.transcendenceTier;
 					if (tt < 1) { //Have some effect even if never transcended
-						effects["faithMax"] = 5;
+						self.effects["faithMax"] = 5;
 					} else if (tt < 100) { //Superlinear growth
-						effects["faithMax"] = (3 * Math.pow(tt, 1.5)) + 5.13167019;
+						self.effects["faithMax"] = (3 * Math.pow(tt, 1.5)) + 5.13167019;
 					} else { //Set a reasonable limit
-						effects["faithMax"] = 3000;
+						self.effects["faithMax"] = 3000;
 					}
+				} else {
+					self.effects["faithMax"] = 0;
 				}
+				self.effects["tearsMax"] = 0;
 			}
-			self.effects = effects;
 		},
 		unlocked: true,
 		defaultUnlocked: true,
@@ -534,7 +532,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"alicornPerTick" : 0,
 			"ivoryMeteorRatio" : 0,
 			"unicornsMax": 0,
-			"zigguratTearsMax": 0
+			"tearsMax": 0
 		},
 		calculateEffects: function(self, game) {
 			var effects = {
@@ -544,19 +542,16 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				"alicornPerTick" : 0,
 				"ivoryMeteorRatio" : 0.05,
 				"unicornsMax": 0,
-				"zigguratTearsMax": 0
+				"tearsMax": 0
 			};
 			if (game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.00002;
 			}
 			if (game.challenges.isActive("unicornTears")) {
 				effects["unicornsMax"] = 500;
-				effects["zigguratTearsMax"] = 4;
+				effects["tearsMax"] = 200;
 			}
 			self.effects = effects;
-		},
-		upgrades: {
-			buildings: ["ziggurat"]
 		},
 		unlocked: false,
 		defaultUnlocked: false,
@@ -580,7 +575,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"tcRefineRatio" : 0,
 			"ivoryMeteorRatio" : 0,
 			"unicornsMax": 0,
-			"unicornTombTearsMax": 0
+			"tearsMax": 0
 		},
 		calculateEffects: function(self, game) {
 			var effects = {
@@ -590,25 +585,21 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				"tcRefineRatio" : 0.05,
 				"ivoryMeteorRatio" : 0.15,
 				"unicornsMax": 0,
-				"unicornTombTearsMax": 0
+				"tearsMax": 0
 			};
 			if (game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.000025;
 			}
 			if (game.challenges.isActive("unicornTears")) {
 				effects["unicornsMax"] = 2000;
-				effects["unicornTombTearsMax"] = 22;
+				effects["tearsMax"] = 1000;
 			}
 			self.effects = effects;
-			game.upgrade(this.upgrades); //This is a HACK
 		},
 		unlocked: false,
 		defaultUnlocked: false,
 		unlocks: {
 			"zigguratUpgrades": ["sunspire"]
-		},
-		upgrades: {
-			"zigguratUpgrades": ["unicornTomb"]
 		},
 		unlockScheme: {
 			name: "unicorn",

@@ -1938,8 +1938,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			};
 
 			if (game.challenges.isActive("unicornTears")) {
-				effects["unicornsMax"] = 600;
-				effects["tearsMax"] = game.getEffect("zigguratTearsMax");
+				effects["unicornsMax"] = 700;
+				effects["tearsMax"] = 3;
 				//So players can see what max tears are before performing their first sacrifice:
 				if(self.val > 0) {
 					game.resPool.get("tears").unlocked = true;

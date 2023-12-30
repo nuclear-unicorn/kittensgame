@@ -334,8 +334,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"workshopBaseTearsCost": 0,
 			"markerCostIncrease": 0,
 			"unicornsMax": 0,
-			"tearsMax": 0,
-			"zigguratTearsMax": 0
+			"tearsMax": 0
 		},
 		calculateEffects: function(self, game) {
 			if (self.active) {
@@ -366,7 +365,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["zigguratIvoryPriceRatio"] = 0;
 				self.effects["unicornsMax"] = 10;
 				self.effects["tearsMax"] = 1;
-				self.effects["zigguratTearsMax"] = 2;
 
 			} else {
 				self.effects["bonfireBaseTearsCost"] = 0;
@@ -375,7 +373,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["zigguratIvoryPriceRatio"] = -0.025;
 				self.effects["unicornsMax"] = 0;
 				self.effects["tearsMax"] = 0;
-				self.effects["zigguratTearsMax"] = 0;
 			}
 		},
 		stackOptions: {
@@ -383,8 +380,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"bonfireBaseTearsCost": { noStack: true },
 			"markerCostIncrease": { LDRLimit: 9 },
 			"unicornsMax": { noStack: true },
-			"tearsMax": { noStack: true },
-			"zigguratTearsMax": { noStack: true }
+			"tearsMax": { noStack: true }
 		},
 		checkCompletionCondition: function(game) {
 			return game.resPool.get("necrocorn").value >= 1;
