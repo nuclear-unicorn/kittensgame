@@ -1494,7 +1494,7 @@
     "village.btn.unwrap": "打開禮物盒",
     "village.btn.unwrap.confirmation.msg": "確定要打開禮物盒嗎？也許稍等片刻就能得到更好的禮物！",
     "village.census.age": "歲",
-    "village.census.filter.all": "所有工作",
+    "village.census.filter.all": "1",
     "village.census.lbl.festival.duration": "延長節日慶典",
     "village.census.lbl.happiness": "幸福",
     "village.census.lbl.leader": "領袖",
@@ -1977,7 +1977,7 @@
     "workshop.uplink.desc": "數據中心和生物實驗室將互相提供加成",
     "workshop.voidAspiration.label": "時空吸取",
     "workshop.voidAspiration.desc": "解鎖時空抽取和時空裂痕。",
-    "workshop.voidEnergy.label": "無效能量",
+    "workshop.voidEnergy.label": "3",
     "workshop.voidEnergy.desc": "能源裂縫更有效地存儲資源。",
     "workshop.voidReactors.label": "太空反應爐",
     "workshop.voidReactors.desc": "你的研究船的有效性提升至四倍"
