@@ -933,7 +933,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         dojo.empty(filtersDiv);
         var show = false;
 
-        for (var fId in console.filters){
+        for (var fId in Object.keys(console.filters).sort()) {
             if (console.filters[fId].unlocked) {
                 this._createFilter(console.filters[fId], fId, filtersDiv);
                 show = true;

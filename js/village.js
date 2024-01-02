@@ -815,9 +815,9 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		}
 
 		if (festivalWasInProgress){
-			this.game.msg($I("village.festival.msg.ext"));
+			this.game.msg($I("village.festival.msg.ext"), null, "festival");
 		} else {
-			this.game.msg($I("village.festival.msg.start"));
+			this.game.msg($I("village.festival.msg.start"), null, "festival");
 		}
 		//TODO: some fun message like Molly Chalk is making a play 'blah blah'
 	},
