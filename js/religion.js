@@ -549,7 +549,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			}
 			if (game.challenges.isActive("unicornTears")) {
 				effects["unicornsMax"] = 500;
-				effects["tearsMax"] = 200;
+				effects["tearsMax"] = 275;
 			}
 			self.effects = effects;
 		},
@@ -591,8 +591,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				effects["alicornPerTick"] = 0.000025;
 			}
 			if (game.challenges.isActive("unicornTears")) {
-				effects["unicornsMax"] = 2000;
-				effects["tearsMax"] = 1000;
+				effects["unicornsMax"] = 5500;
+				effects["tearsMax"] = 1800;
 			}
 			self.effects = effects;
 		},
@@ -641,7 +641,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			}
 			if (game.challenges.isActive("unicornTears")) {
 				effects["unicornsMaxRatio"] = 0.1;
-				effects["tearsMax"] = 2850;
+				effects["tearsMax"] = 10000;
 			}
 			self.effects = effects;
 		},
