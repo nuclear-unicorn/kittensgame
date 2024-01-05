@@ -662,6 +662,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 }
                 //console.log( "Auto-sacrificing unicorns after shattering", amt, "TCs." );
                 this.game.religion.autoSacrificeUnicorns(remainingDaysInCurrentYear / this.game.calendar.daysPerSeason, unicornsValuePrevious);
+                limits["tears"] = Infinity; //The autoSacrifice function calculates its own limits for this resource.
                 for (var j = 0; j < game.resPool.resources.length; j++) {
                     var res = game.resPool.resources[j];
                     res.value = Math.min(res.value, limits[res.name]);
@@ -754,6 +755,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 }
                 //console.log( "Auto-sacrificing unicorns after shattering", amt, "TCs." );
                 this.game.religion.autoSacrificeUnicorns(remainingDaysInCurrentCycle / this.game.calendar.daysPerSeason, unicornsValuePrevious);
+                limits["tears"] = Infinity; //The autoSacrifice function calculates its own limits for this resource.
                 for (var j = 0; j < game.resPool.resources.length; j++) {
                     var res = game.resPool.resources[j];
                     res.value = Math.min(res.value, limits[res.name]);
@@ -886,6 +888,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 }
                 //console.log( "Auto-sacrificing unicorns after shattering", amt, "TCs." );
                 this.game.religion.autoSacrificeUnicorns(daysInCurrentCycle / this.game.calendar.daysPerSeason, unicornsValuePrevious);
+                limits["tears"] = Infinity; //The autoSacrifice function calculates its own limits for this resource.
                 for (var j = 0; j < game.resPool.resources.length; j++) {
                     var res = game.resPool.resources[j];
                     /*

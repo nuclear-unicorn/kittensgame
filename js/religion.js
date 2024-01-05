@@ -346,20 +346,21 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 	/**
 	 * Calculates the number of unicorn tears gained per batch of unicorns sacrificed.
-	 * Currently, unicorns are sacrificed in batches of 2500, & the number of tears gained is 1 per Ziggurat.
+	 * Currently, unicorns are always sacrificed in batches of 2500.
 	 * @param automatic If truthy, calculates the tears gained for an automatic sacrifice.  If falsy, calculates tears for a manual sacrifice.
 	 * @return A nonnegative number (not necessarily an integer; could theoretically be zero)
 	 */
 	getUnicornTearsGainedPerSacrifice: function(automatic) {
 		var retVal = this.game.bld.get("ziggurat").on * (1 + this.game.getEffect("unicornSacrificeRatio"));
 		if (automatic) {
-			retVal *= 0.7; //30% penalty (intended to reward active play)
+			retVal *= 1 + this.game.getEffect("autoSacrificeUnicornsPenalty"); //(Intended to reward active play)
 		}
 		return retVal;
 	},
 
 	/**
 	 * Only in the Unicorn Tears Challenge, auto-sacrifice unicorns when near the cap until we get to max tears.
+	 * Automatic sacrifices have this feature called "Stable Overcapping" where part of the tears gained can ignore storage caps.
 	 * This function is intended to be called once per season, when calculating redshift, & when calculating TC shatter.
 	 * Requires that the policy Ritual Calendar is researched.
 	 * @param fastForwardSeasons (optional)	If we're calling this during redshift or shatter TC calculations, we may need to correct for
@@ -393,40 +394,40 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			fastForwardSeasons = 0;
 		}
 
-		console.log( "Year " + game.calendar.year.toFixed(0) + " - " + game.calendar.getCurSeasonTitle());
-		console.log( "Auto-sacrificing unicorns; the threshold is " + game.toDisplayPercentage( sacrificeThreshold ) + "%." );
-		console.log( "Parameters: fastForwardSeasons =", fastForwardSeasons, "; unicornsValuePrevious =", unicornsValuePrevious );
+		//console.log( "Year " + game.calendar.year.toFixed(0) + " - " + game.calendar.getCurSeasonTitle());
+		//console.log( "Auto-sacrificing unicorns; the threshold is " + game.toDisplayPercentage( sacrificeThreshold ) + "%." );
+		//console.log( "Parameters: fastForwardSeasons =", fastForwardSeasons, "; unicornsValuePrevious =", unicornsValuePrevious );
 
 		var UNICORNS_PER_SACRIFICE = 2500; //How many unicorns are sacrificed at once.
 		var unicorns = game.resPool.get("unicorns");
 		
-		console.log( "• Unicorns (current/max):", unicorns.value, "/", unicorns.maxValue );
-		console.log( "• Unicorn sacrifice threshold is", unicorns.maxValue * sacrificeThreshold, "unicorns." );
-		console.log( "• const UNICORNS_PER_SACRIFICE =", UNICORNS_PER_SACRIFICE );
+		//console.log( "• Unicorns (current/max):", unicorns.value, "/", unicorns.maxValue );
+		//console.log( "• Unicorn sacrifice threshold is", unicorns.maxValue * sacrificeThreshold, "unicorns." );
+		//console.log( "• const UNICORNS_PER_SACRIFICE =", UNICORNS_PER_SACRIFICE );
 		
 		if (fastForwardSeasons > 0 && typeof(unicornsValuePrevious) == "number") {
-			console.log( "• Let's adjust the unicorn values for fast-forwarding through", fastForwardSeasons, "seasons." );
-			console.log( "• The number of unicorns we had before the timeskip was", unicornsValuePrevious, "unicorns." );
+			//console.log( "• Let's adjust the unicorn values for fast-forwarding through", fastForwardSeasons, "seasons." );
+			//console.log( "• The number of unicorns we had before the timeskip was", unicornsValuePrevious, "unicorns." );
 			//Number of unicorns produced per season:
 			var unicornsPerSeason = game.getResourcePerTick("unicorns") * game.calendar.ticksPerDay * game.calendar.daysPerSeason;
 			var theoreticalMax = unicorns.maxValue * (1 - sacrificeThreshold);
-			console.log( "     ○ Unicorn production per season:", unicornsPerSeason, "unicorns." );
-			console.log( "     ○ Highest possible unicorn production per season without losing any due to the cap, accounting for sacrificing:", theoreticalMax, "unicorns." );
+			//console.log( "     ○ Unicorn production per season:", unicornsPerSeason, "unicorns." );
+			//console.log( "     ○ Highest possible unicorn production per season without losing any due to the cap, accounting for sacrificing:", theoreticalMax, "unicorns." );
 			unicornsPerSeason = Math.min( unicornsPerSeason, theoreticalMax );
-			console.log( "     ○ Final calculated unicorn production per season at", unicornsPerSeason, "unicorns." );
+			//console.log( "     ○ Final calculated unicorn production per season at", unicornsPerSeason, "unicorns." );
 
 			//Correction term for if we start the first season close to the cap:
 			var correctionTerm = Math.min(unicorns.maxValue - unicornsValuePrevious - unicornsPerSeason, 0);
-			console.log( "     ○ The correction term for starting the first season close to the cap is", correctionTerm, "unicorns." );
+			//console.log( "     ○ The correction term for starting the first season close to the cap is", correctionTerm, "unicorns." );
 
 			//Taking these into account, the max number possible of unicorns we could have after the timeskip,
 			//assuming the production rate is constant & we sacrifice ALL eligible unicorns each season:
 			var approximateCorrectValue = unicornsValuePrevious + unicornsPerSeason * fastForwardSeasons + correctionTerm;
-			console.log( "     ○ The actual max possible unicorn value post-timeskip is", approximateCorrectValue, "unicorns." );
-			console.log( "     ○ Compare that with unicorns.value:", unicorns.value );
+			//console.log( "     ○ The actual max possible unicorn value post-timeskip is", approximateCorrectValue, "unicorns." );
+			//console.log( "     ○ Compare that with unicorns.value:", unicorns.value );
 
 			unicorns.value = Math.min( unicorns.value, approximateCorrectValue );
-			console.log( "• After adjustment, unicorns (current/max):", unicorns.value, "/", unicorns.maxValue );
+			//console.log( "• After adjustment, unicorns (current/max):", unicorns.value, "/", unicorns.maxValue );
 
 			//Let U = # of unicorns before timeskip
 			//Let N = unicorn production per season
@@ -439,17 +440,17 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 
 		if (unicorns.maxValue < UNICORNS_PER_SACRIFICE ) {
-			console.log( "• Max unicorns is less than UNICORNS_PER_SACRIFICE, so we can't ever sacrifice any." );
+			//console.log( "• Max unicorns is less than UNICORNS_PER_SACRIFICE, so we can't ever sacrifice any." );
 			return; //Not enough max unicorns to ever be able to sacrifice.
 		}
 		if (unicorns.value < unicorns.maxValue * sacrificeThreshold) {
-			console.log( "• Current unicorns is less than the threshold, so we don't want to sacrifice any." );
+			//console.log( "• Current unicorns is less than the threshold, so we don't want to sacrifice any." );
 			return; //Not enough actual unicorns to trigger an auto-sacrifice.
 		}
 		var tearsPerSacrifice = this.getUnicornTearsGainedPerSacrifice(true /*automatic*/);
-		console.log( "• Number of tears gained per sacrifice:", tearsPerSacrifice );
+		//console.log( "• Number of tears gained per sacrifice:", tearsPerSacrifice );
 		if (tearsPerSacrifice < 0.001 /*rounding error?  I don't expect this to ever actually occur but just in case*/) {
-			console.log( "• Tears per sacrifice is zero, so we don't want to sacrifice any." );
+			//console.log( "• Tears per sacrifice is zero, so we don't want to sacrifice any." );
 			return; //There is nothing to gain from the sacrifice, so no point in doing it.
 		}
 
@@ -457,20 +458,28 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		var unicornsToSacrifice = Math.max(1 /*to prevent possible rounding error issues*/, unicorns.value - unicorns.maxValue * sacrificeThreshold);
 		var sacrificesToPerform = Math.ceil(unicornsToSacrifice / UNICORNS_PER_SACRIFICE); //How many sacrifices we need to do to get below the threshold
 
-		console.log( "• Number of unicorns eligible for sacrifice (i.e. how many we have above the threshold):", unicornsToSacrifice );
-		console.log( "• Number of sacrifices it takes to put us below the threshold (rounded up):", sacrificesToPerform );
+		//console.log( "• Number of unicorns eligible for sacrifice (i.e. how many we have above the threshold):", unicornsToSacrifice );
+		//console.log( "• Number of sacrifices it takes to put us below the threshold (rounded up):", sacrificesToPerform );
 
 		var tears = game.resPool.get("tears");
+		//"Stable overcapping" allows auto-sacrifices to bypass storage limits at the cost of greatly reduced efficiency.
+		var stableOvercapLimit = tears.maxValue * (1 + game.getEffect("autoSacrificeStableOvercapRatio"));
+		var stableOvercapEfficiency = game.getEffect("autoSacrificeStableOvercapEfficiency");
 		var tearsToCap = Math.max(0, tears.maxValue - tears.value);
-		var sacrificesToCap = Math.ceil(tearsToCap / tearsPerSacrifice);
+		var tearsToStableOvercap = Math.max(0, stableOvercapLimit - tears.value);
+		var sacrificesToCap = tearsToCap / tearsPerSacrifice;
+		var sacrificesToStableOvercap = tearsToStableOvercap / (tearsPerSacrifice * stableOvercapEfficiency);
 		
-		console.log( "• Unicorn tears (current/max):", tears.value, "/", tears.maxValue );
-		console.log( "• Number of sacrifices it takes to put us at max tears (rounded up):", sacrificesToCap );
+		//console.log( "• Unicorn tears (current/max):", tears.value, "/", tears.maxValue );
+		//console.log( "• Stable overcapping allows us to auto-sacrifice up to", stableOvercapLimit,
+		//			"tears, but at only " + game.toDisplayPercentage( stableOvercapEfficiency ) + "% efficiency." );
+		//console.log( "• We are", tearsToCap, "tears away from reaching the cap &", tearsToStableOvercap, "away from the stable overcap limit." );
+		//console.log( "• We are", sacrificesToCap, "sacrifices away from reaching the cap &", sacrificesToStableOvercap, "away from the stable overcap limit." );
 
-		//Stop sacrificing unicorns when we reach the cap on unicorn tears.
+		//Stop sacrificing unicorns when we reach the stable overcap limit on unicorn tears.
 		//Also don't ever sacrifice more unicorns than we actually have.
-		sacrificesToPerform = Math.min(sacrificesToPerform, sacrificesToCap, Math.floor(unicorns.value / UNICORNS_PER_SACRIFICE));
-		console.log( "• Considering all of the above factors, we will perform", sacrificesToPerform, "sacrifices right now." );
+		sacrificesToPerform = Math.min(sacrificesToPerform, Math.ceil(sacrificesToStableOvercap), Math.floor(unicorns.value / UNICORNS_PER_SACRIFICE));
+		//console.log( "• Considering all of the above factors, we will perform", sacrificesToPerform, "sacrifices right now." );
 		if (sacrificesToPerform < 1) {
 			return; //We don't want to do any sacrifices after all.
 		}
@@ -481,12 +490,30 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		unicornsToSacrifice = UNICORNS_PER_SACRIFICE * sacrificesToPerform;
 		game.stats.getStat("unicornsSacrificed").val += unicornsToSacrifice;
 		game.resPool.addResEvent("unicorns", -unicornsToSacrifice);
-		var tearsExpectedGained = tearsPerSacrifice * sacrificesToPerform;
-		var tearsActualGained = game.resPool.addResEvent("tears", tearsExpectedGained);
-		var overcap = tearsExpectedGained - tearsActualGained;
-		if (overcap > 0.001) {
-			game.bld.cathPollution += overcap * CATH_POLLUTION_PER_OVERCAP * (1 + game.getEffect("cathPollutionRatio"));
-			game.msg($I("religion.sacrificeBtn.sacrifice.msg.overcap", [game.getDisplayValueExt(overcap)]), "", "unicornSacrifice", true /*noBullet*/);
+
+		var normalSacrifices = Math.min(sacrificesToPerform, sacrificesToCap);
+		var stableOvercapSacrifices = sacrificesToPerform - normalSacrifices;
+		//console.log( "•", normalSacrifices, "of the sacrifices are at full efficiency; the remaining", stableOvercapSacrifices, "sacrifices are done for stable overcapping." );
+		
+		var tearsFromNormal = tearsPerSacrifice * normalSacrifices;
+		var tearsFromOvercap = tearsPerSacrifice * stableOvercapEfficiency * stableOvercapSacrifices;
+		var tearsLost = tearsPerSacrifice * (1 - stableOvercapEfficiency) * stableOvercapSacrifices;
+		var tearsValuePrevious = tears.value;
+		
+		//console.log( "• We'll gain", tearsFromNormal, "tears from full-efficiency sacrifices +", tearsFromOvercap, "from stable overcap sacrifices." );
+		//console.log( "• The remaining", tearsLost, "tears that would be produced by stable overcap sacrifices will be lost instead." );
+		tears.value += tearsFromNormal + tearsFromOvercap;
+
+		if (tears.value > stableOvercapLimit) {
+			//console.log( "• An additional", tears.value - stableOvercapLimit, "tears are lost because we surpassed the stable overcap limit." );
+			tearsLost += tears.value - stableOvercapLimit;
+			tears.value = stableOvercapLimit;
+		}
+
+		var tearsActualGained = tears.value - tearsValuePrevious;
+		if (tearsLost > 0.001) {
+			game.bld.cathPollution += tearsLost * CATH_POLLUTION_PER_OVERCAP * (1 + game.getEffect("cathPollutionRatio"));
+			game.msg($I("religion.sacrificeBtn.sacrifice.msg.overcap", [game.getDisplayValueExt(tearsLost)]), "", "unicornSacrifice", true /*noBullet*/);
 		}
 		game.msg($I("religion.sacrificeBtn.sacrifice.msg.auto", [game.getDisplayValueExt(unicornsToSacrifice), game.getDisplayValueExt(tearsActualGained)]), "", "unicornSacrifice" );
 	},
@@ -1273,7 +1300,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 	effectsBase: {
 		"kittensKarmaPerMinneliaRatio" : 0.0001, //unspent pacts can make karma
-		"pactNecrocornConsumption" : -0.0005
+		"pactNecrocornConsumption" : -0.0005,
+		"autoSacrificeUnicornsPenalty": -0.3 //Automatic sacrifices are less efficient
 	},
 
 	getZU: function(name){

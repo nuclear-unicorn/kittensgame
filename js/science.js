@@ -1421,13 +1421,18 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 	{
 		name: "ritualCalendar",
 		label: $I("policy.ritualCalendar.label"),
-		description: $I("policy.ritualCalendar.desc"),
+		description: $I("policy.ritualCalendar.desc", [0]),
 		prices: [
 			{name: "spice", val: 5000},
 			{name: "culture", val: 17500}
 		],
 		effects: {
-			"autoSacrificeUnicornsThreshold": 0.5
+			"autoSacrificeUnicornsThreshold": 0.5,
+			"autoSacrificeStableOvercapRatio": 0.5,
+			"autoSacrificeStableOvercapEfficiency": 0.01
+		},
+		calculateEffects: function(self, game) {
+			self.description = $I("policy.ritualCalendar.desc", [game.toDisplayPercentage(Math.abs(game.getEffect("autoSacrificeUnicornsPenalty")))]);
 		},
 		unlocked: false,
 		blocked: false,
