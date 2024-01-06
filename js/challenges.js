@@ -344,23 +344,17 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				//Third Challenge i.e. second repeat (2 prior completions): 4
 				//After that: 5, 6, 7, 7.4, 7.7, 8, 8.2, 8.4, 8.6, 8.8, 9, 9.2, 9.3, etc., increasing with square root.
 				switch(self.on) {
-				case 0:
-					self.effects["workshopBaseTearsCost"] = 0;
-					break;
-				case 1:
-					self.effects["workshopBaseTearsCost"] = 0.01;
-					break;
-				case 2:
-					self.effects["workshopBaseTearsCost"] = 0.5;
-					break;
-				default:
-					self.effects["workshopBaseTearsCost"] = 1;
+				case 0:	self.effects["workshopBaseTearsCost"] = 0; break;
+				case 1:	self.effects["workshopBaseTearsCost"] = 0.01; break;
+				case 2:	self.effects["workshopBaseTearsCost"] = 0.5; break;
+				default:	self.effects["workshopBaseTearsCost"] = 1;
 				}
 				//First Challenge (0 prior completions): 0 * 0 = 0
 				//Second Challenge i.e. first repeat (1 prior completion): 0.01 * 1 = 0.01
 				//Third Challenge i.e. second repeat (2 prior completions): 0.5 * 2 = 1
 				//Fourth Challenge (3 prior completions): 1 * 3 = 3
 				//After that: 1 * N = N, where N is the number of prior completions
+				//There is an LDR limit, but honestly I don't expect anyone to ever reach it legitimately.
 				self.effects["markerCostIncrease"] = 0.75;
 				self.effects["zigguratIvoryPriceRatio"] = 0;
 				self.effects["unicornsMax"] = 10;
@@ -378,6 +372,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		stackOptions: {
 			"zigguratIvoryPriceRatio": { LDRLimit: 0.15 },
 			"bonfireBaseTearsCost": { noStack: true },
+			"workshopBaseTearsCost": { LDRLimit: 1000 },
 			"markerCostIncrease": { LDRLimit: 9 },
 			"unicornsMax": { noStack: true },
 			"tearsMax": { noStack: true }
@@ -399,7 +394,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		//A list of buildings in the bonfire tab whose prices we won't add unicorn tears to:
 		//Any building that has a truthy value associated with it will be unaffected.
 		//For staged buildings, you can specify the stages separately from each other by providing an array.
-		dontChangeThesePrices: {
+		dontChangeTheseBldPrices: {
 			"field": true,
 			"pasture": [/*Pastures don't cost tears*/ true, /*Solar Farms DO cost tears*/ false],
 			"hut": true,
@@ -413,10 +408,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"amphitheatre": [true, false], //Amphitheatre doesn't cost tears, Broadcast Tower does
 			"workshop": true, //Because we want players to actually have fun
 			"unicornPasture": true,
-			"ziggurat": true,
-			"goldOre": true, //Technically, these are workshop upgrades; remind me to update the documentation later.
-			"coalFurnace": true,
-			"printingPress": false //I'll need to change this to true (& possibly some others) to make this compatible with Pacifism
+			"ziggurat": true
 		},
 		//A list of buildings in the bonfire tab where the first one costs 0 unicorn tears, but subsequent ones cost more tears.
 		isFirstOneFree: {
@@ -426,6 +418,12 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"biolab": true,
 			"temple": true,
 			"tradepost": true
+		},
+		//A list of upgrades in the workshop tab whose prices we won't add unicorn tears to:
+		dontChangeTheseUpgradePrices: {
+			"goldOre": true,
+			"coalFurnace": true,
+			"printingPress": false //I'll need to change this to true (& possibly some others) to make this compatible with Pacifism
 		},
 		/**
 		 * Decides whether or not to add some unicorn tears to the base price of a building.
@@ -444,12 +442,12 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				//...alternatively, build a Mint to get crafting material, but the Mint tech requires already having manuscripts.
 				return !game.challenges.isActive("pacifism"); //Avoid circular dependency
 			}
-			var rawVal = this.dontChangeThesePrices[bldName];
+			var rawVal = this.dontChangeTheseBldPrices[bldName];
 			if (typeof(rawVal) == "boolean") {
 				return !rawVal;
 			}
 			if (rawVal instanceof Array && typeof(bldStage) == "number") {
-				return !rawVal[bldStage];
+				return Boolean(!rawVal[bldStage]);
 			}
 			//Else, rawVal is not defined, so default to making the building cost tears.
 			return true;
@@ -466,7 +464,20 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			if (typeof(game) !== "object") {
 				throw "Missing parameter \"game\" in getIsFirstBldExempt";
 			}
-			return this.isFirstOneFree[bldName];
+			return Boolean(this.isFirstOneFree[bldName]);
+		},
+		/**
+		 * If a workshop upgrade's price is changed to have tears added to it, return true.
+		 * Otherwise, returns false & the workshop upgrade's price is unchanged.
+		 * @param upgradeName	String.  The name of the upgrade in the workshop tab.
+		 * @param game			The game object; not used for anything right now but included just in case a future dev wants this.
+		 * @return	Boolean value.
+		 */
+		getShouldUpgradeCostExtraTears: function(upgradeName, game) {
+			if (typeof(game) !== "object") {
+				throw "Missing parameter \"game\" in getIsFirstBldExempt";
+			}
+			return Boolean(!this.dontChangeTheseUpgradePrices[upgradeName]);
 		}
 	}, {
 		name: "postApocalypse",
