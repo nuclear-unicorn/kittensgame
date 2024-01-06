@@ -630,7 +630,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"alicornPerTick" : 0,
 			"ivoryMeteorRatio" : 0,
 			"unicornsMax": 0,
-			"tearsMax": 0
+			"tearsMax": 0,
+			"alicornMax": 0
 		},
 		calculateEffects: function(self, game) {
 			var effects = {
@@ -640,7 +641,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				"alicornPerTick" : 0,
 				"ivoryMeteorRatio" : 0.05,
 				"unicornsMax": 0,
-				"tearsMax": 0
+				"tearsMax": 0,
+				"alicornMax": 0
 			};
 			if (game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.00002;
@@ -648,6 +650,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			if (game.challenges.isActive("unicornTears")) {
 				effects["unicornsMax"] = 500;
 				effects["tearsMax"] = 275;
+				effects["alicornMax"] = 0.2;
 			}
 			self.effects = effects;
 		},
@@ -673,7 +676,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"tcRefineRatio" : 0,
 			"ivoryMeteorRatio" : 0,
 			"unicornsMax": 0,
-			"tearsMax": 0
+			"tearsMax": 0,
+			"alicornMax": 0
 		},
 		calculateEffects: function(self, game) {
 			var effects = {
@@ -683,7 +687,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				"tcRefineRatio" : 0.05,
 				"ivoryMeteorRatio" : 0.15,
 				"unicornsMax": 0,
-				"tearsMax": 0
+				"tearsMax": 0,
+				"alicornMax": 0
 			};
 			if (game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.000025;
@@ -691,6 +696,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			if (game.challenges.isActive("unicornTears")) {
 				effects["unicornsMax"] = 5500;
 				effects["tearsMax"] = 1800;
+				effects["alicornMax"] = 0.6;
 			}
 			self.effects = effects;
 		},
@@ -722,7 +728,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"tcRefineRatio": 0,
 			"ivoryMeteorRatio" : 0,
 			"unicornsMaxRatio": 0,
-			"tearsMax": 0
+			"tearsMax": 0,
+			"alicornMax": 0
 		},
 		calculateEffects: function(self, game) {
 			var effects = {
@@ -732,7 +739,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				"tcRefineRatio" : 0.1,
 				"ivoryMeteorRatio" : 0.5,
 				"unicornsMaxRatio": 0,
-				"tearsMax": 0
+				"tearsMax": 0,
+				"alicornMax": 0
 			};
 			if (game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.00005;
@@ -740,6 +748,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			if (game.challenges.isActive("unicornTears")) {
 				effects["unicornsMaxRatio"] = 0.1;
 				effects["tearsMax"] = 10000;
+				effects["alicornMax"] = 1;
 			}
 			self.effects = effects;
 		},

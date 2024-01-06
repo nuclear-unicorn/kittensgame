@@ -334,7 +334,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"workshopBaseTearsCost": 0,
 			"markerCostIncrease": 0,
 			"unicornsMax": 0,
-			"tearsMax": 0
+			"tearsMax": 0,
+			"alicornMax": 0
 		},
 		calculateEffects: function(self, game) {
 			if (self.active) {
@@ -359,6 +360,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["zigguratIvoryPriceRatio"] = 0;
 				self.effects["unicornsMax"] = 10;
 				self.effects["tearsMax"] = 1;
+				self.effects["alicornMax"] = 0.2;
 
 			} else {
 				self.effects["bonfireBaseTearsCost"] = 0;
@@ -367,6 +369,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["zigguratIvoryPriceRatio"] = -0.025;
 				self.effects["unicornsMax"] = 0;
 				self.effects["tearsMax"] = 0;
+				self.effects["alicornMax"] = 0;
 			}
 		},
 		stackOptions: {
@@ -375,7 +378,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"workshopBaseTearsCost": { LDRLimit: 1000 },
 			"markerCostIncrease": { LDRLimit: 9 },
 			"unicornsMax": { noStack: true },
-			"tearsMax": { noStack: true }
+			"tearsMax": { noStack: true },
+			"alicornMax": { noStack: true }
 		},
 		checkCompletionCondition: function(game) {
 			return game.resPool.get("necrocorn").value >= 1;
@@ -423,7 +427,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		dontChangeTheseUpgradePrices: {
 			"goldOre": true,
 			"coalFurnace": true,
-			"printingPress": false //I'll need to change this to true (& possibly some others) to make this compatible with Pacifism
+			"huntingArmor": true,	//These 3 upgrades are for IW;
+			"bolas": true,			// I didn't want to have too many special cases
+			"compositeBow": true	// that changed depending on if we're in IW.
 		},
 		/**
 		 * Decides whether or not to add some unicorn tears to the base price of a building.
@@ -470,12 +476,21 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		 * If a workshop upgrade's price is changed to have tears added to it, return true.
 		 * Otherwise, returns false & the workshop upgrade's price is unchanged.
 		 * @param upgradeName	String.  The name of the upgrade in the workshop tab.
-		 * @param game			The game object; not used for anything right now but included just in case a future dev wants this.
+		 * @param game			The game object; needed to check for more complex conditions.
 		 * @return	Boolean value.
 		 */
 		getShouldUpgradeCostExtraTears: function(upgradeName, game) {
 			if (typeof(game) !== "object") {
 				throw "Missing parameter \"game\" in getIsFirstBldExempt";
+			}
+			if (upgradeName === "printingPress") {
+				//Obtaining tears requires Theology, which itself requires manuscripts.
+				//Therefore, this one ought not to cost tears.
+				return !game.challenges.isActive("pacifism"); //Avoid circular dependency
+			}
+			if (upgradeName === "advancedRefinement" /*(Catnip Enrichment)*/ || upgradeName === "celestialMechanics") {
+				//Just to make IW a little more friendly:
+				return !game.ironWill;
 			}
 			return Boolean(!this.dontChangeTheseUpgradePrices[upgradeName]);
 		}
