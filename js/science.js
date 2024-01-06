@@ -1417,6 +1417,82 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocked: false,
         blocks:["rationality"]
     },
+	//----------------   Policies specific to the Unicorn Tears Challenge   --------------------
+	{
+		name: "ritualCalendar",
+		label: $I("policy.ritualCalendar.label"),
+		description: $I("policy.ritualCalendar.desc", [0]),
+		prices: [
+			{name: "spice", val: 5000},
+			{name: "culture", val: 17500}
+		],
+		effects: {
+			"autoSacrificeUnicornsThreshold": 0.5,
+			"autoSacrificeStableOvercapRatio": 0.5,
+			"autoSacrificeStableOvercapEfficiency": 0.01
+		},
+		calculateEffects: function(self, game) {
+			self.description = $I("policy.ritualCalendar.desc", [game.toDisplayPercentage(Math.abs(game.getEffect("autoSacrificeUnicornsPenalty")))]);
+		},
+		unlocked: false,
+		blocked: false,
+		blocks: [ "persistence", "holyGround" ],
+		evaluateLocks: function(game) {
+			return game.challenges.isActive("unicornTears") && game.religion.getZU("unicornTomb").val > 0;
+		}
+	}, {
+		name: "persistence",
+		label: $I("policy.persistence.label"),
+		description: $I("policy.persistence.desc"),
+		prices: [
+			{name: "faith", val: 5000},
+			{name: "culture", val: 17500}
+		],
+		effects: {
+			"unicornsMaxRatio": 1.3,
+			"tearsMaxRatio": 0.3
+		},
+		calculateEffects: function(self, game) {
+			if (game.challenges.isActive("atheism")) {
+				self.description = $I("policy.persistence.atheism.desc");
+			} else {
+				self.description = $I("policy.persistence.desc");
+			}
+		},
+		unlocked: false,
+		blocked: false,
+		blocks: [ "ritualCalendar", "holyGround" ],
+		evaluateLocks: function(game) {
+			return game.challenges.isActive("unicornTears") && game.religion.getZU("unicornTomb").val > 0;
+		}
+	}, {
+		name: "holyGround",
+		label: $I("policy.holyGround.label"),
+		description: $I("policy.holyGround.desc"),
+		prices: [
+			{name: "megalith", val: 5000},
+			{name: "culture", val: 17500}
+		],
+		onResearch: function(game) {
+			var ziggurats = game.bld.get("ziggurat");
+			var amt = this.effects["buildAdditionalZiggurats"];
+			ziggurats.on += amt;
+			ziggurats.val += amt;
+			game.upgrade({ buildings: ["ziggurat"]});
+			//Repurpose an existing console log message:
+			game.msg($I("construct.all.msg", [ziggurats.label, amt]));
+		},
+		effects: {
+			"buildAdditionalZiggurats": 5,
+			"unicornSacrificeRatio": 0.05
+		},
+		unlocked: false,
+		blocked: false,
+		blocks: [ "ritualCalendar", "persistence" ],
+		evaluateLocks: function(game) {
+			return game.challenges.isActive("unicornTears") && game.religion.getZU("unicornTomb").val > 0;
+		}
+	},
     //----------------   Environmental Policy   --------------------
     {
         name: "stripMining",
@@ -1841,12 +1917,16 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 		var policyFakeBought = this.game.getEffect("policyFakeBought");
 		var prices = [];
 		for (var i = 0; i < meta.prices.length; i++){
-            prices.push({
+			var resName = meta.prices[i].name;
+			if (meta.name == "persistence" && resName == "faith" && this.game.challenges.isActive("atheism")) {
+				resName = "science"; //Replace faith with science in Atheism
+			}
+			prices.push({
 				val: meta.prices[i].val * Math.pow(1.25, policyFakeBought),
-				name: meta.prices[i].name
+				name: resName
 			});
 		}
-        return prices;
+		return prices;
 	},
 	updateVisible: function(model){
 		var meta = model.metadata;

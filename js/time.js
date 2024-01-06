@@ -176,6 +176,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     },
 
     applyRedshift: function(daysOffset, ignoreCalendar){
+        var unicornsValuePrevious = this.game.resPool.get("unicorns").value;
+
         //populate cached per tickValues
         this.game.resPool.update();
         this.game.updateResources();
@@ -190,6 +192,10 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.game.village.fastforward(daysOffset);
         this.game.space.fastforward(daysOffset);
         this.game.religion.fastforward(daysOffset);
+        if (daysOffset >= this.game.calendar.daysPerSeason) { //Auto-sacrifice should only happen once per season.
+            //console.log( "Auto-sacrificing unicorns after redshifting for", daysOffset, "days." );
+            this.game.religion.autoSacrificeUnicorns(daysOffset / this.game.calendar.daysPerSeason, unicornsValuePrevious);
+        }
 
         this.game.resPool.enforceLimits(resourceLimits);
 
@@ -643,6 +649,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
             // ShatterTC gain
             if (shatterTCGain > 0) {
+                var unicornsValuePrevious = game.resPool.get("unicorns").value;
                 // XXX Partially duplicates resources#fastforward and #enforceLimits, some nice factorization is probably possible
                 var limits = {};
                 for (var j = 0; j < game.resPool.resources.length; j++) {
@@ -653,6 +660,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 if (this.game.workshop.get("chronoEngineers").researched) {
                     this.game.workshop.craftByEngineers(remainingTicksInCurrentYear * shatterTCGain);
                 }
+                //console.log( "Auto-sacrificing unicorns after shattering", amt, "TCs." );
+                this.game.religion.autoSacrificeUnicorns(remainingDaysInCurrentYear / this.game.calendar.daysPerSeason, unicornsValuePrevious);
+                limits["tears"] = Infinity; //The autoSacrifice function calculates its own limits for this resource.
                 for (var j = 0; j < game.resPool.resources.length; j++) {
                     var res = game.resPool.resources[j];
                     res.value = Math.min(res.value, limits[res.name]);
@@ -732,6 +742,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
             // ShatterTC gain
             if (shatterTCGain > 0) {
+                var unicornsValuePrevious = game.resPool.get("unicorns").value;
                 // XXX Partially duplicates resources#fastforward and #enforceLimits, some nice factorization is probably possible
                 var limits = {};
                 for (var j = 0; j < game.resPool.resources.length; j++) {
@@ -742,6 +753,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 if (this.game.workshop.get("chronoEngineers").researched) {
                     this.game.workshop.craftByEngineers(remainingTicksInCurrentCycle * shatterTCGain);
                 }
+                //console.log( "Auto-sacrificing unicorns after shattering", amt, "TCs." );
+                this.game.religion.autoSacrificeUnicorns(remainingDaysInCurrentCycle / this.game.calendar.daysPerSeason, unicornsValuePrevious);
+                limits["tears"] = Infinity; //The autoSacrifice function calculates its own limits for this resource.
                 for (var j = 0; j < game.resPool.resources.length; j++) {
                     var res = game.resPool.resources[j];
                     res.value = Math.min(res.value, limits[res.name]);
@@ -857,6 +871,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     aiApocalypseLevel = 0;
                 }
                 // XXX Partially duplicates resources#fastforward and #enforceLimits, some nice factorization is probably possible
+                var unicornsValuePrevious = game.resPool.get("unicorns").value;
                 var limits = {};
                 var delta = {};
                 for (var j = 0; j < game.resPool.resources.length; j++) {
@@ -871,6 +886,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 if (this.game.workshop.get("chronoEngineers").researched) {
                     this.game.workshop.craftByEngineers(ticksInCurrentCycle * shatterTCGain);
                 }
+                //console.log( "Auto-sacrificing unicorns after shattering", amt, "TCs." );
+                this.game.religion.autoSacrificeUnicorns(daysInCurrentCycle / this.game.calendar.daysPerSeason, unicornsValuePrevious);
+                limits["tears"] = Infinity; //The autoSacrifice function calculates its own limits for this resource.
                 for (var j = 0; j < game.resPool.resources.length; j++) {
                     var res = game.resPool.resources[j];
                     /*

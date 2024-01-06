@@ -853,6 +853,8 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			this.game.bld.get("steamworks").jammed = false;
 		}
 
+		this.game.religion.autoSacrificeUnicorns();
+
 		// Apply seasonEffect for the newSeason
 		this.game.upgrade({
 			buildings: ["pasture"]
@@ -903,6 +905,8 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		if (this.game.bld.get("steamworks").jammed) {
 			this.game.bld.get("steamworks").jammed = false;	//reset jammed status
 		}
+
+		this.game.religion.autoSacrificeUnicorns();
 
 		if(milleniumChangeCalculated){
 			this.calculateMilleniumProduction(this.getMilleniaChanged(this.year - years, this.year));
@@ -988,6 +992,8 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 		if (this.game.bld.get("steamworks").jammed) {
 			this.game.bld.get("steamworks").jammed = false;	//reset jammed status
 		}
+		
+		this.game.religion.autoSacrificeUnicorns();
 
 		if ( this.year % 1000 === 0 ){
 			this.game.resPool.addResEvent("paragon", 1);
