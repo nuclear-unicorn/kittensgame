@@ -419,7 +419,12 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 				title: $I("console.filter.blackcoin"),
 				enabled: true,
 				unlocked: false
-			}
+			},
+			"festival": {
+				title: $I("console.filter.festival"),
+				enabled: true,
+				unlocked: false
+			},
 		}
 	},
 

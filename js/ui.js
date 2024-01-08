@@ -933,7 +933,9 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         dojo.empty(filtersDiv);
         var show = false;
 
-        for (var fId in console.filters){
+        var filtersSorted = Object.keys(console.filters).sort();
+        for (var filterIndex in filtersSorted) {
+            var fId = filtersSorted[filterIndex];
             if (console.filters[fId].unlocked) {
                 this._createFilter(console.filters[fId], fId, filtersDiv);
                 show = true;

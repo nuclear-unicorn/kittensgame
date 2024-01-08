@@ -2103,29 +2103,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * Display a message in the console. Returns a <span> node of a text container
 	 */
 	msg: function(message, type, tag, noBullet){
-
-		var filters = dojo.clone(this.console.filters);
-		if (tag && filters[tag]){
-			var filter = filters[tag];
-
-			if (!filter.enabled) {
-				return;
-			}
-		}
-
-		var hasCalendarTech = this.science.get("calendar").researched;
-
-		if (hasCalendarTech){
-			var currentDateMessage = $I("calendar.year.ext", [this.calendar.year.toLocaleString(), this.calendar.getCurSeasonTitle()]);
-			if (this.lastDateMessage !== currentDateMessage) {
-				this.console.msg(currentDateMessage, "date", null, false);
-				this.lastDateMessage = currentDateMessage;
-			}
-		}
-
-		var messageLine = this.console.msg(message, type, tag, noBullet);
-
-		return messageLine;
+		return this.console.msg(message, type, tag, noBullet);
 	},
 
 	clearLog: function(){
