@@ -1274,9 +1274,16 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
         dojo.style(this.nextCycle.link, "display", this.model.nextCycleLink.visible ? "" : "none");
         dojo.style(this.previousCycle.link, "display", this.model.previousCycleLink.visible ? "" : "none");
         dojo.style(this.tenEras.link, "display", this.model.tenErasLink.visible ? "" : "none");
-        if(this.custom){
-            dojo.style(this.custom.link, "display", (this.model.customLink && this.model.customLink.visible) ? "" : "none");
+
+        if(this.model.customLink && !this.custom) { //Create custom link if needed
+            this.custom = this.addLink(this.model.customLink);
         }
+        if(!this.model.customLink && this.custom) { //Destroy custom link if needed
+            dojo.destroy(this.custom.link);
+            this.custom = undefined;
+        }
+        this.updateLink(this.custom, this.model.customLink); //need this to sync the changes of effect and shatter number.
+
         if  (this.model.tenErasLink.visible) {
             dojo.addClass(this.tenEras.link,"rightestLink");
             dojo.removeClass(this.previousCycle.link,"rightestLink");
@@ -1285,10 +1292,6 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
             dojo.removeClass(this.nextCycle.link,"rightestLink");
         } else if (this.model.nextCycleLink.visible) {
             dojo.addClass(this.nextCycle.link,"rightestLink");
-        }
-
-        if(this.model.customLink){
-            this.updateLink(this.custom, this.model.customLink); //need this to sync the changes of effect and shatter number. this might be a hack :3
         }
     }
 });
@@ -1603,15 +1606,10 @@ dojo.declare("classes.tab.TimeTab", com.nuclearunicorn.game.ui.tab, {
         this.inherited(arguments);
 
         var hasCF = this.game.workshop.get("chronoforge").researched;
-        if (hasCF){
-            this.cfPanel.setVisible(true);
-        }
+        this.cfPanel.setVisible(hasCF);
 
 		var hasVS = (this.game.science.get("voidSpace").researched || this.game.time.getVSU("usedCryochambers").val > 0);
-        if (hasVS){
-            this.vsPanel.setVisible(true);
-        }
-
+        this.vsPanel.setVisible(hasVS);
     }
 });
 
