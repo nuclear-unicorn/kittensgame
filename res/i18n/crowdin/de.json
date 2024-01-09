@@ -1659,6 +1659,7 @@
     "village.btn.unassign": "Anführer abwählen",
     "village.btn.unassign.job": "Von Beruf entbinden",
     "village.btn.upgradeExplorers": "Verbessere Entdecker",
+    "village.btn.upgradeHQ": "HQ aufwerten",
     "village.btn.upgradeHQ.desc": "Verbessert das maximale Limit deiner Expeditionsvorräte bei 5 Tagen um + 1%",
     "village.btn.unwrap": "Packe Geschenk aus",
     "village.btn.unwrap.confirmation.msg": "Bist du dir sicher, dass du das Geschenk jetzt öffnen willst? Eventuell bekommst du ein besseres Geschenk, wenn du noch ein wenig wartest!",
@@ -1938,6 +1939,7 @@
     "workshop.crafts.kerosene.desc": "Ein aus Öl hergestellter Raketentreibstoff",
     "workshop.crafts.manuscript.label": "Manuskript",
     "workshop.crafts.manuscript.desc": "Schriftliches Dokument, das für technologischen Fortschritt erförderlich est. Jedes Manuskript erhöht ein bisschen (mit abnehmenden Ertragszuwachs) die maximale Kultur",
+    "workshop.crafts.megalith.label": "Megalith",
     "workshop.crafts.megalith.desc": "Ein massiver Block, der genutzt werden kann, um riesige Strukturen zu bauen",
     "workshop.crafts.parchment.label": "Pergament",
     "workshop.crafts.parchment.desc": "Ein Material aus Tierhäuten, auf dem man schreiben kann, wird für kulturelle Gebäude benötigt.",
@@ -1952,6 +1954,7 @@
     "workshop.crafts.steel.label": "Stahl",
     "workshop.crafts.steel.desc": "Ein widerstandsfähiges Metall, hergestellt durch das Schmelzen von Eisen und Kohle. Erforderlich für den Bau von Zahnrädern und komplexen Maschinen.",
     "workshop.crafts.tMythril.label": "T-Mythril",
+    "workshop.crafts.tMythril.desc": "T-Mythril (tbd)",
     "workshop.crafts.tanker.label": "Tankschiff",
     "workshop.crafts.tanker.desc": "Erhöhe die maximale Ölkapazität um 500",
     "workshop.crafts.thorium.label": "Thorium",
@@ -2167,5 +2170,7 @@
     "workshop.voidReactors.label": "Voidreaktoren",
     "workshop.voidReactors.desc": "Your Research Vessels are 4 times as effective",
     "workshop.zebraUpgrade.bloodstoneInstitute.label": "Blutstein Institut",
-    "workshop.zebraUpgrade.darkRevolution.label": "Dunkle Revolution"
+    "workshop.zebraUpgrade.darkRevolution.label": "Dunkle Revolution",
+    "workshop.zebraUpgrade.whispers.desc": "Schalte Alicorn Ascension Rituale an Elfenbeintempeln frei. Alicorn Ascension produziert T-Mythril und erhöht die Mineralproduktion.",
+    "workshop.zebraUpgradesPanel.label": "Zebra Aufwertung"
 }
