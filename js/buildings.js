@@ -1644,7 +1644,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			mpratio *= (1 + game.village.map.villageLevel * 0.005);
 			mpratio *= (1 + game.getEffect("mintRatio"));
 			self.effects["fursPerTickProd"]  = mpratio * 1.25;	//2
-			self.effects["ivoryPerTickProd"] = mpratio * 0.3;	//1.5
+			self.effects["ivoryPerTickProd"] = mpratio * 0.3 * (1 + game.getEffect("mintIvoryRatio"));	//1.5
 
 			var amt = game.resPool.getAmtDependsOnStock(
 				[{res: "gold", amt: -self.effects["goldPerTickCon"]},

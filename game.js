@@ -1437,22 +1437,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.magnetoBoostBonusPolicy.title"),
 				type: "ratio"
 			},
-			"mineralsSuperRatio":{
-                title: $I("effectsMgr.statics.mineralsSuperRatio.title"),
-                type: "ratio"
-            },
-			"goldSuperRatio":{
-                title: $I("effectsMgr.statics.goldSuperRatio.title"),
-                type: "ratio"
-            },
-			"oilSuperRatio":{
-                title: $I("effectsMgr.statics.oilSuperRatio.title"),
-                type: "ratio"
-            },
-			"negativeCycleRatioPolicy":{
-                title: $I("effectsMgr.statics.negativeCycleRatioPolicy.title"),
-                type: "ratio"
-            },
 			"parchmentTradeChanceIncrease":{
 				title: $I("effectsMgr.statics.parchmentTradeChanceIncrease.title"),
                 type: "ratio" 
@@ -1495,6 +1479,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			},			
 			"starchartPolicyRatio":{
 				title: $I("effectsMgr.statics.starchartPolicyRatio.title"),
+				type: "ratio"
+			},
+			"mintIvoryRatio": {
+				title: $I("effectsMgr.statics.mintIvoryRatio.title"),
 				type: "ratio"
 			},
             //philosophy
@@ -1584,6 +1572,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
             },
             "mineralsPolicyRatio":{
 				title: $I("effectsMgr.statics.mineralsPolicyRatio.title"),
+				type: "ratio"
+            },
+			"oilPolicyRatio":{
+				title: $I("effectsMgr.statics.oilPolicyRatio.title"),
 				type: "ratio"
             },
             "woodPolicyRatio":{

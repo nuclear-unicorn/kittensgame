@@ -117,6 +117,12 @@ dojo.declare("classes.managers.StatsManager", com.nuclearunicorn.core.TabManager
             return game.toDisplaySeconds(game.calendar.trueYear() * game.calendar.seasonsPerYear * game.calendar.daysPerSeason * game.calendar.ticksPerDay / game.ticksPerSecond);
         },
         unlocked: false
+    },{
+        name: "totalSpiderTrades",
+        title: $I("stats.spiderTrades.current"),
+        val: 0,
+        unlocked: false,
+        hidden: true
     }
     ],
 
@@ -219,6 +225,10 @@ dojo.declare("classes.tab.StatsTab", com.nuclearunicorn.game.ui.tab, {
 
             for (var i in stats) {
                 var stat = stats[i];
+
+                if (stat.hidden) {
+                    continue;
+                }
 
                 if (stat.calculate) {
                     stat.val = stat.calculate(this.game);

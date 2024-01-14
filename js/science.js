@@ -1507,7 +1507,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 16000}
         ],
         effects:{
-            "magnetoBoostBonusPolicy" : 0.02
+            "magnetoBoostBonusPolicy" : 0.01
         },
         unlocked: false,
         blocked: false,
@@ -1592,18 +1592,24 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 20000}
         ],
         effects:{
-            "mineralsSuperRatio" : 0.1,
-			"coalSuperRatio" : 0.1,
-			"oilSuperRatio": 0.1,
-			"goldSuperRatio": 0.1
+			"mineralsPolicyRatio" : 0,
+			"coalPolicyRatio" : 0,
+			"goldPolicyRatio" : 0
         },
         unlocked: false,
         blocked: false,
 		isRelation: true,
-        blocks:["spiderRelationsChemists"],
+        blocks:["spiderRelationsChemists", "spiderRelationsPaleontologists"],
 		evaluateLocks: function(game){
 			return game.science.checkRelation("spiders", 10);
-		}
+		},
+		calculateEffects: function(self, game) {
+			var trades = game.stats.getStatCurrent("totalSpiderTrades").val;
+			var ratio = Math.min(Math.floor(Math.log10(Math.max(trades, 100)) - 1) * 0.04, 0.2);
+			for (var effect in self.effects) {
+				self.effects[effect] = ratio;
+			}
+		},
 	}, {
 		name: "spiderRelationsChemists",
         label: $I("policy.spiderRelationsChemists.label"),
@@ -1615,7 +1621,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
 		isRelation: true,
-        blocks:["spiderRelationsGeologists"],
+        blocks:["spiderRelationsGeologists", "spiderRelationsPaleontologists"],
 		evaluateLocks: function(game){
 			return game.science.checkRelation("spiders", 10);
 		},
@@ -1633,6 +1639,24 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			if(spiderRelations && !spiders.sells.includes("kerosene")) {
 				spiders.sells.push({name: "kerosene", value: 5, chance: 0.1, width: 0.1, minLevel: 10});
 			}
+		}
+	}, {
+		name: "spiderRelationsPaleontologists",
+        label: $I("policy.spiderRelationsPaleontologists.label"),
+        description: $I("policy.spiderRelationsPaleontologists.desc"),
+        prices: [
+            {name : "culture", val: 20000}
+        ],
+        effects:{
+			"mintIvoryRatio" : 0.25,
+			"oilPolicyRatio" : 0.1
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["spiderRelationsChemists", "spiderRelationsGeologists"],
+		evaluateLocks: function(game){
+			return game.science.checkRelation("spiders", 10);
 		}
 	}, {
 		name: "dragonRelationsPhysicists",
