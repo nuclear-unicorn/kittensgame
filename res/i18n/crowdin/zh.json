@@ -612,7 +612,7 @@
     "navbar.energy.penalty": "生产加成惩罚: ",
     "navbar.energy.prod": "产量：{0}Wt",
     "navbar.energy.prod.short": "产量：",
-    "navbar.observe": "观测天空",
+    "navbar.observe": "观察天空",
     "navbar.observe.short": "观察",
     "navbar.res.amount": "数量",
     "notification.save.title": "正在保存...",
