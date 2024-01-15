@@ -1222,7 +1222,7 @@
     "science.electricity.effectDesc": "解锁磁电机",
     "science.electricity.flavor": "谁知道在地毯上跑来跑去竟能产生如此的力量?",
     "science.electronics.label": "电子学",
-    "science.electronics.desc": "电子学解锁一些主要与科学相关的高级升级",
+    "science.electronics.desc": "电力用于解锁一些主要与科学相关的高阶升级项目",
     "science.electronics.effectDesc": "解锁广播塔、CAD 系统、冷藏和搜寻地外文明计划",
     "science.engineering.label": "工程",
     "science.engineering.desc": "工程是设计复杂材料、结构、设备和系统的科学(或者说艺术?)",
