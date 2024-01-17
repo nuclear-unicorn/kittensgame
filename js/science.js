@@ -1579,6 +1579,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			self.effects["nagaBlueprintTradeChance"] = Math.min(nagaEmbassies * 0.005, 0.2);
 			if (nagaEmbassies > 40) {
 				self.effects["blueprintCraftRatio"] = (nagaEmbassies - 40) * 0.05;
+			} else {
+				self.effects["blueprintCraftRatio"] = 0;
 			}
 		},
 		evaluateLocks: function(game){
@@ -1667,7 +1669,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         ],
 		effects:{
             "reactorEnergyRatio" : 0.25,
-			"harborLimitRatioPolicy": 0.5
+			"harborLimitRatioPolicy": 0.05
         },
         unlocked: false,
         blocked: false,
