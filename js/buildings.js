@@ -1413,6 +1413,12 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		calculateEffects: function(self, game){
 			if (self.val) {
 				game.time.queue.unlockQueueSource("upgrades");
+				if (self.val > 1) {
+					var thePolicy = game.science.getPolicy("scientificCommunism");
+					if (!thePolicy.researched) {
+						thePolicy.blocked = true;
+					}
+				}
 			}
 		},
 		flavor: $I("buildings.workshop.flavor")
@@ -1441,6 +1447,12 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			threshold: 20
 		},
 		calculateEffects: function(self, game){
+			if (self.val > 0) {
+				var thePolicy = game.science.getPolicy("scientificCommunism");
+				if (!thePolicy.researched) {
+					thePolicy.blocked = true;
+				}
+			}
 			var effects = {
 				"craftRatio": 0.05 * (1 + game.getEffect("environmentFactoryCraftBonus"))
 			};

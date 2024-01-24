@@ -960,14 +960,46 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 	//----------------	meme --------------------
 	{
 		name: "socialism",
-        label: $I("policy.socialism.label"),
-        description: $I("policy.socialism.desc"),
+		label: $I("policy.socialism.label"),
+		description: $I("policy.socialism.desc"),
 		prices: [
 			{name : "culture", val: 7500}
 		],
 		unlocked: false,
 		blocked: false,
-        blocks:[]
+		blocks:[],
+		effects: {}, //Empty on purpose; this is a meme policy!
+		calculateEffects: function(self, game) {
+			var effects = {};
+			if (game.science.getPolicy("scientificCommunism").researched) {
+				var SCIENTIFIC_COMMUNISM_RATIO = 1.25;
+				for (var key in effects) {
+					effects[key] *= SCIENTIFIC_COMMUNISM_RATIO;
+				}
+			}
+			self.effects = effects;
+		},
+		unlocks: {
+			policies: ["scientificCommunism"]
+		}
+	},
+	{
+		name: "scientificCommunism",
+		label: $I("policy.scientificCommunism.label"),
+		description: $I("policy.scientificCommunism.desc"),
+		prices: [
+			{name : "culture", val: 8500}
+		],
+		unlocked: false,
+		evaluateLocks: function(game) {
+			//Secret policy that's only available if you never had more than 1 Workshop & never had any Factories.
+			return game.bld.get("workshop").val < 2 && game.bld.get("factory").val < 1 && game.science.getPolicy("socialism").researched;
+		},
+		blocked: false,
+		blocks:[],
+		upgrades: {
+			policies: ["socialism"]
+		},
 	},
 	//----------------	industrial age --------------------
 	{
