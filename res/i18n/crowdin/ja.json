@@ -1,7 +1,7 @@
 {
     "console.intro": "あなたはキャットニップの森にいる1匹の子猫です。",
     "console.intro.zebra": "あなたはチタン鉱山であふれるサバンナのシマウマです。",
-    "achievements.header": "実績: {1}中{0}",
+    "achievements.header": "実績: {0} / {1}",
     "achievements.msg.unlock": "実績がアンロックされた: {0}!",
     "achievements.msg.starUnlock": "実績の星がアンロックされた: {0}!",
     "achievements.anachronox.title": "アナクロノックス",
