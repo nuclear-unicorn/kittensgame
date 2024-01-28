@@ -798,6 +798,8 @@
     "policy.rationing.desc": "Stoic philosophers encourage restraint and saving, making hunting more effective and reducing the effect of happiness on catnip consumption.",
     "policy.republic.label" : "Republic",
     "policy.republic.desc" : "Best for large societies. Highly promoted leaders will provide a small bonus to the production of all kittens.",
+    "policy.scientificCommunism.label" : "Scientific Communism",
+    "policy.scientificCommunism.desc" : "Increases all effects of Socialism by 25%",
     "policy.siphoning.label" : "Siphoning",
     "policy.siphoning.desc" : "Pacts consume alicorns and slow down corruption instead of consuming necrocorns. Lack of alicorns or corruption is compensated by consuming necrocorns.",
     "policy.socialism.label" : "Socialism",
