@@ -939,7 +939,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"rrRatio" : 0.02
 		},
 		upgrades: {
-			chronoforge: ["temporalImpedance"]
+			chronoforge: ["temporalImpedance", "temporalPress"]
+		},
+		unlocks: {
+			chronoforge: ["temporalPress"]
 		},
 		unlocked: false,
 		flavor: $I("religion.tu.blazar.flavor")
