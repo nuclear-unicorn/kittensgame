@@ -150,7 +150,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         //if we have spare chronoheat
         if (this.heat > 0) {
             var perTick = Math.min(this.game.getEffect("heatPerTick"), this.heat);
-            var efficiency = 1 + Math.min(this.game.getEffect("heatEfficiency"), 3);
+            var efficiency = 1 + this.game.getEffect("heatEfficiency");
             this.getCFU("blastFurnace").heat += perTick * efficiency;
             this.heat -= perTick;
             if (this.heat < 0) {
@@ -197,7 +197,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             var heatAttemptTransfer = daysOffset * this.game.calendar.ticksPerDay * perTickHeatTransfer;
             var heatTransfer = Math.min(this.heat, heatAttemptTransfer);
             var blastFurnace = this.getCFU("blastFurnace");
-            var efficiency = 1 + Math.min(this.game.getEffect("heatEfficiency"), 3);
+            var efficiency = 1 + this.game.getEffect("heatEfficiency");
             blastFurnace.heat += heatTransfer * efficiency;
             this.heat -= heatTransfer;
 
@@ -1235,7 +1235,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         var heat_acutoconverted = 1 - 100/(100 + this.game.getEffect("heatCompression"));
         if (heat_acutoconverted){
             this.game.time.heat += amt * factor * (1 - heat_acutoconverted);
-            var efficiency = 1 + Math.min(this.game.getEffect("heatEfficiency"), 3);
+            var efficiency = 1 + this.game.getEffect("heatEfficiency");
             this.game.time.getCFU("blastFurnace").heat += amt * factor * heat_acutoconverted * efficiency;
         }else{
             this.game.time.heat += amt * factor;
