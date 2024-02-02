@@ -175,6 +175,32 @@ WQueue = React.createClass({
         }, selectOpts);
     },
 
+    getPossibleQueueStrategies: function(){
+        var self = this;
+        var selectOpts = [];
+        var options = game.time.queue.possibleQueueStrategies;
+        for (var strategy in options){
+            //console.warn(options[strategy]);
+            //selectOpts.push(options[strategy]);
+            selectOpts.push($r("option", { value: options[strategy], "data-label": options[strategy]}, options[strategy]));
+            //selectOpts.push(strategy);
+        }
+        if (!options.length){
+            selectOpts.push($r("option", {}, "-"));
+        }
+
+        return $r("select", {
+            value: game.time.queue.failStrategy,
+            onChange: function(e){
+                self.setState({
+                    strategy: e.target.value,
+                    itemLabel: e.target.label
+                });
+                game.time.queue.failStrategy = e.target.value;
+            }
+        }, selectOpts);
+    },
+
     getQueueItems: function(){
         var self = this;
         var items = [];
@@ -252,6 +278,7 @@ WQueue = React.createClass({
                 $I("queue.alphabeticalToggle")
             ]),
 
+            this.getPossibleQueueStrategies(),
             this.getQueueItems()
         ]);
     }

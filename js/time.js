@@ -33,7 +33,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "unlocked", "isAutomationEnabled"]),
             vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"]),
             queueItems: this.queue.queueItems,
-            queueSources: this.queue.queueSources
+            queueSources: this.queue.queueSources,
+            failStrategy: this.queue.failStrategy || null 
         };
         this._forceChronoFurnaceStop(saveData.time.cfu);
     },
@@ -86,6 +87,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 this.queue.queueSources[i] = this.queue.queueSourcesDefault[i];
             }
         }
+
+        this.queue.failStrategy = saveData["time"].failStrategy || null;
 
         this.queue.updateQueueSourcesArr();
 
@@ -245,15 +248,71 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             var daysOffsetLeft = daysOffset;
             var redshiftQueueWorked = true;
             if (!result[1]){
-                numberEvents = this.applyRedshift(daysOffset);
-                daysOffsetLeft = 0;
+                    switch (this.queue.failStrategy){
+                        case "remove" | "pushBack":
+                            if (!this.queue.isFirstItemCapped()){
+                                break;
+                            }
+                            for (var _ in this.queue.queueItems){
+                                this.queue.update();
+                                result = this.queue.getFirstItemEtaDay();
+                                if (result[1] || !this.queue.isFirstItemCapped()){
+                                    break;
+                                }
+                            }
+                            break;        
+                        case "skipCapped" || "skip":
+                            if (!this.queue.isFirstItemCapped() && this.queue.failStrategy == "skipCapped"){
+                                break;
+                            }
+                            for (var i in this.queue.queueItems){
+                                result = this.queue.getNthItemEtaDay(i);
+                                if (result[1] || !this.queue.isNthItemCapped(i)){
+                                    break;
+                                }
+                            }
+                            break;
+                        default:
+                            numberEvents = this.applyRedshift(daysOffset);
+                            daysOffsetLeft = 0;
+                    }
+                    if (!result[1]){
+                        numberEvents = this.applyRedshift(daysOffset);
+                        daysOffsetLeft = 0;
+                    }
             }
             while (daysOffsetLeft > 0){
                 result = this.queue.getFirstItemEtaDay();
                 if (!result[1]){
-                    this.applyRedshift(daysOffsetLeft, true);
-                    daysOffsetLeft = 0;
-                    break;
+                    if (this.queue.isFirstItemCapped()){
+                        switch (this.queue.failStrategy){
+                            case "remove" | "pushBack":
+                                for (var _ in this.queue.queueItems){
+                                    this.queue.update();
+                                    result = this.queue.getFirstItemEtaDay();
+                                    if (result[1]|| !this.queue.isFirstItemCapped()){
+                                        break;
+                                    }
+                                }
+                                break;
+                                case "skipCapped":
+                                    for (var i in this.queue.queueItems){
+                                        result = this.queue.getNthItemEtaDay(i);
+                                        if (result[1] || !this.queue.isNthItemCapped(i)){
+                                            break;
+                                        }
+                                    }
+                                    break;                        
+                            default:
+                                this.applyRedshift(daysOffsetLeft, true);
+                                daysOffsetLeft = 0;
+                                break;
+                        }
+                    }else{
+                        this.applyRedshift(daysOffsetLeft, true);
+                        daysOffsetLeft = 0;
+                        break;
+                    }
                 }
                 if (result[1] & redshiftQueueWorked){
                     var daysNeeded = result[0];// + 5; //let's have a little bit more days in case steamwork automation messes things up.
@@ -1646,6 +1705,87 @@ dojo.declare("classes.queue.manager", null,{
         eta = Math.ceil(eta);
         return [eta, true];
     },
+
+    getNthItemEtaDay: function(n){
+        if (this.queueItems.length == 0 || this.queueItems.length >= n){
+            return [0, false];
+        }
+        var eta = 0;
+        var element = this.queueItems[n];
+        if (!element) {
+            //This is probably a null queue item.  Treat it as if it were a valid building that can be built for free.
+            //Later on when we update the queue, this null item should be removed & we'll go on to the next.
+            return [0, true];
+        }
+        var modelElement = this.getQueueElementModel(element);
+        var prices = modelElement.prices;
+        var engineersConsumed = this.game.workshop.getConsumptionEngineers();
+        for (var ind in prices){
+            var price = prices[ind];
+            var res = this.game.resPool.get(price.name);
+		    if (res.value >= price.val){
+                //We already have enough of this resource.
+                continue;
+            }
+            if (res.maxValue < price.val){
+                //We don't have enough storage space to ever be able to afford the price.
+                return [eta, false];
+            }
+            var resPerTick = this.game.getResourcePerTick(res.name, true);
+            var engineersProduced = this.game.workshop.getEffectEngineer(res.name, true);
+            var deltaPerTick = resPerTick + (engineersConsumed[res.name] || 0)+ engineersProduced;
+            if (deltaPerTick <= 0) {
+                //We are losing this resource over time (or not producing any), so we'll never be able to afford the price.
+                return [eta, false];
+            }
+            eta = Math.max(eta,
+            (price.val - res.value) / (deltaPerTick) / this.game.calendar.ticksPerDay
+            );
+            if (engineersProduced){
+                var countdown = (1 / (this.game.workshop.getEffectEngineer(res.name, false))) / this.game.calendar.ticksPerDay;
+                eta = Math.ceil(eta/countdown)*countdown;
+            }
+        }
+        eta = Math.ceil(eta);
+        return [eta, true];
+    },
+
+    /**
+     * Returns if the nth item in queue is capped or not
+     */
+    isNthItemCapped: function(n){
+        if (this.queueItems.length >= n){
+            return null;
+        }
+
+        var element = this.queueItems[n];
+        if (!element) {
+            return false;
+        }
+        var modelElement = this.getQueueElementModel(element);
+        var prices = modelElement.prices;
+
+        console.log(this.game.resPool.isStorageLimited(prices));
+        return this.game.resPool.isStorageLimited(prices);
+    },
+    /**
+     * Returns if the first item in queue is capped or not
+     */
+    isFirstItemCapped: function(){
+        if (this.queueItems.length == 0){
+            return null;
+        }
+
+        var element = this.queueItems[0];
+        if (!element) {
+            return false;
+        }
+        var modelElement = this.getQueueElementModel(element);
+        var prices = modelElement.prices;
+
+        console.log(this.game.resPool.isStorageLimited(prices));
+        return this.game.resPool.isStorageLimited(prices);
+    },
     updateQueueSourcesArr: function(){
         for (var i in this.queueSources){
             if (!this.queueSources[i]){
@@ -1709,6 +1849,9 @@ dojo.declare("classes.queue.manager", null,{
     },
     cap: 0,
     baseCap :2,
+    // we can put resource capped thing back, ignore them all, or remove the item outright...
+    failStrategy: null,
+    possibleQueueStrategies: [null, "skipCapped", "pushBackCapped", "removeCapped", "skip"],
 
     constructor: function(game){
         this.game = game;
@@ -2352,6 +2495,45 @@ dojo.declare("classes.queue.manager", null,{
             this.game._publish("ui/update", this.game);
             //console.log( "Successfully built " + el.name + " using the queue." );
         } else {
+            if (this.failStrategy !== null 
+                //) { console.warn(model.prices, game.resPool.isStorageLimited(model.prices));
+                && this.game.resPool.isStorageLimited(model.prices)){
+                switch (this.failStrategy){
+                    //this is very ugly, probably slow and will need to be refactored
+                    case "skipCapped":
+                        var old_v = this.queueItems;
+                        var new_v = old_v.slice(1);
+                        this.queueItems = new_v;
+                        //console.log(this.queueItems, "hmm", old_v.slice(1));
+                        if (this.queueItems.length > 0){
+                            this.game.time.queue.update();
+                        }
+                        this.game.time.queue.update();
+                        this.queueItems = [old_v[0]].concat(this.queueItems);
+                        break;
+                    case "removeCapped":
+                        console.log("found REMOVE");
+                        //this.dropLastItem();
+                        this.remove(0, this.queueItems[0].value);
+                        break;
+                    case "pushBackCapped":
+                        var deletedElement = this.queueItems.shift();
+                        this.queueItems.push(deletedElement);
+                        break;
+                }
+            }
+            if (this.failStrategy == "skip"){
+                var old_v = this.queueItems;
+                var new_v = old_v.slice(1);
+                this.queueItems = new_v;
+                //console.log(this.queueItems, "hmm", old_v.slice(1));
+                if (this.queueItems.length > 0){
+                    this.game.time.queue.update();
+                }
+                this.game.time.queue.update();
+                this.queueItems = [old_v[0]].concat(this.queueItems);
+            }
+            //game.resPool.isStorageLimited
             //console.log( "Tried to build " + el.name + " using the queue, but failed." );
         }
 
