@@ -1,0 +1,48 @@
+name: KG Test/Deploy Code
+on:
+  push:
+    branches:
+      - master
+      - dev/alpha
+      - dev/beta
+  pull_request:
+    branches:
+      - master
+      - dev/alpha
+      - dev/beta
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: NodeJS setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Test
+        run: yarn test
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    needs: build
+    steps:
+      - name: Executing remote SSH commands using password
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          username: ${{ secrets.KG_SSH_USER }}
+          host: ${{ secrets.KG_SSH_HOST }}
+          key: ${{ secrets.KG_SSH_KEY }}
+          script: /var/www/kittensgame.com/html/deploy.sh

@@ -506,6 +506,12 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 					resName: resname,
 					type: "ratio"
 				};
+			case type == "MaxRatio":
+				return {
+					title: $I("effectsMgr.type.resMaxRatio", [restitle]),
+					resName: resname,
+					type: "ratio"
+				};
 			default:
 				return 0;
 		}
@@ -754,12 +760,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 type: "ratio"
             },
 
-            "catnipMaxRatio" : {
-                title: $I("effectsMgr.statics.catnipMaxRatio.title"),
-				type: "ratio",
-				resName:"catnip"
-            },
-
             "hunterRatio" : {
                 title: $I("effectsMgr.statics.hunterRatio.title"),
                 type: "ratio"
@@ -885,11 +885,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 type: "ratio"
             },
 
-            "cultureMaxRatio" : {
-                title: $I("effectsMgr.statics.cultureMaxRatio.title"),
-                type: "ratio"
-            },
-
             "lunarOutpostRatio" : {
                 title: $I("effectsMgr.statics.lunarOutpostRatio.title"),
                 type: "ratio"
@@ -942,11 +937,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 
             "ivoryMeteorRatio" :  {
                 title: $I("effectsMgr.statics.ivoryMeteorRatio.title"),
-                type: "ratio"
-            },
-
-            "goldMaxRatio" :  {
-                title: $I("effectsMgr.statics.goldMaxRatio.title"),
                 type: "ratio"
             },
 
@@ -2079,7 +2069,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	},
 
-	// Unlimited Diminishing Return
+	// Limited Diminishing Return
 	//getHyperbolicEffect
 	getLimitedDR: function(effect, limit) {
 		var absEffect = Math.abs(effect);
@@ -2107,29 +2097,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * Display a message in the console. Returns a <span> node of a text container
 	 */
 	msg: function(message, type, tag, noBullet){
-
-		var filters = dojo.clone(this.console.filters);
-		if (tag && filters[tag]){
-			var filter = filters[tag];
-
-			if (!filter.enabled) {
-				return;
-			}
-		}
-
-		var hasCalendarTech = this.science.get("calendar").researched;
-
-		if (hasCalendarTech){
-			var currentDateMessage = $I("calendar.year.ext", [this.calendar.year.toLocaleString(), this.calendar.getCurSeasonTitle()]);
-			if (this.lastDateMessage !== currentDateMessage) {
-				this.console.msg(currentDateMessage, "date", null, false);
-				this.lastDateMessage = currentDateMessage;
-			}
-		}
-
-		var messageLine = this.console.msg(message, type, tag, noBullet);
-
-		return messageLine;
+		return this.console.msg(message, type, tag, noBullet);
 	},
 
 	clearLog: function(){
@@ -3944,11 +3912,28 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 					resString += "<br> " + $I("res.netGain") + ": " + this.getDisplayValueExt(resPerDay, true, true);
 				}
 			if (resPerDay < 0) {
-				var toZero = this.calendar.ticksPerDay * res.value / (-resPerDay * this.getTicksPerSecondUI() * (1 + this.timeAccelerationRatio()));
+				var resourceValue = res.value;
+				var fractionOfCurrentDayElapsed = this.calendar.day - Math.floor(this.calendar.day);
+				if (res.name == "necrocorn") {
+					//Fast-forward a fractional amount of days' worth of pacts consumption:
+					var perDayConsumption = this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect("necrocornPerDay")
+					                        + this.religion.pactsManager.getSiphonedCorruption(1);
+					resourceValue += fractionOfCurrentDayElapsed * perDayConsumption;
+					//Count corruption as fractional necrocorns:
+					resourceValue += this.religion.corruption;
+
+					//This isn't completely accurate; it doesn't account for if we reach 0 necrocorns before next corruption.
+					//It also doesn't account for if we run out of alicorns to corrupt.
+				}
+
+				var toZero = this.calendar.ticksPerDay * resourceValue / (-resPerDay * this.getTicksPerSecondUI());
+				if (res.value == 0) {
+					toZero = 0;
+				}
 				resString += "<br>" + $I("res.toZero") + ": " + this.toDisplaySeconds(toZero.toFixed());
 			}
 			if(res.name == "necrocorn"){
-				var toNextNecrocorn = (1 - this.religion.corruption)/(this.religion.getCorruptionPerTick() * 5 * (1 + this.timeAccelerationRatio()));
+				var toNextNecrocorn = (1 - this.religion.corruption)/(this.religion.getCorruptionPerTick() * this.getTicksPerSecondUI());
 				if(toNextNecrocorn > 0){
 					resString += "<br>" + $I("res.toNextNecrocorn") + ": " + this.toDisplaySeconds(toNextNecrocorn.toFixed());
 				}
@@ -3970,7 +3955,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			var nextKittenProgress = this.village.sim.nextKittenProgress;
 			var kittensPerTick = this.village.calculateKittensPerTick();
 			var resString =  " [" + ( nextKittenProgress * 100 ).toFixed()  + "%]";
-			resString += "<br>" + $I("res.toNextKitten") + " " + this.toDisplaySeconds((1 - nextKittenProgress)/kittensPerTick);
+			resString += "<br>" + $I("res.toNextKitten") + " " + this.toDisplaySeconds(
+				(1 - nextKittenProgress)/(kittensPerTick * this.getTicksPerSecondUI()));
 			return resString;
 		}
 		var resStack = this.getResourcePerTickStack(res.name),
@@ -4078,6 +4064,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	toDisplaySeconds : function (secondsRaw) {
+		if (secondsRaw == Infinity) {
+			return "&infin;";
+		}
+
 	    var sec_num = parseInt(secondsRaw, 10); // don't forget the second param
 
         var year_secs = 86400 * 365;
@@ -4781,7 +4771,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 			if (value > 0) {
 				var newRes = this.resPool.createResource(res.name);
-				newRes.value = value;
+				newRes.value = Math.min(value, Number.MAX_VALUE);
 				newResources.push(newRes);
 			}
 		}
@@ -4957,11 +4947,14 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	// Unlimited Diminishing Return
 	//getTriValue
 	getUnlimitedDR: function(value, stripe) {
-		return (Math.sqrt(1 + 8 * value / stripe) - 1) / 2;
+		var result = (Math.sqrt(1 + (value / stripe) * 8) - 1) / 2;
+		return result == Infinity
+			? Math.sqrt(value) / Math.sqrt(stripe) * Math.SQRT2
+			: result;
 	},
 
 	getInverseUnlimitedDR: function(value, stripe) {
-		return value * (value + 1) * stripe / 2;
+		return stripe / 2 * value * (value + 1);
 	},
 
 	getTab: function(name) {
@@ -5146,6 +5139,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				}
 			}
 		}
+
+		//Update caches again to include the latest changes:
+		this.updateCaches();
 	},
 
 	toggleFilters: function(){

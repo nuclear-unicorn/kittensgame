@@ -2253,34 +2253,36 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	 getPricesWithAccessor: function(bld, additionalBought) {
 		additionalBought = additionalBought || 0;
 	 	var bldPrices = bld.get("prices");
+		var bldName = bld.get("name");
+		var bldVal = bld.get("val");
 		var ratio = this.getPriceRatioWithAccessor(bld);
 
 		var prices = [];
 
-		var pricesDiscount = this.game.getLimitedDR((this.game.getEffect(bld.get("name") + "CostReduction")), 1);
+		var pricesDiscount = this.game.getLimitedDR((this.game.getEffect(bldName + "CostReduction")), 1);
 		var priceModifier = 1 - pricesDiscount;
-		var fakeBought = this.game.getEffect(bld.get("name") + "FakeBought") + additionalBought;
+		var fakeBought = this.game.getEffect(bldName + "FakeBought") + additionalBought;
 
 		for (var i = 0; i < bldPrices.length; i++) {
 			var resPriceDiscount = this.game.getLimitedDR(this.game.getEffect(bldPrices[i].name + "CostReduction"), 1);
 			var resPriceModifier = 1 - resPriceDiscount;
 			prices.push({
-				val: bldPrices[i].val * Math.pow(ratio, bld.get("val") + fakeBought) * priceModifier * resPriceModifier,
+				val: bldPrices[i].val * Math.pow(ratio, bldVal + fakeBought) * priceModifier * resPriceModifier,
 				name: bldPrices[i].name
 			});
 		}
 
 		if (this.game.challenges.isActive("blackSky")
-		 && bld.get("name") == "calciner"
-		 && bld.get("val") == 0) {
+		 && bldName == "calciner"
+		 && bldVal == 0) {
 			for (var i = 0; i < prices.length; i++) {
 				prices[i].val *= prices[i].name == "titanium" ? 0 : 11;
 			}
 		}
 
 		if (this.game.challenges.isActive("pacifism")
-		 && bld.get("name") == "steamworks"
-		 && bld.get("val") == 0) {
+		 && bldName == "steamworks"
+		 && bldVal == 0) {
 			for (var i = 0; i < prices.length; i++) {
 				if (prices[i].name == "blueprint"){
 					prices[i].val = this.game.challenges.getChallenge("pacifism").on * 5 + 1;
@@ -2288,10 +2290,10 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}
 		}
 		if (this.game.challenges.isActive("postApocalypse")
-		&& bld.get("name") == "field"
+		&& bldName == "field"
 		&& this.getPollutionLevel() >= 5
-		&& bld.get("val") >= Math.max(95 - this.game.time.getVSU("usedCryochambers").val - this.getPollutionLevel(), 7 + (this.game.ironWill? 8 : 0)) ) {
-			var builtWithUnobtanium = Math.max(bld.get("val") + this.game.time.getVSU("usedCryochambers").val - 100, 0);
+		&& bldVal >= Math.max(95 - this.game.time.getVSU("usedCryochambers").val - this.getPollutionLevel(), 7 + (this.game.ironWill? 8 : 0)) ) {
+			var builtWithUnobtanium = Math.max(bldVal + this.game.time.getVSU("usedCryochambers").val - 100, 0);
 			prices.push({val: 15 * Math.pow(ratio, builtWithUnobtanium),
 						name : "unobtainium",
 						isTemporary: true //can't exploit buy manipulating pollution in postApocalypse
@@ -2300,10 +2302,10 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		/**
 		 * Spaceport will use a much steper price ratio for starcharts to be a dedicated starchart sinker
 		 */
-		if (bld.get("name") == "warehouse" && bld.get("stage") == 1){
+		if (bldName == "warehouse" && bld.get("stage") == 1){
 			for (var i = 0; i < prices.length; i++) {
 				if (prices[i].name == "starchart"){
-					prices[i].val = prices[i].val * Math.pow(1.35, bld.get("val"));
+					prices[i].val = prices[i].val * Math.pow(1.35, bldVal);
 				}
 			}
 		}
@@ -2734,6 +2736,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			this.game.render();
 		} else if (data.action == "deltagrade"){ //Generic term for upgrading/downgrading
 			bldMetaRaw.stage = Math.max(0, bldMetaRaw.stage - amt);
+			this.game.time.queue.onDeltagrade(bld.name);
 
 			//Update because it changed when we changed stages
 			bld = new classes.BuildingMeta(bldMetaRaw).getMeta();
@@ -2763,7 +2766,7 @@ dojo.declare("classes.game.ui.GatherCatnipButtonController", com.nuclearunicorn.
 		}
 
 		this.game.bld.gatherCatnip();
-		callback(true);
+		callback(true /*itemBought*/, {reason: "item-is-free" /*It costs no resources to gather catnip, so we can't fail to buy it*/});
 	}
 });
 
@@ -3012,14 +3015,16 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 			});
 			this.sellInternal(model, 0, false /*requireSellLink*/);
 		}
-		metadataRaw.stage += delta;
-		if (!metadataRaw.stage) {metadataRaw.stage = Math.max(0, delta);}
+		if (metadataRaw.stage) { metadataRaw.stage = Math.max(0, metadataRaw.stage + delta); }
+		else { metadataRaw.stage = Math.max(0, delta); }
 
 		metadataRaw.val = 0;	//TODO: fix by using separate value flags
 		metadataRaw.on = 0;
 		if (metadataRaw.calculateEffects){
 			metadataRaw.calculateEffects(metadataRaw, this.game);
 		}
+		this.game.time.queue.onDeltagrade(model.options.building);
+
 		this.game.upgrade(metadataRaw.upgrades);
 		this.game.render();
 	},
