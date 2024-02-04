@@ -219,6 +219,34 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         }
         return numberEvents;
     },
+    queueRedshiftApplyStrategy: function(result){
+        switch (this.queue.failStrategy){
+            case "remove" | "pushBack":
+                if (!this.queue.isFirstItemCapped()){
+                    break;
+                }
+                for (var _ in this.queue.queueItems){
+                    this.queue.update();
+                    result = this.queue.getFirstItemEtaDay();
+                    if (result[1] || !this.queue.isFirstItemCapped()){
+                        break;
+                    }
+                }
+                break;        
+            case "skipCapped" || "skip":
+                if (!this.queue.isFirstItemCapped() && this.queue.failStrategy == "skipCapped"){
+                    break;
+                }
+                for (var i in this.queue.queueItems){
+                    result = this.queue.getNthItemEtaDay(i);
+                    if (result[1] || !this.queue.isNthItemCapped(i)){
+                        break;
+                    }
+                }
+                break;
+        }
+        return result;
+    },
     calculateRedshift: function(){
         var currentTimestamp = Date.now();
         var delta = this.game.opts.enableRedshift
@@ -248,36 +276,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             //console.log( "Calculating queue redshift for the following queue:", this.queue.queueItems );
             var result = this.queue.getFirstItemEtaDay();
             var daysOffsetLeft = daysOffset;
-            var redshiftQueueWorked = true;
+            //var redshiftQueueWorked = true;
             if (!result[1]){
-                    switch (this.queue.failStrategy){
-                        case "remove" | "pushBack":
-                            if (!this.queue.isFirstItemCapped()){
-                                break;
-                            }
-                            for (var _ in this.queue.queueItems){
-                                this.queue.update();
-                                result = this.queue.getFirstItemEtaDay();
-                                if (result[1] || !this.queue.isFirstItemCapped()){
-                                    break;
-                                }
-                            }
-                            break;        
-                        case "skipCapped" || "skip":
-                            if (!this.queue.isFirstItemCapped() && this.queue.failStrategy == "skipCapped"){
-                                break;
-                            }
-                            for (var i in this.queue.queueItems){
-                                result = this.queue.getNthItemEtaDay(i);
-                                if (result[1] || !this.queue.isNthItemCapped(i)){
-                                    break;
-                                }
-                            }
-                            break;
-                        default:
-                            numberEvents = this.applyRedshift(daysOffset);
-                            daysOffsetLeft = 0;
-                    }
+                result, daysOffsetLeft = this.queueRedshiftApplyStrategy(result);
                     if (!result[1]){
                         numberEvents = this.applyRedshift(daysOffset);
                         daysOffsetLeft = 0;
@@ -286,37 +287,10 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             while (daysOffsetLeft > 0){
                 result = this.queue.getFirstItemEtaDay();
                 if (!result[1]){
-                    if (this.queue.isFirstItemCapped()){
-                        switch (this.queue.failStrategy){
-                            case "remove" | "pushBack":
-                                for (var _ in this.queue.queueItems){
-                                    this.queue.update();
-                                    result = this.queue.getFirstItemEtaDay();
-                                    if (result[1]|| !this.queue.isFirstItemCapped()){
-                                        break;
-                                    }
-                                }
-                                break;
-                                case "skipCapped":
-                                    for (var i in this.queue.queueItems){
-                                        result = this.queue.getNthItemEtaDay(i);
-                                        if (result[1] || !this.queue.isNthItemCapped(i)){
-                                            break;
-                                        }
-                                    }
-                                    break;                        
-                            default:
-                                this.applyRedshift(daysOffsetLeft, true);
-                                daysOffsetLeft = 0;
-                                break;
-                        }
-                    }else{
-                        this.applyRedshift(daysOffsetLeft, true);
-                        daysOffsetLeft = 0;
-                        break;
-                    }
+                    result = this.queueRedshiftApplyStrategy(result);
                 }
-                if (result[1] & redshiftQueueWorked){
+                if (result[1]){
+                    // & redshiftQueueWorked){
                     var daysNeeded = result[0];// + 5; //let's have a little bit more days in case steamwork automation messes things up.
                     if (daysNeeded < 1) {
                         //There are legitimate cases in which the number of days needed would be less than 1.
@@ -325,9 +299,11 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                         //console.log( "Estimated days needed for queue item", this.queue.queueItems[ 0 ], "is too small; setting to a minimum value." );
                         daysNeeded = 1;
                     }
+                    var times = daysNeeded;
                     daysNeeded /= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
                     daysNeeded = Math.ceil(daysNeeded);
                     daysNeeded *= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
+                    times = Math.floor(daysNeeded/times); //simple heuristic
                     if (daysNeeded > daysOffsetLeft){
                         this.applyRedshift(daysOffsetLeft, true);
                         daysOffsetLeft = 0;
@@ -336,7 +312,16 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     }
                     this.applyRedshift(daysNeeded, true);
                     daysOffsetLeft -= daysNeeded;
-                    this.queue.update();
+                    for (var _ in times){
+                        result = this.queue.getFirstItemEtaDay();
+                        if (!result[1]){
+                            result = this.queueRedshiftApplyStrategy(result);
+                        }
+                        if (result[0]){
+                            break;
+                        }
+                        this.queue.update();
+                    }
                     /*if (!redshiftQueueWorked){
                         console.warn("Redshift queue failed to build", this.queue.queueItems[0]);
                     }*/
@@ -2442,7 +2427,7 @@ dojo.declare("classes.queue.manager", null,{
                         this.queueItems = [old_v[0]].concat(this.queueItems);
                         break;
                     case "removeCapped":
-                        console.log("found REMOVE");
+                        //console.log("found REMOVE");
                         //this.dropLastItem();
                         this.remove(0, this.queueItems[0].value);
                         break;
