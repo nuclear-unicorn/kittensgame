@@ -175,13 +175,16 @@ WQueue = React.createClass({
     },
 
     getPossibleQueueStrategies: function(){
+        if (!game.science.get("industrialization").researched){
+            return;
+        }
         var self = this;
         var selectOpts = [];
         var options = game.time.queue.possibleQueueStrategies;
         for (var strategy in options){
             //console.warn(options[strategy]);
             //selectOpts.push(options[strategy]);
-            selectOpts.push($r("option", { value: options[strategy], "data-label": options[strategy]}, options[strategy]));
+            selectOpts.push($r("option", { value: options[strategy][0], "data-label": options[strategy][1]}, options[strategy][1]));
             //selectOpts.push(strategy);
         }
         if (!options.length){

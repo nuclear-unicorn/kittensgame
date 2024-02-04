@@ -303,7 +303,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     daysNeeded /= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
                     daysNeeded = Math.ceil(daysNeeded);
                     daysNeeded *= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
-                    times = Math.floor(daysNeeded/times); //simple heuristic
+                    times = Math.ceil(daysNeeded/times); //simple heuristic
                     if (daysNeeded > daysOffsetLeft){
                         this.applyRedshift(daysOffsetLeft, true);
                         daysOffsetLeft = 0;
@@ -312,15 +312,15 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     }
                     this.applyRedshift(daysNeeded, true);
                     daysOffsetLeft -= daysNeeded;
-                    for (var _ in times){
+                    for (var i= 0; i < times; i+=1){
+                        this.queue.update();
                         result = this.queue.getFirstItemEtaDay();
-                        if (!result[1]){
+                        if (result[0] > 0 || !result[1]){
                             result = this.queueRedshiftApplyStrategy(result);
                         }
-                        if (result[0]){
+                        if (result[0] > 0 || !result[1]){
                             break;
                         }
-                        this.queue.update();
                     }
                     /*if (!redshiftQueueWorked){
                         console.warn("Redshift queue failed to build", this.queue.queueItems[0]);
@@ -1868,7 +1868,9 @@ dojo.declare("classes.queue.manager", null,{
     baseCap :2,
     // we can put resource capped thing back, ignore them all, or remove the item outright...
     failStrategy: null,
-    possibleQueueStrategies: [null, "skipCapped", "pushBackCapped", "removeCapped", "skip"],
+    possibleQueueStrategies: [[null, $I("queue.strategy.none")], ["skipCapped", $I("queue.strategy.skipCapped")],
+     ["pushBackCapped", $I("queue.strategy.pushCapped")], ["removeCapped", $I("queue.strategy.removeCapped")], 
+     ["skip", $I("queue.strategy.skip")]],
 
     constructor: function(game){
         this.game = game;
