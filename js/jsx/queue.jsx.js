@@ -175,6 +175,9 @@ WQueue = React.createClass({
     },
 
     getPossibleQueueStrategies: function(){
+        if(!this.game.getFeatureFlag("QUEUE_STRATEGIES")){
+            return; //no strategy ui if flag is off
+        }
         if (!game.science.get("industrialization").researched){
             return;
         }

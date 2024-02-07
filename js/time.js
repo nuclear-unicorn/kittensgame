@@ -221,7 +221,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     },
     queueRedshiftApplyStrategy: function(result){
         switch (this.queue.failStrategy){
-            case "remove" | "pushBack":
+            case "remove" | "pushBackCapped":
                 if (!this.queue.isFirstItemCapped()){
                     break;
                 }
@@ -277,7 +277,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             var result = this.queue.getFirstItemEtaDay();
             var daysOffsetLeft = daysOffset;
             //var redshiftQueueWorked = true;
-            if (!result[1]){
+            if(this.game.getFeatureFlag("QUEUE_STRATEGIES") && !result[1]){
                 result, daysOffsetLeft = this.queueRedshiftApplyStrategy(result);
                     if (!result[1]){
                         numberEvents = this.applyRedshift(daysOffset);
@@ -286,7 +286,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             }
             while (daysOffsetLeft > 0){
                 result = this.queue.getFirstItemEtaDay();
-                if (!result[1]){
+                if(this.game.getFeatureFlag("QUEUE_STRATEGIES") && !result[1]){
                     result = this.queueRedshiftApplyStrategy(result);
                 }
                 if (result[1]){
@@ -299,11 +299,11 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                         //console.log( "Estimated days needed for queue item", this.queue.queueItems[ 0 ], "is too small; setting to a minimum value." );
                         daysNeeded = 1;
                     }
-                    var times = daysNeeded;
+                    //var times = daysNeeded;
                     daysNeeded /= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
                     daysNeeded = Math.ceil(daysNeeded);
                     daysNeeded *= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
-                    times = Math.ceil(daysNeeded/times); //simple heuristic
+                    //times = Math.ceil(daysNeeded/times); //simple heuristic
                     if (daysNeeded > daysOffsetLeft){
                         this.applyRedshift(daysOffsetLeft, true);
                         daysOffsetLeft = 0;
@@ -312,14 +312,16 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     }
                     this.applyRedshift(daysNeeded, true);
                     daysOffsetLeft -= daysNeeded;
-                    for (var i= 0; i < times; i+=1){
-                        this.queue.update();
-                        result = this.queue.getFirstItemEtaDay();
-                        if (result[0] > 0 || !result[1]){
-                            result = this.queueRedshiftApplyStrategy(result);
-                        }
-                        if (result[0] > 0 || !result[1]){
-                            break;
+                    if(this.game.getFeatureFlag("QUEUE_STRATEGIES")){
+                        for (var i= 0; i < this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear; i+=1){
+                            this.queue.update();
+                            result = this.queue.getFirstItemEtaDay();
+                            if (result[0] > 0 || !result[1]){
+                                result = this.queueRedshiftApplyStrategy(result);
+                            }
+                            if (result[0] > 0 || !result[1]){
+                                break;
+                            }
                         }
                     }
                     /*if (!redshiftQueueWorked){
@@ -2413,42 +2415,43 @@ dojo.declare("classes.queue.manager", null,{
             ///st
 
 
-
-            if (reason == "cannot-afford" && this.failStrategy !== null && this.game.resPool.isStorageLimited(controllerAndModel.model.prices)){
-                switch (this.failStrategy){
-                    //this is very ugly, probably slow and will need to be refactored
-                    case "skipCapped":
-                        var old_v = this.queueItems;
-                        var new_v = old_v.slice(1);
-                        this.queueItems = new_v;
-                        //console.log(this.queueItems, "hmm", old_v.slice(1));
-                        if (this.queueItems.length > 0){
+            if (this.game.getFeatureFlag("QUEUE_STRATEGIES")){
+                if (reason == "cannot-afford" && this.failStrategy !== null && this.game.resPool.isStorageLimited(controllerAndModel.model.prices)){
+                    switch (this.failStrategy){
+                        //this is very ugly, probably slow and will need to be refactored
+                        case "skipCapped":
+                            var old_v = this.queueItems;
+                            var new_v = old_v.slice(1);
+                            this.queueItems = new_v;
+                            //console.log(this.queueItems, "hmm", old_v.slice(1));
+                            if (this.queueItems.length > 0){
+                                this.game.time.queue.update();
+                            }
                             this.game.time.queue.update();
-                        }
+                            this.queueItems = [old_v[0]].concat(this.queueItems);
+                            break;
+                        case "removeCapped":
+                            //console.log("found REMOVE");
+                            //this.dropLastItem();
+                            this.remove(0, this.queueItems[0].value);
+                            break;
+                        case "pushBackCapped":
+                            var deletedElement = this.queueItems.shift();
+                            this.queueItems.push(deletedElement);
+                            break;
+                    }
+                }
+                else if (this.failStrategy == "skip"){
+                    var old_v = this.queueItems;
+                    var new_v = old_v.slice(1);
+                    this.queueItems = new_v;
+                    //console.log(this.queueItems, "hmm", old_v.slice(1));
+                    if (this.queueItems.length > 0){
                         this.game.time.queue.update();
-                        this.queueItems = [old_v[0]].concat(this.queueItems);
-                        break;
-                    case "removeCapped":
-                        //console.log("found REMOVE");
-                        //this.dropLastItem();
-                        this.remove(0, this.queueItems[0].value);
-                        break;
-                    case "pushBackCapped":
-                        var deletedElement = this.queueItems.shift();
-                        this.queueItems.push(deletedElement);
-                        break;
-                }
-            }
-            if (this.failStrategy == "skip"){
-                var old_v = this.queueItems;
-                var new_v = old_v.slice(1);
-                this.queueItems = new_v;
-                //console.log(this.queueItems, "hmm", old_v.slice(1));
-                if (this.queueItems.length > 0){
+                    }
                     this.game.time.queue.update();
+                    this.queueItems = [old_v[0]].concat(this.queueItems);
                 }
-                this.game.time.queue.update();
-                this.queueItems = [old_v[0]].concat(this.queueItems);
             }
             //game.resPool.isStorageLimited
             //console.log( "Tried to build " + el.name + " using the queue, but failed." );
