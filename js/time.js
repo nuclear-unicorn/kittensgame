@@ -457,13 +457,13 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             { name : "void", val: 10 }
         ],
         priceRatio: 1.1,
-        limitBuild: 0,
+        //limitBuild: 0, let's just not
         effects: {
             "shatterYearBoost" : 0,
             "energyConsumption": 5
         },
         calculateEffects: function(self, game){
-            if (game.challenges.getChallenge("1000Years").on > 1) {
+            if (game.challenges.getChallenge("1000Years").on > 1 || game.religion.getTU("blazar").val > 2) {
                 //Completing the challenge 2 or more times unlocks the automation feature
                 self.description = $I("time.cfu.temporalPress.desc") + "<br>" + $I("time.cfu.temporalPress.desc.automation");
                 if (self.isAutomationEnabled == null) { //force non-null value
@@ -475,7 +475,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             }
 
             self.effects["shatterYearBoost"] = (self.isAutomationEnabled)? 5 * game.calendar.yearsPerCycle : game.calendar.yearsPerCycle; //25 or 5 currently
-            self.limitBuild = game.getEffect("temporalPressCap");
+            //self.limitBuild = game.getEffect("temporalPressCap");
             self.priceRatio = Math.max(1.01, 1.1 - game.challenges.getChallenge("1000Years").on * 0.001); //first 90 completions of 1000Years make priceRatio cheaper
         },
         isAutomationEnabled: null,
@@ -1242,7 +1242,14 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 
     doShatter: function(model, amt) {
         var factor = this.game.challenges.getChallenge("1000Years").researched ? 5 : 10;
-        this.game.time.heat += amt * factor;
+        var heat_acutoconverted = 1 - 100/(100 + this.game.getEffect("heatCompression"));
+        if (heat_acutoconverted){
+            this.game.time.heat += amt * factor * (1 - heat_acutoconverted);
+            var efficiency = 1 + this.game.getEffect("heatEfficiency");
+            this.game.time.getCFU("blastFurnace").heat += amt * factor * heat_acutoconverted * efficiency;
+        }else{
+            this.game.time.heat += amt * factor;
+        }
         //this.game.time.shatter(amt);
         if(this.game.time.testShatter == 1) {this.game.time.shatterInGroupCycles(amt);}
         //else if(this.game.time.testShatter == 2) {this.game.time.shatterInCycles(amt);}
@@ -1274,9 +1281,16 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
         dojo.style(this.nextCycle.link, "display", this.model.nextCycleLink.visible ? "" : "none");
         dojo.style(this.previousCycle.link, "display", this.model.previousCycleLink.visible ? "" : "none");
         dojo.style(this.tenEras.link, "display", this.model.tenErasLink.visible ? "" : "none");
-        if(this.custom){
-            dojo.style(this.custom.link, "display", (this.model.customLink && this.model.customLink.visible) ? "" : "none");
+
+        if(this.model.customLink && !this.custom) { //Create custom link if needed
+            this.custom = this.addLink(this.model.customLink);
         }
+        if(!this.model.customLink && this.custom) { //Destroy custom link if needed
+            dojo.destroy(this.custom.link);
+            this.custom = undefined;
+        }
+        this.updateLink(this.custom, this.model.customLink); //need this to sync the changes of effect and shatter number.
+
         if  (this.model.tenErasLink.visible) {
             dojo.addClass(this.tenEras.link,"rightestLink");
             dojo.removeClass(this.previousCycle.link,"rightestLink");
@@ -1285,10 +1299,6 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
             dojo.removeClass(this.nextCycle.link,"rightestLink");
         } else if (this.model.nextCycleLink.visible) {
             dojo.addClass(this.nextCycle.link,"rightestLink");
-        }
-
-        if(this.model.customLink){
-            this.updateLink(this.custom, this.model.customLink); //need this to sync the changes of effect and shatter number. this might be a hack :3
         }
     }
 });
@@ -1603,15 +1613,10 @@ dojo.declare("classes.tab.TimeTab", com.nuclearunicorn.game.ui.tab, {
         this.inherited(arguments);
 
         var hasCF = this.game.workshop.get("chronoforge").researched;
-        if (hasCF){
-            this.cfPanel.setVisible(true);
-        }
+        this.cfPanel.setVisible(hasCF);
 
 		var hasVS = (this.game.science.get("voidSpace").researched || this.game.time.getVSU("usedCryochambers").val > 0);
-        if (hasVS){
-            this.vsPanel.setVisible(true);
-        }
-
+        this.vsPanel.setVisible(hasVS);
     }
 });
 

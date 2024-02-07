@@ -525,7 +525,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		unlocked: false,
 		getEffectiveValue: function(game) {
 			return this.val * (1 + game.getEffect("corruptionBoostRatioChallenge")); //LDR specified in challenges.js
-		}
+		},
+		flavor: $I("religion.zu.marker.flavor")
 	},{
 		name: "unicornGraveyard",
 		label: $I("religion.zu.unicornGraveyard.label"),
@@ -608,7 +609,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			}
 		},
 		cashPreDeficitEffects: function (game) {
-			var transcendenceTierModifier = Math.max(game.religion.transcendenceTier - 25, 1);
+			var transcendenceTierModifier = Math.max(game.religion.transcendenceTier - 24, 1);
 			var self = game.religion.getZU("blackPyramid");
 			for(var counter in self.simpleEffectNames){
 				self.effectsPreDeficit["pyramid" + self.simpleEffectNames[counter]] = game.getEffect("pact" + self.simpleEffectNames[counter]) * transcendenceTierModifier;
@@ -939,7 +940,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"rrRatio" : 0.02
 		},
 		upgrades: {
-			chronoforge: ["temporalImpedance"]
+			chronoforge: ["temporalImpedance", "temporalPress"]
+		},
+		unlocks: {
+			chronoforge: ["temporalPress"]
 		},
 		unlocked: false,
 		flavor: $I("religion.tu.blazar.flavor")
@@ -1159,13 +1163,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				religion.tcratio += needNextLevel;
 				religion.transcendenceTier += 1;
 
-				var atheism = game.challenges.getChallenge("atheism");
-				atheism.calculateEffects(atheism, game);
-				var blackObelisk = religion.getTU("blackObelisk");
-				blackObelisk.calculateEffects(blackObelisk, game);
+				//In the future, we might add more things that care about Transcendence Tier.
+				game.calculateAllEffects();
 				if(game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val){
 					var blackPyramid = game.religion.getZU("blackPyramid");
-					blackPyramid.calculateEffects(blackPyramid, game);
 					blackPyramid.cashPreDeficitEffects(game);
 				}
 				game.msg($I("religion.transcend.msg.success", [religion.transcendenceTier]));
@@ -2302,16 +2303,13 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 			dojo.forEach(this.rUpgradeButtons,  function(e, i){ e.update(); });	
 		}
 		var hasCT = this.game.science.get("cryptotheology").researched && this.game.religion.transcendenceTier > 0;
-		if (hasCT){
-			this.ctPanel.setVisible(true);
-		}
+		this.ctPanel.setVisible(hasCT);
 
 		dojo.forEach(this.zgUpgradeButtons, function(e, i){ e.update(); });
 		var canSeePacts = !this.game.religion.getPact("fractured").researched && this.game.religion.getZU("blackPyramid").val > 0 && (this.game.religion.getTU("mausoleum").val > 0 || this.game.science.getPolicy("radicalXenophobia").researched);
 		canSeePacts = canSeePacts && this.game.getFeatureFlag("MAUSOLEUM_PACTS");
-		if(canSeePacts){
-			this.ptPanel.setVisible(true);
-		}
+		this.ptPanel.setVisible(canSeePacts);
+		
 		//dojo.forEach(this.pactUpgradeButtons, function(e, i){ e.update(); });
 		/*if(this.necrocornDeficitMsgBox){
 			if(this.game.religion.necrocornDeficit > 0){
