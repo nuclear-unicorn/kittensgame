@@ -198,10 +198,12 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"shatterCostIncreaseChallenge": 0,
 			"shatterVoidCost": 0,
 			"temporalPressCap" : 0,
-			"heatEfficiency": 0.1
+			"heatEfficiency": 0.1,
+			"heatCompression": 0.05
         },
 		stackOptions: {
-			"shatterCostReduction": { LDRLimit: 1 }
+			"shatterCostReduction": { LDRLimit: 1 },
+			"heatEfficiency": { capMagnitude: 3 }
 		},
         calculateEffects: function(self, game){
             if (self.active) {
@@ -210,12 +212,14 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
                 self.effects["shatterVoidCost"] = 0.4;
                 self.effects["temporalPressCap"] = 0;
                 self.effects["heatEfficiency"] = 0;
+                self.effects["heatCompression"] = 0;
              }else{
 				self.effects["shatterCostReduction"] = -0.02;
 				self.effects["shatterCostIncreaseChallenge"] = 0;
 				self.effects["shatterVoidCost"] = 0;
 				self.effects["temporalPressCap"] = 10;
 				self.effects["heatEfficiency"] = 0.1;
+                self.effects["heatCompression"] = 0.05;
 			}
 			game.upgrade(self.upgrades); //this is a hack, might need to think of a better sollution later
 		},

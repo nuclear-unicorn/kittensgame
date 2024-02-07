@@ -1533,6 +1533,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 title: $I("effectsMgr.statics.heatEfficiency.title"),
                 type: "ratio"
 			},
+			"heatCompression":{
+                title: $I("effectsMgr.statics.heatCompression.title"),
+                type: "ratio"
+			},
             "shatterCostIncreaseChallenge": {
                 title: $I("effectsMgr.statics.shatterCostIncreaseChallenge.title"),
                 type: "ratio"
@@ -2093,29 +2097,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * Display a message in the console. Returns a <span> node of a text container
 	 */
 	msg: function(message, type, tag, noBullet){
-
-		var filters = dojo.clone(this.console.filters);
-		if (tag && filters[tag]){
-			var filter = filters[tag];
-
-			if (!filter.enabled) {
-				return;
-			}
-		}
-
-		var hasCalendarTech = this.science.get("calendar").researched;
-
-		if (hasCalendarTech){
-			var currentDateMessage = $I("calendar.year.ext", [this.calendar.year.toLocaleString(), this.calendar.getCurSeasonTitle()]);
-			if (this.lastDateMessage !== currentDateMessage) {
-				this.console.msg(currentDateMessage, "date", null, false);
-				this.lastDateMessage = currentDateMessage;
-			}
-		}
-
-		var messageLine = this.console.msg(message, type, tag, noBullet);
-
-		return messageLine;
+		return this.console.msg(message, type, tag, noBullet);
 	},
 
 	clearLog: function(){
@@ -4825,6 +4807,16 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 			cathPollution = (this.challenges.getChallenge("postApocalypse").on + newKittens.length) * 1e+8 + 1e+11;
 		}
+		var temporalPress_reset = this.time.filterMetadata([this.time.getCFU("temporalPress")], ["name", "val", "on", "isAutomationEnabled"]);
+		var temporalPressSaved = Math.min(temporalPress_reset.val, this.getEffect("temporalPressCap"));
+		if (temporalPressSaved > 0){
+			temporalPress_reset["on"] = Math.min(temporalPress_reset["on"], temporalPressSaved);
+			temporalPress_reset["val"] = Math.min(temporalPressSaved);
+		}else{
+			temporalPress_reset["on"] = 0;
+			temporalPress_reset["val"] = 0;
+			temporalPress_reset["isAutomationEnabled"] = null;
+		}
 
 /*
 		if (newKittens.length > 0) {
@@ -4891,7 +4883,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				cfu: [{
 					name: "temporalImpedance",
 					unlocked: this.time.getCFU("temporalImpedance").unlocked
-				}],
+				},
+					temporalPress_reset[0]
+				],
 				vsu: [],
 				usedCryochambers: usedCryochambers_reset,
 				timestamp: Date.now(),

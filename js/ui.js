@@ -933,7 +933,9 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         dojo.empty(filtersDiv);
         var show = false;
 
-        for (var fId in console.filters){
+        var filtersSorted = Object.keys(console.filters).sort();
+        for (var filterIndex in filtersSorted) {
+            var fId = filtersSorted[filterIndex];
             if (console.filters[fId].unlocked) {
                 this._createFilter(console.filters[fId], fId, filtersDiv);
                 show = true;
@@ -1054,33 +1056,44 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             messages = _console.messages;
 
         var gameLog = dojo.byId("gameLog");
-        if (!messages.length) { // micro optimization
+        if (messages.length === 0) {
             return;
         }
 
-        var msg = messages[messages.length - 1];
+        var messageLatest = messages[messages.length - 1];
+        var messagePrevious = 1 < messages.length ? messages[messages.length - 2] : null;
+        var insertDateHeader = !messagePrevious 
+            || messageLatest.year !== messagePrevious.year 
+            || messageLatest.seasonTitle !== messagePrevious.seasonTitle;
 
-        if (!msg.span) {
+        if (!messageLatest.span) {
             var span = dojo.create("span", {className: "msg" }, gameLog);
 
-            if (msg.type) {
-                dojo.addClass(span, "type_" + msg.type);
+            if (messageLatest.type) {
+                dojo.addClass(span, "type_" + messageLatest.type);
             }
-            if (msg.noBullet) {
+            if (messageLatest.noBullet) {
                 dojo.addClass(span, "noBullet");
             }
-            msg.span = span;
+            messageLatest.span = span;
         }
-        //Place date headers above actual log events.
-        if (msg.type === "date") {
-            dojo.place(msg.span, gameLog, "first");
+
+        if (insertDateHeader) {
+            this.game.console.msg($I("calendar.year.ext", [messageLatest.year, messageLatest.seasonTitle]), "date", null, false);
+        }
+
+        if (messageLatest.type === "date") {
+            dojo.place(messageLatest.span, gameLog, "first");
         } else {
-            dojo.place(msg.span, gameLog, 1);
+            dojo.place(messageLatest.span, gameLog, 1);
         }
-        dojo.attr(msg.span, {innerHTML: msg.text});
+
+        dojo.attr(messageLatest.span, {innerHTML: messageLatest.text});
         //Destroy child nodes if there are too many.
         var logLength = dojo.byId("gameLog").childNodes.length;
-        if (logLength > _console.maxMessages) {dojo.destroy(dojo.byId("gameLog").childNodes[logLength - 1]);}
+        if (logLength > _console.maxMessages) {
+            dojo.destroy(dojo.byId("gameLog").childNodes[logLength - 1]);
+        }
 
         //fade message spans as they get closer to being removed and replaced
         var spans = dojo.query("span", gameLog);
