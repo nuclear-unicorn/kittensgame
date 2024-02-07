@@ -313,7 +313,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     this.applyRedshift(daysNeeded, true);
                     daysOffsetLeft -= daysNeeded;
                     if(this.game.getFeatureFlag("QUEUE_STRATEGIES")){
-                        for (var i= 0; i < this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear; i+=1){
+                        var max_times = Math.max(this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear, daysNeeded);
+                        for (var i= 0; i < max_times; i+=1){
                             this.queue.update();
                             result = this.queue.getFirstItemEtaDay();
                             if (result[0] > 0 || !result[1]){
