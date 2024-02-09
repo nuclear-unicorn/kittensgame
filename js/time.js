@@ -95,6 +95,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         }
 	},
 
+	//This function is called when the player has been offline for a while OR when the game is unpawsed.
 	gainTemporalFlux: function (timestamp){
         if (!this.game.science.get("calendar").researched){
             return;
@@ -106,10 +107,35 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             return;
         }
 
-		// Update temporalFluxMax from values loaded
-        this.game.updateCaches();
-        this.game.resPool.update();
+		//=====
 
+		//This is a hack within a hack.  (You can blame Brent if it breaks anything)
+		//The thing is, we can't guarantee that the game-state is fully loaded when this function is called.
+		//   (This function is called about halfway through the game-loading process.)
+		//   So we need to call resPool.upate() to update the max storage capacity for Temporal Flux,
+		//   & it's gotta happen *before* we gain temporal flux so that it uses the proper cap.
+		//But resPool.update() also generates 1 tick of resource production.  Since we can't guarantee the game
+		//   is properly loaded, some effects will be applied (such as unicorn production from pastures) but not
+		//   all effects (such as max unicorns from being in a Challenge).  It can lead to weird bugs like
+		//   producing unicorns over the cap, or not taking into account Workshop upgrades for producing coal.
+		//So we gotta find some way to prevent resPool.update() from producing resources.
+		//Luckily, that already exists.  bloodrizer informed me that game.loadingSave was added to prevent race
+		//   conditions, specifically to avoid timers & update cycles from firing while the game is in a
+		//   half-loaded state.
+		//I don't fully understand that, so I'd rather not mess with it...but I *do* care that if
+		//   game.loadingSave is truthy, the update function won't generate a tick of resource production.
+		//So I'll just hijack game.loadingSave in a way that the outside program won't care or notice.
+
+		var loadingSavePrev = this.game.loadingSave; //Cache the old value of loadingSave
+		this.game.loadingSave = true;
+		// Update temporalFluxMax from values loaded
+		this.game.updateCaches();
+		this.game.resPool.update(); //loadingSave is truthy, so we WON'T generate 1 tick of production
+		this.game.loadingSave = loadingSavePrev; //Restore original value of loadingSave
+
+		//=====
+
+		//Now that temporalFluxMax is correctly calculated, we calculate how much temporal flux to gain:
 		var temporalAccelerator = this.getCFU("temporalAccelerator");
 		var energyRatio = 1 + (temporalAccelerator.val * temporalAccelerator.effects["timeRatio"]);
 		var temporalFluxGained = Math.round(delta / ( 60 * 1000 ) * (this.game.ticksPerSecond * energyRatio)); // 5 every 60 seconds
