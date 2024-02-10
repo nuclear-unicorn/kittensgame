@@ -359,6 +359,20 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	},
 
 	/**
+	 * In a Unicorn Tears Challenge, tears can be capped, & overcapping tears creates pollution.
+	 * This function returns how many units of pollution are created per unit of tears lost due to the cap.
+	 * @return A positive number.
+	 */
+	getCathPollutionPerTearOvercapped: function() {
+		var base = 3;
+		//Minimum 10% of base, maximum 190% of base
+		var pollutionRatio = 1 + this.game.getLimitedDR(this.game.getEffect("cathPollutionRatio"), 0.9);
+		//Combo with Post Apocalypse is more punishing--this part is not affected by pollutionRatio
+		var challengeAdded = this.game.challenges.isActive("postApocalypse") ? 2 : 0;
+		return base * pollutionRatio + challengeAdded;
+	},
+
+	/**
 	 * Only in the Unicorn Tears Challenge, auto-sacrifice unicorns when near the cap until we get to max tears.
 	 * Automatic sacrifices have this feature called "Stable Overcapping" where part of the tears gained can ignore storage caps.
 	 * This function is intended to be called once per season, when calculating redshift, & when calculating TC shatter.
@@ -484,9 +498,6 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			return; //We don't want to do any sacrifices after all.
 		}
 
-		//In the Unicorn Tears Challenge, if we refine over the limit, some of it gets converted into pollution.
-		var CATH_POLLUTION_PER_OVERCAP = 5;
-
 		unicornsToSacrifice = UNICORNS_PER_SACRIFICE * sacrificesToPerform;
 		game.stats.getStat("unicornsSacrificed").val += unicornsToSacrifice;
 		game.resPool.addResEvent("unicorns", -unicornsToSacrifice);
@@ -512,7 +523,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 		var tearsActualGained = tears.value - tearsValuePrevious;
 		if (tearsLost > 0.001) {
-			game.bld.cathPollution += tearsLost * CATH_POLLUTION_PER_OVERCAP * (1 + game.getEffect("cathPollutionRatio"));
+			game.bld.cathPollution += tearsLost * this.getCathPollutionPerTearOvercapped();
 			game.msg($I("religion.sacrificeBtn.sacrifice.msg.overcap", [game.getDisplayValueExt(tearsLost)]), "", "unicornSacrifice", true /*noBullet*/);
 		}
 		game.msg($I("religion.sacrificeBtn.sacrifice.msg.auto", [game.getDisplayValueExt(unicornsToSacrifice), game.getDisplayValueExt(tearsActualGained)]), "", "unicornSacrifice" );
@@ -556,7 +567,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		defaultUnlocked: true,
 		unlocks: {
 			"zigguratUpgrades": ["ivoryTower"],
-			policies: ["ritualCalendar", "persistence", "holyGround"]
+			policies: ["ritualCalendar", "agathism", "holyGround"]
 		}
 	},{
 		name: "ivoryTower",
@@ -1309,8 +1320,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 	effectsBase: {
 		"kittensKarmaPerMinneliaRatio" : 0.0001, //unspent pacts can make karma
-		"pactNecrocornConsumption" : -0.0005,
-		"autoSacrificeUnicornsPenalty": -0.3 //Automatic sacrifices are less efficient
+		"pactNecrocornConsumption" : -0.0005
 	},
 
 	getZU: function(name){
@@ -1725,8 +1735,9 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 			if (this.controllerOpts.overcapMsgID) { //Optional parameter--if truthy, display a message when we overcap
 				this.game.msg($I(this.controllerOpts.overcapMsgID, [this.game.getDisplayValueExt(overcap)]), "", this.controllerOpts.logfilterID, true /*noBullet*/);
 			}
-			if (this.controllerOpts.cathPollutionPerOvercap) { //Optional parameter--if truthy, overcapping affects pollution
-				this.game.bld.cathPollution += overcap * this.controllerOpts.cathPollutionPerOvercap * (1 + this.game.getEffect("cathPollutionRatio"));
+			if (this.controllerOpts.gainedResource === "tears" ) {
+				//In Unicorn Tears Challenge, overcapping tears creates pollution:
+				this.game.bld.cathPollution += overcap * this.game.religion.getCathPollutionPerTearOvercapped();
 			}
 		}
 
@@ -2377,7 +2388,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 					applyAtGain: function(priceCount) {
 						this.game.stats.getStat("unicornsSacrificed").val += priceCount;
 					},
-					cathPollutionPerOvercap: 5, //In the Unicorn Tears Challenge if we refine over the limit, some of it gets converted into pollution.
 					overcapMsgID: "religion.sacrificeBtn.sacrifice.msg.overcap",
 					logTextID: "religion.sacrificeBtn.sacrifice.msg",
 					logfilterID: "unicornSacrifice"

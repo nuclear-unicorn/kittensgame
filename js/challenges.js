@@ -427,9 +427,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		dontChangeTheseUpgradePrices: {
 			"goldOre": true,
 			"coalFurnace": true,
-			"huntingArmor": true,	//These 3 upgrades are for IW;
-			"bolas": true,			// I didn't want to have too many special cases
-			"compositeBow": true	// that changed depending on if we're in IW.
+			"deepMining": true,
+			"huntingArmor": true, //These 3 upgrades are for IW;
+			"bolas": true,        // I didn't want to have too many special cases
+			"compositeBow": true  // that changed depending on if we're in IW.
 		},
 		/**
 		 * Decides whether or not to add some unicorn tears to the base price of a building.
