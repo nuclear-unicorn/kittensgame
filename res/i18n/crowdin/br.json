@@ -1606,6 +1606,7 @@
     "eta.hour": "h",
     "eta.min": "m",
     "eta.sec": "seg",
+    "modal.button.ok": "OK",
     "modal.button.cancel": "Cancelar",
     "workshop.upgradePanel.label": "Melhorias",
     "workshop.all.upgrades.unlocked": "Todas as melhorias foram desbloqueadas!",
