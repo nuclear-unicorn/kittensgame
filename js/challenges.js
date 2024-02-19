@@ -390,9 +390,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			if (!ritualCalendar.researched) {
 				ritualCalendar.blocked = true;
 			}
-			var persistence = game.science.getPolicy("persistence");
-			if (!persistence.researched) {
-				persistence.blocked = true;
+			var agathism = game.science.getPolicy("agathism");
+			if (!agathism.researched) {
+				agathism.blocked = true;
 			}
 		},
 		//A list of buildings in the bonfire tab whose prices we won't add unicorn tears to:
