@@ -1688,8 +1688,18 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 		}
 	},
 
+	//Calculates the max number of transformations we can afford to do.
+	//If the resource has a stroage cap, it won't give the option to go farther than 1 transformation above that cap.
 	_canAfford: function(model) {
-		return Math.floor(this.game.resPool.get(model.prices[0].name).value / model.prices[0].val);
+		var spendRes = this.game.resPool.get(model.prices[0].name);
+		var gainRes = this.game.resPool.get(this.controllerOpts.gainedResource);
+		var amtWeCanAfford = Math.floor(spendRes.value / model.prices[0].val);
+
+		if (gainRes.maxValue && amtWeCanAfford > 1) { //Perform this check only if we can afford 2 or more
+			var amtToReachCap = Math.ceil((gainRes.maxValue - gainRes.value) / this.controllerOpts.gainMultiplier.call(this));
+			amtWeCanAfford = Math.min(amtWeCanAfford, amtToReachCap);
+		}
+		return amtWeCanAfford;
 	},
 
 	transform: function(model, divider, event, callback) {
