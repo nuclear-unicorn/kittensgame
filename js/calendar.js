@@ -630,6 +630,17 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			this.game.resPool.addResEvent("ivory", ivory);
 		}
 
+		// -------------- remove unicorns over the cap in a challenge ---------------
+		if (this.game.challenges.isActive("unicornTears")) {
+			var unicorns = this.game.resPool.get("unicorns");
+			if (unicorns.value > unicorns.maxValue) {
+				var amtLost = Math.ceil(unicorns.value - unicorns.maxValue);
+				this.game.resPool.addResEvent("unicorns", -amtLost);
+				this.game.resPool.addResEvent("tMythril", amtLost * 0.00075); //1000 unicorns -> 0.75 T-Mythril
+				this.game.msg($I("calendar.msg.unicorns.departed", [this.game.getDisplayValueExt(amtLost)]));
+			}
+		}
+
 		this.game.diplomacy.onNewDay();
 
 		this.adjustCryptoPrice();

@@ -264,6 +264,7 @@
     "calendar.msg.starchart": "You've made {0} starcharts!",
     "calendar.msg.science": "+{0} science!",
     "calendar.msg.unicorn": "A unicorn comes to your village attracted by the catnip scent!",
+    "calendar.msg.unicorns.departed": "{0} unicorns wandered off into the lands north of your village.",
     "calendar.msg.zebra.hunter": "A mysterious hunter from zebra tribe decides to stop over in the village.",
     "calendar.msg.zebra.hunter.departed": "Zebra hunter has departed from your village.",
     "calendar.msg.zebra.hunter.departed.pl": "Zebra hunters have departed from your village.",
