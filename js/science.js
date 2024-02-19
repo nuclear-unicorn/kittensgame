@@ -1428,9 +1428,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		],
 		effects: {
 			"autoSacrificeUnicornsThreshold": 0.5,       //Auto-sacrifice only when have more than this fraction of unicornsMax
-			"autoSacrificeUnicornsPenalty": -0.3,        //Automatic sacrifices are less efficient by this fraction
+			"autoSacrificeUnicornsPenalty": -0.3,        //Automatic sacrifices are less efficient by this ratio
 			"autoSacrificeStableOvercapRatio": 0.5,      //How far above tearsMax the automatic sacrifices can go
-			"autoSacrificeStableOvercapEfficiency": 0.01 //We only gain this fraction of tears when sacrificing over the cap
+			"autoSacrificeStableOvercapEfficiency": 0.02 //We only gain this fraction of tears when sacrificing over the cap
 		},
 		unlocked: false,
 		blocked: false,

@@ -1602,7 +1602,8 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio"
 			},
 			"autoSacrificeUnicornsPenalty": {
-				type: "hidden"
+				title: $I("effectsMgr.statics.autoSacrificeUnicornsPenalty.title"),
+				type: "ratio"
 			},
 			"autoSacrificeUnicornsThreshold": {
 				title: $I("effectsMgr.statics.autoSacrificeUnicornsThreshold.title"),
@@ -1613,7 +1614,8 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio"
 			},
 			"autoSacrificeStableOvercapEfficiency": {
-				type: "hidden"
+				title: $I("effectsMgr.statics.autoSacrificeStableOvercapEfficiency.title"),
+				type: "ratio"
 			},
 			"cryochamberSupport":{
 				title: $I("effectsMgr.statics.cryochamberSupport.title"),
