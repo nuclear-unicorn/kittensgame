@@ -48,8 +48,11 @@ WQueueItem = React.createClass({
 
         //TODO: red indicator when can't process
         //TODO: attach tooltip as if it is a button
+        var showActive = this.props.queueManager.activeItem == this.props.index &&
+                             this.props.queueManager.failStrategy == "skipCapped";
         return $r("div", {}, 
         [
+            (showActive ? "» " : "") +
             "[" + item.type + "] - ", 
             $r("span", {ref:"itemLabel", className:"queue-label"}, item.label),
             (
@@ -175,7 +178,7 @@ WQueue = React.createClass({
     },
 
     getPossibleQueueStrategies: function(){
-        if(!this.game.getFeatureFlag("QUEUE_STRATEGIES")){
+        if(!game.getFeatureFlag("QUEUE_STRATEGIES")){
             return; //no strategy ui if flag is off
         }
         if (!game.science.get("industrialization").researched){

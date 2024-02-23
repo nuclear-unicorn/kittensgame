@@ -77,6 +77,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.gainTemporalFlux(ts);
         this.timestamp = ts;
         this.queue.queueItems = saveData["time"].queueItems || [];
+        this.queue.activeItem = 0;
         this.queue.queueSources = saveData["time"].queueSources || this.queue.queueSourcesDefault;
         if (this.queue.queueSources === {} || typeof(this.queue.queueSources["buildings"]) != "boolean") {
             this.queue.queueSources = this.queue.queueSourcesDefault;
@@ -1672,6 +1673,7 @@ dojo.declare("classes.queue.manager", null,{
     game: null,
     alphabeticalSort: true,
     queueItems : [],
+    activeItem: 0, //Index of element in queueItems array that we're trying to build.  Used for some queue strategies.
 
     toggleAlphabeticalSort: function(){
         this.alphabeticalSort = !this.alphabeticalSort;
@@ -1886,6 +1888,7 @@ dojo.declare("classes.queue.manager", null,{
         this.queueItems = [];
         this.queueSources = dojo.clone(this.queueSourcesDefault);
         this.queueSourcesArr = [{name: "buildings", label: $I("buildings.tabName")}];
+        this.activeItem = 0;
     },
 
     /**
@@ -2370,13 +2373,19 @@ dojo.declare("classes.queue.manager", null,{
     },
     update: function(){
         this.cap = this.calculateCap();
+        if(this.failStrategy !== "skipCapped") {
+            this.activeItem = 0; //activeItem is only used in certain queue strategies
+        }
         if(!this.queueItems.length){
             return;
         }
-        var el = this.queueItems[0];
+        if(this.activeItem >= this.queueItems.length) {
+            this.activeItem = 0; //Gone past end of the queue?  Loop back to beginning
+        }
+        var el = this.queueItems[this.activeItem];
         if (!el){
             console.warn("null queue item, skipping");
-            this.queueItems.shift();
+            this.queueItems.splice(this.activeItem, 1); //Remove null queue item
             this.game._publish("ui/update", this.game);
             return;
         }
@@ -2384,7 +2393,7 @@ dojo.declare("classes.queue.manager", null,{
         var controllerAndModel = this.getQueueElementControllerAndModel(el);
         if(!controllerAndModel || !controllerAndModel.controller || !controllerAndModel.model){
             console.error(el.name + " of " + el.type + " queing is not supported!");
-            this.queueItems.shift();
+            this.queueItems.splice(this.activeItem, 1);
             this.game._publish("ui/update", this.game);
             return;
         }
@@ -2407,9 +2416,10 @@ dojo.declare("classes.queue.manager", null,{
         //Depending on the result, do something different:
         if (wasItemBought){
             //Item successfully purchased!  Remove it from the queue because we did it :D
-            this.dropLastItem();
+            this.remove(this.activeItem, 1);
             this.game._publish("ui/update", this.game);
             //console.log("Successfully built " + el.name + " using the queue because " + reason);
+            this.activeItem = 0; //Reset active item in case we built a storage building or something
         } else {
             
 
@@ -2419,30 +2429,35 @@ dojo.declare("classes.queue.manager", null,{
             if (this.game.getFeatureFlag("QUEUE_STRATEGIES")){
                 if (reason == "cannot-afford" && this.failStrategy !== null && this.game.resPool.isStorageLimited(controllerAndModel.model.prices)){
                     switch (this.failStrategy){
-                        //this is very ugly, probably slow and will need to be refactored
                         case "skipCapped":
-                            var old_v = this.queueItems;
-                            var new_v = old_v.slice(1);
-                            this.queueItems = new_v;
-                            //console.log(this.queueItems, "hmm", old_v.slice(1));
-                            if (this.queueItems.length > 0){
-                                this.game.time.queue.update();
+                            //console.log("Item is capped, so increment the active item index");
+                            this.activeItem += 1;
+                            if(this.activeItem >= this.queueItems.length) {
+                                this.activeItem = 0; //Gone past end of the queue?  Loop back to beginning
                             }
-                            this.game.time.queue.update();
-                            this.queueItems = [old_v[0]].concat(this.queueItems);
                             break;
                         case "removeCapped":
-                            //console.log("found REMOVE");
+                            if(this.activeItem !== 0) {
+                                console.error("Assumption that activeItem == 0 has been violated!");
+                            }
+                            //console.log("Removed " + el.name + " from the queue (queue strategy = " + this.failStrategy + ").");
                             //this.dropLastItem();
                             this.remove(0, this.queueItems[0].value);
                             break;
                         case "pushBackCapped":
+                            if(this.activeItem !== 0) {
+                                console.error("Assumption that activeItem == 0 has been violated!");
+                            }
+                            //console.log("Pushed " + el.name + " to the back of the queue (queue strategy = " + this.failStrategy + ").");
                             var deletedElement = this.queueItems.shift();
                             this.queueItems.push(deletedElement);
                             break;
                     }
                 }
                 else if (this.failStrategy == "skip"){
+                    if(this.activeItem !== 0) {
+                        console.error("Assumption that activeItem == 0 has been violated!");
+                    }
                     var old_v = this.queueItems;
                     var new_v = old_v.slice(1);
                     this.queueItems = new_v;
@@ -2455,11 +2470,10 @@ dojo.declare("classes.queue.manager", null,{
                 }
             }
             //game.resPool.isStorageLimited
-            //console.log( "Tried to build " + el.name + " using the queue, but failed." );
 
             ///end
             if (this._isReasonToSkipItem(reason)) {
-                this.dropLastItem();
+                this.remove(this.activeItem, 1);
                 this.game._publish("ui/update", this.game);
                 //console.log("Dropped " + el.name + " from the queue because " + reason);
             } else {
