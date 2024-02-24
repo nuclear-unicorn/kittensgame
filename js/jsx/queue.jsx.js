@@ -191,7 +191,7 @@ WQueue = React.createClass({
         for (var strategy in options){
             //console.warn(options[strategy]);
             //selectOpts.push(options[strategy]);
-            selectOpts.push($r("option", { value: options[strategy][0], "data-label": options[strategy][1]}, options[strategy][1]));
+            selectOpts.push($r("option", { value: options[strategy][0] || "null", "data-label": options[strategy][1]}, options[strategy][1]));
             //selectOpts.push(strategy);
         }
         if (!options.length){
@@ -206,6 +206,9 @@ WQueue = React.createClass({
                     itemLabel: e.target.label
                 });
                 game.time.queue.failStrategy = e.target.value;
+                if (game.time.queue.failStrategy === "null") { //This is a bit of a hack since the "value" property defaults to the text inside the element.
+                    game.time.queue.failStrategy = null;
+                }
             }
         }, selectOpts);
     },
