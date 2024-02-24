@@ -180,6 +180,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     },
 
     applyRedshift: function(daysOffset, ignoreCalendar){
+        //console.log("Applying redshift for daysOffset = " + daysOffset);
         //populate cached per tickValues
         this.game.resPool.update();
         this.game.updateResources();
@@ -220,35 +221,87 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         }
         return numberEvents;
     },
-    queueRedshiftApplyStrategy: function(result){
-        //console.log("Called queueRedshiftApplyStrategy(", result, ") with failStrategy = " + this.queue.failStrategy);
-        switch (this.queue.failStrategy){
-            case "remove" | "pushBackCapped":
-                //console.log("remove or push back capped");
-                if (!this.queue.isFirstItemCapped()){
+    /**
+     * Returns eta and
+     * if the eta was actually calculated.
+     * Has the following behavior for different strategies:
+     *   null OR feature flag disabled: returns the ETA for the first item in the queue
+     *   skip capped: returns the ETA for the first item in the queue that's not capped & sets the active item index to that item
+     *   push back capped: reorganizes the queue until the first item is not capped & returns the ETA for the first item
+     *                     if every item is capped, stops reorganizing the queue
+     *   remove capped: removes items from the queue until the first item isn't capped, then returns the ETA for that item
+     *   skip: calculates the ETA for every item in the queue, sets the active item index to the one that can be built soonest, &
+     *         returns the ETA for the item that can be built soonest.
+     */
+    queueRedshiftApplyStrategy: function(){
+        var failStrategy = this.queue.failStrategy;
+        var result = [0, false];
+        //console.log("Called queueRedshiftApplyStrategy() with failStrategy = " + JSON.stringify(failStrategy));
+        //console.log("Queue:", this.queue.queueItems.slice());
+
+        if (!this.game.getFeatureFlag("QUEUE_STRATEGIES") || !failStrategy) {
+            result = this.queue.getFirstItemEtaDay();
+
+        } else if (failStrategy === "skipCapped") {
+            this.queue.activeItem = 0;
+            for (var queueIndex = 0; queueIndex < this.queue.queueItems.length; queueIndex += 1) {
+                if (this.queue.isNthItemCapped(queueIndex) === false) {
+                    //Set active item index to the first one in the queue that's not capped
+                    this.queue.activeItem = queueIndex;
+                    //console.log("> Setting active item index to " + queueIndex + " because it's the first one that's not capped.");
                     break;
                 }
-                for (var _ in this.queue.queueItems){
-                    this.queue.update();
-                    result = this.queue.getFirstItemEtaDay();
-                    if (result[1] || !this.queue.isFirstItemCapped()){
-                        break;
-                    }
-                }
-                break;        
-            case "skipCapped" || "skip":
-                //console.log("skipCapped or skip");
-                if (!this.queue.isFirstItemCapped() && this.queue.failStrategy == "skipCapped"){
+            }
+            result = this.queue.getNthItemEtaDay(this.queue.activeItem);
+
+        } else if (failStrategy === "pushBackCapped") {
+            var pushBackCounter = 0;
+            result = this.queue.getFirstItemEtaDay();
+            while (!result[1] && this.queue.isFirstItemCapped()) {
+                //Push first queue element to the back:
+                var deletedElement = this.queue.queueItems.shift();
+                this.queue.queueItems.push(deletedElement);
+                //console.log("> Pushed item " + deletedElement.label + " to the back of the queue");
+                pushBackCounter += 1;
+                //Calculate new ETA:
+                result = this.queue.getFirstItemEtaDay();
+                //Stop the loop if we've gone full circle
+                if (pushBackCounter >= this.queue.queueItems.length) {
+                    //console.log("> ALL items in the queue are capped.  (pushBackCapped failed to build anything)");
                     break;
                 }
-                for (var i in this.queue.queueItems){
-                    result = this.queue.getNthItemEtaDay(i);
-                    if (result[1] || !this.queue.isNthItemCapped(i)){
-                        break;
-                    }
+            }
+
+        } else if (failStrategy === "removeCapped") {
+            result = this.queue.getFirstItemEtaDay();
+            while (!result[1] && this.queue.isFirstItemCapped()) {
+                //console.log("> Removed " + this.queue.queueItems[0].name + " from the queue (queue strategy = " + failStrategy + ").");
+                this.queue.remove(0, this.queue.queueItems[0].value);
+                //Calculate new ETA:
+                result = this.queue.getFirstItemEtaDay();
+            }
+
+        } else if (failStrategy === "skip") {
+            this.queue.activeItem = 0;
+            result = [Infinity, false];
+
+            //Calculate the ETA of every item in the queue & track which can be built soonest:
+            for (var queueIndex = 0; queueIndex < this.queue.queueItems.length; queueIndex += 1) {
+                var tempResult = this.queue.getNthItemEtaDay(queueIndex);
+                if (tempResult[1] && tempResult[0] < result[0]) {
+                    //This item CAN be built, & it has a shorter ETA than any we've tracked so far:
+                    //console.log("> Previous best ETA: " + result[0] + "; new best ETA: " + tempResult[0]);
+                    result = tempResult;
+                    this.queue.activeItem = queueIndex;
+                    //console.log("> Setting active item index to " + queueIndex + " because it can be built sooner.");
                 }
-                break;
+            }
+
+        } else {
+            console.warn("Called queueRedshiftApplyStrategy with unknown queue strategy " + JSON.stringify(failStrategy));
         }
+
+        //console.log("Result of queueRedshiftApplyStrategy = " + JSON.stringify(result));
         return result;
     },
     calculateRedshift: function(){
@@ -276,46 +329,48 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         if (daysOffset > offset){
             daysOffset = offset;
         }
+        //console.log("Redshift: we're calculating for a total of daysOffset = " + daysOffset);
+
         if(this.game.getFeatureFlag("QUEUE_REDSHIFT")){
-            //console.log( "Calculating queue redshift for the following queue:", this.queue.queueItems );
-            var result = this.queue.getFirstItemEtaDay();
+            //console.log("Calculating queue redshift for the following queue:", this.queue.queueItems.slice());
             var daysOffsetLeft = daysOffset;
-            //var redshiftQueueWorked = true;
-            if(this.game.getFeatureFlag("QUEUE_STRATEGIES") && !result[1]){
-                result, daysOffsetLeft = this.queueRedshiftApplyStrategy(result);
-                    if (!result[1]){
-                        numberEvents = this.applyRedshift(daysOffset);
-                        daysOffsetLeft = 0;
-                    }
-            }
             while (daysOffsetLeft > 0){
-                result = this.queue.getFirstItemEtaDay();
-                if(this.game.getFeatureFlag("QUEUE_STRATEGIES") && !result[1]){
-                    result = this.queueRedshiftApplyStrategy(result);
-                }
-                if (result[1]){
-                    // & redshiftQueueWorked){
+                //If the QUEUE_STRATEGIES feature flag is off, applies the "none" strategy:
+                var result = this.queueRedshiftApplyStrategy();
+
+                //result is now a 2-element array of the form [integer, boolean]
+                //  result[0] is how many days until the next queue item is to be built
+                //  result[1] is whether the next queue item can be built at all
+                //If result[1] is false, then result[0] is meaningless.
+
+                if (result[1]){ //i.e. we CAN build an item from the queue
                     var daysNeeded = result[0];// + 5; //let's have a little bit more days in case steamwork automation messes things up.
                     if (daysNeeded < 1) {
                         //There are legitimate cases in which the number of days needed would be less than 1.
                         //However, if we were to allow daysNeeded to be 0, there'd be risk of an infinite loop,
                         //so we set the minimum value to 1.
-                        //console.log( "Estimated days needed for queue item", this.queue.queueItems[ 0 ], "is too small; setting to a minimum value." );
+                        //console.log( "Estimated days needed for queue item is too small; setting to a minimum value." );
                         daysNeeded = 1;
                     }
-                    //var times = daysNeeded;
+
+                    //Round up to nearest whole year...I think Ziggurat wanted to remove this at some point:
                     daysNeeded /= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
                     daysNeeded = Math.ceil(daysNeeded);
                     daysNeeded *= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
-                    //times = Math.ceil(daysNeeded/times); //simple heuristic
+
                     if (daysNeeded > daysOffsetLeft){
                         this.applyRedshift(daysOffsetLeft, true);
                         daysOffsetLeft = 0;
-                        this.queue.update();
-                        break;
+                    } else {
+                        this.applyRedshift(daysNeeded, true);
+                        daysOffsetLeft -= daysNeeded;
                     }
-                    this.applyRedshift(daysNeeded, true);
-                    daysOffsetLeft -= daysNeeded;
+                    this.queue.update();
+
+                    //Oh, it looks like *this* is the code that Ziggurat wrote to allow the queue to update
+                    //  up to 1 time for each day skipped.  I turned it off because I changed how queueRedshiftApplyStrategy
+                    //  works, & I still need to test things fully.
+                    /*
                     if(this.game.getFeatureFlag("QUEUE_STRATEGIES")){
                         var max_times = Math.max(this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear, daysNeeded);
                         for (var i= 0; i < max_times; i+=1){
@@ -329,16 +384,16 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                             }
                         }
                     }
-                    /*if (!redshiftQueueWorked){
-                        console.warn("Redshift queue failed to build", this.queue.queueItems[0]);
-                    }*/
+                    */
                 }else{
+                    //i.e. We CAN'T build any more items from the queue, so just use up all the remaining redshift days:
                     this.applyRedshift(daysOffsetLeft, true);
                     daysOffsetLeft = 0;
                 }
             }
+            this.queue.activeItem = 0;
             numberEvents = this.game.calendar.fastForward(daysOffset);
-            //console.log( "Queue redshift calculations finished.  This is the new queue:", this.queue.queueItems );
+            //console.log( "Queue redshift calculations finished.  This is the new queue:", this.queue.queueItems.slice());
         }
         else{
             numberEvents = this.applyRedshift(daysOffset);
@@ -1681,58 +1736,15 @@ dojo.declare("classes.queue.manager", null,{
     toggleAlphabeticalSort: function(){
         this.alphabeticalSort = !this.alphabeticalSort;
     },
+
     /**
      * Returns eta and
      * if the eta was actually calculated.
      * For now ignores per day and per year production.
      * Corruption is also ignored.
      */
-    getFirstItemEtaDay: function(){
-        if (this.queueItems.length == 0){
-            return [0, false];
-        }
-        var eta = 0;
-        var element = this.queueItems[0];
-        if (!element) {
-            //This is probably a null queue item.  Treat it as if it were a valid building that can be built for free.
-            //Later on when we update the queue, this null item should be removed & we'll go on to the next.
-            return [0, true];
-        }
-        var modelElement = this.getQueueElementModel(element);
-        var prices = modelElement.prices;
-        var engineersConsumed = this.game.workshop.getConsumptionEngineers();
-        for (var ind in prices){
-            var price = prices[ind];
-            var res = this.game.resPool.get(price.name);
-		    if (res.value >= price.val){
-                //We already have enough of this resource.
-                continue;
-            }
-            if (res.maxValue < price.val){
-                //We don't have enough storage space to ever be able to afford the price.
-                return [eta, false];
-            }
-            var resPerTick = this.game.getResourcePerTick(res.name, true);
-            var engineersProduced = this.game.workshop.getEffectEngineer(res.name, true);
-            var deltaPerTick = resPerTick + (engineersConsumed[res.name] || 0)+ engineersProduced;
-            if (deltaPerTick <= 0) {
-                //We are losing this resource over time (or not producing any), so we'll never be able to afford the price.
-                return [eta, false];
-            }
-            eta = Math.max(eta,
-            (price.val - res.value) / (deltaPerTick) / this.game.calendar.ticksPerDay
-            );
-            if (engineersProduced){
-                var countdown = (1 / (this.game.workshop.getEffectEngineer(res.name, false))) / this.game.calendar.ticksPerDay;
-                eta = Math.ceil(eta/countdown)*countdown;
-            }
-        }
-        eta = Math.ceil(eta);
-        return [eta, true];
-    },
-
     getNthItemEtaDay: function(n){
-        if (this.queueItems.length == 0 || this.queueItems.length >= n){
+        if (this.queueItems.length == 0 || n >= this.queueItems.length){
             return [0, false];
         }
         var eta = 0;
@@ -1774,12 +1786,16 @@ dojo.declare("classes.queue.manager", null,{
         eta = Math.ceil(eta);
         return [eta, true];
     },
+    getFirstItemEtaDay: function(){
+        return this.getNthItemEtaDay(0);
+    },
 
     /**
      * Returns if the nth item in queue is capped or not
+     * Returns null if the nth item in the queue doesn't exist
      */
     isNthItemCapped: function(n){
-        if (this.queueItems.length >= n){
+        if (n >= this.queueItems.length){
             return null;
         }
 
@@ -1790,26 +1806,14 @@ dojo.declare("classes.queue.manager", null,{
         var modelElement = this.getQueueElementModel(element);
         var prices = modelElement.prices;
 
-        console.log(this.game.resPool.isStorageLimited(prices));
+        //console.log(n + "th item in queue, " + modelElement.name + ": Is it capped?", this.game.resPool.isStorageLimited(prices));
         return this.game.resPool.isStorageLimited(prices);
     },
     /**
      * Returns if the first item in queue is capped or not
      */
     isFirstItemCapped: function(){
-        if (this.queueItems.length == 0){
-            return null;
-        }
-
-        var element = this.queueItems[0];
-        if (!element) {
-            return false;
-        }
-        var modelElement = this.getQueueElementModel(element);
-        var prices = modelElement.prices;
-
-        console.log(this.game.resPool.isStorageLimited(prices));
-        return this.game.resPool.isStorageLimited(prices);
+        return this.isNthItemCapped(0);
     },
     updateQueueSourcesArr: function(){
         for (var i in this.queueSources){
