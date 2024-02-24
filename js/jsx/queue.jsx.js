@@ -48,8 +48,9 @@ WQueueItem = React.createClass({
 
         //TODO: red indicator when can't process
         //TODO: attach tooltip as if it is a button
+        var failStrategy = this.props.queueManager.failStrategy;
         var showActive = this.props.queueManager.activeItem == this.props.index &&
-                             this.props.queueManager.failStrategy == "skipCapped";
+                             (failStrategy == "skipCapped" || failStrategy == "skip");
         return $r("div", {}, 
         [
             (showActive ? "» " : "") +

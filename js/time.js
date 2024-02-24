@@ -221,8 +221,10 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         return numberEvents;
     },
     queueRedshiftApplyStrategy: function(result){
+        //console.log("Called queueRedshiftApplyStrategy(", result, ") with failStrategy = " + this.queue.failStrategy);
         switch (this.queue.failStrategy){
             case "remove" | "pushBackCapped":
+                //console.log("remove or push back capped");
                 if (!this.queue.isFirstItemCapped()){
                     break;
                 }
@@ -235,6 +237,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 }
                 break;        
             case "skipCapped" || "skip":
+                //console.log("skipCapped or skip");
                 if (!this.queue.isFirstItemCapped() && this.queue.failStrategy == "skipCapped"){
                     break;
                 }
@@ -2373,13 +2376,13 @@ dojo.declare("classes.queue.manager", null,{
     },
     update: function(){
         this.cap = this.calculateCap();
-        if(this.failStrategy !== "skipCapped") {
+        if (this.failStrategy !== "skipCapped" && this.failStrategy !== "skip") {
             this.activeItem = 0; //activeItem is only used in certain queue strategies
         }
-        if(!this.queueItems.length){
+        if (!this.queueItems.length){
             return;
         }
-        if(this.activeItem >= this.queueItems.length) {
+        if (this.activeItem >= this.queueItems.length) {
             this.activeItem = 0; //Gone past end of the queue?  Loop back to beginning
         }
         var el = this.queueItems[this.activeItem];
@@ -2432,12 +2435,12 @@ dojo.declare("classes.queue.manager", null,{
                         case "skipCapped":
                             //console.log("Item is capped, so increment the active item index");
                             this.activeItem += 1;
-                            if(this.activeItem >= this.queueItems.length) {
+                            if (this.activeItem >= this.queueItems.length) {
                                 this.activeItem = 0; //Gone past end of the queue?  Loop back to beginning
                             }
                             break;
                         case "removeCapped":
-                            if(this.activeItem !== 0) {
+                            if (this.activeItem !== 0) {
                                 console.error("Assumption that activeItem == 0 has been violated!");
                             }
                             //console.log("Removed " + el.name + " from the queue (queue strategy = " + this.failStrategy + ").");
@@ -2445,7 +2448,7 @@ dojo.declare("classes.queue.manager", null,{
                             this.remove(0, this.queueItems[0].value);
                             break;
                         case "pushBackCapped":
-                            if(this.activeItem !== 0) {
+                            if (this.activeItem !== 0) {
                                 console.error("Assumption that activeItem == 0 has been violated!");
                             }
                             //console.log("Pushed " + el.name + " to the back of the queue (queue strategy = " + this.failStrategy + ").");
@@ -2454,19 +2457,12 @@ dojo.declare("classes.queue.manager", null,{
                             break;
                     }
                 }
-                else if (this.failStrategy == "skip"){
-                    if(this.activeItem !== 0) {
-                        console.error("Assumption that activeItem == 0 has been violated!");
+                if (this.failStrategy == "skip"){
+                    //console.log("Item wasn't built, so increment the active item index");
+                    this.activeItem += 1;
+                    if (this.activeItem >= this.queueItems.length) {
+                        this.activeItem = 0; //Gone past end of the queue?  Loop back to beginning
                     }
-                    var old_v = this.queueItems;
-                    var new_v = old_v.slice(1);
-                    this.queueItems = new_v;
-                    //console.log(this.queueItems, "hmm", old_v.slice(1));
-                    if (this.queueItems.length > 0){
-                        this.game.time.queue.update();
-                    }
-                    this.game.time.queue.update();
-                    this.queueItems = [old_v[0]].concat(this.queueItems);
                 }
             }
             //game.resPool.isStorageLimited
