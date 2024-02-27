@@ -539,10 +539,6 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		//Update Trade Stats
 		this.game.stats.getStat("totalTrades").val += successfullTradeAmount;
 		this.game.stats.getStatCurrent("totalTrades").val += successfullTradeAmount;
-		if (race.name == "spiders"){
-			this.game.stats.getStatCurrent("totalSpiderTrades").val += successfullTradeAmount;
-			this.game.upgrade({policies : ["spiderRelationsGeologists"]});
-		}
 		this.game.upgrade({policies : ["sharkRelationsMerchants"]});
 
 		return boughtResources;
@@ -1040,7 +1036,7 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 
 	buyItem: function(model, event, callback) {
 		this.inherited(arguments);
-		this.game.upgrade({policies: ["lizardRelationsDiplomats", "nagaRelationsArchitects"]}); //Upgrade, since the policy is based on number of embassies.
+		this.game.upgrade({policies: ["lizardRelationsDiplomats", "nagaRelationsArchitects", "spiderRelationsGeologists"]}); //Upgrade, since the policy is based on number of embassies.
 		this.game.science.unlockRelations(); //Check if we can unlock new relation policies based on number of embassies.
 		this.game.ui.render();
 	},

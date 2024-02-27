@@ -1436,8 +1436,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["sharkRelationsScribes", "sharkRelationsBotanists"],
 		calculateEffects: function(self, game) {
 			var trades = game.stats.getStatCurrent("totalTrades").val;
-			self.effects["tradeRatio"] = Math.min(Math.floor(Math.log10(Math.max(trades, 100)) - 1) * 0.05, 0.5);
-			
+			self.effects["tradeRatio"] = Math.min(Math.floor(Math.log10(Math.max(trades, 100)) - 1) * 0.05, 0.5);			
 		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("sharks", 20);
@@ -1452,12 +1451,22 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         effects:{
             "refinePolicyRatio" : 0.25,
 			"biolabEnergyRatio" : -0.75,
-			"breweryPolicyManpowerRatio" : 0.01
+			"breweryPolicyManpowerRatio" : 0.01,
+			"woodRatio" : 0
         },
         unlocked: false,
         blocked: false,
 		isRelation: true,
         blocks:["sharkRelationsScribes", "sharkRelationsMerchants"],
+		calculateEffects: function(self, game) {
+			if (game.ironWill) {
+				self.effects["refinePolicyRatio"] = 0;
+				self.effects["woodRatio"] = 0.25;
+			} else {
+				self.effects["refinePolicyRatio"] = 0.25;
+				self.effects["woodRatio"] = 0;
+			}
+		},
 		upgrades: {
 			buildings: ["biolab", "brewery"],
 			
@@ -1606,10 +1615,10 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			return game.science.checkRelation("spiders", 10);
 		},
 		calculateEffects: function(self, game) {
-			var trades = game.stats.getStatCurrent("totalSpiderTrades").val;
-			var ratio = Math.min(Math.floor(Math.log10(Math.max(trades, 100)) - 1) * 0.04, 0.2);
+			var spiderEmbassies = game.diplomacy.get("spiders").embassyLevel;
+			var bonus = game.getLimitedDR(0.06 + 0.004 * spiderEmbassies, 0.3);
 			for (var effect in self.effects) {
-				self.effects[effect] = ratio;
+				self.effects[effect] = bonus;
 			}
 		},
 	}, {

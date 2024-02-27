@@ -839,7 +839,7 @@
     "policy.spaceBasedTerraforming.label" : "Space-based terraforming",
     "policy.spaceBasedTerraforming.desc" : "Put giant mirrors in the sky, boosting solar farms consistency. Unlocks Space Mirrors.",
     "policy.spiderRelationsGeologists.label" : "Spider Relations: Geologists",
-    "policy.spiderRelationsGeologists.desc" : "The spiders are willing to help us find and exploit good mineral deposits in exchange for our continued trading partnership.<br>The more we trade with spiders, the more it will benefit our mining industry",
+    "policy.spiderRelationsGeologists.desc" : "The spiders are willing to help us find and exploit good mineral deposits in exchange for our continued partnership.<br>The more embassies we have with spiders, the more it will benefit our mining industry",
     "policy.spiderRelationsChemists.label" : "Spider Relations: Chemists",
     "policy.spiderRelationsChemists.desc" : "While spiders have abundant oil, they do not have the means to create kerosene yet. Our chemists can help them study chemical processes.<br><br> Spiders will now sell kerosene",
     "policy.spiderRelationsPaleontologists.label" : "Spider Relations: Paleontologists",
