@@ -624,6 +624,11 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio"
 			},
 
+			"faithMaxRatio" : {
+				title: $I("effectsMgr.statics.faithMaxRatio.title"),
+				type: "ratio"
+			},
+
 			"refineRatio": {
 				title: $I("effectsMgr.statics.refineRatio.title"),
 				type: "ratio"

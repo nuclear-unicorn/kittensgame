@@ -2138,18 +2138,26 @@ dojo.declare("classes.village.ui.artifacts.CherishController", com.nuclearunicor
 	},
 
 	buyItem: function(model, event, callback) {
-		/*if (this.artifact.exp < 250 * Math.pow(2, this.artifact.level)) {			
-			this.game.msg("village.btn.cherishbutton.notEnoughXP")
+		if (event){
+			if (event.ctrlKey == true || event.shiftKey == true) {
+				this.buyItem(model, null, callback);
+				return;
+			}
+		}
+		var expNeeded = 100 * this.artifact.level;
+		if (this.artifact.exp < expNeeded) {			
+			this.game.msg($I("village.btn.cherishbutton.notEnoughXP") + Math.trunc(expNeeded - this.artifact.exp) + "XP");
 			return;
-		}*/	
+		}		
 		this.inherited(arguments);
-		//this.artifact.exp -= 250 * Math.pow(2, this.artifact.level) || 0;
-		this.game.ui.render();
+		this.game.ui.render();		
 	},
 
 	incrementValue: function(model) {
 		this.inherited(arguments);
 		this.artifact.level++;
+		var expNeeded = 100 * this.artifact.level;
+		this.artifact.exp -= expNeeded;
 	},
 
 	updateVisible: function(model){
@@ -2174,26 +2182,96 @@ dojo.declare("classes.village.Artifact", null, {
 
 	effects: {},
 
+	creator: "",
+	year: "",
+	description: "",
+
+	game: null,
+
 	artForms: [{
 		name: "book",
 		title: $I("village.artifact.artForm.book.title"),
-		effects: [{"scienceMaxRatio" : 0.01}, {"scienceRatio" : 0.01}, {"skillMultiplier" : 0.01}]
+		effects: [{"scienceMaxRatio" : 0.01}, {"scienceRatio" : 0.01}, {"skillMultiplier" : 0.005}],
+		collapsed: false,
+		description: [{
+				pool: ["technology"],
+				text: "village.artifact.description.book.technology"
+			},{
+				pool: ["policy"],
+				text: "village.artifact.description.book.policy"
+			},{
+				pool: ["spaceMission"],
+				text: "village.artifact.description.book.program"
+			}
+		]
 	}, {
 		name: "painting",
 		title: $I("village.artifact.artForm.painting.title"),
-		effects: [{"cultureMaxRatio": 0.01}, {"cultureRatio": 0.01}, {"artifactXPRatio": 0.01}]
+		effects: [{"cultureMaxRatio": 0.01}, {"cultureRatio": 0.01}, {"artifactXPRatio": 0.01}],
+		collapsed: false,
+		description: [{
+				pool: ["building", "spaceBuilding"],
+				text: "village.artifact.description.painting.building"
+			},{
+				pool: ["zigguratUpgrade"],
+				text: "village.artifact.description.painting.zigguratUpgrade"
+			},{
+				pool: ["planet"],
+				text: "village.artifact.description.painting.planet"
+			}
+		]
 	}, {
 		name: "music",
 		title: $I("village.artifact.artForm.music.title"),
-		effects: [{"faithRatio": 0.01}, {"happiness": 1}, {"festivalRatio": 0.005}]
+		effects: [{"faithRatio": 0.01}, {"happiness": 1}, {"festivalRatio": 0.001}],
+		collapsed: false,
+		description: [{
+			pool: ["job"],
+			text: "village.artifact.description.music.job"
+		},{
+			pool: ["religionUpgrade"],
+			text: "village.artifact.description.music.religionUpgrade"
+		},{
+			pool: ["governmentPolicy"],
+			text: "village.artifact.description.music.governmentPolicy"
+		}
+	]
 	}, {
 		name: "sculpture",
 		title: $I("village.artifact.artForm.sculpture.title"),
-		effects: [{"faithMaxRatio": 0.01}, {"craftRatio": 0.01}, {"embassyCostReduction": 0.005}]	
+		effects: [{"faithMaxRatio": 0.01}, {"craftRatio": 0.01}, {"embassyCostReduction": 0.005}],
+		collapsed: false,
+		description: [{
+				pool: ["race"/*, "animal"*/],
+				text: "village.artifact.description.sculpture.race"
+			},{
+				pool: ["traitKitten"],
+				text: "village.artifact.description.sculpture.traitKitten"
+			},{
+				pool: ["jobKitten"],
+				text: "village.artifact.description.sculpture.jobKitten"
+			},{
+				pool: ["trait"],
+				text: "village.artifact.description.sculpture.trait"
+			}
+		]
 	}, {
 		name: "tapestry",
 		title: $I("village.artifact.artForm.tapestry.title"),
-		effects: [{"manpowerMaxRatio": 0.01}, {"manpowerRatio": 0.01}, {"tradeRatio": 0.005}]
+		effects: [{"manpowerMaxRatio": 0.01}, {"manpowerRatio": 0.01}, {"tradeRatio": 0.005}],
+		collapsed: false,
+		description: [{
+				pool: ["race"],
+				text: "village.artifact.description.tapestry.raceTrade"
+			},{
+				pool: ["race"],
+				pool2: ["villageTitle"],
+				text: "village.artifact.description.tapestry.emissaries"
+			},{
+				pool: ["religionUpgrade", "zigguratUpgrade"],
+				text: "village.artifact.description.tapestry.religion"
+			}
+		]
 	}],
 
 	constructor: function(){
@@ -2201,8 +2279,168 @@ dojo.declare("classes.village.Artifact", null, {
 		this.artForm = {name: tempArtForm.name, title: tempArtForm.title};
 		this.effects = tempArtForm.effects[this.rand(tempArtForm.effects.length)];
 		this.level = 1;
-
+		var kitten = self.game.village.sim.kittens[this.rand(self.game.village.sim.kittens.length)];
+		this.creator = kitten.name + " " +kitten.surname;
+		this.year = self.game.calendar.year;
+		var tempDescription = tempArtForm.description[this.rand(tempArtForm.description.length)];
+		var randomItem = [this.getRandomItem(tempDescription.pool, self.game)];
+		if (tempDescription.pool2) {
+			randomItem.push(this.getRandomItem(tempDescription.pool2, self.game));
+		}
+		/*if (!tempDescription.pool2) {
+			description = $I(tempDescription.text, [randomItem]);
+		} else {
+			description = $I(tempDescription.text, [this.getRandomItem(tempDescription.pool, self.game), this.getRandomItem(tempDescription.pool2, self.game)]);
+		}*/
+		if(randomItem){
+			this.description = $I(tempDescription.text, randomItem);
+		} else {
+			this.description = "";
+		}				
 	},
+
+	getRandomItem: function(pool, game) {
+		var tempPool = [];
+		for (var i = 0; pool.length > i; i++) {
+			switch(pool[0]){
+				case "technology":
+					var technologies = game.science.techs;
+					for (var j in technologies){
+						var technology = technologies[j];
+						if (technology.researched){
+							tempPool.push(technology.label);
+						}
+					}
+					break;
+				case "policy":
+					var policies = game.science.policies;
+					for (var j in policies){
+						var policy = policies[j];
+						if (policy.researched){
+							tempPool.push(policy.label);
+						}
+					}
+					break;
+				case "religionUpgrade":
+					var religionUpgrades = game.religion.religionUpgrades;
+					for (var j in religionUpgrades){
+						var upgrade = religionUpgrades[j];
+						if (upgrade.val){
+							tempPool.push(upgrade.label);
+						}
+					}
+					break;
+				case "spaceMission":
+					var spaceMissions = game.space.programs;
+					for (var j in spaceMissions){
+						var program = spaceMissions[j];
+						if (program.val){
+							tempPool.push(program.label);
+						}
+					}
+					break;
+				case "building":
+					var bld = game.bld;
+					for (var j in bld.buildingsData){
+						var building = bld.buildingsData[j];
+						if(building.val){
+							var label = building.label;
+							if(building.stages){
+								if(building.stages){
+									label = building.stages[building.stage].label;
+								}
+							}
+							tempPool.push(label);
+						}
+					}
+					break;
+				case "spaceBuilding":
+					var spaceBuildMap = game.space.spaceBuildingsMap;
+					for (var j in spaceBuildMap){
+                    var building = this.game.space.getBuilding(spaceBuildMap[j]);
+						if (building.val){
+							tempPool.push(building.label);
+						}
+					}
+					break;
+				case "zigguratUpgrade":
+					var zigguratUpgrades = game.religion.zigguratUpgrades;
+					for (var j in zigguratUpgrades){
+						var upgrade = game.religion.zigguratUpgrades[j];
+						if (upgrade.val){
+							tempPool.push(upgrade.label);
+						}
+					}
+					break;
+				case "planet":
+					var planets = game.space.planets;
+					for (var j in planets){
+						var planet = planets[j];
+						if (planet.unlocked){
+							tempPool.push(planet.label);
+						}
+					}
+					break;
+				case "job":
+					var jobs = game.village.jobs;
+					for (var j in jobs){
+						var job = jobs[j];
+						if (job.unlocked){
+							tempPool.push(job.title);
+						}
+					}
+					break;
+				case "governmentPolicy":
+					var policies = game.science.policies;
+					for (var j in policies){
+						var policy = policies[j];
+						if (policy.researched && policy.type == "government"){
+							tempPool.push(policy.label);
+						}
+					}
+					break;
+				case "race":
+					var races = game.diplomacy.races;
+					for (var j in races){
+						var race = races[j];
+						if (race.unlocked){
+							tempPool.push(race.title);
+						}
+					}
+					break;
+				case "trait":
+					var traits = game.village.traits;
+					for (var j in traits){
+						var trait = traits[j];
+						if (trait.name != "none"){
+							tempPool.push(trait.title);
+						}
+					}
+					break;
+				case "traitKitten":
+					var kitten = game.village.sim.kittens[this.rand(game.village.sim.kittens.length)];
+						var trait = kitten.trait.title;
+						if (trait == "None" || !trait) {
+							trait = "";
+						}
+						tempPool.push(trait + " " + kitten.name + " " + kitten.surname);
+						break;
+				case "jobKitten":
+					var kitten = game.village.sim.kittens[this.rand(game.village.sim.kittens.length)];
+						var job = kitten.job;
+						if (!job) {
+							job = "";
+						}
+						tempPool.push(job + " " + kitten.name + " " + kitten.surname);
+						break;
+				case "villageTitle":
+					tempPool.push(game.villageTab.getVillageTitle());
+			}
+			
+			return tempPool[this.rand(tempPool.length)];
+		}
+	},
+
 	/*save: function(){
 		return {
 			artForm: this.artForm,
@@ -2247,8 +2485,8 @@ dojo.declare("classes.village.ArtifactSim", null, {
 		}
 		
 		if (this.artifacts.length < this.maxArtifacts) {
-			var temp = this.game.getLimitedDR(this.game.village.getFreeKittens(), 100) * 0.1;
-			this.nextArtifactProgress += times * this.artifactsPerTick * (1 + this.game.getLimitedDR(this.game.village.getFreeKittens(), 100) * 0.1);
+			//var temp = this.game.getLimitedDR(this.game.village.getFreeKittens(), 100) * 0.1;
+			this.nextArtifactProgress += times * this.artifactsPerTick * (1 + this.game.getLimitedDR(this.game.village.getFreeKittens(), 100) * 0.05);
 			if (this.nextArtifactProgress >= 1) {
 				var artifactsToAdd = Math.floor(this.nextArtifactProgress);
 				this.nextArtifactProgress -= artifactsToAdd;
@@ -2267,7 +2505,7 @@ dojo.declare("classes.village.ArtifactSim", null, {
 
 		for (var i = this.artifacts.length - 1; i >= 0; i--) {
 			var artifact = this.artifacts[i];
-			artifact.exp += (0.01 + game.getEffect("artifactXP")) * game.getEffect("artifactXPRatio") * times;
+			artifact.exp += (0.01 + game.getEffect("artifactXP")) * (1 + game.getEffect("artifactXPRatio")) * times;
 		}
 	},
 	addArtifact: function() {
@@ -2277,18 +2515,14 @@ dojo.declare("classes.village.ArtifactSim", null, {
 
 		for (var i = 0; this.game.village.artForms.length > i; i++) {
 			if (this.game.village.artForms[i].name == artifact.artForm.name) {
-				this.game.ui.render();
-				this.game.villageTab.updateTab();
+				//this.game.ui.render();
+				//this.game.villageTab.updateTab();
 				return false;
 			}
 		}
 		this.game.village.artForms.push(artifact.artForm);
-
-		/*if (!this.game.village.artForms.indexOf(artifact.artForm)) {
-			this.game.village.artForms.unshift(artifact.artForm);
-		}*/
-		this.game.ui.render();
-		this.game.villageTab.updateTab();
+		//this.game.ui.render();
+		//this.game.villageTab.updateTab();
 	},
 	removeArtifact: function(artifact){
 		var temp = this.artifacts.indexOf(artifact);
@@ -2354,6 +2588,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ArtFormPanel", com.nuclearunicorn.game.
 		this.name = artForm.title;
 		this.artFormID = artForm.name;
 		this.game = game;
+		this.artForm = artForm;
 	},
 
 	render: function(container) {
@@ -2391,9 +2626,12 @@ dojo.declare("com.nuclearunicorn.game.ui.ArtFormPanel", com.nuclearunicorn.game.
 			var textToDisplay = displayParams.displayEffectName + ": " + displayParams.displayEffectValue;
 			this.effectBar.innerHTML += "<br>" + textToDisplay;
 		}
+
+		this.collapse(this.artForm.collapsed);
 		
 		for (i = 0; artifactFiltered.length > i; i++) {
 			var artifact = artifactFiltered[i];
+			
 			var textToDisplay = "";
 
 			var div = dojo.create("div", {
@@ -2403,6 +2641,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ArtFormPanel", com.nuclearunicorn.game.
 			var content = dojo.create("div", {
 				style: {
 					display: "inline-block",
+					width: "50%"
 				}
 			}, div);
 
@@ -2413,28 +2652,32 @@ dojo.declare("com.nuclearunicorn.game.ui.ArtFormPanel", com.nuclearunicorn.game.
 				}
 			}, div);
 
-			var effects = artifact.effects;
-			content.innerHTML = this.name;
-			for (var effect in effects) {
-				var displayParams = this.game.getEffectDisplayParams(effect, effects[effect] * artifact.level, false);
-				if (!displayParams) {
-					continue;
-				}
-				var textToDisplay = displayParams.displayEffectName + ": " + displayParams.displayEffectValue;
-				content.innerHTML += "<br>" + textToDisplay;
-			}
-
 			var cherishButton = new classes.village.ui.artifacts.CherishButton({
 				name: $I("village.btn.cherish"),
 				description: $I("village.btn.cherish.desc"),				
 				prices: [{ name : "culture", val: 2000 }],
-				exp: artifact.exp,
 				controller: new classes.village.ui.artifacts.CherishController(this.game, this.game.opts, artifact)
 			}, this.game);
 			
 			cherishButton.render(linksDiv);
 
+			var effects = artifact.effects;
+			content.innerHTML = ""/*this.name*/;
+			for (var effect in effects) {
+				var displayParams = this.game.getEffectDisplayParams(effect, effects[effect] * artifact.level, false);
+				if (!displayParams) {
+					continue;
+				}
+				var textToDisplay = artifact.description + "<br>" + displayParams.displayEffectName + ": " + displayParams.displayEffectValue
+				+ "<br>" + $I("village.artifact.creator") + ": " + artifact.creator
+				/*+ "<br>" + Math.trunc(artifact.exp) + "/" +  artifact.level * 100 + "XP"*/;
+				content.innerHTML += textToDisplay;
+			}			
 		}
+	},
+
+	onToggle: function(isToggled){
+		this.artForm.collapsed = isToggled;
 	},
 
 	update: function(){

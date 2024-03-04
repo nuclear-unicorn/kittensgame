@@ -1729,7 +1729,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					"unhappinessRatio" : -0.048,
 					"culturePerTickBase" : 0.005,
 					"cultureMax" : 50,
-					"artifactXP": 0.0003,
+					"artifactXP": 0.002,
 				},
 				stageUnlocked : true,
 				flavor: $I("buildings.amphitheatre.flavor")
@@ -1746,7 +1746,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					"unhappinessRatio" : -0.75,
 					"culturePerTickBase" : 1,
 					"cultureMax" : 300,
-					"artifactXP": 0.0006,
+					"artifactXP": 0.004,
 				},
 				stageUnlocked : false
 			}

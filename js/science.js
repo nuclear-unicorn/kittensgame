@@ -851,6 +851,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		name: "liberty",
 		label: $I("policy.liberty.label"),
 		description: $I("policy.liberty.desc"),
+		type: "government",
 		prices: [
 			{name : "culture", val: 150}
 		],
@@ -871,6 +872,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		name: "tradition",
 		label: $I("policy.tradition.label"),
 		description:$I("policy.tradition.desc"),
+		type: "government",
 		prices: [
 			{name : "culture", val: 150}
 		],
@@ -891,6 +893,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		name: "monarchy",
 		label: $I("policy.monarchy.label"),
 		description: $I("policy.monarchy.desc"),
+		type: "government",
 		prices: [
 			{name : "culture", val: 1500}
 		],
@@ -910,6 +913,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		name: "authocracy",
 		label: $I("policy.autocracy.label"),
 		description: $I("policy.autocracy.desc"),
+		type: "government",
 		prices: [
 			{name : "culture", val: 1500}
 		],
@@ -944,6 +948,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		name: "republic",
         label: $I("policy.republic.label"),
         description: $I("policy.republic.desc"),
+		type: "government",
 		prices: [
 			{name : "culture", val: 1500}
 		],
@@ -962,6 +967,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		name: "socialism",
         label: $I("policy.socialism.label"),
         description: $I("policy.socialism.desc"),
+		type: "government",
 		prices: [
 			{name : "culture", val: 7500}
 		],
@@ -974,6 +980,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		name: "liberalism",
         label: $I("policy.liberalism.label"),
         description: $I("policy.liberalism.desc"),
+		type: "government",
 		prices: [
 			{name : "culture", val: 15000}
 		],
@@ -992,6 +999,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		name: "communism",
         label: $I("policy.communism.label"),
         description: $I("policy.communism.desc"),
+		type: "government",
 		prices: [
 			{name : "culture", val: 15000}
 		],
@@ -1012,6 +1020,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		name: "fascism",
         label: $I("policy.fascism.label"),
         description: $I("policy.fascism.desc"),
+		type: "government",
 		prices: [
 			{name : "culture", val: 15000}
 		],
@@ -1031,6 +1040,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		name: "technocracy",
         label: $I("policy.technocracy.label"),
         description: $I("policy.technocracy.desc"),
+		type: "government",
         prices: [
 			{name : "culture", val: 150000}
 		],
@@ -1044,6 +1054,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		name: "theocracy",
         label: $I("policy.theocracy.label"),
         description: $I("policy.theocracy.desc"),
+		type: "government",
 		prices: [
 			{name : "culture", val: 150000}
 		],
@@ -1058,6 +1069,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		name: "expansionism",
         label: $I("policy.expansionism.label"),
         description: $I("policy.expansionism.desc"),
+		type: "government",
 		prices: [
 			{name : "culture", val: 150000}
 		],
@@ -1073,6 +1085,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		name: "transkittenism",
         label: $I("policy.transkittenism.label"),
         description: $I("policy.transkittenism.desc"),
+		type: "government",
 		prices: [
 			{name : "culture", val: 1500000}
 		],
@@ -1092,6 +1105,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		name: "necrocracy",
 		label: $I("policy.necrocracy.label"),
 		description:$I("policy.necrocracy.desc"),
+		type: "government",
 		prices: [
 			{name : "culture", val: 1500000}
 		],
@@ -1107,6 +1121,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		name: "radicalXenophobia",
         label: $I("policy.radicalXenophobia.label"),
         description: $I("policy.radicalXenophobia.desc"),
+		type: "government",
 		prices: [
 			{name : "culture", val: 1500000}
 		],
