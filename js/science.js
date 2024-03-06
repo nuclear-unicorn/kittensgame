@@ -2390,7 +2390,8 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 		}
 		this.payPrice(model);
 		this.onPurchase(model);
-		if (model.metadata.calculateEffects){
+		var meta = model.metadata;
+		if (meta.calculateEffects){
 			model.metadata.calculateEffects(meta, this.game);
 		}
 		callback(true /*itemBought*/, { reason: (this.game.devMode ? "dev-mode" : "paid-for") });
