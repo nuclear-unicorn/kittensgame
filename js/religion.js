@@ -679,7 +679,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//none
 		},
 		upgrades: {
-			buildings: ["temple"]
+			buildings: ["temple", "ziggurat"]
 		},
 		calculateEffects: function(self, game) {
 			self.noStackable = (game.religion.getRU("transcendence").on == 0);
@@ -699,7 +699,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//none
 		},
 		upgrades: {
-			buildings: ["temple"]
+			buildings: ["temple", "ziggurat"]
 		},
 		calculateEffects: function(self, game) {
 			self.noStackable = (game.religion.getRU("transcendence").on == 0);
@@ -720,7 +720,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//none
 		},
 		upgrades: {
-			buildings: ["temple"]
+			buildings: ["temple", "ziggurat"]
 		},
 		calculateEffects: function(self, game) {
 			self.noStackable = (game.religion.getRU("transcendence").on == 0);
@@ -740,7 +740,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//none
 		},
 		upgrades: {
-			buildings: ["temple"]
+			buildings: ["temple", "ziggurat"]
 		},
 		calculateEffects: function(self, game) {
 			self.noStackable = (game.religion.getRU("transcendence").on == 0);
@@ -776,7 +776,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//none
 		},
 		upgrades: {
-			buildings: ["temple"]
+			buildings: ["temple", "ziggurat"]
 		},
 		calculateEffects: function(self, game) {
 			self.noStackable = (game.religion.getRU("transcendence").on == 0);
@@ -796,7 +796,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//none
 		},
 		upgrades: {
-			buildings: ["temple"]
+			buildings: ["temple", "ziggurat"]
 		},
 		calculateEffects: function(self, game) {
 			self.noStackable = (game.religion.getRU("transcendence").on == 0);
@@ -1287,7 +1287,13 @@ dojo.declare("com.nuclearunicorn.game.ui.ReligionBtnController", com.nuclearunic
 	},
 
 	getPrices: function(model){
-		return this.game.village.getEffectLeader("wise", this.inherited(arguments));
+		var defaultPrices = this.inherited(arguments);
+		for (var i = 0; i < defaultPrices.length; i++) {
+			if (defaultPrices[i].name == "faith" || defaultPrices[i].name == "gold") {
+				defaultPrices[i].val = defaultPrices[i].val * (1 + this.game.getEffect("religionUpgradesDiscount"));
+			}
+		}
+		return this.game.village.getEffectLeader("wise", defaultPrices);
 	},
 
 	updateVisible: function(model){

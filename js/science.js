@@ -1324,7 +1324,428 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		evaluateLocks: function(game){
 			return game.space.getBuilding("sattelite").val > 0 && !game.challenges.isActive("pacifism");
 		}
-    },
+    }, {
+		name: "lizardRelationsEcologists",
+        label: $I("policy.lizardRelationsEcologists.label"),
+        description: $I("policy.lizardRelationsEcologists.desc"),
+        prices: [
+            {name : "culture", val: 2100}
+        ],
+        effects:{
+            "cathPollutionRatio" : -0.1,
+			"solarFarmRatio" : 0,
+			"hydroPlantRatio": 0
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["lizardRelationsPriests", "lizardRelationsDiplomats"],
+		calculateEffects: function(self,game){
+			var cathPollution = Math.floor(game.bld.cathPollution);
+			if (cathPollution < 1e8) {
+				var boostRatio = Math.round(((1e8 - cathPollution) * 5 / 1e9) * 1e2) / 1e2;
+				self.effects["solarFarmRatio"] = boostRatio;
+				self.effects["hydroPlantRatio"] = boostRatio;
+			} else {
+				self.effects["solarFarmRatio"] = 0;
+				self.effects["hydroPlantRatio"] = 0;
+			}
+			game.upgrade({buildings: ["pasture", "aqueduct"]});
+			
+		},
+		evaluateLocks: function(game){
+			return game.science.checkRelation("lizards", 20);
+		}
+	}, {
+		name: "lizardRelationsPriests",
+        label: $I("policy.lizardRelationsPriests.label"),
+        description: $I("policy.lizardRelationsPriests.desc"),
+        prices: [
+            {name : "culture", val: 2100}
+        ],
+        effects:{
+			"religionUpgradesDiscount" : -0.1
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["lizardRelationsEcologists", "lizardRelationsDiplomats"],
+		calculateEffects: function(self,game) {
+			game.science.unlockRelations(); //Hack: Check relations by being upgraded by diplomacy and on load
+		},
+		evaluateLocks: function(game){
+			return game.science.checkRelation("lizards", 20);
+		}
+	}, {
+		name: "lizardRelationsDiplomats",
+        label: $I("policy.lizardRelationsDiplomats.label"),
+        description: $I("policy.lizardRelationsDiplomats.desc"),
+        prices: [
+            {name : "culture", val: 2100}
+        ],
+        effects:{
+			"culturePolicyRatio": 0
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["lizardRelationsEcologists", "lizardRelationsPriests"],
+		calculateEffects: function(self, game){
+			var raceList = game.diplomacy.races;
+			var embassyCount = 0;
+			for (var i = 0; i < raceList.length; i++ ) {
+				if (raceList[i].embassyLevel) {
+					embassyCount += raceList[i].embassyLevel;
+				}
+			}
+			self.effects["culturePolicyRatio"] = game.getLimitedDR(0.05 + 0.001 * embassyCount, 0.3);
+		},
+		evaluateLocks: function(game){
+			return game.science.checkRelation("lizards", 20);
+		}
+	}, {
+		name: "sharkRelationsScribes",
+        label: $I("policy.sharkRelationsScribes.label"),
+        description: $I("policy.sharkRelationsScribes.desc"),
+        prices: [
+            {name : "culture", val: 2200}
+        ],
+        effects:{
+            "parchmentTradeChanceIncrease" : 0.5,
+			"manuscriptTradeChanceIncrease" : 0.3,
+			"ironBuyRatioIncrease": 1
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["sharkRelationsMerchants", "sharkRelationsBotanists"],
+		calculateEffects: function(self, game){
+			var sharks = game.diplomacy.get("sharks");
+				for (var i = 0; i < sharks.sells.length; i++) {
+					var sell = sharks.sells[i]["name"];
+					if (sell == "parchment") {
+						if (self.researched) {
+							sharks.sells[i].chance = 0.25 + self.effects["parchmentTradeChanceIncrease"];
+						} else {
+							sharks.sells[i].chance = 0.25;
+						}
+					}
+					if (sell == "manuscript"){
+						if (self.researched) {
+							sharks.sells[i].chance = 0.15 + self.effects["manuscriptTradeChanceIncrease"];
+						} else {
+							sharks.sells[i].chance = 0.15;
+						}
+					}
+				}
+				for (i = 0; i < sharks.buys.length; i++) {
+					var buy = sharks.buys[i]["name"];
+					if(buy == "iron") {
+						if(self.researched){
+							sharks.buys[i].val = 100 * (1 + self.effects["ironBuyRatioIncrease"]);
+						} else {
+							sharks.buys[i].val = 100;
+						}
+					}
+				}
+		},
+		evaluateLocks: function(game){
+			return game.science.checkRelation("sharks", 20);
+		}
+	}, {
+		name: "sharkRelationsMerchants",
+        label: $I("policy.sharkRelationsMerchants.label"),
+        description: $I("policy.sharkRelationsMerchants.desc"),
+        prices: [
+            {name : "culture", val: 2200}
+        ],
+        effects:{
+            "tradeRatio" : 0
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["sharkRelationsScribes", "sharkRelationsBotanists"],
+		calculateEffects: function(self, game) {
+			var trades = game.stats.getStatCurrent("totalTrades").val;
+			self.effects["tradeRatio"] = Math.min(Math.floor(Math.log10(Math.max(trades, 100)) - 1) * 0.05, 0.5);			
+		},
+		evaluateLocks: function(game){
+			return game.science.checkRelation("sharks", 20);
+		}
+	},{
+		name: "sharkRelationsBotanists",
+        label: $I("policy.sharkRelationsBotanists.label"),
+        description: $I("policy.sharkRelationsBotanists.desc"),
+        prices: [
+            {name : "culture", val: 2200}
+        ],
+        effects:{
+            "refinePolicyRatio" : 0.25,
+			"biolabEnergyRatio" : -0.75,
+			"breweryPolicyManpowerRatio" : 0.01,
+			"woodRatio" : 0
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["sharkRelationsScribes", "sharkRelationsMerchants"],
+		calculateEffects: function(self, game) {
+			if (game.ironWill) {
+				self.effects["refinePolicyRatio"] = 0;
+				self.effects["woodRatio"] = 0.25;
+			} else {
+				self.effects["refinePolicyRatio"] = 0.25;
+				self.effects["woodRatio"] = 0;
+			}
+		},
+		upgrades: {
+			buildings: ["biolab", "brewery"],
+			
+		},
+		evaluateLocks: function(game){
+			return game.science.checkRelation("sharks", 20);
+		}
+	}, {
+		name: "griffinRelationsMetallurgists",
+        label: $I("policy.griffinRelationsMetallurgists.label"),
+        description: $I("policy.griffinRelationsMetallurgists.desc"),
+        prices: [
+            {name : "culture", val: 16000}
+        ],
+        effects:{
+            "calcinerSteelRatioBonus": 0.25,
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["griffinRelationsMachinists", "griffinRelationsScouts"],
+		evaluateLocks: function(game){
+			return game.science.checkRelation("griffins", 20);
+		}
+	}, {
+		name: "griffinRelationsScouts",
+        label: $I("policy.griffinRelationsScouts.label"),
+        description: $I("policy.griffinRelationsScouts.desc"),
+        prices: [
+            {name : "culture", val: 16000}
+        ],
+        effects:{
+            "hunterRatio" : 1
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["griffinRelationsMachinists", "griffinRelationsMetallurgists"],
+		evaluateLocks: function(game){
+			return game.science.checkRelation("griffins", 20);
+		}
+	}, {
+		name: "griffinRelationsMachinists",
+        label: $I("policy.griffinRelationsMachinists.label"),
+        description: $I("policy.griffinRelationsMachinists.desc"),
+        prices: [
+            {name : "culture", val: 16000}
+        ],
+        effects:{
+            "magnetoBoostBonusPolicy" : 0.01
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["griffinRelationsMetallurgists", "griffinRelationsScouts"],
+		upgrades: {
+			buildings: ["steamworks"]
+		},
+		evaluateLocks: function(game){
+			return game.science.checkRelation("griffins", 20);
+		}
+	}, {
+		name: "nagaRelationsMasons",
+        label: $I("policy.nagaRelationsMasons.label"),
+        description: $I("policy.nagaRelationsMasons.desc"),
+        prices: [
+            {name : "culture", val: 8000}
+        ],
+        effects:{
+            "quarrySlabCraftBonus" : 0.05
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+		upgrades: {
+			buildings: ["quarry"]
+		},
+        blocks:["nagaRelationsCultists", "nagaRelationsArchitects"],
+		evaluateLocks: function(game){
+			return game.science.checkRelation("nagas", 20);
+		}
+	}, {
+		name: "nagaRelationsCultists",
+        label: $I("policy.nagaRelationsCultists.label"),
+        description: $I("policy.nagaRelationsCultists.desc"),
+        prices: [
+            {name : "culture", val: 8000}
+        ],
+        effects:{
+            "zigguratTempleEffectPolicy" : 0.2
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+		upgrades: {
+			buildings: ["ziggurat"]
+		},
+        blocks:["nagaRelationsMasons", "nagaRelationsArchitects"],
+		evaluateLocks: function(game){
+			return game.science.checkRelation("nagas", 20);
+		}
+	}, {
+		name: "nagaRelationsArchitects",
+        label: $I("policy.nagaRelationsArchitects.label"),
+        description: $I("policy.nagaRelationsArchitects.desc"),
+        prices: [
+            {name : "culture", val: 8000}
+        ],
+        effects:{
+			"nagaBlueprintTradeChance": 0,
+            "blueprintCraftRatio" : 0
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["nagaRelationsMasons", "nagaRelationsCultists"],
+		calculateEffects: function(self, game) {
+			var nagaEmbassies = game.diplomacy.get("nagas").embassyLevel;
+			self.effects["nagaBlueprintTradeChance"] = Math.min(nagaEmbassies * 0.005, 0.2);
+			if (nagaEmbassies > 40) {
+				self.effects["blueprintCraftRatio"] = (nagaEmbassies - 40) * 0.05;
+			} else {
+				self.effects["blueprintCraftRatio"] = 0;
+			}
+		},
+		evaluateLocks: function(game){
+			return game.science.checkRelation("nagas", 20);
+		}
+	}, {
+		name: "spiderRelationsGeologists",
+        label: $I("policy.spiderRelationsGeologists.label"),
+        description: $I("policy.spiderRelationsGeologists.desc"),
+        prices: [
+            {name : "culture", val: 20000}
+        ],
+        effects:{
+			"mineralsPolicyRatio" : 0,
+			"coalPolicyRatio" : 0,
+			"goldPolicyRatio" : 0
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["spiderRelationsChemists", "spiderRelationsPaleontologists"],
+		evaluateLocks: function(game){
+			return game.science.checkRelation("spiders", 10);
+		},
+		calculateEffects: function(self, game) {
+			var spiderEmbassies = game.diplomacy.get("spiders").embassyLevel;
+			var bonus = game.getLimitedDR(0.06 + 0.004 * spiderEmbassies, 0.3);
+			for (var effect in self.effects) {
+				self.effects[effect] = bonus;
+			}
+		},
+	}, {
+		name: "spiderRelationsChemists",
+        label: $I("policy.spiderRelationsChemists.label"),
+        description: $I("policy.spiderRelationsChemists.desc"),
+        prices: [
+            {name : "culture", val: 20000}
+        ],
+		//Spiders now trade Kerosene
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["spiderRelationsGeologists", "spiderRelationsPaleontologists"],
+		evaluateLocks: function(game){
+			return game.science.checkRelation("spiders", 10);
+		},
+		calculateEffects: function(self, game){
+			var spiders = game.diplomacy.get("spiders");
+			var spiderRelations = self.researched;
+			var sells = [];
+			for (var i = 0; i < spiders.sells.length; i++) {
+				var sell = spiders.sells[i]["name"];
+				sells.push(sell);
+				if(!spiderRelations && sell == "kerosene"){
+					spiders.sells.splice(i); //Remove kerosene on load
+				}
+			}
+			if(spiderRelations && !spiders.sells.includes("kerosene")) {
+				spiders.sells.push({name: "kerosene", value: 5, chance: 0.1, width: 0.1, minLevel: 10});
+			}
+		}
+	}, {
+		name: "spiderRelationsPaleontologists",
+        label: $I("policy.spiderRelationsPaleontologists.label"),
+        description: $I("policy.spiderRelationsPaleontologists.desc"),
+        prices: [
+            {name : "culture", val: 20000}
+        ],
+        effects:{
+			"mintIvoryRatio" : 0.25,
+			"oilPolicyRatio" : 0.1
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["spiderRelationsChemists", "spiderRelationsGeologists"],
+		evaluateLocks: function(game){
+			return game.science.checkRelation("spiders", 10);
+		}
+	}, {
+		name: "dragonRelationsPhysicists",
+        label: $I("policy.dragonRelationsPhysicists.label"),
+        description: $I("policy.dragonRelationsPhysicists.desc"),
+        prices: [
+            {name : "culture", val: 30000}
+        ],
+		effects:{
+            "reactorEnergyRatio" : 0.25,
+			"harborLimitRatioPolicy": 0.05
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["dragonRelationsAstrologers"],
+		upgrades: {
+			buildings: ["harbor"]
+		},
+		evaluateLocks: function(game){
+			return game.science.checkRelation("dragons", 10);
+		}
+	}, {
+		name: "dragonRelationsAstrologers",
+        label: $I("policy.dragonRelationsAstrologers.label"),
+        description: $I("policy.dragonRelationsAstrologers.desc"),
+        prices: [
+            {name : "culture", val: 30000}
+        ],
+		effects:{
+			"starEventChance": 0.006,
+			"starchartPolicyRatio": 0.05
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["dragonRelationsPhysicists"],
+		calculateEffects: function(self, game) {
+			var cycle = game.calendar.cycleYear + 1;
+			self.effects["starEventChance"] = cycle * 0.006;
+			self.effects["starchartPolicyRatio"] = cycle * 0.05;
+		},
+		evaluateLocks: function(game){
+			return game.science.checkRelation("dragons", 10);
+		}
+	},
     //----------------   Philosophy   --------------------
     {
         name: "stoicism",
@@ -1719,6 +2140,22 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		return this.getMeta(name, this.policies);
 	},
 
+	checkRelation: function(race, embassyNeeded){
+		var race = this.game.diplomacy.get(race); //Standing Ratio removed for now as standing calculations don't seem to work correctly on load. Also could be interpreted as making them work if they don't like you.
+		return (race.embassyLevel >= embassyNeeded /*&& race.standing + this.game.getEffect("standingRatio") +
+		this.game.diplomacy.calculateStandingFromPolicies(race.name, this.game) >= 0*/);
+	},
+
+	unlockRelations: function(){ //Called on load and every time we buy an embassy to unlock Relations.
+		if (this.game.prestige.getPerk("diplomacy").researched){
+			for (var i = this.policies.length - 1; i >= 0; i--) {
+				if (this.policies[i].isRelation && !this.policies[i].unlocked){
+					this.game.unlock({policies: [this.policies[i].name]});
+				}
+			}
+		}
+	},
+
 	getPrices: function(tech) {
 
 		var prices = tech.prices;
@@ -1953,6 +2390,10 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 		}
 		this.payPrice(model);
 		this.onPurchase(model);
+		var meta = model.metadata;
+		if (meta.calculateEffects){
+			model.metadata.calculateEffects(meta, this.game);
+		}
 		callback(true /*itemBought*/, { reason: (this.game.devMode ? "dev-mode" : "paid-for") });
 		this.game.render();
 	},
