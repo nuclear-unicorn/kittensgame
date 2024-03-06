@@ -546,7 +546,7 @@ dojo.declare("classes.ui.PrestigeBtnController", com.nuclearunicorn.game.ui.Buil
 		if (this.game.science.get("metaphysics").researched) {
 			this.inherited(arguments);
 		} else {
-			callback(false);
+			callback(false /*itemBought*/, { reason: "not-unlocked" });
 		}
 	},
 

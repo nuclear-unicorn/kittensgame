@@ -1304,7 +1304,7 @@ dojo.declare("com.nuclearunicorn.game.ui.SpaceProgramBtnController", com.nuclear
 		if (model.metadata.val == 0) {
 			this.inherited(arguments);
 		} else {
-			callback(false);
+			callback(false /*itemBought*/, { reason: "already-bought" });
 		}
 	},
 

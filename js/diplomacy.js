@@ -537,7 +537,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 
 		//Update Trade Stats
-		this.game.stats.getStat("totalTrades").val += successfullTradeAmount;
+		this.game.stats.getStat("totalTrades").val = Math.min(this.game.stats.getStat("totalTrades").val + successfullTradeAmount, Number.MAX_VALUE);
 		this.game.stats.getStatCurrent("totalTrades").val += successfullTradeAmount;
 		this.game.upgrade({policies : ["sharkRelationsMerchants"]});
 
@@ -703,7 +703,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 	buyBcoin: function(){
 		var amt = this.game.resPool.get("relic").value / this.game.calendar.cryptoPrice;
-		this.game.resPool.get("blackcoin").value += amt;
+		amt = this.game.resPool.addResEvent("blackcoin", amt);
 		this.game.resPool.get("relic").value = 0;
 		this.game.msg($I("trade.bcoin.buy.msg", [this.game.getDisplayValueExt(amt)]), "", "blackcoin");
 
@@ -711,9 +711,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 	sellBcoin: function(){
 		var amt = this.game.resPool.get("blackcoin").value * this.game.calendar.cryptoPrice;
-		this.game.resPool.get("relic").value += amt;
+		var amt = this.game.resPool.addResEvent("relic", amt);
 		this.game.resPool.get("blackcoin").value = 0;
-
 		this.game.msg($I("trade.bcoin.sell.msg", [this.game.getDisplayValueExt(amt)])), "", "blackcoin";
 	},
 

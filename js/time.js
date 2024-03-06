@@ -137,6 +137,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 			var bld = this.voidspaceUpgrades[i];
 			this.resetStateStackable(bld);
 		}
+
+        this.queue.resetState();
     },
 
     update: function(){
@@ -455,13 +457,13 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             { name : "void", val: 10 }
         ],
         priceRatio: 1.1,
-        limitBuild: 0,
+        //limitBuild: 0, let's just not
         effects: {
             "shatterYearBoost" : 0,
             "energyConsumption": 5
         },
         calculateEffects: function(self, game){
-            if (game.challenges.getChallenge("1000Years").on > 1) {
+            if (game.challenges.getChallenge("1000Years").on > 1 || game.religion.getTU("blazar").val > 2) {
                 //Completing the challenge 2 or more times unlocks the automation feature
                 self.description = $I("time.cfu.temporalPress.desc") + "<br>" + $I("time.cfu.temporalPress.desc.automation");
                 if (self.isAutomationEnabled == null) { //force non-null value
@@ -473,7 +475,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             }
 
             self.effects["shatterYearBoost"] = (self.isAutomationEnabled)? 5 * game.calendar.yearsPerCycle : game.calendar.yearsPerCycle; //25 or 5 currently
-            self.limitBuild = game.getEffect("temporalPressCap");
+            //self.limitBuild = game.getEffect("temporalPressCap");
             self.priceRatio = Math.max(1.01, 1.1 - game.challenges.getChallenge("1000Years").on * 0.001); //first 90 completions of 1000Years make priceRatio cheaper
         },
         isAutomationEnabled: null,
@@ -645,7 +647,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 var limits = {};
                 for (var j = 0; j < game.resPool.resources.length; j++) {
                     var res = game.resPool.resources[j];
-                    limits[res.name] = Math.max(res.value, res.maxValue || Number.POSITIVE_INFINITY);
+                    limits[res.name] = Math.max(res.value, res.maxValue || Number.MAX_VALUE);
                     game.resPool.addRes(res, game.getResourcePerTick(res.name, true) * remainingTicksInCurrentYear * shatterTCGain, false, true);
                 }
                 if (this.game.workshop.get("chronoEngineers").researched) {
@@ -984,19 +986,20 @@ dojo.declare("classes.ui.time.AccelerateTimeBtnController", com.nuclearunicorn.g
             tooltip: this.game.time.isAccelerated ? $I("time.AccelerateTimeBtn.tooltip.accelerated") : $I("time.AccelerateTimeBtn.tooltip.normal"),
             cssClass: this.game.time.isAccelerated ? "fugit-on" : "fugit-off",
             handler: function(btn, callback) {
-                if (self.game.resPool.get("temporalFlux").value <= 0) {
-                    self.game.time.isAccelerated = false;
-                    self.game.resPool.get("temporalFlux").value = 0;
-                } else {
-                    self.game.time.isAccelerated = !self.game.time.isAccelerated;
-                }
-                callback(true);
+                self.buyItem(null, null, callback);
             }
         };
         return model;
     },
 
-    buyItem: function() {
+    buyItem: function(model, event, callback) {
+        if (self.game.resPool.get("temporalFlux").value <= 0) {
+            self.game.time.isAccelerated = false;
+            self.game.resPool.get("temporalFlux").value = 0;
+        } else {
+            self.game.time.isAccelerated = !self.game.time.isAccelerated;
+        }
+        callback(true /*itemBought*/, { reason: "item-is-free" /*It costs flux, but you can still toggle it freely*/ });
     }
 });
 
@@ -1199,15 +1202,22 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 	},
 
     buyItem: function(model, event, callback){
-        if (model.enabled && this.hasResources(model)) {
-            var price = this.getPrices(model);
-            for (var i in price){
-                this.game.resPool.addResEvent(price[i].name, -price[i].val);
-            }
-            this.doShatter(model, 1);
-            callback(true);
+        if (!this.hasResources(model)) {
+			callback(false /*itemBought*/, { reason: "cannot-afford" });
+			return true;
+		}
+		if (!model.enabled) {
+            //As far as I can tell, this shouldn't ever happen because being
+            //unable to afford it is the only reason for it to be disabled.
+			callback(false /*itemBought*/, { reason: "not-enabled" });
+			return true;
+		}
+        var price = this.getPrices(model);
+        for (var i in price){
+            this.game.resPool.addResEvent(price[i].name, -price[i].val);
         }
-        callback(false);
+        this.doShatter(model, 1);
+        callback(true /*itemBought*/, { reason: "paid-for" });
         return true;
     },
 
@@ -1232,7 +1242,14 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 
     doShatter: function(model, amt) {
         var factor = this.game.challenges.getChallenge("1000Years").researched ? 5 : 10;
-        this.game.time.heat += amt * factor;
+        var heat_acutoconverted = 1 - 100/(100 + this.game.getEffect("heatCompression"));
+        if (heat_acutoconverted){
+            this.game.time.heat += amt * factor * (1 - heat_acutoconverted);
+            var efficiency = 1 + this.game.getEffect("heatEfficiency");
+            this.game.time.getCFU("blastFurnace").heat += amt * factor * heat_acutoconverted * efficiency;
+        }else{
+            this.game.time.heat += amt * factor;
+        }
         //this.game.time.shatter(amt);
         if(this.game.time.testShatter == 1) {this.game.time.shatterInGroupCycles(amt);}
         //else if(this.game.time.testShatter == 2) {this.game.time.shatterInCycles(amt);}
@@ -1264,9 +1281,16 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
         dojo.style(this.nextCycle.link, "display", this.model.nextCycleLink.visible ? "" : "none");
         dojo.style(this.previousCycle.link, "display", this.model.previousCycleLink.visible ? "" : "none");
         dojo.style(this.tenEras.link, "display", this.model.tenErasLink.visible ? "" : "none");
-        if(this.custom){
-            dojo.style(this.custom.link, "display", (this.model.customLink && this.model.customLink.visible) ? "" : "none");
+
+        if(this.model.customLink && !this.custom) { //Create custom link if needed
+            this.custom = this.addLink(this.model.customLink);
         }
+        if(!this.model.customLink && this.custom) { //Destroy custom link if needed
+            dojo.destroy(this.custom.link);
+            this.custom = undefined;
+        }
+        this.updateLink(this.custom, this.model.customLink); //need this to sync the changes of effect and shatter number.
+
         if  (this.model.tenErasLink.visible) {
             dojo.addClass(this.tenEras.link,"rightestLink");
             dojo.removeClass(this.previousCycle.link,"rightestLink");
@@ -1275,10 +1299,6 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
             dojo.removeClass(this.nextCycle.link,"rightestLink");
         } else if (this.model.nextCycleLink.visible) {
             dojo.addClass(this.nextCycle.link,"rightestLink");
-        }
-
-        if(this.model.customLink){
-            this.updateLink(this.custom, this.model.customLink); //need this to sync the changes of effect and shatter number. this might be a hack :3
         }
     }
 });
@@ -1375,11 +1395,20 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
     },
 
 	buyItem: function(model, event, callback) {
-		if (!model.enabled) {
-			callback(false);
+        if (this.game.time.getVSU("usedCryochambers").val == 0) {
+			callback(false /*itemBought*/, { reason: "already-bought" });
+			return;
+        }
+		if (!model.visible) {
+			callback(false /*itemBought*/, { reason: "not-unlocked" });
 			return;
 		}
+        if (!this.hasResources(model)) {
+			callback(false /*itemBought*/, { reason: "cannot-afford" });
+			return;
+        }
 
+		if (!event) { event = {}; /*event is an optional parameter*/ }
 		var fixCount = event.shiftKey
 			? 1000
 			: event.ctrlKey || event.metaKey /*osx tears*/
@@ -1395,8 +1424,10 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
         if(fixHappened){
             var cry = this.game.time.getVSU("cryochambers");
             cry.calculateEffects(cry, this.game);
+            callback(true /*itemBought*/, { reason: "paid-for" });
+        } else {
+			callback(false /*itemBought*/, { reason: "not-enabled" });
         }
-		callback(fixHappened);
 	},
 
     doFixCryochamber: function(model){
@@ -1417,7 +1448,20 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
 
 	updateVisible: function(model) {
 		model.visible = this.game.workshop.get("chronoforge").researched && this.game.time.getVSU("usedCryochambers").val != 0;
-	}
+	},
+
+    //This is a bit of a hack to get the correct description to appear in the queue tooltips...
+    getDescription: function(model) {
+        return $I("time.fixCryochambers.desc");
+    },
+
+    getPrices: function(model) {
+        if (!model.prices) {
+            //Initialize model.prices if it hasn't been initialized already.
+            model.prices = this.game.time.getVSU("usedCryochambers").fixPrices;
+        }
+        return model.prices;
+    }
 });
 
 dojo.declare("classes.ui.VoidSpaceWgt", [mixin.IChildrenAware, mixin.IGameAware], {
@@ -1426,7 +1470,7 @@ dojo.declare("classes.ui.VoidSpaceWgt", [mixin.IChildrenAware, mixin.IGameAware]
 		this.addChild(new com.nuclearunicorn.game.ui.ButtonModern({
             name: $I("time.fixCryochambers.label"),
             description: $I("time.fixCryochambers.desc"),
-            prices: game.time.getVSU("usedCryochambers").fixPrices,
+            //The prices field will be set when getPrices is called.
             /*prices: [
 				{name: "temporalFlux", val: 3000},
 				{name: "timeCrystal", val: 100},
@@ -1569,15 +1613,10 @@ dojo.declare("classes.tab.TimeTab", com.nuclearunicorn.game.ui.tab, {
         this.inherited(arguments);
 
         var hasCF = this.game.workshop.get("chronoforge").researched;
-        if (hasCF){
-            this.cfPanel.setVisible(true);
-        }
+        this.cfPanel.setVisible(hasCF);
 
 		var hasVS = (this.game.science.get("voidSpace").researched || this.game.time.getVSU("usedCryochambers").val > 0);
-        if (hasVS){
-            this.vsPanel.setVisible(true);
-        }
-
+        this.vsPanel.setVisible(hasVS);
     }
 });
 
@@ -1708,6 +1747,14 @@ dojo.declare("classes.queue.manager", null,{
         
     },
 
+    resetState: function() {
+        this.cap = this.baseCap;
+        this.alphabeticalSort = true;
+        this.queueItems = [];
+        this.queueSources = dojo.clone(this.queueSourcesDefault);
+        this.queueSourcesArr = [{name: "buildings", label: $I("buildings.tabName")}];
+    },
+
     /**
      * Get maximum amount if individual (not grouped) items in the queue (see #queueLength)
      */
@@ -1774,7 +1821,7 @@ dojo.declare("classes.queue.manager", null,{
             value: 1    //always store size of the queue group, even if it is a single item
         });
 
-        if (shiftKey && !this.queueNonStabkable.includes(type)){
+        if (shiftKey && !this.queueNonStackable.includes(type)){
             while(this.queueLength() < this.cap){
                 this.addToQueue(name, type, label, false);
             }
@@ -1968,10 +2015,14 @@ dojo.declare("classes.queue.manager", null,{
                 for (var i in voidSpaceUpgrades){
                     var building = voidSpaceUpgrades[i];
                     if(building.name == "usedCryochambers"){
-                        options.push({
-                            name: building.name,
-                            label: $I("time.fixCryochambers.label")
-                        });
+                        //ONLY allow queueing of Fix Cryochamber if we have unlocked that feature normally.
+                        if (this.game.workshop.get("chronoforge").researched && building.val != 0)
+                        {
+                            options.push({
+                                name: building.name,
+                                label: $I("time.fixCryochambers.label")
+                            });
+                        }
                         continue;
                     }
                     if (building.unlocked){
@@ -2083,7 +2134,13 @@ dojo.declare("classes.queue.manager", null,{
         this.dropLastItem();
         this.showList();
     },
-    getQueueElementModel: function(el){
+    getQueueElementModel: function(el) {
+        var controllerAndModel = this.getQueueElementControllerAndModel(el);
+        if (controllerAndModel) {
+            return controllerAndModel.model;
+        }
+    },
+    getQueueElementControllerAndModel: function(el){
         var itemMetaRaw = this.game.getUnlockByName(el.name, el.type);
         if (!itemMetaRaw){
             console.error("invalid queue item:", el);
@@ -2141,51 +2198,42 @@ dojo.declare("classes.queue.manager", null,{
                     props.controller = new classes.ui.time.FixCryochamberBtnController(this.game);
                     itemMetaRaw = this.game.getUnlockByName("cryochambers", el.type);
                     model.prices = this.game.time.getVSU("usedCryochambers").fixPrices;
-                    model.enabled = this.game.resPool.hasRes(model.prices); //check we actually have enough to do one fix!
-                    console.log(model);
+                    props.controller.updateVisible(model);
+                    props.controller.updateEnabled(model);
                 }
                 break;
 
             case "zigguratUpgrades":
                 props.controller = new com.nuclearunicorn.game.ui.ZigguratBtnController(this.game);
-                //var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 break;
 
             case "religion":
                 props.controller = new com.nuclearunicorn.game.ui.ReligionBtnController(this.game);
-                //var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 break;
 
             case "transcendenceUpgrades":
                 props.controller = new classes.ui.TranscendenceBtnController(this.game);
-                //var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 break;
 
             case "pacts":
                 props.controller = new com.nuclearunicorn.game.ui.PactsBtnController(this.game);
-                //var oldVal = itemMetaRaw.val;
                 var model = props.controller.fetchModel(props);
                 break;
 
             case "upgrades":
-                //compare = "researched";
                 props.controller = new com.nuclearunicorn.game.ui.UpgradeButtonController(this.game);
-                //var oldVal = itemMetaRaw.researched;
                 var model = props.controller.fetchModel(props);
                 break;
 
             case "zebraUpgrades":
-                //compare = "researched";
                 props.controller = new com.nuclearunicorn.game.ui.ZebraUpgradeButtonController(this.game);
-                //var oldVal = itemMetaRaw.researched;
                 var model = props.controller.fetchModel(props);
                 break;
         }
-        //return props, model;
-        return model;
+        return { controller: props.controller, model: model };
     },
     update: function(){
         this.cap = this.calculateCap();
@@ -2193,7 +2241,6 @@ dojo.declare("classes.queue.manager", null,{
             return;
         }
         var el = this.queueItems[0];
-
         if (!el){
             console.warn("null queue item, skipping");
             this.queueItems.shift();
@@ -2201,159 +2248,84 @@ dojo.declare("classes.queue.manager", null,{
             return;
         }
 
-        var itemMetaRaw = this.game.getUnlockByName(el.name, el.type);
-        var compare = "val"; //we should do some sort of refractoring of the switch mechanism
-
-        if (!itemMetaRaw){
-            console.error("invalid queue item:", el);
+        var controllerAndModel = this.getQueueElementControllerAndModel(el);
+        if(!controllerAndModel || !controllerAndModel.controller || !controllerAndModel.model){
+            console.error(el.name + " of " + el.type + " queing is not supported!");
+            this.queueItems.shift();
+            this.game._publish("ui/update", this.game);
             return;
         }
 
-        var props = {
-            id: itemMetaRaw.name
-        };
-        var buyItem = true;
+        var wasItemBought = false;
+        var resultOfBuyingItem = null;
+        controllerAndModel.controller.buyItem(controllerAndModel.model, null,
+            function(success, extendedInfo) {
+                wasItemBought = success;
+                resultOfBuyingItem = extendedInfo;
+            });
 
-        switch (el.type){
-            case "policies":
-                compare = ["researched", "blocked"];
-                props.controller = new classes.ui.PolicyBtnController(this.game);
-                var oldVal = {
-                    researched: itemMetaRaw.researched,
-                    blocked: itemMetaRaw.blocked
-                };
-                var model = props.controller.fetchModel(props);
-                break;
-                
-            case "tech":
-                compare = "researched";
-                props.controller = new com.nuclearunicorn.game.ui.TechButtonController(this.game);
-                var oldVal = itemMetaRaw.researched;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "buildings":
-                var bld = new classes.BuildingMeta(itemMetaRaw).getMeta();
-                    oldVal = itemMetaRaw.val;
-                props = {
-                    key:            bld.name,
-                    name:           bld.label,
-                    description:    bld.description,
-                    building:       bld.name
-                };
-                if (typeof(bld.stages) == "object"){
-                    props.controller = new classes.ui.btn.StagingBldBtnController(this.game);
-                } else {
-                    props.controller = new classes.ui.btn.BuildingBtnModernController(this.game);
-                }
-                var model = props.controller.fetchModel(props);
-                props.controller.build(model, 1);
-                buyItem = false;
-                break;
-
-            case "spaceMission":
-                compare = "reached";
-                props.controller = new com.nuclearunicorn.game.ui.SpaceProgramBtnController(this.game);
-                var oldVal = itemMetaRaw.researched;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "spaceBuilding":
-                props.controller = new classes.ui.space.PlanetBuildingBtnController(this.game);
-                var oldVal = itemMetaRaw.val;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "chronoforge":
-                props.controller = new classes.ui.time.ChronoforgeBtnController(this.game);
-                var oldVal = itemMetaRaw.val;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "voidSpace":
-                props.controller = new classes.ui.time.VoidSpaceBtnController(this.game);
-                var oldVal = itemMetaRaw.val;
-                var model = props.controller.fetchModel(props);
-                if(el.name == "usedCryochambers"){ //a bunch of model black magic
-                    props.controller = new classes.ui.time.FixCryochamberBtnController(this.game);
-                    itemMetaRaw = this.game.getUnlockByName("cryochambers", el.type);
-                    model.prices = this.game.time.getVSU("usedCryochambers").fixPrices;
-                    model.enabled = this.game.resPool.hasRes(model.prices); //check we actually have enough to do one fix!
-                    console.log(model);
-                }
-                break;
-
-            case "zigguratUpgrades":
-                props.controller = new com.nuclearunicorn.game.ui.ZigguratBtnController(this.game);
-                var oldVal = itemMetaRaw.val;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "religion":
-                props.controller = new com.nuclearunicorn.game.ui.ReligionBtnController(this.game);
-                var oldVal = itemMetaRaw.val;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "transcendenceUpgrades":
-                props.controller = new classes.ui.TranscendenceBtnController(this.game);
-                var oldVal = itemMetaRaw.val;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "pacts":
-                props.controller = new com.nuclearunicorn.game.ui.PactsBtnController(this.game);
-                var oldVal = itemMetaRaw.val;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "upgrades":
-                compare = "researched";
-                props.controller = new com.nuclearunicorn.game.ui.UpgradeButtonController(this.game);
-                var oldVal = itemMetaRaw.researched;
-                var model = props.controller.fetchModel(props);
-                break;
-
-            case "zebraUpgrades":
-                compare = "researched";
-                props.controller = new com.nuclearunicorn.game.ui.ZebraUpgradeButtonController(this.game);
-                var oldVal = itemMetaRaw.researched;
-                var model = props.controller.fetchModel(props);
-                break;
+        if (typeof(wasItemBought) !== "boolean" || typeof(resultOfBuyingItem) !== "object") {
+            console.error("Invalid result after attempting to buy item via queue", resultOfBuyingItem);
+            return;
         }
-        
-        if(!props.controller){
-            console.error(el.name + " of " + el.type + " queing is not supported!");
-            var deletedElement = this.queueItems.shift();
-            this.game._publish("ui/update", this.game);
-        }
-        if(buyItem){
-            props.controller.buyItem(model, 1,  function(result) {});
-        }
-        var changed = false;
-        if (Array.isArray(compare)){
-            for (var i in compare){
-                if (oldVal[compare[i]] != model.metadata[compare[i]]){
-                    changed = true;
-                }
-            }
-        }else{
-            changed = oldVal != model.metadata[compare];
-        }
-        if(changed){
+
+        var reason = resultOfBuyingItem.reason; //String explaining *why* we failed to buy the item
+
+        //Depending on the result, do something different:
+        if (wasItemBought){
+            //Item successfully purchased!  Remove it from the queue because we did it :D
             this.dropLastItem();
             this.game._publish("ui/update", this.game);
-            //console.log( "Successfully built " + el.name + " using the queue." );
+            //console.log("Successfully built " + el.name + " using the queue because " + reason);
         } else {
-            //console.log( "Tried to build " + el.name + " using the queue, but failed." );
+            if (this._isReasonToSkipItem(reason)) {
+                this.dropLastItem();
+                this.game._publish("ui/update", this.game);
+                //console.log("Dropped " + el.name + " from the queue because " + reason);
+            } else {
+                //console.log("Tried to build " + el.name + " using the queue, but failed because " + reason);
+            }
         }
+    },
 
-        if(compare == "research" || compare == "reached" && model.metadata[compare] == true
-            || (compare.includes("blocked") && model.metadata["blocked"] == true) ||
-            (compare.includes("research") && model.metadata["research"] == true)
-        ){
-            this.dropLastItem();
-            this.game._publish("ui/update", this.game);
+    //Determines whether or not we should silently remove an item from the queue
+    //based on the reason WHY we can't buy it.
+    //@param reason     String containing a code passed to the callback function
+    //@return           Boolean.  If true, the item should be removed from the queue.
+    //                  If false, the queue should wait until we are able to purchase the item.
+    _isReasonToSkipItem: function(reason) {
+        if (reason == "paid-for" || reason == "item-is-free" || reason == "dev-mode") {
+            //These are used as reasons why we DID purchase the item.
+            //If we DID purchase the item, of course we want it removed from the queue!
+            return true;
         }
+        if (reason == "already-bought" || reason == "blocked" || reason == "player-denied") {
+            //These are good reasons the queue should skip over the item entirely.
+            return true;
+        }
+        //Else, most likely we just can't afford the item yet.
+        return false;
+    },
+
+    //This function is to be called whenever a building is deltagraded.
+    //This function iterates through all queue items with the same internal ID as the
+    //deltagraded building & updates their labels to match the new version.
+    //@param itemName   String.  The ID of whichever building was deltagraded.
+    onDeltagrade: function(itemName) {
+        var buildingsManager = this.game.bld;
+        dojo.forEach(this.queueItems, function(item) {
+            if(!item || item.name !== itemName) {
+                return;
+            }
+            //Else, we have here a valid queue item matching the name of what was deltagraded.
+            if(item.type === "buildings") {
+                var building = buildingsManager.getBuildingExt(itemName).meta;
+                var newLabel = building.label;
+                if(building.stages){
+                    newLabel = building.stages[building.stage].label;
+                }
+                item.label = newLabel;
+            }
+        });
     }
 });

@@ -960,14 +960,46 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 	//----------------	meme --------------------
 	{
 		name: "socialism",
-        label: $I("policy.socialism.label"),
-        description: $I("policy.socialism.desc"),
+		label: $I("policy.socialism.label"),
+		description: $I("policy.socialism.desc"),
 		prices: [
 			{name : "culture", val: 7500}
 		],
 		unlocked: false,
 		blocked: false,
-        blocks:[]
+		blocks:[],
+		effects: {}, //Empty on purpose; this is a meme policy!
+		calculateEffects: function(self, game) {
+			var effects = {};
+			if (game.science.getPolicy("scientificCommunism").researched) {
+				var SCIENTIFIC_COMMUNISM_RATIO = 1.25;
+				for (var key in effects) {
+					effects[key] *= SCIENTIFIC_COMMUNISM_RATIO;
+				}
+			}
+			self.effects = effects;
+		},
+		unlocks: {
+			policies: ["scientificCommunism"]
+		}
+	},
+	{
+		name: "scientificCommunism",
+		label: $I("policy.scientificCommunism.label"),
+		description: $I("policy.scientificCommunism.desc"),
+		prices: [
+			{name : "culture", val: 8500}
+		],
+		unlocked: false,
+		evaluateLocks: function(game) {
+			//Secret policy that's only available if you never had more than 1 Workshop & never had any Factories.
+			return game.bld.get("workshop").val < 2 && game.bld.get("factory").val < 1 && game.science.getPolicy("socialism").researched;
+		},
+		blocked: false,
+		blocks:[],
+		upgrades: {
+			policies: ["socialism"]
+		},
 	},
 	//----------------	industrial age --------------------
 	{
@@ -2311,50 +2343,58 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 		}
 	},
 
-	shouldBeBough: function(model, game){ //fail checks:
+	//Returns an object with one field:
+	//	reason:		String.  If we can't buy it, why not?  If we can buy it, returns
+	//				"paid-for" regardless of whether we can actually afford it or not.
+	shouldBeBought: function(model, game){ //fail checks:
 		if(this.game.village.leader && model.metadata.requiredLeaderJob && this.game.village.leader.job != model.metadata.requiredLeaderJob){
 			var jobTitle = this.game.village.getJob(model.metadata.requiredLeaderJob).title;
 			this.game.msg($I("msg.policy.wrongLeaderJobForResearch", [model.metadata.label, jobTitle]), "important");
-			return false;
+			return { reason: "blocked" };
 		}else if(model.metadata.name == "transkittenism" && this.game.bld.getBuildingExt("aiCore").meta.effects["aiLevel"] >= 15){
 			this.game.msg($I("msg.policy.aiNotMerges"),"alert", "ai");
-			return false;
+			return { reason: "blocked" };
 		}else if(model.metadata.blocked != true) {
              for(var i = 0; i < model.metadata.blocks.length; i++){
                 if(this.game.science.getPolicy(model.metadata.blocks[i]).researched){
                     model.metadata.blocked = true;
-                    return false;
+				return { reason: "blocked" };
                 }
 			}
 			var confirmed = false; //confirmation:
 			if(game.opts.noConfirm){
-				return true;
+				return { reason: "paid-for" };
 			}
 			game.ui.confirm($I("policy.confirmation.title"), $I("policy.confirmation.title"), function() {
 				confirmed = true;
 			});
+			return confirmed ? { reason: "paid-for" } : { reason: "player-denied" };
 		}
-		return confirmed;
+		//Else, the policy was blocked:
+		return { reason: "blocked" };
 	},
 	buyItem: function(model, event, callback) {
-		if ((!model.metadata.researched && this.hasResources(model)) || this.game.devMode){
-			if(!this.shouldBeBough(model, this.game)){
-				callback(false);
-				return;
-			}
-			this.payPrice(model);
-
-			this.onPurchase(model);
-
-			var meta = model.metadata;
-			if (meta.calculateEffects){
-				model.metadata.calculateEffects(meta, this.game);
-			}
-			callback(true);
-			this.game.render();
+		var isInDevMode = this.game.devMode;
+		if (model.metadata.researched && !isInDevMode) {
+			callback(false /*itemBought*/, { reason: "already-bought" });
 			return;
 		}
-		callback(false);
+		if (!this.hasResources(model) && !isInDevMode) {
+			callback(false /*itemBought*/, { reason: "cannot-afford" });
+			return;
+		}
+		var extendedInfo = this.shouldBeBought(model, this.game);
+		if(extendedInfo.reason !== "paid-for"){
+			callback(false /*itemBought*/, extendedInfo); //Tell them *why* we failed to buy the item.
+			return;
+		}
+		this.payPrice(model);
+		this.onPurchase(model);
+		if (model.metadata.calculateEffects){
+			model.metadata.calculateEffects(meta, this.game);
+		}
+		callback(true /*itemBought*/, { reason: (this.game.devMode ? "dev-mode" : "paid-for") });
+		this.game.render();
 	},
 	onPurchase: function(model){
 		this.inherited(arguments);
