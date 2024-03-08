@@ -268,12 +268,12 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
 		var necrocornVal = this.game.resPool.get("necrocorn").value;
 		var corruptionWithExisting = this.game.religion.getCorruptionPerTickProduction(true);
-		var worstPerTickDelta = corruptionWithExisting * days *this.game.calendar.ticksPerDay + corruptionWithExisting;
+		var worstPerTickDelta = corruptionWithExisting * this.game.calendar.ticksPerDay + necrocornPerDay;
 		//if(!this.game.science.getPolicy(["siphoning"]).researched){
 		if(
 			(worstPerTickDelta >= 0)
-			||(worstPerTickDelta < 0 && necrocornVal + worstPerTickDelta * days > 0)&&
-			(this.game.resPool.get("alicorn").value - 1 + necrocornPerDay * days >= 0)){ //naive solution here
+			||((worstPerTickDelta < 0 && necrocornVal + worstPerTickDelta * days > 0)&&
+			(this.game.resPool.get("alicorn").value - 1 + necrocornPerDay * days >= 0))){ //naive solution here
 			this.necrocornsNaiveFastForward(days, times);
 			return;
 		}
@@ -290,23 +290,31 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			){
 				corruptionWithoutExisting += necrocornPerDay * (necrocornDeficitRepaymentModifier - 1);
 			}
-			var daysUntilSpentOne = -(necrocornPerDay * days + corruptionWithExisting/this.game.calendar.ticksPerDay);
-			var daysUntilCorrupted = necrocornPerDay * days + corruptionWithoutExisting/this.game.calendar.ticksPerDay;
-			var timePeriodWorking = days - necrocornVal * daysUntilSpentOne;
+			var daysUntilSpentOne = - Math.ceil(1/(necrocornPerDay + corruptionWithExisting/this.game.calendar.ticksPerDay));
+			var daysUntilCorrupted = -Math.ceil(1/(necrocornPerDay + corruptionWithoutExisting/this.game.calendar.ticksPerDay));
+			var timePeriodWorking = Math.floor(days - necrocornVal * daysUntilSpentOne);
+
 
 			if(alicornsResult < 0){
 				this.pactsManager.deficit -= alicornsResult;
 				alicornsSpent += alicornsResult;
 				timePeriodWorking += alicornsResult/necrocornPerDay; 
 			}
-			var state = timePeriodWorking%(daysUntilCorrupted + daysUntilSpentOne);
-			this.pactsManager.necrocornDeficit += timePeriodWorking * daysUntilCorrupted/(daysUntilCorrupted + daysUntilSpentOne)* necrocornPerDay * (necrocornDeficitRepaymentModifier - 1);
-			if (this.pactsManager.necrocornDeficit < 0){
-				this.pactsManager.necrocornDeficit = 0;
+			if (daysUntilCorrupted + daysUntilSpentOne == 0){
+				return;
 			}
-			if(state/daysUntilCorrupted <= 1 - this.corruption){
-				this.corruption += state/daysUntilCorrupted;
+			var state = timePeriodWorking%(daysUntilCorrupted + daysUntilSpentOne);
+			
+			//this.pactsManager.necrocornDeficit += timePeriodWorking * daysUntilCorrupted/(daysUntilCorrupted + daysUntilSpentOne)* necrocornPerDay * (necrocornDeficitRepaymentModifier - 1);
+			//if (this.pactsManager.necrocornDeficit < 0){
+			//	this.pactsManager.necrocornDeficit = 0;
+			//}
+			//let's return to deficit delta later
+
+			this.pactsManager.necrocornDeficit = 0;
+			if (state < daysUntilCorrupted){
 				this.game.resPool.get("necrocorn").value = 0;
+				this.corruption += necrocornPerDay * state + corruptionWithoutExisting * this.game.calendar.ticksPerDay * state;
 			}else{
 				this.game.resPool.get("necrocorn").value = (state - daysUntilCorrupted)/daysUntilSpentOne;
 			}
@@ -315,10 +323,11 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 		var compensatedNecrocorns = 0;
 		var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
-		/*if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
+		if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
 			this.game.resPool.addResPerTick("alicorn",consumedAlicorns);
-		}*/
+		}
 		//var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
+
 		var siphenedNecrocorns = this.pactsManager.getSiphonedCorruption(days);
 		compensatedNecrocorns = Math.max(consumedAlicorns, -siphenedNecrocorns);
 		this.game.resPool.addResPerTick("alicorn", compensatedNecrocorns);
