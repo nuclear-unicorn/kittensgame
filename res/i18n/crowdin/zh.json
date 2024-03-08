@@ -2104,6 +2104,7 @@
     "workshop.logistics.label": "后勤",
     "workshop.logistics.desc": "小猫的技能效率将提升 15%",
     "workshop.longRangeSpaceships.label": "远程宇宙飞船",
+    "workshop.longRangeSpaceships.desc": "",
     "workshop.mWReactor.label": "微型亚空间反应装置",
     "workshop.mWReactor.desc": "月球前哨中应用了E合金的新型反应装置。难得素生产效率提升 75％",
     "workshop.machineLearning.label": "机器学习",
