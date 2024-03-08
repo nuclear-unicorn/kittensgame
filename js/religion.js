@@ -273,7 +273,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		if(
 			(worstPerTickDelta >= 0)
 			||(worstPerTickDelta < 0 && necrocornVal + worstPerTickDelta * days > 0)&&
-			(this.game.resPool.get("alicorns").value - 1 + necrocornPerDay * days >= 0)){ //naive solution here
+			(this.game.resPool.get("alicorn").value - 1 + necrocornPerDay * days >= 0)){ //naive solution here
 			this.necrocornsNaiveFastForward(days, times);
 			return;
 		}
@@ -283,7 +283,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		if(corruptionWithExisting * this.game.calendar.ticksPerDay + necrocornPerDay < 0 &&
 		corruptionWithoutExisting * this.game.calendar.ticksPerDay + necrocornPerDay > 0
 		){
-			var alicornsResult = this.game.resPool.get("alicorns").value - 1 + necrocornPerDay * days;
+			var alicornsResult = this.game.resPool.get("alicorn").value - 1 + necrocornPerDay * days;
 			var alicornsSpent = necrocornPerDay * days;
 			if (corruptionWithoutExisting * days/this.game.calendar.ticksPerDay + necrocornPerDay * necrocornDeficitRepaymentModifier> 0
 				&& this.pactsManager.necrocornDeficit>0
