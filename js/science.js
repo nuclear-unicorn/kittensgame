@@ -1447,9 +1447,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: "faith", val: 5000}
 		],
 		effects: {
-			"unicornsMaxRatio": 1.3,
-			"alicornMaxRatio": 0.25,
-			"tearsMaxRatio": 0.3
+			"unicornsMaxRatio": 1.5,
+			"alicornMaxRatio": 14, //15 times increase so the player can more easily reach 25 to start making TCs
+			"tearsMaxRatio": 0.5
 		},
 		unlocked: false,
 		blocked: false,

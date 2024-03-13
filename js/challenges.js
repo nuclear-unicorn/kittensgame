@@ -329,6 +329,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		researched: false,
 		unlocked: false,
 		effects: {
+			"zigguratIvoryPriceIncrease": -0.25,
 			"zigguratIvoryPriceRatio": -0.025,
 			"bonfireBaseTearsCost": 0,
 			"workshopBaseTearsCost": 0,
@@ -357,6 +358,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				//After that: 1 * N = N, where N is the number of prior completions
 				//There is an LDR limit, but honestly I don't expect anyone to ever reach it legitimately.
 				self.effects["markerCostIncrease"] = 0.75;
+				self.effects["zigguratIvoryPriceIncrease"] = 0;
 				self.effects["zigguratIvoryPriceRatio"] = 0;
 				self.effects["unicornsMax"] = 10;
 				self.effects["tearsMax"] = 1;
@@ -366,6 +368,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["bonfireBaseTearsCost"] = 0;
 				self.effects["workshopBaseTearsCost"] = 0;
 				self.effects["markerCostIncrease"] = 0;
+				self.effects["zigguratIvoryPriceIncrease"] = 0.25;
 				self.effects["zigguratIvoryPriceRatio"] = -0.025;
 				self.effects["unicornsMax"] = 0;
 				self.effects["tearsMax"] = 0;
@@ -373,6 +376,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			}
 		},
 		stackOptions: {
+			"zigguratIvoryPriceIncrease": { LDRLimit: 1.5 },
 			"zigguratIvoryPriceRatio": { LDRLimit: 0.15 },
 			"bonfireBaseTearsCost": { noStack: true },
 			"workshopBaseTearsCost": { LDRLimit: 1000 },

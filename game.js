@@ -1585,6 +1585,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.weaponEfficency.title"),
 				type: "ratio"
 			},
+			"zigguratIvoryPriceIncrease": {
+				title: $I("effectsMgr.statics.zigguratIvoryPriceIncrease.title"),
+				type: "ratio"
+			},
 			"zigguratIvoryPriceRatio": {
 				title: $I("effectsMgr.statics.zigguratIvoryPriceRatio.title"),
 				type: "ratio"

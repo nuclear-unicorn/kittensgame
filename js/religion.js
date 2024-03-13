@@ -1534,7 +1534,9 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 			var resPriceModifier = 1 - resPriceDiscount;
 			var ratioToUse = meta.prices[i].name == "ivory" ? ivoryRatio : ratio;
 			var amt = meta.prices[i].val * Math.pow(ratioToUse, meta.val) * resPriceModifier * priceModifier;
-
+			if (meta.prices[i].name == "ivory") {
+				amt *= 1 + this.game.getEffect("zigguratIvoryPriceIncrease");
+			}
 			if (meta.name == "marker") {
 				amt *= 1 + this.game.getEffect("markerCostIncrease");
 			}
