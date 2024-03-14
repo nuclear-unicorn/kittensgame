@@ -1272,6 +1272,7 @@
     "ui.close": "zavřít",
     "ui.option.language": "Jazyk:",
     "ui.option.scheme": "Barevný motiv:",
+    "ui.option.scheme.relock": "Znova uzamknout skiny",
     "ui.option.use.percentage.resource.values": "Použití procentuálních hodnot produkce zdrojů",
     "ui.option.show.non.applicable.buttons": "Vždy zobrazovat tlačítka masopustu/obchodu/obětování/otřesu, i když není použitelné",
     "ui.option.more": "Více..",
