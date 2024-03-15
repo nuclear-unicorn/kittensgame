@@ -1441,7 +1441,7 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			},
 			"zigguratTempleEffectPolicy":{
 				title: $I("effectsMgr.statics.zigguratTempleEffectPolicy.title"),
-				type: "hidden" 
+				type: "ratio" 
 			},
 			"refinePolicyRatio":{
 				title: $I("effectsMgr.statics.refinePolicyRatio.title"),

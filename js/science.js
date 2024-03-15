@@ -1332,7 +1332,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 2100}
         ],
         effects:{
-            "cathPollutionRatio" : -0.1,
+            "cathPollutionRatio" : -0.05,
 			"solarFarmRatio" : 0,
 			"hydroPlantRatio": 0
         },
@@ -1342,8 +1342,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["lizardRelationsPriests", "lizardRelationsDiplomats"],
 		calculateEffects: function(self,game){
 			var cathPollution = Math.floor(game.bld.cathPollution);
-			if (cathPollution < 1e8) {
-				var boostRatio = Math.round(((1e8 - cathPollution) * 5 / 1e9) * 1e2) / 1e2;
+			if (cathPollution < 0.5e9) {
+				var boostRatio = Math.round(((0.5e9 - cathPollution) * 2 / 0.5e10) * 1e2) / 1e2;
 				self.effects["solarFarmRatio"] = boostRatio;
 				self.effects["hydroPlantRatio"] = boostRatio;
 			} else {
@@ -1398,7 +1398,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 					embassyCount += raceList[i].embassyLevel;
 				}
 			}
-			self.effects["culturePolicyRatio"] = game.getLimitedDR(0.05 + 0.001 * embassyCount, 0.3);
+			self.effects["culturePolicyRatio"] = Math.min(0.01 + 0.0004 * embassyCount, 0.15);
 		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("lizards", 20);
@@ -1411,9 +1411,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 2200}
         ],
         effects:{
-            "parchmentTradeChanceIncrease" : 0.5,
-			"manuscriptTradeChanceIncrease" : 0.3,
-			"ironBuyRatioIncrease": 1
+            "parchmentTradeChanceIncrease" : 0.25,
+			"manuscriptTradeChanceIncrease" : 0.15,
+			"ironBuyRatioIncrease": 0.5
         },
         unlocked: false,
         blocked: false,
@@ -1468,7 +1468,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["sharkRelationsScribes", "sharkRelationsBotanists"],
 		calculateEffects: function(self, game) {
 			var trades = game.stats.getStatCurrent("totalTrades").val;
-			self.effects["tradeRatio"] = Math.min(Math.floor(Math.log10(Math.max(trades, 100)) - 1) * 0.05, 0.5);			
+			self.effects["tradeRatio"] = Math.min(Math.floor(Math.log10(Math.max(trades, 100)) - 1) * 0.03, 0.3);			
 		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("sharks", 20);
@@ -1514,7 +1514,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 16000}
         ],
         effects:{
-            "calcinerSteelRatioBonus": 0.25,
+            "calcinerSteelRatioBonus": 0.15,
         },
         unlocked: false,
         blocked: false,
@@ -1531,7 +1531,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 16000}
         ],
         effects:{
-            "hunterRatio" : 1
+            "hunterRatio" : 0.5
         },
         unlocked: false,
         blocked: false,
@@ -1548,7 +1548,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 16000}
         ],
         effects:{
-            "magnetoBoostBonusPolicy" : 0.01
+            "magnetoBoostBonusPolicy" : 0.005
         },
         unlocked: false,
         blocked: false,
@@ -1568,7 +1568,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 8000}
         ],
         effects:{
-            "quarrySlabCraftBonus" : 0.05
+            "quarrySlabCraftBonus" : 0.025
         },
         unlocked: false,
         blocked: false,
@@ -1588,7 +1588,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 8000}
         ],
         effects:{
-            "zigguratTempleEffectPolicy" : 0.2
+            "zigguratTempleEffectPolicy" : 0.1
         },
         unlocked: false,
         blocked: false,
@@ -1617,9 +1617,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["nagaRelationsMasons", "nagaRelationsCultists"],
 		calculateEffects: function(self, game) {
 			var nagaEmbassies = game.diplomacy.get("nagas").embassyLevel;
-			self.effects["nagaBlueprintTradeChance"] = Math.min(nagaEmbassies * 0.005, 0.2);
+			self.effects["nagaBlueprintTradeChance"] = Math.min(nagaEmbassies * 0.0025, 0.1);
 			if (nagaEmbassies > 40) {
-				self.effects["blueprintCraftRatio"] = (nagaEmbassies - 40) * 0.05;
+				self.effects["blueprintCraftRatio"] = (nagaEmbassies - 40) * 0.02;
 			} else {
 				self.effects["blueprintCraftRatio"] = 0;
 			}
@@ -1648,7 +1648,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		},
 		calculateEffects: function(self, game) {
 			var spiderEmbassies = game.diplomacy.get("spiders").embassyLevel;
-			var bonus = game.getLimitedDR(0.06 + 0.004 * spiderEmbassies, 0.3);
+			var bonus = Math.min(0.03 + 0.002 * spiderEmbassies, 0.15);
 			for (var effect in self.effects) {
 				self.effects[effect] = bonus;
 			}
@@ -1691,7 +1691,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 20000}
         ],
         effects:{
-			"mintIvoryRatio" : 0.25,
+			"mintIvoryRatio" : 0.15,
 			"oilPolicyRatio" : 0.1
         },
         unlocked: false,
@@ -1730,8 +1730,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 30000}
         ],
 		effects:{
-			"starEventChance": 0.006,
-			"starchartPolicyRatio": 0.05
+			"starEventChance": 0.004,
+			"starchartPolicyRatio": 0.03
         },
         unlocked: false,
         blocked: false,
@@ -1739,8 +1739,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["dragonRelationsPhysicists"],
 		calculateEffects: function(self, game) {
 			var cycle = game.calendar.cycleYear + 1;
-			self.effects["starEventChance"] = cycle * 0.006;
-			self.effects["starchartPolicyRatio"] = cycle * 0.05;
+			self.effects["starEventChance"] = cycle * 0.004;
+			self.effects["starchartPolicyRatio"] = cycle * 0.03;
 		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("dragons", 10);
