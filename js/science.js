@@ -1398,7 +1398,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 					embassyCount += raceList[i].embassyLevel;
 				}
 			}
-			self.effects["culturePolicyRatio"] = Math.min(0.01 + 0.0004 * embassyCount, 0.15);
+			self.effects["culturePolicyRatio"] = Math.min(0.0004 * embassyCount, 0.15);
 		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("lizards", 20);
@@ -1648,7 +1648,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		},
 		calculateEffects: function(self, game) {
 			var spiderEmbassies = game.diplomacy.get("spiders").embassyLevel;
-			var bonus = Math.min(0.03 + 0.002 * spiderEmbassies, 0.15);
+			var bonus = Math.min(0.002 * spiderEmbassies, 0.15);
 			for (var effect in self.effects) {
 				self.effects[effect] = bonus;
 			}
