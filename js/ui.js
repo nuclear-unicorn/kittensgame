@@ -1079,7 +1079,11 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         }
 
         if (insertDateHeader) {
-            this.game.console.msg($I("calendar.year.ext", [messageLatest.year, messageLatest.seasonTitle]), "date", null, false);
+            if (!messageLatest.year || !messageLatest.seasonTitle) {
+                this.game.console.msg($I("ui.log.link"), "date", null, false);
+            } else {
+                this.game.console.msg($I("calendar.year.ext", [messageLatest.year, messageLatest.seasonTitle]), "date", null, false);
+            }
         }
 
         if (messageLatest.type === "date") {
