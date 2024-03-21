@@ -1675,11 +1675,11 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			for (var i = 0; i < spiders.sells.length; i++) {
 				var sell = spiders.sells[i]["name"];
 				sells.push(sell);
-				if(!spiderRelations && sell == "kerosene"){
+				if(sell == "kerosene"){
 					spiders.sells.splice(i); //Remove kerosene on load
 				}
 			}
-			if(spiderRelations && !spiders.sells.includes("kerosene")) {
+			if(spiderRelations) {
 				spiders.sells.push({name: "kerosene", value: 5, chance: 0.1, width: 0.1, minLevel: 10});
 			}
 		}
