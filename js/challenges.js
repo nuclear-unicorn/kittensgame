@@ -333,7 +333,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"zigguratIvoryPriceRatio": -0.025,
 			"bonfireBaseTearsCost": 0,
 			"workshopBaseTearsCost": 0,
-			"markerCostIncrease": 0,
+			"techUnicornsRatio": 0,
 			"unicornsMax": 0,
 			"tearsMax": 0,
 			"alicornMax": 0
@@ -341,23 +341,28 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		calculateEffects: function(self, game) {
 			if (self.active) {
 				self.effects["bonfireBaseTearsCost"] = (self.on < 4) ? (self.on + 2) : (6 + Math.sqrt(this.on - 4));
+				if (self.on == 2) {
+					self.effects["bonfireBaseTearsCost"] = 0;
+				}
 				//First Challenge (0 prior completions): 2
 				//Second Challenge i.e. first repeat (1 prior completion): 3
-				//Third Challenge i.e. second repeat (2 prior completions): 4
+				//Third Challenge i.e. second repeat (2 prior completions): 0 (taking a break from this effect)
 				//After that: 5, 6, 7, 7.4, 7.7, 8, 8.2, 8.4, 8.6, 8.8, 9, 9.2, 9.3, etc., increasing with square root.
 				switch(self.on) {
-				case 0:	self.effects["workshopBaseTearsCost"] = 0; break;
+				case 0:
+				case 3:
+					self.effects["workshopBaseTearsCost"] = 0;
+					break;
 				case 1:	self.effects["workshopBaseTearsCost"] = 0.01; break;
-				case 2:	self.effects["workshopBaseTearsCost"] = 0.5; break;
 				default:	self.effects["workshopBaseTearsCost"] = 1;
 				}
 				//First Challenge (0 prior completions): 0 * 0 = 0
 				//Second Challenge i.e. first repeat (1 prior completion): 0.01 * 1 = 0.01
-				//Third Challenge i.e. second repeat (2 prior completions): 0.5 * 2 = 1
-				//Fourth Challenge (3 prior completions): 1 * 3 = 3
+				//Third Challenge i.e. second repeat (2 prior completions): 1 * 2 = 2
+				//Fourth Challenge (3 prior completions): 0 * 3 = 0 (taking a break from this effect)
 				//After that: 1 * N = N, where N is the number of prior completions
 				//There is an LDR limit, but honestly I don't expect anyone to ever reach it legitimately.
-				self.effects["markerCostIncrease"] = 0.75;
+				self.effects["techUnicornsRatio"] = (self.on < 2) ? 0 : 0.25;
 				self.effects["zigguratIvoryPriceIncrease"] = 0;
 				self.effects["zigguratIvoryPriceRatio"] = 0;
 				self.effects["unicornsMax"] = 10;
@@ -367,7 +372,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			} else {
 				self.effects["bonfireBaseTearsCost"] = 0;
 				self.effects["workshopBaseTearsCost"] = 0;
-				self.effects["markerCostIncrease"] = 0;
+				self.effects["techUnicornsRatio"] = 0;
 				self.effects["zigguratIvoryPriceIncrease"] = 0.25;
 				self.effects["zigguratIvoryPriceRatio"] = -0.025;
 				self.effects["unicornsMax"] = 0;
@@ -380,7 +385,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"zigguratIvoryPriceRatio": { LDRLimit: 0.15 },
 			"bonfireBaseTearsCost": { noStack: true },
 			"workshopBaseTearsCost": { LDRLimit: 1000 },
-			"markerCostIncrease": { LDRLimit: 9 },
+			"techUnicornsRatio": { LDRLimit: 100 },
 			"unicornsMax": { noStack: true },
 			"tearsMax": { noStack: true },
 			"alicornMax": { noStack: true }
@@ -452,6 +457,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				//...obtaining tears requires Theology, which costs manuscripts, which are produced by Steamworks...
 				//...alternatively, build a Mint to get crafting material, but the Mint tech requires already having manuscripts.
 				return !game.challenges.isActive("pacifism"); //Avoid circular dependency
+			}
+			if (bldName === "logHouse" || bldName === "mansion") {
+				return this.on > 0; //The first time, these buildings don't cost tears.  But after that, they do.
 			}
 			var rawVal = this.dontChangeTheseBldPrices[bldName];
 			if (typeof(rawVal) == "boolean") {

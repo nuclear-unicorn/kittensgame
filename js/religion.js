@@ -585,7 +585,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		},
 		calculateEffects: function(self, game) {
 			if (game.challenges.isActive("unicornTears")) {
-				self.effects["tearsMax"] = 2;
+				self.effects["tearsMax"] = 20;
 			} else {
 				self.effects["tearsMax"] = 0;
 			}
@@ -612,8 +612,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		},
 		calculateEffects: function(self, game) {
 			if (game.challenges.isActive("unicornTears")) {
-				self.effects["unicornsMax"] = 100;
-				self.effects["tearsMax"] = 20;
+				self.effects["unicornsMax"] = 2000;
+				self.effects["tearsMax"] = 5;
 			} else {
 				self.effects["unicornsMax"] = 0;
 				self.effects["tearsMax"] = 0;
@@ -659,7 +659,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				effects["alicornPerTick"] = 0.00002;
 			}
 			if (game.challenges.isActive("unicornTears")) {
-				effects["unicornsMax"] = 500;
+				effects["unicornsMax"] = 50;
 				effects["tearsMax"] = 275;
 				effects["alicornMax"] = 0.2;
 			}
@@ -1534,11 +1534,9 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 			var resPriceModifier = 1 - resPriceDiscount;
 			var ratioToUse = meta.prices[i].name == "ivory" ? ivoryRatio : ratio;
 			var amt = meta.prices[i].val * Math.pow(ratioToUse, meta.val) * resPriceModifier * priceModifier;
+
 			if (meta.prices[i].name == "ivory") {
 				amt *= 1 + this.game.getEffect("zigguratIvoryPriceIncrease");
-			}
-			if (meta.name == "marker") {
-				amt *= 1 + this.game.getEffect("markerCostIncrease");
 			}
 
 			prices.push({

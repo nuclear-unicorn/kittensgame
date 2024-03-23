@@ -1769,6 +1769,26 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			}
 		}
 
+		//Unicorn Tears Challenge stuff
+		if (this.game.challenges.isActive("unicornTears")) {
+			var techRatio = this.game.getEffect("techUnicornsRatio");
+			if (techRatio > 0) {
+				for (var i = 0; i < prices.length; i += 1) {
+					switch(prices[i].name) {
+					case "manuscript":
+						prices_result = prices_result.concat([{name: "unicorns", val: prices[i].val * techRatio}]);
+						break;
+					case "compedium":
+						prices_result = prices_result.concat([{name: "tears", val: prices[i].val * techRatio}]);
+						break;
+					case "blueprint":
+						prices_result = prices_result.concat([{name: "alicorn", val: Math.max(1, techRatio)}]);
+						break;
+					}
+				}
+			}
+		}
+
 		return prices_result;
 	},
     /*getEffect: function(effectName){
@@ -2106,16 +2126,7 @@ dojo.declare("com.nuclearunicorn.game.ui.TechButtonController", com.nuclearunico
     },
 
 	getPrices: function(model) {
-		var prices_result = this.game.village.getEffectLeader("scientist", this.inherited(arguments));
-
-		// this is to force Gold Ore pathway in BSK+IW and avoid soft locks
-		if(this.game.ironWill && this.game.challenges.isActive('blackSky')) {
-			if(model.metadata.name == 'construction') {
-				prices_result = prices_result.concat([{name: "gold", val: 5}]);
-			}
-		}
-
-		return prices_result;
+		return this.game.science.getPrices(model.metadata); //*sigh* I want to avoid duplicate code if possible
     },
 
 	updateVisible: function(model){

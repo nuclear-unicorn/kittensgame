@@ -1601,8 +1601,8 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.workshopBaseTearsCost.title"),
 				type: "fixed"
 			},
-			"markerCostIncrease": {
-				title: $I("effectsMgr.statics.markerCostIncrease.title"),
+			"techUnicornsRatio": {
+				title: $I("effectsMgr.statics.techUnicornsRatio.title"),
 				type: "ratio"
 			},
 			"autoSacrificeUnicornsPenalty": {
