@@ -1,31 +1,33 @@
 <html lang="en">
   <head>
     <script type="text/javascript">
-		
-	function parseQuery(queryString) {
-		var query = {};
-		var pairs = (queryString[0] === '?' ? queryString.substr(1) : queryString).split('&');
-		for (var i = 0; i < pairs.length; i++) {
-			var pair = pairs[i].split('=');
-			query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
-		}
-		return query;
-	}
-		
-	window.addEventListener('load', function() {
-		var message = parseQuery(window.location.hash)
-		window.location.hash = '';
+      function parseQuery(queryString) {
+        var query = {};
+        var pairs = (
+          queryString[0] === "?" ? queryString.substr(1) : queryString
+        ).split("&");
+        for (var i = 0; i < pairs.length; i++) {
+          var pair = pairs[i].split("=");
+          query[decodeURIComponent(pair[0])] = decodeURIComponent(
+            pair[1] || ""
+          );
+        }
+        return query;
+      }
 
-		opener = window.opener
-		if (window.parent != window.top) {
-			opener =  opener || window.parent
-		}
+      window.addEventListener("load", function () {
+        var message = parseQuery(window.location.hash);
+        window.location.hash = "";
 
-		opener.postMessage(message, window.location.origin);
-		window.close();
+        opener = window.opener;
+        if (window.parent != window.top) {
+          opener = opener || window.parent;
+        }
 
-	});
-	</script>
+        opener.postMessage(message, window.location.origin);
+        window.close();
+      });
+    </script>
   </head>
   <body>
     <h1>Dropbox sign-in successful</h1>
