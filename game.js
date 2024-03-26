@@ -1415,6 +1415,66 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
             title: $I("effectsMgr.statics.globalRelationsBonus.title"),
                 type: "fixed"
             },
+			"harborLimitRatioPolicy":{
+				title: $I("effectsMgr.statics.harborLimitRatioPolicy.title"),
+				type: "ratio"
+			},
+			"calcinerSteelRatioBonus":{
+				title: $I("effectsMgr.statics.calcinerSteelRatioBonus.title"),
+				type: "ratio"
+			},
+			"magnetoBoostBonusPolicy":{
+				title: $I("effectsMgr.statics.magnetoBoostBonusPolicy.title"),
+				type: "ratio"
+			},
+			"parchmentTradeChanceIncrease":{
+				title: $I("effectsMgr.statics.parchmentTradeChanceIncrease.title"),
+                type: "ratio" 
+			},
+			"manuscriptTradeChanceIncrease":{
+				title: $I("effectsMgr.statics.manuscriptTradeChanceIncrease.title"),
+                type: "ratio" 
+			},
+			"quarrySlabCraftBonus":{
+				title: $I("effectsMgr.statics.quarrySlabCraftBonus.title"),
+                type: "ratio" 
+			},
+			"zigguratTempleEffectPolicy":{
+				title: $I("effectsMgr.statics.zigguratTempleEffectPolicy.title"),
+				type: "ratio" 
+			},
+			"refinePolicyRatio":{
+				title: $I("effectsMgr.statics.refinePolicyRatio.title"),
+				type: "ratio"
+			},
+			"biolabEnergyRatio":{
+				title: $I("effectsMgr.statics.biolabEnergyRatio.title"),
+				type: "ratio"
+			},
+			"breweryPolicyManpowerRatio":{
+				title: $I("effectsMgr.statics.breweryPolicyManpowerRatio.title"),
+				type: "ratio"
+			},
+			"religionUpgradesDiscount":{
+				title: $I("effectsMgr.statics.religionUpgradesDiscount.title"),
+				type: "ratio"
+			},
+			"ironBuyRatioIncrease":{
+				title: $I("effectsMgr.statics.ironBuyRatioIncrease.title"),
+				type: "ratio"
+			},
+			"nagaBlueprintTradeChance":{
+				title: $I("effectsMgr.statics.nagaBlueprintTradeChance.title"),
+				type: "ratio"
+			},			
+			"starchartPolicyRatio":{
+				title: $I("effectsMgr.statics.starchartPolicyRatio.title"),
+				type: "ratio"
+			},
+			"mintIvoryRatio": {
+				title: $I("effectsMgr.statics.mintIvoryRatio.title"),
+				type: "ratio"
+			},
             //philosophy
             "luxuryDemandRatio":{
                 title: $I("effectsMgr.statics.luxuryDemandRatio.title"),
@@ -1502,6 +1562,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
             },
             "mineralsPolicyRatio":{
 				title: $I("effectsMgr.statics.mineralsPolicyRatio.title"),
+				type: "ratio"
+            },
+			"oilPolicyRatio":{
+				title: $I("effectsMgr.statics.oilPolicyRatio.title"),
 				type: "ratio"
             },
             "woodPolicyRatio":{
@@ -3658,7 +3722,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	getResCraftRatio: function(craftedResName) {
 		if (craftedResName == "wood") {
-			var refineRatio = this.getEffect("refineRatio");
+			var policyRefineRatio = this.getEffect("refinePolicyRatio");
+			var refineRatio =  (policyRefineRatio) + (1 + policyRefineRatio) * this.getEffect("refineRatio");
 			return this.ironWill
 				? ((1 + refineRatio) * (1 + this.getEffect("woodRatio"))) - 1
 				: refineRatio;

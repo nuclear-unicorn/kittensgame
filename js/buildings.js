@@ -693,7 +693,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				self.togglable = true;
 				self.effects["catnipPerTickCon"] = -1;
 				self.effects["oilPerTickProd"] = 0.02 * (1 + game.getEffect("biofuelRatio"));
-				self.effects["energyConsumption"] = 1;
+				self.effects["energyConsumption"] = 1 * (1 + game.getEffect("biolabEnergyRatio"));
 			}else{
 				self.togglable = false;
 				self.effects["catnipPerTickCon"] = 0;
@@ -898,7 +898,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				var shipVal = game.resPool.get("ship").value;
 
 				//100% to 225% with slow falldown on the 75%
-				var limit = 2.25 + game.getEffect("shipLimit") * game.bld.get("reactor").on;
+				var limit = 2.25 + game.getEffect("shipLimit") * game.bld.get("reactor").on * (1 + game.getEffect("harborLimitRatioPolicy"));
 				var ratio = 1 + game.getLimitedDR(cargoShips.effects["harborRatio"] * shipVal, limit);
 
 				effects["catnipMax"] *= ratio;
@@ -967,17 +967,22 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"mineralsRatio": 0.35,
 			"coalPerTickBase": 0.015,
 			"uraniumPerTickBase": 0,
-			"cathPollutionPerTickProd": 0.25
+			"cathPollutionPerTickProd": 0.25,
+			"slabCraftRatio": 0
 		},
 		calculateEffects: function(self, game){
 			var effects = {
 				"mineralsRatio": 0.35,
 				"coalPerTickBase": 0.015,
 				"uraniumPerTickBase": 0,
-				"cathPollutionPerTickProd": 0.25
+				"cathPollutionPerTickProd": 0.25,
+				"slabCraftRatio": 0
 			};
 			if (game.workshop.get("orbitalGeodesy").researched){
 				effects["uraniumPerTickBase"] = 0.0005; //4% of accelerator output
+			}
+			if (game.science.getPolicy("nagaRelationsMasons").researched){
+				effects["slabCraftRatio"] = game.getEffect("quarrySlabCraftBonus");
 			}
 			self.effects = effects;
 			self.togglable = game.science.get("ecology").researched;
@@ -1153,7 +1158,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 						self.effects["ironPerTickCon"] *= amt;
 
 						// Automated production, metallurgist leader won't help here
-						self.effects["steelPerTickProd"] *= amt * (1 + game.getCraftRatio() * game.getEffect("calcinerSteelCraftRatio") + game.bld.get("reactor").on * game.getEffect("calcinerSteelReactorBonus"));
+						self.effects["steelPerTickProd"] *= amt * (1 + game.getCraftRatio() * game.getEffect("calcinerSteelCraftRatio") + game.bld.get("reactor").on * game.getEffect("calcinerSteelReactorBonus")) *
+						(1 + game.getEffect("calcinerSteelRatioBonus"));
 
 						return amt;
 					}
@@ -1225,6 +1231,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				}
 			}
 			self.effects["manuscriptPerTickProd"] = amt;
+			self.effects["magnetoBoostRatio"] = 0.15 + game.getEffect("magnetoBoostBonusPolicy");
 
 			//Update description to explain what automation does:
 			if (game.workshop.get("factoryAutomation").researched) {
@@ -1649,7 +1656,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			mpratio *= (1 + game.village.map.villageLevel * 0.005);
 			mpratio *= (1 + game.getEffect("mintRatio"));
 			self.effects["fursPerTickProd"]  = mpratio * 1.25;	//2
-			self.effects["ivoryPerTickProd"] = mpratio * 0.3;	//1.5
+			self.effects["ivoryPerTickProd"] = mpratio * 0.3 * (1 + game.getEffect("mintIvoryRatio"));	//1.5
 
 			var amt = game.resPool.getAmtDependsOnStock(
 				[{res: "gold", amt: -self.effects["goldPerTickCon"]},
@@ -1683,7 +1690,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"catnipPerTickCon" : -1,
 			"spicePerTickCon" : -0.1,
 			"festivalRatio" : 0.01,
-			"festivalArrivalRatio" : 0.001
+			"festivalArrivalRatio" : 0.001,
+			"manpowerRatio" : 0
 		},
 		effectsCalculated: {},
 		togglable: true,
@@ -1693,7 +1701,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				"catnipPerTickCon" : -1 * (1 + game.getEffect("breweryConsumptionRatio")),
 				"spicePerTickCon" : -0.1 * (1 + game.getEffect("breweryConsumptionRatio")),
 				"festivalRatio" : 0.01,
-				"festivalArrivalRatio" : 0.001
+				"festivalArrivalRatio" : 0.001,
+				"manpowerRatio" : game.getEffect("breweryPolicyManpowerRatio")
 			};
 			self.effectsCalculated = dojo.clone(self.effects);
 		},
@@ -1707,6 +1716,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			self.effects["spicePerTickCon"] = self.effectsCalculated["spicePerTickCon"] * amt;
 			self.effects["festivalRatio"] = self.effectsCalculated["festivalRatio"] * amt;
 			self.effects["festivalArrivalRatio"] = self.effectsCalculated["festivalArrivalRatio"] * amt;
+			self.effects["manpowerRatio"] = self.effectsCalculated["manpowerRatio"] * amt;
 			return amt;
 		},
 		flavor: $I("buildings.brewery.flavor"),
@@ -1827,6 +1837,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			{ name : "manuscript", val: 10 }
 		],
 		priceRatio: 1.15,
+		upgrades: {
+			buildings: ["ziggurat"]
+		},
 		effects: {
 			"culturePerTickBase" : 0,
 			"faithPerTickBase" : 0,
@@ -1925,6 +1938,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			{ name : "megalith", val: 50 }
 		],
 		priceRatio: 1.25,
+		upgrades: {
+			buildings: ["temple"]
+		},
 		effects: {
 			"cultureMaxRatio": 0.08
 		},
@@ -1932,6 +1948,21 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			var effects = {
 				cultureMaxRatio: 0.08
 			};
+			if(game.science.getPolicy("nagaRelationsCultists").researched) {
+				game.upgrade(
+					self.upgrades
+				);
+				var multiplier = game.getEffect("zigguratTempleEffectPolicy");
+				var templeEffects = Object.assign({}, game.bld.getBuildingExt("temple").meta.effects);
+				
+				for (var key in templeEffects) {
+					templeEffects[key] *= multiplier;
+				}
+				//Object.keys(templeEffects).forEach(key => {
+				//	templeEffects[key] *= multiplier;
+				//});
+				effects = Object.assign(effects, templeEffects);
+			}
 			effects["cultureMaxRatio"] = 0.08 + game.getEffect("cultureMaxRatioBonus");
 			self.effects = effects;
 			if(self.val){

@@ -966,7 +966,7 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 			}
 		}
 
-		this.game.upgrade({policies: ["authocracy"]});
+		this.game.upgrade({policies: ["authocracy", "dragonRelationsAstrologers", "lizardRelationsEcologists"]});
 
 		if (updateUI) {
 			this.game.ui.render();
@@ -1043,7 +1043,7 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 			}
 		}
 
-		this.game.upgrade({policies: ["authocracy"]});
+		this.game.upgrade({policies: ["authocracy", "dragonRelationsAstrologers", "lizardRelationsEcologists"]});
 		
 		if (updateUI) {
 			this.game.ui.render();
