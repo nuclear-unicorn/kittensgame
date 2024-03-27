@@ -48,8 +48,12 @@ WQueueItem = React.createClass({
 
         //TODO: red indicator when can't process
         //TODO: attach tooltip as if it is a button
+        var failStrategy = this.props.queueManager.failStrategy;
+        var showActive = this.props.queueManager.activeItem == this.props.index &&
+                             (failStrategy == "skipCapped" || failStrategy == "skip");
         return $r("div", {}, 
         [
+            (showActive ? "» " : "") +
             "[" + item.type + "] - ", 
             $r("span", {ref:"itemLabel", className:"queue-label"}, item.label),
             (
@@ -174,6 +178,41 @@ WQueue = React.createClass({
         }, selectOpts);
     },
 
+    getPossibleQueueStrategies: function(){
+        if(!game.getFeatureFlag("QUEUE_STRATEGIES")){
+            return; //no strategy ui if flag is off
+        }
+        if (!game.science.get("industrialization").researched){
+            return;
+        }
+        var self = this;
+        var selectOpts = [];
+        var options = game.time.queue.possibleQueueStrategies;
+        for (var strategy in options){
+            //console.warn(options[strategy]);
+            //selectOpts.push(options[strategy]);
+            selectOpts.push($r("option", { value: options[strategy][0] || "null", "data-label": options[strategy][1]}, options[strategy][1]));
+            //selectOpts.push(strategy);
+        }
+        if (!options.length){
+            selectOpts.push($r("option", {}, "-"));
+        }
+
+        return $r("select", {
+            value: game.time.queue.failStrategy,
+            onChange: function(e){
+                self.setState({
+                    strategy: e.target.value,
+                    itemLabel: e.target.label
+                });
+                game.time.queue.failStrategy = e.target.value;
+                if (game.time.queue.failStrategy === "null") { //This is a bit of a hack since the "value" property defaults to the text inside the element.
+                    game.time.queue.failStrategy = null;
+                }
+            }
+        }, selectOpts);
+    },
+
     getQueueItems: function(){
         var self = this;
         var items = [];
@@ -251,6 +290,7 @@ WQueue = React.createClass({
                 $I("queue.alphabeticalToggle")
             ]),
 
+            this.getPossibleQueueStrategies(),
             this.getQueueItems()
         ]);
     }
