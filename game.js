@@ -2998,7 +2998,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		// Once we have rendered the page immidiately update it in order to
 		// reduce flicker
-		this.update();
+		this.ui.update();
 		this.calendar.update();
 	},
 
@@ -4509,6 +4509,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
         var fpsElement;
 
 		if (this.isPaused){
+			this.ui.update(); //Still update UI if the player gathers catnip while pawsed or something
 			return;
 		}
 
