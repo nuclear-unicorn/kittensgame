@@ -280,6 +280,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: 	"unobtainium", val: 5},
 			{name : "science", val: 55000}
 		],
+		upgrades: {
+			policies: ["agathism"]
+		}
 	}, {
 		name: "chemistry",
 		label: $I("science.chemistry.label"),
@@ -462,7 +465,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["carbonSequestration"]
 		},
 		upgrades:{
-			buildings: ["mine", "quarry"]
+			buildings: ["mine", "quarry"],
+			policies: ["agathism"]
 		}
 	},
 	{
@@ -1447,14 +1451,35 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: "faith", val: 5000}
 		],
 		effects: {
-			"unicornsMaxRatio": 1.5,
-			"alicornMaxRatio": 14, //15 times increase so the player can more easily reach 25 to start making TCs
-			"tearsMaxRatio": 0.5
+			"unicornsMaxRatio": 0,
+			"alicornMaxRatio": 0,
+			"tearsMaxRatio": 0,
+		},
+		calculateEffects: function(self, game) {
+			var effects = {
+				"unicornsMaxRatio": 1.5,
+				"alicornMaxRatio": 2,
+				"tearsMaxRatio": 0.5
+			};
+			if (!game.science.get("ecology").researched) {
+				for (var i in effects) {
+					effects[i] *= 0.5;
+				}
+			}
+			if (!game.science.get("metaphysics").researched) {
+				for (var i in effects) {
+					effects[i] *= 0.5;
+				}
+			}
+			self.effects = effects;
 		},
 		unlocked: false,
 		blocked: false,
 		blocks: [ "ritualCalendar", "holyGround" ],
 		evaluateLocks: function(game) {
+			if (game.challenges.isActive("atheism")) {
+				return false; //Faith as a resource is unavailable in this Challenge
+			}
 			return game.challenges.isActive("unicornTears") && game.religion.getZU("unicornTomb").val > 0;
 		}
 	}, {
