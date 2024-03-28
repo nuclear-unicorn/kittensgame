@@ -576,7 +576,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         if (now.getDate() == 1 && now.getMonth() == 3) {
             $(".console-intro").css("font-size", "300%").addClass("blaze").text($I("console.intro.zebra"));
         } else {
-            $(".console-intro").text($I("console.intro"));
+            $(".console-intro").css("font-size", "100%").removeClass("blaze").text($I("console.intro"));
         }
 
         React.render($r(WLeftPanel, {
@@ -1079,7 +1079,11 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         }
 
         if (insertDateHeader) {
-            this.game.console.msg($I("calendar.year.ext", [messageLatest.year, messageLatest.seasonTitle]), "date", null, false);
+            if (!messageLatest.year || !messageLatest.seasonTitle) {
+                this.game.console.msg($I("ui.log.link"), "date", null, false);
+            } else {
+                this.game.console.msg($I("calendar.year.ext", [messageLatest.year, messageLatest.seasonTitle]), "date", null, false);
+            }
         }
 
         if (messageLatest.type === "date") {

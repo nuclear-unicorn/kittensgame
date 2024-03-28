@@ -3372,7 +3372,8 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 			}),
 			controller: new classes.village.ui.VillageButtonController(this.game, {
 				updateVisible: function (model) {
-					model.visible = !this.game.isEldermass() && (this.game.resPool.get("elderBox").value > 0);
+					var elderBox = this.game.resPool.get("elderBox");
+					model.visible = !this.game.isEldermass() && (elderBox.value > 0) && !elderBox.isHidden;
 				}
 			})
 		}, this.game);
@@ -3415,6 +3416,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 
 		this.huntBtn && this.huntBtn.update();
 		this.festivalBtn && this.festivalBtn.update();
+		this.redeemGiftBtn && this.redeemGiftBtn.update();
 
 		this.mapPanel && this.mapPanel.update();
 		this.mapWgt && this.mapWgt.update();
