@@ -3,6 +3,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 	game: null,
 
 	hideResearched: false,
+	hideUseless: false,
 
 
 	/***
@@ -2573,11 +2574,13 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		this.getCraft("wood").prices = [{name: "catnip", val: 100}];
 
 		this.hideResearched = false;
+		this.hideUseless = false;
 	},
 
 	save: function(saveData){
 		saveData.workshop = {
 			hideResearched: this.hideResearched,
+			hideUseless: this.hideUseless,
 			upgrades: this.filterMetadata(this.upgrades, ["name", "unlocked", "researched"]),
 			crafts: this.filterMetadata(this.crafts, ["name", "unlocked", "value", "progress"]),
 			zebraUpgrades: this.filterMetadata(this.zebraUpgrades, ["name", "unlocked", "researched"])
@@ -2590,6 +2593,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		}
 
 		this.hideResearched = saveData.workshop.hideResearched;
+		this.hideUseless = saveData.workshop.hideUseless || false;
 		this.loadMetadata(this.upgrades, saveData.workshop.upgrades);
 		this.loadMetadata(this.crafts, saveData.workshop.crafts);
 		this.loadMetadata(this.zebraUpgrades, saveData.workshop.zebraUpgrades);
@@ -3010,15 +3014,14 @@ dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearun
 	updateVisible: function(model){
 		var upgrade = model.metadata;
 		model.visible = upgrade.unlocked;
+		model.uselessRightNow = this.game.workshop.getIsUpgradeUseless(model.metadata);
 
 		if (upgrade.researched && this.game.workshop.hideResearched){
 			model.visible = false;
 		}
-	},
-
-	updateEnabled: function(model) {
-		this.inherited(arguments);
-		model.uselessRightNow = this.game.workshop.getIsUpgradeUseless(model.metadata);
+		if (model.uselessRightNow && this.game.workshop.hideUseless) {
+			model.visible = false;
+		}
 	}
 });
 
@@ -3316,18 +3319,20 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 		this.craftBtns = [];
 		this.buttons = [];
 
-		var div = dojo.create("div", { style: { float: "left"}}, tabContainer);
+		var div = dojo.create("div", {style: {minHeight: "20px", display: "flex"}}, tabContainer);
 		dojo.create("span", {innerHTML: $I("workshop.craft.effectiveness", [this.game.getDisplayValueExt(100 * this.game.getCraftRatio(), false, false, 0)])}, div);
 
 		//--------------------------------------------------------------------
-		var divCombobox = dojo.create("div", {style: { height: "20px"}} , tabContainer);
-		var div = dojo.create("div", { style: { float: "right"}}, divCombobox);
+
+		var checkboxContainer = dojo.create("div", {style: {marginLeft: "auto", marginRight: "0px"}}, div);
+		var toggleResearchedRow = dojo.create("div", {}, checkboxContainer);
+		var toggleUselessRow = dojo.create("div", {}, checkboxContainer);
 
 		var groupCheckbox = dojo.create("input", {
 			id: "toggleResearched",
 			type: "checkbox",
 			checked: this.game.workshop.hideResearched
-		}, div);
+		}, toggleResearchedRow);
 
 		dojo.connect(groupCheckbox, "onclick", this, function(){
 			this.game.workshop.hideResearched = !this.game.workshop.hideResearched;
@@ -3335,8 +3340,22 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 			dojo.empty(tabContainer);
 			this.render(tabContainer);
 		});
+		
+		var groupCheckbox2 = dojo.create("input", {
+			id: "toggleUseless",
+			type: "checkbox",
+			checked: this.game.workshop.hideUseless
+		}, toggleUselessRow);
 
-		dojo.create("label", { innerHTML: $I("workshop.toggleResearched.label"), for: "toggleResearched"}, div);
+		dojo.connect(groupCheckbox2, "onclick", this, function(){
+			this.game.workshop.hideUseless = !this.game.workshop.hideUseless;
+
+			dojo.empty(tabContainer);
+			this.render(tabContainer);
+		});
+
+		dojo.create("label", { innerHTML: $I("workshop.toggleResearched.label"), for: "toggleResearched"}, toggleResearchedRow);
+		dojo.create("label", { innerHTML: $I("workshop.toggleUseless.label"), for: "toggleUseless"}, toggleUselessRow);
 		//---------------------------------------------------------------------
 
 		var upgradePanel = new com.nuclearunicorn.game.ui.Panel($I("workshop.upgradePanel.label"), this.game.workshop);

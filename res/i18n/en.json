@@ -2037,6 +2037,7 @@
     "workshop.upgradePanel.label": "Upgrades",
     "workshop.all.upgrades.unlocked": "All upgrades are unlocked!",
     "workshop.toggleResearched.label": "Hide researched upgrades",
+    "workshop.toggleUseless.label": "Hide useless upgrades",
     "workshop.advancedAutomation.label": "Advanced Automation",
     "workshop.advancedAutomation.desc": "Workshop Automation will be activated twice per year.",
     "workshop.advancedRefinement.label": "Catnip Enrichment",
