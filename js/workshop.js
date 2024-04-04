@@ -4,6 +4,13 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 	hideResearched: false,
 
+
+	/***
+	 * isUseless OPTIONAL: Function that returns true if the upgrade isn't useful in the current game-state. If not defined, the game engine will try to figure it out on its own based on the upgrades & wants fields.
+	 * wants OPTIONAL: The item will be marked as "not useful in the current game-state" if we are missing ANY item from this table. (Has the same format as the upgrades table.)
+	 * If a metadata object has no upgrades table, no wants table, & no isUseless function, it will never be marked as useless.
+	 */
+
 	upgrades:[
 		//--------------------- food upgrades ----------------------
 		{
@@ -19,6 +26,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		unlocks: {
 			upgrades: ["ironHoes"]
+		},
+		wants: {
+			jobs: ["farmer"]
 		}
 	},{
 		name: "ironHoes",
@@ -31,6 +41,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "iron", val: 25 },
 			{ name : "science", val: 200 }
 		],
+		wants: {
+			jobs: ["farmer"]
+		}
 	},
 	//--------------------- wood upgrades ----------------------
 	{
@@ -46,6 +59,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		unlocks: {
 			upgrades: ["ironAxes"]
+		},
+		wants: {
+			jobs: ["woodcutter"]
 		}
 	},{
 		name: "ironAxes",
@@ -57,7 +73,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "iron", val: 50 },
 			{ name : "science", val: 200 }
-		]
+		],
+		wants: {
+			jobs: ["woodcutter"]
+		}
 	},{
 		name: "steelAxe",
 		label: $I("workshop.steelAxe.label"),
@@ -68,7 +87,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "science", val: 20000 },
 			{ name : "steel", val: 75 }
-		]
+		],
+		wants: {
+			jobs: ["woodcutter"]
+		}
 	},{
 		name: "reinforcedSaw",
 		label: $I("workshop.reinforcedSaw.label"),
@@ -141,7 +163,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "titanium", val: 10 },
 			{ name : "science", val: 38000 }
-		]
+		],
+		wants: {
+			jobs: ["woodcutter"]
+		}
 	},{
 		name: "alloyAxe",
 		label: $I("workshop.alloyAxe.label"),
@@ -152,7 +177,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "science", val: 70000 },
 			{ name : "alloy", val: 25 }
-		]
+		],
+		wants: {
+			jobs: ["woodcutter"]
+		}
 	},
 	//--------------------- unobtainium stuff --------------------------
 	{
@@ -165,7 +193,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "unobtainium", val: 75 },
 			{ name : "science", val: 125000 }
-		]
+		],
+		wants: {
+			jobs: ["woodcutter"]
+		}
 	},
 	{
 		name: "unobtainiumSaw",
@@ -359,6 +390,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			buildings: ["accelerator"]
+		},
+		isUseless: function(game) {
+			return game.bld.get("accelerator").val == 0; //Even if they're turned off, they benefit
 		}
 	},{
 		name: "stasisChambers",
@@ -378,6 +412,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		},
 		unlocks: {
 			upgrades: ["voidEnergy"]
+		},
+		isUseless: function(game) {
+			return game.bld.get("accelerator").val == 0 || //Even if they're turned off, they benefit
+			       !game.workshop.get("energyRifts").researched;
 		}
 	},{
 		name: "voidEnergy",
@@ -397,6 +435,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		},
 		unlocks: {
 			upgrades: ["darkEnergy"]
+		},
+		isUseless: function(game) {
+			return game.bld.get("accelerator").val == 0 || //Even if they're turned off, they benefit
+			       !game.workshop.get("energyRifts").researched;
 		}
 	},{
 		name: "darkEnergy",
@@ -412,6 +454,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			buildings: ["accelerator"]
+		},
+		isUseless: function(game) {
+			return game.bld.get("accelerator").val == 0 || //Even if they're turned off, they benefit
+			       !game.workshop.get("energyRifts").researched;
 		}
 	},{
 		name: "chronoforge",
@@ -441,6 +487,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			buildings: ["accelerator"]
+		},
+		isUseless: function(game) {
+			return game.bld.get("accelerator").val == 0 || //Even if they're turned off, they benefit
+			       !game.workshop.get("energyRifts").researched;
 		}
 	},{
 		name: "fluxCondensator",
@@ -452,7 +502,11 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "unobtainium", val: 5000 },
 			{ name : "timeCrystal", val: 5 },
 			{ name : "alloy", 	val: 	 250 }
-		]
+		],
+		isUseless: function(game) {
+			//The code in game.js & js/challenges.js both care about the "val" property, not the "on" property.
+			return game.bld.get("chronosphere").val == 0;
+		}
 	},{
 		name: "lhc",
 		label: $I("workshop.lhc.label"),
@@ -466,6 +520,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			buildings: ["accelerator"]
+		},
+		isUseless: function(game) {
+			return game.bld.get("accelerator").val == 0; //Even if they're turned off, they benefit
 		}
 	},
 	//----------- energy stuff ---------
@@ -482,6 +539,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		},
 		upgrades: {
 			buildings: ["pasture"]
+		},
+		wants: {
+			stages: [{bld:"pasture", stage:1}]
 		}
 	},{
 		name: "thinFilm",
@@ -497,6 +557,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		},
 		upgrades: {
 			buildings: ["pasture"]
+		},
+		wants: {
+			stages: [{bld:"pasture", stage:1}]
 		}
 	},{
 		name: "qdot",
@@ -512,6 +575,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		},
 		upgrades: {
 			buildings: ["pasture"]
+		},
+		wants: {
+			stages: [{bld:"pasture", stage:1}]
 		}
 	},
 	{
@@ -524,6 +590,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			spaceBuilding: ["sattelite"]
+		},
+		isUseless: function(game) {
+			return game.space.getBuilding("sattelite").val == 0; //Even if turned off, they benefit
 		}
 	},
 	//	------------- harbour stuff ------------
@@ -572,6 +641,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		upgrades: {
 			buildings: ["harbor"]
 		},
+		wants: {
+			buildings: ["harbor", "reactor"],
+			upgrades: ["cargoShips"]
+		}
 	},{
 		name: "ironwood",
 		label: $I("workshop.ironwood.label"),
@@ -587,6 +660,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		unlocks: {
 			upgrades: ["silos"]
 		}
+		//No isUseless function for this one because unlocking Silos can be useful.
 	},{
 		name: "concreteHuts",
 		label: $I("workshop.concreteHuts.label"),
@@ -599,6 +673,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science", val: 125000 },
 			{ name : "concrate", val: 45 }
 		],
+		isUseless: function(game) {
+			return game.ironWill;
+		}
 	},{
 		name: "unobtainiumHuts",
 		label: $I("workshop.unobtainiumHuts.label"),
@@ -611,6 +688,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "unobtainium", val: 350 },
 			{ name : "science", val: 200000 }
 		],
+		isUseless: function(game) {
+			return game.ironWill;
+		}
 	},{
 		name: "eludiumHuts",
 		label: $I("workshop.eludiumHuts.label"),
@@ -622,25 +702,29 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science", val: 275000 },
 			{ name : "eludium", val: 125 }
 		],
+		isUseless: function(game) {
+			return game.ironWill;
+		}
 	},
 	{
 		name: "silos",
 		label: $I("workshop.silos.label"),
 		description: $I("workshop.silos.desc"),
-		effects: {
-		},
 		prices:[
 			{ name : "science", val: 50000 },
 			{ name : "steel", val: 125 },
 			{ name : "blueprint", val: 5 }
 		],
 		upgrades: {
-			buildings: ["barn", "warehouse", "harbor"]
+			buildings: ["warehouse"]
 		},
 		unlocks: {
 			upgrades: ["titaniumWarehouses"]
 		},
-		flavor: $I("workshop.silos.flavor")
+		wants: {
+			stages: [{bld: "warehouse", stage: 0}]
+		},
+		flavor: $I("workshop.silos.flavor"),
 	},{
 		name: "refrigeration",
 		label: $I("workshop.refrigeration.label"),
@@ -669,7 +753,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "wood", val: 200 },
 			{ name : "iron", val: 100 },
 			{ name : "science", val: 500 }
-		]
+		],
+		isUseless: function(game) {
+			return (game.village.getJob("hunter").value + game.resPool.get("zebras").value) == 0 || game.getEffect("weaponEfficency") < -0.999;
+		}
 	},{
 		name: "crossbow",
 		label: $I("workshop.crossbow.label"),
@@ -683,7 +770,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "iron", val: 1500 },
 			{ name : "science", val: 12000 }
-		]
+		],
+		isUseless: function(game) {
+			return (game.village.getJob("hunter").value + game.resPool.get("zebras").value) == 0 || game.getEffect("weaponEfficency") < -0.999;
+		}
 	},{
 		name: "railgun",
 		label: $I("workshop.railgun.label"),
@@ -699,6 +789,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science", val: 150000 },
 			{ name : "blueprint", val: 25 }
 		],
+		isUseless: function(game) {
+			return (game.village.getJob("hunter").value + game.resPool.get("zebras").value) == 0 || game.getEffect("weaponEfficency") < -0.999;
+		},
 		flavor: $I("workshop.railgun.flavor")
 	},{
 		name: "bolas",
@@ -712,7 +805,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "minerals", val: 250 },
 			{ name : "science", val: 1000 }
 		],
-		flavor: $I("workshop.bolas.flavor")
+		flavor: $I("workshop.bolas.flavor"),
+		isUseless: function(game) {
+			return game.challenges.isActive("pacifism");
+		}
 	},{
 		name: "huntingArmor",
 		label: $I("workshop.huntingArmor.label"),
@@ -724,7 +820,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "iron", val: 750 },
 			{ name : "science", val: 2000 }
 		],
-        flavor: $I("workshop.huntingArmor.flavor")
+		flavor: $I("workshop.huntingArmor.flavor"),
+		isUseless: function(game) {
+			return game.challenges.isActive("pacifism");
+		}
 	},{
 		name: "steelArmor",
 		label: $I("workshop.steelArmor.label"),
@@ -735,7 +834,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "science", val: 10000 },
 			{ name : "steel", val: 50 }
-		]
+		],
+		isUseless: function(game) {
+			return game.challenges.isActive("pacifism");
+		}
 	},{
 		name: "alloyArmor",
 		label: $I("workshop.alloyArmor.label"),
@@ -746,7 +848,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "science", val: 50000 },
 			{ name : "alloy", val: 25 }
-		]
+		],
+		isUseless: function(game) {
+			return game.challenges.isActive("pacifism");
+		}
 	},{
 		name: "nanosuits",
 		label: $I("workshop.nanosuits.label"),
@@ -757,7 +862,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "science", val: 185000 },
 			{ name : "alloy", val: 250 }
-		]
+		],
+		isUseless: function(game) {
+			return game.challenges.isActive("pacifism");
+		}
 	},{
 		name: "caravanserai",
 		label: $I("workshop.caravanserai.label"),
@@ -828,7 +936,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "gold", 	 val: 10 },
 			{ name : "science",  val: 500 }
-		]
+		],
+		isUseless: function(game) {
+			return game.village.getKittens() == 0 || game.challenges.isActive("anarchy");
+		}
 	},{
 		name: "strenghtenBuild",
 		label: $I("workshop.strenghtenBuild.label"),
@@ -963,6 +1074,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		unlocks: {
 			upgrades: ["automatedPlants"]
+		},
+		wants: {
+			buildings: ["calciner"]
 		}
 	},{
 		name: "automatedPlants",
@@ -975,9 +1089,13 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",  val: 200000 },
 			{ name : "alloy", val: 750 }
 		],
-        unlocks: {
+		unlocks: {
 			upgrades: ["nuclearPlants"]
 		},
+		isUseless: function(game) {
+			var calciners = game.bld.get("calciner");
+			return calciners.on == 0 || !calciners.isAutomationEnabled;
+		}
 	},{
 		name: "nuclearPlants",
 		label: $I("workshop.nuclearPlants.label"),
@@ -988,7 +1106,11 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "uranium", val: 10000 },
 			{ name : "science",  val: 250000 }
-		]
+		],
+		isUseless: function(game) {
+			var calciners = game.bld.get("calciner");
+			return calciners.on == 0 || !calciners.isAutomationEnabled;
+		}
 	},{
 		name: "rotaryKiln",
 		label: $I("workshop.rotaryKiln.label"),
@@ -1076,6 +1198,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		upgrades: {
 			buildings: ["steamworks"]
 		},
+		wants: {
+			upgrades: ["printingPress"]
+		},
 		flavor: $I("workshop.offsetPress.flavor")
 	},{
 		name: "photolithography",
@@ -1091,6 +1216,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			buildings: ["steamworks"]
+		},
+		wants: {
+			upgrades: ["printingPress"]
 		}
 	},{
 		name: "uplink",
@@ -1105,7 +1233,12 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "alloy", 	 val: 1750 }
 		],
 		upgrades: {
-		buildings: ["library", "biolab"]
+			buildings: ["library", "biolab"]
+		},
+		isUseless: function(game) {
+			var dataCenters = game.bld.get("library");
+			var bioLabs = game.bld.get("biolab");
+			return dataCenters.val == 0 || dataCenters.stage == 0 || bioLabs.val == 0;
 		}
 	},{
 		name: "starlink",
@@ -1121,6 +1254,14 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			buildings: ["library","biolab"]
+		},
+		isUseless: function(game) {
+			if (!game.workshop.get("uplink").researched) {
+				return true; //This upgrade does nothing without Uplink.
+			}
+			var dataCenters = game.bld.get("library");
+			var bioLabs = game.bld.get("biolab");
+			return dataCenters.val == 0 || dataCenters.stage == 0 || bioLabs.val == 0;
 		}
 	},{
 		name: "cryocomputing",
@@ -1134,6 +1275,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			buildings: ["library"]
+		},
+		wants: {
+			stages: [{bld: "library", stage: 1}]
 		}
 	},{
 		name: "machineLearning",
@@ -1149,6 +1293,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			buildings: ["library"]
+		},
+		wants: {
+			buildings: ["aiCore"],
+			stages: [{bld: "library", stage: 1}]
 		}
 	},
 	{
@@ -1161,6 +1309,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",  val: 10000 },
 			{ name : "gear", 	 val: 25 }
 		],
+		wants: {
+			buildings: ["steamworks"]
+		},
 		flavor: $I("workshop.factoryAutomation.flavor")
 	},{
 		name: "advancedAutomation",
@@ -1172,7 +1323,11 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",  val: 100000 },
 			{ name : "gear", 	 val: 75 },
 			{ name : "blueprint",  val: 25 }
-		]
+		],
+		isUseless: function(game) {
+			var steamworks = game.bld.get("steamworks");
+			return steamworks.on == 0 || !steamworks.isAutomationEnabled;
+		}
 	},{
 		name: "pneumaticPress",
 		label: $I("workshop.pneumaticPress.label"),
@@ -1183,7 +1338,11 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",  val: 20000 },
 			{ name : "gear", 	 val: 30 },
 			{ name : "blueprint",  val: 5 }
-		]
+		],
+		isUseless: function(game) {
+			var steamworks = game.bld.get("steamworks");
+			return steamworks.on == 0 || !steamworks.isAutomationEnabled;
+		}
 	},{
 		name: "combustionEngine",
 		label: $I("workshop.combustionEngine.label"),
@@ -1360,8 +1519,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		upgrades: {
 			buildings: ["observatory"]
 		},
-	},
-	{
+	}, {
 		name: "titaniumMirrors",
 		label: $I("workshop.titaniumMirrors.label"),
 		description: $I("workshop.titaniumMirrors.desc"),
@@ -1376,9 +1534,11 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		upgrades: {
 			buildings: ["library"]
 		},
+		wants: {
+			buildings: ["observatory"]
+		},
 		flavor: $I("workshop.titaniumMirrors.flavor")
-	},
-	{
+	}, {
 		name: "unobtainiumReflectors",
 		label: $I("workshop.unobtainiumReflectors.label"),
 		description: $I("workshop.unobtainiumReflectors.desc"),
@@ -1392,9 +1552,11 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			buildings: ["library"]
+		},
+		wants: {
+			buildings: ["observatory"]
 		}
-	},
-	{
+	}, {
 		name: "eludiumReflectors",
 		label: $I("workshop.eludiumReflectors.label"),
 		description: $I("workshop.eludiumReflectors.desc"),
@@ -1407,23 +1569,28 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			buildings: ["library"]
+		},
+		wants: {
+			buildings: ["observatory"]
 		}
-	},
-    {
-        name: "hydroPlantTurbines",
-        label: $I("workshop.hydroPlantTurbines.label"),
-        description: $I("workshop.hydroPlantTurbines.desc"),
-        effects: {
-            "hydroPlantRatio": 0.15
-        },
-        prices: [
-            {name: "unobtainium", val: 125},
-            {name: "science", val: 250000}
-        ],
-        upgrades: {
-            buildings: ["aqueduct"]
-        }
-    },{
+	}, {
+		name: "hydroPlantTurbines",
+		label: $I("workshop.hydroPlantTurbines.label"),
+		description: $I("workshop.hydroPlantTurbines.desc"),
+		effects: {
+			"hydroPlantRatio": 0.15
+		},
+		prices: [
+			{name: "unobtainium", val: 125},
+			{name: "science", val: 250000}
+		],
+		upgrades: {
+			buildings: ["aqueduct"]
+		},
+		wants: {
+			stages: [{bld: "aqueduct", stage: 1}]
+		}
+	}, {
 		name: "amBases",
 		label: $I("workshop.amBases.label"),
 		description: $I("workshop.amBases.desc"),
@@ -1447,6 +1614,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			spaceBuilding: ["moonBase"]
+		},
+		wants: {
+			buildings: ["aiCore"]
 		}
 	},{
 		name: "amFission",
@@ -1459,6 +1629,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		effects: {
 			"eludiumAutomationBonus" : 0.25
+		},
+		wants: {
+			crafts: ["eludium"] //Look for engineers specifically crafting eludium
 		}
 	},{
 		name: "amReactors",
@@ -1590,6 +1763,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			buildings: ["biolab"]
+		},
+		wants: {
+			upgrades: ["biofuel"]
 		}
 	},
 	//------------------- blueprints ----------------
@@ -1613,7 +1789,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "titanium", val: 250 },
 			{ name : "science",  val: 125000 }
-		]
+		],
+		isUseless: function(game) {
+			return game.challenges.isActive("blackSky");
+		}
 	},{
 		name: "logistics",
 		label: $I("workshop.logistics.label"),
@@ -1625,7 +1804,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",  val: 100000 },
 			{ name : "gear", val: 100 },
 			{ name : "scaffold",  val: 1000 }
-		]
+		],
+		isUseless: function(game) {
+			return game.village.getKittens() == 0 || game.challenges.isActive("anarchy");
+		}
 	},{
 		name: "augumentation",
 		label: $I("workshop.augumentation.label"),
@@ -1637,7 +1819,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "titanium", val: 5000 },
 			{ name : "uranium",  val: 50 },
 			{ name : "science",  val: 150000 }
-		]
+		],
+		isUseless: function(game) {
+			return game.village.getKittens() == 0 || game.challenges.isActive("anarchy");
+		}
 	},{
 		name: "internet",
 		label: $I("workshop.internet.label"),
@@ -1647,7 +1832,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "titanium", val: 5000 },
 			{ name : "uranium",  val: 50 },
 			{ name : "science",  val: 150000 }
-		]
+		],
+		isUseless: function(game) {
+			return game.village.getKittens() == 0;
+		}
 	},{
 		name: "neuralNetworks",
 		label: $I("workshop.neuralNetworks.label"),
@@ -1657,10 +1845,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "titanium", val: 7500 },
 			{ name : "science",  val: 200000 }
 		],
-		unlocks: {
-		},
-		upgrades: {
-			buildings: ["factory"]
+		wants: {
+			jobs: ["engineer"]
 		}
 	},{
 		name: "assistance",
@@ -1673,7 +1859,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science", val: 100000 },
 			{ name : "steel", val: 10000 },
 			{ name : "gear", val: 250 }
-		]
+		],
+		isUseless: function(game) {
+			return game.village.getKittens() == 0;
+		}
 	},{
 		name: "enrichedUranium",
 		label: $I("workshop.enrichedUranium.label"),
@@ -1734,6 +1923,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			buildings: ["reactor"]
+		},
+		isUseless: function(game) {
+			var reactors = game.bld.get("reactor");
+			return reactors.on == 0 || !reactors.isAutomationEnabled;
 		}
 	},
 	//------------------- starcharts / space ----------------
@@ -1751,6 +1944,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		unlocks: {
 			upgrades: ["satnav"]
+		},
+		isUseless: function(game) {
+			//Useful only if we have starchart income from a source other than astro events
+			return game.getResourcePerTick("starchart", true) < 0.001;
 		}
 	},
 	{
@@ -1763,20 +1960,26 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "science",  val: 200000 },
 			{ name : "alloy", 	 val: 750 }
-		]
-	},{
-        name: "satelliteRadio",
-        label: $I("workshop.satelliteRadio.label"),
-        description: $I("workshop.satelliteRadio.desc"),
-        effects: {
-            "broadcastTowerRatio" : 0.005
-        },
-        prices:[
-            { name : "science",  val: 225000 },
-            { name : "alloy", 	 val: 5000 }
-        ]
-    },
-	{
+		],
+		wants: {
+			spaceBuilding: ["sattelite"]
+		}
+	}, {
+		name: "satelliteRadio",
+		label: $I("workshop.satelliteRadio.label"),
+		description: $I("workshop.satelliteRadio.desc"),
+		effects: {
+			"broadcastTowerRatio" : 0.005
+		},
+		prices: [
+			{ name : "science",  val: 225000 },
+			{ name : "alloy", 	 val: 5000 }
+		],
+		wants: {
+			spaceBuilding: ["sattelite"],
+			stages: [{bld: "amphitheatre", stage: 1}]
+		}
+	}, {
 		name: "astrophysicists",
 		label: $I("workshop.astrophysicists.label"),
 		description: $I("workshop.astrophysicists.desc"),
@@ -1799,7 +2002,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "science",  val: 150000 },
 			{ name : "eludium", val: 50 }
-		]
+		],
+		wants: {
+			spaceBuilding: ["moonOutpost"]
+		}
 	},
 	{
 		name: "eludiumCracker",
@@ -1900,7 +2106,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
             { name : "titanium", val: 7500   },
             { name : "science",  val: 195000 },
             { name : "concrate", val: 125    }
-        ]
+        ],
+	   wants: {
+		buildings: ["factory"]
+	   }
     },
     //---------------- Void Space ---------------
     {
@@ -2410,6 +2619,102 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 	},
 
+	/**
+	 * Tests if an upgrade will be not-useful in the current game-state.
+	 * (Example: Upgrading Observatory effectiveness when we have 0 of that building? Useless!)
+	 * @param meta Metadata object for the item
+	 * @returns Boolean value.
+	 */
+	getIsUpgradeUseless: function(meta) {
+		if (typeof(meta.isUseless) === "function") {
+			return meta.isUseless(this.game);
+		}
+		//Else, there's no custom-defined uselessness function, so use a default one:
+
+		//If we have a wants table && we're missing ANY thing from that table, mark it as useless:
+		if (meta.wants) {
+			for (var type in meta.wants) {
+				if (meta.wants[type].length == 0) {
+					continue;
+				}
+				for (var i = meta.wants[type].length - 1; i >= 0; i--) {
+					var unlockID = meta.wants[type][i];
+					var stage = (typeof(unlockID) === "object" && typeof(unlockID.stage) === "number") ? unlockID.stage : undefined;
+					var item = this.game.getUnlockByName(unlockID, type);
+					if (!item){
+						console.error("unable to get unlock by [id]", meta.wants[type][i], "[type]", type);
+						continue;
+					}
+					if (this._getIsMissingItem(type, item, stage)) {
+						return true;
+					}
+				}
+			}
+		}
+
+		//If we have an upgrades table && we're missing EACH thing from that table, mark it as useless
+		if (meta.upgrades) {
+			var missingEach = true;
+			for (var type in meta.upgrades) {
+				if (meta.upgrades[type].length == 0) {
+					continue;
+				}
+				for (var i = meta.upgrades[type].length - 1; i >= 0; i--) {
+					var unlockID = meta.upgrades[type][i];
+					var stage = (typeof(unlockID) === "object" && typeof(unlockID.stage) === "number") ? unlockID.stage : undefined;
+					var item = this.game.getUnlockByName(unlockID, type);
+					if (!item){
+						console.error("unable to get unlock by [id]", meta.upgrades[type][i], "[type]", type);
+						continue;
+					}
+					if (!this._getIsMissingItem(type, item, stage)) {
+						missingEach = false;
+						break;
+					}
+				}
+				if (missingEach) {
+					break;
+				}
+			}
+			if (missingEach) {
+				return true;
+			}
+		}
+		//Else, we didn't find a situation where the upgrade is useless, so I guess it's not useless!
+		return false;
+	},
+
+	//stage is an optional parameter for staged buildings only
+	_getIsMissingItem: function(type, item, stage) {
+		switch(type) {
+			case "jobs":
+			case "crafts": //In the context of checking for wants, check if we have engineers crafting that item
+				return item.value == 0;
+			case "tabs":
+				return !item.visible;
+			case "planet":
+				return !item.reached;
+			case "stages":
+				//Match building stages exactly:
+				if (typeof(stage) === "number" && item.stage != stage) {
+					return true;
+				}
+				//Else, we have the correct stage, so check the count:
+				return item.on == 0;
+			default:
+				if (typeof(item.on) === "number") {
+					//Item is stackable; check if it's turned off.
+					//For the specific case of space missions, on is set to 0 if we haven't completed it yet.
+					return item.on == 0;
+				}
+				if (typeof(item.researched) === "boolean") {
+					return !item.researched;
+				}
+				//Else, it's something I haven't had the need to program in yet; just assume we have it:
+				return false;
+		}
+	},
+
 	getCraftPrice: function(craft) {
 		if (craft.name != "ship" && craft.name != "manuscript") {
 			return craft.prices;
@@ -2709,6 +3014,11 @@ dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearun
 		if (upgrade.researched && this.game.workshop.hideResearched){
 			model.visible = false;
 		}
+	},
+
+	updateEnabled: function(model) {
+		this.inherited(arguments);
+		model.uselessRightNow = this.game.workshop.getIsUpgradeUseless(model.metadata);
 	}
 });
 

@@ -850,6 +850,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		if ( this.domNode ){
 			var hasClass = dojo.hasClass(this.domNode, "disabled");
 			var hasClassLimited = dojo.hasClass(this.domNode, "limited");
+			var hasClassUseless = dojo.hasClass(this.domNode, "useless");
 			if (this.model.enabled){
 				if (hasClass){
 					dojo.removeClass(this.domNode, "disabled");
@@ -864,7 +865,14 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 				if (!hasClassLimited && this.model.resourceIsLimited){
 					dojo.addClass(this.domNode, "limited");
 				}
-			}			
+			}
+
+			if (this.model.uselessRightNow && !hasClassUseless) {
+				dojo.addClass(this.domNode, "useless");
+			}
+			if (!this.model.uselessRightNow && hasClassUseless) {
+				dojo.removeClass(this.domNode, "useless");
+			}
 		}
 		//---------------------------------------------------
 		//		a bit hackish place for price highlight
