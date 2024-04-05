@@ -1362,6 +1362,13 @@ ButtonModernHelper = {
 			}, tooltip);
 		}
 
+		if (model.uselessRightNow){
+			dojo.create("div", {
+				innerHTML: $I("btn.useless.tooltip"),
+				className: "desc small useless"
+			}, tooltip);
+		}
+
 		if (model.metadata && model.metadata.almostLimited){
 			dojo.create("div", {
 				innerHTML: $I("btn.almostlimited.tooltip"),

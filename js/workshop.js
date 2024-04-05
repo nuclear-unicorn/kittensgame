@@ -5,7 +5,6 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 	hideResearched: false,
 	hideUseless: false,
 
-
 	/***
 	 * isUseless OPTIONAL: Function that returns true if the upgrade isn't useful in the current game-state. If not defined, the game engine will try to figure it out on its own based on the upgrades & wants fields.
 	 * wants OPTIONAL: The item will be marked as "not useful in the current game-state" if we are missing ANY item from this table. (Has the same format as the upgrades table.)
@@ -2528,6 +2527,15 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		return null;
 	},
 
+	updateEffectCached: function() {
+		this.inherited(arguments);
+
+		for (var i = 0; i < this.upgrades.length; i++) {
+			var meta = this.upgrades[i];
+			meta.useless = this.getIsUpgradeUseless(meta);
+		}
+	},
+
 	resetState: function(){
 		for (var i = 0; i < this.upgrades.length; i++){
 			var upgrade = this.upgrades[i];
@@ -3014,7 +3022,7 @@ dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearun
 	updateVisible: function(model){
 		var upgrade = model.metadata;
 		model.visible = upgrade.unlocked;
-		model.uselessRightNow = this.game.workshop.getIsUpgradeUseless(model.metadata);
+		model.uselessRightNow = Boolean(upgrade.useless);
 
 		if (upgrade.researched && this.game.workshop.hideResearched){
 			model.visible = false;
