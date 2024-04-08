@@ -2051,7 +2051,8 @@ dojo.declare("classes.queue.manager", null,{
                 var upgrades = this.game.workshop.upgrades;
                 for (var i in upgrades){
                     var upgrade = upgrades[i];
-                    if (upgrade.unlocked && !upgrade.researched){
+                    if (upgrade.unlocked && !upgrade.researched &&
+                        !(this.game.workshop.hideUseless && upgrade.useless)){
                         options.push({
                             name: upgrade.name,
                             label: upgrade.label
