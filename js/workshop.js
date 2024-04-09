@@ -2458,8 +2458,11 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		}
 
 		if (meta.name == "compositeBow" || meta.name == "crossbow" || meta.name == "railgun") {
-			//These 3 upgrades are useless if the weapon efficiency debuff from Pacifism gets severe enough:
-			if (game.getEffect("weaponEfficency") < -0.9999) {
+			//These 3 upgrades are useless if the weapon efficiency debuff from Pacifism gets severe enough.
+			//(Note that the total effects might not be calculated correctly on the first tick after the game loads,
+			// but after a couple ticks it'll all work out.)
+			var pacifismTotalEffects = game.challenges.getChallenge("pacifism").totalEffectsCached;
+			if (pacifismTotalEffects && pacifismTotalEffects["weaponEfficency"] < -0.9999) {
 				return true;
 			}
 		}
