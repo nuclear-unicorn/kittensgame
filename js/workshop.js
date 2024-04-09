@@ -3070,10 +3070,10 @@ dojo.declare("com.nuclearunicorn.game.ui.ZebraUpgradeButtonController", com.nucl
 dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.ui.tab, {
 
 	tdTop: null,
-
 	craftBtns: null,
-
 	resTd: null,
+	toggleResearchedRow: null,
+	toggleUselessRow: null,
 
 	constructor: function(tabName, game){
 		this.game = game;
@@ -3092,37 +3092,38 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 		//--------------------------------------------------------------------
 
 		var checkboxContainer = dojo.create("div", {style: {marginLeft: "auto", marginRight: "0px"}}, div);
-		var toggleResearchedRow = dojo.create("div", {}, checkboxContainer);
-		var toggleUselessRow = dojo.create("div", {}, checkboxContainer);
+		this.toggleResearchedRow = dojo.create("div", {}, checkboxContainer);
+		this.toggleUselessRow = dojo.create("div", {}, checkboxContainer);
 
-		var groupCheckbox = dojo.create("input", {
+		var hideResearchedCheckbox = dojo.create("input", {
 			id: "toggleResearched",
 			type: "checkbox",
 			checked: this.game.workshop.hideResearched
-		}, toggleResearchedRow);
+		}, this.toggleResearchedRow);
 
-		dojo.connect(groupCheckbox, "onclick", this, function(){
+		dojo.connect(hideResearchedCheckbox, "onclick", this, function(){
 			this.game.workshop.hideResearched = !this.game.workshop.hideResearched;
 
 			dojo.empty(tabContainer);
 			this.render(tabContainer);
 		});
 		
-		var groupCheckbox2 = dojo.create("input", {
+		var hideUselessCheckbox = dojo.create("input", {
 			id: "toggleUseless",
 			type: "checkbox",
 			checked: this.game.workshop.hideUseless
-		}, toggleUselessRow);
+		}, this.toggleUselessRow);
 
-		dojo.connect(groupCheckbox2, "onclick", this, function(){
+		dojo.connect(hideUselessCheckbox, "onclick", this, function(){
 			this.game.workshop.hideUseless = !this.game.workshop.hideUseless;
 
 			dojo.empty(tabContainer);
 			this.render(tabContainer);
 		});
 
-		dojo.create("label", { innerHTML: $I("workshop.toggleResearched.label"), for: "toggleResearched"}, toggleResearchedRow);
-		dojo.create("label", { innerHTML: $I("workshop.toggleUseless.label"), for: "toggleUseless"}, toggleUselessRow);
+		dojo.create("label", { innerHTML: $I("workshop.toggleResearched.label"), for: "toggleResearched"}, this.toggleResearchedRow);
+		dojo.create("label", { innerHTML: $I("workshop.toggleUseless.label"), for: "toggleUseless"}, this.toggleUselessRow);
+
 		//---------------------------------------------------------------------
 
 		var upgradePanel = new com.nuclearunicorn.game.ui.Panel($I("workshop.upgradePanel.label"), this.game.workshop);
@@ -3242,6 +3243,9 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 
 	update: function(){
 		this.inherited(arguments);
+		
+		//Only show the "hide useless upgrades" thing if it has the possibility of being relevant this run:
+		dojo.style(this.toggleUselessRow, "display", dojo.some(this.game.workshop.upgrades, function(upgrade) { return upgrade.useless; }) ? "block" : "none" );
 
 		for (var i = this.craftBtns.length - 1; i >= 0; i--) {
 			var craftBtn = this.craftBtns[i];

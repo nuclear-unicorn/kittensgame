@@ -1364,7 +1364,7 @@ ButtonModernHelper = {
 
 		if (model.uselessRightNow){
 			dojo.create("div", {
-				innerHTML: $I("btn.useless.tooltip"),
+				innerHTML: $I("btn.upgrade.useless.tooltip"),
 				className: "desc small useless"
 			}, tooltip);
 		}

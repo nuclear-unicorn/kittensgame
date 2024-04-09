@@ -106,7 +106,7 @@
     "btn.sell": "Sell",
     "btn.sell.minor": "sell",
     "btn.trade": "Trade",
-    "btn.useless.tooltip": "Part or all of its effect is unavailable right now",
+    "btn.upgrade.useless.tooltip": "This upgrade is useless in the current challenge.",
     "btn.blocked.capital": "(Blocked)",
 
     "sell.all.confirmation.title": "",
