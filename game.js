@@ -4600,6 +4600,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			for (var i = 0; i < game.challenges.challenges.length; i++){
 				game.challenges.challenges[i].pending = false;
 			}
+			if(game.village.loadoutController.loadouts){
+				if(game.village.loadoutController.loadouts.length == 0){
+					game.village.loadoutController.toggleDefaultLoadouts();
+				}
+			}
 			game.resetAutomatic();
 		});
 	},
@@ -4906,6 +4911,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 		}
 		var reservesSaveData = this.challenges.reserves.getSaveData();
+
+		var loadouts = [];
+		for (var i in this.village.loadoutController.loadouts){
+			var _loadout = this.village.loadoutController.loadouts[i].save();
+			loadouts.push(_loadout);
+		}
+
 		var saveData = {
 			saveVersion: this.saveVersion,
 			game : lsData.game,
@@ -4961,6 +4973,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				jobs: [],
 				traits: [],
 				hadKittenHunters: false,
+				loadouts: loadouts
 			},
 			workshop: {
 				hideResearched: this.workshop.hideResearched,

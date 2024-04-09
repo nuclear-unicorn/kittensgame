@@ -237,6 +237,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		}
 		this.senators = [];
 		this.traits = [];
+		//this.loadouts = [];
+		this.loadoutController = new classes.village.LoadoutController(game);
 	},
 
 	getJob: function(jobName){
@@ -621,6 +623,12 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			kittens.push(_kitten);
 		}
 
+		var loadouts = [];
+		for (var i in this.loadoutController.loadouts){
+			var _loadout = this.loadoutController.loadouts[i].save();
+			loadouts.push(_loadout);
+		}
+
 		saveData.village = {
 			kittens : kittens,
 			maxKittens: this.maxKittens,
@@ -629,7 +637,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			currentBiome: this.map.currentBiome,
 			hadKittenHunters: this.sim.hadKittenHunters,
 			nextKittenProgress: this.sim.nextKittenProgress,
-			map: this.map.save()
+			map: this.map.save(),
+			loadouts: loadouts
 		};
 	},
 
@@ -671,6 +680,17 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			this.sim.nextKittenProgress = saveData.village.nextKittenProgress ||0;
 			if (saveData.village.map){
 				this.map.load(saveData.village.map);
+			}
+
+			var loadouts = saveData.village.loadouts;
+			this.loadoutController.loadouts = [];
+
+			for(var i in loadouts){
+				var loadout = loadouts[i];
+
+				var newLoadout = new com.nuclearunicorn.game.village.Loadout(this.game);
+				newLoadout.load(loadout);
+				this.loadoutController.loadouts.push(newLoadout);
 			}
 		}
 
@@ -2518,6 +2538,733 @@ dojo.declare("classes.village.KittenSim", null, {
 
 });
 
+dojo.declare("classes.village.LoadoutController", null, {
+
+	game: null,
+	loadouts: null,
+
+	defaultLoadouts: [{
+		title: $I("village.loadout.default.balanced.title"),
+		isDefault: true,
+		pinned: false,
+		leaderJob: "farmer",
+		leaderTrait: {
+			name: "engineer",
+			title: $I("village.trait.engineer")
+		},
+		jobs: [{
+			name: "woodcutter",
+			value: 1,
+		},{
+			name: "farmer",
+			value: 1,
+		},{
+			name: "scholar",
+			value: 1,
+		},{
+			name: "hunter",
+			value: 1,
+		},{
+			name: "miner",
+			value: 1,
+		},{
+			name: "priest",
+			value: 1,
+		},{
+			name: "geologist",
+			value: 1,
+		},{
+			name: "engineer",
+			value: 0,
+		}]
+	},{
+		title: $I("village.loadout.default.farming.title"),
+		isDefault: true,
+		pinned: false,
+		leaderJob: "farmer",
+		leaderTrait: {
+			name: "engineer",
+			title: $I("village.trait.engineer")
+		},
+		jobs: [{
+			name: "woodcutter",
+			value: 1,
+		},{
+			name: "farmer",
+			value: 5,
+		},{
+			name: "scholar",
+			value: 1,
+		},{
+			name: "hunter",
+			value: 1,
+		},{
+			name: "miner",
+			value: 1,
+		},{
+			name: "priest",
+			value: 1,
+		},{
+			name: "geologist",
+			value: 1,
+		},{
+			name: "engineer",
+			value: 0,
+		}]
+	},{
+		title: $I("village.loadout.default.gathering.title"),
+		isDefault: true,
+		pinned: false,
+		leaderJob: "woodcutter",
+		leaderTrait: {
+			name: "engineer",
+			title: $I("village.trait.engineer")
+		},
+		jobs: [{
+			name: "woodcutter",
+			value: 5,
+		},{
+			name: "farmer",
+			value: 2,
+		},{
+			name: "scholar",
+			value: 1,
+		},{
+			name: "hunter",
+			value: 1,
+		},{
+			name: "miner",
+			value: 5,
+		},{
+			name: "priest",
+			value: 1,
+		},{
+			name: "geologist",
+			value: 0,
+		},{
+			name: "engineer",
+			value: 0,
+		}]
+	},{
+		title: $I("village.loadout.default.hunting.title"),
+		isDefault: true,
+		pinned: false,
+		leaderJob: "hunter",
+		leaderTrait: {
+			name: "manager",
+			title: $I("village.trait.manager")
+		},
+		jobs: [{
+			name: "woodcutter",
+			value: 1,
+		},{
+			name: "farmer",
+			value: 2,
+		},{
+			name: "scholar",
+			value: 1,
+		},{
+			name: "hunter",
+			value: 10,
+		},{
+			name: "miner",
+			value: 1,
+		},{
+			name: "priest",
+			value: 1,
+		},{
+			name: "geologist",
+			value: 0,
+		},{
+			name: "engineer",
+			value: 0,
+		}]
+	},{
+		title: $I("village.loadout.default.research.title"),
+		isDefault: true,
+		pinned: false,
+		leaderJob: "scholar",
+		leaderTrait: {
+			name: "scientist",
+			title: $I("village.trait.scientist")
+		},
+		jobs: [{
+			name: "woodcutter",
+			value: 1,
+		},{
+			name: "farmer",
+			value: 2,
+		},{
+			name: "scholar",
+			value: 10,
+		},{
+			name: "hunter",
+			value: 1,
+		},{
+			name: "miner",
+			value: 1,
+		},{
+			name: "priest",
+			value: 1,
+		},{
+			name: "geologist",
+			value: 0,
+		},{
+			name: "engineer",
+			value: 0,
+		}]
+	},{
+		title: $I("village.loadout.default.religion.title"),
+		isDefault: true,
+		pinned: false,
+		leaderJob: "priest",
+		leaderTrait: {
+			name: "wise",
+			title: $I("village.trait.wise")
+		},
+		jobs: [{
+			name: "woodcutter",
+			value: 1,
+		},{
+			name: "farmer",
+			value: 2,
+		},{
+			name: "scholar",
+			value: 1,
+		},{
+			name: "hunter",
+			value: 1,
+		},{
+			name: "miner",
+			value: 1,
+		},{
+			name: "priest",
+			value: 10,
+		},{
+			name: "geologist",
+			value: 0,
+		},{
+			name: "engineer",
+			value: 0,
+		}]
+	},{
+		title: $I("village.loadout.default.trade.title"),
+		isDefault: true,
+		pinned: false,
+		leaderJob: "geologist",
+		leaderTrait: {
+			name: "merchant",
+			title: $I("village.trait.merchant")
+		},
+		jobs: [{
+			name: "woodcutter",
+			value: 1,
+		},{
+			name: "farmer",
+			value: 2,
+		},{
+			name: "scholar",
+			value: 1,
+		},{
+			name: "hunter",
+			value: 5,
+		},{
+			name: "miner",
+			value: 1,
+		},{
+			name: "priest",
+			value: 1,
+		},{
+			name: "geologist",
+			value: 5,
+		},{
+			name: "engineer",
+			value: 0,
+		}]
+	},{
+		title: $I("village.loadout.default.metallurgy.title"),
+		isDefault: true,
+		pinned: false,
+		leaderJob: "geologist",
+		leaderTrait: {
+			name: "metallurgist",
+			title: $I("village.trait.metallurgist")
+		},
+		jobs: [{
+			name: "woodcutter",
+			value: 1,
+		},{
+			name: "farmer",
+			value: 2,
+		},{
+			name: "scholar",
+			value: 1,
+		},{
+			name: "hunter",
+			value: 1,
+		},{
+			name: "miner",
+			value: 5,
+		},{
+			name: "priest",
+			value: 1,
+		},{
+			name: "geologist",
+			value: 5,
+		},{
+			name: "engineer",
+			value: 0,
+		}]
+	}],
+	
+	constructor: function(game){
+		this.loadouts = [];
+		this.game = game;
+	},
+
+	toggleDefaultLoadouts: function(){
+
+		var showLoadout = true;
+
+		for(var i = this.loadouts.length - 1; i >= 0; i--){
+			var loadout = this.loadouts[i];
+			if (loadout.isDefault){
+				showLoadout = false;
+				this.loadouts.splice(i, 1);
+			}
+		}
+
+		if(showLoadout){
+			for(var i = this.defaultLoadouts.length - 1; i >= 0; i--){
+				var defaultLoadout = this.defaultLoadouts[i];
+				var newLoadout = new com.nuclearunicorn.game.village.Loadout(this.game, true);
+				for(var j in defaultLoadout){
+					var property = defaultLoadout[j];
+					newLoadout[j] = property;
+				}
+				this.loadouts.unshift(newLoadout);
+			}
+		}
+		this.game.render();
+	}
+
+	}),
+
+dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
+
+	game: null,
+	title: null,
+
+	jobs: null,
+	leaderTrait: null,
+	leaderJob: null,
+	engineerJobs: null,
+	pinned: false,
+	isDefault: false,
+
+	constructor: function(game, isDefault){
+
+		this.game = game;
+		this.jobs = [];
+		this.engineerJobs = [];
+
+		if(!isDefault){
+			this.saveLoadout();
+		}
+		
+	},
+
+	save: function() {
+
+		var saveJobs = {};
+		for (var i in this.jobs){
+			if (this.jobs[i].value > 0){
+				saveJobs[i] = this.jobs[i];
+			}
+		}
+
+		var saveEngineerJobs = {};
+		for (var i in this.engineerJobs){
+			if (this.engineerJobs[i].value > 0){
+				saveEngineerJobs[i] = this.engineerJobs[i];
+			}
+		}
+
+		return {
+			title: this.title,
+			jobs: saveJobs,
+			engineerJobs: saveEngineerJobs,
+			leaderTrait: this.leaderTrait,
+			pinned: this.pinned,
+			isDefault: this.isDefault
+		};
+	},
+
+	load: function(data) {
+		this.title = 	data.title;
+		this.jobs = 	data.jobs;
+		this.engineerJobs = data.engineerJobs;
+		this.leaderTrait = data.leaderTrait;
+		this.pinned = 	data.pinned;
+		this.isDefault = data.isDefault;
+	},
+
+	saveLoadout: function(setDefault) {
+
+		if(setDefault){
+			this.isDefault = false;
+		}
+
+		this.jobs = [];
+		this.engineerJobs = [];
+
+		if(this.game.village.leader){
+			this.leaderTrait = this.game.village.leader.trait;
+		}
+
+		for (var i in this.game.village.jobs) {
+			var job = this.game.village.jobs[i];
+			if (job.unlocked) {
+				this.jobs.push({name: job.name, value: job.value});
+			}
+		}	
+
+		if(this.jobs && !this.title){
+			var tempJobs = Object.create(this.jobs);
+			tempJobs = tempJobs.sort(function(a, b){return b.value - a.value;});
+			if(tempJobs[0].value > 0){
+				this.title = this.game.village.getJob(tempJobs[0].name).title;
+			} else {
+				this.title = $I("village.btn.loadout.empty");
+			}
+		}
+		
+
+		if (this.game.village.getJob("engineer").unlocked) {
+			var crafts = this.game.workshop.crafts;
+			for (var i = crafts.length - 1; i >= 0; i--) {
+				if(crafts[i].value > 0) {
+				this.engineerJobs.push({craft: crafts[i].name, value: crafts[i].value});
+				}
+			}
+		}
+	},
+
+	setLoadout: function(setLeader) {
+		this.game.village.clearJobs(true);
+		var kittens = this.game.village.sim.kittens;
+		var loadoutJobsSum = 0;
+		var jobsFiltered = [];
+
+		for (var i in this.jobs) {
+			var job = this.jobs[i];
+
+			if(this.game.village.getJob(job.name).unlocked && job.value > 0) {				
+				loadoutJobsSum += job.value;
+				jobsFiltered.push({name : job.name, value : job.value});
+			}
+		}
+		var jobRatio = kittens.length / loadoutJobsSum;
+
+		var limitedJobs = 0;
+		for(i in jobsFiltered) {	//Check the filtered jobs if they are limited (engineers) and if the kittens assigned would be over the limit, assign the limit and remove the job from the filter
+			job = jobsFiltered[i];
+			var jobLimit = this.game.village.getJobLimit(job.name);
+			if(jobLimit < job.value * jobRatio){
+				this.game.village.assignJob(this.game.village.getJob(job.name), jobLimit);
+				loadoutJobsSum -= job.value;
+				jobsFiltered.splice(jobsFiltered.indexOf(job), 1);			
+				limitedJobs += jobLimit;
+			}
+		}
+
+		//Assign jobs
+
+		jobRatio = (kittens.length - limitedJobs) / loadoutJobsSum;
+
+		jobsFiltered.sort(function(a, b){return b.value - a.value;});	//Sort the jobs, so the job with the most weight gets the most priority
+
+		for (var i in jobsFiltered){	//Assign 1 kitten to each job so at least one worker is assigned.
+			this.game.village.assignJob(this.game.village.getJob(jobsFiltered[i].name), 1);
+		}
+
+		
+		for (var i in jobsFiltered) {
+			job = jobsFiltered[i];
+
+			var valueFiltered = Math.floor(jobRatio * (job.value)) - 1;
+			if(valueFiltered > 0){
+				this.game.village.assignJob(this.game.village.getJob(job.name), valueFiltered);
+			}			
+		}
+
+		var freeKittens = this.game.village.getFreeKittens();
+		
+		if(freeKittens && jobsFiltered.length) { //Assign remaining kittens due to Math.floor, adding to the lowest values first
+			for (var i in jobsFiltered) {
+				if (freeKittens > 0){
+					job = jobsFiltered[i];
+					this.game.village.assignJob(this.game.village.getJob(job.name), 1);
+					freeKittens--;
+				} else {
+					break;
+				}				
+			}
+		}
+
+		//Assign engineers
+
+		var craftsFiltered = [];
+		var craftsSum = 0;
+		for (var i in this.engineerJobs) {
+			var engineerJob = this.engineerJobs[i];
+
+			if(this.game.workshop.getCraft(engineerJob.craft).unlocked && engineerJob.value > 0) {
+				craftsSum += engineerJob.value;
+				craftsFiltered.push(engineerJob);
+			}
+		}
+
+		var engineerRatio = this.game.village.getFreeEngineers() / craftsSum;
+
+		craftsFiltered.sort(function(a, b){return b.value - a.value;});
+
+		for (var i in craftsFiltered){
+			this.assignCraftJob(this.game.workshop.getCraft(craftsFiltered[i].craft), 1);
+		}
+
+		for (var i in craftsFiltered) {
+			var craft = craftsFiltered[i];
+
+			var craftValueFiltered = Math.floor(engineerRatio * (craft.value)) - 1;
+			if(craftValueFiltered > 0){
+				this.assignCraftJob(this.game.workshop.getCraft(craft.craft), craftValueFiltered);
+			}
+		}
+
+		var freeEngineers = this.game.village.getFreeEngineers();
+
+		if(freeEngineers && craftsFiltered.length) { //Assign remaining kittens due to Math.floor, adding to the lowest values first			
+			for (var i in craftsFiltered) {
+				if (freeEngineers > 0){
+					this.assignCraftJob(this.game.workshop.getCraft(craftsFiltered[i].craft), 1);
+					freeEngineers--;
+				} else {
+					break;
+				}				
+			}
+		}
+
+		//Assign leader
+
+		if(setLeader && this.leaderTrait) {
+			var theocracy = this.game.science.getPolicy("theocracy");
+			var tempKitten = null;
+			for(var i in kittens) {
+				if (kittens[i].trait.name == this.leaderTrait.name) {
+					if((theocracy.researched) && (kittens[i].job != theocracy.requiredLeaderJob)){
+						continue;
+					}
+
+					if(kittens[i].job == this.leaderJob){
+						this.makeLeader(kittens[i]);
+						tempKitten = null;
+						break;
+					} else if (!tempKitten){
+						tempKitten = kittens[i];
+					}		
+					
+				}
+			}
+			if(tempKitten){
+				this.makeLeader(tempKitten);
+			}
+		}
+
+		this.game.render();
+	},
+
+	assignCraftJob: function(craft, value) {
+
+		var valueCorrected = this.game.village.getFreeEngineers() > value ? value : this.game.village.getFreeEngineers();
+
+		var valueAdded = 0;
+		for (var i = 0; i < valueCorrected; i++) {
+			var success = this.game.village.sim.assignCraftJob(craft);
+
+			if (success) {
+				valueAdded += 1;
+			} else {
+				break;
+			}
+		}
+		craft.value += valueAdded;
+	},
+
+	makeLeader: function(kitten){
+		var theocracy = this.game.science.getPolicy("theocracy");
+		if((theocracy.researched) && (kitten.job != theocracy.requiredLeaderJob)){
+			var jobTitle = this.game.village.getJob(theocracy.requiredLeaderJob).title;
+			this.game.msg($I("msg.policy.kittenNotMadeLeader", [theocracy.label, jobTitle]), "important");
+             //can't assign non-priest leaders if orderOfTheStars is researched
+			return;
+		}
+		var game = this.game;
+		if (game.village.leader){
+			game.village.leader.isLeader = false;
+		}
+
+		kitten.isLeader = true;
+		game.village.leader = kitten;
+	},
+
+	renameLoadout: function(){
+		var textToDisplay = prompt("", this.title);
+		if(!textToDisplay) {
+			return;
+		}
+		textToDisplay = textToDisplay.substring(0,25);
+		this.title = textToDisplay;
+		this.game.render();
+	},
+
+	getLoadoutJobsSum: function(){
+		var loadoutJobsSum = 0;
+		for (var i in this.jobs){
+			var job = this.jobs[i];
+			loadoutJobsSum += job.value;
+		}
+		return loadoutJobsSum;
+	},
+
+	getLoadoutEngineerJobsSum: function(){
+		var engineerJobsSum = 0;
+		for (var i in this.engineerJobs){
+			var job = this.engineerJobs[i];
+			engineerJobsSum += job.value;
+		}
+		return engineerJobsSum;
+	}
+
+});
+
+dojo.declare("com.nuclearunicorn.game.ui.LoadoutButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
+
+	defaults: function() {
+		var result = this.inherited(arguments);
+		result.tooltipName = true;
+		return result;
+	},
+
+	clickHandler: function(model) {
+		model.options.loadout.setLoadout(true);
+	},
+
+	getDescription: function(model) {
+		var loadout = model.options.loadout;
+		var jobText = "";
+		var textToDisplay = "";
+
+		if(loadout.leaderTrait){
+			textToDisplay += $I("village.loadout.desc", [loadout.leaderTrait.title]);
+		}
+
+		var loadoutJobsSum = loadout.getLoadoutJobsSum();
+		for (var i in loadout.jobs){
+			var job = loadout.jobs[i];
+			if (job.value > 0){
+				jobText += "<br>" + this.game.village.getJob(job.name).title + ": " + this.game.getDisplayValueExt(job.value / loadoutJobsSum * 1e2, "", false, 2, "%");
+			}
+		}
+		textToDisplay += $I("village.loadout.desc2", [jobText]);
+
+		var engineerText = "";
+		for(var i in loadout.engineerJobs){
+			var engineerJob = loadout.engineerJobs[i];
+			var engineerJobsSum = loadout.getLoadoutEngineerJobsSum();
+			if (engineerJob.value > 0){
+				engineerText += "<br>" + this.game.workshop.getCraft(engineerJob.craft).label + ": " + this.game.getDisplayValueExt(engineerJob.value / engineerJobsSum * 1e2, "", false, 2, "%");
+			}
+		}
+		
+		if(engineerText) {
+			textToDisplay += $I("village.loadout.desc3", [engineerText]);
+		}
+		
+        return textToDisplay;
+    },
+
+
+
+	fetchModel: function(options){
+		var model = this.inherited(arguments);
+		var self = this;
+		var loadout = model.options.loadout;
+		model.editLinks = [
+			{
+				id: "save",
+				title: $I("village.btn.loadout.save"),
+				handler: function(){
+					self.saveLoadout(loadout);
+				}
+			},{
+				id: "rename",
+				title: $I("village.btn.loadout.rename"),
+				handler: function(){
+					self.renameLoadout(loadout);
+				}
+			},{
+				id: "delete",
+				title: $I("village.btn.loadout.delete"),
+				handler: function(){
+					if (this.game.opts.noConfirm) {
+						self.deleteLoadout(loadout);
+					} else {
+						this.game.ui.confirm("", $I("village.btn.loadout.delete.confirm"), function() {
+						self.deleteLoadout(loadout);
+						});
+					}					
+				}
+			}];
+		model.pinLink = {
+			title: loadout.pinned ? "[v]" : "[ ]",
+			handler: function(){
+				loadout.pinned = !loadout.pinned;
+				this.game.render();
+			}
+		};
+		return model;
+	},
+
+	
+
+	deleteLoadout: function(loadout){
+		var loadouts = this.game.village.loadoutController.loadouts;
+		loadouts.splice(loadouts.indexOf(loadout), 1);
+		this.game.render();
+	},
+
+	saveLoadout: function(loadout){
+		var loadouts = this.game.village.loadoutController.loadouts;
+		loadouts[loadouts.indexOf(loadout)].saveLoadout(true);
+	},
+
+	renameLoadout: function(loadout){
+		var loadouts = this.game.village.loadoutController.loadouts;
+		loadouts[loadouts.indexOf(loadout)].renameLoadout();
+	}
+});
+
+dojo.declare("com.nuclearunicorn.game.ui.LoadoutButton", com.nuclearunicorn.game.ui.ButtonModern, {
+
+	renderLinks: function(){
+
+		this.editLinks = this.addLinkList(this.model.editLinks);
+		this.pinLink = this.addLink(this.model.pinLink);
+
+	}
+});
+
 dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 
 	defaults: function() {
@@ -3196,6 +3943,15 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		return btn;
 	},
 
+	createLoadoutBtn: function(loadout, game) {
+		var btn = new com.nuclearunicorn.game.ui.LoadoutButton({
+			name : loadout.title,
+			loadout : loadout,
+			controller: new com.nuclearunicorn.game.ui.LoadoutButtonController(game)
+		}, game);
+		return btn;
+	},
+
 	render: function(tabContainer){
 		this.advModeButtons = [];
 		this.buttons = [];
@@ -3212,6 +3968,11 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 			width: "100%"
 		}}, jobsPanelContainer);
 
+		var loadoutDiv = dojo.create("div", { className: "loadout",
+			style:{
+				float: "right",
+				width: "50%",
+		}}, jobsPanelContainer);
 
 		//-----------------------------------------------------------
 		for (var i = 0; i < this.game.village.jobs.length; i++){
@@ -3242,15 +4003,95 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		}, this.game);
 		btn.render(jobsPanelContainer);
 		this.addButton(btn);
+
+		//------------------------------------------------------------
+
+		var defaultOn = false;
+		for (var i = 0; i < this.game.village.loadoutController.loadouts.length; i++){
+			var loadout = this.game.village.loadoutController.loadouts[i];
+			if(loadout.isDefault){
+				defaultOn = true;
+			}
+
+			var btn = this.createLoadoutBtn(loadout, this.game);
+
+			btn.updateEnabled();
+			btn.updateVisible();
+
+			btn.render(loadoutDiv);
+			this.addButton(btn);
+		}
+
+		this.deleteAllLoadoutHref = dojo.create("a", { // Delete all loadouts
+			href: "#", innerHTML: $I("village.loadout.delete.all"),
+			className: "loadoutHref",
+			style: {
+				float: "right"
+			},
+			title: "Delete all loadouts"
+		}, loadoutDiv);
+
+		dojo.connect(this.deleteAllLoadoutHref, "onclick", this,  function(){
+			this.game.ui.confirm("", $I("village.loadout.delete.all.confirm"), function() {
+				this.game.village.loadoutController.loadouts = [];
+				this.game.render();
+			});
+		});
+
+		var toggleText = $I("village.loadout.show.default");
+		if(defaultOn){
+			toggleText = $I("village.loadout.remove.default");
+		}
+
+		this.toggleDefaultLoadoutHref = dojo.create("a", { // Restore all default loadouts
+			href: "#", innerHTML: toggleText,
+			className: "loadoutHref",
+			title: "Default loadouts"
+		}, loadoutDiv);
+
+		dojo.connect(this.toggleDefaultLoadoutHref, "onclick", this,  function(){
+			this.game.village.loadoutController.toggleDefaultLoadouts();
+		});
+		
+		var bottomDiv = dojo.create("div", { //HACK, stops the loadout buttons from overflowing
+			style:{
+				float: "bottom",
+				clear: "both"
+		}}, jobsPanelContainer);
+
 		//------------------------------------------------------------
 
 		dojo.create("tr", null, table);
 
-		var tdTop = dojo.create("td", { colspan: 2 },
-			dojo.create("tr", null, table));
+		var row = dojo.create("tr", null, table);
+
+		var tdTop = dojo.create("td", { colspan: 2, width: "50%" },
+			row);
 
 		this.tdTop = tdTop;
 
+		var tdTop2 = dojo.create("td", null, row);
+		tdTop2.innerHTML = $I("village.loadout.title");
+
+		this.createLoadoutHref = dojo.create("a", {
+			href: "#", innerHTML: $I("village.loadout.create"),
+			className: "loadoutHref",
+			style: {
+				float: "right"
+			},
+			title: "Create Loadout"
+		}, tdTop2);
+
+		dojo.connect(this.createLoadoutHref, "onclick", this,  function(){
+			this.game.village.loadoutController.loadouts.push(new com.nuclearunicorn.game.village.Loadout(this.game));
+			this.game.render();
+		});
+
+		if (!this.game.prestige.getPerk("engeneering").researched){
+			loadoutDiv.style.visibility = "hidden";
+			tdTop2.style.visibility = "hidden";
+		}
+		
 		//--------------------------	map ---------------------------
 		var isMapVisible = this.game.getFeatureFlag("VILLAGE_MAP") && this.game.science.get("archery").researched/* &&
 			this.game.resPool.get("paragon").value >= 5*/;
