@@ -2920,6 +2920,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 
 		if(this.game.village.leader){
 			this.leaderTrait = this.game.village.leader.trait;
+			this.leaderJob = this.game.village.leader.job;
 		}
 
 		for (var i in this.game.village.jobs) {
@@ -3220,7 +3221,7 @@ dojo.declare("com.nuclearunicorn.game.ui.LoadoutButtonController", com.nuclearun
 					if (this.game.opts.noConfirm) {
 						self.deleteLoadout(loadout);
 					} else {
-						this.game.ui.confirm("", $I("village.btn.loadout.delete.confirm"), function() {
+						this.game.ui.confirm("", $I("village.btn.loadout.delete.confirm", [model.options.loadout.title]), function() {
 						self.deleteLoadout(loadout);
 						});
 					}					
