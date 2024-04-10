@@ -3058,7 +3058,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 
 		//Assign leader
 
-		if(setLeader && this.leaderTrait) {
+		if(setLeader && this.leaderTrait && !this.game.challenges.isActive("anarchy")) {
 			var theocracy = this.game.science.getPolicy("theocracy");
 			var tempKitten = null;
 			for(var i in kittens) {
