@@ -1364,7 +1364,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 2100}
         ],
         effects:{
-			"religionUpgradesDiscount" : -0.1
+			"cultureFromManuscripts": -0.25,
+			"faithFromManuscripts": 1
         },
         unlocked: false,
         blocked: false,
@@ -1715,7 +1716,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
 		isRelation: true,
-        blocks:["dragonRelationsAstrologers"],
+        blocks:["dragonRelationsAstrologers", "dragonRelationsDynamicists"],
 		upgrades: {
 			buildings: ["harbor"]
 		},
@@ -1736,11 +1737,33 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
 		isRelation: true,
-        blocks:["dragonRelationsPhysicists"],
+        blocks:["dragonRelationsPhysicists", "dragonRelationsDynamicists"],
 		calculateEffects: function(self, game) {
 			var cycle = game.calendar.cycleYear + 1;
 			self.effects["starEventChance"] = cycle * 0.004;
 			self.effects["starchartPolicyRatio"] = cycle * 0.03;
+		},
+		evaluateLocks: function(game){
+			return game.science.checkRelation("dragons", 10);
+		}
+	}, {
+		name: "dragonRelationsDynamicists",
+        label: $I("policy.dragonRelationsDynamicists.label"),
+        description: $I("policy.dragonRelationsDynamicists.desc"),
+        prices: [
+            {name : "culture", val: 30000}
+        ],
+		effects:{
+			"tradeCatpowerDiscount": 5,
+			"huntCatpowerDiscount": 10,
+			"catpowerReductionRatio": 0.5,
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["dragonRelationsPhysicists", "dragonRelationsAstrologers"],
+		calculateEffects: function(self, game) {
+			
 		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("dragons", 10);
@@ -2141,9 +2164,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 	},
 
 	checkRelation: function(race, embassyNeeded){
-		var race = this.game.diplomacy.get(race); //Standing Ratio removed for now as standing calculations don't seem to work correctly on load. Also could be interpreted as making them work if they don't like you.
-		return (race.embassyLevel >= embassyNeeded /*&& race.standing + this.game.getEffect("standingRatio") +
-		this.game.diplomacy.calculateStandingFromPolicies(race.name, this.game) >= 0*/);
+		var race = this.game.diplomacy.get(race);
+		return (race.embassyLevel >= embassyNeeded);
 	},
 
 	unlockRelations: function(){ //Called on load and every time we buy an embassy to unlock Relations.
