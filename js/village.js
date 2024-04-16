@@ -1083,6 +1083,7 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 	//obsolete
 	isSenator: false,
 
+	favorite: false,
 
 	constructor: function(){
 		this.name = this.names[this.rand(this.names.length)];
@@ -1145,6 +1146,7 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 		this.color = 	data.color || 0;
 		this.variety = 	data.variety || 0;
 		this.rarity = data.rarity || 0;
+		this.favorite = data.favorite || false;
 
 		for (var job in this.skills) {
 			if (this.skills[job] > 20001) {
@@ -1181,6 +1183,7 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 		this.isLeader = data.isLeader || false;
 		this.isSenator = false;
 		this.isAdopted = data.isAdopted || false;
+		this.favorite = data.favorite || false;
 	},
 
 	/**
@@ -1224,7 +1227,8 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 			engineerSpeciality: this.engineerSpeciality || undefined,
 			rank: this.rank || undefined,
 			isLeader: this.isLeader || undefined,
-			isAdopted: this.isAdopted || undefined
+			isAdopted: this.isAdopted || undefined,
+			favorite: this.favorite || undefined
 		};
 	},
 
@@ -1260,7 +1264,8 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 			engineerSpeciality: this.engineerSpeciality || undefined,
 			rank: this.rank || undefined,
 			isLeader: this.isLeader || undefined,
-			isAdopted: this.isAdopted || undefined
+			isAdopted: this.isAdopted || undefined,
+			favorite: this.favorite || undefined
 		};
 		// Custom sur/names
 		if (nameIndex <= 0 || surnameIndex <= 0) {
@@ -2254,6 +2259,41 @@ dojo.declare("classes.village.KittenSim", null, {
 		this.kittens.sort(function(a,b) {
 			var rankDiff = a.rank - b.rank;
 			return rankDiff != 0 ? rankDiff : a.exp - b.exp;
+		});
+	},
+
+	sortKittensByFavorite: function(){
+		this.sortKittensByExp();
+		this.kittens.sort(function(a,b) {
+			if(a.favorite == b.favorite){
+				return 0;
+			} else {
+				return a.favorite? 1 : -1;
+			}
+		});
+	},
+
+	sortKittensByColor: function(){
+		this.sortKittensByExp();
+		this.kittens.sort(function(a,b) {
+			if(a.color || b.color){
+				if(a.color && b.color){
+					return 0;
+				}
+				return a.color? 1 : -1;
+			}
+		});
+	},
+
+	sortKittensByVariety: function(){
+		this.sortKittensByExp();
+		this.kittens.sort(function(a,b) {
+			if(a.variety || b.variety) {
+				if(a.variety && b.variety){
+					return 0;
+				}
+				return a.variety? 1 : -1;
+			}
 		});
 	},
 
@@ -3436,6 +3476,21 @@ dojo.declare("classes.ui.village.Census", null, {
 
 	filterJob: null,
 	filterTrait: null,
+	startKitten: 0,
+	sortKittens: null,
+	sortOptions: [{
+		name: "exp",
+		title: $I("village.census.sort.exp")
+	},{
+		name: "favorite",
+		title: $I("village.census.sort.favorite")
+	},{
+		name: "color",
+		title: $I("village.census.sort.color")
+	},{
+		name: "variety",
+		title: $I("village.census.sort.variety")
+	}],
 
 	constructor: function(game){
 		this.game = game;
@@ -3474,6 +3529,7 @@ dojo.declare("classes.ui.village.Census", null, {
 
 		dojo.connect(traitSelect, "onchange", this, function (event) {
 			this.filterTrait = event.target.value;
+			this.startKitten = 0;
 			this.render(this.container);
 		});
 
@@ -3495,20 +3551,78 @@ dojo.declare("classes.ui.village.Census", null, {
 
 		dojo.connect(jobSelect, "onchange", this, function(event){
 			var job = event.target.value;
+			this.startKitten = 0;
 			this.filterJob = job;
 			this.render(this.container);
 		});
 
-		var kittensLimit = 0;
+		//--------------- sorting -----------------
+
+		var selectSorting = dojo.create("select", { style: {float: "right" }}, navbar);
+
+		for (var i = 0; i < this.sortOptions.length; i++){
+			var option = this.sortOptions[i];
+			dojo.create("option", { value: option.name, innerHTML: option.title, selected: (option.name == this.sortKittens)}, selectSorting);
+		}
+
+		dojo.connect(selectSorting, "onchange", this, function(event){
+			var sorting = event.target.value;
+			this.sortKittens = sorting;
+			this.startKitten = 0;
+			this.render(this.container);
+		});
 
 		var sim = this.game.village.sim;
-		sim.sortKittensByExp();
+		if(!this.sortKittens){
+			sim.sortKittensByExp(); //When switching to this tab, the default sorting is used.
+		}
 
-		for (var i = sim.kittens.length - 1; i >= 0 && kittensLimit < 10; i--) {
+		switch (this.sortKittens) {
+			case "exp":
+				sim.sortKittensByExp();
+				break;
+			case "favorite":
+				sim.sortKittensByFavorite();
+				break;
+			case "color":
+				sim.sortKittensByColor();
+				break;
+			case "variety":
+				sim.sortKittensByVariety();
+		}
+
+		var filterKittens = 0;
+		var start = this.startKitten;
+		// Filters work differently from sorting as they skip kittens, because of this a workaround is used
+		if(this.filterJob || this.filterTrait){
+			filterKittens = sim.kittens.length;
+			for(var i in sim.kittens){
+				var kitten = sim.kittens[i];
+				if ((this.filterJob && kitten.job !== this.filterJob) || (this.filterTrait && kitten.trait.name !== this.filterTrait)) {
+					filterKittens--;
+				}				
+			}
+			
+			var maxStart = Math.floor(filterKittens / 10) * 10;
+			filterKittens = Math.floor(Math.min(this.startKitten, filterKittens) / 10) * 10;
+			if (filterKittens == maxStart && filterKittens > 0){ //Used to prevent empty pages
+				filterKittens -= 10;
+			}
+			this.startKitten = filterKittens;
+			start = 0;
+		}
+
+		var kittensLimit = 0;
+				
+		for (var i = sim.kittens.length - (1 + start); i >= 0 && kittensLimit < 10; i--) {
 
 			var kitten = sim.kittens[i];
 
 			if ((this.filterJob && kitten.job !== this.filterJob) || (this.filterTrait && kitten.trait.name !== this.filterTrait)) {
+				continue;
+			}
+			if(filterKittens > 0){
+				filterKittens--;
 				continue;
 			}
 
@@ -3548,6 +3662,15 @@ dojo.declare("classes.ui.village.Census", null, {
 				}, linksDiv);
 			}
 
+			var favoriteHref = dojo.create("a", {
+				href: "#", innerHTML: "",
+				className: "favoriteHref",
+				style: {
+					float: "right"
+				},
+				title: "Favorite kitten"
+			}, linksDiv);
+
 			var unassignHref = dojo.create("a", {
 				href: "#", innerHTML:  $I("village.btn.unassign.job"),
 				className: "unassignHref",
@@ -3563,6 +3686,12 @@ dojo.declare("classes.ui.village.Census", null, {
 				game.village.updateResourceProduction();
 				game.render();
 
+			}, this.game, i));
+
+			dojo.connect(favoriteHref, "onclick", this, dojo.partial(function(game, i){
+				var kitten = game.village.sim.kittens[i];
+				kitten.favorite = !kitten.favorite;
+				this.render(this.container);
 			}, this.game, i));
 
 			if (!this.game.challenges.isActive("anarchy")) {
@@ -3589,9 +3718,86 @@ dojo.declare("classes.ui.village.Census", null, {
 				kitten: kitten,
 				unassignHref: unassignHref,
                 /*senatorHref: senatorHref,*/
-                leaderHref: leaderHref
+                leaderHref: leaderHref,
+				favoriteHref: favoriteHref
 			});
 		}
+		
+		//--------------- Page Switching -----------------
+
+		var pageNumber = Math.floor(this.startKitten / 10) + 1;
+
+		var pageSwitchDiv = dojo.create("div", {
+			innerHTML: pageNumber,
+			style: {
+				display: "inline-block",
+				width: "100%",
+				textAlign: "center",
+				margin: "0 auto"
+			}
+		}, container);
+		//--------------- Last page -----------------
+		var lastHref = dojo.create("a", {
+			href: "#", innerHTML:  ">>",
+			className: "lastHref",
+			style: {
+				float: "right"
+			}
+		}, pageSwitchDiv);
+
+		dojo.connect(lastHref, "onclick", this, dojo.partial(function(){
+			this.startKitten = sim.kittens.length / 10;
+			if (Math.floor(this.startKitten) == this.startKitten){
+				this.startKitten -= 1;
+			}
+			this.startKitten = Math.floor(this.startKitten) * 10;
+			this.render(this.container);
+		}));
+		//--------------- Next page -----------------
+		var nextHref = dojo.create("a", {
+			href: "#", innerHTML:  $I("village.btn.next"),
+			className: "nextHref",
+			style: {
+				float: "right"
+			}
+		}, pageSwitchDiv);
+
+		dojo.connect(nextHref, "onclick", this, dojo.partial(function(){
+			if(sim.kittens.length - 10 > this.startKitten){
+				this.startKitten += 10;
+			}
+			this.render(this.container);
+		}));
+		//--------------- First Page -----------------
+		var firstHref = dojo.create("a", {
+			href: "#", innerHTML:  "<<",
+			className: "firstHref",
+			style: {
+				float: "left"
+			}
+		}, pageSwitchDiv);
+
+		dojo.connect(firstHref, "onclick", this, dojo.partial(function(){
+			this.startKitten = 0;
+			this.render(this.container);
+		}));
+		//--------------- Previous page -----------------
+		var previousHref = dojo.create("a", {
+			href: "#", innerHTML:  $I("village.btn.previous"),
+			className: "previousHref",
+			style: {
+				float: "left"
+			}
+		}, pageSwitchDiv);
+
+		dojo.connect(previousHref, "onclick", this, dojo.partial(function(){
+			this.startKitten -= 10;
+			if(this.startKitten < 0){
+				this.startKitten = 0;
+			}
+			this.render(this.container);
+		}));
+		
 	},
 
 	makeLeader: function(kitten){
@@ -3644,6 +3850,7 @@ dojo.declare("classes.ui.village.Census", null, {
 			: this.game.village.sim.getSkillsSorted(kitten.skills);
 
 		var info = "";
+		var craftInfo = "";
 
 		for (var j = 0; j < Math.min(skillsArr.length,3) ; j++) {
 
@@ -3678,11 +3885,22 @@ dojo.declare("classes.ui.village.Census", null, {
 				bonus = bonus * 100;
 				bonus = bonus > 0 ? " +" + bonus.toFixed(0) + "%" : "";
 			}
+			if(kitten.job == "engineer" && j == 0){
+				craftInfo = $I("village.census.crafting") + " ";
+				if (kitten.engineerSpeciality){
+					craftInfo += this.game.workshop.getCraft(kitten.engineerSpeciality).label;
+				} else{
+					craftInfo += $I("village.census.crafting.nothing");
+				}
+			} else{
+				craftInfo = "";
+			}
+
 
 			info += "<span class='skill' title='" + exp.toFixed(2) + "'" + style + ">"
 				+ this.game.village.getJob(skillsArr[j].name).title + bonus
-				+ " (" + this.game.villageTab.skillToText(exp) + " " + expPercent.toFixed() + "%)"
-				+ "</span><br>";
+				+ " (" + this.game.villageTab.skillToText(exp) + " " + expPercent.toFixed() + "%) "
+				+ craftInfo + "</span><br>";
 		}
 
 		return info;
@@ -3821,8 +4039,9 @@ dojo.declare("classes.ui.village.Census", null, {
 			record.content.innerHTML += skillInfo;
 
 			if (!this.game.challenges.isActive("anarchy")) {
-				record.leaderHref.innerHTML = kitten.isLeader ? "&#9733;" : "&#9734;"; //star-shaped link to reduce visual noise
+				record.leaderHref.innerHTML = kitten.isLeader ? "&#9873;" : "&#9872;"; //flag-shaped link to reduce visual noise
 			}
+			record.favoriteHref.innerHTML = kitten.favorite ? "&#9733;" : "&#9734;"; //star-shaped link to reduce visual noise
 
 		}
 	}
