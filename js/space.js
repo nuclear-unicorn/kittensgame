@@ -1249,6 +1249,10 @@ dojo.declare("com.nuclearunicorn.game.ui.SpaceProgramBtnController", com.nuclear
                 var reductionRatio = this.game.getLimitedDR(this.game.getEffect("oilReductionRatio"), 0.75);
                 prices[i].val *= (1 - reductionRatio);
 			}
+			if (prices[i].name == "manpower"){
+                var reductionRatio = this.game.getLimitedDR(this.game.getEffect("catpowerReductionRatio"), 0.75);
+                prices[i].val *= (1 - reductionRatio);
+			}
 		}
 
 		if (this.game.challenges.isActive("blackSky")

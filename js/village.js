@@ -770,9 +770,11 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 	},
 
 	huntAll: function() {
-		var squads = Math.floor(this.game.resPool.get("manpower").value / 100);
+		var manpowerCost = 100 - this.game.getEffect("huntCatpowerDiscount");
+
+		var squads = Math.floor(this.game.resPool.get("manpower").value / manpowerCost);
 		if (squads >= 1) {
-			this.game.resPool.addResEvent("manpower", -squads * 100);
+			this.game.resPool.addResEvent("manpower", -squads * manpowerCost);
 			this.gainHuntRes(squads);
 		}
 		if(squads >= 1000&&!this.game.challenges.getChallenge("pacifism").unlocked){
@@ -4131,7 +4133,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		this.happinessStats = statsTd;
 
 		var controlsTd = dojo.create("td", {}, tr);
-
+		var manpowerCost = 100 - this.game.getEffect("huntCatpowerDiscount");
 		//hunt
 		var huntBtn = new com.nuclearunicorn.game.ui.ButtonModern({
 				name: $I("village.btn.hunters"),
@@ -4139,7 +4141,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 				handler: dojo.hitch(this, function(){
 					this.sendHunterSquad();
 				}),
-				prices: [{ name : "manpower", val: 100 }],
+				prices: [{ name : "manpower", val: manpowerCost }],
 				controller: new classes.village.ui.VillageButtonController(this.game, {
 					updateVisible: function (model) {
 						model.visible = this.game.science.get("archery").researched && (!this.game.challenges.isActive("pacifism"));

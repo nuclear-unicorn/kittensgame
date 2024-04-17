@@ -562,6 +562,11 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio"
 			},
 
+			"catpowerReductionRatio" : {
+				title: $I("effectsMgr.statics.catpowerReductionRatio.title"),
+				type: "ratio"
+			},
+
 			//kittens
 
 			"maxKittens" : {
@@ -1435,6 +1440,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.manuscriptTradeChanceIncrease.title"),
                 type: "ratio" 
 			},
+			"faithFromManuscripts":{
+				title: $I("effectsMgr.statics.faithFromManuscripts.title"),
+                type: "ratio" 
+			},
 			"quarrySlabCraftBonus":{
 				title: $I("effectsMgr.statics.quarrySlabCraftBonus.title"),
                 type: "ratio" 
@@ -1474,6 +1483,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"mintIvoryRatio": {
 				title: $I("effectsMgr.statics.mintIvoryRatio.title"),
 				type: "ratio"
+			},
+			"huntCatpowerDiscount": {
+				title: $I("effectsMgr.statics.huntCatpowerDiscount.title"),
+				type: "fixed"
 			},
             //philosophy
             "luxuryDemandRatio":{
