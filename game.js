@@ -562,6 +562,11 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio"
 			},
 
+			"catpowerReductionRatio" : {
+				title: $I("effectsMgr.statics.catpowerReductionRatio.title"),
+				type: "ratio"
+			},
+
 			//kittens
 
 			"maxKittens" : {
@@ -1423,6 +1428,74 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
             title: $I("effectsMgr.statics.globalRelationsBonus.title"),
                 type: "fixed"
             },
+			"harborLimitRatioPolicy":{
+				title: $I("effectsMgr.statics.harborLimitRatioPolicy.title"),
+				type: "ratio"
+			},
+			"calcinerSteelRatioBonus":{
+				title: $I("effectsMgr.statics.calcinerSteelRatioBonus.title"),
+				type: "ratio"
+			},
+			"magnetoBoostBonusPolicy":{
+				title: $I("effectsMgr.statics.magnetoBoostBonusPolicy.title"),
+				type: "ratio"
+			},
+			"parchmentTradeChanceIncrease":{
+				title: $I("effectsMgr.statics.parchmentTradeChanceIncrease.title"),
+                type: "ratio" 
+			},
+			"manuscriptTradeChanceIncrease":{
+				title: $I("effectsMgr.statics.manuscriptTradeChanceIncrease.title"),
+                type: "ratio" 
+			},
+			"faithFromManuscripts":{
+				title: $I("effectsMgr.statics.faithFromManuscripts.title"),
+                type: "ratio" 
+			},
+			"quarrySlabCraftBonus":{
+				title: $I("effectsMgr.statics.quarrySlabCraftBonus.title"),
+                type: "ratio" 
+			},
+			"zigguratTempleEffectPolicy":{
+				title: $I("effectsMgr.statics.zigguratTempleEffectPolicy.title"),
+				type: "ratio" 
+			},
+			"refinePolicyRatio":{
+				title: $I("effectsMgr.statics.refinePolicyRatio.title"),
+				type: "ratio"
+			},
+			"biolabEnergyRatio":{
+				title: $I("effectsMgr.statics.biolabEnergyRatio.title"),
+				type: "ratio"
+			},
+			"breweryPolicyManpowerRatio":{
+				title: $I("effectsMgr.statics.breweryPolicyManpowerRatio.title"),
+				type: "ratio"
+			},
+			"religionUpgradesDiscount":{
+				title: $I("effectsMgr.statics.religionUpgradesDiscount.title"),
+				type: "ratio"
+			},
+			"ironBuyRatioIncrease":{
+				title: $I("effectsMgr.statics.ironBuyRatioIncrease.title"),
+				type: "ratio"
+			},
+			"nagaBlueprintTradeChance":{
+				title: $I("effectsMgr.statics.nagaBlueprintTradeChance.title"),
+				type: "ratio"
+			},			
+			"starchartPolicyRatio":{
+				title: $I("effectsMgr.statics.starchartPolicyRatio.title"),
+				type: "ratio"
+			},
+			"mintIvoryRatio": {
+				title: $I("effectsMgr.statics.mintIvoryRatio.title"),
+				type: "ratio"
+			},
+			"huntCatpowerDiscount": {
+				title: $I("effectsMgr.statics.huntCatpowerDiscount.title"),
+				type: "fixed"
+			},
             //philosophy
             "luxuryDemandRatio":{
                 title: $I("effectsMgr.statics.luxuryDemandRatio.title"),
@@ -1512,6 +1585,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.mineralsPolicyRatio.title"),
 				type: "ratio"
             },
+			"oilPolicyRatio":{
+				title: $I("effectsMgr.statics.oilPolicyRatio.title"),
+				type: "ratio"
+            },
             "woodPolicyRatio":{
 				title: $I("effectsMgr.statics.woodPolicyRatio.title"),
 				type: "ratio"
@@ -1539,6 +1616,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			},
             "heatEfficiency": {
                 title: $I("effectsMgr.statics.heatEfficiency.title"),
+                type: "ratio"
+			},
+			"heatCompression":{
+                title: $I("effectsMgr.statics.heatCompression.title"),
                 type: "ratio"
 			},
             "shatterCostIncreaseChallenge": {
@@ -2137,29 +2218,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * Display a message in the console. Returns a <span> node of a text container
 	 */
 	msg: function(message, type, tag, noBullet){
-
-		var filters = dojo.clone(this.console.filters);
-		if (tag && filters[tag]){
-			var filter = filters[tag];
-
-			if (!filter.enabled) {
-				return;
-			}
-		}
-
-		var hasCalendarTech = this.science.get("calendar").researched;
-
-		if (hasCalendarTech){
-			var currentDateMessage = $I("calendar.year.ext", [this.calendar.year.toLocaleString(), this.calendar.getCurSeasonTitle()]);
-			if (this.lastDateMessage !== currentDateMessage) {
-				this.console.msg(currentDateMessage, "date", null, false);
-				this.lastDateMessage = currentDateMessage;
-			}
-		}
-
-		var messageLine = this.console.msg(message, type, tag, noBullet);
-
-		return messageLine;
+		return this.console.msg(message, type, tag, noBullet);
 	},
 
 	clearLog: function(){
@@ -2996,7 +3055,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		// Once we have rendered the page immidiately update it in order to
 		// reduce flicker
-		this.update();
+		this.ui.update();
 		this.calendar.update();
 	},
 
@@ -3720,7 +3779,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	getResCraftRatio: function(craftedResName) {
 		if (craftedResName == "wood") {
-			var refineRatio = this.getEffect("refineRatio");
+			var policyRefineRatio = this.getEffect("refinePolicyRatio");
+			var refineRatio =  (policyRefineRatio) + (1 + policyRefineRatio) * this.getEffect("refineRatio");
 			return this.ironWill
 				? ((1 + refineRatio) * (1 + this.getEffect("woodRatio"))) - 1
 				: refineRatio;
@@ -4506,6 +4566,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
         var fpsElement;
 
 		if (this.isPaused){
+			this.ui.update(); //Still update UI if the player gathers catnip while pawsed or something
 			return;
 		}
 
@@ -4596,6 +4657,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 			for (var i = 0; i < game.challenges.challenges.length; i++){
 				game.challenges.challenges[i].pending = false;
+			}
+			if(game.village.loadoutController.loadouts){
+				if(game.village.loadoutController.loadouts.length == 0){
+					game.village.loadoutController.toggleDefaultLoadouts();
+				}
 			}
 			game.resetAutomatic();
 		});
@@ -4845,10 +4911,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		if (cryochambers > 0) {
 			this.village.sim.sortKittensByExp();
+			this.village.sim.sortKittensByFavorite();
 			newKittens = this.village.sim.kittens.slice(-cryochambers);
 			for (var i in newKittens) {
 				delete newKittens[i].job;
 				delete newKittens[i].engineerSpeciality;
+				newKittens[i].favorite = true;
 			}
 			var usedCryochambers_reset = this.time.filterMetadata([this.time.getVSU("usedCryochambers")], ["name", "val", "on"]);
 			usedCryochambers_reset[0]["val"] = cryochambers;
@@ -4868,6 +4936,16 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				newResources.push(catnip);
 			}
 			cathPollution = (this.challenges.getChallenge("postApocalypse").on + newKittens.length) * 1e+8 + 1e+11;
+		}
+		var temporalPress_reset = this.time.filterMetadata([this.time.getCFU("temporalPress")], ["name", "val", "on", "isAutomationEnabled"]);
+		var temporalPressSaved = Math.min(temporalPress_reset.val, this.getEffect("temporalPressCap"));
+		if (temporalPressSaved > 0){
+			temporalPress_reset["on"] = Math.min(temporalPress_reset["on"], temporalPressSaved);
+			temporalPress_reset["val"] = Math.min(temporalPressSaved);
+		}else{
+			temporalPress_reset["on"] = 0;
+			temporalPress_reset["val"] = 0;
+			temporalPress_reset["isAutomationEnabled"] = null;
 		}
 
 /*
@@ -4893,6 +4971,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 		}
 		var reservesSaveData = this.challenges.reserves.getSaveData();
+
+		var loadouts = [];
+		for (var i in this.village.loadoutController.loadouts){
+			var _loadout = this.village.loadoutController.loadouts[i].save();
+			loadouts.push(_loadout);
+		}
+
 		var saveData = {
 			saveVersion: this.saveVersion,
 			game : lsData.game,
@@ -4935,7 +5020,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				cfu: [{
 					name: "temporalImpedance",
 					unlocked: this.time.getCFU("temporalImpedance").unlocked
-				}],
+				},
+					temporalPress_reset[0]
+				],
 				vsu: [],
 				usedCryochambers: usedCryochambers_reset,
 				timestamp: Date.now(),
@@ -4946,6 +5033,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				jobs: [],
 				traits: [],
 				hadKittenHunters: false,
+				loadouts: loadouts
 			},
 			workshop: {
 				hideResearched: this.workshop.hideResearched,

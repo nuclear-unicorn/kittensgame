@@ -439,7 +439,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			this.festivalDays--;
 			if(this.game.getEffect("festivalLuxuryConsumptionRatio")){
 				if(!this.game.resPool.get("furs").value || !this.game.resPool.get("ivory").value || !this.game.resPool.get("spice").value){
-					this.game.msg($I("village.festival.msg.deficitEnd"), "important");
+					this.game.msg($I("village.festival.msg.deficitEnd"), "important", "festival");
 					this.festivalDays = 0;
 				}
 			}
@@ -981,7 +981,7 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 			}
 		}
 
-		this.game.upgrade({policies: ["authocracy"]});
+		this.game.upgrade({policies: ["authocracy", "dragonRelationsAstrologers", "lizardRelationsEcologists"]});
 
 		if (updateUI) {
 			this.game.ui.render();
@@ -1060,7 +1060,7 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 			}
 		}
 
-		this.game.upgrade({policies: ["authocracy"]});
+		this.game.upgrade({policies: ["authocracy", "dragonRelationsAstrologers", "lizardRelationsEcologists"]});
 		
 		if (updateUI) {
 			this.game.ui.render();

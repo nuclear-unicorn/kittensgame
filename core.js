@@ -419,7 +419,12 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 				title: $I("console.filter.blackcoin"),
 				enabled: true,
 				unlocked: false
-			}
+			},
+			"festival": {
+				title: $I("console.filter.festival"),
+				enabled: true,
+				unlocked: false
+			},
 		}
 	},
 
@@ -2105,6 +2110,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 			var zebraOutpostMeta = this.game.bld.getBuildingExt("zebraOutpost").meta;
 			zebraOutpostMeta.calculateEffects(zebraOutpostMeta, this.game);
 			zebraOutpostMeta.jammed = false;
+			this.game.upgrade({policies : ["sharkRelationsBotanists"]});
 			this.game.diplomacy.onLeavingIW();
 		}
 

@@ -2269,7 +2269,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 	effectsBase: {
 		"oilMax" : 0,
 		"scienceMax" : 0,
-		"cultureMax" : 0
+		"cultureMax" : 0,
+		"faithMax" : 0
 	},
 
 	metaCache: null,
@@ -2615,6 +2616,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 		var cultureBonusRaw = Math.floor(this.game.resPool.get("manuscript").value);
 		this.effectsBase["cultureMax"] = this.game.getUnlimitedDR(cultureBonusRaw, 0.01);
+		this.effectsBase["faithMax"] = this.game.getUnlimitedDR(cultureBonusRaw, 0.02) * this.game.getEffect("faithFromManuscripts");
 
 		this.effectsBase["cultureMax"] *= 1 + this.game.getEffect("cultureFromManuscripts");
 
