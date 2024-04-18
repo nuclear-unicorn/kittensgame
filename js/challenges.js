@@ -10,13 +10,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			}
 			//Get the base amount for the effect:
 			var amt = challenge.effects[effectName] || 0;
-			if (effectName == "kittenLaziness" ) { //Calculated in a special way just for the Anarchy Challenge
-				return amt;
-			}
 			var stackOptions = (challenge.stackOptions || {})[effectName] || {}; //Get the stack options for this effect.  If it doesn't exist, get an empty object instead.
 			if (stackOptions.noStack) {
-				//This effect doesn't stack.  Apply only if the Challenge has been completed.
-				return challenge.researched ? amt : 0;
+				//This effect doesn't stack.  The Challenge calculates it itself.
+				return amt;
 			}
 			//Else, the effect stacks with Challenge completions.
 			amt *= challenge.on;
@@ -38,7 +35,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 
 	//Challenges have an optional property named "stackOptions".
 	//stackOptions is a table where the keys are the names of effects & the values are objects with parameters that control how that effect behaves when the challenge has been completed multiple times.
-	//	noStack - If true, the effect only cares about whether or not the Challenge has been completed, but it doesn't care about the exact number of completions.
+	//	noStack - If true, the effect is used directly from the Challenge data with no modifications at all.
 	//			If noStack is combined with another option, noStack overrides all other options & the effect doesn't stack.
 	//	LDRLimit - Applies Limited Diminishing Returns (LDR) specifying the asymptotic limit.
 	//	capMagnitude - The magnitude of the effect will be clamped to this value, but the sign of the effect will not be changed.
@@ -102,7 +99,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
         },
 		stackOptions: {
 			"masterSkillMultiplier": { LDRLimit: 4 },
-			"kittenLaziness": { LDRLimit: 0.25 }
+			"kittenLaziness": { LDRLimit: 0.25, noStack: true }
 		},
 		calculateEffects: function(self, game){
 			if (self.active) {
@@ -328,7 +325,193 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			var tradepostRatioLimit = game.getLimitedDR(0.099 + tradeKnowledge * 0.0075, 0.25);
 			return (tradepost.effects["tradeRatio"] * Math.min(tradepostLimit, tradepost.val * tradepostRatioLimit));
 		}
-	},{
+	}, {
+		name: "unicornTears",
+		label: $I("challendge.unicornTears.label"),
+		description: $I("challendge.unicornTears.desc"),
+		effectDesc: $I("challendge.unicornTears.effect.desc"),
+		researched: false,
+		unlocked: false,
+		effects: {
+			"zigguratIvoryPriceIncrease": -0.25,
+			"zigguratIvoryPriceRatio": -0.025,
+			"bonfireBaseTearsCost": 0,
+			"workshopBaseTearsCost": 0,
+			"techUnicornsRatio": 0,
+			"unicornsMax": 0,
+			"tearsMax": 0,
+			"alicornMax": 0
+		},
+		calculateEffects: function(self, game) {
+			if (self.active) {
+				self.effects["bonfireBaseTearsCost"] = (self.on < 4) ? (self.on + 2) : (6 + Math.sqrt(this.on - 4));
+				if (self.on == 2) {
+					self.effects["bonfireBaseTearsCost"] = 0;
+				}
+				//First Challenge (0 prior completions): 2
+				//Second Challenge i.e. first repeat (1 prior completion): 3
+				//Third Challenge i.e. second repeat (2 prior completions): 0 (taking a break from this effect)
+				//After that: 5, 6, 7, 7.4, 7.7, 8, 8.2, 8.4, 8.6, 8.8, 9, 9.2, 9.3, etc., increasing with square root.
+				switch(self.on) {
+				case 0:
+				case 3:
+					self.effects["workshopBaseTearsCost"] = 0;
+					break;
+				case 1:	self.effects["workshopBaseTearsCost"] = 0.01; break;
+				default:	self.effects["workshopBaseTearsCost"] = 1;
+				}
+				//First Challenge (0 prior completions): 0 * 0 = 0
+				//Second Challenge i.e. first repeat (1 prior completion): 0.01 * 1 = 0.01
+				//Third Challenge i.e. second repeat (2 prior completions): 1 * 2 = 2
+				//Fourth Challenge (3 prior completions): 0 * 3 = 0 (taking a break from this effect)
+				//After that: 1 * N = N, where N is the number of prior completions
+				//There is an LDR limit, but honestly I don't expect anyone to ever reach it legitimately.
+				self.effects["techUnicornsRatio"] = (self.on < 2) ? 0 : 0.25;
+				self.effects["zigguratIvoryPriceIncrease"] = 0;
+				self.effects["zigguratIvoryPriceRatio"] = 0;
+				self.effects["unicornsMax"] = 10;
+				self.effects["tearsMax"] = 1;
+				self.effects["alicornMax"] = 0.2;
+
+			} else {
+				self.effects["bonfireBaseTearsCost"] = 0;
+				self.effects["workshopBaseTearsCost"] = 0;
+				self.effects["techUnicornsRatio"] = 0;
+				self.effects["zigguratIvoryPriceIncrease"] = 0.25;
+				self.effects["zigguratIvoryPriceRatio"] = -0.025;
+				self.effects["unicornsMax"] = 0;
+				self.effects["tearsMax"] = 0;
+				self.effects["alicornMax"] = 0;
+			}
+		},
+		stackOptions: {
+			"zigguratIvoryPriceIncrease": { LDRLimit: 1.5 },
+			"zigguratIvoryPriceRatio": { LDRLimit: 0.15 },
+			"bonfireBaseTearsCost": { noStack: true },
+			"workshopBaseTearsCost": { LDRLimit: 1000 },
+			"techUnicornsRatio": { LDRLimit: 100 },
+			"unicornsMax": { noStack: true },
+			"tearsMax": { noStack: true },
+			"alicornMax": { noStack: true }
+		},
+		checkCompletionCondition: function(game) {
+			return game.resPool.get("necrocorn").value >= 1;
+		},
+		actionOnCompletion: function(game) {
+			//Block any policies that are useless outside the Unicorn Tears Challenge:
+			var ritualCalendar = game.science.getPolicy("ritualCalendar");
+			if (!ritualCalendar.researched) {
+				ritualCalendar.blocked = true;
+			}
+			var agathism = game.science.getPolicy("agathism");
+			if (!agathism.researched) {
+				agathism.blocked = true;
+			}
+		},
+		//A list of buildings in the bonfire tab whose prices we won't add unicorn tears to:
+		//Any building that has a truthy value associated with it will be unaffected.
+		//For staged buildings, you can specify the stages separately from each other by providing an array.
+		dontChangeTheseBldPrices: {
+			"field": true,
+			"pasture": [/*Pastures don't cost tears*/ true, /*Solar Farms DO cost tears*/ false],
+			"hut": true,
+			"library": [/*Libraries don't cost tears*/ true, /*Data Centers DO cost tears*/ false],
+			"observatory": true, //Because the Challenge is already slow enough without good starchart income
+			"barn": true,
+			"warehouse": [true, false], //Warehouse doesn't cost tears, Spaceport does
+			"smelter": true,
+			"calciner": true,
+			"oilWell": true,
+			"amphitheatre": [true, false], //Amphitheatre doesn't cost tears, Broadcast Tower does
+			"workshop": true, //Because we want players to actually have fun
+			"unicornPasture": true,
+			"ziggurat": true
+		},
+		//A list of buildings in the bonfire tab where the first one costs 0 unicorn tears, but subsequent ones cost more tears.
+		isFirstOneFree: {
+			"library": true, //Make it so the first Data Center doesn't require tears.
+			"mine": true,
+			"lumberMill": true,
+			"biolab": true,
+			"temple": true,
+			"tradepost": true
+		},
+		//A list of upgrades in the workshop tab whose prices we won't add unicorn tears to:
+		dontChangeTheseUpgradePrices: {
+			"goldOre": true,
+			"coalFurnace": true,
+			"deepMining": true,
+			"huntingArmor": true, //These 3 upgrades are for IW;
+			"bolas": true,        // I didn't want to have too many special cases
+			"compositeBow": true  // that changed depending on if we're in IW.
+		},
+		/**
+		 * Decides whether or not to add some unicorn tears to the base price of a building.
+		 * @param bldName	String.  The name of a building in the bonfire tab.
+		 * @param game		The game object; needed to check for more complex conditions.
+		 * @param bldStage	Number (optional).  Compares a specific stage of the building.  Ignored if wrong type.
+		 * @return	Boolean value.
+		 */
+		getShouldBldCostExtraTears: function(bldName, game, bldStage) {
+			if (typeof(game) !== "object") {
+				throw "Missing parameter \"game\" in getShouldBldCostExtraTears";
+			}
+			if (bldName === "steamworks") {
+				//The reason for this is that there's a circular dependency where if Steamworks cost tears, then...
+				//...obtaining tears requires Theology, which costs manuscripts, which are produced by Steamworks...
+				//...alternatively, build a Mint to get crafting material, but the Mint tech requires already having manuscripts.
+				return !game.challenges.isActive("pacifism"); //Avoid circular dependency
+			}
+			if (bldName === "logHouse" || bldName === "mansion") {
+				return this.on > 0; //The first time, these buildings don't cost tears.  But after that, they do.
+			}
+			var rawVal = this.dontChangeTheseBldPrices[bldName];
+			if (typeof(rawVal) == "boolean") {
+				return !rawVal;
+			}
+			if (rawVal instanceof Array && typeof(bldStage) == "number") {
+				return Boolean(!rawVal[bldStage]);
+			}
+			//Else, rawVal is not defined, so default to making the building cost tears.
+			return true;
+		},
+		/**
+		 * For some buildings, they DO cost unicorn tears, but only if you've already built 1 of that building.
+		 * So the first one won't have its price changed.
+		 * @param bldName	String.  The name of a building in the bonfire tab.
+		 * @param game		The game object; not used for anything right now but included just in case a future dev wants this.
+		 * @param bldStage	Number (optional).  Currently not supported yet.
+		 * @return	Boolean value.
+		 */
+		getIsFirstBldExempt: function(bldName, game, bldStage) {
+			if (typeof(game) !== "object") {
+				throw "Missing parameter \"game\" in getIsFirstBldExempt";
+			}
+			return Boolean(this.isFirstOneFree[bldName]);
+		},
+		/**
+		 * If a workshop upgrade's price is changed to have tears added to it, return true.
+		 * Otherwise, returns false & the workshop upgrade's price is unchanged.
+		 * @param upgradeName	String.  The name of the upgrade in the workshop tab.
+		 * @param game			The game object; needed to check for more complex conditions.
+		 * @return	Boolean value.
+		 */
+		getShouldUpgradeCostExtraTears: function(upgradeName, game) {
+			if (typeof(game) !== "object") {
+				throw "Missing parameter \"game\" in getIsFirstBldExempt";
+			}
+			if (upgradeName === "printingPress") {
+				//Obtaining tears requires Theology, which itself requires manuscripts.
+				//Therefore, this one ought not to cost tears.
+				return !game.challenges.isActive("pacifism"); //Avoid circular dependency
+			}
+			if (upgradeName === "advancedRefinement" /*(Catnip Enrichment)*/ || upgradeName === "celestialMechanics") {
+				//Just to make IW a little more friendly:
+				return !game.ironWill;
+			}
+			return Boolean(!this.dontChangeTheseUpgradePrices[upgradeName]);
+		}
+	}, {
 		name: "postApocalypse",
 		label: $I("challendge.postApocalypse.label"),
 		description: $I("challendge.postApocalypse.desc"),
@@ -366,7 +549,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			game.science.getPolicy("terraformingInsight").unlocked = true; //policy which helpes to get more paragon this run
 			game.science.getPolicy("cryochamberExtraction").unlocked = true; //single use policy; gets not researched after player gets the bonus
 		}
-		}],
+	}],
 
 	game: null,
 

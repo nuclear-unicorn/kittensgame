@@ -1569,7 +1569,11 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.unicornSelection.label"),
 		description: $I("workshop.unicornSelection.desc"),
 		effects: {
-			"unicornsGlobalRatio": 0.25
+			"unicornsGlobalRatio": 0.25,
+			"unicornsMaxRatio": 0
+		},
+		calculateEffects: function(self, game) {
+			self.effects["unicornsMaxRatio"] = game.challenges.isActive("unicornTears") ? 0.5 : 0;
 		},
 		prices:[
 			{ name : "titanium", val: 1500 },
@@ -2701,8 +2705,30 @@ dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearun
     },
 
 	getPrices: function(model) {
-        return this.game.village.getEffectLeader("scientist", this.inherited(arguments));
-    },
+		var game = this.game;
+		var retVal = game.village.getEffectLeader("scientist", this.inherited(arguments));
+
+		//Only in a Unicorn Tears Challenge, we might add tears to the price of an upgrade.
+		if (game.challenges.isActive("unicornTears")) {
+			var unicornTearsChallenge = game.challenges.getChallenge("unicornTears");
+			var tearsCost = game.getEffect("workshopBaseTearsCost");
+
+			//Only add tears to the base price if tearsCost is positive AND if the cost doesn't already include tears
+			// AND if the Unicorn Tears Challenge doesn't define that specific upgrade as an exception to the rule.
+			if (tearsCost > 0 && dojo.every(model.metadata.prices, function(priceElem) { return priceElem.name != "tears"; }) && unicornTearsChallenge.getShouldUpgradeCostExtraTears(model.metadata.name, game)) {
+				
+				//Each upgrade that costs tears increases the price of the next one; the first one is a freebie.
+				var alreadyPurchased = 0;
+				dojo.forEach(game.workshop.meta[0].meta, function(upgradeElem) {
+					if (unicornTearsChallenge.getShouldUpgradeCostExtraTears(upgradeElem.name, game)) {
+						alreadyPurchased += 1 * upgradeElem.researched;
+					}});
+				tearsCost *= alreadyPurchased;
+				retVal.push({ val: tearsCost, name: "tears" });
+			}
+		}
+		return retVal;
+	},
 
 	updateVisible: function(model){
 		var upgrade = model.metadata;

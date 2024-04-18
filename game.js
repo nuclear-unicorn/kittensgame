@@ -949,6 +949,14 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 title: $I("effectsMgr.statics.alicornChance.title"),
                 type: "ratio"
             },
+		"unicornSacrificeRatio": {
+			title: $I("effectsMgr.statics.unicornSacrificeRatio.title"),
+			type: "ratio"
+		},
+		"buildAdditionalZiggurats": {
+			title: $I("effectsMgr.statics.buildAdditionalZiggurats.title"),
+			type: "fixed"
+		},
 
 			"tcRefineRatio" :  {
                 title: $I("effectsMgr.statics.tcRefineRatio.title"),
@@ -1656,6 +1664,42 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			},
 			"weaponEfficency":{
 				title: $I("effectsMgr.statics.weaponEfficency.title"),
+				type: "ratio"
+			},
+			"zigguratIvoryPriceIncrease": {
+				title: $I("effectsMgr.statics.zigguratIvoryPriceIncrease.title"),
+				type: "ratio"
+			},
+			"zigguratIvoryPriceRatio": {
+				title: $I("effectsMgr.statics.zigguratIvoryPriceRatio.title"),
+				type: "ratio"
+			},
+			"bonfireBaseTearsCost": {
+				title: $I("effectsMgr.statics.bonfireBaseTearsCost.title"),
+				type: "fixed"
+			},
+			"workshopBaseTearsCost": {
+				title: $I("effectsMgr.statics.workshopBaseTearsCost.title"),
+				type: "fixed"
+			},
+			"techUnicornsRatio": {
+				title: $I("effectsMgr.statics.techUnicornsRatio.title"),
+				type: "ratio"
+			},
+			"autoSacrificeUnicornsPenalty": {
+				title: $I("effectsMgr.statics.autoSacrificeUnicornsPenalty.title"),
+				type: "ratio"
+			},
+			"autoSacrificeUnicornsThreshold": {
+				title: $I("effectsMgr.statics.autoSacrificeUnicornsThreshold.title"),
+				type: "ratio"
+			},
+			"autoSacrificeStableOvercapRatio": {
+				title: $I("effectsMgr.statics.autoSacrificeStableOvercapRatio.title"),
+				type: "ratio"
+			},
+			"autoSacrificeStableOvercapEfficiency": {
+				title: $I("effectsMgr.statics.autoSacrificeStableOvercapEfficiency.title"),
 				type: "ratio"
 			},
 			"cryochamberSupport":{
