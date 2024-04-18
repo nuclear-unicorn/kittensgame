@@ -714,6 +714,19 @@ WPins = React.createClass({
                 });
             }
         }
+
+        for (var i in this.props.game.village.loadoutController.loadouts) {
+            var loadout = this.props.game.village.loadoutController.loadouts[i];
+
+            if (loadout.pinned){
+                pins.push({
+                    title: $I("left.loadout.do", [loadout.title]),
+                    handler: function(loadout){ 
+                        loadout.setLoadout(true);
+                    }.bind(this, loadout)
+                })
+            }
+        }
         return pins;
     },
     render: function(){

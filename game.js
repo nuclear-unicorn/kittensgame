@@ -562,6 +562,11 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio"
 			},
 
+			"catpowerReductionRatio" : {
+				title: $I("effectsMgr.statics.catpowerReductionRatio.title"),
+				type: "ratio"
+			},
+
 			//kittens
 
 			"maxKittens" : {
@@ -1435,6 +1440,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.manuscriptTradeChanceIncrease.title"),
                 type: "ratio" 
 			},
+			"faithFromManuscripts":{
+				title: $I("effectsMgr.statics.faithFromManuscripts.title"),
+                type: "ratio" 
+			},
 			"quarrySlabCraftBonus":{
 				title: $I("effectsMgr.statics.quarrySlabCraftBonus.title"),
                 type: "ratio" 
@@ -1474,6 +1483,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"mintIvoryRatio": {
 				title: $I("effectsMgr.statics.mintIvoryRatio.title"),
 				type: "ratio"
+			},
+			"huntCatpowerDiscount": {
+				title: $I("effectsMgr.statics.huntCatpowerDiscount.title"),
+				type: "fixed"
 			},
             //philosophy
             "luxuryDemandRatio":{
@@ -2998,7 +3011,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		// Once we have rendered the page immidiately update it in order to
 		// reduce flicker
-		this.update();
+		this.ui.update();
 		this.calendar.update();
 	},
 
@@ -4509,6 +4522,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
         var fpsElement;
 
 		if (this.isPaused){
+			this.ui.update(); //Still update UI if the player gathers catnip while pawsed or something
 			return;
 		}
 
@@ -4599,6 +4613,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 			for (var i = 0; i < game.challenges.challenges.length; i++){
 				game.challenges.challenges[i].pending = false;
+			}
+			if(game.village.loadoutController.loadouts){
+				if(game.village.loadoutController.loadouts.length == 0){
+					game.village.loadoutController.toggleDefaultLoadouts();
+				}
 			}
 			game.resetAutomatic();
 		});
@@ -4848,10 +4867,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		if (cryochambers > 0) {
 			this.village.sim.sortKittensByExp();
+			this.village.sim.sortKittensByFavorite();
 			newKittens = this.village.sim.kittens.slice(-cryochambers);
 			for (var i in newKittens) {
 				delete newKittens[i].job;
 				delete newKittens[i].engineerSpeciality;
+				newKittens[i].favorite = true;
 			}
 			var usedCryochambers_reset = this.time.filterMetadata([this.time.getVSU("usedCryochambers")], ["name", "val", "on"]);
 			usedCryochambers_reset[0]["val"] = cryochambers;
@@ -4906,6 +4927,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 		}
 		var reservesSaveData = this.challenges.reserves.getSaveData();
+
+		var loadouts = [];
+		for (var i in this.village.loadoutController.loadouts){
+			var _loadout = this.village.loadoutController.loadouts[i].save();
+			loadouts.push(_loadout);
+		}
+
 		var saveData = {
 			saveVersion: this.saveVersion,
 			game : lsData.game,
@@ -4961,6 +4989,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				jobs: [],
 				traits: [],
 				hadKittenHunters: false,
+				loadouts: loadouts
 			},
 			workshop: {
 				hideResearched: this.workshop.hideResearched,
