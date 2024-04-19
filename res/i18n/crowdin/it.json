@@ -1175,7 +1175,7 @@
     "ui.autosave.tooltip": "autosalvataggio...",
     "ui.save.tooltip": "Salvato!",
     "ui.energy.tooltip": "Energia",
-    "ui.log.link": "Tronco",
+    "ui.log.link": "Registro",
     "ui.clear.log": "Cancella registri",
     "ui.pause": "pausa",
     "ui.unpause": "riavvia",
