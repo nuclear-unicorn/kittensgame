@@ -3043,7 +3043,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 
 		var freeKittens = this.game.village.getFreeKittens();
 		
-		if(freeKittens && jobsFiltered.length) { //Assign remaining kittens due to Math.floor, adding to the lowest values first
+		if(freeKittens && jobsFiltered.length) { //Assign remaining kittens due to Math.floor being used
 			for (var i in jobsFiltered) {
 				if (freeKittens > 0){
 					job = jobsFiltered[i];
@@ -3087,7 +3087,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 
 		var freeEngineers = this.game.village.getFreeEngineers();
 
-		if(freeEngineers && craftsFiltered.length) { //Assign remaining kittens due to Math.floor, adding to the lowest values first			
+		if(freeEngineers && craftsFiltered.length) { //Assign remaining kittens due to Math.floor.	
 			for (var i in craftsFiltered) {
 				if (freeEngineers > 0){
 					this.assignCraftJob(this.game.workshop.getCraft(craftsFiltered[i].craft), 1);
@@ -3101,9 +3101,10 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 		//Assign leader
 
 		if(setLeader && this.leaderTrait && !this.game.challenges.isActive("anarchy")) {
+			this.game.village.sim.sortKittensByExp();
 			var theocracy = this.game.science.getPolicy("theocracy");
 			var tempKitten = null;
-			for(var i in kittens) {
+			for(var i = kittens.length - 1; i >= 0; i--) {
 				if (kittens[i].trait.name == this.leaderTrait.name) {
 					if((theocracy.researched) && (kittens[i].job != theocracy.requiredLeaderJob)){
 						continue;
@@ -3119,7 +3120,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 					
 				}
 			}
-			if(tempKitten){
+			if(tempKitten){ // If there is no kitten that has the saved job and trait together, assign the first kitten with the trait. 
 				this.makeLeader(tempKitten);
 			}
 		}
@@ -3209,7 +3210,10 @@ dojo.declare("com.nuclearunicorn.game.ui.LoadoutButtonController", com.nuclearun
 		var textToDisplay = "";
 
 		if(loadout.leaderTrait){
-			textToDisplay += $I("village.loadout.desc", [loadout.leaderTrait.title]);
+			textToDisplay += $I("village.loadout.desc", [loadout.leaderTrait.title]) + "<br>";
+		}
+		if(loadout.leaderJob){
+			textToDisplay += $I("village.loadout.desc2", [this.game.village.getJob(loadout.leaderJob).title]) + "<br>";
 		}
 
 		var loadoutJobsSum = loadout.getLoadoutJobsSum();
@@ -3219,7 +3223,7 @@ dojo.declare("com.nuclearunicorn.game.ui.LoadoutButtonController", com.nuclearun
 				jobText += "<br>" + this.game.village.getJob(job.name).title + ": " + this.game.getDisplayValueExt(job.value / loadoutJobsSum * 1e2, "", false, 2, "%");
 			}
 		}
-		textToDisplay += $I("village.loadout.desc2", [jobText]);
+		textToDisplay += "<br>" + $I("village.loadout.desc3", [jobText]);
 
 		var engineerText = "";
 		for(var i in loadout.engineerJobs){
@@ -3231,7 +3235,7 @@ dojo.declare("com.nuclearunicorn.game.ui.LoadoutButtonController", com.nuclearun
 		}
 		
 		if(engineerText) {
-			textToDisplay += $I("village.loadout.desc3", [engineerText]);
+			textToDisplay += $I("village.loadout.desc4", [engineerText]);
 		}
 		
         return textToDisplay;
