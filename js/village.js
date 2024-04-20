@@ -3120,7 +3120,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 					
 				}
 			}
-			if(tempKitten){ // If there is no kitten that has the saved job and trait together, assing the first kitten with the trait. 
+			if(tempKitten){ // If there is no kitten that has the saved job and trait together, assign the first kitten with the trait. 
 				this.makeLeader(tempKitten);
 			}
 		}
