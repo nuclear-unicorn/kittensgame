@@ -335,6 +335,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		effects: {
 			"zigguratIvoryPriceIncrease": -0.25,
 			"zigguratIvoryPriceRatio": -0.025,
+			"unicornHuntChance": 0.08,
 			"bonfireBaseTearsCost": 0,
 			"workshopBaseTearsCost": 0,
 			"techUnicornsRatio": 0,
@@ -369,6 +370,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["techUnicornsRatio"] = (self.on < 2) ? 0 : 0.25;
 				self.effects["zigguratIvoryPriceIncrease"] = 0;
 				self.effects["zigguratIvoryPriceRatio"] = 0;
+				self.effects["unicornHuntChance"] = 0;
 				self.effects["unicornsMax"] = 10;
 				self.effects["tearsMax"] = 1;
 				self.effects["alicornMax"] = 0.2;
@@ -379,6 +381,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["techUnicornsRatio"] = 0;
 				self.effects["zigguratIvoryPriceIncrease"] = 0.25;
 				self.effects["zigguratIvoryPriceRatio"] = -0.025;
+				self.effects["unicornHuntChance"] = 0.08;
 				self.effects["unicornsMax"] = 0;
 				self.effects["tearsMax"] = 0;
 				self.effects["alicornMax"] = 0;
