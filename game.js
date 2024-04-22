@@ -1676,7 +1676,7 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			},
 			"unicornHuntChance": {
 				title: $I("effectsMgr.statics.unicornHuntChance.title"),
-				type: "ratio"
+				type: "fixed"
 			},
 			"bonfireBaseTearsCost": {
 				title: $I("effectsMgr.statics.bonfireBaseTearsCost.title"),
