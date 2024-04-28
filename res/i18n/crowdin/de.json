@@ -1542,7 +1542,7 @@
     "trade.bcoin.buy": "Schwarzmünzen kaufen",
     "trade.bcoin.buy.desc": "Tausche deine Relikte ein für Schwarzmünzen",
     "trade.bcoin.buy.msg": "Du hast {0} Schwarzemünzen gekauft",
-    "trade.bcoin.sell": "Bcoin verkaufen",
+    "trade.bcoin.sell": "Verkaufe Schwarzmünze",
     "trade.bcoin.sell.desc": "Deine Schwarzmünzen für Relikte austauschen",
     "trade.bcoin.sell.msg": "Du hast {0} Relikte",
     "trade.bcoin.crash": "Verärgere die unsichtbare Schwarze Hand",
