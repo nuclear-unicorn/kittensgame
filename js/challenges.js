@@ -559,10 +559,11 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 	resetState: function(){
 		for (var i = 0; i < this.challenges.length; i++){
 			var challenge = this.challenges[i];
-			challenge.enabled = false;
+			challenge.unlocked = (challenge.name == "ironWill" || challenge.name == "winterIsComing" || challenge.name == "anarchy" );
 			challenge.pending = false;
 			challenge.active = false;
-			this.resetStateStackable(challenge);
+			challenge.researched = false;
+			challenge.on = 0;
 		}
 		this.currentChallenge = null;
 		this.reserves.resetState();
