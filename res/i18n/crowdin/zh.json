@@ -599,7 +599,7 @@
     "menu.export.btn": "保存到 Dropbox (测试)",
     "menu.export.text": "存档文本",
     "menu.export.to": "导出存档",
-    "menu.import": "导入进度",
+    "menu.import": "导入",
     "menu.import.btn": "导入存档文本",
     "menu.import.from": "导入存档",
     "menu.import.text": "存档文本",
