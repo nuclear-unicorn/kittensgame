@@ -600,6 +600,10 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 			unlocked: false
 		};
+		if (name == "wood") {
+			//Wood is displayed as both a normal & a crafted resource.
+			res.isHiddenFromCrafting = false;
+		}
 		return res;
 	},
 
@@ -894,6 +898,10 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 			res.perTickCached = 0;
 			res.unlocked = false;
 			res.isHidden = false;
+
+			if (res.name == "wood") {
+				res.isHiddenFromCrafting = false;
+			}
 		}
 	},
 
@@ -1003,7 +1011,11 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 	setDisplayAll: function() {
 		for(var i = 0; i < this.resources.length; i++){
-			this.resources[i].isHidden = false;
+			var res = this.resources[i];
+			res.isHidden = false;
+			if (res.name == "wood") {
+				res.isHiddenFromCrafting = false;
+			}
 		}
 	},
 

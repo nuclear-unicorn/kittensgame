@@ -413,7 +413,12 @@ WCraftRow = React.createClass({
     },
 
     getInitialState: function(){
-        return {visible: !this.props.resource.isHidden};
+        var res = this.props.resource;
+        if (res.name == "wood") {
+            return {visible: !res.isHiddenFromCrafting};
+        } else {
+            return {visible: !res.isHidden};
+        }
     },
 
     shouldComponentUpdate: function(nextProp, nextState){
@@ -503,7 +508,12 @@ WCraftRow = React.createClass({
 
     toggleView: function(){
         this.setState({visible: !this.state.visible});
-        this.props.resource.isHidden = this.state.visible; 
+        var res = this.props.resource;
+        if (res.name == "wood") {
+            res.isHiddenFromCrafting = this.state.visible;
+        } else {
+            res.isHidden = this.state.visible;
+        }
     },
 
     componentDidMount: function(){
