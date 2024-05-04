@@ -95,6 +95,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         }
 	},
 
+	//This function is called when the player has been offline for a while OR when the game is unpawsed.
 	gainTemporalFlux: function (timestamp){
         if (!this.game.science.get("calendar").researched){
             return;
@@ -106,10 +107,35 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             return;
         }
 
-		// Update temporalFluxMax from values loaded
-        this.game.updateCaches();
-        this.game.resPool.update();
+		//=====
 
+		//This is a hack within a hack.  (You can blame Brent if it breaks anything)
+		//The thing is, we can't guarantee that the game-state is fully loaded when this function is called.
+		//   (This function is called about halfway through the game-loading process.)
+		//   So we need to call resPool.upate() to update the max storage capacity for Temporal Flux,
+		//   & it's gotta happen *before* we gain temporal flux so that it uses the proper cap.
+		//But resPool.update() also generates 1 tick of resource production.  Since we can't guarantee the game
+		//   is properly loaded, some effects will be applied (such as unicorn production from pastures) but not
+		//   all effects (such as max unicorns from being in a Challenge).  It can lead to weird bugs like
+		//   producing unicorns over the cap, or not taking into account Workshop upgrades for producing coal.
+		//So we gotta find some way to prevent resPool.update() from producing resources.
+		//Luckily, that already exists.  bloodrizer informed me that game.loadingSave was added to prevent race
+		//   conditions, specifically to avoid timers & update cycles from firing while the game is in a
+		//   half-loaded state.
+		//I don't fully understand that, so I'd rather not mess with it...but I *do* care that if
+		//   game.loadingSave is truthy, the update function won't generate a tick of resource production.
+		//So I'll just hijack game.loadingSave in a way that the outside program won't care or notice.
+
+		var loadingSavePrev = this.game.loadingSave; //Cache the old value of loadingSave
+		this.game.loadingSave = true;
+		// Update temporalFluxMax from values loaded
+		this.game.updateCaches();
+		this.game.resPool.update(); //loadingSave is truthy, so we WON'T generate 1 tick of production
+		this.game.loadingSave = loadingSavePrev; //Restore original value of loadingSave
+
+		//=====
+
+		//Now that temporalFluxMax is correctly calculated, we calculate how much temporal flux to gain:
 		var temporalAccelerator = this.getCFU("temporalAccelerator");
 		var energyRatio = 1 + (temporalAccelerator.val * temporalAccelerator.effects["timeRatio"]);
 		var temporalFluxGained = Math.round(delta / ( 60 * 1000 ) * (this.game.ticksPerSecond * energyRatio)); // 5 every 60 seconds
@@ -176,6 +202,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     },
 
     applyRedshift: function(daysOffset, ignoreCalendar){
+        var unicornsValuePrevious = this.game.resPool.get("unicorns").value;
+
         //populate cached per tickValues
         this.game.resPool.update();
         this.game.updateResources();
@@ -190,6 +218,10 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.game.village.fastforward(daysOffset);
         this.game.space.fastforward(daysOffset);
         this.game.religion.fastforward(daysOffset);
+        if (daysOffset >= this.game.calendar.daysPerSeason) { //Auto-sacrifice should only happen once per season.
+            //console.log( "Auto-sacrificing unicorns after redshifting for", daysOffset, "days." );
+            this.game.religion.autoSacrificeUnicorns(daysOffset / this.game.calendar.daysPerSeason, unicornsValuePrevious);
+        }
 
         this.game.resPool.enforceLimits(resourceLimits);
 
@@ -643,6 +675,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
             // ShatterTC gain
             if (shatterTCGain > 0) {
+                var unicornsValuePrevious = game.resPool.get("unicorns").value;
                 // XXX Partially duplicates resources#fastforward and #enforceLimits, some nice factorization is probably possible
                 var limits = {};
                 for (var j = 0; j < game.resPool.resources.length; j++) {
@@ -653,6 +686,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 if (this.game.workshop.get("chronoEngineers").researched) {
                     this.game.workshop.craftByEngineers(remainingTicksInCurrentYear * shatterTCGain);
                 }
+                //console.log( "Auto-sacrificing unicorns after shattering", amt, "TCs." );
+                this.game.religion.autoSacrificeUnicorns(remainingDaysInCurrentYear / this.game.calendar.daysPerSeason, unicornsValuePrevious);
+                limits["tears"] = Infinity; //The autoSacrifice function calculates its own limits for this resource.
                 for (var j = 0; j < game.resPool.resources.length; j++) {
                     var res = game.resPool.resources[j];
                     res.value = Math.min(res.value, limits[res.name]);
@@ -732,6 +768,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
             // ShatterTC gain
             if (shatterTCGain > 0) {
+                var unicornsValuePrevious = game.resPool.get("unicorns").value;
                 // XXX Partially duplicates resources#fastforward and #enforceLimits, some nice factorization is probably possible
                 var limits = {};
                 for (var j = 0; j < game.resPool.resources.length; j++) {
@@ -742,6 +779,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 if (this.game.workshop.get("chronoEngineers").researched) {
                     this.game.workshop.craftByEngineers(remainingTicksInCurrentCycle * shatterTCGain);
                 }
+                //console.log( "Auto-sacrificing unicorns after shattering", amt, "TCs." );
+                this.game.religion.autoSacrificeUnicorns(remainingDaysInCurrentCycle / this.game.calendar.daysPerSeason, unicornsValuePrevious);
+                limits["tears"] = Infinity; //The autoSacrifice function calculates its own limits for this resource.
                 for (var j = 0; j < game.resPool.resources.length; j++) {
                     var res = game.resPool.resources[j];
                     res.value = Math.min(res.value, limits[res.name]);
@@ -857,6 +897,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     aiApocalypseLevel = 0;
                 }
                 // XXX Partially duplicates resources#fastforward and #enforceLimits, some nice factorization is probably possible
+                var unicornsValuePrevious = game.resPool.get("unicorns").value;
                 var limits = {};
                 var delta = {};
                 for (var j = 0; j < game.resPool.resources.length; j++) {
@@ -871,6 +912,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 if (this.game.workshop.get("chronoEngineers").researched) {
                     this.game.workshop.craftByEngineers(ticksInCurrentCycle * shatterTCGain);
                 }
+                //console.log( "Auto-sacrificing unicorns after shattering", amt, "TCs." );
+                this.game.religion.autoSacrificeUnicorns(daysInCurrentCycle / this.game.calendar.daysPerSeason, unicornsValuePrevious);
+                limits["tears"] = Infinity; //The autoSacrifice function calculates its own limits for this resource.
                 for (var j = 0; j < game.resPool.resources.length; j++) {
                     var res = game.resPool.resources[j];
                     /*

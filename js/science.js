@@ -280,6 +280,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: 	"unobtainium", val: 5},
 			{name : "science", val: 55000}
 		],
+		upgrades: {
+			policies: ["agathism"]
+		}
 	}, {
 		name: "chemistry",
 		label: $I("science.chemistry.label"),
@@ -462,7 +465,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["carbonSequestration"]
 		},
 		upgrades:{
-			buildings: ["mine", "quarry"]
+			buildings: ["mine", "quarry"],
+			policies: ["agathism"]
 		}
 	},
 	{
@@ -1893,6 +1897,95 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocked: false,
         blocks:["rationality"]
     },
+	//----------------   Policies specific to the Unicorn Tears Challenge   --------------------
+	{
+		name: "ritualCalendar",
+		label: $I("policy.ritualCalendar.label"),
+		description: $I("policy.ritualCalendar.desc"),
+		prices: [
+			{name: "culture", val: 17500},
+			{name: "spice", val: 5000}
+		],
+		effects: {
+			"autoSacrificeUnicornsThreshold": 0.5,       //Auto-sacrifice only when have more than this fraction of unicornsMax
+			"autoSacrificeUnicornsPenalty": -0.3,        //Automatic sacrifices are less efficient by this ratio
+			"autoSacrificeStableOvercapRatio": 0.5,      //How far above tearsMax the automatic sacrifices can go
+			"autoSacrificeStableOvercapEfficiency": 0.02 //We only gain this fraction of tears when sacrificing over the cap
+		},
+		unlocked: false,
+		blocked: false,
+		blocks: [ "agathism", "holyGround" ],
+		evaluateLocks: function(game) {
+			return game.challenges.isActive("unicornTears") && game.religion.getZU("unicornTomb").val > 0;
+		}
+	}, {
+		name: "agathism",
+		label: $I("policy.agathism.label"),
+		description: $I("policy.agathism.desc"),
+		prices: [
+			{name: "culture", val: 17500},
+			{name: "faith", val: 5000}
+		],
+		effects: {
+			"unicornsMaxRatio": 0,
+			"alicornMaxRatio": 0,
+			"tearsMaxRatio": 0,
+		},
+		calculateEffects: function(self, game) {
+			var effects = {
+				"unicornsMaxRatio": 1.5,
+				"alicornMaxRatio": 2,
+				"tearsMaxRatio": 0.5
+			};
+			if (!game.science.get("ecology").researched) {
+				for (var i in effects) {
+					effects[i] *= 0.5;
+				}
+			}
+			if (!game.science.get("metaphysics").researched) {
+				for (var i in effects) {
+					effects[i] *= 0.5;
+				}
+			}
+			self.effects = effects;
+		},
+		unlocked: false,
+		blocked: false,
+		blocks: [ "ritualCalendar", "holyGround" ],
+		evaluateLocks: function(game) {
+			if (game.challenges.isActive("atheism")) {
+				return false; //Faith as a resource is unavailable in this Challenge
+			}
+			return game.challenges.isActive("unicornTears") && game.religion.getZU("unicornTomb").val > 0;
+		}
+	}, {
+		name: "holyGround",
+		label: $I("policy.holyGround.label"),
+		description: $I("policy.holyGround.desc"),
+		prices: [
+			{name: "culture", val: 17500},
+			{name: "megalith", val: 5000}
+		],
+		onResearch: function(game) {
+			var ziggurats = game.bld.get("ziggurat");
+			var amt = this.effects["buildAdditionalZiggurats"];
+			ziggurats.on += amt;
+			ziggurats.val += amt;
+			game.upgrade({ buildings: ["ziggurat"]});
+			//Repurpose an existing console log message:
+			game.msg($I("construct.all.msg", [ziggurats.label, amt]));
+		},
+		effects: {
+			"buildAdditionalZiggurats": 5,
+			"unicornSacrificeRatio": 0.05
+		},
+		unlocked: false,
+		blocked: false,
+		blocks: [ "ritualCalendar", "agathism" ],
+		evaluateLocks: function(game) {
+			return game.challenges.isActive("unicornTears") && game.religion.getZU("unicornTomb").val > 0;
+		}
+	},
     //----------------   Environmental Policy   --------------------
     {
         name: "stripMining",
@@ -2192,6 +2285,26 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			}
 		}
 
+		//Unicorn Tears Challenge stuff
+		if (this.game.challenges.isActive("unicornTears")) {
+			var techRatio = this.game.getEffect("techUnicornsRatio");
+			if (techRatio > 0) {
+				for (var i = 0; i < prices.length; i += 1) {
+					switch(prices[i].name) {
+					case "manuscript":
+						prices_result = prices_result.concat([{name: "unicorns", val: prices[i].val * techRatio}]);
+						break;
+					case "compedium":
+						prices_result = prices_result.concat([{name: "tears", val: prices[i].val * techRatio}]);
+						break;
+					case "blueprint":
+						prices_result = prices_result.concat([{name: "alicorn", val: Math.max(1, techRatio)}]);
+						break;
+					}
+				}
+			}
+		}
+
 		return prices_result;
 	},
     /*getEffect: function(effectName){
@@ -2332,12 +2445,12 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 		var policyFakeBought = this.game.getEffect("policyFakeBought");
 		var prices = [];
 		for (var i = 0; i < meta.prices.length; i++){
-            prices.push({
+			prices.push({
 				val: meta.prices[i].val * Math.pow(1.25, policyFakeBought),
 				name: meta.prices[i].name
 			});
 		}
-        return prices;
+		return prices;
 	},
 	updateVisible: function(model){
 		var meta = model.metadata;
@@ -2533,16 +2646,7 @@ dojo.declare("com.nuclearunicorn.game.ui.TechButtonController", com.nuclearunico
     },
 
 	getPrices: function(model) {
-		var prices_result = this.game.village.getEffectLeader("scientist", this.inherited(arguments));
-
-		// this is to force Gold Ore pathway in BSK+IW and avoid soft locks
-		if(this.game.ironWill && this.game.challenges.isActive('blackSky')) {
-			if(model.metadata.name == 'construction') {
-				prices_result = prices_result.concat([{name: "gold", val: 5}]);
-			}
-		}
-
-		return prices_result;
+		return this.game.science.getPrices(model.metadata); //*sigh* I want to avoid duplicate code if possible
     },
 
 	updateVisible: function(model){

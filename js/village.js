@@ -783,7 +783,24 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 	},
 
 	gainHuntRes: function (squads) {
-		var unicorns = this.game.resPool.addResEvent("unicorns", this.game.math.binominalRandomInteger(squads, 0.05));
+		//Expected average number of unicorns found per hunt:
+		var unicornChance = Math.max(0.05, this.game.getEffect("unicornHuntChance"));
+		//Chance of finding unicorns from any given hunt is capped at 75%
+		//So we have a 75% chance of finding this many, plus a 25% chance of finding zero.
+		var guaranteedUnicorns = Math.floor(unicornChance / 0.75);
+		//Number of hunting trips that found at least the "guaranteed" number of unicorns:
+		var huntsFindGuaranteedUnicorns = this.game.math.binominalRandomInteger(squads, 0.75);
+		//Number of hunting trips that found the "guaranteed" number of unicorns plus 1 unicorn:
+		//This is always a subset of huntsFindGuaranteedUnicorns.
+		var huntsFindAdditionalUnicorns = this.game.math.binominalRandomInteger(huntsFindGuaranteedUnicorns,
+			unicornChance / 0.75 - guaranteedUnicorns);
+
+		//The numbers look a little weird, but you can verify for yourself that the average number of unicorns
+		//found over a large number of hunts is unicornChance * squads, but any individual hunt has a 25%
+		//chance of finding no unicorns.  It's just that the successful hunts find more to compensate.
+
+		var unicorns = this.game.resPool.addResEvent("unicorns",
+			(huntsFindGuaranteedUnicorns * guaranteedUnicorns) + huntsFindAdditionalUnicorns);
 		if (unicorns > 0) {
 			var unicornMsg = unicorns == 1
 				? $I("village.new.one.unicorn")

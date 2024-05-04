@@ -630,6 +630,17 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			this.game.resPool.addResEvent("ivory", ivory);
 		}
 
+		// -------------- remove unicorns over the cap in a challenge ---------------
+		if (this.game.challenges.isActive("unicornTears")) {
+			var unicorns = this.game.resPool.get("unicorns");
+			if (unicorns.value > unicorns.maxValue) {
+				var amtLost = Math.ceil(unicorns.value - unicorns.maxValue);
+				this.game.resPool.addResEvent("unicorns", -amtLost);
+				this.game.resPool.addResEvent("tMythril", amtLost * 0.00075); //1000 unicorns -> 0.75 T-Mythril
+				this.game.msg($I("calendar.msg.unicorns.departed", [this.game.getDisplayValueExt(amtLost)]));
+			}
+		}
+
 		this.game.diplomacy.onNewDay();
 
 		this.adjustCryptoPrice();
@@ -853,6 +864,8 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			this.game.bld.get("steamworks").jammed = false;
 		}
 
+		this.game.religion.autoSacrificeUnicorns();
+
 		// Apply seasonEffect for the newSeason
 		this.game.upgrade({
 			buildings: ["pasture"]
@@ -903,6 +916,8 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		if (this.game.bld.get("steamworks").jammed) {
 			this.game.bld.get("steamworks").jammed = false;	//reset jammed status
 		}
+
+		this.game.religion.autoSacrificeUnicorns();
 
 		if(milleniumChangeCalculated){
 			this.calculateMilleniumProduction(this.getMilleniaChanged(this.year - years, this.year));
@@ -988,6 +1003,8 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 		if (this.game.bld.get("steamworks").jammed) {
 			this.game.bld.get("steamworks").jammed = false;	//reset jammed status
 		}
+		
+		this.game.religion.autoSacrificeUnicorns();
 
 		if ( this.year % 1000 === 0 ){
 			this.game.resPool.addResEvent("paragon", 1);
