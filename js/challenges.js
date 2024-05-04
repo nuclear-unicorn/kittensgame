@@ -633,6 +633,12 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				this.getChallenge("energy").unlocked = true;
 			}
 		} 
+		if (!this.game.getFeatureFlag("UNICORN_TEARS_CHALLENGE")) {
+			var challenge = this.getChallenge("unicornTears");
+			challenge.unlocked = false;
+			challenge.active = false;
+			challenge.pending = false;
+		}
 
 		//Iron Will has special rules.  Just make the UI more obvious when the game is in IW mode:
 		this.getChallenge("ironWill").active = this.game.ironWill;
