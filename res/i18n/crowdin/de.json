@@ -989,6 +989,7 @@
     "res.stack.boost": "Verstärkung",
     "res.stack.buildings": "Gebäude",
     "res.stack.corruptionPerDay": "Korruption",
+    "res.stack.corruptionPerDayProduction": "Korruptionsproduktion",
     "res.stack.policy": "Richtlinie",
     "res.stack.pollution": "Verschmutzung",
     "res.stack.convCons": "Konversations Verbrauch",
