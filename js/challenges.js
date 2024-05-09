@@ -10,13 +10,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			}
 			//Get the base amount for the effect:
 			var amt = challenge.effects[effectName] || 0;
-			if (effectName == "kittenLaziness" ) { //Calculated in a special way just for the Anarchy Challenge
-				return amt;
-			}
 			var stackOptions = (challenge.stackOptions || {})[effectName] || {}; //Get the stack options for this effect.  If it doesn't exist, get an empty object instead.
 			if (stackOptions.noStack) {
-				//This effect doesn't stack.  Apply only if the Challenge has been completed.
-				return challenge.researched ? amt : 0;
+				//This effect doesn't stack; use value directly from the Challenge data.
+				return amt;
 			}
 			//Else, the effect stacks with Challenge completions.
 			amt *= challenge.on;
@@ -38,8 +35,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 
 	//Challenges have an optional property named "stackOptions".
 	//stackOptions is a table where the keys are the names of effects & the values are objects with parameters that control how that effect behaves when the challenge has been completed multiple times.
-	//	noStack - If true, the effect only cares about whether or not the Challenge has been completed, but it doesn't care about the exact number of completions.
-	//			If noStack is combined with another option, noStack overrides all other options & the effect doesn't stack.
+	//	noStack - If true, the effect is used directly from the Challenge data with no modifications at all.
 	//	LDRLimit - Applies Limited Diminishing Returns (LDR) specifying the asymptotic limit.
 	//	capMagnitude - The magnitude of the effect will be clamped to this value, but the sign of the effect will not be changed.
 	//			If capMagnitude is combined with LDRLimit, the LDR will be applied first, then the magnitude will be capped afterwards.
@@ -49,15 +45,13 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		label: $I("challendge.ironWill.label"),
 		description: $I("challendge.ironWill.desc"),
 		effectDesc: $I("challendge.ironWill.effect.desc"),
-        researched: false,
-        unlocked: true
+		defaultUnlocked: true
 	},{
 		name: "winterIsComing",
 		label: $I("challendge.winterIsComing.label"),
 		description: $I("challendge.winterIsComing.desc"),
 		effectDesc: $I("challendge.winterIsComing.effect.desc"),
-		researched: false,
-		unlocked: true,
+		defaultUnlocked: true,
 		upgrades: {
 			buildings: ["pasture"]
 		},
@@ -94,15 +88,14 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		label: $I("challendge.anarchy.label"),
 		description: $I("challendge.anarchy.desc"),
 		effectDesc: $I("challendge.anarchy.effect.desc"),
-		researched: false,
-		unlocked: true,
+		defaultUnlocked: true,
         effects: {
 			"masterSkillMultiplier": 0.2,
 			"kittenLaziness": 0
         },
 		stackOptions: {
 			"masterSkillMultiplier": { LDRLimit: 4 },
-			"kittenLaziness": { LDRLimit: 0.25 }
+			"kittenLaziness": { LDRLimit: 0.25, noStack: true }
 		},
 		calculateEffects: function(self, game){
 			if (self.active) {
@@ -121,8 +114,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		label: $I("challendge.energy.label"),
 		description: $I("challendge.energy.desc"),
 		effectDesc: $I("challendge.energy.effect.desc"),
-        researched: false,
-		unlocked: false,
 		effects: {
 			"energyConsumptionRatio": -0.02,
 			"energyConsumptionIncrease": 0
@@ -185,9 +176,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		checkCompletionConditionOnReset: function(game){
 			return game.time.getVSU("cryochambers").on > 0;
 		},
-		researched: false,
-		reserveDelay: true,
-        unlocked: false
+		reserveDelay: true
 	},{
 		name: "1000Years",
 		label: $I("challendge.1000Years.label"),
@@ -223,8 +212,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			}
 			game.upgrade(self.upgrades); //this is a hack, might need to think of a better sollution later
 		},
-		researched: false,
-		unlocked: false,
 		upgrades:{
 			chronoforge: ["temporalPress"]
 		},
@@ -236,8 +223,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		label: $I("challendge.blackSky.label"),
 		description: $I("challendge.blackSky.desc"),
 		effectDesc: $I("challendge.blackSky.effect.desc"),
-		researched: false,
-		unlocked: false,
         effects: {
 			"corruptionBoostRatioChallenge": 0.1,
 			"bskSattelitePenalty": 0
@@ -314,9 +299,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		upgrades: {
 			upgrades: ["compositeBow", "crossbow", "railgun"]
 		},
-		researched: false,
 		reserveDelay: true,
-		unlocked: false,
 		getTradeBonusEffect: function(game){
 			var self = game.challenges.getChallenge("pacifism");
 			if(!self.on || game.challenges.isActive("pacifism")){
@@ -329,12 +312,15 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			return (tradepost.effects["tradeRatio"] * Math.min(tradepostLimit, tradepost.val * tradepostRatioLimit));
 		}
 	},{
+		name: "unicornTears",
+		label: $I("challendge.unicornTears.label"),
+		description: $I("challendge.unicornTears.desc"),
+		effectDesc: $I("challendge.unicornTears.effect.desc")
+	},{
 		name: "postApocalypse",
 		label: $I("challendge.postApocalypse.label"),
 		description: $I("challendge.postApocalypse.desc"),
 		effectDesc: $I("challendge.postApocalypse.effect.desc"),
-		researched: false,
-		unlocked: false,
 		flavor: $I("challendge.postApocalypse.flavor"),
         effects: {
 			"arrivalSlowdown": 0, //additive with pollution
@@ -366,20 +352,31 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			game.science.getPolicy("terraformingInsight").unlocked = true; //policy which helpes to get more paragon this run
 			game.science.getPolicy("cryochamberExtraction").unlocked = true; //single use policy; gets not researched after player gets the bonus
 		}
-		}],
+	}],
 
 	game: null,
 
 	resetState: function(){
 		for (var i = 0; i < this.challenges.length; i++){
-			var challenge = this.challenges[i];
-			challenge.enabled = false;
-			challenge.pending = false;
-			challenge.active = false;
-			this.resetStateStackable(challenge);
+			this.resetStateStackable(this.challenges[i]);
 		}
 		this.currentChallenge = null;
 		this.reserves.resetState();
+	},
+
+	/**
+	 * The parent class's resetStateStackable, defined in core.js, is designed for buildings.
+	 * Challenges are so fundamentally different that I felt it was best to write custom logic for them.
+	 * That way, if someone decides to call this function, it'll have well-defined behavior.
+	 * @param challenge The Challenge whose state will be reset to default values.
+	 * @return Nothing
+	 */
+	resetStateStackable: function(challenge) {
+		challenge.unlocked = Boolean(challenge.defaultUnlocked);
+		challenge.pending = false;
+		challenge.active = false;
+		challenge.researched = false;
+		challenge.on = 0;
 	},
 
 	save: function(saveData){
