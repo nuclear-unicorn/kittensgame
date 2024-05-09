@@ -2275,7 +2275,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var saveData = {
 			saveVersion: this.saveVersion,
 			resources: this.resPool.filterMetadata(
-				this.resPool.resources, ["name", "value", "unlocked", "isHidden"]
+				this.resPool.resources, ["name", "value", "unlocked", "isHidden", "isHiddenFromCrafting"]
 			)
 		};
 
