@@ -1897,7 +1897,7 @@
     "modal.button.ok": "好的",
     "modal.button.cancel": "取消",
     "workshop.upgradePanel.label": "升级",
-    "workshop.all.upgrades.unlocked": "所有升级均已解锁!",
+    "workshop.all.upgrades.unlocked": "所有升级都已解锁！",
     "workshop.toggleResearched.label": "隐藏已完成的升级",
     "workshop.advancedAutomation.label": "高级自动化",
     "workshop.advancedAutomation.desc": "工坊自动化每年将运行两次",
