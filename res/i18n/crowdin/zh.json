@@ -1982,7 +1982,7 @@
     "workshop.craft.effectiveness": "工艺制作效率: +{0}%",
     "workshop.craftBtn.desc.countdown": "每 {0} 秒制作一次",
     "workshop.craftBtn.desc.craftRatio": "工程师专有技能",
-    "workshop.craftBtn.desc.effectivenessBonus": "工艺制作效率加成: +{0}%",
+    "workshop.craftBtn.desc.effectivenessBonus": "锻造效率加成：+{0}%",
     "workshop.craftBtn.desc.progressHandicap": "工艺制作难度",
     "workshop.craftBtn.desc.tier": "工程师的最适等级",
     "workshop.craftPanel.label": "工艺制作",
