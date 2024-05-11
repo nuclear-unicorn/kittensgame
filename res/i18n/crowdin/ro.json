@@ -95,6 +95,7 @@
     "buildings.chapel.label": "Capela",
     "buildings.field.label": "Câmp de iarba-mâței",
     "buildings.field.desc": "Planteaza niste iarba matzei in sat. Campurile au +50% productie primavara si -75% productie iarna",
+    "buildings.field.flavor": "'Iarba cat poți vedea cu ochii.",
     "buildings.observatory.desc": "Crește șansa evenimentelor astronomice cu 0.2%",
     "buildings.quarry.label": "Cariera de piatra",
     "buildings.group.zebraBuildings": "Zebre",
