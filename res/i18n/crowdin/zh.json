@@ -756,7 +756,7 @@
     "policy.siphoning.label": "虹吸主义",
     "policy.siphoning.desc": "契约会消耗天角兽并减缓腐化，而不是消耗死灵兽。缺少天角兽或腐化可以通过消耗死灵兽来弥补。",
     "policy.socialism.label": "社会主义",
-    "policy.socialism.desc": "没有效果",
+    "policy.socialism.desc": "无效",
     "policy.spaceBasedTerraforming.label": "天基星球改造",
     "policy.spaceBasedTerraforming.desc": "在太空中放置巨型反射镜，提高太阳能发电站的一致性。解锁空间反射镜",
     "policy.stoicism.label": "斯多葛主义",
