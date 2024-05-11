@@ -750,8 +750,11 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				effects: {
 					"maxKittens": 1
 				},
-				action: function(self, game) {
+				updateEffects: function(self, game) {
 					self.effects["maxKittens"] = 1 + game.getEffect("terraformingMaxKittensRatio");
+				},
+				action: function(self, game) {
+					self.updateEffects(self, game);
 				},
 				unlocks: {
 					tabs: ["village"]

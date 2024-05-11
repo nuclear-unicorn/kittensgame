@@ -3833,7 +3833,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		//maybe it will be a good idea to move it elsewhere?
 
 		//for example, here kitten resources are calculated per effect, this logic could be unified
-
 		this.village.maxKittens = Math.floor(this.getEffect("maxKittens"));
 
 		this.village.update();
@@ -5092,7 +5091,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				pacts: this.religion.pactsManager.pacts.map(getName),
 				challenges: this.challenges.challenges.map(getName)
 			};
-		this.upgrade({ buildings: ["warehouse"]});
+		this.upgrade({ buildings: ["warehouse"], spaceBuilding: ["hydroponics"]});
 		this.upgrade(metaKeys);
 		this.upgrade({policies: ["authocracy"]});
 	},
@@ -5222,8 +5221,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 					console.error("unable to get unlock by [id]", list[type][i], "[type]", type);
 					continue;
 				}
-				if (item.calculateEffects){
-					item.calculateEffects(item, this);
+				if (item.calculateEffects || item.updateEffects){
+					//Call calculateEffects or updateEffects, but don't call both.
+					if (item.calculateEffects) {
+						item.calculateEffects(item, this);
+					} else {
+						item.updateEffects(item, this);
+					}
 					if (type == "spaceBuilding") {
 						this.calendar.cycleEffectsBasics(item.effects, item.name);
 					}
