@@ -315,7 +315,28 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		name: "unicornTears",
 		label: $I("challendge.unicornTears.label"),
 		description: $I("challendge.unicornTears.desc"),
-		effectDesc: $I("challendge.unicornTears.effect.desc")
+		effectDesc: $I("challendge.unicornTears.effect.desc"),
+		effects: {
+			"unicornsMax": 0,
+			"tearsMax": 0,
+			"alicornMax": 0
+		},
+		calculateEffects: function(self, game) {
+			if (self.active) {
+				self.effects["unicornsMax"] = 10;
+				self.effects["tearsMax"] = 1;
+				self.effects["alicornMax"] = 0.2;
+			} else {
+				self.effects["unicornsMax"] = 0;
+				self.effects["tearsMax"] = 0;
+				self.effects["alicornMax"] = 0;
+			}
+		},
+		stackOptions: {
+			"unicornsMax": { noStack: true },
+			"tearsMax": { noStack: true },
+			"alicornMax": { noStack: true }
+		}
 	},{
 		name: "postApocalypse",
 		label: $I("challendge.postApocalypse.label"),
