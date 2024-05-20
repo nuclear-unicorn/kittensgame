@@ -1288,7 +1288,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				resFrom: model.prices[0].name,
 				resTo: this.controllerOpts.gainedResource,
 				valFrom: priceCount,
-				valTo: gainCount
+				valTo: actualGainCount
 			*/
 			var resConverted = resPool.get(data.resTo);
 			/*
@@ -1297,9 +1297,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				find out actual remaining value
 				and refund it proportionally, but I am to lazy to code it in 
 			*/
-			if (resConverted.value > data.valTo) {
+			if (resConverted.value >= data.valTo) {
 				this.game.resPool.addResEvent(data.resFrom, data.valFrom);
 				this.game.resPool.addResEvent(data.resTo, -data.valTo);
+				this.game.msg($I("workshop.undo.msg", [this.game.getDisplayValueExt(data.valTo), (resConverted.title || resConverted.name)]));
 			}
 		}
 	}
@@ -1479,8 +1480,19 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 		}
 	},
 
+	//Calculates the max number of transformations the player can afford to do.
+	//If the resource has a storage cap (such as during a Unicorn Tears Challenge),
+	//it won't give the option to go farther than 1 transformation above that cap.
 	_canAfford: function(model) {
-		return Math.floor(this.game.resPool.get(model.prices[0].name).value / model.prices[0].val);
+		var spendRes = this.game.resPool.get(model.prices[0].name);
+		var gainRes = this.game.resPool.get(this.controllerOpts.gainedResource);
+		var amtWeCanAfford = Math.floor(spendRes.value / model.prices[0].val);
+
+		if (gainRes.maxValue && amtWeCanAfford > 1) { //Perform this check only if we can afford 2 or more
+			var amtToReachCap = Math.ceil((gainRes.maxValue - gainRes.value) / this.controllerOpts.gainMultiplier.call(this));
+			amtWeCanAfford = Math.min(amtWeCanAfford, amtToReachCap);
+		}
+		return amtWeCanAfford;
 	},
 
 	transform: function(model, divider, event, callback) {
@@ -1510,25 +1522,37 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 			return false;
 		}
 
-		var gainCount = this.controllerOpts.gainMultiplier.call(this) * amt;
+		var attemptedGainCount = this.controllerOpts.gainMultiplier.call(this) * amt;
 
 		this.game.resPool.addResEvent(model.prices[0].name, -priceCount);
-		this.game.resPool.addResEvent(this.controllerOpts.gainedResource, gainCount);
+
+		//Gain the resource & remember the amount we gained, taking into account resource storage limits:
+		var actualGainCount = this.game.resPool.addResEvent(this.controllerOpts.gainedResource, attemptedGainCount);
+
+		//Amount of the resource we failed to gain because we hit the cap:
+		var overcap = attemptedGainCount - actualGainCount;
 
 		if (this.controllerOpts.applyAtGain) {
 			this.controllerOpts.applyAtGain.call(this, priceCount);
 		}
 
+		if (overcap > 0.001) { //Don't trigger from floating-point errors
+			//Optional parameter to display a message when we overcap:
+			if (typeof(this.controllerOpts.overcapMsgID) === "string") {
+				this.game.msg($I(this.controllerOpts.overcapMsgID, [this.game.getDisplayValueExt(overcap)]), "", this.controllerOpts.logfilterID, true /*noBullet*/);
+			}
+		}
+
 		var undo = this.game.registerUndoChange();
-        undo.addEvent("religion", {
+		undo.addEvent("religion", {
 			action:"refine",
 			resFrom: model.prices[0].name,
 			resTo: this.controllerOpts.gainedResource,
 			valFrom: priceCount,
-			valTo: gainCount
+			valTo: actualGainCount
 		});
 
-		this.game.msg($I(this.controllerOpts.logTextID, [this.game.getDisplayValueExt(priceCount), this.game.getDisplayValueExt(gainCount)]), "", this.controllerOpts.logfilterID);
+		this.game.msg($I(this.controllerOpts.logTextID, [this.game.getDisplayValueExt(priceCount), this.game.getDisplayValueExt(actualGainCount)]), "", this.controllerOpts.logfilterID);
 
 		return true;
 	}
@@ -2165,6 +2189,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 					applyAtGain: function(priceCount) {
 						this.game.stats.getStat("unicornsSacrificed").val += priceCount;
 					},
+					overcapMsgID: "religion.sacrificeBtn.sacrifice.msg.overcap",
 					logTextID: "religion.sacrificeBtn.sacrifice.msg",
 					logfilterID: "unicornSacrifice"
 				})

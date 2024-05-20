@@ -1048,6 +1048,7 @@
     "religion.sacrificeBtn.label": "Sacrifice Unicorns",
     "religion.sacrificeBtn.desc": "Return the unicorns to the Unicorn Dimension. You will receive one Unicorn Tear for every ziggurat you have.",
     "religion.sacrificeBtn.sacrifice.msg": "{0} unicorns have been sacrificed. You've got {1} unicorn tears!",
+    "religion.sacrificeBtn.sacrifice.msg.overcap": "{0} tears spilled, vanishing into black smoke.",
     "religion.transcend.confirmation.title": "Transcend?",
     "religion.transcend.confirmation.msg": "Are you sure you want to discard part of your epiphany?\n\nYou can reach special transcendence tiers by sacrificing part of your epiphany.\n\nEach tier will boost the effectiveness of worship conversion (Adore the stars).\n\nEvery level requires proportionally more epiphany to be sacrificed.\n\nThis bonus will stack and carry over through resets.\n\nCLICKING THIS BUTTON WILL ERASE PART OF YOUR EPIPHANY AND PRAISING EFFICIENCY.",
     "religion.transcend.msg.failure": "One step closer: {0}%",
