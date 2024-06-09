@@ -723,6 +723,7 @@
     "religion.refineTCsBtn.label": "Refine Time Crystals",
     "religion.refineTCsBtn.refine.msg": "{0} relics crafted",
     "religion.refineTearsBtn.desc": "Raffina lacrime di unicorno in Oscuro Rimpianto Liquido.",
+    "religion.refineTearsBtn.label": "Raffina Lacrime",
     "religion.refineTearsBtn.refine.msg.failure": "Non accade nulla",
     "religion.ru.apocripha.label": "Apocrifo",
     "religion.ru.apocripha.desc": "Grants the ability to discard accumulated faith to improve effectiveness of praying",
