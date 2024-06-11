@@ -17,7 +17,15 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     constructor: function(game){
         this.game = game;
 
-		this.registerMeta("stackable", this.chronoforgeUpgrades, null);
+		this.registerMeta(false, this.chronoforgeUpgrades, {
+		//Custom provider: Don't count effects of Temporal Presses if we haven't researched Chronoforge yet.
+		//If TPs are carried over, they can make Energy challenges harder for no good reason.
+		getEffect: function(cfu, effectName){
+			if (!game.workshop.get("chronoforge").researched) {
+				return 0;
+			}
+			return (cfu.effects) ? cfu.effects[effectName] * cfu.on : 0;
+		}});
 		this.registerMeta("stackable", this.voidspaceUpgrades, null);
 		this.setEffectsCachedExisting();
         this.queue = new classes.queue.manager(game);
