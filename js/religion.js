@@ -363,7 +363,15 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		],
 		priceRatio: 1.15,
 		effects: {
-			"unicornsRatioReligion" : 0.05
+			"unicornsRatioReligion" : 0.05,
+			"tearsMax": 0
+		},
+		calculateEffects: function(self, game) {
+			if (game.challenges.isActive("unicornTears")) {
+				self.effects["tearsMax"] = 1;
+			} else {
+				self.effects["tearsMax"] = 0;
+			}
 		},
 		unlocked: true,
 		defaultUnlocked: true,
@@ -381,7 +389,15 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		priceRatio: 1.15,
 		effects: {
 			"unicornsRatioReligion" : 0.1,
-			"riftChance" : 0.0005
+			"riftChance" : 0.0005,
+			"tearsMax": 0
+		},
+		calculateEffects: function(self, game) {
+			if (game.challenges.isActive("unicornTears")) {
+				self.effects["tearsMax"] = 20;
+			} else {
+				self.effects["tearsMax"] = 0;
+			}
 		},
 		unlocked: false,
 		defaultUnlocked: false,
@@ -399,7 +415,18 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		priceRatio: 1.15,
 		effects: {
 			"unicornsRatioReligion" : 0.25,
-			"ivoryMeteorChance" : 0.0005
+			"ivoryMeteorChance" : 0.0005,
+			"unicornsMax": 0,
+			"tearsMax": 0
+		},
+		calculateEffects: function(self, game) {
+			if (game.challenges.isActive("unicornTears")) {
+				self.effects["unicornsMax"] = 2000;
+				self.effects["tearsMax"] = 5;
+			} else {
+				self.effects["unicornsMax"] = 0;
+				self.effects["tearsMax"] = 0;
+			}
 		},
 		unlocked: false,
 		defaultUnlocked: false,
@@ -421,7 +448,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"unicornsRatioReligion" : 0,
 			"alicornChance" : 0,
 			"alicornPerTick" : 0,
-			"ivoryMeteorRatio" : 0
+			"ivoryMeteorRatio" : 0,
+			"unicornsMax": 0,
+			"tearsMax": 0,
+			"alicornMax": 0
 		},
 		calculateEffects: function(self, game) {
 			var effects = {
@@ -429,10 +459,18 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				"unicornsRatioReligion" : 0.5,
 				"alicornChance" : 0.0001,
 				"alicornPerTick" : 0,
-				"ivoryMeteorRatio" : 0.05
+				"ivoryMeteorRatio" : 0.05,
+				"unicornsMax": 0,
+				"tearsMax": 0,
+				"alicornMax": 0
 			};
 			if (game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.00002;
+			}
+			if (game.challenges.isActive("unicornTears")) {
+				effects["unicornsMax"] = 50;
+				effects["tearsMax"] = 275;
+				effects["alicornMax"] = 0.2;
 			}
 			self.effects = effects;
 		},
@@ -456,7 +494,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"alicornChance" : 0,
 			"alicornPerTick" : 0,
 			"tcRefineRatio" : 0,
-			"ivoryMeteorRatio" : 0
+			"ivoryMeteorRatio" : 0,
+			"unicornsMax": 0,
+			"tearsMax": 0,
+			"alicornMax": 0
 		},
 		calculateEffects: function(self, game) {
 			var effects = {
@@ -464,10 +505,18 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				"alicornChance" : 0.00015,
 				"alicornPerTick" : 0,
 				"tcRefineRatio" : 0.05,
-				"ivoryMeteorRatio" : 0.15
+				"ivoryMeteorRatio" : 0.15,
+				"unicornsMax": 0,
+				"tearsMax": 0,
+				"alicornMax": 0
 			};
 			if (game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.000025;
+			}
+			if (game.challenges.isActive("unicornTears")) {
+				effects["unicornsMax"] = 5500;
+				effects["tearsMax"] = 1800;
+				effects["alicornMax"] = 0.6;
 			}
 			self.effects = effects;
 		},
@@ -497,7 +546,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"alicornChance" : 0,
 			"alicornPerTick" : 0,
 			"tcRefineRatio": 0,
-			"ivoryMeteorRatio" : 0
+			"ivoryMeteorRatio" : 0,
+			"unicornsMaxRatio": 0,
+			"tearsMax": 0,
+			"alicornMax": 0
 		},
 		calculateEffects: function(self, game) {
 			var effects = {
@@ -505,10 +557,18 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				"alicornChance" : 0.0003,
 				"alicornPerTick" : 0,
 				"tcRefineRatio" : 0.1,
-				"ivoryMeteorRatio" : 0.5
+				"ivoryMeteorRatio" : 0.5,
+				"unicornsMaxRatio": 0,
+				"tearsMax": 0,
+				"alicornMax": 0
 			};
 			if (game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.00005;
+			}
+			if (game.challenges.isActive("unicornTears")) {
+				effects["unicornsMaxRatio"] = 0.1;
+				effects["tearsMax"] = 10000;
+				effects["alicornMax"] = 1;
 			}
 			self.effects = effects;
 		},
@@ -1228,7 +1288,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				resFrom: model.prices[0].name,
 				resTo: this.controllerOpts.gainedResource,
 				valFrom: priceCount,
-				valTo: gainCount
+				valTo: actualGainCount
 			*/
 			var resConverted = resPool.get(data.resTo);
 			/*
@@ -1237,9 +1297,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				find out actual remaining value
 				and refund it proportionally, but I am to lazy to code it in 
 			*/
-			if (resConverted.value > data.valTo) {
+			if (resConverted.value >= data.valTo) {
 				this.game.resPool.addResEvent(data.resFrom, data.valFrom);
 				this.game.resPool.addResEvent(data.resTo, -data.valTo);
+				this.game.msg($I("workshop.undo.msg", [this.game.getDisplayValueExt(data.valTo), (resConverted.title || resConverted.name)]));
 			}
 		}
 	}
@@ -1419,8 +1480,19 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 		}
 	},
 
+	//Calculates the max number of transformations the player can afford to do.
+	//If the resource has a storage cap (such as during a Unicorn Tears Challenge),
+	//it won't give the option to go farther than 1 transformation above that cap.
 	_canAfford: function(model) {
-		return Math.floor(this.game.resPool.get(model.prices[0].name).value / model.prices[0].val);
+		var spendRes = this.game.resPool.get(model.prices[0].name);
+		var gainRes = this.game.resPool.get(this.controllerOpts.gainedResource);
+		var amtWeCanAfford = Math.floor(spendRes.value / model.prices[0].val);
+
+		if (gainRes.maxValue && amtWeCanAfford > 1) { //Perform this check only if we can afford 2 or more
+			var amtToReachCap = Math.ceil((gainRes.maxValue - gainRes.value) / this.controllerOpts.gainMultiplier.call(this));
+			amtWeCanAfford = Math.min(amtWeCanAfford, amtToReachCap);
+		}
+		return amtWeCanAfford;
 	},
 
 	transform: function(model, divider, event, callback) {
@@ -1450,25 +1522,37 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 			return false;
 		}
 
-		var gainCount = this.controllerOpts.gainMultiplier.call(this) * amt;
+		var attemptedGainCount = this.controllerOpts.gainMultiplier.call(this) * amt;
 
 		this.game.resPool.addResEvent(model.prices[0].name, -priceCount);
-		this.game.resPool.addResEvent(this.controllerOpts.gainedResource, gainCount);
+
+		//Gain the resource & remember the amount we gained, taking into account resource storage limits:
+		var actualGainCount = this.game.resPool.addResEvent(this.controllerOpts.gainedResource, attemptedGainCount);
+
+		//Amount of the resource we failed to gain because we hit the cap:
+		var overcap = attemptedGainCount - actualGainCount;
 
 		if (this.controllerOpts.applyAtGain) {
 			this.controllerOpts.applyAtGain.call(this, priceCount);
 		}
 
+		if (overcap > 0.001) { //Don't trigger from floating-point errors
+			//Optional parameter to display a message when we overcap:
+			if (typeof(this.controllerOpts.overcapMsgID) === "string") {
+				this.game.msg($I(this.controllerOpts.overcapMsgID, [this.game.getDisplayValueExt(overcap)]), "", this.controllerOpts.logfilterID, true /*noBullet*/);
+			}
+		}
+
 		var undo = this.game.registerUndoChange();
-        undo.addEvent("religion", {
+		undo.addEvent("religion", {
 			action:"refine",
 			resFrom: model.prices[0].name,
 			resTo: this.controllerOpts.gainedResource,
 			valFrom: priceCount,
-			valTo: gainCount
+			valTo: actualGainCount
 		});
 
-		this.game.msg($I(this.controllerOpts.logTextID, [this.game.getDisplayValueExt(priceCount), this.game.getDisplayValueExt(gainCount)]), "", this.controllerOpts.logfilterID);
+		this.game.msg($I(this.controllerOpts.logTextID, [this.game.getDisplayValueExt(priceCount), this.game.getDisplayValueExt(actualGainCount)]), "", this.controllerOpts.logfilterID);
 
 		return true;
 	}
@@ -2105,6 +2189,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 					applyAtGain: function(priceCount) {
 						this.game.stats.getStat("unicornsSacrificed").val += priceCount;
 					},
+					overcapMsgID: "religion.sacrificeBtn.sacrifice.msg.overcap",
 					logTextID: "religion.sacrificeBtn.sacrifice.msg",
 					logfilterID: "unicornSacrifice"
 				})

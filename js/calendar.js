@@ -630,6 +630,33 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			this.game.resPool.addResEvent("ivory", ivory);
 		}
 
+		// -------------- Enforce storage limits in Unicorn Tears Challenge ---------------
+		if (this.game.challenges.isActive("unicornTears")) {
+			var unicorns = this.game.resPool.get("unicorns");
+			if (unicorns.value > unicorns.maxValue) {
+				//Unicorns wander away (always in integer amounts!)
+				var amtLost = Math.ceil(unicorns.value - unicorns.maxValue);
+				this.game.resPool.addResEvent("unicorns", -amtLost);
+				//Mostly a joke way to get T-Mythril, really
+				this.game.resPool.addResEvent("tMythril", amtLost * 0.00075); //1000 unicorns -> 0.75 T-Mythril
+				this.game.msg($I("calendar.msg.unicorn.departed", [this.game.getDisplayValueExt(amtLost)]));
+			}
+			var tears = this.game.resPool.get("tears");
+			if (tears.value > tears.maxValue) {
+				//Tears spill out of the container
+				var amtLost = tears.value - tears.maxValue;
+				this.game.resPool.addResEvent("tears", -amtLost);
+				this.game.msg($I("calendar.msg.tear.spilled", [this.game.getDisplayValueExt(amtLost)]));
+			}
+			var alicorns = this.game.resPool.get("alicorn");
+			if (alicorns.value > alicorns.maxValue) {
+				//Alicorns ascend back into the sky (always in integer amounts!)
+				var amtLost = Math.ceil(alicorns.value - alicorns.maxValue);
+				this.game.resPool.addResEvent("alicorn", -amtLost);
+				this.game.msg($I("calendar.msg.alicorn.departed", [this.game.getDisplayValueExt(amtLost)]));
+			}
+		}
+
 		this.game.diplomacy.onNewDay();
 
 		this.adjustCryptoPrice();

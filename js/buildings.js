@@ -161,7 +161,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					effectValue = bld.effects[effectName];
 		        }
 
-
 				// Need a better way to do this...
 				if (effectName == "coalRatioGlobal") {
 					effect = effectValue;
@@ -1921,7 +1920,20 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		priceRatio: 1.75,
 		effects: {
 			"catnipDemandRatio": -0.0015,
-			"unicornsPerTickBase" : 0.001
+			"unicornsPerTickBase" : 0.001,
+			"unicornsMax": 0
+		},
+		calculateEffects: function(self, game) {
+			self.effects["unicornsPerTickBase"] = 0.001;
+			if (game.challenges.isActive("unicornTears")) {
+				self.effects["unicornsMax"] = 50;
+				//If combo of Atheism + Unicorn Tears, compensate for lack of SR bonus:
+				if (game.challenges.isActive("atheism")) {
+					self.effects["unicornsPerTickBase"] *= 5;
+				}
+			} else {
+				self.effects["unicornsMax"] = 0;
+			}
 		},
 		flavor: $I("buildings.unicornPasture.flavor")
 	},
@@ -1942,11 +1954,15 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			buildings: ["temple"]
 		},
 		effects: {
-			"cultureMaxRatio": 0.08
+			"cultureMaxRatio": 0.08,
+			"unicornsMax": 0,
+			"tearsMax": 0
 		},
 		calculateEffects: function(self, game) {
 			var effects = {
-				cultureMaxRatio: 0.08
+				cultureMaxRatio: 0.08,
+				unicornsMax: 0,
+				tearsMax: 0
 			};
 			if(game.science.getPolicy("nagaRelationsCultists").researched) {
 				game.upgrade(
@@ -1964,6 +1980,10 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				effects = Object.assign(effects, templeEffects);
 			}
 			effects["cultureMaxRatio"] = 0.08 + game.getEffect("cultureMaxRatioBonus");
+			if (game.challenges.isActive("unicornTears")) {
+				effects["unicornsMax"] = 700;
+				effects["tearsMax"] = 3;
+			}
 			self.effects = effects;
 			if(self.val){
 				game.time.queue.unlockQueueSource("zigguratUpgrades");
