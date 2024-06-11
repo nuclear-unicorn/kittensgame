@@ -1,6 +1,6 @@
 dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager, {
     game: null,
-    testShatter: 0, //0 is current function call, 1 is shatterInGroupCycles, 2 is shatterInCycles
+    testShatter: 0, //0 is current function call, 1 is shatterInGroupCycles, 2 is shatterInCycles (deprecated)
     /*
      * Amount of years skipped by CF time jumps
      */
@@ -698,6 +698,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     3)calculates Millenium production
     4)calculates flux
     likely to be deprecated after shatterInGroupCycles is finished
+       Note from another dev: it's deprecated already, so does that mean shatterInGroupCycles is finished now?
     */
     shatterInCycles: function(amt){
         amt = amt || 1;
@@ -942,7 +943,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 this.shatter(shatters);
             }
             var oldShatterD2 = new Date();
-            console.log("oldShatterAverafe = " + (oldShatterD2.getTime() - oldShatterD1.getTime())/times);
+            //Average time in milliseconds to resolve 1 batch of *shatters* shatters, averaged across *times* trials
+            console.log("Old shatter average = " + (oldShatterD2.getTime() - oldShatterD1.getTime())/times + " ms");
         }
         if (!ignoreGroupCycles){
             var newShatterD1 = new Date();
@@ -950,15 +952,16 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 this.shatterInGroupCycles(shatters);
             }
             var newShatterD2 = new Date();
-            console.log("Group shatter average = " + (newShatterD2.getTime() - newShatterD1.getTime())/times);
+            console.log("Group shatter average = " + (newShatterD2.getTime() - newShatterD1.getTime())/times + " ms");
         }
         if(!ignoreShatterInCycles){
+            //shatterInCycles is currently deprecated
             var new1ShatterD1 = new Date();
             for (var i = 0; i < times; i++){
                 this.shatterInCycles(shatters);
             }
             var new1ShatterD2 = new Date();
-            if(!ignoreShatterInCycles) {console.log("Cycle shatter average= " + (new1ShatterD2.getTime() - new1ShatterD1.getTime())/times);}
+            console.log("Cycle shatter average = " + (new1ShatterD2.getTime() - new1ShatterD1.getTime())/times + " ms");
         }
 
         if(!ignoreOldFunction && !ignoreGroupCycles){
@@ -966,6 +969,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         }
 
         if(!ignoreOldFunction && !ignoreShatterInCycles){
+            //shatterInCycles is currently deprecated
             console.log("new1Efficensy = " + (oldShatterD2.getTime() - oldShatterD1.getTime())/(new1ShatterD2.getTime() - new1ShatterD1.getTime()));
         }
     },
