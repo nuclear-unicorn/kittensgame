@@ -1102,11 +1102,14 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 
     _newLink: function(model, shatteredQuantity) {
         var self = this;
+        var isVisible = true; //Always true if showNonApplicableButtons is true
+        if (!this.game.opts.showNonApplicableButtons) {
+            var prices = this.getPricesMultiple(model, shatteredQuantity);
+            isVisible = (prices.timeCrystal <= this.game.resPool.get("timeCrystal").value) &&
+                        (prices.void <= this.game.resPool.get("void").value);
+        }
         return {
-            visible: this.game.opts.showNonApplicableButtons ||
-                (this.getPricesMultiple(model, shatteredQuantity).timeCrystal <= this.game.resPool.get("timeCrystal").value &&
-                (this.getPricesMultiple(model, shatteredQuantity).void <= this.game.resPool.get("void").value)
-            ),
+            visible: isVisible,
             title: "x" + shatteredQuantity,
             handler: function(event) {
                 self.doShatterAmt(model, shatteredQuantity);
