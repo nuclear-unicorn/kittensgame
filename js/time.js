@@ -977,13 +977,6 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             console.log("new1Efficensy = " + (oldShatterD2.getTime() - oldShatterD1.getTime())/(new1ShatterD2.getTime() - new1ShatterD1.getTime()));
         }
     },
-    compareGetShatterTCPricesMultiple: function(shatters) {
-        var controller = new classes.ui.time.ShatterTCBtnController(this.game);
-        var model = { options: { prices: [{name: "timeCrystal", val: 1}] }};
-        console.log( "Price of " + shatters + " shatters is:" );
-        console.log( "\tOld way: " + JSON.stringify(controller.getPricesMultiple(model, shatters)));
-        console.log( "\tNew way: " + JSON.stringify(controller.getPricesMultiple_NEW(model, shatters)));
-    },
     unlockAll: function(){
         for (var i in this.cfu){
             this.cfu[i].unlocked = true;
@@ -1173,57 +1166,6 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
             void: 0,
             timeCrystal: 0
         };
-
-		var prices_cloned = $.extend(true, [], model.options.prices);
-        var heatMax = this.game.getEffect("heatMax");
-
-        var heatFactor = this.game.challenges.getChallenge("1000Years").researched ? 5 : 10;
-
-        if(this.game.getEffect("shatterVoidCost")){
-            var shatterVoidCost = this.game.getEffect("shatterVoidCost");
-            prices_cloned.push({
-                name: "void",
-                val: shatterVoidCost
-            });
-        }
-
-		for (var k = 0; k < amt; k++) {
-			for (var i in prices_cloned) {
-				var price = prices_cloned[i];
-				if (price["name"] == "timeCrystal") {
-					var priceLoop = price["val"];
-                        var darkYears = this.game.calendar.darkFutureYears(true);
-	                if (darkYears > 0) {
-	                    priceLoop = 1 + ((darkYears) / 1000) * 0.01;
-	                }
-	                if ((this.game.time.heat + k * heatFactor) > heatMax) {
-	                    priceLoop *= (1 + (this.game.time.heat + k * heatFactor - heatMax) * 0.01);  //1% per excessive heat unit
-	                }
-
-                    //LDR for the effect "shatterCostReduction" is specified in challenges.js
-                    priceLoop *= (1 + this.game.getEffect("shatterCostReduction") +
-                        this.game.getEffect("shatterCostIncreaseChallenge"));
-
-                    pricesTotal.timeCrystal += priceLoop;
-
-				}else if (price["name"] == "void"){
-                    var priceLoop = price["val"];
-	                if ((this.game.time.heat + k * heatFactor) > heatMax) {
-	                    priceLoop *= (1 + (this.game.time.heat + k * heatFactor - heatMax) * 0.01);  //1% per excessive heat unit
-                    }
-                    pricesTotal.void += priceLoop;
-                }
-			}
-		}
-        pricesTotal.void = Math.round(pricesTotal.void * 1000) / 1000;
-		return pricesTotal;
-	},
-
-	getPricesMultiple_NEW: function(model, amt) {
-		var pricesTotal = {
-            void: 0,
-            timeCrystal: 0
-        };
 		var prices_cloned = $.extend(true, [], model.options.prices);
         if(this.game.getEffect("shatterVoidCost")){
             var shatterVoidCost = this.game.getEffect("shatterVoidCost");
@@ -1307,6 +1249,10 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         for (var i in prices_cloned) {
 			var price = prices_cloned[i];
             pricesTotal[price.name] = price.val * resultTotal;
+            //Previously, void costs didn't increase in Dark Future.
+            //I changed it so now both void & TC costs are affected by Dark Future, but I think it's
+            // fine because shattering only costs void in a 1000 Years Challenge, so you complete the
+            // 1000 Years Challenge long before reaching any Dark Future penalties.
 		}
         //Apply effects to specific resources:
         //LDR for the effect "shatterCostReduction" is specified in challenges.js
