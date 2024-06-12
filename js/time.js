@@ -977,6 +977,13 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             console.log("new1Efficensy = " + (oldShatterD2.getTime() - oldShatterD1.getTime())/(new1ShatterD2.getTime() - new1ShatterD1.getTime()));
         }
     },
+    compareGetShatterTCPricesMultiple: function(shatters) {
+        var controller = new classes.ui.time.ShatterTCBtnController(this.game);
+        var model = { options: { prices: [{name: "timeCrystal", val: 1}] }};
+        console.log( "Price of " + shatters + " shatters is:" );
+        console.log( "\tOld way: " + JSON.stringify(controller.getPricesMultiple(model, shatters)));
+        console.log( "\tNew way: " + JSON.stringify(controller.getPricesMultiple_NEW(model, shatters)));
+    },
     unlockAll: function(){
         for (var i in this.cfu){
             this.cfu[i].unlocked = true;
@@ -1208,6 +1215,102 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
                 }
 			}
 		}
+        pricesTotal.void = Math.round(pricesTotal.void * 1000) / 1000;
+		return pricesTotal;
+	},
+
+	getPricesMultiple_NEW: function(model, amt) {
+		var pricesTotal = {
+            void: 0,
+            timeCrystal: 0
+        };
+		var prices_cloned = $.extend(true, [], model.options.prices);
+        if(this.game.getEffect("shatterVoidCost")){
+            var shatterVoidCost = this.game.getEffect("shatterVoidCost");
+            prices_cloned.push({
+                name: "void",
+                val: shatterVoidCost
+            });
+        }
+
+        //Number of units of heat we can have before penalties start being applied:
+        var heatMax = this.game.getEffect("heatMax");
+        //Number of units of heat generated for each shatter performed:
+        var heatPerShatter = this.game.challenges.getChallenge("1000Years").researched ? 5 : 10;
+        //Number of units of heat we had before we started calculating the prices:
+        var heatCurrent = this.game.time.heat;
+        //Each unit of heat above heatMax increases the cost by this ratio:
+        var penaltyPerHeat = 0.01; //1% per excessive heat unit
+
+        //How many shatters we can do before heat starts affecting them:
+        var shattersBeforeHeat = (heatMax - heatCurrent) / heatPerShatter; //Not guaranteed to be an integer or even positive
+        shattersBeforeHeat = Math.max(0, Math.min(Math.ceil(shattersBeforeHeat), amt)); //Clamp & ceiling
+        if (shattersBeforeHeat < 0 ) { shattersBeforeHeat = 0; }
+        if (shattersBeforeHeat > amt ) { shattersBeforeHeat = amt; }
+        //How many shatters we do where each one generates heat which increases the price of the next:
+        var shattersAfterHeat = amt - shattersBeforeHeat;
+
+        //How many years we are into the Dark Future penalty:
+        var darkYears = this.game.calendar.darkFutureYears(true);
+        //Each year into the penalty region increases the cost by this ratio:
+        var penaltyPerDarkYear = 0.00001; //1% for every 1000 years
+
+        //How many shatters we can do before the Dark Future penalty starts affecting them:
+        // (Remember that we can build Time Impedances to delay the onset of this penalty.)
+        var shattersBeforeDF = -darkYears; //Should already be an integer!
+        shattersBeforeDF = Math.max(0, Math.min(shattersBeforeDF, amt)); //Clamp
+        //How many shatters we do where each shatter takes us deeper into the Dark Future penalty:
+        var shattersAfterDF = amt - shattersBeforeDF;
+
+        //There's a thing called discrete integrals which are EXACTLY what I want in this situation.
+        //Imagine integrating Ax^2 + Bx + C, except you don't want a smooth integral, you just want the area under a "staircase" looking thing.
+        //To simplify things a little bit, we're taking the definite integral from 0 to T, where T is a positive integer.
+        //The result turns out to be A*T*(T-1)*(2*T-1)/6 + B*T*(T-1)/2 + C*T.
+
+        //I'm going to break this into 4 segments:
+        // Constant-cost
+        // Linear cost (heat penalty only)
+        // Linear cost (Dark Future penalty only)
+        // Quadratic cost (both penalties)
+
+        var shattersConstant = Math.min(shattersBeforeDF, shattersBeforeHeat);
+        var shattersLinearHeatOnly = Math.max(0, shattersBeforeDF - shattersConstant);
+        var shattersLinearDFOnly = Math.max(0, shattersBeforeHeat - shattersConstant);
+        var shattersQuadratic = Math.min(shattersAfterDF, shattersAfterHeat);
+
+        //console.log("Shatters before/after heat = " + shattersBeforeHeat + "/" + shattersAfterHeat + ", DF = " + shattersBeforeDF + "/" + shattersAfterDF);
+        //console.log("Shatters per category: constant = " + shattersConstant + ", heat only = " + shattersLinearHeatOnly + ", DF only = " + shattersLinearDFOnly + ", quadratic = " + shattersQuadratic);
+
+        //Alright, now time to evaluate these 4 segments.
+        //All of these are stored as temp variables so you can use console.log to query them.
+        var resultConstant = 1 * shattersConstant;
+
+        var slopeHeat = penaltyPerHeat * heatPerShatter; //How much 1 shatter causes the cost to increase by
+        var yInterceptHeat = 1 + (heatCurrent + heatPerShatter * shattersBeforeHeat - heatMax) * penaltyPerHeat; //Cost of the first one that falls in this linear category
+        var resultLinearHeatOnly = slopeHeat * shattersLinearHeatOnly * (shattersLinearHeatOnly-1)/2 + yInterceptHeat * shattersLinearHeatOnly;
+
+        var slopeDF = penaltyPerDarkYear * 1; //How much 1 shatter causes the cost to increase by
+        var yInterceptDF = 1 + (darkYears + 1 * shattersBeforeDF) * penaltyPerDarkYear; //Cost of the first one that falls in this linear category
+        var resultLinearDFOnly = slopeDF * shattersLinearDFOnly * (shattersLinearDFOnly-1)/2 + yInterceptDF * shattersLinearDFOnly;
+
+        var coefficientA = slopeHeat * slopeDF;
+        var coefficientB = slopeHeat * yInterceptDF + slopeDF * yInterceptHeat;
+        var coefficientC = yInterceptHeat * yInterceptDF;
+        var shattersQuadraticS = shattersQuadratic * (shattersQuadratic-1); // T*(T-1) is a term that occurs twice, so cache it here
+        var resultQuadratic = coefficientA*shattersQuadraticS*(2*shattersQuadratic-1)/6 + coefficientB*shattersQuadraticS/2 + coefficientC*shattersQuadratic;
+
+        var resultTotal = resultConstant + resultLinearHeatOnly + resultLinearDFOnly + resultQuadratic;
+
+        //console.log("Integral results: constant = " + resultConstant + ", heat only = " + resultLinearHeatOnly + ", DF only = " + resultLinearDFOnly + ", quadratic = " + resultQuadratic);
+
+        //After all that math we did above, we take the base price times the area of our discrete integral:
+        for (var i in prices_cloned) {
+			var price = prices_cloned[i];
+            pricesTotal[price.name] = price.val * resultTotal;
+		}
+        //Apply effects to specific resources:
+        //LDR for the effect "shatterCostReduction" is specified in challenges.js
+        pricesTotal.timeCrystal *= (1 + this.game.getEffect("shatterCostReduction") + this.game.getEffect("shatterCostIncreaseChallenge"));
         pricesTotal.void = Math.round(pricesTotal.void * 1000) / 1000;
 		return pricesTotal;
 	},
