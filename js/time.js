@@ -1335,7 +1335,13 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
             dojo.destroy(this.custom.link);
             this.custom = undefined;
         }
-        this.updateLink(this.custom, this.model.customLink); //need this to sync the changes of effect and shatter number.
+        if (this.custom && this.model.customLink && this.model.customLink.title != this.custom.link.innerHTML) {
+            //Change the value of the custom link if needed.
+            //We can't just call updateLink() because we need to change the link handler as well!
+            //Instead, destroy the old link & create a new one.
+            dojo.destroy(this.custom.link);
+            this.custom = this.addLink(this.model.customLink);
+        }
 
         if  (this.model.tenErasLink.visible) {
             dojo.addClass(this.tenEras.link,"rightestLink");
