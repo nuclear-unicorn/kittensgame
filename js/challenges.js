@@ -714,10 +714,6 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 		return name;
 	},
 
-	updateVisible: function(model){
-		model.visible = model.metadata.unlocked;
-	},
-
 	getPrices: function(model) {
 		return $.extend(true, [], model.metadata.prices); // Create a new array to keep original values
 	},
@@ -735,11 +731,12 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 		model.metadata.pending = !model.metadata.pending;
 	},
 
+	updateVisible: function(model){
+		model.visible = model.metadata.unlocked;
+	},
+
 	updateEnabled: function(model){
-		this.inherited(arguments);
-		if (model.metadata.researched){
-			model.enabled = false;
-		}
+		model.enabled = true;
 	}
 });
 
