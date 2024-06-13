@@ -3673,12 +3673,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				value: - this.religion.pactsManager.getSiphonedCorruption(1)
 			});
 			stack.push(corruptionStack);
-				// TIME extra-compare
-			stack.push({
-				name: $I("res.stack.time"),
-				type: "ratio",
-				value: this.timeAccelerationRatio()
-			});
 		}
 
 		if(resName == "alicorn"){
