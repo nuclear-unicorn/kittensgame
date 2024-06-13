@@ -1125,42 +1125,28 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         return name;
     },
 
+    /**
+     * @return A prices object, which is an array of objects that each have "name" & "val" properties.
+     */
     getPrices: function(model) {
-		var prices_cloned = $.extend(true, [], model.options.prices);
+        //Calculate the price using the same algorithm so the code is easier to maintain:
+        var price = this.getPricesMultiple(model, 1);
 
-        if(this.game.getEffect("shatterVoidCost")){
-            var shatterVoidCost = this.game.getEffect("shatterVoidCost");
-            prices_cloned.push({
-                name: "void",
-                val: shatterVoidCost
-            });
-        }
-
-		for (var i in prices_cloned) {
-			var price = prices_cloned[i];
-			if (price["name"] == "timeCrystal") {
-                var darkYears = this.game.calendar.darkFutureYears(true);
-                if (darkYears > 0) {
-                    price["val"] = 1 + ((darkYears) / 1000) * 0.01;
-                }
-                var heatMax = this.game.getEffect("heatMax");
-                if (this.game.time.heat > heatMax) {
-                    price["val"] *= (1 + (this.game.time.heat - heatMax) * 0.01);  //1% per excessive heat unit
-                }
-
-                //LDR for the effect "shatterCostReduction" is specified in challenges.js
-                price["val"] *= (1 + this.game.getEffect("shatterCostReduction") + this.game.getEffect("shatterCostIncreaseChallenge"));
-            }
-            else if(price["name"] == "void"){
-                var heatMax = this.game.getEffect("heatMax");
-                if (this.game.time.heat > heatMax) {
-                    price["val"] *= (1 + (this.game.time.heat - heatMax) * 0.01);  //1% per excessive heat unit
-                }
+        //getPricesMultiple returns an object in a different format than we want
+        //So we just need to convert it to the format we DO want
+        var retVal = [];
+        for (var key in price) {
+            if (price[key]) {
+                retVal.push({ name: key, val: price[key] });
             }
         }
-		return prices_cloned;
+        return retVal;
 	},
 
+    /**
+     * Updated function that doesn't lag for high values of amt.
+     * @return An object with 2 keys: void & timeCrystal, which contain the prices of shattering amt times.
+     */
 	getPricesMultiple: function(model, amt) {
 		var pricesTotal = {
             void: 0,
