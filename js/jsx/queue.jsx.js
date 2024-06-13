@@ -45,12 +45,11 @@ WQueueItem = React.createClass({
             }, "[↑]"));
         }
 
-
         //TODO: red indicator when can't process
         //TODO: attach tooltip as if it is a button
-        return $r("div", {}, 
+        return $r("div", { className: this.isStorageLimited() ? "limited" : ""}, 
         [
-            "[" + item.type + "] - ", 
+            this.props.game.devMode ? ("[" + item.type + "] - ") : "",
             $r("span", {ref:"itemLabel", className:"queue-label"}, item.label),
             (
                 item.value ? (" " + item.value ) : ""
@@ -90,6 +89,13 @@ WQueueItem = React.createClass({
             return;
         }
         UIUtils.attachTooltip(game, node, 0, 200, dojo.partial(ButtonModernHelper.getTooltipHTML, controllerAndModel.controller, controllerAndModel.model));
+    },
+
+    //Ask the game engine if this item is storage-limited
+    isStorageLimited: function() {
+        var game = this.props.game;
+        var model = game.time.queue.getQueueElementModel(this.props.item);
+        return game.resPool.isStorageLimited(model.prices);
     }
 });
 
@@ -112,6 +118,24 @@ WQueue = React.createClass({
         this.onUpdateHandler = dojo.subscribe("ui/update", function(game){
             self.setState({game: game});
         });
+    },
+    componentDidUpdate: function() {
+        //Update the state properly if the list of options has changed
+        var options = game.time.queue.getQueueOptions(this.state.typeId);
+        if (this.state.itemId) {
+            if (options.length <= this.state.itemId) {
+                //Current itemId is invalid!  Default to null.
+                this.setState({
+                    itemId: null,
+                    itemLabel: null,
+                });
+            } else if (options[this.state.itemId].label != this.state.itemLabel) {
+                //Current itemLabel doesn't match itemId.
+                this.setState({
+                    itemLabel: options[this.state.itemId].label,
+                });
+            }
+        }
     },
 
     getQueueTypeSelect: function(){
