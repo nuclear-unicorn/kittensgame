@@ -1342,6 +1342,9 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
             dojo.destroy(this.custom.link);
             this.custom = this.addLink(this.model.customLink);
         }
+        if (this.custom && this.model.customLink) {
+            dojo.style(this.custom.link, "display", this.model.customLink.visible ? "" : "none");
+        }
 
         if  (this.model.tenErasLink.visible) {
             dojo.addClass(this.tenEras.link,"rightestLink");
