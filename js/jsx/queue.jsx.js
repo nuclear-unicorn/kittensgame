@@ -45,9 +45,12 @@ WQueueItem = React.createClass({
             }, "[↑]"));
         }
 
+        //Mark this queue item as limited, but respect the setting in the options menu:
+        var resourceIsLimited = this.props.game.opts.highlightUnavailable && this.isStorageLimited();
+
         //TODO: red indicator when can't process
         //TODO: attach tooltip as if it is a button
-        return $r("div", { className: this.isStorageLimited() ? "limited" : ""}, 
+        return $r("div", { className: resourceIsLimited ? "limited" : ""},
         [
             this.props.game.devMode ? ("[" + item.type + "] - ") : "",
             $r("span", {ref:"itemLabel", className:"queue-label"}, item.label),
