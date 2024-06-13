@@ -37,6 +37,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			getEffect: function(bld, effectName){
 				var effectValue = bld.effects[effectName] || 0;
 				if (bld.name == "holyGenocide"){
+					if (effectName == "activeHG") { //This one doesn't stack at all.
+						return game.religion.activeHolyGenocide;
+					}
 					return effectValue * game.religion.activeHolyGenocide;
 				}
 				return effectValue * bld.on;
