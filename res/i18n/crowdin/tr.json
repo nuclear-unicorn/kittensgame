@@ -667,6 +667,7 @@
     "religion.ru.basilica.label": "Bazilika",
     "religion.ru.scholasticism.label": "Skolastizm",
     "religion.ru.solarRevolution.label": "Solar Devrim",
+    "religion.ru.solarRevolution.desc": "Tapmak, kaynak üretimine küçük bir katkı sağlar.",
     "religion.ru.solarchant.label": "Solar tilavet",
     "religion.ru.stainedGlass.label": "Vitraylar",
     "religion.ru.stainedGlass.desc": "Her tapınak iki katı kültür üretir",
@@ -716,6 +717,7 @@
     "res.stack.faith": "İnanç",
     "res.stack.holyGenocide": "Kutsal Soykırım",
     "res.stack.magnetos": "Magneto",
+    "res.stack.mysticism": "Mistisizm",
     "res.stack.paragon": "Paragon",
     "res.stack.production": "Üretim",
     "res.stack.reactors": "Reaktörler",
@@ -1255,6 +1257,7 @@
     "workshop.titaniumBarns.label": "Titanyum Ambar",
     "workshop.titaniumSaw.label": "Titanyum Testere",
     "workshop.undo.msg": "{0} tane {1} iade edildi",
+    "workshop.unobtainiumAxe.label": "Elde Edilemez Balta",
     "workshop.uplink.label": "Yükleme",
     "workshop.zebraUpgrade.darkBrew.label": "Koyu İçki",
     "workshop.zebraUpgradesPanel.label": "Zebra Geliştirmeleri"
