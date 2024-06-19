@@ -6,7 +6,7 @@
     "buildings.pasture.desc": "Bietet eine alternative Nahrungsquelle an, welche den Katzenminzenverbrauch reduziert.",
     "buildings.pasture.flavor": "Nehmt ein Schlückchen Milch, mein Herr!",
     "buildings.solarfarm.label": "Solarpark",
-    "buildings.solarfarm.desc": "Bietet eine zusätzliche Energiequelle an. Produktion ist jahreszeitenabhängig.",
+    "buildings.solarfarm.desc": "Bietet eine zusätzliche Energiequelle an. Produktion hängt von der Jahreszeit ab.",
     "buildings.aqueduct.label": "Aquädukt",
     "buildings.aqueduct.desc": "+3% auf Katzenminze-Produktion",
     "buildings.aqueduct.flavor": "Schwimmen verboten!",
@@ -207,12 +207,12 @@
     "village.tab.title.outpost":"Vorposten",
     
     "village.new.one.unicorn": "Du erhältst ein Einhorn!",
-    "village.new.many.unicorns": "Sie erhältst {0} Einhörner!",
+    "village.new.many.unicorns": "Du erhältst {0} Einhörner!",
     "village.job.hunter.flavor": "Wir sind so süß, wir schnurren unsere Opfer an, bis sie sterben.",
     "village.job.miner.flavor": "Ich verstehe nicht, wie ich eine Hacke mit meinen Pfoten halten kann.",
     "village.woodcutter.flavor": "Darf. Nicht. Kratzen.",
-    "village.leader.promoted.one.kitten": "Ihr Anführer hat 1 Kätzchen befördert",
-    "village.leader.promoted.many.kittens": "Ihr Anführer hat {0} Kätzchen befördert",
+    "village.leader.promoted.one.kitten": "Dein Anführer hat 1 Kätzchen befördert",
+    "village.leader.promoted.many.kittens": "Dein Anführer hat {0} Kätzchen befördert",
     "village.general.free.kittens.label": "Gratis-Kätzchen",
     "village.kittens.have.best.rank": "Deine Kätzchen haben ihren besten Rang",
     "village.msg.kitten.has.joined": "Ein Kätzchen ist Deinem Dorf beigetreten",
@@ -293,7 +293,7 @@
     "space.newplanet.log.msg": "Du hast einen neuen Himmelskörper erreicht!",
     "space.orbitalLaunch.desc": "Starte eine Rakete in den Weltraum.",
     "space.orbitalLaunch.label": "Orbitalstart",
-    "space.panel.rorshach.label": "Rorshach",
+    "space.panel.rorshach.label": "Rorschach",
     "space.piscineMission.desc": "Piscine ist ein gigantischer Planet zusammengesetzt aus einem Säurekörper und einer Methan Atmosphäre",
     "space.piscineMission.label": "Mission Piscine",
     
@@ -1994,9 +1994,9 @@
     "res.per.year":"Jahr",
     "res.energy.wt":"Wt",
     
-    "science.machinery.label":"Maschienerie",
+    "science.machinery.label":"Maschinerie",
     "science.machinery.desc":"Vorherige Vortschritte in Metallurgie und Wissenschaft führen zu dem Konzept einer Maschine, einem Gerät mit mehreren bewegungsfähigen Teilen. Maschinerie führt ein Konzept der Automation ein.",
-    "science.machinery.effectDesc":"Schaltet Dampfmaschiene-, Armbrust-, Druckerpresse- und Fabrik-automatisierung frei.",
+    "science.machinery.effectDesc":"Schaltet Dampfmaschine-, Armbrust-, Druckerpresse- und Fabrik-automatisierung frei.",
     
     "menu.language":"Sprache",
     
