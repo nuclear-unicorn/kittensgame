@@ -107,8 +107,7 @@ WQueue = React.createClass({
     getInitialState: function(){
         return {
             typeId: "buildings",
-            itemId: null,
-            itemLabel: null,
+            itemIndex: null, //Index of item from options list that is selected, or null
             game: this.props.game
         };
     },
@@ -121,24 +120,6 @@ WQueue = React.createClass({
         this.onUpdateHandler = dojo.subscribe("ui/update", function(game){
             self.setState({game: game});
         });
-    },
-    componentDidUpdate: function() {
-        //Update the state properly if the list of options has changed
-        var options = game.time.queue.getQueueOptions(this.state.typeId);
-        if (this.state.itemId) {
-            if (options.length <= this.state.itemId) {
-                //Current itemId is invalid!  Default to null.
-                this.setState({
-                    itemId: null,
-                    itemLabel: null,
-                });
-            } else if (options[this.state.itemId].label != this.state.itemLabel) {
-                //Current itemLabel doesn't match itemId.
-                this.setState({
-                    itemLabel: options[this.state.itemId].label,
-                });
-            }
-        }
     },
 
     getQueueTypeSelect: function(){
@@ -157,18 +138,11 @@ WQueue = React.createClass({
             value: this.state.queueTypeId,
             onChange: function(e){
                 var typeId = e.target.value;
-
-                self.setState({
-                    typeId: typeId
-                });
                 var options = game.time.queue.getQueueOptions(typeId);
-                if (options.length){
-                    self.setState({
-                        //itemId: options[0].name,
-                        itemId: 0,
-                        itemLabel: options[0].label
-                    });
-                }
+                self.setState({
+                    typeId: typeId,
+                    itemIndex: options.length ? 0 : null
+                });
                 
             }
         }, options);
@@ -189,13 +163,10 @@ WQueue = React.createClass({
         }
 
         return $r("select", {
-            value: this.state.itemId,
+            value: this.state.itemIndex,
             onChange: function(e){
                 self.setState({
-                    itemId: e.target.value,
-                    //itemLabel: e.target.dataset.label
-                    //itemId: options[e.target.value].name,
-                    itemLabel: options[e.target.value].label
+                    itemIndex: e.target.value,
                 });
             }
         }, selectOpts);
@@ -246,19 +217,15 @@ WQueue = React.createClass({
             this.getQueueItemSelect(options),
             $r("button", {
                 onClick: function(e){
-                    if(self.state.itemId){
+                    var indexToUse = self.state.itemIndex || 0;
+                    if (indexToUse >= options.length) { //Default to first element.
+                        indexToUse = 0;
+                    }
+                    if(indexToUse < options.length){
                         game.time.queue.addToQueue(
-                            //self.state.itemId,
-                            options[self.state.itemId].name,
+                            options[indexToUse].name,
                             self.state.typeId,
-                            self.state.itemLabel,
-                            e.shiftKey
-                        );
-                    }else if(options.length){
-                        game.time.queue.addToQueue(
-                            options[0].name,
-                            self.state.typeId,
-                            options[0].label,
+                            options[indexToUse].label,
                             e.shiftKey
                         );
                     }
