@@ -3673,12 +3673,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				value: - this.religion.pactsManager.getSiphonedCorruption(1)
 			});
 			stack.push(corruptionStack);
-				// TIME extra-compare
-			stack.push({
-				name: $I("res.stack.time"),
-				type: "ratio",
-				value: this.timeAccelerationRatio()
-			});
 		}
 
 		if(resName == "alicorn"){
@@ -4890,14 +4884,15 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			cathPollution = (this.challenges.getChallenge("postApocalypse").on + newKittens.length) * 1e+8 + 1e+11;
 		}
 		var temporalPress_reset = this.time.filterMetadata([this.time.getCFU("temporalPress")], ["name", "val", "on", "isAutomationEnabled"]);
-		var temporalPressSaved = Math.min(temporalPress_reset.val, this.getEffect("temporalPressCap"));
+		//temporalPress_reset is an ARRAY with 1 element: the metadata for Temporal Presses.
+		var temporalPressSaved = Math.min(temporalPress_reset[0].val, this.getEffect("temporalPressCap"));
 		if (temporalPressSaved > 0){
-			temporalPress_reset["on"] = Math.min(temporalPress_reset["on"], temporalPressSaved);
-			temporalPress_reset["val"] = Math.min(temporalPressSaved);
+			temporalPress_reset[0].on = Math.min(temporalPress_reset[0].on, temporalPressSaved);
+			temporalPress_reset[0].val = Math.min(temporalPressSaved);
 		}else{
-			temporalPress_reset["on"] = 0;
-			temporalPress_reset["val"] = 0;
-			temporalPress_reset["isAutomationEnabled"] = null;
+			temporalPress_reset[0].on = 0;
+			temporalPress_reset[0].val = 0;
+			temporalPress_reset[0].isAutomationEnabled = null;
 		}
 
 /*

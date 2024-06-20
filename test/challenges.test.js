@@ -601,3 +601,148 @@ test("Pacifism Challenge--Weapon upgrades should have correct values", () => {
     expect(weaponUpgrades[1].effects["manpowerJobRatio"]).toBe(0);
     expect(weaponUpgrades[2].effects["manpowerJobRatio"]).toBe(0);
 });
+
+//--------------------------------
+//       Shatter TC Prices
+//--------------------------------
+//I put this in the testing suite for challenges because we're going to try different combinations of the 1000 Years Challenge.
+test("Shatter TC Prices should be correct (in a variety of 1kY states)", () => {
+    const oneKYChallenge = game.challenges.getChallenge("1000Years");
+    
+    let controller = new classes.ui.time.ShatterTCBtnController(game);
+    let model = controller.fetchModel({ prices: [{name: "timeCrystal", val: 1}] });
+    let pricesResult = null;
+
+    //Function to calculate the price of shattering TCs.
+    const calcPrices = function(shatters, startHeat, startYear) {
+        game.time.heat = startHeat;
+        game.calendar.year = startYear;
+        pricesResult = controller.getPricesMultiple(model, shatters);
+    }
+    const calculateWhatIsRelevant = function() { game.upgrade({ challenges: ["1000Years"]}); };
+
+    //We're going to assume from here on out that the max amount of heat is 100 units:
+    calculateWhatIsRelevant();
+    expect(game.getEffect("heatMax")).toBeCloseTo(100, 5 /*5 digits of precision*/);
+
+    //Starting at year 0 with no heat & no modifiers, shattering 1 TC should cost 1 TC.
+    calcPrices(1 /*shatters*/, 0 /*heat*/, 0 /*year*/);
+    expect(pricesResult.timeCrystal).toBe(1);
+    expect(pricesResult.void).toBe(0);
+
+    //If each shatter generates 10 units of heat, we should be able to shatter 10 times without hitting the heat penalty:
+    //Ah--but after exactly 10 shatters, we are at 100 heat, which is 0 units over the max, so the 11th shatter has its price increased by 0%
+    calcPrices(11 /*shatters*/, 0, 0);
+    expect(pricesResult.timeCrystal).toBeCloseTo(10 + 1, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //After 11 shatters, we are at 110 heat, so the 12th costs 10% more
+    calcPrices(12, 0, 0);
+    expect(pricesResult.timeCrystal).toBeCloseTo(10 + 1 + 1.1, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //After 12 shatters, the next one costs 20% more
+    calcPrices(13, 0, 0);
+    expect(pricesResult.timeCrystal).toBeCloseTo(10 + 1 + 1.1 + 1.2, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //But what if we start with, say, 5 units of heat already?  The 10th shatter should be unaffected, but the 11th should cost 5% more:
+    calcPrices(10 /*shatters*/, 5 /*heat*/, 0 /*year*/);
+    expect(pricesResult.timeCrystal).toBeCloseTo(10, 5);
+    expect(pricesResult.void).toBe(0);
+    calcPrices(11 /*shatters*/, 5 /*heat*/, 0 /*year*/);
+    expect(pricesResult.timeCrystal).toBeCloseTo(10 + 1.05, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //...& the 12th should cost 15% more:
+    calcPrices(12, 5, 0);
+    expect(pricesResult.timeCrystal).toBeCloseTo(10 + 1.05 + 1.15, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //Now, let's do it again, but with 1kY reward active.
+    oneKYChallenge.researched = true; //Reward: shatters generate 5 heat instead of 10
+    oneKYChallenge.on = 1; //Reward: shatters cost 2% fewer TCs
+    oneKYChallenge.active = false;
+    calculateWhatIsRelevant();
+
+    //Shatters generate 5 units of heat now--so we should be able to shatter 20 times with no penalty.
+    //But shatters cost 2% fewer TCs now
+    calcPrices(20, 0, 0);
+    expect(pricesResult.timeCrystal).toBeCloseTo((20) * 0.98, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //21st shatter costs 0% more, 22nd costs 5% more, etc.
+    calcPrices(23, 0, 0);
+    expect(pricesResult.timeCrystal).toBeCloseTo((20 + 1 + 1.05 + 1.1) * 0.98, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //Let's try shattering, but we start with some heat already.
+    //I picked 73 heat because 73 is not divisible by 5.
+    //After 6 shatters, we are at 103 heat, so the 7th shatter should be 3% more expensive
+    calcPrices(7 /*shatters*/, 73 /*heat*/, 0 /*year*/);
+    expect(pricesResult.timeCrystal).toBeCloseTo((6 + 1.03) * 0.98, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //The next few shatters after this should be 8%, then 13%, then 18%, etc. more expensive
+    calcPrices(12 /*shatters*/, 73 /*heat*/, 0 /*year*/);
+    expect(pricesResult.timeCrystal).toBeCloseTo((6 + 1.03 + 1.08 + 1.13 + 1.18 + 1.23 + 1.28) * 0.98, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //Now, let's test that prices are MORE expensive with 1kY active, but that the half-heat reward still applies:
+    oneKYChallenge.researched = true; //Reward: shatters generate 5 heat instead of 10
+    oneKYChallenge.on = 8; //Increasing challenge: shatters cost 4 more TCs & 3.2 more void each.
+    oneKYChallenge.active = true;
+    calculateWhatIsRelevant();
+    
+    //Shatters still generate 5 units of heat, so starting at 0 heat with 25 shatters, the 21st costs 0% more, then 5% more, then 10% more, etc.
+    //But the base price of shatters is now 5 TCs + 3.2 void.
+    calcPrices(25, 0, 0);
+    expect(pricesResult.timeCrystal).toBeCloseTo(100 + 5 + 5.25 + 5.5 + 5.75 + 6, 5);
+    expect(pricesResult.void).toBeCloseTo(64 + 3.2 + 3.36 + 3.52 + 3.68 + 3.84);
+
+    //Now let's test Dark Future (DF).
+    //Since the 1kY Challenge is completed before you reach Dark Future, we will NOT test DF + 1kY, only DF outside of 1kY.
+    oneKYChallenge.researched = true; //Reward: shatters generate 5 heat instead of 10
+    oneKYChallenge.on = 8; //Reward: shatters cost 16% fewer TCs
+    oneKYChallenge.active = false;
+    calculateWhatIsRelevant();
+
+    //Shatter prices should be 1% more expensive for each 1000 years we are into Dark Future.
+    calcPrices(1 /*shatters*/, 0 /*heat*/, 41000 /*year*/);
+    expect(pricesResult.timeCrystal).toBeCloseTo((1.01) * 0.84, 5);
+    expect(pricesResult.void).toBe(0);
+    
+    //Each further year we skip needs to be 1/1000th of 1% more expensive
+    calcPrices(2 /*shatters*/, 0 /*heat*/, 41000 /*year*/);
+    expect(pricesResult.timeCrystal).toBeCloseTo((1.01 + 1.01001) * 0.84, 5 /*We REQUIRE high precision for this */);
+    expect(pricesResult.void).toBe(0);
+    calcPrices(3 /*shatters*/, 0 /*heat*/, 41000 /*year*/);
+    expect(pricesResult.timeCrystal).toBeCloseTo((1.01 + 1.01001 + 1.01002) * 0.84, 5 /*We REQUIRE high precision for this */);
+    expect(pricesResult.void).toBe(0);
+    
+    //At this point, I'm going to do the math on a calculator
+    calcPrices(20, 0, 41000);
+    expect(pricesResult.timeCrystal).toBeCloseTo((20.2019) * 0.84, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //But remember, shatters generate heat--so the 21st shatter costs 0% more heat on top of everything, then 5%, then 10%, etc.
+    calcPrices(25, 0, 41000);
+    expect(pricesResult.timeCrystal).toBeCloseTo((20.2019 + 1.0102 + 1.0607205 + 1.111242 + 1.1617645 + 1.212288) * 0.84, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //Let's test hitting the heat limit BEFORE hitting the DF penalty.
+    calcPrices(1000, 0, 39000);
+    expect(pricesResult.timeCrystal).toBeCloseTo((20 + 24965.5) * 0.84, 5);
+    expect(pricesResult.void).toBe(0);
+    calcPrices(1002, 0, 39000);
+    expect(pricesResult.timeCrystal).toBeCloseTo((20 + 24965.5 + 50 + 50.0505005) * 0.84, 5);
+    expect(pricesResult.void).toBe(0);
+    calcPrices(2000, 0, 39000);
+    expect(pricesResult.timeCrystal).toBeCloseTo((20 + 24965.5 + 75391.16675) * 0.84, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //Let's test hitting the heat limit exactly at the same time as the DF penalty.
+    calcPrices(1020, 0, 39980);
+    expect(pricesResult.timeCrystal).toBeCloseTo((20 + 26146.41175) * 0.84, 5);
+    expect(pricesResult.void).toBe(0);
+});
