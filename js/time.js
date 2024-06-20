@@ -1221,6 +1221,9 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         var yInterceptDF = 1 + (darkYears + 1 * shattersBeforeDF) * penaltyPerDarkYear; //Cost of the first one that falls in this linear category
         var resultLinearDFOnly = slopeDF * shattersLinearDFOnly * (shattersLinearDFOnly-1)/2 + yInterceptDF * shattersLinearDFOnly;
 
+        //Now for the quadratic part, the y-intercepts need to be updated
+        yInterceptHeat = 1 + (heatCurrent + heatPerShatter * (amt - shattersQuadratic) - heatMax) * penaltyPerHeat;
+        yInterceptDF = 1 + (darkYears + 1 * (amt - shattersQuadratic)) * penaltyPerDarkYear;
         var coefficientA = slopeHeat * slopeDF;
         var coefficientB = slopeHeat * yInterceptDF + slopeDF * yInterceptHeat;
         var coefficientC = yInterceptHeat * yInterceptDF;
