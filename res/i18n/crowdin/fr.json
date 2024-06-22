@@ -827,7 +827,7 @@
     "religion.refineTearsBtn.label": "Raffiner les larmes",
     "religion.refineTearsBtn.refine.msg.failure": "Rien ne se produit",
     "religion.resetFaith.confirmation.msg": "Vous êtes sure que vous vouloir réinitialiser le pool?\n\nVous aura une prime aux transfert du foi basé sur votre montant total du foi accumulé par louant.\n\nCette prime reporterai par les réinitialises.\n\nCLICQUER CETTE BOUTON EFFACERAI TOUTE FOI ACCUMULÉ PAR LOUENT.",
-    "religion.ru.apocripha.label": "Réforme",
+    "religion.ru.apocripha.label": "Apocryphes",
     "religion.ru.apocripha.desc": "Octroie la capacité de défausser la foi accumulée afin d'améliorer l'efficacité des prières",
     "religion.ru.basilica.label": "Basiliques",
     "religion.ru.basilica.desc": "Les temples génèrent davantage de culture et étendent les limites culturelles",
