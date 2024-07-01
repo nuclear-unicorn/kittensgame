@@ -379,6 +379,7 @@
     "effectsMgr.statics.harborRatio.title": "港口船擴張",
     "effectsMgr.statics.hashrate.title": "當前算力",
     "effectsMgr.statics.hashrateLevel.title": "算力等級",
+    "effectsMgr.statics.heatEfficiency.title": "熱量傳輸效率",
     "effectsMgr.statics.heatMax.title": "熱度上限",
     "effectsMgr.statics.heatMaxExpansion.title": "熱度上限提升",
     "effectsMgr.statics.heatPerTick.title": "散熱速率",
