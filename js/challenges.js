@@ -317,25 +317,98 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		description: $I("challendge.unicornTears.desc"),
 		effectDesc: $I("challendge.unicornTears.effect.desc"),
 		effects: {
+			"bonfireTearsPriceRatioChallenge": 0,
+			"workshopTearsPricesChallenge": 0,
 			"unicornsMax": 0,
 			"tearsMax": 0,
 			"alicornMax": 0
 		},
 		calculateEffects: function(self, game) {
 			if (self.active) {
+				//Base challenge: Price ratio of ×1.2 determining added costs in the Bonfire tab.
+				//Increasing challenge: +0.03 to the price ratio for each additional completion.
+				//Diminishing returns starts after 23 completions
+				//Price ratio exceeds ×2 after 28 completions
+				//LDR limit is at a price ratio of ×2.5
+				self.effects["bonfireTearsPriceRatioChallenge"] =
+					game.getLimitedDR(1.2 + 0.03 * self.on, self.stackOptions["bonfireTearsPriceRatioChallenge"].LDRLimit);
+				//Increasing challenge: Multiplier to prices in the Workshop tab.
+				self.effects["workshopTearsPricesChallenge"] = 0.01;
 				self.effects["unicornsMax"] = 10;
 				self.effects["tearsMax"] = 1;
 				self.effects["alicornMax"] = 0.2;
 			} else {
+				self.effects["bonfireTearsPriceRatioChallenge"] = 0;
+				self.effects["workshopTearsPricesChallenge"] = 0;
 				self.effects["unicornsMax"] = 0;
 				self.effects["tearsMax"] = 0;
 				self.effects["alicornMax"] = 0;
 			}
 		},
 		stackOptions: {
+			"bonfireTearsPriceRatioChallenge": { noStack: true, LDRLimit: 2.5 },
+			"workshopTearsPricesChallenge": { LDRLimit: 1 },
 			"unicornsMax": { noStack: true },
 			"tearsMax": { noStack: true },
 			"alicornMax": { noStack: true }
+		},
+		/**
+		 * Calculate the total weight of all resources involved in the price of an item.
+		 * @param prices A prices object, which is an array where each element has the format: { name: "slab", val: 1000 }
+		 * @return A number.  It could be positive, negative, or infinite, but it will NOT be NaN.
+		 */
+		sumPricesWeighted: function(prices) {
+			var total = 0;
+			var lineValue = 0;
+			for (var i = 0; i < prices.length; i += 1) {
+				lineValue = this._getResWeight(prices[i].name) * prices[i].val;
+				//Indeterminate forms such as 0*Infinity could give us NaN here.
+				//NaNs are contagious, so get rid of them ASAP.
+				total += isNaN(lineValue) ? 0 : lineValue;
+			}
+			//Indeterminate forms such as Infinity-Infinity could give us NaN here.
+			return isNaN(total) ? 0 : total;
+		},
+		//Helper function to look up a resource's weight value from a table:
+		_getResWeight: function(resName) {
+			if (typeof(this.resWeights[resName]) == "number") {
+				return this.resWeights[resName];
+			}
+			return this.resWeights["default"];
+		},
+		resWeights: {
+			//---Normal---//
+			"catnip": 0,
+			"wood": 0.5,
+			"minerals": 0.35,
+			"iron": 1,
+			"titanium": 200, //Starting in the titanium era, each new resource we unlock is vastly more weighty than the previous
+			"uranium": 150000,
+			"unobtainium": 1e6,
+			"antimatter": 1e10,
+			"starchart": 200,
+			"spice": 250,
+			//---Craftables---//
+			"beam": 0.75,
+			"slab": 0.75,
+			"plate": 5,
+			"concrate": 25,
+			"gear": 20,
+			"alloy": 300,
+			"eludium": 1e8,
+			"ship": 1500,
+			"tanker": 150000,
+			"kerosene": 7000,
+			"parchment": 2,
+			"compedium": 20,
+			"blueprint": 50,
+			"thorium": 180000,
+			//---Other---//
+			"unicorns": -Infinity, //Used to prevent a building that already costs this resource from having its price modified
+			"alicorns": -Infinity,
+			"tears": -Infinity,
+			"megalith": -Infinity,
+			"default": 10 //Used for any resource not explicitly specified
 		}
 	},{
 		name: "postApocalypse",

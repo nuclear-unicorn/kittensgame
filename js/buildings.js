@@ -2362,6 +2362,47 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 						isTemporary: true //can't exploit buy manipulating pollution in postApocalypse
 					});
 		}
+		if (this.game.challenges.isActive("unicornTears")
+		 && bldVal > 0 /*For the purposes of Challenge compatibility, the first one will always have its price unmodified.*/) {
+			//In the Unicorn Tears Challenge, we give each Bonfire building a price of unicorns, unicorn tears, or alicorns.
+			if (bldName == "warehouse" && bld.get("stage") == 0 /*Affects Warehouses but not Spaceports*/) {
+				//I don't like having these special cases, but I want to avoid the player getting stuck.
+				prices.push({ name: "unicorns",
+					val: 2 * bldVal * priceModifier, //Linear (not exponential) scaling
+					isTemporary: true
+				});
+			} else if (bldName == "harbor") {
+				//I don't like having these special cases, but I want to avoid the player getting stuck.
+				prices.push({ name: "tears",
+					val: 2 * bldVal * priceModifier, //Linear (not exponential) scaling
+					isTemporary: true
+				});
+			} else {
+				//We use the base price of a building (not affected by policies that reduce resource prices) to calculate the weight:
+				var weight = this.game.challenges.getChallenge("unicornTears").sumPricesWeighted(bldPrices);
+				if (weight > 0) {
+					//We use a price ratio determined by the Unicorn Tears Challenge.
+					weight *= Math.pow(this.game.getEffect("bonfireTearsPriceRatioChallenge"), bldVal - 1);
+				}
+				if (weight > 1e9) {
+					prices.push({ name: "alicorn",
+						val: (Math.log(weight) - 19.7232) * priceModifier, //With a weight of exactly 1e9, this is just a smidge over 1
+						isTemporary: true
+					});
+				} else if (weight > 100000) {
+					prices.push({ name: "tears",
+						val: weight / 100000 * priceModifier,
+						isTemporary: true
+					});
+				} else if (weight >= 100) {
+					prices.push({ name: "unicorns",
+						val: weight / 100 * priceModifier,
+						isTemporary: true
+					});
+				}
+				//Else, if the weight is under 100, we don't add anything to the price.
+			}
+		}
 		/**
 		 * Spaceport will use a much steper price ratio for starcharts to be a dedicated starchart sinker
 		 */

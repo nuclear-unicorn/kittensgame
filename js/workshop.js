@@ -2706,8 +2706,59 @@ dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearun
     },
 
 	getPrices: function(model) {
-        return this.game.village.getEffectLeader("scientist", this.inherited(arguments));
-    },
+		var prices = this.inherited(arguments);
+
+		if (this.game.challenges.isActive("unicornTears")) {
+			//In the Unicorn Tears Challenge, we give each Workshop upgrade a price of unicorns or unicorn tears based on its weight.
+			//The prices scale with how many Challenges we've already completed.
+			var multiplier = this.game.getEffect("workshopTearsPricesChallenge"); //Number in range [0,1)
+			if (multiplier > 0) {
+				//We use the weight to separate early-game, mid-game, & late-game upgrades.
+				var weight = this.game.challenges.getChallenge("unicornTears").sumPricesWeighted(prices);
+				//For easy access, here are the weights of a few different upgrades:
+				//Celestial Mechanics - weight 2500
+				//Catnip Enrichment - weight 5000
+				//Gold Ore - weight 10k
+				//Coal Furnace - weight 54k
+				//Deep Mining - weight 51k
+				//Printing Press - weight 76k
+				//Oxidation - weight 1.1M
+				//Carbon Sequestration - weight 1.3M
+				//CAD System - weight 1.4M
+				//Orbital Geodesy - weight 2.2M
+				//Space Manufacturing - weight 28M
+				//Flux Condensator - weight 5G
+				//Thorium Drive - weight 18G
+				//Relic Station - weight 50T
+				if (weight < 1e6) { //Generally early-game upgrades; these require from 1 to 10k unicorns.
+					if (weight > 0) {
+						//Early-game upgrades can range wildly, so I chose a mathematical function that puts them closer together.
+						//At a multiplier of 1, f(1000) = 100, f(1 million) = 10k
+						prices.push({ name : "unicorns",
+							val: Math.ceil(Math.pow(weight, 2/3) * multiplier),
+						});
+					}
+				} else if (weight < 1e8) { //Generally mid-game upgrades; these require from 10 to 99k unicorn tears.
+					//Mid-game upgrades have weights much closer together, so I chose a mathematical function that spreads them out a bit.
+					//At a multiplier of 1, f(1 million) = 10, then the output increases by 1 for every 1000 increase in input.
+					prices.push({ name : "tears",
+						val: Math.ceil((weight-990000) / 1000 * multiplier)
+					});
+				} else { //Generally late-game upgrades; these require 100k or more unicorn tears.
+					//f(100 million) = 100k, f(1 billion) = 200k, increases by another +100k for each order of magnitude increase
+					//I don't expect the player to be able to get more than 200k max unicorns in the Unicorn Tears Challenge.
+					//  So, after repeating the Challenge many times, these upgrades become unobtainable.
+					//  That's fine, since none of these upgrades are necessary for progression.
+					prices.push({ name : "tears",
+						val: Math.ceil((Math.log10(weight)-7) * 100000 * multiplier)
+					});
+				}
+			}
+		}
+
+		//Scientist leader gives a 5% discount to science cost, but doesn't affect Unicorn Tears Challenge prices.
+		return this.game.village.getEffectLeader("scientist", prices);
+	},
 
 	updateVisible: function(model){
 		var upgrade = model.metadata;

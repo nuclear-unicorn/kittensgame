@@ -1658,6 +1658,15 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.weaponEfficency.title"),
 				type: "ratio"
 			},
+			"bonfireTearsPriceRatioChallenge": {
+				title: $I("effectsMgr.statics.bonfireTearsPriceRatioChallenge.title"),
+				type: "ratio",
+				calculation: "nonProportional"
+			},
+			"workshopTearsPricesChallenge": {
+				title: $I("effectsMgr.statics.workshopTearsPricesChallenge.title"),
+				type: "ratio"
+			},
 			"cryochamberSupport":{
 				title: $I("effectsMgr.statics.cryochamberSupport.title"),
 			},
