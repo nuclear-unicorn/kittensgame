@@ -602,6 +602,58 @@ test("Pacifism Challenge--Weapon upgrades should have correct values", () => {
     expect(weaponUpgrades[2].effects["manpowerJobRatio"]).toBe(0);
 });
 
+
+//--------------------------------
+//    Unicorn Tears Challenge
+//--------------------------------
+test("Unicorn Tears Challenge--Weighted price algorithm should behave nicely with zero, infinity, & NaN", () => {
+    const unicornTearsChallenge = game.challenges.getChallenge("unicornTears");
+    expect(typeof(unicornTearsChallenge.sumPricesWeighted)).toBe("function");
+    const sumPricesWeighted = unicornTearsChallenge.sumPricesWeighted.bind(unicornTearsChallenge);
+
+    //Default weight should be 10, which should work for nonexistent resources:
+    expect(sumPricesWeighted([{ name: "notARealResourceName", val: 19 }])).toBeCloseTo(190);
+
+    //Catnip should have a weight of 0:
+    expect(sumPricesWeighted([{ name: "catnip", val: 11 }])).toBe(0);
+
+    //Resources should sum together:
+    expect(sumPricesWeighted([{ name: "res1", val: 13 }, { name: "res2", val: 44 }])).toBeCloseTo(570);
+    expect(sumPricesWeighted([{ name: "catnip", val: 9 }, { name: "res1", val: 19 }, { name: "catnip", val: 18 }, { name: "res1", val: 94 }])).toBeCloseTo(1130);
+
+    //Test zero times infinity:
+    expect(sumPricesWeighted([{ name: "catnip", val: Infinity }])).not.toBeNaN();
+    expect(sumPricesWeighted([{ name: "catnip", val: Infinity }])).toBe(0);
+
+    //Unicorns should have a weight of negative infinity.
+    //We will add a tiny amount of unicorns to a huge amount of a default resource.
+    expect(sumPricesWeighted([{ name: "unicorns", val: 1e-25 }, { name: "res1", val: 1e93 }])).toBe(-Infinity);
+
+    //Test NaN of a resource, test fractional resources, test infinite resources, test negative resources:
+    expect(sumPricesWeighted([{ name: "res1", val: NaN }])).not.toBeNaN();
+    expect(sumPricesWeighted([{ name: "res1", val: NaN }])).toBe(0);
+    expect(sumPricesWeighted([{ name: "res1", val: 70 }, { name: "res2", val: NaN }])).toBeCloseTo(700);
+    expect(sumPricesWeighted([{ name: "res1", val: 0.051 }, { name: "catnip", val: NaN }])).toBeCloseTo(0.51);
+    expect(sumPricesWeighted([{ name: "res1", val: 8 }, { name: "catnip", val: Infinity }])).toBeCloseTo(80);
+    expect(sumPricesWeighted([{ name: "res1", val: 6.5e6 }, { name: "catnip", val: -Infinity }])).toBeCloseTo(6.5e7);
+    expect(sumPricesWeighted([{ name: "unicorns", val: NaN }, { name: "unicorns", val: -Infinity }])).toBe(Infinity); //negative infinity times negative infinity equals positive infinity
+    expect(sumPricesWeighted([{ name: "unicorns", val: Infinity }, { name: "unicorns", val: -Infinity }])).toBe(0); //negative infinity plus infinity gives NaN but we want zero instead
+    expect(sumPricesWeighted([{ name: "res1", val: Infinity }, { name: "res1", val: -Infinity }])).toBe(0);
+    expect(sumPricesWeighted([{ name: "res1", val: Infinity }, { name: "unicorns", val: -Infinity }])).toBe(Infinity);
+    expect(sumPricesWeighted([{ name: "res1", val: Infinity }, { name: "catnip", val: -Infinity }, { name: "unicorns", val: -Infinity }])).toBe(Infinity);
+    expect(sumPricesWeighted([{ name: "res1", val: Math.SQRT2 }])).toBeCloseTo(14.1421);
+    expect(sumPricesWeighted([{ name: "res1", val: -39 }, { name: "res2", val: 63 }, { name: "res3", val: -23.5 }])).toBeCloseTo(5);
+    expect(sumPricesWeighted([{ name: "res1", val: -39 }, { name: "res2", val: -97 }, { name: "res3", val: 3 }])).toBeCloseTo(-1330);
+
+    //Zero prices should not contribute:
+    expect(sumPricesWeighted([{ name: "unicorns", val: 0 }])).toBe(0);
+    expect(sumPricesWeighted([{ name: "catnip", val: 0 }])).toBe(0);
+    expect(sumPricesWeighted([{ name: "res1", val: 0.4 }, { name: "unicorns", val: 0 }, { name: "res1", val: 0 }, { name: "res2", val: 0 }])).toBeCloseTo(4);
+
+    //Empty price should be zero:
+    expect(sumPricesWeighted([])).toBe(0);
+});
+
 //--------------------------------
 //       Shatter TC Prices
 //--------------------------------
