@@ -1540,6 +1540,10 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 		}
 
 		if (overcap > 0.001) { //Don't trigger from floating-point errors
+			if (this.controllerOpts.gainedResource == "tears") {
+				//Tears evaporate into a smoky substance
+				this.game.bld.cathPollution += overcap * this.game.getEffect("cathPollutionPerTearOvercapped");
+			}
 			//Optional parameter to display a message when we overcap:
 			if (typeof(this.controllerOpts.overcapMsgID) === "string") {
 				this.game.msg($I(this.controllerOpts.overcapMsgID, [this.game.getDisplayValueExt(overcap)]), "", this.controllerOpts.logfilterID, true /*noBullet*/);

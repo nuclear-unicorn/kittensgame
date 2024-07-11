@@ -1746,6 +1746,9 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title:  $I("effectsMgr.statics.pollutionRatio.title"),
 				type: "ratio"
 			},
+			"cathPollutionPerTearOvercapped": {
+				type: "hidden"
+			},
             //zebra workshop upgrades
             "zebraPreparations": {
                 title: $I("effectsMgr.statics.zebraPreparations.title"),
