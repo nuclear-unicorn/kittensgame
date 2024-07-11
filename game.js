@@ -1663,6 +1663,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio",
 				calculation: "nonProportional"
 			},
+			"scienceTearsPricesChallenge": {
+				title: $I("effectsMgr.statics.scienceTearsPricesChallenge.title"),
+				type: "ratio"
+			},
 			"workshopTearsPricesChallenge": {
 				title: $I("effectsMgr.statics.workshopTearsPricesChallenge.title"),
 				type: "ratio"
