@@ -646,6 +646,8 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 				//Tears spill out of the container
 				var amtLost = tears.value - tears.maxValue;
 				this.game.resPool.addResEvent("tears", -amtLost);
+				//Tears evaporate into a smoky substance
+				this.game.bld.cathPollution += amtLost * this.game.getEffect("cathPollutionPerTearOvercapped");
 				this.game.msg($I("calendar.msg.tear.spilled", [this.game.getDisplayValueExt(amtLost)]));
 			}
 			var alicorns = this.game.resPool.get("alicorn");

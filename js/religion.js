@@ -1494,6 +1494,8 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 		if (gainRes.maxValue && amtWeCanAfford > 1) { //Perform this check only if we can afford 2 or more
 			var amtToReachCap = Math.ceil((gainRes.maxValue - gainRes.value) / this.controllerOpts.gainMultiplier.call(this));
 			amtWeCanAfford = Math.min(amtWeCanAfford, amtToReachCap);
+			//But don't go below 1 so we always give the player the option to sacrifice 1
+			amtWeCanAfford = Math.max(1, amtWeCanAfford);
 		}
 		return amtWeCanAfford;
 	},
@@ -1540,6 +1542,10 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 		}
 
 		if (overcap > 0.001) { //Don't trigger from floating-point errors
+			if (this.controllerOpts.gainedResource == "tears") {
+				//Tears evaporate into a smoky substance
+				this.game.bld.cathPollution += overcap * this.game.getEffect("cathPollutionPerTearOvercapped");
+			}
 			//Optional parameter to display a message when we overcap:
 			if (typeof(this.controllerOpts.overcapMsgID) === "string") {
 				this.game.msg($I(this.controllerOpts.overcapMsgID, [this.game.getDisplayValueExt(overcap)]), "", this.controllerOpts.logfilterID, true /*noBullet*/);
