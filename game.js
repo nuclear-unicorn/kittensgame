@@ -1850,6 +1850,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	gatherClicks: 0,	//how many clicks in a row was performed on a gather button
 	cheatMode: false,	//flag triggering Super Unethical Climax achievement
 	systemShockMode: false,	//flag triggering System Shock achievement
+	startedWithoutChronospheres: true, //Flag for achievements
 
 	ticks: 0,				//how many ticks passed since the start of the game
 	totalUpdateTime: [0, 0, 0, 0, 0],	//total time spent on update cycle in milliseconds, useful for debug/fps counter. 1 ticks per second have more calculations
@@ -2215,6 +2216,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.deadKittens = 0;
 		this.cheatMode = false;
 		this.systemShockMode = false;
+		this.startedWithoutChronospheres = true;
 		this.isCMBREnabled = false;
 
 		if (this.pauseTimestamp){
@@ -2309,6 +2311,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			ironWill : this.ironWill,
 			deadKittens: this.deadKittens,
 			cheatMode: this.cheatMode,
+			startedWithoutChronospheres: this.startedWithoutChronospheres,
 
 			opts : this.opts,
 			lastBackup: this.lastBackup
@@ -2489,6 +2492,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			this.useWorkers = (data.useWorkers !== undefined) ? data.useWorkers : false;
 
 			this.cheatMode = (data.cheatMode !== undefined) ? data.cheatMode : false;
+			this.startedWithoutChronospheres = (data.startedWithoutChronospheres !== undefined) ? data.startedWithoutChronospheres : false; //false for existing games
 
 			this.isCMBREnabled = (data.isCMBREnabled !== undefined) ? data.isCMBREnabled : true;	//true for all existing games
 			this.lastBackup = data.lastBackup || new Date().getTime();
@@ -4812,6 +4816,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			karmaKittens: 		karmaKittens,
 			karmaZebras: 		karmaZebras,
 			ironWill : 			(saveRatio > 0 || this.time.getVSU("cryochambers").on > 0) ? false : true,			//chronospheres or cryochaimbers will disable IW. Post Apocalypse allows cryochaimbers to work without chronospheres working.
+			startedWithoutChronospheres: saveRatio == 0 && this.time.getVSU("cryochambers").on == 0,
 			deadKittens: 		0,
 			isCMBREnabled:		false
 		});
