@@ -1294,20 +1294,37 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
     },
 
     doShatter: function(model, amt) {
-        var factor = this.game.challenges.getChallenge("1000Years").researched ? 5 : 10;
-        var heat_acutoconverted = 1 - 100/(100 + this.game.getEffect("heatCompression"));
-        if (heat_acutoconverted){
-            this.game.time.heat += amt * factor * (1 - heat_acutoconverted);
-            var efficiency = 1 + this.game.getEffect("heatEfficiency");
-            this.game.time.getCFU("blastFurnace").heat += amt * factor * heat_acutoconverted * efficiency;
-        }else{
-            this.game.time.heat += amt * factor;
+        var game = this.game;
+        var timeManager = game.time;
+        if (game.calendar.day < 0 && amt >= 500) {
+            var badge = game.achievements.getBadge("whatYearIsIt");
+            //One-time bonus: gain void upon unlocking the basge
+            if (!badge.unlocked) {
+                var voidAmtGained = 3; //This is more of a joke than anything, so the amount is small
+                game.resPool.addResEvent("void", voidAmtGained);
+                game.achievements.unlockBadge("whatYearIsIt");
+                game.msg($I("badges.whatYearIsIt.get", [voidAmtGained]));
+            }
+            //Silly thing: randomize the fur color of the leader kitten
+            if (game.village.leader != null) {
+                game.village.leader.color = game.createRandomVarietyAndColor(100 /*chance for rare color*/, 0 /*chance for variety*/)[0]; //extract color information
+            }
         }
-        //this.game.time.shatter(amt);
-        if(this.game.time.testShatter == 1) {this.game.time.shatterInGroupCycles(amt);}
-        //else if(this.game.time.testShatter == 2) {this.game.time.shatterInCycles(amt);}
+
+        var factor = game.challenges.getChallenge("1000Years").researched ? 5 : 10;
+        var heat_acutoconverted = 1 - 100/(100 + game.getEffect("heatCompression"));
+        if (heat_acutoconverted){
+            timeManager.heat += amt * factor * (1 - heat_acutoconverted);
+            var efficiency = 1 + this.game.getEffect("heatEfficiency");
+            timeManager.getCFU("blastFurnace").heat += amt * factor * heat_acutoconverted * efficiency;
+        }else{
+            timeManager.heat += amt * factor;
+        }
+        //timeManager.shatter(amt);
+        if(timeManager.testShatter == 1) {timeManager.shatterInGroupCycles(amt);}
+        //else if(timeManager.testShatter == 2) {timeManager.shatterInCycles(amt);}
         //shatterInCycles is deprecated
-        else {this.game.time.shatter(amt);}
+        else {timeManager.shatter(amt);}
     },
 
     updateVisible: function(model){
