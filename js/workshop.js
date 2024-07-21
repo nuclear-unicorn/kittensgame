@@ -2767,6 +2767,13 @@ dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearun
 		if (upgrade.researched && this.game.workshop.hideResearched){
 			model.visible = false;
 		}
+	},
+
+	onPurchase: function(model) {
+		if (model.metadata.name == "carbonSequestration" && this.game.bld.cathPollution == 0) {
+			this.game.achievements.unlockBadge("betterSafeThanSorry");
+		}
+		this.inherited(arguments);
 	}
 });
 

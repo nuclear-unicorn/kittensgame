@@ -1310,6 +1310,9 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
                 game.village.leader.color = game.createRandomVarietyAndColor(100 /*chance for rare color*/, 0 /*chance for variety*/)[0]; //extract color information
             }
         }
+        if (game.space.getProgram("orbitalLaunch").val == 0) {
+            game.achievements.unlockBadge("tardis");
+        }
 
         var factor = game.challenges.getChallenge("1000Years").researched ? 5 : 10;
         var heat_acutoconverted = 1 - 100/(100 + game.getEffect("heatCompression"));

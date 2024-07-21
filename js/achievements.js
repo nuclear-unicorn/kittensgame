@@ -49,6 +49,13 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
                 return ( this.game.resPool.get("necrocorn").value > 0 );
             }
         }, {
+            name: "sadnessAbyss",
+            title: $I("achievements.sadnessAbyss.title"),
+            description: $I("achievements.sadnessAbyss.desc"),
+            condition: function() {
+                return this.game.resPool.get("sorrow").value >= 100;
+            }
+        }, {
             name: "ironWill",
             title: $I("achievements.ironWill.title"),
             description: $I("achievements.ironWill.desc"),
@@ -105,8 +112,19 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             name: "jupiterAscending",
             title: $I("achievements.jupiterAscending.title"),
             description: $I("achievements.jupiterAscending.desc"),
+            starDescription: $I("achievements.jupiterAscending.starDesc"),
             condition: function () {
                 return ( this.game.space.getProgram("orbitalLaunch").on && this.game.calendar.year <= 1);
+            },
+            starCondition: function() {
+                return (this.game.startedWithoutChronospheres && this.game.space.getProgram("orbitalLaunch").on && this.game.calendar.year <= 1);
+            }
+        }, {
+            name: "veryLargeArray",
+            title: $I("achievements.veryLargeArray.title"),
+            description: $I("achievements.veryLargeArray.desc"),
+            condition: function() {
+                return this.game.bld.get("observatory").on >= 100 && !this.game.workshop.get("seti").researched;
             }
         }, {
             name: "shadowOfTheColossus",
@@ -142,6 +160,7 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             title: $I("achievements.youMonster.title"),
             unethical: true,
             description: $I("achievements.youMonster.desc"),
+            starDescription: $I("achievements.youMonster.starDesc"),
             condition: function () {
                 return (this.game.deadKittens >= 100);
             },
@@ -176,8 +195,12 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             name: "serenity",
             title: $I("achievements.serenity.title"),
             description: $I("achievements.serenity.desc"),
+            starDescription: $I("achievements.serenity.starDesc"),
             condition: function () {
                 return (this.game.village.getKittens() >= 50 && this.game.deadKittens == 0);
+            },
+            starCondition: function() {
+                return (this.game.village.getKittens() >= 1000 && this.game.deadKittens == 0);
             }
         },
         {
@@ -209,7 +232,20 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             starCondition: function () {
                 return (this.game.calendar.trueYear() >= this.game.calendar.darkFutureBeginning);
             }
-    }],
+        }, {
+            name: "eternalBacchanalia",
+            title: $I("achievements.eternalBacchanalia.title"),
+            description: $I("achievements.eternalBacchanalia.desc"),
+            starDescription: $I("achievements.eternalBacchanalia.starDesc"),
+            condition: function() {
+                return this.game.calendar.festivalDays >= 100 * this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear;
+            },
+            //TODO: Add a way to make it reasonable for both mobile & web players to get millions of years of festivals.
+            //starCondition: function() {
+            //    return this.game.calendar.festivalDays >= 1e6 * this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear;
+            //}
+        }
+    ],
 
     badges: [
         {   
@@ -301,6 +337,65 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             condition: function(){
                 return (!this.game.space.getPlanet("moon").reached && this.game.space.getPlanet("dune").reached);
             }
+        },{
+            name: "fantasticFurColor",
+            title: "Fantastic Fur Color",
+            description: "The colored names just mean the kitten has a rare fur color; it has no gameplay effect.",
+            difficulty: "F",
+            condition: function() {
+                var leader = this.game.village.leader;
+                return leader != null && leader.color != 0;
+            }
+        },{
+            name: "whatYearIsIt",
+            title: "What Year is it Again?",
+            description: "Forcefully resolve a Temporal Paradox. May have unknown side effects.",
+            difficulty: "C"
+        },{
+            name: "tardis",
+            title: "Time Advancing Relative Dimensions In Space",
+            description: "Prioritize time travel over space travel.",
+            difficulty: "C"
+        },{
+            name: "wheredThisComeFrom",
+            title: "Where'd This Come From?",
+            description: "Use Chronospheres to duplicate resources",
+            difficulty: "S"
+        },{
+            name: "lostDates",
+            title: "Lost Dates",
+            description: "Accumulate 5 years of timeslip.",
+            difficulty: "B",
+            condition: function() {
+                //"flux" measures the amount of time the player has skipped this run
+                //Negative timeskip = timeslip
+                return this.game.time.flux <= -5;
+                //Before you ask, no, you can't use the 1000 Years Challenge to generate timeslip
+            }
+        },{
+            name: "buffet",
+            title: "A Whale of a Buffet",
+            description: "Reach 1000 Leviathan energy.",
+            difficulty: "A",
+            condition: function() {
+                return this.game.diplomacy.get("leviathans").energy >= 1000;
+            }
+        },{
+            name: "newHome",
+            title: "A New Home",
+            description: "Have more housing on Yarn than on Cath.",
+            difficulty: "D",
+            condition: function() {
+                var yarnHousing = this.game.space.getBuilding("terraformingStation").totalEffectsCached["maxKittens"];
+                var cathHousing = this.game.getEffect("maxKittens") - yarnHousing;
+                //cathHousing includes Space Stations & Cryochambers
+                return yarnHousing > cathHousing;
+            }
+        },{
+            name: "betterSafeThanSorry",
+            title: "Better Safe Than Sorry",
+            description: "Purchase Carbon Sequestration when there is no pollution.",
+            difficulty: "E"
         }
     ],
 

@@ -4798,6 +4798,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 		//------------------------------------------------------------------------------------------------------
 
+		var saveRatio = this.bld.get("chronosphere").val > 0 ? this.getEffect("resStasisRatio") : 0; // resStasisRatio excepted when challenge
+		if (saveRatio > 1) {
+			this.achievements.unlockBadge("wheredThisComeFrom");
+		}
+
 		// Trigger a save to make sure we're working with most recent data
 		this.save();
 
@@ -4811,7 +4816,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			};
 		}
 
-		var saveRatio = this.bld.get("chronosphere").val > 0 ? this.getEffect("resStasisRatio") : 0; // resStasisRatio excepted when challenge
 		dojo.mixin(lsData.game, {
 			karmaKittens: 		karmaKittens,
 			karmaZebras: 		karmaZebras,
