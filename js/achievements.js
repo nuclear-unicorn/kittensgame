@@ -706,7 +706,7 @@ dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
     render: function(container){
         var content = this.inherited(arguments);
         
-		var div = dojo.create("div", {}, content);
+		var div = dojo.create("div", {className: "badges-container"}, content);
 		div.innerHTML = "";
 		this.badgesHeader = dojo.create("div", {className: "achievement-header"}, div);
         var totalBadges = 0;

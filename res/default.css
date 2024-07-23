@@ -364,14 +364,17 @@ select > option:disabled {
 
 .achievement.badge {
     display: inline-block;
-    width: 45%;
+    width: 90%;
 }
 
-.achievement.badge:nth-child(2n+1) { /* select even elements */
-    margin-left: 10px;
-    float: right;
+.badges-container { /* display children in 2 equally-sized columns */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
 }
 
+.badges-container .achievement-header { /* header occupies both columns */
+    grid-column: span 2;
+}
 
 .achievement.unethical {
     border-color: red;
