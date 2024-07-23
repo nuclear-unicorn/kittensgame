@@ -516,11 +516,14 @@ dojo.declare("classes.ui.AchievementsPanel", com.nuclearunicorn.game.ui.Panel, {
                 continue;
             }
 
-            if (!ach.unethical){
-                totalAchievements++;
-            }
+			//Count ethical achievements: total & completed.
+			if (!ach.unethical){
+				totalAchievements++;
+				if (ach.unlocked) {
+					completedAchievements++;
+				}
+			}
 
-            if (ach.unlocked && !ach.unethical) { completedAchievements++; }
             var className = "achievement";
             if (ach.unlocked && ach.unethical) {className += " unethical";}
             if (ach.unlocked) {className += " unlocked";}
@@ -535,31 +538,36 @@ dojo.declare("classes.ui.AchievementsPanel", com.nuclearunicorn.game.ui.Panel, {
 				continue;
 			}
 
-			if (ach.starUnlocked) {
-				completedStars++;
-			} else {
-				uncompletedStars++;
+			//Count ethical starred achievements: completed & incomplete.
+			if (!ach.unethical) {
+				if (ach.starUnlocked) {
+					completedStars++;
+				} else {
+					uncompletedStars++;
+				}
 			}
+
 			dojo.create("div", {
 				className: "star",
 				innerHTML: ach.starUnlocked ? "&#9733;" : "&#9734;",
 				title: ach.starUnlocked ? ach.starDescription : "???"
 			}, span);
 		}
-		divHeader.innerHTML = $I("badges.header", [completedAchievements, totalAchievements]);
-		var stars = "";
-		for (var i = completedStars; i > 0; --i) {
-			stars += "&#9733;";
-		}
-		for (var i = uncompletedStars; i > 0; --i) {
-			stars += "&#9734;";
-		}
+		divHeader.innerHTML = $I("achievements.header", [completedAchievements, totalAchievements]);
 		dojo.create("span", {
 			className: "star",
-			innerHTML: stars
+			innerHTML: this.generateStarText(completedStars, uncompletedStars)
 		}, divHeader);
-	}
+	},
 
+	update: function () {
+		//TODO: update the achievements panel live whenever anything changes
+	},
+
+	//Creates a string composed of filled stars & unfilled stars:
+	generateStarText: function(completedStars, uncompletedStars) {
+		return "&#9733;".repeat(completedStars) + "&#9734;".repeat(uncompletedStars);
+	}
 });
 
 dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
@@ -592,8 +600,11 @@ dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
 			}, div);
 		}
         divHeader.innerHTML = $I("badges.header", [completedBadges, totalBadges]);
-	}
+	},
 
+	update: function () {
+		//TODO: update the badges panel live whenever anything changes
+	},
 });
 
 dojo.declare("com.nuclearunicorn.game.ui.tab.AchTab", com.nuclearunicorn.game.ui.tab, {
@@ -623,6 +634,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.AchTab", com.nuclearunicorn.game.ui
 	},
 
     update: function() {
-        this.inherited(arguments);
+		this.achievementsPanel.update();
+		this.badgesPanel.update();
     }
 });
