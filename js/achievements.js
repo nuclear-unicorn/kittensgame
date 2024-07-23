@@ -495,21 +495,26 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
 dojo.declare("classes.ui.AchievementsPanel", com.nuclearunicorn.game.ui.Panel, {
 
 	game: null,
+	refreshNextTick: false, //Used internally to update the list
 
 	constructor: function(){
+		this.achievementsHeader = null;
+		this.achievementsMap = {};
+		this.achievementsContainer = null;
 	},
 
     render: function(container){
         var content = this.inherited(arguments);
         
-		var div = dojo.create("div", {}, content);
+		this.achievementsContainer = dojo.create("div", {}, content);
 
-		div.innerHTML = "";
-        var divHeader = dojo.create("div", {className: "achievement-header"}, div);
+		this.achievementsContainer.innerHTML = "";
+		this.achievementsHeader = dojo.create("div", {className: "achievement-header"}, this.achievementsContainer);
         var totalAchievements = 0;
         var completedAchievements = 0;
         var completedStars = 0;
         var uncompletedStars = 0;
+		this.achievementsMap = {}; //Associates each non-hidden achievement in the game with a UI element representing it
 		for (var i in this.game.achievements.achievements){
 			var ach = this.game.achievements.achievements[i];
             if (!ach.unlocked && ach.hidden){
@@ -524,15 +529,8 @@ dojo.declare("classes.ui.AchievementsPanel", com.nuclearunicorn.game.ui.Panel, {
 				}
 			}
 
-            var className = "achievement";
-            if (ach.unlocked && ach.unethical) {className += " unethical";}
-            if (ach.unlocked) {className += " unlocked";}
-            if (ach.starUnlocked) {className += " starUnlocked";}
-			var span = dojo.create("span", {
-				className: className,
-				title: ach.unlocked ? ach.description : "???",
-				innerHTML : ach.unlocked ? ach.title : "???"
-			}, div);
+			//Create the UI element for this achievement:
+			this.achievementsMap[ach.name] = this.renderAchievementItem(ach, this.achievementsContainer);
 
 			if (ach.starCondition == undefined) {
 				continue;
@@ -546,27 +544,153 @@ dojo.declare("classes.ui.AchievementsPanel", com.nuclearunicorn.game.ui.Panel, {
 					uncompletedStars++;
 				}
 			}
+		}
+		this.achievementsHeader.innerHTML = $I("achievements.header", [completedAchievements, totalAchievements]);
+		dojo.create("span", {
+			className: "star",
+			innerHTML: this.generateStarText(completedStars, uncompletedStars)
+		}, this.achievementsHeader);
+	},
 
+	update: function () {
+		var refreshThisTick = this.refreshNextTick;
+		this.refreshNextTick = false;
+		//Count all the achievements:
+		var totalAchievements = 0;
+		var completedAchievements = 0;
+		var completedStars = 0;
+		var uncompletedStars = 0;
+		for (var i in this.game.achievements.achievements){
+			var ach = this.game.achievements.achievements[i];
+			if (!ach.unlocked && ach.hidden){
+				if (this.achievementsMap[ach.name]) {
+					//Hide locked hidden achievements:
+					dojo.destroy(this.achievementsMap[ach.name]);
+					this.achievementsMap[ach.name] = undefined;
+				}
+				continue;
+			}
+			//From here on out, all achievements are non-hidden.
+
+			if (refreshThisTick) { //Delete all entries & recreate them all
+				dojo.destroy(this.achievementsMap[ach.name]);
+				this.renderAchievementItem(ach, this.achievementsContainer);
+			} else if (this.achievementsMap[ach.name]) { //Update existing entry
+				this.updateAchievementItem(ach);
+			} else {
+				//We aren't refreshing & the entry for this achievement is missing.
+				//Next tick, refresh everything.
+				this.refreshNextTick = true;
+			}
+			//Count ethical achievements: total & completed.
+			if (!ach.unethical){
+				totalAchievements++;
+				if (ach.unlocked) {
+					completedAchievements++;
+				}
+			}
+			if (ach.starCondition == undefined) {
+				continue;
+			}
+			//Count ethical starred achievements: completed & incomplete.
+			if (!ach.unethical) {
+				if (ach.starUnlocked) {
+					completedStars++;
+				} else {
+					uncompletedStars++;
+				}
+			}
+		}
+
+		//Update the numbers of completed & starred achievements in the header:
+		var desiredHeaderText = $I("achievements.header", [completedAchievements, totalAchievements]);
+		if (this.achievementsHeader.firstChild.nodeValue != desiredHeaderText) {
+			this.achievementsHeader.firstChild.nodeValue = desiredHeaderText;
+		}
+		var desiredStarText = this.generateStarText(completedStars, uncompletedStars);
+		//The inner HTML has taken the &#; format & rendered it as Unicode; we must do something similar.
+		var starTextForCompare = String.fromCharCode.apply(null, desiredStarText.replaceAll("&#", "").split(";").slice(0, -1));
+		if(this.achievementsHeader.firstElementChild.innerHTML != starTextForCompare) {
+			this.achievementsHeader.firstElementChild.innerHTML = desiredStarText;
+		}
+	},
+
+	//Creates a string composed of filled stars & unfilled stars:
+	generateStarText: function(completedStars, uncompletedStars) {
+		return "&#9733;".repeat(completedStars) + "&#9734;".repeat(uncompletedStars);
+	},
+
+	/**
+	 * Creates a UI element representing a single achievement.
+	 * @param ach The achievement object to create a UI element for
+	 * @param container A <div> element or similar, inside which we'll place this
+	 * @return The <span> element representing the achievement in question
+	 */
+	renderAchievementItem: function(ach, container) {
+		var className = "achievement";
+		if (ach.unlocked && ach.unethical) {className += " unethical";}
+		if (ach.unlocked) {className += " unlocked";}
+		if (ach.starUnlocked) {className += " starUnlocked";}
+		var span = dojo.create("span", {
+			className: className,
+			title: ach.unlocked ? ach.description : "???",
+			innerHTML : ach.unlocked ? ach.title : "???"
+		}, container);
+
+		this.achievementsMap[ach.name] = span;
+		if (ach.starCondition) {
 			dojo.create("div", {
 				className: "star",
 				innerHTML: ach.starUnlocked ? "&#9733;" : "&#9734;",
 				title: ach.starUnlocked ? ach.starDescription : "???"
 			}, span);
 		}
-		divHeader.innerHTML = $I("achievements.header", [completedAchievements, totalAchievements]);
-		dojo.create("span", {
-			className: "star",
-			innerHTML: this.generateStarText(completedStars, uncompletedStars)
-		}, divHeader);
+
+		return span;
 	},
 
-	update: function () {
-		//TODO: update the achievements panel live whenever anything changes
-	},
+	/**
+	 * Updates the state of a UI element to match the game-state.
+	 * Logs an error if no corresponding UI element has been previously rendered.
+	 * @param ach The achievement object to update a UI element for
+	 */
+	updateAchievementItem: function(ach) {
+		var span = this.achievementsMap[ach.name];
+		if (!span) {
+			console.error("Called updateAchievementItem when no corresponding UI element exists.");
+			return;
+		}
 
-	//Creates a string composed of filled stars & unfilled stars:
-	generateStarText: function(completedStars, uncompletedStars) {
-		return "&#9733;".repeat(completedStars) + "&#9734;".repeat(uncompletedStars);
+		//For each property of the span, check if it's what we want it to be, then change if necessaary:
+		var desiredClassName = "achievement";
+		if (ach.unlocked && ach.unethical) {desiredClassName += " unethical";}
+		if (ach.unlocked) {desiredClassName += " unlocked";}
+		if (ach.starUnlocked) {desiredClassName += " starUnlocked";}
+		if (span.className != desiredClassName) {
+			span.className = desiredClassName;
+		}
+		var desiredTitle = ach.unlocked ? ach.description : "???";
+		if (span.title != desiredTitle) {
+			span.title = desiredTitle;
+		}
+		var desiredContent = ach.unlocked ? ach.title : "???";
+		if (span.firstChild.nodeValue != desiredContent) {
+			span.firstChild.nodeValue = desiredContent;
+		}
+
+		//For each property of the star, check if it's what we want it to be, then change if necessaary:
+		if (ach.starCondition) {
+			var star = span.firstElementChild;
+			var desiredInnerHTML = ach.starUnlocked ? "&#9733;" : "&#9734;";
+			var desiredInnerHTMLForCompare = String.fromCharCode(ach.starUnlocked ? 9733 : 9734);
+			if (star.innerHTML != desiredInnerHTMLForCompare) {
+				star.innerHTML = desiredInnerHTML;
+			}
+			desiredTitle = ach.starUnlocked ? ach.starDescription : "???";
+			if (star.title != desiredTitle) {
+				star.title = desiredTitle;
+			}
+		}
 	}
 });
 
