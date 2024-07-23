@@ -699,6 +699,8 @@ dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
 	game: null,
 
 	constructor: function(){
+		this.badgesHeader = null;
+		this.badgesMap = {};
 	},
 
     render: function(container){
@@ -706,9 +708,10 @@ dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
         
 		var div = dojo.create("div", {}, content);
 		div.innerHTML = "";
-        var divHeader = dojo.create("div", {className: "achievement-header"}, div);
+		this.badgesHeader = dojo.create("div", {className: "achievement-header"}, div);
         var totalBadges = 0;
         var completedBadges = 0;
+		this.badgesMap = {}; //Associates each badge in the game with a UI element representing it
 		for (var i in this.game.achievements.badges){
 			var badge = this.game.achievements.badges[i];
             
@@ -717,17 +720,46 @@ dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
             if (badge.unlocked) { completedBadges++; }
             var className = "achievement badge";
             if (badge.unlocked) {className += " unlocked";}
-			dojo.create("span", {
+			this.badgesMap[badge.name] = dojo.create("span", {
 				className: className,
 				title: badge.unlocked ? badge.description : "???",
 				innerHTML : badge.unlocked ? badge.title : "???"
 			}, div);
 		}
-        divHeader.innerHTML = $I("badges.header", [completedBadges, totalBadges]);
+		this.badgesHeader.innerHTML = $I("badges.header", [completedBadges, totalBadges]);
 	},
 
 	update: function () {
-		//TODO: update the badges panel live whenever anything changes
+		var totalBadges = 0;
+		var completedBadges = 0;
+		for (var i in this.game.achievements.badges){
+			var badge = this.game.achievements.badges[i];
+			var span = this.badgesMap[badge.name];
+			//Recount every tick
+			totalBadges++;
+			if (badge.unlocked) { completedBadges++; }
+
+			//For each property of the HTML element, compare it against the expected value.
+			// Update only if we need to make a change.
+			var desiredClassName = "achievement badge";
+			if (badge.unlocked) {desiredClassName += " unlocked";}
+			if (span.className != desiredClassName) {
+				span.className = desiredClassName;
+			}
+			var desiredTitle = badge.unlocked ? badge.description : "???";
+			if (span.title != desiredTitle) {
+				span.title = desiredTitle;
+			}
+			var desiredInnerHTML = badge.unlocked ? badge.title : "???";
+			if (span.innerHTML != desiredInnerHTML) {
+				span.innerHTML = desiredInnerHTML;
+			}
+		}
+
+		var desiredHeaderText = $I("badges.header", [completedBadges, totalBadges]);
+		if (this.badgesHeader.innerHTML != desiredHeaderText) {
+			this.badgesHeader.innerHTML = desiredHeaderText;
+		}
 	},
 });
 
