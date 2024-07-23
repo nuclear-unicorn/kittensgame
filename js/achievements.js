@@ -340,7 +340,7 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
         },{
             name: "fantasticFurColor",
             title: "Fantastic Fur Color",
-            description: "The colored names just mean the kitten has a rare fur color; it has no gameplay effect.",
+            description: "When a kitten has a colored name, that just means the kitten has a rare fur color; colored kittens have no gameplay effect, but they're extra cute.",
             difficulty: "F",
             condition: function() {
                 var leader = this.game.village.leader;
@@ -359,7 +359,7 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
         },{
             name: "wheredThisComeFrom",
             title: "Where'd This Come From?",
-            description: "Use Chronospheres to duplicate resources",
+            description: "Chronoreset to gain resources.",
             difficulty: "S"
         },{
             name: "lostDates",
@@ -394,7 +394,7 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
         },{
             name: "betterSafeThanSorry",
             title: "Better Safe Than Sorry",
-            description: "Purchase Carbon Sequestration when there is no pollution.",
+            description: "Get Carbon Sequestration with no pollution.",
             difficulty: "E"
         }
     ],
@@ -449,6 +449,15 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
                 badge.unlocked = true;
                 this.badgesUnlocked = true;
             }
+        }
+
+        //Mess with the player a little bit.
+        if (this.game.rand(100) < 10) {
+            //10% chance of 5 hourglass symbols
+            this.getBadge("lostDates").title = "\u231b".repeat(5);
+        } else {
+            //90% chance to be normal
+            this.getBadge("lostDates").title = "Lost Dates";
         }
     },
 
@@ -714,14 +723,11 @@ dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
 		this.badgesMap = {}; //Associates each badge in the game with a UI element representing it
 		for (var i in this.game.achievements.badges){
 			var badge = this.game.achievements.badges[i];
-            
             totalBadges++;
-
             if (badge.unlocked) { completedBadges++; }
-            var className = "achievement badge";
-            if (badge.unlocked) {className += " unlocked";}
+
 			this.badgesMap[badge.name] = dojo.create("span", {
-				className: className,
+				className: this.generateBadgeCSSClass(badge),
 				title: badge.unlocked ? badge.description : "???",
 				innerHTML : badge.unlocked ? badge.title : "???"
 			}, div);
@@ -741,8 +747,7 @@ dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
 
 			//For each property of the HTML element, compare it against the expected value.
 			// Update only if we need to make a change.
-			var desiredClassName = "achievement badge";
-			if (badge.unlocked) {desiredClassName += " unlocked";}
+			var desiredClassName = this.generateBadgeCSSClass(badge);
 			if (span.className != desiredClassName) {
 				span.className = desiredClassName;
 			}
@@ -761,6 +766,32 @@ dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
 			this.badgesHeader.innerHTML = desiredHeaderText;
 		}
 	},
+
+	//Returns a string with the proper CSS class for the UI element representing a particular badge.
+	generateBadgeCSSClass: function(badge) {
+		var retVal = "achievement badge";
+		if (badge.unlocked) {
+			retVal += " unlocked";
+
+			//Style Fantastic Fur Color after the leader's fur color.
+			if (badge.name == "fantasticFurColor") {
+				var kitten = this.game.village.leader;
+				if (kitten) {
+					var fracturedPacts = this.game.religion.getPact("fractured").val && this.game.getFeatureFlag("MAUSOLEUM_PACTS");
+					var colorToUse = fracturedPacts ? kitten.fakeColor : kitten.color;
+					var varietyToUse = fracturedPacts ? kitten.fakeVariety : kitten.variety;
+					var colorStr = (colorToUse && kitten.colors[colorToUse + 1]) ? kitten.colors[colorToUse + 1].color : "none";
+					var varietyStr = (varietyToUse && kitten.varieties[varietyToUse + 1]) ? kitten.varieties[varietyToUse + 1].style : "none";
+
+					//Only format if we have a colored kitten.
+					if (colorStr != "none" || varietyStr != "none") {
+						retVal += " name color-" + colorStr + " variety-" + varietyStr;
+					}
+				}
+			}
+		}
+		return retVal;
+	}
 });
 
 dojo.declare("com.nuclearunicorn.game.ui.tab.AchTab", com.nuclearunicorn.game.ui.tab, {
