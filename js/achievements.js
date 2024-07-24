@@ -244,6 +244,17 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             //starCondition: function() {
             //    return this.game.calendar.festivalDays >= 1e6 * this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear;
             //}
+        }, {
+            name: "challenger",
+            title: $I("achievements.challenger.title"),
+            description: $I("achievements.challenger.desc"),
+            starDescription: $I("achievements.challenger.starDesc"),
+            condition: function() {
+                return this.game.challenges.getCountUniqueCompletions() >= 5;
+            },
+            starCondition: function() {
+                return this.game.challenges.getCountCompletions() >= 100;
+            }
         }
     ],
 
