@@ -889,6 +889,8 @@ body.scheme_catnip {
 }
 .scheme_catnip .achievement:not(.unethical).unlocked {
 	background-color: rgba(128, 128, 128, 0.1);
+}
+.scheme_catnip .achievement:not(.unethical, .name).unlocked {
 	color: #366208;
 }
 .scheme_catnip .achievement:not(.unethical).unlocked:hover {

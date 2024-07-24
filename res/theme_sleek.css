@@ -284,11 +284,14 @@ body.scheme_sleek  {
     margin: 10px;
     height: 40px;
     background-color: rgba(0, 0, 0, 0.1);
-    color: white;
     text-shadow: rgb(118, 176, 255) 2px 0px 10px;
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: default !important;
+}
+
+.scheme_sleek .achievement:not(.name) {
+    color: white;
 }
 
 .scheme_sleek .achievement.unethical {

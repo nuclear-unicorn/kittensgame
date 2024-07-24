@@ -340,7 +340,7 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
         },{
             name: "fantasticFurColor",
             title: "Fantastic Fur Color",
-            description: "When a kitten has a colored name, that just means the kitten has a rare fur color; colored kittens have no gameplay effect, but they're extra cute.",
+            description: "When a kitten has a colored name, that just means the kitten has a rare fur color; there is no special gameplay effect for having a rare fur color.",
             difficulty: "F",
             condition: function() {
                 var leader = this.game.village.leader;
@@ -389,7 +389,7 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
                 var yarnHousing = this.game.space.getBuilding("terraformingStation").totalEffectsCached["maxKittens"];
                 var cathHousing = this.game.getEffect("maxKittens") - yarnHousing;
                 //cathHousing includes Space Stations & Cryochambers
-                return yarnHousing > cathHousing;
+                return yarnHousing > cathHousing && this.game.village.getOverpopulation() <= 0;
             }
         },{
             name: "betterSafeThanSorry",

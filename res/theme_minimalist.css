@@ -898,11 +898,13 @@ body.scheme_minimalist.with_background_image,
 	font-size: 15px;
     margin: 3px 5px;
     background-color: rgba(93, 86, 169, 0.1); /* color #5D56A9; */
-    color: #D8D8D8;
     text-shadow: rgba(187, 192, 202) 2px 0 10px; /* color #BBC0CA */
     letter-spacing: 1px;
-	border-color : rgba(93, 86, 169, 0.3); /* color #5D56A9; */
 	border-radius: 5px;
+}
+.scheme_minimalist .achievement:not(.name) {
+	color: #D8D8D8;
+	border-color : rgba(93, 86, 169, 0.3); /* color #5D56A9; */
 }
 .scheme_minimalist .achievement:hover {
     background-color: rgba(93, 86, 169, 0.3); /* color #5D56A9; */
