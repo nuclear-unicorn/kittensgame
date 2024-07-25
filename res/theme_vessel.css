@@ -819,26 +819,25 @@ body.scheme_vessel {
 }
 .scheme_vessel .container .name.variety-dual { /* bicolore */
 	border: 1px solid grey;
-	padding: 0 5px;
 }
 .scheme_vessel .container .name.variety-tabby { /* tigré  ou rayé*/
 	border: 1px dashed grey;
-	padding: 0 5px;
 }
 .scheme_vessel .container .name.variety-torbie { /* marbré strié */
 	border: 1px dashed grey;
 	border-left: dotted;
 	border-right: dotted;
-	padding: 0 5px;
 }
 .scheme_vessel .container .name.variety-calico { /* tricolore */
 	border: 1px solid grey;
 	border-top-color: burlywood;
 	border-bottom-color: burlywood;
-	padding: 0 5px;
 }
 .scheme_vessel .container .name.variety-spots { /* tacheté */
 	border: 1px dotted grey;
+}
+.scheme_vessel .container .name:not(.variety-none, .achievement) {
+	/* Apply this to all rare varieties */
 	padding: 0 5px;
 }
 .scheme_vessel .btn.modern a.bld-on,
@@ -913,6 +912,9 @@ body.scheme_vessel {
     letter-spacing: 1px;
     cursor: default !important;
 	border-radius: 7px;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_vessel .achievement:not(.name) {
 	color: #D2D2D2;

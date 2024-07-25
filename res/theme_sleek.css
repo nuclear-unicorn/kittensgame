@@ -288,6 +288,9 @@ body.scheme_sleek  {
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: default !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .scheme_sleek .achievement:not(.name) {

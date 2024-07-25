@@ -753,6 +753,9 @@ body.scheme_oil,
     text-shadow: rgba(192, 192, 192) 2px 0 10px; /* color #BBC0CA */
     letter-spacing: 1px;
 	border-radius: 19px;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_oil .achievement:not(.name) {
 	color: #909090;

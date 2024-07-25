@@ -951,6 +951,9 @@ body.scheme_cyber {
 	letter-spacing: 1px;
 	border: solid 1px transparent;
 	background: local repeat top left url('img/theme_cyber_texture_03.png'), #0b0b0b;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_cyber .achievement:hover {
 	border-image-source: url('img/theme_cyber_frame_06.png');

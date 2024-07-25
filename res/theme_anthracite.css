@@ -818,6 +818,9 @@ body.scheme_anthracite.with_background_image,
 	background-repeat: no-repeat;
 	background-attachment: local;
 	background-position: top left;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_anthracite .achievement:not(.badge) {
 	margin-right: 120px;

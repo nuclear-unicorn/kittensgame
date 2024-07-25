@@ -385,6 +385,8 @@ select > option:disabled {
     content: ' ' attr(title);
     transition: opacity 0.25s;
     opacity: 0;
+    text-overflow: inherit;
+    overflow: inherit;
   }
   .achievement[title]:hover::after{
     opacity: 0.6;

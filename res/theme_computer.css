@@ -910,6 +910,9 @@ body.scheme_computer {
 	color: #030303;
 	letter-spacing: 1px;
 	border-bottom: 1px solid #777777;
+	white-space: nowrap !important;
+	text-overflow: clip;
+	overflow: hidden;
 }
 .scheme_computer .achievement.unethical {
 	color: #b00005;

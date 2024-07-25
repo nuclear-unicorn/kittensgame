@@ -1058,6 +1058,9 @@ body.scheme_wood.with_background_image {
 	border-image-outset: 0;
 	border-image-repeat: round;
 	box-shadow: inset 1px 1px 2px #000000, 1px 1px 1px #000000;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_wood .achievement:hover {
 	box-shadow: inset -1px -1px 2px #000000, 2px 2px 5px #000000, 0 -1px 2px #403939;
