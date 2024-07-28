@@ -1619,7 +1619,6 @@
     "ui.save.tooltip": "¡Guardado!",
     "ui.energy.tooltip": "Energía",
     "ui.log.link": "Registro",
-    "ui.chat.link": "Conversación",
     "ui.clear.log": "Borrar registro",
     "ui.log.filters.block": "[<span id=\"filterIcon\">+</span>] Filtros del registro",
     "ui.pause": "pausar",

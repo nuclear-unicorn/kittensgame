@@ -166,8 +166,6 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
     },
 
     isDisplayOver: false,
-    isChatActive: false,
-    isChatVisited: false,
     isCenter: false,
 
     defaultSchemes: ["default", "dark", "grassy", "sleek", "black", "wood", "bluish", "grayish", "greenish", "tombstone", "spooky"],
@@ -614,9 +612,6 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             this.game.tooltipUpdateFunc();
         }
 
-        //not relevant anymore
-        //$(".chatLink").css("font-weight", this.isChatVisited ? "normal" : "bold");
-
         //wat
         /*React.render($r(WLeftPanel, {
             game: this.game
@@ -878,49 +873,17 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#leftColumn").css("font-size", this.fontSize + "px");
     },
 
-    hideChat: function(){ //actually loads log!
+    loadLog: function(){ //actually loads log!
         $("#rightTabLog").show();
-        $("#IRCChatInner").css("visibility", "hidden");
         $("#logLink").toggleClass("active", true);
-        $("#chatLink").toggleClass("active", false);
         $("#queueLink").toggleClass("active", false);
-        $("#rightTabChat").hide();
         $("#rightTabQueue").hide();
-    },
-
-    loadChat: function(){
-        $("#rightTabChat").show();
-        $("#rightTabLog").hide();
-        $("#rightTabQueue").hide();
-
-        $("#logLink").toggleClass("active", false);
-        $("#chatLink").toggleClass("active", true);
-        $("#queueLink").toggleClass("active", false);
-
-        $("#IRCChatInner").css("visibility", "visible");
-
-        if (this.isChatActive) {
-            return;
-        }
-
-        var height = $(window.top).height() || 850;
-        //console.log("IRC WINDOW HEIGHT:", height);
-
-        var $chat = $("#IRCChatInner iframe");
-        $chat.css("height", height - 180);
-
-        this.isChatActive = true;
-        //this.isChatVisited = true;
     },
     loadQueue: function(){
-        $("#rightTabChat").hide();
         $("#rightTabLog").hide();
         $("#rightTabQueue").show();
-        $("#IRCChatInner").css("visibility", "hidden");
         $("#logLink").toggleClass("active", false);
-        $("#chatLink").toggleClass("active", false);
         $("#queueLink").toggleClass("active", true);
-        $("#rightTabChat").hide();
     },
     resetConsole: function(){
         this.game.console.resetState();
@@ -973,7 +936,6 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#autosaveTooltip").text($I("ui.autosave.tooltip"));
         $("#saveTooltip").text($I("ui.save.tooltip"));
         $("#logLink").text($I("ui.log.link"));
-        $("#chatLink").text($I("ui.chat.link"));
         if(this.game.getFeatureFlag("QUEUE")){
             $("#queueLink").text($I("ui.queue.link"));
         }
@@ -1167,7 +1129,6 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             uiData = uiData ? JSON.parse(uiData) : {};
 
             this.fontSize = uiData.fontSize || 16;
-            this.isChatVisited = uiData.isChatVisited || false;
             this.isCenter = uiData.isCenter || false;
         } catch (ex) {
             console.error("unable to load ui data");
@@ -1179,7 +1140,6 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
     save: function(){
         LCstorage["com.nuclearunicorn.kittengame.ui"] = JSON.stringify({
            fontSize: this.fontSize,
-           isChatVisited: this.isChatVisited,
            isCenter: this.isCenter,
            theme: this.game.colorScheme
         });
