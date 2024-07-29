@@ -86,7 +86,9 @@
 
 				var i = (Math.floor(Math.random() * loadingMessages.length));
 				$("#loadingProgressInfo").html(loadingMessages[i] + "...&nbsp(" + progress.toFixed() + "%)");
-				return System.import(module + ".js?rev_=" + buildRevision + "_" + Date.now());
+
+				var fileVersion = version + ".r" + buildRevision;
+				return System.import(module + ".js?v=" + fileVersion);
 			}
 
 			function _import(module, def){
@@ -102,11 +104,12 @@
 				}
 			}
 
-			function loadTheme(themeId, timestamp){
+			function loadTheme(themeId){
+				var fileVersion = version + ".r" + buildRevision;
 				$("<link />")
 					.attr("rel", "stylesheet")
 					.attr("type", "text/css")
-					.attr("href", "res/theme_" + themeId + ".css?_=" + timestamp)
+					.attr("href", "res/theme_" + themeId + ".css?v=" + fileVersion)
 					.appendTo($("head"));
 			}
 
@@ -165,11 +168,11 @@
 				if (uiSettings){
 					if (uiSettings.theme){
 						$("body").addClass("scheme_" + uiSettings.theme);
-						loadTheme(uiSettings.theme, now);
+						loadTheme(uiSettings.theme);
 					}
 				}
 
-				var def = $.getJSON("build.version.json?="+now).then(function(json){
+				var def = $.getJSON("build.version.json?v=" + now).then(function(json){
 					buildRevision = json.buildRevision;
 					console.log("build revison is" + buildRevision);
 					$("#versionLink").html(displayedVersion + ".r" + buildRevision);
@@ -180,7 +183,7 @@
 					for (var i = 0; i < schemes.length; ++i) {
 						//todo: skip theme if preloaded
 						if (!uiSettings || uiSettings.theme != schemes[i]){
-							loadTheme(schemes[i], buildRevision);
+							loadTheme(schemes[i]);
 						}
 					}
 				});
@@ -188,7 +191,8 @@
 				def = _import("i18n", def);
 				def.then(function () {
 					console.log("Loading locale system");
-					var langPromise = i18nLang.init(now);
+					var fileVersion = version + ".r" + buildRevision;
+					var langPromise = i18nLang.init(fileVersion);
 					langPromise.done(function() {
 						loadingMessages = [
 							$I("ui.loading.msg.0"),
