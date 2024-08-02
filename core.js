@@ -1180,6 +1180,9 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 		var hasRes = res.value >= price.val;
 
 		var hasLimitIssue = res.maxValue && ((price.val > res.maxValue && !indent) || price.baseVal > res.maxValue);
+		if (price.val == Infinity && !indent) {
+			hasLimitIssue = true; //The player can't have infinite of any resource.
+		}
 		var asterisk = hasLimitIssue ? "*" : "";	//mark limit issues with asterisk
 
 		var displayValue = hasRes || simplePrices
@@ -1209,24 +1212,22 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 			hasLimitIssue: hasLimitIssue
 		};
 
-
 		//unroll prices to the raw resources
 		if (!hasRes && res.craftable && !simplePrices && res.name != "wood") {
 			var craft = this.game.workshop.getCraft(res.name);
-			if (craft.unlocked) {
+			var diff = price.val - res.value;
+			//Only unroll if we've unlocked the craft; don't unroll infinite prices
+			if (craft.unlocked && isFinite(diff)) {
 				var craftRatio = this.game.getResCraftRatio(res.name);
 				result.title = "+ " + result.title;
 				result.children = [];
 
 				var components = this.game.workshop.getCraftPrice(craft);
 				for (var j in components) {
-
-					var diff = price.val - res.value;
-
 					// Round up to the nearest craftable amount
 					var val = Math.ceil(components[j].val * diff / (1 + craftRatio));
 					var remainder = val % components[j].val;
-					if (remainder != 0) {
+					if (remainder != 0 && isFinite(remainder)) {
 						val += components[j].val - remainder;
 					}
 
