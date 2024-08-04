@@ -1546,7 +1546,6 @@
     "ui.save.tooltip": "Guardado!",
     "ui.energy.tooltip": "Energía",
     "ui.log.link": "Registro",
-    "ui.chat.link": "Chat",
     "ui.clear.log": "Vaciar registro",
     "ui.log.filters.block": "[<span id=\"filterIcon\">+</span>] Filtros de Registro",
     "ui.pause": "pawsar",

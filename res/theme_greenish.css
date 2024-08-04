@@ -977,7 +977,7 @@ body.scheme_greenish {
 .scheme_greenish #calendarSign:hover {
    cursor: default;
 }
-.scheme_greenish .right-tab-header { /* Log | Chat link on right column */
+.scheme_greenish .right-tab-header { /* Log | Queue link on right column */
 	/* default margin-top: 10px; */
 	font-size: 80%;
  }
@@ -996,9 +996,6 @@ body.scheme_greenish {
 	margin-top: 5px; /* default margin-top: 15px */
 	height: 35px; /* default height: 30px; */
 	margin-bottom: 3px;
-}
-.scheme_greenish #rightTabChat {
-	margin-top: 10px;
 }
 .scheme_greenish div.console-intro { /* Text on right column: "You are a kitten in a catnip forest." */
 	color: #d56d2e;

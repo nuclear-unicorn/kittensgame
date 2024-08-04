@@ -1029,7 +1029,7 @@ body.scheme_arctic.with_background_image {
 .scheme_arctic #calendarSign:hover {
    cursor: default;
 }
-.scheme_arctic .right-tab-header { /* Log | Chat link on right column */
+.scheme_arctic .right-tab-header { /* Log | Queue link on right column */
 	/* default margin-top: 10px; */
 	font-size: 80%;
 }
@@ -1051,9 +1051,6 @@ body.scheme_arctic.with_background_image {
 .scheme_arctic div#observeButton {
 	margin-top: 5px; /* default margin-top: 15px */
 	height: 50px; /* default height: 30px; */
-}
-.scheme_arctic #rightTabChat {
-	margin-top: 10px;
 }
 .scheme_arctic div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #606060;

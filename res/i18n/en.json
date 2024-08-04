@@ -1690,7 +1690,6 @@
     "ui.save.tooltip": "Saved!",
     "ui.energy.tooltip": "Energy",
     "ui.log.link": "Log",
-    "ui.chat.link": "Chat",
     "ui.clear.log": "Clear log",
     "ui.log.filters.block": "[<span id=\"filterIcon\">+</span>] Log Filters",
     "ui.pause": "pawse",
