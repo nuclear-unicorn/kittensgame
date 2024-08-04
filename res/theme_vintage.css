@@ -894,6 +894,9 @@ body.scheme_vintage {
 	border-image-slice: 2 2 2 2;
 	border-image-outset: 0;
 	border-image-repeat: round;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_vintage .achievement:hover {
 	text-shadow: 2px 2px 2px #000000;

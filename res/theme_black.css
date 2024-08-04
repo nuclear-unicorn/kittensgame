@@ -805,6 +805,9 @@ body.scheme_black {
 	letter-spacing: 1px;
 	border: 2px solid rgba(110, 66, 255, 0.3); /* color #6e42ff */
 	border-radius: 3px;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_black .achievement:hover {
 	color: #ffffff;

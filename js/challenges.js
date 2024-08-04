@@ -577,6 +577,26 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			});
 		return count;
 	},
+	/**
+	 * Returns the total number of Challenge completions.
+	 */
+	getCountCompletions: function() {
+		var total = 0;
+		for(var i = 0; i < this.challenges.length; i += 1) {
+		    total += this.challenges[i].on;
+		}
+		return total;
+	},
+	/**
+	 * Returns the number of different Challenges completed.
+	 */
+	getCountUniqueCompletions: function() {
+		var total = 0;
+		for(var i = 0; i < this.challenges.length; i += 1) {
+		    total += 1 * this.challenges[i].researched;
+		}
+		return total;
+	},
 
 	researchChallenge: function(challenge) {
 		if (this.isActive(challenge)){

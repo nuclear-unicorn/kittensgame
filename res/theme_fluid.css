@@ -737,6 +737,9 @@ body.scheme_fluid,
     cursor: default !important;
 	border-color : rgba(17, 138, 194, 0.5); /* color #118AC2; */
 	border-radius: 7px;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_fluid .achievement-header {
 	color: #118AC2;

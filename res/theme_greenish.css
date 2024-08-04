@@ -894,6 +894,9 @@ body.scheme_greenish {
 	letter-spacing: 1px;
 	border: solid 1px #b5d0b1;
 	border-radius: 7px;
+	white-space: nowrap !important;
+	text-overflow: clip; /* I couldn't figure out how to get ellipsis to work the way I wanted it to */
+	overflow: hidden;
 }
 .scheme_greenish .achievement:hover {
 	background-color: rgba(240, 240, 240, 0.1);

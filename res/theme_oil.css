@@ -750,11 +750,16 @@ body.scheme_oil,
 	margin: 10px; /* default margin-bottom: 10px; */
     height: 40px;
     background-color: #000000;
-    color: #909090;
     text-shadow: rgba(192, 192, 192) 2px 0 10px; /* color #BBC0CA */
     letter-spacing: 1px;
-	border-color : rgba(255, 201, 0, 0.3); /* color #FFC900; */
 	border-radius: 19px;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+.scheme_oil .achievement:not(.name) {
+	color: #909090;
+	border-color : rgba(255, 201, 0, 0.3); /* color #FFC900; */
 }
 .scheme_oil .achievement:hover {
 	color: #E0E0E0;

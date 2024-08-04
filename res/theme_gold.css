@@ -719,6 +719,9 @@ body.scheme_gold {
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: default !important;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_gold .achievement:hover {
     background-color: rgba(223, 206, 153, 0.4); /* color #DFCE99 */

@@ -945,6 +945,9 @@ body.scheme_arctic.with_background_image {
 	border-image-slice: 0 0 4 0;
 	border-image-outset: 0;
 	border-image-repeat: round;
+	white-space: nowrap !important;
+	text-overflow: clip; /* It seems to be that ellipsis doesn't work properly in color themes where the achievement is all on one line */
+	overflow: hidden;
 }
 .scheme_arctic .achievement:not(.unethical).unlocked:hover {
 	text-shadow: 0 -1px 1px #93c4cf;

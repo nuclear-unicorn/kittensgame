@@ -1078,7 +1078,7 @@ body.scheme_spooky.with_background_image {
 	outline: 2px inset #060713;
 	border-radius: 5px;
 }
-.scheme_spooky .achievement:not(.unethical).unlocked {
+.scheme_spooky .achievement:not(.unethical, .name).unlocked {
 	color: #d0d0d0;
 }
 .scheme_spooky .achievement:not(.unethical).unlocked:hover {

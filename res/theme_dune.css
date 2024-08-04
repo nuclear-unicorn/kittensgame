@@ -907,11 +907,13 @@ body.scheme_dune {
 .scheme_dune .achievement {
     margin: 3px 5px;
     background-color: rgba(157, 93, 224, 0.1);
-    color: #e3e3eb;
     text-shadow: 1px 0 7px #e3e3eb;
     letter-spacing: 1px;
-	border-color : rgba(157, 93, 224, 0.3);
 	border-radius: 5px;
+}
+.scheme_dune .achievement:not(.name) {
+	color: #e3e3eb;
+	border-color : rgba(157, 93, 224, 0.3);
 }
 .scheme_dune .achievement:hover {
     background-color: rgba(157, 93, 224, 0.3);

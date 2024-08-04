@@ -835,6 +835,9 @@ body.scheme_space.with_background_image {
     cursor: default !important;
 	border-color : #14F0D8;
 	border-radius: 5px;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_space .achievement.badge {
     margin: 10px 0 0 0;
