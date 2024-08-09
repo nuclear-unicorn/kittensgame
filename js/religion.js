@@ -1536,6 +1536,11 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 
 		//Amount of the resource we failed to gain because we hit the cap:
 		var overcap = attemptedGainCount - actualGainCount;
+		if (actualGainCount == 0 && attemptedGainCount > 0 &&
+			this.game.resPool.get(this.controllerOpts.gainedResource).value / attemptedGainCount > 1e15) {
+			//We are in territory where overcap will be triggered due to floating-point precision limits.
+			overcap = 0;
+		}
 
 		if (this.controllerOpts.applyAtGain) {
 			this.controllerOpts.applyAtGain.call(this, priceCount);
