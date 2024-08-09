@@ -782,6 +782,10 @@ body.scheme_tombstone {
 	border: 1px solid #1c1d20;
 	border-radius: 5px;
 }
+.scheme_tombstone .census-block .links-container span {
+	border-radius: 50% 50% 1px 1px;
+	max-width: 2ch;
+}
 .scheme_tombstone .census-block:hover {
 	background-color: #1c1d20;
 }
@@ -793,7 +797,8 @@ body.scheme_tombstone {
 	background-color: #323337;
 	border-color: #5b5b5e;
 }
-.scheme_tombstone .census-block.simLeader a.leaderHref {
+.scheme_tombstone .census-block.simLeader .leaderHref,
+.scheme_tombstone .census-block.simFavorite .favoriteHref {
 	color: #6897bb;
 }
 .scheme_tombstone .census-block .info { /* info of kitten */

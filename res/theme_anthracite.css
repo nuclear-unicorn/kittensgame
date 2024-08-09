@@ -38,7 +38,8 @@ body.scheme_anthracite.with_background_image,
 	border-radius: 5px; /* default border-radius: 3px; */
 	width: 280px; /* +10px gained from left column +15px gained from padding default width: 264px; */
 }
-.scheme_anthracite .btn.modern.disabled {
+.scheme_anthracite .btn.modern.disabled,
+.scheme_anthracite .census-block.simLeader > .links-container > .btn.modern.leaderHref {
 	background-color: #202020;
 	border: inset 1px #181818;
 	background-image: url('img/theme_anthracite_button_disabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
@@ -46,7 +47,8 @@ body.scheme_anthracite.with_background_image,
 	background-attachment: local;
 	background-position: top left;
 }
-.scheme_anthracite .btn.modern.disabled:hover {
+.scheme_anthracite .btn.modern.disabled:hover,
+.scheme_anthracite .census-block.simLeader > .links-container > .btn.modern.leaderHref:hover {
 	background-color: #202020;
 	background-image: url('img/theme_anthracite_button_disabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
 	background-repeat: no-repeat;
@@ -676,7 +678,8 @@ body.scheme_anthracite.with_background_image,
 .scheme_anthracite .census-block.simLeader:hover {
 	border-color: #585858;
 }
-.scheme_anthracite .census-block.simLeader a.leaderHref {
+.scheme_anthracite .census-block.simLeader .leaderHref,
+.scheme_anthracite .census-block.simFavorite .favoriteHref {
 	color: #19b0ff;
 }
 .scheme_anthracite .census-block .info { /* info of kitten */

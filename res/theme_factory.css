@@ -864,7 +864,17 @@ body.scheme_factory {
 .scheme_factory .census-block.simLeader {
 	background-color: #242324;
 }
-.scheme_factory .census-block.simLeader a.leaderHref {
+.scheme_factory .census-block .links-container span {
+	color: #000000;
+	box-shadow: inset 1px 0 1px rgba(32, 32, 32, 1), inset -1px 0 1px rgba(32, 32, 32, 1), inset 0 2px 2px rgba(255, 255 , 255, 1), inset 0 -2px 2px rgba(0, 0, 0, 1),
+				0 0 4px 1px #201d1b !important;
+}
+.scheme_factory .census-block .links-container span:hover {
+	box-shadow: inset 1px 0 1px rgba(104, 69, 26, 0.8), inset -1px 0 1px rgba(104, 69, 26, 0.8), inset 0 2px 2px rgba(255, 255 , 255, 0.8), inset 0 -2px 2px rgba(0, 0, 0, 0.8),
+				0 0 4px 1px #a28256 !important;
+}
+.scheme_factory .census-block.simLeader .leaderHref,
+.scheme_factory .census-block.simFavorite .favoriteHref {
 	color: #ffe6c0;
 }
 .scheme_factory .census-block .info { /* info of kitten */

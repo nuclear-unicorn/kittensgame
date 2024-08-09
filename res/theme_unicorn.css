@@ -673,7 +673,8 @@ body.scheme_unicorn.with_background_image {
 	box-shadow: 3px 3px 5px #111922;
 	border-color: #ebedf0;
 }
-.scheme_unicorn .census-block.simLeader a.leaderHref {
+.scheme_unicorn .census-block.simLeader .leaderHref,
+.scheme_unicorn .census-block.simFavorite .favoriteHref {
 	color: #4f8fdd;
 }
 .scheme_unicorn .census-block .info { /* info of kitten */

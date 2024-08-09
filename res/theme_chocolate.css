@@ -685,7 +685,13 @@ body.scheme_chocolate.with_background_image {
 .scheme_chocolate .census-block.simLeader:hover {
 	border-color: #eddcc7;
 }
-.scheme_chocolate .census-block.simLeader a.leaderHref {
+.scheme_chocolate .census-block .links-container span {
+	border-radius: 1px;
+	border: none !important;
+	color: #c0a787;
+}
+.scheme_chocolate .census-block.simLeader .leaderHref,
+.scheme_chocolate .census-block.simFavorite .favoriteHref {
 	color: #96e8df;
 }
 .scheme_chocolate .census-block .info { /* info of kitten */

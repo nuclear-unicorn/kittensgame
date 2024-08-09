@@ -108,6 +108,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		},
 		checkCompletionCondition: function(game){
 			return game.bld.get("aiCore").val > 0;
+		},
+		actionOnCompletion: function(game) {
+			game.villageTab.requestCensusRefresh(); //Just in case the player is looking at the village tab when it happens.
 		}
 	},{
 		name: "energy",

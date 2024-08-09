@@ -84,6 +84,7 @@ body.scheme_vessel {
 	background-color: rgba(220, 220, 220, 0.85); /* color: #DCDCDC */
 	border: solid 1px #808080;
 }
+.scheme_vessel .census-block .links-container span,
 .scheme_vessel .btn.modern:not(.disabled) .btnTitle { /* to change only the properties of the button name for buttons enabled */
 	color: #000000;
 }
@@ -776,7 +777,8 @@ body.scheme_vessel {
 .scheme_vessel .census-block.simLeader:hover {
 	background-color : rgba(1, 129, 177, 0.4);
 }
-.scheme_vessel .census-block.simLeader a.leaderHref {
+.scheme_vessel .census-block.simLeader .leaderHref,
+.scheme_vessel .census-block.simFavorite .favoriteHref {
 	color: #0181B1;
 }
 .scheme_vessel .census-block .info { /* info of kitten */

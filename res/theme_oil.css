@@ -624,8 +624,13 @@ body.scheme_oil,
 .scheme_oil .census-block.simLeader {
 	background-color : rgba(160, 160, 160, 0.2); /* color #A0A0A0; */
 }
-.scheme_oil .census-block.simLeader a.leaderHref {
-	color: #118AC2;
+.scheme_oil .census-block.simLeader .leaderHref {
+	background: transparent !important;
+	border: none !important;
+}
+.scheme_oil .census-block.simLeader .leaderHref,
+.scheme_oil .census-block.simFavorite .favoriteHref {
+	color: #ffc900;
 }
 .scheme_oil .census-block .info { /* info of kitten */
 	font-size: 0.9em;

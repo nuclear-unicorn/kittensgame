@@ -91,9 +91,11 @@ body.scheme_cyber {
 				linear-gradient(270deg, rgba(0, 0, 0, 0.5) 0%, transparent 50%, transparent 100%),
 				local repeat top left url('img/theme_cyber_texture_02.png'), #0b0b0b;
 }
+.scheme_cyber .census-block .links-container span,
 .scheme_cyber .btn.modern:not(.disabled) span.btnTitle { /* to change only the properties of the button name for buttons enabled */
 	color: #b6bec0;
 }
+.scheme_cyber .census-block .links-container span:hover,
 .scheme_cyber .btn.modern:not(.disabled):hover span.btnTitle {
 	color: #79d9ff;
 }
@@ -827,7 +829,8 @@ body.scheme_cyber {
 .scheme_cyber .census-block.simLeader {
 	border-image-source: url('img/theme_cyber_frame_03.png');
 }
-.scheme_cyber .census-block.simLeader a.leaderHref {
+.scheme_cyber .census-block.simLeader .leaderHref,
+.scheme_cyber .census-block.simFavorite .favoriteHref {
 	color: #FFE279;
 }
 .scheme_cyber .census-block .info { /* info of kitten */

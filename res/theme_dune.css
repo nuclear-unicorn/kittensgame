@@ -794,7 +794,11 @@ body.scheme_dune {
 .scheme_dune .census-block.simLeader:hover {
 	border-color: #fad5b4;
 }
-.scheme_dune .census-block.simLeader a.leaderHref {
+.scheme_dune .census-block .links-container span:hover {
+	color: #fee0dd;
+}
+.scheme_dune .census-block.simLeader .leaderHref,
+.scheme_dune .census-block.simFavorite .favoriteHref {
 	color: #fad5b4;
 }
 .scheme_dune .census-block .info { /* info of kitten */

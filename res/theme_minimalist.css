@@ -786,7 +786,8 @@ body.scheme_minimalist.with_background_image,
 .scheme_minimalist .census-block.simLeader:hover {
 	border-color: #5D56A9;
 }
-.scheme_minimalist .census-block.simLeader a.leaderHref {
+.scheme_minimalist .census-block.simLeader .leaderHref,
+.scheme_minimalist .census-block.simFavorite .favoriteHref {
 	color: #5D56A9;
 }
 .scheme_minimalist .census-block .info { /* info of kitten */

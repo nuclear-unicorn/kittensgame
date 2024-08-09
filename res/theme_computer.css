@@ -70,9 +70,11 @@ body.scheme_computer {
 .scheme_computer .btn.modern:not(.disabled):hover a {
 	color: #b8b8b8;
 }
+.scheme_computer .census-block > .links-container > span.btn.modern,
 .scheme_computer .btn.modern:not(.disabled) span.btnTitle { /* to change only the properties of the button name for buttons enabled */
 	color: #fcffff;
 }
+.scheme_computer .census-block > .links-container > span.btn.modern:hover,
 .scheme_computer .btn.modern:not(.disabled):hover span.btnTitle {
 	color: #e8e8e8;
 }
@@ -721,8 +723,9 @@ body.scheme_computer {
 .scheme_computer .census-block.simLeader a:hover {
 	color: #000000;
 }
-.scheme_computer .census-block.simLeader a.leaderHref {
-	color: #0053a0;
+.scheme_computer .census-block.simLeader .leaderHref,
+.scheme_computer .census-block.simFavorite .favoriteHref {
+	color: #0053a0 !important;
 }
 .scheme_computer .census-block .info { /* info of kitten */
 	font-size: 0.9em;
