@@ -973,7 +973,7 @@ body.scheme_computer {
 .scheme_computer #calendarSign:hover {
    cursor: default;
 }
-.scheme_computer .right-tab-header { /* Log | Chat link on right column */
+.scheme_computer .right-tab-header { /* Log | Queue link on right column */
 	/* default margin-top: 10px; */
 	font-size: 80%;
 }
@@ -993,9 +993,6 @@ body.scheme_computer {
 .scheme_computer div#observeButton {
 	margin-top: 5px; /* default margin-top: 15px */
 	height: 40px; /* default height: 30px; */
-}
-.scheme_computer #rightTabChat {
-	margin-top: 10px;
 }
 .scheme_computer div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #f0a258;

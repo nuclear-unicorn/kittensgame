@@ -774,7 +774,7 @@ body.scheme_school.with_background_image,
 .scheme_school #calendarSign:hover {
    cursor: default;
 }
-.scheme_school .right-tab-header { /* Log | Chat link on right column */
+.scheme_school .right-tab-header { /* Log | Queue link on right column */
 	color: rgba(86, 89, 92, 0.5); /* color #56595C */ /* for separator tab | */
 	font-size: 80%;
  }
@@ -782,9 +782,6 @@ body.scheme_school.with_background_image,
     text-decoration: underline rgba(187, 192, 202, 0.4); /* color #BBC0CA */;
 	color: #B5BAC4;
 	border-top: none;
-}
-.scheme_school #rightTabChat {
-	margin-top: 20px;
 }
 .scheme_school div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #4A4A4A;
