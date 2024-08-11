@@ -291,11 +291,11 @@ dojo.declare("classes.game.Server", null, {
 	syncUserProfile: function(){
 		var self = this;
 
-		//TODO: use some XHR snippet, this is getting too verbose
 		this._xhr("/user/", "GET", {}, function(resp){
-            if (resp && resp.id){
-                self.setUserProfile(resp);
-            }
+			if (resp && resp.id){
+				self.setUserProfile(resp);
+				self.syncSaveData();
+			}
 		});
 	},
 
