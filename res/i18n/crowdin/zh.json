@@ -1400,7 +1400,7 @@
     "space.planet.helios.containmentChamber.label": "收容室",
     "space.planet.helios.containmentChamber.desc": "收容室。将反物质存储上限提高 100 点",
     "space.planet.helios.heatsink.label": "散热器",
-    "space.planet.helios.heatsink.desc": "散热系统。每级散热器使收容室的功率消耗增加 1％，同时将反物质存储容量提升 2％",
+    "space.planet.helios.heatsink.desc": "1",
     "space.planet.helios.sunforge.label": "锻造阳光",
     "space.planet.helios.sunforge.desc": "利用太阳的热量将物质熔化成超浓缩的等离子体。每级太阳锻造使基本金属资源的存储上限提升 1%",
     "space.planet.helios.sunlifter.label": "太阳提取",
