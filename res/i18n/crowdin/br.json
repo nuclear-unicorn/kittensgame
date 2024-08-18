@@ -59,6 +59,7 @@
     "achievements.winterIsComing.desc": "Tenha 10 gatos mortos",
     "achievements.youMonster.title": "Seu Monstro!",
     "achievements.youMonster.desc": "Tadinhos dos gatinhos.",
+    "achievements.deathStranding.desc": "Anel mais distante atingido",
     "ai.apocalypse.msg": "IA destruiu {0}% dos seus recursos",
     "bld.msg.automation": "Ativando a automação de oficina",
     "bld.msg.automation.beams": "Gastou {0} madeira, +{1} vigas!",
