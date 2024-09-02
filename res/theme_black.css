@@ -681,6 +681,10 @@ body.scheme_black {
 .scheme_black .census-block:hover {
 	border-color: #606060;
 }
+.scheme_black .census-block > .links-container > span.btn.modern:not(.simLeader .leaderHref):hover {
+	/*don't apply this to the "make-leader" button if this already is the leader*/
+	background-color: #222222 !important;
+}
 .scheme_black .census-block.simLeader {
     background: rgba(0, 0, 0, 0.2);
 	border: solid 1px #1e0080;
@@ -688,7 +692,12 @@ body.scheme_black {
 .scheme_black .census-block.simLeader:hover {
 	border-color: #6e42ff;
 }
-.scheme_black .census-block.simLeader a.leaderHref {
+.scheme_black .census-block.simLeader > .links-container > span.btn.modern.leaderHref {
+	background: transparent;
+	border: none;
+}
+.scheme_black .census-block.simLeader .leaderHref,
+.scheme_black .census-block.simFavorite .favoriteHref {
 	color: #6e42ff;
 }
 .scheme_black .census-block .info { /* info of kitten */

@@ -1276,6 +1276,29 @@ a.link.collapse:hover {
     font-size: 0.8em;
 }
 
+.census-block .links-container {
+    float: right;
+    display: block grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+}
+
+.census-block .links-container span {
+    width: initial !important;
+}
+
+.census-block .links-container span:hover {
+    background-color: #EEEEEE;
+}
+
+.census-block .links-container span:active {
+    text-shadow: 0 0 0.1em currentColor; /*shadow is the same color as the text*/
+}
+
+.census-block .links-container a {
+    grid-column: span 3; /* <a> element should occupy all 3 columns */
+}
+
 .name.color-brown {
     color: saddlebrown;
 }

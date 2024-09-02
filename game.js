@@ -2513,10 +2513,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.calculateAllEffects();
 		//------------------------------------
 
-		this.villageTab.visible = (this.bld.get("hut").on > 0
-			|| this.resPool.get("kittens").unlocked
-			|| this.resPool.get("zebras").unlocked
-			|| this.time.getVSU("usedCryochambers").val > 0);
+		this.villageTab.visible = this.villageTab.evaluateLocks();
 		this.libraryTab.visible = (this.bld.get("library").on > 0 || this.science.get("calendar").researched || this.science.get("chronophysics").researched);
 		this.workshopTab.visible = (this.bld.get("workshop").on > 0);
 		this.achievementTab.visible = (this.achievements.hasUnlocked());

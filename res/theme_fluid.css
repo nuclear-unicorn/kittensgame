@@ -78,9 +78,11 @@ body.scheme_fluid,
 	box-shadow: none;
 	cursor: pointer;
 }
+.scheme_fluid .census-block .links-container span,
 .scheme_fluid .btn.modern:not(.disabled) span.btnTitle { /* to change only the properties of the button name for buttons enabled */
 	color: #BBBBBB;
 }
+.scheme_fluid .census-block .links-container span:hover,
 .scheme_fluid .btn.modern:not(.disabled):hover span.btnTitle {
 	color: #EEEEEE;
 	text-shadow: 0 1px 1px #000000;
@@ -620,7 +622,8 @@ body.scheme_fluid,
 	border-color : rgba(17, 138, 194, 1); /* color #118AC2; */
 	box-shadow: 2px 2px 6px #000000, 0 -1px 0 rgba(187, 192, 202, 0.6); /* color #BBC0CA */
 }
-.scheme_fluid .census-block.simLeader a.leaderHref {
+.scheme_fluid .census-block.simLeader .leaderHref,
+.scheme_fluid .census-block.simFavorite .favoriteHref {
 	color: #118AC2;
 }
 .scheme_fluid .census-block .info { /* info of kitten */

@@ -595,7 +595,9 @@ body.scheme_school.with_background_image,
 	background-color : rgba(17, 138, 194, 0.05); /* color #4895b9; */
 	border-color: rgba(187, 192, 202, 0.3); /* color #BBC0CA */
 }
-.scheme_school .census-block.simLeader a.leaderHref {
+.scheme_school .census-block.simLeader .leaderHref,
+.scheme_school .census-block.simFavorite .favoriteHref {
+	background-color: rgba(64, 64, 64, 0.4);
 	color: #4895b9;
 	text-shadow: 0 0 3px #4895b9;
 }

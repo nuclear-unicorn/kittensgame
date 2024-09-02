@@ -925,7 +925,8 @@ body.scheme_wood.with_background_image {
 	border-image-width: 6px 6px 6px 6px;
 	border-image-slice: 12 12 12 12;
 }
-.scheme_wood .census-block.simLeader a.leaderHref {
+.scheme_wood .census-block.simLeader .leaderHref,
+.scheme_wood .census-block.simFavorite .favoriteHref {
 	color: #d4b356;
 }
 .scheme_wood .census-block .info { /* info of kitten */

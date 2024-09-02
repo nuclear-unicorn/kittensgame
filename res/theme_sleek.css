@@ -420,6 +420,8 @@ body.scheme_sleek  {
     outline: 0 !important;
     text-transform: uppercase !important;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.3), 0 2px 10px 0 rgba(0, 0, 0, 0.3) !important;
+}
+.scheme_sleek .btn.modern:not(.links-container .btn.modern) { /*.btn.modern except if it's a descendant of .links-container*/
     width: 262px !important;
 }
 
