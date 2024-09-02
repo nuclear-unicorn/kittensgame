@@ -321,7 +321,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		effectDesc: $I("challendge.unicornTears.effect.desc"),
 		effects: {
 			"bonfireTearsPriceRatioChallenge": 0,
+			"scienceTearsPricesChallenge": 0,
 			"workshopTearsPricesChallenge": 0,
+			"cathPollutionPerTearOvercapped": 0, //Overcapped unicorn tears evaporate into a smoky substance
 			"unicornsMax": 0,
 			"tearsMax": 0,
 			"alicornMax": 0
@@ -335,14 +337,20 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				//LDR limit is at a price ratio of ×2.5
 				self.effects["bonfireTearsPriceRatioChallenge"] =
 					game.getLimitedDR(1.2 + 0.03 * self.on, self.stackOptions["bonfireTearsPriceRatioChallenge"].LDRLimit);
+				//Increasing challenge: Multiplier to prices in the Science tab.
+				self.effects["scienceTearsPricesChallenge"] = 0.25;
 				//Increasing challenge: Multiplier to prices in the Workshop tab.
 				self.effects["workshopTearsPricesChallenge"] = 0.01;
+				self.effects["cathPollutionPerTearOvercapped"] = 3;
+				//Base resource storage:
 				self.effects["unicornsMax"] = 10;
 				self.effects["tearsMax"] = 1;
 				self.effects["alicornMax"] = 0.2;
 			} else {
 				self.effects["bonfireTearsPriceRatioChallenge"] = 0;
+				self.effects["scienceTearsPricesChallenge"] = 0;
 				self.effects["workshopTearsPricesChallenge"] = 0;
+				self.effects["cathPollutionPerTearOvercapped"] = 0;
 				self.effects["unicornsMax"] = 0;
 				self.effects["tearsMax"] = 0;
 				self.effects["alicornMax"] = 0;
@@ -350,7 +358,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		},
 		stackOptions: {
 			"bonfireTearsPriceRatioChallenge": { noStack: true, LDRLimit: 2.5 },
+			"scienceTearsPricesChallenge": { LDRLimit: 100 },
 			"workshopTearsPricesChallenge": { LDRLimit: 1 },
+			"cathPollutionPerTearOvercapped": { noStack: true },
 			"unicornsMax": { noStack: true },
 			"tearsMax": { noStack: true },
 			"alicornMax": { noStack: true }

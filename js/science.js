@@ -2192,6 +2192,30 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			}
 		}
 
+		if (this.game.challenges.isActive("unicornTears")) {
+			var priceScaling = this.game.getEffect("scienceTearsPricesChallenge");
+			if (priceScaling > 0) {
+				//If the tech costs manuscripts, add unicorns to the price.
+				//If the tech costs compendia, add unicorn tears to the price.
+				//If the tech costs blueprints, add alicorns to the price.
+				for (var i = 0; i < prices.length; i += 1) {
+					switch(prices[i].name) {
+					case "manuscript":
+						prices_result = prices_result.concat([{name: "unicorns", val: prices[i].val * priceScaling}]);
+						break;
+					case "compedium":
+						prices_result = prices_result.concat([{name: "tears", val: prices[i].val * priceScaling}]);
+						break;
+					case "blueprint":
+						//Alicorn requirement is independent of the cost of the tech
+						//Minimum of 1, maximum of 10 with LDR.
+						prices_result = prices_result.concat([{name: "alicorn", val: Math.max(1, this.game.getLimitedDR(priceScaling, 10))}]);
+						break;
+					}
+				}
+			}
+		}
+
 		return prices_result;
 	},
     /*getEffect: function(effectName){
@@ -2533,17 +2557,9 @@ dojo.declare("com.nuclearunicorn.game.ui.TechButtonController", com.nuclearunico
     },
 
 	getPrices: function(model) {
-		var prices_result = this.game.village.getEffectLeader("scientist", this.inherited(arguments));
-
-		// this is to force Gold Ore pathway in BSK+IW and avoid soft locks
-		if(this.game.ironWill && this.game.challenges.isActive('blackSky')) {
-			if(model.metadata.name == 'construction') {
-				prices_result = prices_result.concat([{name: "gold", val: 5}]);
-			}
-		}
-
-		return prices_result;
-    },
+		//I want to avoid duplicate code if possible
+		return this.game.science.getPrices(model.metadata);
+	},
 
 	updateVisible: function(model){
 		var meta = model.metadata;

@@ -653,6 +653,79 @@ test("Unicorn Tears Challenge--Weighted price algorithm should behave nicely wit
     //Empty price should be zero:
     expect(sumPricesWeighted([])).toBe(0);
 });
+test("Unicorn Tears Challenge--Resource caps should be enforced, & unicorn sacrifice should respect them", () => {
+    //Save references to resPool objects we'll use often:
+    const unic = game.resPool.get("unicorns");
+    const tear = game.resPool.get("tears");
+    const alic = game.resPool.get("alicorn");
+    expect(game.bld.cathPollution).toBe(0) //Expect to start at 0 pollution
+
+    //Outside of any Challenge, unicorn-related resources wouldn't have a cap:
+    expect(game.challenges.isActive("unicornTears")).toBe(false);
+    game.resPool.addResEvent("unicorns", 500.1);
+    expect(unic.value).toBeCloseTo(500.1);
+    game.resPool.addResEvent("tears", 500.1);
+    expect(tear.value).toBeCloseTo(500.1);
+    game.resPool.addResEvent("alicorn", 500.1);
+    expect(alic.value).toBeCloseTo(500.1);
+
+    //Activate Unicorn Tears Challenge, then test that caps are enforced:
+    //While we're at it, let's add some paragon points (should NOT affect the caps at all)
+    const unicornTearsChallenge = game.challenges.getChallenge("unicornTears");
+    unicornTearsChallenge.active = true;
+    unicornTearsChallenge.on = 83;
+    game.resPool.addResEvent("paragon", 8026);
+    game.upgrade({ challenges: ["unicornTears"]});
+    game.updateModel(); //To apply resource limits
+    game.calendar.onNewDay(); //This is when extra resources are drained
+
+    expect(unic.maxValue).toBe(10);
+    expect(unic.value).toBeCloseTo(9.1); //Unicorns disappear in integer amounts
+    expect(tear.maxValue).toBe(1);
+    expect(tear.value).toBeCloseTo(1);
+    expect(tear.value == tear.maxValue).toBe(true); //Should be exactly equal
+    expect(game.bld.cathPollution).toBeCloseTo(1497.3 /* (500.1-1)*3 */); //Produced 3 pollution per tear overcapped
+    expect(alic.maxValue).toBe(0.2);
+    expect(alic.value).toBeCloseTo(0.1); //Alicorns also disappear in integer amounts
+
+    //Build some Ziggurats, then test unicorn sacrifice:
+    const ziggurat = game.bld.get("ziggurat");
+    ziggurat.val = 36;
+    ziggurat.on = 36;
+    game.updateModel(); //To apply resource limits
+
+    unic.value = 1e12; //Enough unicorns to do hundreds of transformations if we want to
+    tear.value = tear.maxValue - 110; //3 transformations + 2 tears away from the cap
+
+    //Copied from religion.js
+    //I kind of wish there were a better way to make fully functional "buttons" for these test cases
+    let unicornsSacrificed = 0;
+    let controller = new classes.ui.religion.TransformBtnController(game, {
+        gainMultiplier: function() {
+            return this.game.bld.get("ziggurat").on;
+        },
+        gainedResource: "tears",
+        applyAtGain: function(priceCount) {
+            unicornsSacrificed += priceCount; //Count the number of unicorns we sacrificed
+        },
+    });
+    let model = controller.fetchModel({ prices: [{ name: "unicorns", val: 2500}]});
+    let callbackFunction = function() {};
+
+    //The smart "sacrifice all unicorns" algorithm should have sacrificed 4 batches to give us 110 tears plus (34*3) pollution
+    expect(controller._canAfford(model)).toBe(4);
+    controller.transform(model, 1 /*divider, 1 means "all"*/, null /*event*/, callbackFunction);
+    expect(unicornsSacrificed).toBe(10000); //4 batches' worth
+    expect(tear.value == tear.maxValue).toBe(true);
+    expect(game.bld.cathPollution).toBeCloseTo(1497.3 + 102); //Previous pollution plus what we just made
+
+    //Even though we're at max tears, we should still be able to sacrifice 1 batch of unicorns for no gain:
+    expect(controller._canAfford(model)).toBe(1);
+    controller.transform(model, 1 /*divider, 1 means "all"*/, null /*event*/, callbackFunction);
+    expect(unicornsSacrificed).toBe(12500); //+1 batch
+    expect(tear.value == tear.maxValue).toBe(true);
+    expect(game.bld.cathPollution).toBeCloseTo(1497.3 + 102 + 108); //Previous pollution plus what we just made
+});
 
 //--------------------------------
 //       Shatter TC Prices

@@ -556,6 +556,7 @@
     "effectsMgr.statics.sattelite-observatoryRatio.title": "Satellite - Observatory science bonus",
     "effectsMgr.statics.sattelite-starchartPerTickBaseSpace.title": "Satellite - Starchart production",
     "effectsMgr.statics.scienceMaxCompendia.title": "Compendia maximum science bonus",
+    "effectsMgr.statics.scienceTearsPricesChallenge.title": "Science tears prices",
     "effectsMgr.statics.sharedKnowledgeBonus.title" : "Science bonus from sharing knowledge",
     "effectsMgr.statics.shatterCostIncreaseChallenge.title": "Shatter TC cost increase",
     "effectsMgr.statics.shatterCostReduction.title": "Shatter TC cost reduction",
