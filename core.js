@@ -488,7 +488,16 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 		this.ui.renderConsoleLog();
 	},
 
-
+	//Sets a single filter to be not unlocked anymore
+	lockFilter: function(filterName) {
+		var filter = this.filters[filterName];
+		if (filter) {
+			filter.unlocked = false;
+			this.ui.renderFilters();
+		} else {
+			console.error("Error: Invalid filter name passed to lockFilter.");
+		}
+	},
 
 	resetState: function (){
 		for (var fId in this.filters){
