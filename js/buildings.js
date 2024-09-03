@@ -2001,6 +2001,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		],
 		priceRatio: 1.25,
 		effects: {
+			"temporalParadoxChance": 0.01, //1% chance of Temporal Paradox each season
 			"resStasisRatio": 0.015, //1.5% of resources will be preserved
 			"temporalFluxProduction" : 0,
 			"energyConsumption" : 0

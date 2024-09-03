@@ -910,6 +910,11 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 type: "ratio"
             },
 
+			"temporalParadoxChance": {
+				title: $I("effectsMgr.statics.temporalParadoxChance.title"),
+				type: "hidden"
+			},
+
             "temporalParadoxVoid" :  {
                 title: $I("effectsMgr.statics.temporalParadoxVoid.title"),
                 type: "perDay"
