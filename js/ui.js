@@ -1029,7 +1029,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             || messageLatest.seasonTitle !== messagePrevious.seasonTitle;
 
         if (!messageLatest.span) {
-            var span = dojo.create("span", {className: "msg" }, gameLog);
+            var span = dojo.create("span", {className: "msg", innerHTML: messageLatest.text}, gameLog);
 
             if (messageLatest.type) {
                 dojo.addClass(span, "type_" + messageLatest.type);
@@ -1041,6 +1041,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         }
 
         if (insertDateHeader) {
+            //Calling msg will itself trigger another call to renderConsoleLog
             if (!messageLatest.year || !messageLatest.seasonTitle) {
                 this.game.console.msg($I("ui.log.link"), "date", null, false);
             } else {
@@ -1050,15 +1051,20 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
 
         if (messageLatest.type === "date") {
             dojo.place(messageLatest.span, gameLog, "first");
-        } else {
-            dojo.place(messageLatest.span, gameLog, 1);
+            //Skip the housekeeping logic because the function-call stack contains
+            // another instance of renderConsoleLog that will take care of it for us.
+            //At the moment, the last message in the log is the one we wanted to create--
+            // it hasn't been dojo.place'd in its proper spot yet.
+            return;
         }
+        //------------ else: non-date, non-header messages ------------
 
-        dojo.attr(messageLatest.span, {innerHTML: messageLatest.text});
+        //Place current message immediately below the date header.
+        dojo.place(messageLatest.span, gameLog, 1);
+
         //Destroy child nodes if there are too many.
-        var logLength = dojo.byId("gameLog").childNodes.length;
-        if (logLength > _console.maxMessages) {
-            dojo.destroy(dojo.byId("gameLog").childNodes[logLength - 1]);
+        while (gameLog.childNodes.length > _console.maxMessages) {
+            dojo.destroy(gameLog.lastChild);
         }
 
         //fade message spans as they get closer to being removed and replaced

@@ -622,7 +622,7 @@ WCloudSaves = React.createClass({
                         (this.state.isLoading && "[loading..]"), 
                         $I("ui.kgnet.sync")
                     ),
-                    $r("span", {paddingTop:"10px"}, $I("ui.kgnet.instructional"))
+                    (!saveData || !saveData.length) && $r("span", {paddingTop:"10px"}, $I("ui.kgnet.instructional"))
                 ])
             ])
         ])
