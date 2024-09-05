@@ -1829,6 +1829,11 @@
     "ui.option.pollution": "Disable pollution effects",
 
     "queue.alphabeticalToggle": "Sort queue items by alphabet",
+    "queue.strategy.none": "No strategy",
+    "queue.strategy.pushCapped": "Push back to the back capped queue items",
+    "queue.strategy.removeCapped": "Remove capped queue items",
+    "queue.strategy.skip": "Skip non built queue items",
+    "queue.strategy.skipCapped": "Skip capped queue items",
 
     "left.resources": "resources",
     "left.resources.tip": "Ctrl+click resource to hide it, use gear icon for more settings.",

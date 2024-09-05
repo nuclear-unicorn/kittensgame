@@ -1927,6 +1927,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			beta: true,
 			main: true,
 			mobile: true
+		},
+		QUEUE_STRATEGIES: {
+			beta: true,
+			main: false,
+			mobile: false
 		}
 	},
 
