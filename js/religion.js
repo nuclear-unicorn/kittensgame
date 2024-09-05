@@ -367,13 +367,29 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		priceRatio: 1.15,
 		effects: {
 			"unicornsRatioReligion" : 0.05,
+			"faithMax": 0,
 			"tearsMax": 0
 		},
 		calculateEffects: function(self, game) {
 			if (game.challenges.isActive("unicornTears")) {
 				self.effects["tearsMax"] = 1;
+				self.effects["faithMax"] = 0;
 			} else {
 				self.effects["tearsMax"] = 0;
+
+				var faithMax = 0;
+				if (game.challenges.getChallenge("unicornTears").researched) {
+					//Challenge reward: max faith based on TT
+					var tt = game.religion.transcendenceTier;
+					if (tt < 1) { //Have some effect even if never transcended
+						faithMax = 5;
+					} else if (tt < 100) { //Superlinear growth
+						faithMax = 5 + (3 * Math.pow(tt, 1.5));
+					} else { //Set a reasonable limit
+						faithMax = 3000;
+					}
+				}
+				self.effects["faithMax"] = faithMax;
 			}
 		},
 		unlocked: true,
@@ -1334,6 +1350,33 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 		} else {
 			return this.inherited(arguments);
 		}
+	},
+
+	//zigguratIvoryPriceRatio applies an additive modifier to the price ratio, but only for ivory
+	//zigguratIvoryCostIncrease applies a multiplicative modifier to the base price, but only for ivory
+	getPrices: function(model) {
+		var meta = model.metadata;
+		var ratio = meta.priceRatio || 1;
+		var ivoryRatio = Math.max(ratio + this.game.getEffect("zigguratIvoryPriceRatio"), 1);
+		var prices = [];
+		var pricesDiscount = this.game.getLimitedDR((this.game.getEffect(meta.name + "CostReduction")), 1);
+		var priceModifier = 1 - pricesDiscount;
+
+		for (var i = 0; i < meta.prices.length; i++){
+			var resPriceDiscount = this.game.getEffect(meta.prices[i].name + "CostReduction");
+			resPriceDiscount = this.game.getLimitedDR(resPriceDiscount, 1);
+			var resPriceModifier = 1 - resPriceDiscount;
+			if (meta.prices[i].name == "ivory") {
+				resPriceModifier *= 1 + this.game.getEffect("zigguratIvoryCostIncrease");
+			}
+			var ratioToUse = meta.prices[i].name == "ivory" ? ivoryRatio : ratio;
+
+			prices.push({
+				val: meta.prices[i].val * Math.pow(ratioToUse, meta.val) * resPriceModifier * priceModifier,
+				name: meta.prices[i].name
+			});
+		}
+		return prices;
 	}
 });
 
