@@ -133,7 +133,7 @@
     "buildings.dataCenter.label": "資料中心",
     "buildings.dataCenter.desc": "提升概要對最大科學上限的加成效果",
     "buildings.factory.label": "工廠",
-    "buildings.factory.desc": "提升工藝製作效率",
+    "buildings.factory.desc": "增加製作效率",
     "buildings.field.label": "貓薄荷田",
     "buildings.field.desc": "在村莊種植一些貓薄荷。貓薄荷田的產量在春天 +50%，冬天 -75% ",
     "buildings.field.flavor": "一望無際的貓薄荷。",
