@@ -1183,6 +1183,7 @@
     "workshop.chronoEngineers.label": "Kronomühendisler",
     "workshop.coalFurnace.label": "Kömür Fırın",
     "workshop.coalFurnace.desc": "Eriticiler yaktıkları odundan kömür üretecek",
+    "workshop.combustionEngine.label": "Yüksek Basınçlı Motor",
     "workshop.compositeBow.desc": "Kedigücü üretiminde kalıcı +%50 artış sağlayan geliştirilmiş bir yay versiyonu",
     "workshop.craftPanel.header.freeEngineers": "Boştaki Mühendisler",
     "workshop.crafted.msg": "+{0} {1} üretildi",
