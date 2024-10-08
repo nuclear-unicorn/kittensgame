@@ -925,16 +925,13 @@ body.scheme_space.with_background_image {
 .scheme_space #calendarSign:hover {
    cursor: default;
 }
-.scheme_space .right-tab-header { /* Log | Chat link on right column */
+.scheme_space .right-tab-header { /* Log | Queue link on right column */
     color : #0A2450; /* for separator tab | */
 	font-size: 90%;
 }
 .scheme_space .right-tab-header a.active {
     color: #14F0D8;
 	border-top: 1px solid #0A2450;
-}
-.scheme_space #rightTabChat {
-	margin-top: 14px;
 }
 .scheme_space div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #167E9D;

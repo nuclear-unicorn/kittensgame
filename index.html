@@ -253,14 +253,6 @@
 					gamePage.ui.onLoad();
 					gamePage.start();
 
-
-					//load optional irc
-
-					$('iframe#kiwiirc_iframe').attr(
-						'src', 
-						'https://kiwiirc.com/client/irc.canternet.org/?nick=kitten_?#kittensgame'
-					);
-
 					var config = new classes.KGConfig();
 
 					//update eldermass gifts on every game load pass
@@ -423,8 +415,7 @@
 						<a id="dev_boostCalendar" href="#" onclick="dev_boostCalendar();" style="display: none; text-decoration: none; position: relative; left: 5px;">&gt;&gt;&gt;</a>
 					</div>
 					<div class="right-tab-header">
-						<a id="logLink" href="#" class="active" onclick="gamePage.ui.hideChat();">Log</a>
-						<a id="chatLink" class="chatLink" href="#" onclick="gamePage.ui.loadChat();">Chat</a>
+						<a id="logLink" href="#" class="active" onclick="gamePage.ui.loadLog();">Log</a>
 						<a id="queueLink" class="queueLink" href="#" onclick="gamePage.ui.loadQueue();">Queue</a>
 					</div>
 					<div id="observeButton"></div>
@@ -452,13 +443,6 @@
 					</div>
 					<div class="right-tab" id="rightTabQueue" style="display:none;">
 						<div id="queueViewport"></div>
-					</div>
-					<div class="right-tab" id="rightTabChat" style="display:none;">
-						<div id="IRCChatInner">
-
-							<!--iframe-- src="https://kiwiirc.com/client/irc.canternet.org/?nick=kitten_?#kittensgame" style="border:0; width: 400px; height:800px;"></iframe-->
-							<iframe id="kiwiirc_iframe" style="border:0; width: 400px; height:800px;"></iframe>
-						</div>
 					</div>
 				</div>
 				<div

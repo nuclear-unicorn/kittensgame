@@ -166,8 +166,6 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
     },
 
     isDisplayOver: false,
-    isChatActive: false,
-    isChatVisited: false,
     isCenter: false,
 
     defaultSchemes: ["default", "dark", "grassy", "sleek", "black", "wood", "bluish", "grayish", "greenish", "tombstone", "spooky"],
@@ -576,7 +574,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         if (now.getDate() == 1 && now.getMonth() == 3) {
             $(".console-intro").css("font-size", "300%").addClass("blaze").text($I("console.intro.zebra"));
         } else {
-            $(".console-intro").text($I("console.intro"));
+            $(".console-intro").css("font-size", "100%").removeClass("blaze").text($I("console.intro"));
         }
 
         React.render($r(WLeftPanel, {
@@ -613,9 +611,6 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         if (this.game.ticks % 5 == 0 && this.game.tooltipUpdateFunc) {
             this.game.tooltipUpdateFunc();
         }
-
-        //not relevant anymore
-        //$(".chatLink").css("font-weight", this.isChatVisited ? "normal" : "bold");
 
         //wat
         /*React.render($r(WLeftPanel, {
@@ -878,49 +873,17 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#leftColumn").css("font-size", this.fontSize + "px");
     },
 
-    hideChat: function(){ //actually loads log!
+    loadLog: function(){ //actually loads log!
         $("#rightTabLog").show();
-        $("#IRCChatInner").css("visibility", "hidden");
         $("#logLink").toggleClass("active", true);
-        $("#chatLink").toggleClass("active", false);
         $("#queueLink").toggleClass("active", false);
-        $("#rightTabChat").hide();
         $("#rightTabQueue").hide();
-    },
-
-    loadChat: function(){
-        $("#rightTabChat").show();
-        $("#rightTabLog").hide();
-        $("#rightTabQueue").hide();
-
-        $("#logLink").toggleClass("active", false);
-        $("#chatLink").toggleClass("active", true);
-        $("#queueLink").toggleClass("active", false);
-
-        $("#IRCChatInner").css("visibility", "visible");
-
-        if (this.isChatActive) {
-            return;
-        }
-
-        var height = $(window.top).height() || 850;
-        //console.log("IRC WINDOW HEIGHT:", height);
-
-        var $chat = $("#IRCChatInner iframe");
-        $chat.css("height", height - 180);
-
-        this.isChatActive = true;
-        //this.isChatVisited = true;
     },
     loadQueue: function(){
-        $("#rightTabChat").hide();
         $("#rightTabLog").hide();
         $("#rightTabQueue").show();
-        $("#IRCChatInner").css("visibility", "hidden");
         $("#logLink").toggleClass("active", false);
-        $("#chatLink").toggleClass("active", false);
         $("#queueLink").toggleClass("active", true);
-        $("#rightTabChat").hide();
     },
     resetConsole: function(){
         this.game.console.resetState();
@@ -973,7 +936,6 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#autosaveTooltip").text($I("ui.autosave.tooltip"));
         $("#saveTooltip").text($I("ui.save.tooltip"));
         $("#logLink").text($I("ui.log.link"));
-        $("#chatLink").text($I("ui.chat.link"));
         if(this.game.getFeatureFlag("QUEUE")){
             $("#queueLink").text($I("ui.queue.link"));
         }
@@ -1067,7 +1029,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             || messageLatest.seasonTitle !== messagePrevious.seasonTitle;
 
         if (!messageLatest.span) {
-            var span = dojo.create("span", {className: "msg" }, gameLog);
+            var span = dojo.create("span", {className: "msg", innerHTML: messageLatest.text}, gameLog);
 
             if (messageLatest.type) {
                 dojo.addClass(span, "type_" + messageLatest.type);
@@ -1079,20 +1041,30 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         }
 
         if (insertDateHeader) {
-            this.game.console.msg($I("calendar.year.ext", [messageLatest.year, messageLatest.seasonTitle]), "date", null, false);
+            //Calling msg will itself trigger another call to renderConsoleLog
+            if (!messageLatest.year || !messageLatest.seasonTitle) {
+                this.game.console.msg($I("ui.log.link"), "date", null, false);
+            } else {
+                this.game.console.msg($I("calendar.year.ext", [messageLatest.year, messageLatest.seasonTitle]), "date", null, false);
+            }
         }
 
         if (messageLatest.type === "date") {
             dojo.place(messageLatest.span, gameLog, "first");
-        } else {
-            dojo.place(messageLatest.span, gameLog, 1);
+            //Skip the housekeeping logic because the function-call stack contains
+            // another instance of renderConsoleLog that will take care of it for us.
+            //At the moment, the last message in the log is the one we wanted to create--
+            // it hasn't been dojo.place'd in its proper spot yet.
+            return;
         }
+        //------------ else: non-date, non-header messages ------------
 
-        dojo.attr(messageLatest.span, {innerHTML: messageLatest.text});
+        //Place current message immediately below the date header.
+        dojo.place(messageLatest.span, gameLog, 1);
+
         //Destroy child nodes if there are too many.
-        var logLength = dojo.byId("gameLog").childNodes.length;
-        if (logLength > _console.maxMessages) {
-            dojo.destroy(dojo.byId("gameLog").childNodes[logLength - 1]);
+        while (gameLog.childNodes.length > _console.maxMessages) {
+            dojo.destroy(gameLog.lastChild);
         }
 
         //fade message spans as they get closer to being removed and replaced
@@ -1163,7 +1135,6 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             uiData = uiData ? JSON.parse(uiData) : {};
 
             this.fontSize = uiData.fontSize || 16;
-            this.isChatVisited = uiData.isChatVisited || false;
             this.isCenter = uiData.isCenter || false;
         } catch (ex) {
             console.error("unable to load ui data");
@@ -1175,7 +1146,6 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
     save: function(){
         LCstorage["com.nuclearunicorn.kittengame.ui"] = JSON.stringify({
            fontSize: this.fontSize,
-           isChatVisited: this.isChatVisited,
            isCenter: this.isCenter,
            theme: this.game.colorScheme
         });

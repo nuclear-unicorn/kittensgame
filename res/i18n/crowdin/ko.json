@@ -1619,7 +1619,6 @@
     "ui.save.tooltip": "저장 완료!",
     "ui.energy.tooltip": "에너지",
     "ui.log.link": "기록",
-    "ui.chat.link": "대화",
     "ui.clear.log": "기록 삭제",
     "ui.log.filters.block": "[<span id=\"filterIcon\">+</span>] 로그 필터",
     "ui.pause": "일시 정지",

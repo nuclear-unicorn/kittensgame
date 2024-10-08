@@ -2041,8 +2041,8 @@ dojo.declare("classes.religion.pactsManager", null, {
 				, 100);
 			var karmaOld = this.game.resPool.get("karma").value;
 			this.game.updateKarma();
-			console.log("produced " + String(this.game.resPool.get("karma").value - karmaOld) + " karma");
-			console.log("produced " + String(this.game.karmaKittens - oldKarmaKittens) + " karmaKittens"); //for testing purposes - comment over before merging into ML
+			//console.log("produced " + String(this.game.resPool.get("karma").value - karmaOld) + " karma");
+			//console.log("produced " + String(this.game.karmaKittens - oldKarmaKittens) + " karmaKittens"); //for testing purposes - comment over before merging into ML
 			return this.game.resPool.get("karma").value - karmaOld;
 		}
 		return 0;

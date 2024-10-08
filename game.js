@@ -291,11 +291,11 @@ dojo.declare("classes.game.Server", null, {
 	syncUserProfile: function(){
 		var self = this;
 
-		//TODO: use some XHR snippet, this is getting too verbose
 		this._xhr("/user/", "GET", {}, function(resp){
-            if (resp && resp.id){
-                self.setUserProfile(resp);
-            }
+			if (resp && resp.id){
+				self.setUserProfile(resp);
+				self.syncSaveData();
+			}
 		});
 	},
 
@@ -4128,20 +4128,36 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return resString;
 	},
 
+	/**
+	 * Outputs a formatted representation of time.  If the input is negative or NaN, treats it as zero instead.
+	 * @param secondsRaw Either a number or a string representing a number.
+	 * @return A string.  For the sake of consistency, all whitespace is trimmed from beginning & end.
+	 */
 	toDisplaySeconds : function (secondsRaw) {
 		if (secondsRaw == Infinity) {
 			return "&infin;";
 		}
+		//We parseFloat because sometimes the numbers are so huge they end up being converted to scientific notation
+		var sec_num = Math.floor(parseFloat(secondsRaw));
+		if (isNaN(sec_num) || sec_num < 1) {
+			return "0" + $I("unit.s");
+		}
 
-	    var sec_num = parseInt(secondsRaw, 10); // don't forget the second param
+		var year_secs = 86400 * 365;
 
-        var year_secs = 86400 * 365;
-
-        var years   = Math.floor(sec_num / year_secs);
-	    var days    = Math.floor((sec_num - (years * year_secs)) / 86400);
-	    var hours   = Math.floor((sec_num - (years * year_secs) - (days * 86400)) / 3600);
-	    var minutes = Math.floor((sec_num - (years * year_secs) - (days * 86400 + hours * 3600)) / 60);
-	    var seconds = sec_num - (years * year_secs) - (days * 86400) - (hours * 3600) - (minutes * 60);
+		var years = Math.floor(sec_num / year_secs);
+		var days = 0;
+		var hours = 0;
+		var minutes = 0;
+		var seconds = 0;
+		if (years < 1e6) {
+			//At certain large values, we get weird behavior caused by floating-point rounding errors.
+			//Avoid these by only calculating these if the number of years is small.
+			days    = Math.floor((sec_num - (years * year_secs)) / 86400);
+			hours   = Math.floor((sec_num - (years * year_secs) - (days * 86400)) / 3600);
+			minutes = Math.floor((sec_num - (years * year_secs) - (days * 86400 + hours * 3600)) / 60);
+			seconds = sec_num - (years * year_secs) - (days * 86400) - (hours * 3600) - (minutes * 60);
+		}
 
         if (years > 0){
             years = this.getDisplayValueExt(years);
@@ -4156,7 +4172,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
             if ( seconds ) { timeFormated += seconds + $I("unit.s") + " "; }
         }
 
-	    return timeFormated;
+	    return timeFormated.trim();
 	},
 
 	/**
@@ -4164,11 +4180,18 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * Just for aestetical pleasness
 	 */
 	toDisplayDays: function(daysRaw){
-		var daysNum = parseInt(daysRaw, 10); // don't forget the second param
+		var daysNum = Math.floor(parseFloat(daysRaw));
+		if (isNaN(daysNum) || daysNum < 1) {
+			return "0" + $I("unit.d");
+		}
 
 		var daysPerYear = this.calendar.daysPerSeason * this.calendar.seasonsPerYear;
 		var years = Math.floor(daysNum / daysPerYear);
-		var days = daysNum - years * daysPerYear;
+		var days = 0;
+		if (years < 1e9) {
+			//Avoid weird floating-point behavior by only calculating days if the number of years is small.
+			days = daysNum - years * daysPerYear;
+		}
 
 		if (years > 0){
 			years = this.getDisplayValueExt(years);
@@ -4178,7 +4201,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		if ( years ) { timeFormated = years + $I("unit.y") + " "; }
 		if ( days ) { timeFormated += days + $I("unit.d") + " "; }
 
-		return timeFormated;
+		return timeFormated.trim();
 	},
 
 	toDisplayPercentage: function(percentage, precision, precisionFixed) {

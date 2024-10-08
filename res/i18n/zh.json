@@ -1453,7 +1453,6 @@
     "ui.save.tooltip": "已保存!",
     "ui.energy.tooltip": "能量",
     "ui.log.link": "日志",
-    "ui.chat.link": "聊天",
     "ui.clear.log": "清空日志",
     "ui.log.filters.block": "[<span id=\"filterIcon\">+</span>] 日志过滤",
     "ui.pause": "暂停",
