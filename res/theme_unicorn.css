@@ -673,7 +673,8 @@ body.scheme_unicorn.with_background_image {
 	box-shadow: 3px 3px 5px #111922;
 	border-color: #ebedf0;
 }
-.scheme_unicorn .census-block.simLeader a.leaderHref {
+.scheme_unicorn .census-block.simLeader .leaderHref,
+.scheme_unicorn .census-block.simFavorite .favoriteHref {
 	color: #4f8fdd;
 }
 .scheme_unicorn .census-block .info { /* info of kitten */
@@ -794,6 +795,9 @@ body.scheme_unicorn.with_background_image {
 	border : 3px ridge #e8dbc7;
 	border-radius: 5px;
 	box-shadow: 0 -1px #e8dfd0, 1px 1px 2px #111922;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_unicorn .achievement:hover {
 	color: #f8f6f1;

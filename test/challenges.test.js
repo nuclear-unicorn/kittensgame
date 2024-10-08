@@ -601,3 +601,273 @@ test("Pacifism Challenge--Weapon upgrades should have correct values", () => {
     expect(weaponUpgrades[1].effects["manpowerJobRatio"]).toBe(0);
     expect(weaponUpgrades[2].effects["manpowerJobRatio"]).toBe(0);
 });
+
+
+//--------------------------------
+//    Unicorn Tears Challenge
+//--------------------------------
+test("Unicorn Tears Challenge--Weighted price algorithm should behave nicely with zero, infinity, & NaN", () => {
+    const unicornTearsChallenge = game.challenges.getChallenge("unicornTears");
+    expect(typeof(unicornTearsChallenge.sumPricesWeighted)).toBe("function");
+    const sumPricesWeighted = unicornTearsChallenge.sumPricesWeighted.bind(unicornTearsChallenge);
+
+    //Default weight should be 10, which should work for nonexistent resources:
+    expect(sumPricesWeighted([{ name: "notARealResourceName", val: 19 }])).toBeCloseTo(190);
+
+    //Catnip should have a weight of 0:
+    expect(sumPricesWeighted([{ name: "catnip", val: 11 }])).toBe(0);
+
+    //Resources should sum together:
+    expect(sumPricesWeighted([{ name: "res1", val: 13 }, { name: "res2", val: 44 }])).toBeCloseTo(570);
+    expect(sumPricesWeighted([{ name: "catnip", val: 9 }, { name: "res1", val: 19 }, { name: "catnip", val: 18 }, { name: "res1", val: 94 }])).toBeCloseTo(1130);
+
+    //Test zero times infinity:
+    expect(sumPricesWeighted([{ name: "catnip", val: Infinity }])).not.toBeNaN();
+    expect(sumPricesWeighted([{ name: "catnip", val: Infinity }])).toBe(0);
+
+    //Unicorns should have a weight of negative infinity.
+    //We will add a tiny amount of unicorns to a huge amount of a default resource.
+    expect(sumPricesWeighted([{ name: "unicorns", val: 1e-25 }, { name: "res1", val: 1e93 }])).toBe(-Infinity);
+
+    //Test NaN of a resource, test fractional resources, test infinite resources, test negative resources:
+    expect(sumPricesWeighted([{ name: "res1", val: NaN }])).not.toBeNaN();
+    expect(sumPricesWeighted([{ name: "res1", val: NaN }])).toBe(0);
+    expect(sumPricesWeighted([{ name: "res1", val: 70 }, { name: "res2", val: NaN }])).toBeCloseTo(700);
+    expect(sumPricesWeighted([{ name: "res1", val: 0.051 }, { name: "catnip", val: NaN }])).toBeCloseTo(0.51);
+    expect(sumPricesWeighted([{ name: "res1", val: 8 }, { name: "catnip", val: Infinity }])).toBeCloseTo(80);
+    expect(sumPricesWeighted([{ name: "res1", val: 6.5e6 }, { name: "catnip", val: -Infinity }])).toBeCloseTo(6.5e7);
+    expect(sumPricesWeighted([{ name: "unicorns", val: NaN }, { name: "unicorns", val: -Infinity }])).toBe(Infinity); //negative infinity times negative infinity equals positive infinity
+    expect(sumPricesWeighted([{ name: "unicorns", val: Infinity }, { name: "unicorns", val: -Infinity }])).toBe(0); //negative infinity plus infinity gives NaN but we want zero instead
+    expect(sumPricesWeighted([{ name: "res1", val: Infinity }, { name: "res1", val: -Infinity }])).toBe(0);
+    expect(sumPricesWeighted([{ name: "res1", val: Infinity }, { name: "unicorns", val: -Infinity }])).toBe(Infinity);
+    expect(sumPricesWeighted([{ name: "res1", val: Infinity }, { name: "catnip", val: -Infinity }, { name: "unicorns", val: -Infinity }])).toBe(Infinity);
+    expect(sumPricesWeighted([{ name: "res1", val: Math.SQRT2 }])).toBeCloseTo(14.1421);
+    expect(sumPricesWeighted([{ name: "res1", val: -39 }, { name: "res2", val: 63 }, { name: "res3", val: -23.5 }])).toBeCloseTo(5);
+    expect(sumPricesWeighted([{ name: "res1", val: -39 }, { name: "res2", val: -97 }, { name: "res3", val: 3 }])).toBeCloseTo(-1330);
+
+    //Zero prices should not contribute:
+    expect(sumPricesWeighted([{ name: "unicorns", val: 0 }])).toBe(0);
+    expect(sumPricesWeighted([{ name: "catnip", val: 0 }])).toBe(0);
+    expect(sumPricesWeighted([{ name: "res1", val: 0.4 }, { name: "unicorns", val: 0 }, { name: "res1", val: 0 }, { name: "res2", val: 0 }])).toBeCloseTo(4);
+
+    //Empty price should be zero:
+    expect(sumPricesWeighted([])).toBe(0);
+});
+test("Unicorn Tears Challenge--Resource caps should be enforced, & unicorn sacrifice should respect them", () => {
+    //Save references to resPool objects we'll use often:
+    const unic = game.resPool.get("unicorns");
+    const tear = game.resPool.get("tears");
+    const alic = game.resPool.get("alicorn");
+    expect(game.bld.cathPollution).toBe(0) //Expect to start at 0 pollution
+
+    //Outside of any Challenge, unicorn-related resources wouldn't have a cap:
+    expect(game.challenges.isActive("unicornTears")).toBe(false);
+    game.resPool.addResEvent("unicorns", 500.1);
+    expect(unic.value).toBeCloseTo(500.1);
+    game.resPool.addResEvent("tears", 500.1);
+    expect(tear.value).toBeCloseTo(500.1);
+    game.resPool.addResEvent("alicorn", 500.1);
+    expect(alic.value).toBeCloseTo(500.1);
+
+    //Activate Unicorn Tears Challenge, then test that caps are enforced:
+    //While we're at it, let's add some paragon points (should NOT affect the caps at all)
+    const unicornTearsChallenge = game.challenges.getChallenge("unicornTears");
+    unicornTearsChallenge.active = true;
+    unicornTearsChallenge.on = 83;
+    game.resPool.addResEvent("paragon", 8026);
+    game.upgrade({ challenges: ["unicornTears"]});
+    game.updateModel(); //To apply resource limits
+    game.calendar.onNewDay(); //This is when extra resources are drained
+
+    expect(unic.maxValue).toBe(10);
+    expect(unic.value).toBeCloseTo(9.1); //Unicorns disappear in integer amounts
+    expect(tear.maxValue).toBe(1);
+    expect(tear.value).toBeCloseTo(1);
+    expect(tear.value == tear.maxValue).toBe(true); //Should be exactly equal
+    expect(game.bld.cathPollution).toBeCloseTo(1497.3 /* (500.1-1)*3 */); //Produced 3 pollution per tear overcapped
+    expect(alic.maxValue).toBe(0.2);
+    expect(alic.value).toBeCloseTo(0.1); //Alicorns also disappear in integer amounts
+
+    //Build some Ziggurats, then test unicorn sacrifice:
+    const ziggurat = game.bld.get("ziggurat");
+    ziggurat.val = 36;
+    ziggurat.on = 36;
+    game.updateModel(); //To apply resource limits
+
+    unic.value = 1e12; //Enough unicorns to do hundreds of transformations if we want to
+    tear.value = tear.maxValue - 110; //3 transformations + 2 tears away from the cap
+
+    //Copied from religion.js
+    //I kind of wish there were a better way to make fully functional "buttons" for these test cases
+    let unicornsSacrificed = 0;
+    let controller = new classes.ui.religion.TransformBtnController(game, {
+        gainMultiplier: function() {
+            return this.game.bld.get("ziggurat").on;
+        },
+        gainedResource: "tears",
+        applyAtGain: function(priceCount) {
+            unicornsSacrificed += priceCount; //Count the number of unicorns we sacrificed
+        },
+    });
+    let model = controller.fetchModel({ prices: [{ name: "unicorns", val: 2500}]});
+    let callbackFunction = function() {};
+
+    //The smart "sacrifice all unicorns" algorithm should have sacrificed 4 batches to give us 110 tears plus (34*3) pollution
+    expect(controller._canAfford(model)).toBe(4);
+    controller.transform(model, 1 /*divider, 1 means "all"*/, null /*event*/, callbackFunction);
+    expect(unicornsSacrificed).toBe(10000); //4 batches' worth
+    expect(tear.value == tear.maxValue).toBe(true);
+    expect(game.bld.cathPollution).toBeCloseTo(1497.3 + 102); //Previous pollution plus what we just made
+
+    //Even though we're at max tears, we should still be able to sacrifice 1 batch of unicorns for no gain:
+    expect(controller._canAfford(model)).toBe(1);
+    controller.transform(model, 1 /*divider, 1 means "all"*/, null /*event*/, callbackFunction);
+    expect(unicornsSacrificed).toBe(12500); //+1 batch
+    expect(tear.value == tear.maxValue).toBe(true);
+    expect(game.bld.cathPollution).toBeCloseTo(1497.3 + 102 + 108); //Previous pollution plus what we just made
+});
+
+//--------------------------------
+//       Shatter TC Prices
+//--------------------------------
+//I put this in the testing suite for challenges because we're going to try different combinations of the 1000 Years Challenge.
+test("Shatter TC Prices should be correct (in a variety of 1kY states)", () => {
+    const oneKYChallenge = game.challenges.getChallenge("1000Years");
+    
+    let controller = new classes.ui.time.ShatterTCBtnController(game);
+    let model = controller.fetchModel({ prices: [{name: "timeCrystal", val: 1}] });
+    let pricesResult = null;
+
+    //Function to calculate the price of shattering TCs.
+    const calcPrices = function(shatters, startHeat, startYear) {
+        game.time.heat = startHeat;
+        game.calendar.year = startYear;
+        pricesResult = controller.getPricesMultiple(model, shatters);
+    }
+    const calculateWhatIsRelevant = function() { game.upgrade({ challenges: ["1000Years"]}); };
+
+    //We're going to assume from here on out that the max amount of heat is 100 units:
+    calculateWhatIsRelevant();
+    expect(game.getEffect("heatMax")).toBeCloseTo(100, 5 /*5 digits of precision*/);
+
+    //Starting at year 0 with no heat & no modifiers, shattering 1 TC should cost 1 TC.
+    calcPrices(1 /*shatters*/, 0 /*heat*/, 0 /*year*/);
+    expect(pricesResult.timeCrystal).toBe(1);
+    expect(pricesResult.void).toBe(0);
+
+    //If each shatter generates 10 units of heat, we should be able to shatter 10 times without hitting the heat penalty:
+    //Ah--but after exactly 10 shatters, we are at 100 heat, which is 0 units over the max, so the 11th shatter has its price increased by 0%
+    calcPrices(11 /*shatters*/, 0, 0);
+    expect(pricesResult.timeCrystal).toBeCloseTo(10 + 1, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //After 11 shatters, we are at 110 heat, so the 12th costs 10% more
+    calcPrices(12, 0, 0);
+    expect(pricesResult.timeCrystal).toBeCloseTo(10 + 1 + 1.1, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //After 12 shatters, the next one costs 20% more
+    calcPrices(13, 0, 0);
+    expect(pricesResult.timeCrystal).toBeCloseTo(10 + 1 + 1.1 + 1.2, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //But what if we start with, say, 5 units of heat already?  The 10th shatter should be unaffected, but the 11th should cost 5% more:
+    calcPrices(10 /*shatters*/, 5 /*heat*/, 0 /*year*/);
+    expect(pricesResult.timeCrystal).toBeCloseTo(10, 5);
+    expect(pricesResult.void).toBe(0);
+    calcPrices(11 /*shatters*/, 5 /*heat*/, 0 /*year*/);
+    expect(pricesResult.timeCrystal).toBeCloseTo(10 + 1.05, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //...& the 12th should cost 15% more:
+    calcPrices(12, 5, 0);
+    expect(pricesResult.timeCrystal).toBeCloseTo(10 + 1.05 + 1.15, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //Now, let's do it again, but with 1kY reward active.
+    oneKYChallenge.researched = true; //Reward: shatters generate 5 heat instead of 10
+    oneKYChallenge.on = 1; //Reward: shatters cost 2% fewer TCs
+    oneKYChallenge.active = false;
+    calculateWhatIsRelevant();
+
+    //Shatters generate 5 units of heat now--so we should be able to shatter 20 times with no penalty.
+    //But shatters cost 2% fewer TCs now
+    calcPrices(20, 0, 0);
+    expect(pricesResult.timeCrystal).toBeCloseTo((20) * 0.98, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //21st shatter costs 0% more, 22nd costs 5% more, etc.
+    calcPrices(23, 0, 0);
+    expect(pricesResult.timeCrystal).toBeCloseTo((20 + 1 + 1.05 + 1.1) * 0.98, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //Let's try shattering, but we start with some heat already.
+    //I picked 73 heat because 73 is not divisible by 5.
+    //After 6 shatters, we are at 103 heat, so the 7th shatter should be 3% more expensive
+    calcPrices(7 /*shatters*/, 73 /*heat*/, 0 /*year*/);
+    expect(pricesResult.timeCrystal).toBeCloseTo((6 + 1.03) * 0.98, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //The next few shatters after this should be 8%, then 13%, then 18%, etc. more expensive
+    calcPrices(12 /*shatters*/, 73 /*heat*/, 0 /*year*/);
+    expect(pricesResult.timeCrystal).toBeCloseTo((6 + 1.03 + 1.08 + 1.13 + 1.18 + 1.23 + 1.28) * 0.98, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //Now, let's test that prices are MORE expensive with 1kY active, but that the half-heat reward still applies:
+    oneKYChallenge.researched = true; //Reward: shatters generate 5 heat instead of 10
+    oneKYChallenge.on = 8; //Increasing challenge: shatters cost 4 more TCs & 3.2 more void each.
+    oneKYChallenge.active = true;
+    calculateWhatIsRelevant();
+    
+    //Shatters still generate 5 units of heat, so starting at 0 heat with 25 shatters, the 21st costs 0% more, then 5% more, then 10% more, etc.
+    //But the base price of shatters is now 5 TCs + 3.2 void.
+    calcPrices(25, 0, 0);
+    expect(pricesResult.timeCrystal).toBeCloseTo(100 + 5 + 5.25 + 5.5 + 5.75 + 6, 5);
+    expect(pricesResult.void).toBeCloseTo(64 + 3.2 + 3.36 + 3.52 + 3.68 + 3.84);
+
+    //Now let's test Dark Future (DF).
+    //Since the 1kY Challenge is completed before you reach Dark Future, we will NOT test DF + 1kY, only DF outside of 1kY.
+    oneKYChallenge.researched = true; //Reward: shatters generate 5 heat instead of 10
+    oneKYChallenge.on = 8; //Reward: shatters cost 16% fewer TCs
+    oneKYChallenge.active = false;
+    calculateWhatIsRelevant();
+
+    //Shatter prices should be 1% more expensive for each 1000 years we are into Dark Future.
+    calcPrices(1 /*shatters*/, 0 /*heat*/, 41000 /*year*/);
+    expect(pricesResult.timeCrystal).toBeCloseTo((1.01) * 0.84, 5);
+    expect(pricesResult.void).toBe(0);
+    
+    //Each further year we skip needs to be 1/1000th of 1% more expensive
+    calcPrices(2 /*shatters*/, 0 /*heat*/, 41000 /*year*/);
+    expect(pricesResult.timeCrystal).toBeCloseTo((1.01 + 1.01001) * 0.84, 5 /*We REQUIRE high precision for this */);
+    expect(pricesResult.void).toBe(0);
+    calcPrices(3 /*shatters*/, 0 /*heat*/, 41000 /*year*/);
+    expect(pricesResult.timeCrystal).toBeCloseTo((1.01 + 1.01001 + 1.01002) * 0.84, 5 /*We REQUIRE high precision for this */);
+    expect(pricesResult.void).toBe(0);
+    
+    //At this point, I'm going to do the math on a calculator
+    calcPrices(20, 0, 41000);
+    expect(pricesResult.timeCrystal).toBeCloseTo((20.2019) * 0.84, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //But remember, shatters generate heat--so the 21st shatter costs 0% more heat on top of everything, then 5%, then 10%, etc.
+    calcPrices(25, 0, 41000);
+    expect(pricesResult.timeCrystal).toBeCloseTo((20.2019 + 1.0102 + 1.0607205 + 1.111242 + 1.1617645 + 1.212288) * 0.84, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //Let's test hitting the heat limit BEFORE hitting the DF penalty.
+    calcPrices(1000, 0, 39000);
+    expect(pricesResult.timeCrystal).toBeCloseTo((20 + 24965.5) * 0.84, 5);
+    expect(pricesResult.void).toBe(0);
+    calcPrices(1002, 0, 39000);
+    expect(pricesResult.timeCrystal).toBeCloseTo((20 + 24965.5 + 50 + 50.0505005) * 0.84, 5);
+    expect(pricesResult.void).toBe(0);
+    calcPrices(2000, 0, 39000);
+    expect(pricesResult.timeCrystal).toBeCloseTo((20 + 24965.5 + 75391.16675) * 0.84, 5);
+    expect(pricesResult.void).toBe(0);
+
+    //Let's test hitting the heat limit exactly at the same time as the DF penalty.
+    calcPrices(1020, 0, 39980);
+    expect(pricesResult.timeCrystal).toBeCloseTo((20 + 26146.41175) * 0.84, 5);
+    expect(pricesResult.void).toBe(0);
+});

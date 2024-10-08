@@ -813,8 +813,22 @@ body.scheme_arctic.with_background_image {
 	background: local repeat top left url('img/theme_arctic_background_04.jpg'), #d0d0d0;
 	box-shadow: -1px 1px 2px #505050;
 }
-.scheme_arctic .census-block.simLeader a.leaderHref {
+.scheme_arctic .census-block.simLeader .leaderHref,
+.scheme_arctic .census-block.simFavorite .favoriteHref {
+	background-color: transparent;
+	background-image: url('img/theme_arctic_background_02.png');
+	background-repeat: no-repeat;
+	background-attachment: local;
+	background-position: top -10px left;
+	border: solid 1px #c0c0c0;
+	box-shadow: inset -1px 1px 1px #707070;
 	color: #0793f8;
+}
+.scheme_arctic .census-block.simLeader .leaderHref:hover,
+.scheme_arctic .census-block.simFavorite .favoriteHref:hover {
+	border: outset 1px #c0c0c0;
+	background-position: top -16px left;
+	box-shadow: 1px 1px 2px #707070;
 }
 .scheme_arctic .census-block .info { /* info of kitten */
 	font-size: 0.9em;
@@ -945,6 +959,9 @@ body.scheme_arctic.with_background_image {
 	border-image-slice: 0 0 4 0;
 	border-image-outset: 0;
 	border-image-repeat: round;
+	white-space: nowrap !important;
+	text-overflow: clip; /* It seems to be that ellipsis doesn't work properly in color themes where the achievement is all on one line */
+	overflow: hidden;
 }
 .scheme_arctic .achievement:not(.unethical).unlocked:hover {
 	text-shadow: 0 -1px 1px #93c4cf;

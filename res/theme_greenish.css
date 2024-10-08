@@ -773,7 +773,19 @@ body.scheme_greenish {
 .scheme_greenish .census-block.simLeader {
 	background-color: #a7e090;
 }
-.scheme_greenish .census-block.simLeader a.leaderHref {
+.scheme_greenish .census-block .links-container span.btn.modern {
+	border-radius: 50%; /*make it a circle!*/
+	background: rgba(255, 255, 255, 0.5);
+}
+.scheme_greenish .census-block .links-container span.btn.modern:hover {
+	background: rgba(255, 255, 255, 0.75);
+}
+.scheme_greenish .census-block.simLeader .leaderHref {
+	background: transparent;
+	border: none;
+}
+.scheme_greenish .census-block.simLeader .leaderHref,
+.scheme_greenish .census-block.simFavorite .favoriteHref {
 	color: #1b4885;
 }
 .scheme_greenish .census-block .info { /* info of kitten */
@@ -894,6 +906,9 @@ body.scheme_greenish {
 	letter-spacing: 1px;
 	border: solid 1px #b5d0b1;
 	border-radius: 7px;
+	white-space: nowrap !important;
+	text-overflow: clip; /* I couldn't figure out how to get ellipsis to work the way I wanted it to */
+	overflow: hidden;
 }
 .scheme_greenish .achievement:hover {
 	background-color: rgba(240, 240, 240, 0.1);

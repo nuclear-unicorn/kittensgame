@@ -10,13 +10,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			}
 			//Get the base amount for the effect:
 			var amt = challenge.effects[effectName] || 0;
-			if (effectName == "kittenLaziness" ) { //Calculated in a special way just for the Anarchy Challenge
-				return amt;
-			}
 			var stackOptions = (challenge.stackOptions || {})[effectName] || {}; //Get the stack options for this effect.  If it doesn't exist, get an empty object instead.
 			if (stackOptions.noStack) {
-				//This effect doesn't stack.  Apply only if the Challenge has been completed.
-				return challenge.researched ? amt : 0;
+				//This effect doesn't stack; use value directly from the Challenge data.
+				return amt;
 			}
 			//Else, the effect stacks with Challenge completions.
 			amt *= challenge.on;
@@ -38,8 +35,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 
 	//Challenges have an optional property named "stackOptions".
 	//stackOptions is a table where the keys are the names of effects & the values are objects with parameters that control how that effect behaves when the challenge has been completed multiple times.
-	//	noStack - If true, the effect only cares about whether or not the Challenge has been completed, but it doesn't care about the exact number of completions.
-	//			If noStack is combined with another option, noStack overrides all other options & the effect doesn't stack.
+	//	noStack - If true, the effect is used directly from the Challenge data with no modifications at all.
 	//	LDRLimit - Applies Limited Diminishing Returns (LDR) specifying the asymptotic limit.
 	//	capMagnitude - The magnitude of the effect will be clamped to this value, but the sign of the effect will not be changed.
 	//			If capMagnitude is combined with LDRLimit, the LDR will be applied first, then the magnitude will be capped afterwards.
@@ -49,15 +45,13 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		label: $I("challendge.ironWill.label"),
 		description: $I("challendge.ironWill.desc"),
 		effectDesc: $I("challendge.ironWill.effect.desc"),
-        researched: false,
-        unlocked: true
+		defaultUnlocked: true
 	},{
 		name: "winterIsComing",
 		label: $I("challendge.winterIsComing.label"),
 		description: $I("challendge.winterIsComing.desc"),
 		effectDesc: $I("challendge.winterIsComing.effect.desc"),
-		researched: false,
-		unlocked: true,
+		defaultUnlocked: true,
 		upgrades: {
 			buildings: ["pasture"]
 		},
@@ -94,15 +88,14 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		label: $I("challendge.anarchy.label"),
 		description: $I("challendge.anarchy.desc"),
 		effectDesc: $I("challendge.anarchy.effect.desc"),
-		researched: false,
-		unlocked: true,
+		defaultUnlocked: true,
         effects: {
 			"masterSkillMultiplier": 0.2,
 			"kittenLaziness": 0
         },
 		stackOptions: {
 			"masterSkillMultiplier": { LDRLimit: 4 },
-			"kittenLaziness": { LDRLimit: 0.25 }
+			"kittenLaziness": { LDRLimit: 0.25, noStack: true }
 		},
 		calculateEffects: function(self, game){
 			if (self.active) {
@@ -115,14 +108,15 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		},
 		checkCompletionCondition: function(game){
 			return game.bld.get("aiCore").val > 0;
+		},
+		actionOnCompletion: function(game) {
+			game.villageTab.requestCensusRefresh(); //Just in case the player is looking at the village tab when it happens.
 		}
 	},{
 		name: "energy",
 		label: $I("challendge.energy.label"),
 		description: $I("challendge.energy.desc"),
 		effectDesc: $I("challendge.energy.effect.desc"),
-        researched: false,
-		unlocked: false,
 		effects: {
 			"energyConsumptionRatio": -0.02,
 			"energyConsumptionIncrease": 0
@@ -185,9 +179,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		checkCompletionConditionOnReset: function(game){
 			return game.time.getVSU("cryochambers").on > 0;
 		},
-		researched: false,
-		reserveDelay: true,
-        unlocked: false
+		reserveDelay: true
 	},{
 		name: "1000Years",
 		label: $I("challendge.1000Years.label"),
@@ -223,8 +215,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			}
 			game.upgrade(self.upgrades); //this is a hack, might need to think of a better sollution later
 		},
-		researched: false,
-		unlocked: false,
 		upgrades:{
 			chronoforge: ["temporalPress"]
 		},
@@ -236,8 +226,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		label: $I("challendge.blackSky.label"),
 		description: $I("challendge.blackSky.desc"),
 		effectDesc: $I("challendge.blackSky.effect.desc"),
-		researched: false,
-		unlocked: false,
         effects: {
 			"corruptionBoostRatioChallenge": 0.1,
 			"bskSattelitePenalty": 0
@@ -314,9 +302,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		upgrades: {
 			upgrades: ["compositeBow", "crossbow", "railgun"]
 		},
-		researched: false,
 		reserveDelay: true,
-		unlocked: false,
 		getTradeBonusEffect: function(game){
 			var self = game.challenges.getChallenge("pacifism");
 			if(!self.on || game.challenges.isActive("pacifism")){
@@ -329,12 +315,119 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			return (tradepost.effects["tradeRatio"] * Math.min(tradepostLimit, tradepost.val * tradepostRatioLimit));
 		}
 	},{
+		name: "unicornTears",
+		label: $I("challendge.unicornTears.label"),
+		description: $I("challendge.unicornTears.desc"),
+		effectDesc: $I("challendge.unicornTears.effect.desc"),
+		effects: {
+			"bonfireTearsPriceRatioChallenge": 0,
+			"scienceTearsPricesChallenge": 0,
+			"workshopTearsPricesChallenge": 0,
+			"cathPollutionPerTearOvercapped": 0, //Overcapped unicorn tears evaporate into a smoky substance
+			"unicornsMax": 0,
+			"tearsMax": 0,
+			"alicornMax": 0
+		},
+		calculateEffects: function(self, game) {
+			if (self.active) {
+				//Base challenge: Price ratio of ×1.2 determining added costs in the Bonfire tab.
+				//Increasing challenge: +0.03 to the price ratio for each additional completion.
+				//Diminishing returns starts after 23 completions
+				//Price ratio exceeds ×2 after 28 completions
+				//LDR limit is at a price ratio of ×2.5
+				self.effects["bonfireTearsPriceRatioChallenge"] =
+					game.getLimitedDR(1.2 + 0.03 * self.on, self.stackOptions["bonfireTearsPriceRatioChallenge"].LDRLimit);
+				//Increasing challenge: Multiplier to prices in the Science tab.
+				self.effects["scienceTearsPricesChallenge"] = 0.25;
+				//Increasing challenge: Multiplier to prices in the Workshop tab.
+				self.effects["workshopTearsPricesChallenge"] = 0.01;
+				self.effects["cathPollutionPerTearOvercapped"] = 3;
+				//Base resource storage:
+				self.effects["unicornsMax"] = 10;
+				self.effects["tearsMax"] = 1;
+				self.effects["alicornMax"] = 0.2;
+			} else {
+				self.effects["bonfireTearsPriceRatioChallenge"] = 0;
+				self.effects["scienceTearsPricesChallenge"] = 0;
+				self.effects["workshopTearsPricesChallenge"] = 0;
+				self.effects["cathPollutionPerTearOvercapped"] = 0;
+				self.effects["unicornsMax"] = 0;
+				self.effects["tearsMax"] = 0;
+				self.effects["alicornMax"] = 0;
+			}
+		},
+		stackOptions: {
+			"bonfireTearsPriceRatioChallenge": { noStack: true, LDRLimit: 2.5 },
+			"scienceTearsPricesChallenge": { LDRLimit: 100 },
+			"workshopTearsPricesChallenge": { LDRLimit: 1 },
+			"cathPollutionPerTearOvercapped": { noStack: true },
+			"unicornsMax": { noStack: true },
+			"tearsMax": { noStack: true },
+			"alicornMax": { noStack: true }
+		},
+		/**
+		 * Calculate the total weight of all resources involved in the price of an item.
+		 * @param prices A prices object, which is an array where each element has the format: { name: "slab", val: 1000 }
+		 * @return A number.  It could be positive, negative, or infinite, but it will NOT be NaN.
+		 */
+		sumPricesWeighted: function(prices) {
+			var total = 0;
+			var lineValue = 0;
+			for (var i = 0; i < prices.length; i += 1) {
+				lineValue = this._getResWeight(prices[i].name) * prices[i].val;
+				//Indeterminate forms such as 0*Infinity could give us NaN here.
+				//NaNs are contagious, so get rid of them ASAP.
+				total += isNaN(lineValue) ? 0 : lineValue;
+			}
+			//Indeterminate forms such as Infinity-Infinity could give us NaN here.
+			return isNaN(total) ? 0 : total;
+		},
+		//Helper function to look up a resource's weight value from a table:
+		_getResWeight: function(resName) {
+			if (typeof(this.resWeights[resName]) == "number") {
+				return this.resWeights[resName];
+			}
+			return this.resWeights["default"];
+		},
+		resWeights: {
+			//---Normal---//
+			"catnip": 0,
+			"wood": 0.5,
+			"minerals": 0.35,
+			"iron": 1,
+			"titanium": 200, //Starting in the titanium era, each new resource we unlock is vastly more weighty than the previous
+			"uranium": 150000,
+			"unobtainium": 1e6,
+			"antimatter": 1e10,
+			"starchart": 200,
+			"spice": 250,
+			//---Craftables---//
+			"beam": 0.75,
+			"slab": 0.75,
+			"plate": 5,
+			"concrate": 25,
+			"gear": 20,
+			"alloy": 300,
+			"eludium": 1e8,
+			"ship": 1500,
+			"tanker": 150000,
+			"kerosene": 7000,
+			"parchment": 2,
+			"compedium": 20,
+			"blueprint": 50,
+			"thorium": 180000,
+			//---Other---//
+			"unicorns": -Infinity, //Used to prevent a building that already costs this resource from having its price modified
+			"alicorns": -Infinity,
+			"tears": -Infinity,
+			"megalith": -Infinity,
+			"default": 10 //Used for any resource not explicitly specified
+		}
+	},{
 		name: "postApocalypse",
 		label: $I("challendge.postApocalypse.label"),
 		description: $I("challendge.postApocalypse.desc"),
 		effectDesc: $I("challendge.postApocalypse.effect.desc"),
-		researched: false,
-		unlocked: false,
 		flavor: $I("challendge.postApocalypse.flavor"),
         effects: {
 			"arrivalSlowdown": 0, //additive with pollution
@@ -366,20 +459,31 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			game.science.getPolicy("terraformingInsight").unlocked = true; //policy which helpes to get more paragon this run
 			game.science.getPolicy("cryochamberExtraction").unlocked = true; //single use policy; gets not researched after player gets the bonus
 		}
-		}],
+	}],
 
 	game: null,
 
 	resetState: function(){
 		for (var i = 0; i < this.challenges.length; i++){
-			var challenge = this.challenges[i];
-			challenge.enabled = false;
-			challenge.pending = false;
-			challenge.active = false;
-			this.resetStateStackable(challenge);
+			this.resetStateStackable(this.challenges[i]);
 		}
 		this.currentChallenge = null;
 		this.reserves.resetState();
+	},
+
+	/**
+	 * The parent class's resetStateStackable, defined in core.js, is designed for buildings.
+	 * Challenges are so fundamentally different that I felt it was best to write custom logic for them.
+	 * That way, if someone decides to call this function, it'll have well-defined behavior.
+	 * @param challenge The Challenge whose state will be reset to default values.
+	 * @return Nothing
+	 */
+	resetStateStackable: function(challenge) {
+		challenge.unlocked = Boolean(challenge.defaultUnlocked);
+		challenge.pending = false;
+		challenge.active = false;
+		challenge.researched = false;
+		challenge.on = 0;
 	},
 
 	save: function(saveData){
@@ -485,6 +589,26 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				count += challenge.pending ? 1 : 0;
 			});
 		return count;
+	},
+	/**
+	 * Returns the total number of Challenge completions.
+	 */
+	getCountCompletions: function() {
+		var total = 0;
+		for(var i = 0; i < this.challenges.length; i += 1) {
+		    total += this.challenges[i].on;
+		}
+		return total;
+	},
+	/**
+	 * Returns the number of different Challenges completed.
+	 */
+	getCountUniqueCompletions: function() {
+		var total = 0;
+		for(var i = 0; i < this.challenges.length; i += 1) {
+		    total += 1 * this.challenges[i].researched;
+		}
+		return total;
 	},
 
 	researchChallenge: function(challenge) {
@@ -717,10 +841,6 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 		return name;
 	},
 
-	updateVisible: function(model){
-		model.visible = model.metadata.unlocked;
-	},
-
 	getPrices: function(model) {
 		return $.extend(true, [], model.metadata.prices); // Create a new array to keep original values
 	},
@@ -738,11 +858,12 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 		model.metadata.pending = !model.metadata.pending;
 	},
 
+	updateVisible: function(model){
+		model.visible = model.metadata.unlocked;
+	},
+
 	updateEnabled: function(model){
-		this.inherited(arguments);
-		if (model.metadata.researched){
-			model.enabled = false;
-		}
+		model.enabled = true;
 	}
 });
 
