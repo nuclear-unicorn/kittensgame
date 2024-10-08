@@ -1501,7 +1501,6 @@
     "ui.save.tooltip": "Enregistré!",
     "ui.energy.tooltip": "Énergie",
     "ui.log.link": "Journal",
-    "ui.chat.link": "Chat",
     "ui.clear.log": "Effacer le journal",
     "ui.log.filters.block": "[<span id=\"filterIcon\">+</span>] Filtres des logs",
     "ui.pause": "pause",

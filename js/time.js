@@ -247,7 +247,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             var daysOffsetLeft = daysOffset;
             var redshiftQueueWorked = true;
             if (!result[1]){
-                numberEvents = this.applyRedshift(daysOffset);
+                numberEvents = this.applyRedshift(daysOffsetLeft, true);
                 daysOffsetLeft = 0;
             }
             while (daysOffsetLeft > 0){
@@ -1242,7 +1242,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 
     doShatter: function(model, amt) {
         var factor = this.game.challenges.getChallenge("1000Years").researched ? 5 : 10;
-        var heat_acutoconverted = 1 - 100/(100 + this.game.getEffect("heatCompression"));
+        var heat_acutoconverted = 1 - 1/(1 + this.game.getEffect("heatCompression"));
         if (heat_acutoconverted){
             this.game.time.heat += amt * factor * (1 - heat_acutoconverted);
             var efficiency = 1 + this.game.getEffect("heatEfficiency");

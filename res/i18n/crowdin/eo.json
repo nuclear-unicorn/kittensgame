@@ -639,7 +639,6 @@
     "ui.autosave.tooltip": "memkonservas...",
     "ui.save.tooltip": "Konservita!",
     "ui.energy.tooltip": "Energio",
-    "ui.chat.link": "Babili",
     "ui.log.filters.block": "[<span id=\"filterIcon\">+</span>] Mesaĝaj Filtroj",
     "ui.pause": "halti",
     "ui.unpause": "malhalti",

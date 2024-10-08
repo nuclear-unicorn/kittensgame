@@ -1053,7 +1053,7 @@ body.scheme_cyber {
 .scheme_cyber #calendarSign:hover {
    cursor: default;
 }
-.scheme_cyber .right-tab-header { /* Log | Chat link on right column */
+.scheme_cyber .right-tab-header { /* Log | Queue link on right column */
 	/* default margin-top: 10px; */
 	font-size: 80%;
 }
@@ -1075,9 +1075,6 @@ body.scheme_cyber {
 	margin-top: 5px; /* default margin-top: 15px */
 	/* default height: 30px; */
 	margin-bottom: 3px;
-}
-.scheme_cyber #rightTabChat {
-	margin-top: 10px;
 }
 .scheme_cyber div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #646464;

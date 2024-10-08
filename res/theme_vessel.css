@@ -1008,7 +1008,7 @@ body.scheme_vessel {
 .scheme_vessel #calendarSign:hover {
    cursor: default;
 }
-.scheme_vessel .right-tab-header { /* Log and Chat link on right column */
+.scheme_vessel .right-tab-header { /* Log and Queue link on right column */
 	/* default margin-top: 10px; */
 	font-size: 75%;
  }
@@ -1024,9 +1024,6 @@ body.scheme_vessel {
 }
 .scheme_vessel .right-tab-header a.active:hover {
 	color: #A0A0A0;
-}
-.scheme_vessel #rightTabChat {
-	margin-top: 30px;
 }
 .scheme_vessel div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #707070;

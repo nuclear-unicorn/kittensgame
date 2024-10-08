@@ -1554,7 +1554,6 @@
     "ui.save.tooltip": "Gespeichert!",
     "ui.energy.tooltip": "Energie",
     "ui.log.link": "Protokoll",
-    "ui.chat.link": "Chat",
     "ui.clear.log": "Protokoll leeren",
     "ui.log.filters.block": "[<span id=\"filterIcon\">+</span>] Protokoll filtern",
     "ui.pause": "pausieren",

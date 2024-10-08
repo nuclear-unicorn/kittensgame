@@ -1032,9 +1032,6 @@ body.scheme_tombstone {
 	height: 35px; /* default height: 30px; */
 	margin-bottom: 3px;
 }
-.scheme_tombstone #rightTabChat {
-	margin-top: 10px;
-}
 .scheme_tombstone div.console-intro { /* Text on right column: "You are a kitten in a catnip forest." */
 	color: #47474a;
 	text-shadow: 0 -2px 1px #000000;

@@ -1595,7 +1595,6 @@
     "ui.save.tooltip": "保存しました",
     "ui.energy.tooltip": "エネルギー",
     "ui.log.link": "ログ",
-    "ui.chat.link": "チャット",
     "ui.clear.log": "ログを消去",
     "ui.log.filters.block": "[<span id=\"filterIcon\">+</span>] フィルター",
     "ui.pause": "一時停止",

@@ -1411,7 +1411,6 @@
     "ui.save.tooltip": "已保存!",
     "ui.energy.tooltip": "能量",
     "ui.log.link": "事件記錄",
-    "ui.chat.link": "聊天",
     "ui.clear.log": "清除事件記錄",
     "ui.log.filters.block": "[<span id=\"filterIcon\">+</span>] 過濾紀錄",
     "ui.pause": "暫停",

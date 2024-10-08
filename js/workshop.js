@@ -1608,12 +1608,16 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		name: "seti",
 		label: $I("workshop.seti.label"),
 		description: $I("workshop.seti.desc"),
-		effects: {
-		},
 		prices:[
 			{ name : "titanium", val: 250 },
 			{ name : "science",  val: 125000 }
-		]
+		],
+		handler: function(game) {
+			game.console.lockFilter("astronomicalEvent");
+			if (game.calendar.observeRemainingTime > 0) {
+				game.calendar.observeHandler();
+			}
+		}
 	},{
 		name: "logistics",
 		label: $I("workshop.logistics.label"),

@@ -1138,7 +1138,7 @@ body.scheme_wood.with_background_image {
 .scheme_wood #calendarSign:hover {
    cursor: default;
 }
-.scheme_wood .right-tab-header { /* Log | Chat link on right column */
+.scheme_wood .right-tab-header { /* Log | Queue link on right column */
 	/* default margin-top: 10px; */
 	font-size: 90%;
 	text-shadow: 0 -2px 1px #000000;
@@ -1159,9 +1159,6 @@ body.scheme_wood.with_background_image {
 .scheme_wood div#observeButton {
 	margin-top: 5px; /* default margin-top: 15px */
 	height: 45px; /* default height: 30px; */
-}
-.scheme_wood #rightTabChat {
-	margin-top: 15px;
 }
 .scheme_wood div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #585145;

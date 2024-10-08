@@ -805,7 +805,7 @@ body.scheme_gold {
 .scheme_gold #calendarSign:hover {
    cursor: default;
 }
-.scheme_gold .right-tab-header { /* Log | Chat link on right column */
+.scheme_gold .right-tab-header { /* Log | Queue link on right column */
     color : #404040; /* for separator tab | */
 	font-size: 80%;
 }
@@ -816,9 +816,6 @@ body.scheme_gold {
 .scheme_gold div#observeButton {
 	margin-top: 5px; /* default margin-top: 15px */
 	height: 45px; /* default height: 30px; */
-}
-.scheme_gold #rightTabChat {
-	margin-top: 15px;
 }
 .scheme_gold div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: rgba(145, 144, 132, 0.7); /* color: #919084; */
