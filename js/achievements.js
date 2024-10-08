@@ -49,6 +49,13 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
                 return ( this.game.resPool.get("necrocorn").value > 0 );
             }
         }, {
+            name: "sadnessAbyss",
+            title: $I("achievements.sadnessAbyss.title"),
+            description: $I("achievements.sadnessAbyss.desc"),
+            condition: function() {
+                return this.game.resPool.get("sorrow").value >= 100;
+            }
+        }, {
             name: "ironWill",
             title: $I("achievements.ironWill.title"),
             description: $I("achievements.ironWill.desc"),
@@ -105,8 +112,19 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             name: "jupiterAscending",
             title: $I("achievements.jupiterAscending.title"),
             description: $I("achievements.jupiterAscending.desc"),
+            starDescription: $I("achievements.jupiterAscending.starDesc"),
             condition: function () {
                 return ( this.game.space.getProgram("orbitalLaunch").on && this.game.calendar.year <= 1);
+            },
+            starCondition: function() {
+                return (this.game.startedWithoutChronospheres && this.game.space.getProgram("orbitalLaunch").on && this.game.calendar.year <= 1);
+            }
+        }, {
+            name: "veryLargeArray",
+            title: $I("achievements.veryLargeArray.title"),
+            description: $I("achievements.veryLargeArray.desc"),
+            condition: function() {
+                return this.game.bld.get("observatory").on >= 100 && !this.game.workshop.get("seti").researched;
             }
         }, {
             name: "shadowOfTheColossus",
@@ -142,6 +160,7 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             title: $I("achievements.youMonster.title"),
             unethical: true,
             description: $I("achievements.youMonster.desc"),
+            starDescription: $I("achievements.youMonster.starDesc"),
             condition: function () {
                 return (this.game.deadKittens >= 100);
             },
@@ -176,8 +195,12 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             name: "serenity",
             title: $I("achievements.serenity.title"),
             description: $I("achievements.serenity.desc"),
+            starDescription: $I("achievements.serenity.starDesc"),
             condition: function () {
                 return (this.game.village.getKittens() >= 50 && this.game.deadKittens == 0);
+            },
+            starCondition: function() {
+                return (this.game.village.getKittens() >= 1000 && this.game.deadKittens == 0);
             }
         },
         {
@@ -209,7 +232,31 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             starCondition: function () {
                 return (this.game.calendar.trueYear() >= this.game.calendar.darkFutureBeginning);
             }
-    }],
+        }, {
+            name: "eternalBacchanalia",
+            title: $I("achievements.eternalBacchanalia.title"),
+            description: $I("achievements.eternalBacchanalia.desc"),
+            starDescription: $I("achievements.eternalBacchanalia.starDesc"),
+            condition: function() {
+                return this.game.calendar.festivalDays >= 100 * this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear;
+            },
+            //TODO: Add a way to make it reasonable for both mobile & web players to get millions of years of festivals.
+            //starCondition: function() {
+            //    return this.game.calendar.festivalDays >= 1e6 * this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear;
+            //}
+        }, {
+            name: "challenger",
+            title: $I("achievements.challenger.title"),
+            description: $I("achievements.challenger.desc"),
+            starDescription: $I("achievements.challenger.starDesc"),
+            condition: function() {
+                return this.game.challenges.getCountUniqueCompletions() >= 5;
+            },
+            starCondition: function() {
+                return this.game.challenges.getCountCompletions() >= 100;
+            }
+        }
+    ],
 
     badges: [
         {   
@@ -301,6 +348,65 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             condition: function(){
                 return (!this.game.space.getPlanet("moon").reached && this.game.space.getPlanet("dune").reached);
             }
+        },{
+            name: "fantasticFurColor",
+            title: "Fantastic Fur Color",
+            description: "When a kitten has a colored name, that just means the kitten has a rare fur color; there is no special gameplay effect for having a rare fur color.",
+            difficulty: "F",
+            condition: function() {
+                var leader = this.game.village.leader;
+                return leader != null && leader.color != 0;
+            }
+        },{
+            name: "whatYearIsIt",
+            title: "What Year is it Again?",
+            description: "Forcefully resolve a Temporal Paradox. May have unknown side effects.",
+            difficulty: "C"
+        },{
+            name: "tardis",
+            title: "Time Advancing Relative Dimensions In Space",
+            description: "Prioritize time travel over space travel.",
+            difficulty: "C"
+        },{
+            name: "wheredThisComeFrom",
+            title: "Where'd This Come From?",
+            description: "Chronoreset to gain resources.",
+            difficulty: "S"
+        },{
+            name: "lostDates",
+            title: "Lost Dates",
+            description: "Accumulate 5 years of timeslip.",
+            difficulty: "B",
+            condition: function() {
+                //"flux" measures the amount of time the player has skipped this run
+                //Negative timeskip = timeslip
+                return this.game.time.flux <= -5;
+                //Before you ask, no, you can't use the 1000 Years Challenge to generate timeslip
+            }
+        },{
+            name: "buffet",
+            title: "A Whale of a Buffet",
+            description: "Reach 1000 Leviathan energy.",
+            difficulty: "A",
+            condition: function() {
+                return this.game.diplomacy.get("leviathans").energy >= 1000;
+            }
+        },{
+            name: "newHome",
+            title: "A New Home",
+            description: "Have more housing on Yarn than on Cath.",
+            difficulty: "D",
+            condition: function() {
+                var yarnHousing = this.game.space.getBuilding("terraformingStation").totalEffectsCached["maxKittens"];
+                var cathHousing = this.game.getEffect("maxKittens") - yarnHousing;
+                //cathHousing includes Space Stations & Cryochambers
+                return yarnHousing > cathHousing && this.game.village.getOverpopulation() <= 0;
+            }
+        },{
+            name: "betterSafeThanSorry",
+            title: "Better Safe Than Sorry",
+            description: "Get Carbon Sequestration with no pollution.",
+            difficulty: "E"
         }
     ],
 
@@ -355,6 +461,15 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
                 this.badgesUnlocked = true;
             }
         }
+
+        //Mess with the player a little bit.
+        if (this.game.rand(100) < 10) {
+            //10% chance of 5 hourglass symbols
+            this.getBadge("lostDates").title = "\u231b".repeat(5);
+        } else {
+            //90% chance to be normal
+            this.getBadge("lostDates").title = "Lost Dates";
+        }
     },
 
 	resetState: function(){
@@ -400,71 +515,203 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
 dojo.declare("classes.ui.AchievementsPanel", com.nuclearunicorn.game.ui.Panel, {
 
 	game: null,
+	refreshNextTick: false, //Used internally to update the list
 
 	constructor: function(){
+		this.achievementsHeader = null;
+		this.achievementsMap = {};
+		this.achievementsContainer = null;
 	},
 
     render: function(container){
         var content = this.inherited(arguments);
         
-		var div = dojo.create("div", {}, content);
+		this.achievementsContainer = dojo.create("div", {}, content);
 
-		div.innerHTML = "";
-        var divHeader = dojo.create("div", {className: "achievement-header"}, div);
+		this.achievementsContainer.innerHTML = "";
+		this.achievementsHeader = dojo.create("div", {className: "achievement-header"}, this.achievementsContainer);
         var totalAchievements = 0;
         var completedAchievements = 0;
         var completedStars = 0;
         var uncompletedStars = 0;
+		this.achievementsMap = {}; //Associates each non-hidden achievement in the game with a UI element representing it
 		for (var i in this.game.achievements.achievements){
 			var ach = this.game.achievements.achievements[i];
             if (!ach.unlocked && ach.hidden){
                 continue;
             }
 
-            if (!ach.unethical){
-                totalAchievements++;
-            }
+			//Count ethical achievements: total & completed.
+			if (!ach.unethical){
+				totalAchievements++;
+				if (ach.unlocked) {
+					completedAchievements++;
+				}
+			}
 
-            if (ach.unlocked && !ach.unethical) { completedAchievements++; }
-            var className = "achievement";
-            if (ach.unlocked && ach.unethical) {className += " unethical";}
-            if (ach.unlocked) {className += " unlocked";}
-            if (ach.starUnlocked) {className += " starUnlocked";}
-			var span = dojo.create("span", {
-				className: className,
-				title: ach.unlocked ? ach.description : "???",
-				innerHTML : ach.unlocked ? ach.title : "???"
-			}, div);
+			//Create the UI element for this achievement:
+			this.achievementsMap[ach.name] = this.renderAchievementItem(ach, this.achievementsContainer);
 
 			if (ach.starCondition == undefined) {
 				continue;
 			}
 
-			if (ach.starUnlocked) {
-				completedStars++;
-			} else {
-				uncompletedStars++;
+			//Count ethical starred achievements: completed & incomplete.
+			if (!ach.unethical) {
+				if (ach.starUnlocked) {
+					completedStars++;
+				} else {
+					uncompletedStars++;
+				}
 			}
+		}
+		this.achievementsHeader.innerHTML = $I("achievements.header", [completedAchievements, totalAchievements]);
+		dojo.create("span", {
+			className: "star",
+			innerHTML: this.generateStarText(completedStars, uncompletedStars)
+		}, this.achievementsHeader);
+	},
+
+	update: function () {
+		var refreshThisTick = this.refreshNextTick;
+		this.refreshNextTick = false;
+		//Count all the achievements:
+		var totalAchievements = 0;
+		var completedAchievements = 0;
+		var completedStars = 0;
+		var uncompletedStars = 0;
+		for (var i in this.game.achievements.achievements){
+			var ach = this.game.achievements.achievements[i];
+			if (!ach.unlocked && ach.hidden){
+				if (this.achievementsMap[ach.name]) {
+					//Hide locked hidden achievements:
+					dojo.destroy(this.achievementsMap[ach.name]);
+					this.achievementsMap[ach.name] = undefined;
+				}
+				continue;
+			}
+			//From here on out, all achievements are non-hidden.
+
+			if (refreshThisTick) { //Delete all entries & recreate them all
+				dojo.destroy(this.achievementsMap[ach.name]);
+				this.renderAchievementItem(ach, this.achievementsContainer);
+			} else if (this.achievementsMap[ach.name]) { //Update existing entry
+				this.updateAchievementItem(ach);
+			} else {
+				//We aren't refreshing & the entry for this achievement is missing.
+				//Next tick, refresh everything.
+				this.refreshNextTick = true;
+			}
+			//Count ethical achievements: total & completed.
+			if (!ach.unethical){
+				totalAchievements++;
+				if (ach.unlocked) {
+					completedAchievements++;
+				}
+			}
+			if (ach.starCondition == undefined) {
+				continue;
+			}
+			//Count ethical starred achievements: completed & incomplete.
+			if (!ach.unethical) {
+				if (ach.starUnlocked) {
+					completedStars++;
+				} else {
+					uncompletedStars++;
+				}
+			}
+		}
+
+		//Update the numbers of completed & starred achievements in the header:
+		var desiredHeaderText = $I("achievements.header", [completedAchievements, totalAchievements]);
+		if (this.achievementsHeader.firstChild.nodeValue != desiredHeaderText) {
+			this.achievementsHeader.firstChild.nodeValue = desiredHeaderText;
+		}
+		var desiredStarText = this.generateStarText(completedStars, uncompletedStars);
+		//The inner HTML has taken the &#; format & rendered it as Unicode; we must do something similar.
+		var starTextForCompare = String.fromCharCode.apply(null, desiredStarText.replaceAll("&#", "").split(";").slice(0, -1));
+		if(this.achievementsHeader.firstElementChild.innerHTML != starTextForCompare) {
+			this.achievementsHeader.firstElementChild.innerHTML = desiredStarText;
+		}
+	},
+
+	//Creates a string composed of filled stars & unfilled stars:
+	generateStarText: function(completedStars, uncompletedStars) {
+		return "&#9733;".repeat(completedStars) + "&#9734;".repeat(uncompletedStars);
+	},
+
+	/**
+	 * Creates a UI element representing a single achievement.
+	 * @param ach The achievement object to create a UI element for
+	 * @param container A <div> element or similar, inside which we'll place this
+	 * @return The <span> element representing the achievement in question
+	 */
+	renderAchievementItem: function(ach, container) {
+		var className = "achievement";
+		if (ach.unlocked && ach.unethical) {className += " unethical";}
+		if (ach.unlocked) {className += " unlocked";}
+		if (ach.starUnlocked) {className += " starUnlocked";}
+		var span = dojo.create("span", {
+			className: className,
+			title: ach.unlocked ? ach.description : "???",
+			innerHTML : ach.unlocked ? ach.title : "???"
+		}, container);
+
+		this.achievementsMap[ach.name] = span;
+		if (ach.starCondition) {
 			dojo.create("div", {
 				className: "star",
 				innerHTML: ach.starUnlocked ? "&#9733;" : "&#9734;",
 				title: ach.starUnlocked ? ach.starDescription : "???"
 			}, span);
 		}
-		divHeader.innerHTML = $I("badges.header", [completedAchievements, totalAchievements]);
-		var stars = "";
-		for (var i = completedStars; i > 0; --i) {
-			stars += "&#9733;";
-		}
-		for (var i = uncompletedStars; i > 0; --i) {
-			stars += "&#9734;";
-		}
-		dojo.create("span", {
-			className: "star",
-			innerHTML: stars
-		}, divHeader);
-	}
 
+		return span;
+	},
+
+	/**
+	 * Updates the state of a UI element to match the game-state.
+	 * Logs an error if no corresponding UI element has been previously rendered.
+	 * @param ach The achievement object to update a UI element for
+	 */
+	updateAchievementItem: function(ach) {
+		var span = this.achievementsMap[ach.name];
+		if (!span) {
+			console.error("Called updateAchievementItem when no corresponding UI element exists.");
+			return;
+		}
+
+		//For each property of the span, check if it's what we want it to be, then change if necessaary:
+		var desiredClassName = "achievement";
+		if (ach.unlocked && ach.unethical) {desiredClassName += " unethical";}
+		if (ach.unlocked) {desiredClassName += " unlocked";}
+		if (ach.starUnlocked) {desiredClassName += " starUnlocked";}
+		if (span.className != desiredClassName) {
+			span.className = desiredClassName;
+		}
+		var desiredTitle = ach.unlocked ? ach.description : "???";
+		if (span.title != desiredTitle) {
+			span.title = desiredTitle;
+		}
+		var desiredContent = ach.unlocked ? ach.title : "???";
+		if (span.firstChild.nodeValue != desiredContent) {
+			span.firstChild.nodeValue = desiredContent;
+		}
+
+		//For each property of the star, check if it's what we want it to be, then change if necessaary:
+		if (ach.starCondition) {
+			var star = span.firstElementChild;
+			var desiredInnerHTML = ach.starUnlocked ? "&#9733;" : "&#9734;";
+			var desiredInnerHTMLForCompare = String.fromCharCode(ach.starUnlocked ? 9733 : 9734);
+			if (star.innerHTML != desiredInnerHTMLForCompare) {
+				star.innerHTML = desiredInnerHTML;
+			}
+			desiredTitle = ach.starUnlocked ? ach.starDescription : "???";
+			if (star.title != desiredTitle) {
+				star.title = desiredTitle;
+			}
+		}
+	}
 });
 
 dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
@@ -472,33 +719,90 @@ dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
 	game: null,
 
 	constructor: function(){
+		this.badgesHeader = null;
+		this.badgesMap = {};
 	},
 
     render: function(container){
         var content = this.inherited(arguments);
         
-		var div = dojo.create("div", {}, content);
+		var div = dojo.create("div", {className: "badges-container"}, content);
 		div.innerHTML = "";
-        var divHeader = dojo.create("div", {className: "achievement-header"}, div);
+		this.badgesHeader = dojo.create("div", {className: "achievement-header"}, div);
         var totalBadges = 0;
         var completedBadges = 0;
+		this.badgesMap = {}; //Associates each badge in the game with a UI element representing it
 		for (var i in this.game.achievements.badges){
 			var badge = this.game.achievements.badges[i];
-            
             totalBadges++;
-
             if (badge.unlocked) { completedBadges++; }
-            var className = "achievement badge";
-            if (badge.unlocked) {className += " unlocked";}
-			dojo.create("span", {
-				className: className,
+
+			this.badgesMap[badge.name] = dojo.create("span", {
+				className: this.generateBadgeCSSClass(badge),
 				title: badge.unlocked ? badge.description : "???",
 				innerHTML : badge.unlocked ? badge.title : "???"
 			}, div);
 		}
-        divHeader.innerHTML = $I("badges.header", [completedBadges, totalBadges]);
-	}
+		this.badgesHeader.innerHTML = $I("badges.header", [completedBadges, totalBadges]);
+	},
 
+	update: function () {
+		var totalBadges = 0;
+		var completedBadges = 0;
+		for (var i in this.game.achievements.badges){
+			var badge = this.game.achievements.badges[i];
+			var span = this.badgesMap[badge.name];
+			//Recount every tick
+			totalBadges++;
+			if (badge.unlocked) { completedBadges++; }
+
+			//For each property of the HTML element, compare it against the expected value.
+			// Update only if we need to make a change.
+			var desiredClassName = this.generateBadgeCSSClass(badge);
+			if (span.className != desiredClassName) {
+				span.className = desiredClassName;
+			}
+			var desiredTitle = badge.unlocked ? badge.description : "???";
+			if (span.title != desiredTitle) {
+				span.title = desiredTitle;
+			}
+			var desiredInnerHTML = badge.unlocked ? badge.title : "???";
+			if (span.innerHTML != desiredInnerHTML) {
+				span.innerHTML = desiredInnerHTML;
+			}
+		}
+
+		var desiredHeaderText = $I("badges.header", [completedBadges, totalBadges]);
+		if (this.badgesHeader.innerHTML != desiredHeaderText) {
+			this.badgesHeader.innerHTML = desiredHeaderText;
+		}
+	},
+
+	//Returns a string with the proper CSS class for the UI element representing a particular badge.
+	generateBadgeCSSClass: function(badge) {
+		var retVal = "achievement badge";
+		if (badge.unlocked) {
+			retVal += " unlocked";
+
+			//Style Fantastic Fur Color after the leader's fur color.
+			if (badge.name == "fantasticFurColor") {
+				var kitten = this.game.village.leader;
+				if (kitten) {
+					var fracturedPacts = this.game.religion.getPact("fractured").val && this.game.getFeatureFlag("MAUSOLEUM_PACTS");
+					var colorToUse = fracturedPacts ? kitten.fakeColor : kitten.color;
+					var varietyToUse = fracturedPacts ? kitten.fakeVariety : kitten.variety;
+					var colorStr = (colorToUse && kitten.colors[colorToUse + 1]) ? kitten.colors[colorToUse + 1].color : "none";
+					var varietyStr = (varietyToUse && kitten.varieties[varietyToUse + 1]) ? kitten.varieties[varietyToUse + 1].style : "none";
+
+					//Only format if we have a colored kitten.
+					if (colorStr != "none" || varietyStr != "none") {
+						retVal += " name color-" + colorStr + " variety-" + varietyStr;
+					}
+				}
+			}
+		}
+		return retVal;
+	}
 });
 
 dojo.declare("com.nuclearunicorn.game.ui.tab.AchTab", com.nuclearunicorn.game.ui.tab, {
@@ -528,6 +832,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.AchTab", com.nuclearunicorn.game.ui
 	},
 
     update: function() {
-        this.inherited(arguments);
+		this.achievementsPanel.update();
+		this.badgesPanel.update();
     }
 });

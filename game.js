@@ -562,6 +562,11 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio"
 			},
 
+			"catpowerReductionRatio" : {
+				title: $I("effectsMgr.statics.catpowerReductionRatio.title"),
+				type: "ratio"
+			},
+
 			//kittens
 
 			"maxKittens" : {
@@ -904,6 +909,11 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 title: $I("effectsMgr.statics.timeRatio.title"),
                 type: "ratio"
             },
+
+			"temporalParadoxChance": {
+				title: $I("effectsMgr.statics.temporalParadoxChance.title"),
+				type: "hidden"
+			},
 
             "temporalParadoxVoid" :  {
                 title: $I("effectsMgr.statics.temporalParadoxVoid.title"),
@@ -1435,6 +1445,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.manuscriptTradeChanceIncrease.title"),
                 type: "ratio" 
 			},
+			"faithFromManuscripts":{
+				title: $I("effectsMgr.statics.faithFromManuscripts.title"),
+                type: "ratio" 
+			},
 			"quarrySlabCraftBonus":{
 				title: $I("effectsMgr.statics.quarrySlabCraftBonus.title"),
                 type: "ratio" 
@@ -1474,6 +1488,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"mintIvoryRatio": {
 				title: $I("effectsMgr.statics.mintIvoryRatio.title"),
 				type: "ratio"
+			},
+			"huntCatpowerDiscount": {
+				title: $I("effectsMgr.statics.huntCatpowerDiscount.title"),
+				type: "fixed"
 			},
             //philosophy
             "luxuryDemandRatio":{
@@ -1645,6 +1663,19 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.weaponEfficency.title"),
 				type: "ratio"
 			},
+			"bonfireTearsPriceRatioChallenge": {
+				title: $I("effectsMgr.statics.bonfireTearsPriceRatioChallenge.title"),
+				type: "ratio",
+				calculation: "nonProportional"
+			},
+			"scienceTearsPricesChallenge": {
+				title: $I("effectsMgr.statics.scienceTearsPricesChallenge.title"),
+				type: "ratio"
+			},
+			"workshopTearsPricesChallenge": {
+				title: $I("effectsMgr.statics.workshopTearsPricesChallenge.title"),
+				type: "ratio"
+			},
 			"cryochamberSupport":{
 				title: $I("effectsMgr.statics.cryochamberSupport.title"),
 			},
@@ -1724,6 +1755,9 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title:  $I("effectsMgr.statics.pollutionRatio.title"),
 				type: "ratio"
 			},
+			"cathPollutionPerTearOvercapped": {
+				type: "hidden"
+			},
             //zebra workshop upgrades
             "zebraPreparations": {
                 title: $I("effectsMgr.statics.zebraPreparations.title"),
@@ -1768,7 +1802,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	telemetry: null,
 	server: null,
 	math: null,
-	loadingSave: false, //while save is being imported we should ignore production from buildings for one tick; hack
 
 	//global cache
 	globalEffectsCached: {},
@@ -1829,6 +1862,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	gatherClicks: 0,	//how many clicks in a row was performed on a gather button
 	cheatMode: false,	//flag triggering Super Unethical Climax achievement
 	systemShockMode: false,	//flag triggering System Shock achievement
+	startedWithoutChronospheres: true, //Flag for achievements
 
 	ticks: 0,				//how many ticks passed since the start of the game
 	totalUpdateTime: [0, 0, 0, 0, 0],	//total time spent on update cycle in milliseconds, useful for debug/fps counter. 1 ticks per second have more calculations
@@ -2194,6 +2228,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.deadKittens = 0;
 		this.cheatMode = false;
 		this.systemShockMode = false;
+		this.startedWithoutChronospheres = true;
 		this.isCMBREnabled = false;
 
 		if (this.pauseTimestamp){
@@ -2262,7 +2297,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var saveData = {
 			saveVersion: this.saveVersion,
 			resources: this.resPool.filterMetadata(
-				this.resPool.resources, ["name", "value", "unlocked", "isHidden"]
+				this.resPool.resources, ["name", "value", "unlocked", "isHidden", "isHiddenFromCrafting"]
 			)
 		};
 
@@ -2288,6 +2323,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			ironWill : this.ironWill,
 			deadKittens: this.deadKittens,
 			cheatMode: this.cheatMode,
+			startedWithoutChronospheres: this.startedWithoutChronospheres,
 
 			opts : this.opts,
 			lastBackup: this.lastBackup
@@ -2468,6 +2504,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			this.useWorkers = (data.useWorkers !== undefined) ? data.useWorkers : false;
 
 			this.cheatMode = (data.cheatMode !== undefined) ? data.cheatMode : false;
+			this.startedWithoutChronospheres = (data.startedWithoutChronospheres !== undefined) ? data.startedWithoutChronospheres : false; //false for existing games
 
 			this.isCMBREnabled = (data.isCMBREnabled !== undefined) ? data.isCMBREnabled : true;	//true for all existing games
 			this.lastBackup = data.lastBackup || new Date().getTime();
@@ -2488,10 +2525,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.calculateAllEffects();
 		//------------------------------------
 
-		this.villageTab.visible = (this.bld.get("hut").on > 0
-			|| this.resPool.get("kittens").unlocked
-			|| this.resPool.get("zebras").unlocked
-			|| this.time.getVSU("usedCryochambers").val > 0);
+		this.villageTab.visible = this.villageTab.evaluateLocks();
 		this.libraryTab.visible = (this.bld.get("library").on > 0 || this.science.get("calendar").researched || this.science.get("chronophysics").researched);
 		this.workshopTab.visible = (this.bld.get("workshop").on > 0);
 		this.achievementTab.visible = (this.achievements.hasUnlocked());
@@ -2671,9 +2705,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				throw "Integrity check failure";
 			}
 
-			this.loadingSave = true;
 			this.load();
-			this.loadingSave = false;
 			this.msg($I("save.import.msg"));
 
 			this.render();
@@ -2998,7 +3030,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		// Once we have rendered the page immidiately update it in order to
 		// reduce flicker
-		this.update();
+		this.ui.update();
 		this.calendar.update();
 	},
 
@@ -3663,12 +3695,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				value: - this.religion.pactsManager.getSiphonedCorruption(1)
 			});
 			stack.push(corruptionStack);
-				// TIME extra-compare
-			stack.push({
-				name: $I("res.stack.time"),
-				type: "ratio",
-				value: this.timeAccelerationRatio()
-			});
 		}
 
 		if(resName == "alicorn"){
@@ -3820,7 +3846,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		//maybe it will be a good idea to move it elsewhere?
 
 		//for example, here kitten resources are calculated per effect, this logic could be unified
-
 		this.village.maxKittens = Math.floor(this.getEffect("maxKittens"));
 
 		this.village.update();
@@ -4532,6 +4557,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
         var fpsElement;
 
 		if (this.isPaused){
+			this.ui.update(); //Still update UI if the player gathers catnip while pawsed or something
 			return;
 		}
 
@@ -4622,6 +4648,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 			for (var i = 0; i < game.challenges.challenges.length; i++){
 				game.challenges.challenges[i].pending = false;
+			}
+			if(game.village.loadoutController.loadouts){
+				if(game.village.loadoutController.loadouts.length == 0){
+					game.village.loadoutController.toggleDefaultLoadouts();
+				}
 			}
 			game.resetAutomatic();
 		});
@@ -4799,6 +4830,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 		//------------------------------------------------------------------------------------------------------
 
+		var saveRatio = this.bld.get("chronosphere").val > 0 ? this.getEffect("resStasisRatio") : 0; // resStasisRatio excepted when challenge
+		if (saveRatio > 1) {
+			this.achievements.unlockBadge("wheredThisComeFrom");
+		}
+
 		// Trigger a save to make sure we're working with most recent data
 		this.save();
 
@@ -4812,11 +4848,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			};
 		}
 
-		var saveRatio = this.bld.get("chronosphere").val > 0 ? this.getEffect("resStasisRatio") : 0; // resStasisRatio excepted when challenge
 		dojo.mixin(lsData.game, {
 			karmaKittens: 		karmaKittens,
 			karmaZebras: 		karmaZebras,
 			ironWill : 			(saveRatio > 0 || this.time.getVSU("cryochambers").on > 0) ? false : true,			//chronospheres or cryochaimbers will disable IW. Post Apocalypse allows cryochaimbers to work without chronospheres working.
+			startedWithoutChronospheres: saveRatio == 0 && this.time.getVSU("cryochambers").on == 0,
 			deadKittens: 		0,
 			isCMBREnabled:		false
 		});
@@ -4871,10 +4907,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		if (cryochambers > 0) {
 			this.village.sim.sortKittensByExp();
+			this.village.sim.sortKittensByFavorite();
 			newKittens = this.village.sim.kittens.slice(-cryochambers);
 			for (var i in newKittens) {
 				delete newKittens[i].job;
 				delete newKittens[i].engineerSpeciality;
+				newKittens[i].favorite = true;
 			}
 			var usedCryochambers_reset = this.time.filterMetadata([this.time.getVSU("usedCryochambers")], ["name", "val", "on"]);
 			usedCryochambers_reset[0]["val"] = cryochambers;
@@ -4896,14 +4934,15 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			cathPollution = (this.challenges.getChallenge("postApocalypse").on + newKittens.length) * 1e+8 + 1e+11;
 		}
 		var temporalPress_reset = this.time.filterMetadata([this.time.getCFU("temporalPress")], ["name", "val", "on", "isAutomationEnabled"]);
-		var temporalPressSaved = Math.min(temporalPress_reset.val, this.getEffect("temporalPressCap"));
+		//temporalPress_reset is an ARRAY with 1 element: the metadata for Temporal Presses.
+		var temporalPressSaved = Math.min(temporalPress_reset[0].val, this.getEffect("temporalPressCap"));
 		if (temporalPressSaved > 0){
-			temporalPress_reset["on"] = Math.min(temporalPress_reset["on"], temporalPressSaved);
-			temporalPress_reset["val"] = Math.min(temporalPressSaved);
+			temporalPress_reset[0].on = Math.min(temporalPress_reset[0].on, temporalPressSaved);
+			temporalPress_reset[0].val = Math.min(temporalPressSaved);
 		}else{
-			temporalPress_reset["on"] = 0;
-			temporalPress_reset["val"] = 0;
-			temporalPress_reset["isAutomationEnabled"] = null;
+			temporalPress_reset[0].on = 0;
+			temporalPress_reset[0].val = 0;
+			temporalPress_reset[0].isAutomationEnabled = null;
 		}
 
 /*
@@ -4929,6 +4968,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 		}
 		var reservesSaveData = this.challenges.reserves.getSaveData();
+
+		var loadouts = [];
+		for (var i in this.village.loadoutController.loadouts){
+			var _loadout = this.village.loadoutController.loadouts[i].save();
+			loadouts.push(_loadout);
+		}
+
 		var saveData = {
 			saveVersion: this.saveVersion,
 			game : lsData.game,
@@ -4984,6 +5030,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				jobs: [],
 				traits: [],
 				hadKittenHunters: false,
+				loadouts: loadouts
 			},
 			workshop: {
 				hideResearched: this.workshop.hideResearched,
@@ -5086,7 +5133,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				pacts: this.religion.pactsManager.pacts.map(getName),
 				challenges: this.challenges.challenges.map(getName)
 			};
-		this.upgrade({ buildings: ["warehouse"]});
+		this.upgrade({ buildings: ["warehouse"], spaceBuilding: ["hydroponics"]});
 		this.upgrade(metaKeys);
 		this.upgrade({policies: ["authocracy"]});
 	},
@@ -5216,8 +5263,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 					console.error("unable to get unlock by [id]", list[type][i], "[type]", type);
 					continue;
 				}
-				if (item.calculateEffects){
-					item.calculateEffects(item, this);
+				if (item.calculateEffects || item.updateEffects){
+					//Call calculateEffects or updateEffects, but don't call both.
+					if (item.calculateEffects) {
+						item.calculateEffects(item, this);
+					} else {
+						item.updateEffects(item, this);
+					}
 					if (type == "spaceBuilding") {
 						this.calendar.cycleEffectsBasics(item.effects, item.name);
 					}
