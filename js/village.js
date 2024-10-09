@@ -875,7 +875,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 		var msg = $I("village.msg.hunt.success");
 		if (squads > 1) {
-			msg += $I("village.msg.hunt.from", [squads]);
+			msg += " " + $I("village.msg.hunt.from", [squads]);
 		}
 		this.game.msg(msg, null, "hunt");
 	},
