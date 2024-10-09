@@ -841,20 +841,14 @@ body.scheme_fluid,
 .scheme_fluid #calendarSign:hover {
    cursor: default;
 }
-.scheme_fluid .right-tab-header { /* Log | Chat link on right column */
+.scheme_fluid .right-tab-header { /* Log | Queue link on right column */
 	color: rgba(90, 90, 90, 0.5); /* color #5A5A5A */ /* for separator tab | */
 	font-size: 80%;
  }
 .scheme_fluid a[id='logLink'],
-.scheme_fluid a[id='chatLink']{
-	font-weight: 400 !important; /* thin if possible with font sizes */
-}
 .scheme_fluid .right-tab-header a.active {
     color: #B5BAC4;
 	font-weight: bold !important;
-}
-.scheme_fluid #rightTabChat {
-	margin-top: 20px;
 }
 .scheme_fluid div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #7AA738;

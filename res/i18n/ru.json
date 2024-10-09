@@ -1450,7 +1450,6 @@
     "ui.save.tooltip": "Сохранено!",
     "ui.energy.tooltip": "Энергия",
     "ui.log.link": "Лог",
-    "ui.chat.link": "Чат",
     "ui.clear.log": "Очистить лог",
     "ui.log.filters.block": "[<span id=\"filterIcon\">+</span>] Фильтры лога",
     "ui.pause": "мяуза",

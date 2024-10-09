@@ -1207,9 +1207,6 @@ body.scheme_spooky.with_background_image {
 	border-image-outset: 10px 0 0 0;
 	border-image-repeat: stretch;
 }
-.scheme_spooky #rightTabChat {
-	margin-top: 10px;
-}
 .scheme_spooky div.console-intro { /* Text on right column: "You are a kitten in a catnip forest." */
 	color: #1f5dba;
 	text-shadow: 1px 1px 2px #000000;

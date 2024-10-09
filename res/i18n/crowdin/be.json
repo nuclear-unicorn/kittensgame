@@ -1618,7 +1618,6 @@
     "ui.save.tooltip": "Захована!",
     "ui.energy.tooltip": "Энэргія",
     "ui.log.link": "Журнал",
-    "ui.chat.link": "Чат",
     "ui.clear.log": "Ачысціць журнал",
     "ui.log.filters.block": "[<span id=\"filterIcon\">+</span>] Фільтры журналаў",
     "ui.pause": "паўза",

@@ -1495,7 +1495,6 @@
     "ui.save.tooltip": "Zapisano!",
     "ui.energy.tooltip": "Energia",
     "ui.log.link": "Dziennik",
-    "ui.chat.link": "Czat",
     "ui.clear.log": "Wyczyść dziennik",
     "ui.log.filters.block": "[<span id=\"filterIcon\">+</span>] Filtry dziennika",
     "ui.pause": "pauza",

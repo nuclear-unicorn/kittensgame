@@ -851,7 +851,7 @@ body.scheme_oil,
 .scheme_oil #calendarSign:hover {
    cursor: default;
 }
-.scheme_oil .right-tab-header { /* Log and Chat link on right column */
+.scheme_oil .right-tab-header { /* Log and Queue link on right column */
 	/* default margin-top: 10px; */
 	font-size: 80%;
 	border-bottom: 1px solid #191919;
@@ -870,9 +870,6 @@ body.scheme_oil,
 .scheme_oil .right-tab-header a:not(.active) {
 	text-decoration: none;
 	border-top: none;
-}
-.scheme_oil #rightTabChat {
-	margin-top: 20px;
 }
 .scheme_oil div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #494949;

@@ -929,7 +929,7 @@ body.scheme_chocolate.with_background_image {
 .scheme_chocolate #calendarSign:hover {
 	cursor: default;
 }
-.scheme_chocolate .right-tab-header { /* Log | Chat link on right column */
+.scheme_chocolate .right-tab-header { /* Log | Queue link on right column */
 	color: #70543d; /* for separator tab | */
 	font-size: 80%;
 }
@@ -945,9 +945,6 @@ body.scheme_chocolate.with_background_image {
 }
 .scheme_chocolate div#observeButton {
 	height: 40px; /* default height 30px */
-}
-.scheme_chocolate #rightTabChat {
-	margin-top: 20px;
 }
 .scheme_chocolate div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #876f57;
