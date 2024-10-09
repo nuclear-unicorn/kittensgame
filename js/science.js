@@ -1364,7 +1364,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 2100}
         ],
         effects:{
-			"religionUpgradesDiscount" : -0.1
+			"cultureFromManuscripts": -0.25,
+			"faithFromManuscripts": 1
         },
         unlocked: false,
         blocked: false,
@@ -1715,7 +1716,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
 		isRelation: true,
-        blocks:["dragonRelationsAstrologers"],
+        blocks:["dragonRelationsAstrologers", "dragonRelationsDynamicists"],
 		upgrades: {
 			buildings: ["harbor"]
 		},
@@ -1736,11 +1737,33 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
 		isRelation: true,
-        blocks:["dragonRelationsPhysicists"],
+        blocks:["dragonRelationsPhysicists", "dragonRelationsDynamicists"],
 		calculateEffects: function(self, game) {
 			var cycle = game.calendar.cycleYear + 1;
 			self.effects["starEventChance"] = cycle * 0.004;
 			self.effects["starchartPolicyRatio"] = cycle * 0.03;
+		},
+		evaluateLocks: function(game){
+			return game.science.checkRelation("dragons", 10);
+		}
+	}, {
+		name: "dragonRelationsDynamicists",
+        label: $I("policy.dragonRelationsDynamicists.label"),
+        description: $I("policy.dragonRelationsDynamicists.desc"),
+        prices: [
+            {name : "culture", val: 30000}
+        ],
+		effects:{
+			"tradeCatpowerDiscount": 5,
+			"huntCatpowerDiscount": 10,
+			"catpowerReductionRatio": 0.5,
+        },
+        unlocked: false,
+        blocked: false,
+		isRelation: true,
+        blocks:["dragonRelationsPhysicists", "dragonRelationsAstrologers"],
+		calculateEffects: function(self, game) {
+			
 		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("dragons", 10);
@@ -2141,9 +2164,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 	},
 
 	checkRelation: function(race, embassyNeeded){
-		var race = this.game.diplomacy.get(race); //Standing Ratio removed for now as standing calculations don't seem to work correctly on load. Also could be interpreted as making them work if they don't like you.
-		return (race.embassyLevel >= embassyNeeded /*&& race.standing + this.game.getEffect("standingRatio") +
-		this.game.diplomacy.calculateStandingFromPolicies(race.name, this.game) >= 0*/);
+		var race = this.game.diplomacy.get(race);
+		return (race.embassyLevel >= embassyNeeded);
 	},
 
 	unlockRelations: function(){ //Called on load and every time we buy an embassy to unlock Relations.
@@ -2167,6 +2189,30 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		if(this.game.ironWill && this.game.challenges.isActive('blackSky')) {
 			if(tech.name == 'construction') {
 				prices_result = prices_result.concat([{name: "gold", val: 5}]);
+			}
+		}
+
+		if (this.game.challenges.isActive("unicornTears")) {
+			var priceScaling = this.game.getEffect("scienceTearsPricesChallenge");
+			if (priceScaling > 0) {
+				//If the tech costs manuscripts, add unicorns to the price.
+				//If the tech costs compendia, add unicorn tears to the price.
+				//If the tech costs blueprints, add alicorns to the price.
+				for (var i = 0; i < prices.length; i += 1) {
+					switch(prices[i].name) {
+					case "manuscript":
+						prices_result = prices_result.concat([{name: "unicorns", val: prices[i].val * priceScaling}]);
+						break;
+					case "compedium":
+						prices_result = prices_result.concat([{name: "tears", val: prices[i].val * priceScaling}]);
+						break;
+					case "blueprint":
+						//Alicorn requirement is independent of the cost of the tech
+						//Minimum of 1, maximum of 10 with LDR.
+						prices_result = prices_result.concat([{name: "alicorn", val: Math.max(1, this.game.getLimitedDR(priceScaling, 10))}]);
+						break;
+					}
+				}
 			}
 		}
 
@@ -2511,17 +2557,9 @@ dojo.declare("com.nuclearunicorn.game.ui.TechButtonController", com.nuclearunico
     },
 
 	getPrices: function(model) {
-		var prices_result = this.game.village.getEffectLeader("scientist", this.inherited(arguments));
-
-		// this is to force Gold Ore pathway in BSK+IW and avoid soft locks
-		if(this.game.ironWill && this.game.challenges.isActive('blackSky')) {
-			if(model.metadata.name == 'construction') {
-				prices_result = prices_result.concat([{name: "gold", val: 5}]);
-			}
-		}
-
-		return prices_result;
-    },
+		//I want to avoid duplicate code if possible
+		return this.game.science.getPrices(model.metadata);
+	},
 
 	updateVisible: function(model){
 		var meta = model.metadata;
