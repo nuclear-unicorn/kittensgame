@@ -292,11 +292,11 @@ test("Reset should assign a correct ammount of paragon and preserve certain upgr
 test("Safe infinity tests", () => {
     // -------- toDisplaySeconds ---------
     const tdsVector = [
-        [55,     "55$unit.s$ "],
-        [100000, "1$unit.d$ 3$unit.h$ 46$unit.m$ 40$unit.s$ "],
-        [-5,     "-1$unit.y$ 364$unit.d$ "], // we don't judge, we just want it to terminate
-        [1e20,   "3.17T$unit.y$ 167$unit.d$ "],
-        [1e308,  "1$unit.s$ "], // it's getting hard not to judge
+        [55,     "55$unit.s$"],
+        [100000, "1$unit.d$ 3$unit.h$ 46$unit.m$ 40$unit.s$"],
+        [-5,     "0$unit.s$"], // clamp at zero
+        [1e20,   "3.17T$unit.y$"], // above a certain number of years, don't calculate days anymore
+        [1e308,  "3.17QWWM$unit.y$"], // should at least be accurate to the correct order of magnitude
         [2e308,  "&infin;"]
     ]
     for (const [seconds,display] of tdsVector) {

@@ -255,7 +255,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             var daysOffsetLeft = daysOffset;
             var redshiftQueueWorked = true;
             if (!result[1]){
-                numberEvents = this.applyRedshift(daysOffset);
+                numberEvents = this.applyRedshift(daysOffsetLeft, true);
                 daysOffsetLeft = 0;
             }
             while (daysOffsetLeft > 0){

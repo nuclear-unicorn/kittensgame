@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/bloodrizer/kitten-game.git"
+    "url": "git+https://github.com/nuclear-unicorn/kittensgame.git"
   },
   "keywords": [
     "incremental",
@@ -29,11 +29,12 @@
   ],
   "author": "bloodrizer",
   "license": "SEE LICENSE IN license.txt",
-  "homepage": "https://bitbucket.org/bloodrizer/kitten-game#readme",
+  "homepage": "https://kittensgame.com/",
   "devDependencies": {
     "eslint": "^7.4.0",
     "http-server": "^0.12.3",
     "husky": "^4.2.5",
     "jest": "^26.1.0"
-  }
+  },
+  "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72"
 }

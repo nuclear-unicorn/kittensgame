@@ -202,16 +202,22 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 					case "scientist": // Science prices bonus
 						for (var i = 0; i < defaultObject.length; i++) {
 							if (defaultObject[i].name == "science") {
-								defaultObject[i].val -= defaultObject[i].val
+								var amtDiscounted = defaultObject[i].val
 									* this.game.getLimitedDR(0.05 * burnedParagonRatio  * leaderRatio, 1.0); //5% before BP
+								if (isFinite(amtDiscounted)) {
+									defaultObject[i].val -= amtDiscounted;
+								}
 							}
 						}
 						break;
 					case "wise": // Religion bonus
 						for (var i = 0; i < defaultObject.length; i++) {
 							if (defaultObject[i].name == "faith" || defaultObject[i].name == "gold") {
-								defaultObject[i].val -= defaultObject[i].val
+								var amtDiscounted = defaultObject[i].val
 									* this.game.getLimitedDR((0.09 + 0.01 * burnedParagonRatio) * leaderRatio, 1.0); //10% before BP
+								if (isFinite(amtDiscounted)) {
+									defaultObject[i].val -= amtDiscounted;
+								}
 							}
 						}
 						break;
@@ -4678,7 +4684,8 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 			}),
 			controller: new classes.village.ui.VillageButtonController(this.game, {
 				updateVisible: function (model) {
-					model.visible = !this.game.isEldermass() && (this.game.resPool.get("elderBox").value > 0);
+					var elderBox = this.game.resPool.get("elderBox");
+					model.visible = !this.game.isEldermass() && (elderBox.value > 0) && !elderBox.isHidden;
 				}
 			})
 		}, this.game);

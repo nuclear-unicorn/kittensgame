@@ -1388,7 +1388,6 @@
     "ui.save.tooltip": "Salvo!",
     "ui.energy.tooltip": "Energia",
     "ui.log.link": "Registro",
-    "ui.chat.link": "Conversar",
     "ui.clear.log": "Limpar registro",
     "ui.pause.title": "Pausar/retomar o jogo",
     "ui.undo": "desfazer ({0}s)",

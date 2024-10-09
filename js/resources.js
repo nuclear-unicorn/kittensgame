@@ -694,6 +694,14 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 			if (res.name == "sorrow"){
 				continue;
 			}
+			if (res.name == "spice") { //This is a hack, will probably have to come up with a better system for this later
+				var now = new Date();
+				if (now.getMonth() == 9 && game.colorScheme == "spooky" && i18nLang.getLanguage() == "en") {
+					res.title = $I("resources.spice.title.october");
+				} else {
+					res.title = $I("resources.spice.title");
+				}
+			}
 
 			if (res.unlocked == false && res.value > 0){
 				res.unlocked = true;

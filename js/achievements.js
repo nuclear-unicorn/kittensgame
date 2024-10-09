@@ -323,7 +323,7 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             description: "Have 500 kittens and no alicorns",
             difficulty: "S",
             condition: function(){
-                return (this.game.resPool.get("kittens").value > 500 && this.game.resPool.get("alicorn").value == 0);
+                return (this.game.resPool.get("kittens").value >= 500 && this.game.resPool.get("alicorn").value == 0);
             }
         },{
             name: "ghostInTheMachine",
