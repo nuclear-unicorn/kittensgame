@@ -929,13 +929,24 @@ body.scheme_spooky.with_background_image {
 .scheme_spooky .census-block:hover {
 	outline-color: #6c6c6c;
 }
+.scheme_spooky .census-block .links-container span {
+	border-radius: 50% 50% 1px 1px;
+	max-width: 2ch;
+	background: transparent !important;
+	outline-width: 1px !important;
+}
 .scheme_spooky .census-block.simLeader {
 	outline-color: #8e29d4;
 }
 .scheme_spooky .census-block.simLeader:hover {
 	outline-color: #e57333;
 }
-.scheme_spooky .census-block.simLeader a.leaderHref {
+.scheme_spooky .census-block.simLeader .leaderHref {
+	border: none;
+	outline: none;
+}
+.scheme_spooky .census-block.simLeader .leaderHref,
+.scheme_spooky .census-block.simFavorite .favoriteHref {
 	color: #53a8e0;
 }
 .scheme_spooky .census-block .info { /* info of kitten */
@@ -1078,7 +1089,7 @@ body.scheme_spooky.with_background_image {
 	outline: 2px inset #060713;
 	border-radius: 5px;
 }
-.scheme_spooky .achievement:not(.unethical).unlocked {
+.scheme_spooky .achievement:not(.unethical, .name).unlocked {
 	color: #d0d0d0;
 }
 .scheme_spooky .achievement:not(.unethical).unlocked:hover {
