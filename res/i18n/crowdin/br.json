@@ -732,6 +732,8 @@
     "policy.zebraRelationsBellicosity.desc": "Mostre que não tem medo das zebras, você fará as trocas com eles piores, porém todos as outras raças irão de respeitar.",
     "pollution.label": "Poluição",
     "pollution.level0": "Seus gatinhos não estão sofrendo nenhum effeito nocivos devido a poluição.",
+    "pollution.level1.warning": "Os cientistas alertam que a poluição pode afetar o rendimento da erva-de-gato das proximas colheitas.",
+    "pollution.level1": "A produção de erva-de-gato está afectada pela poluição",
     "prestige.panel.label": "Metafísica",
     "prestige.adjustmentBureau.label": "Escritório de Retificação",
     "prestige.adjustmentBureau.desc": "Desbloqueia desafios de jogo adicionais.",
