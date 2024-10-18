@@ -82,12 +82,7 @@ dojo.declare("classes.managers.StatsManager", com.nuclearunicorn.core.TabManager
             title: $I("stats.challenges.total"),
             val: 0,
             calculate: function(game){
-                var total = 0;
-                var challengeList = game.challenges.challenges;
-                for(var i = 0; i < challengeList.length; i += 1) {
-                    total += challengeList[i].on;
-                }
-                return total;
+                return game.challenges.getCountCompletions();
             },
             unlocked: false
         }

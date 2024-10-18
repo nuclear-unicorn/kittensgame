@@ -45,12 +45,14 @@ WQueueItem = React.createClass({
             }, "[↑]"));
         }
 
+        //Mark this queue item as limited, but respect the setting in the options menu:
+        var resourceIsLimited = this.props.game.opts.highlightUnavailable && this.isStorageLimited();
 
         //TODO: red indicator when can't process
         //TODO: attach tooltip as if it is a button
-        return $r("div", {}, 
+        return $r("div", { className: resourceIsLimited ? "limited" : ""},
         [
-            "[" + item.type + "] - ", 
+            this.props.game.devMode ? ("[" + item.type + "] - ") : "",
             $r("span", {ref:"itemLabel", className:"queue-label"}, item.label),
             (
                 item.value ? (" " + item.value ) : ""
@@ -90,6 +92,13 @@ WQueueItem = React.createClass({
             return;
         }
         UIUtils.attachTooltip(game, node, 0, 200, dojo.partial(ButtonModernHelper.getTooltipHTML, controllerAndModel.controller, controllerAndModel.model));
+    },
+
+    //Ask the game engine if this item is storage-limited
+    isStorageLimited: function() {
+        var game = this.props.game;
+        var model = game.time.queue.getQueueElementModel(this.props.item);
+        return game.resPool.isStorageLimited(model.prices);
     }
 });
 
@@ -98,8 +107,7 @@ WQueue = React.createClass({
     getInitialState: function(){
         return {
             typeId: "buildings",
-            itemId: null,
-            itemLabel: null,
+            itemIndex: null, //Index of item from options list that is selected, or null
             game: this.props.game
         };
     },
@@ -130,18 +138,11 @@ WQueue = React.createClass({
             value: this.state.queueTypeId,
             onChange: function(e){
                 var typeId = e.target.value;
-
-                self.setState({
-                    typeId: typeId
-                });
                 var options = game.time.queue.getQueueOptions(typeId);
-                if (options.length){
-                    self.setState({
-                        //itemId: options[0].name,
-                        itemId: 0,
-                        itemLabel: options[0].label
-                    });
-                }
+                self.setState({
+                    typeId: typeId,
+                    itemIndex: options.length ? 0 : null
+                });
                 
             }
         }, options);
@@ -162,13 +163,10 @@ WQueue = React.createClass({
         }
 
         return $r("select", {
-            value: this.state.itemId,
+            value: this.state.itemIndex,
             onChange: function(e){
                 self.setState({
-                    itemId: e.target.value,
-                    //itemLabel: e.target.dataset.label
-                    //itemId: options[e.target.value].name,
-                    itemLabel: options[e.target.value].label
+                    itemIndex: e.target.value,
                 });
             }
         }, selectOpts);
@@ -219,19 +217,15 @@ WQueue = React.createClass({
             this.getQueueItemSelect(options),
             $r("button", {
                 onClick: function(e){
-                    if(self.state.itemId){
+                    var indexToUse = self.state.itemIndex || 0;
+                    if (indexToUse >= options.length) { //Default to first element.
+                        indexToUse = 0;
+                    }
+                    if(indexToUse < options.length){
                         game.time.queue.addToQueue(
-                            //self.state.itemId,
-                            options[self.state.itemId].name,
+                            options[indexToUse].name,
                             self.state.typeId,
-                            self.state.itemLabel,
-                            e.shiftKey
-                        );
-                    }else if(options.length){
-                        game.time.queue.addToQueue(
-                            options[0].name,
-                            self.state.typeId,
-                            options[0].label,
+                            options[indexToUse].label,
                             e.shiftKey
                         );
                     }

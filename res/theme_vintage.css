@@ -764,8 +764,16 @@ body.scheme_vintage {
 	border-image-repeat: round;
 	box-shadow: inset 0 0 3px 1px #000000, 0 0 3px 1px #000000;
 }
-.scheme_vintage .census-block.simLeader a.leaderHref {
+.scheme_vintage .census-block.simLeader .leaderHref {
+	background: transparent !important;
+	border: none;
+}
+.scheme_vintage .census-block.simLeader .leaderHref,
+.scheme_vintage .census-block.simFavorite .favoriteHref {
 	color: #d4b356;
+}
+.scheme_vintage .census-block.simFavorite .favoriteHref:hover {
+	color: #f8edd0;
 }
 .scheme_vintage .census-block .info { /* info of kitten */
 	font-size: 0.9em;
@@ -894,6 +902,9 @@ body.scheme_vintage {
 	border-image-slice: 2 2 2 2;
 	border-image-outset: 0;
 	border-image-repeat: round;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_vintage .achievement:hover {
 	text-shadow: 2px 2px 2px #000000;

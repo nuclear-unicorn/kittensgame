@@ -609,8 +609,10 @@ body.scheme_gold {
 	border: solid 1px #38352c;
 	box-shadow: inset 1px 1px 3px #000000, inset -1px -1px 1px rgba(200, 200, 200, 0.4);
 }
-.scheme_gold .census-block.simLeader a.leaderHref {
-	color: #99AADF;
+.scheme_gold .census-block.simLeader .leaderHref,
+.scheme_gold .census-block.simFavorite .favoriteHref {
+    border: none;
+	color: rgba(247, 230, 163, 0.9);
 }
 .scheme_gold .census-block .info { /* info of kitten */
 	font-size: 0.9em;
@@ -719,6 +721,9 @@ body.scheme_gold {
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: default !important;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_gold .achievement:hover {
     background-color: rgba(223, 206, 153, 0.4); /* color #DFCE99 */
