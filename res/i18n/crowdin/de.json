@@ -1224,7 +1224,7 @@
     "science.cryptotheology.effectDesc": "Schaltet Relikt-Station und Kryptotheologiebaum frei",
     "science.currency.label": "Währung",
     "science.currency.desc": "Währung repräsentiert eine bestimmte Menge an Wohlstand. Kann die Entwicklung auf indirekte Weise signifikant verbessern.",
-    "science.currency.effectDesc": "Schaltet Gold und Handel frei",
+    "science.currency.effectDesc": "Gold und Handel werden freigeschaltet",
     "science.dimensionalPhysics.label": "Dimensionale Physik",
     "science.dimensionalPhysics.desc": "Die Dimensionelle Physik untersucht die Konzepte von Raum und Zeit",
     "science.dimensionalPhysics.effectDesc": "Entsperre Energierisse und LHC",
