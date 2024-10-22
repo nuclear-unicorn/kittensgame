@@ -497,6 +497,7 @@
     "effectsMgr.statics.shatterCostIncreaseChallenge.title": "Aumento de custo do Shatter TC",
     "effectsMgr.statics.shatterTCGain.title": "Recursos recuperados ao quebrar Cristais de Tempo",
     "effectsMgr.statics.shipLimit.title": "Efeito de limite de navios",
+    "effectsMgr.statics.simScalingRatio.title": "Taxa de escalonamento da simulação",
     "effectsMgr.statics.skillMultiplier.title": "Efeito de habilidades felinas",
     "effectsMgr.statics.masterSkillMultiplier.title": "Efeitos de habilidade dos mestre felino",
     "effectsMgr.statics.skillXP.title": "Aprendizado de Habilidades",
