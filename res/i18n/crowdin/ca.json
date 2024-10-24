@@ -74,5 +74,6 @@
     "left.craft": "fabricar",
     "console.filter.trade": "Comerciar",
     "console.filter.craft": "Fabricar",
-    "village.census.lbl.leader": "Líder"
+    "village.census.lbl.leader": "Líder",
+    "workshop.titaniumMirrors.label": "钛反射器"
 }
