@@ -1332,7 +1332,7 @@
     "space.planet.cath.spaceStation.desc": "Implementar una estación espacial. Cada estación genera ciencia y proporciona un espacio para 2 astronautas",
     "space.planet.centaurusSystem.label": "Sistema Centaurus",
     "space.planet.centaurusSystem.moltenCore.label": "Núcleo fundido",
-    "space.planet.centaurusSystem.moltenCore.desc": "Cada nivel del Núcleo fundido mejora la efectividad tectónica en un 5%",
+    "space.planet.centaurusSystem.moltenCore.desc": "Cada nivel de Nucleo Fundido incrementa la efectividad Tectónica en un 5%",
     "space.planet.centaurusSystem.tectonic.label": "Tectónico",
     "space.planet.centaurusSystem.tectonic.desc": "Rip abrir el planeta cerca de la estrella Centaurus para recoger la energía del magma",
     "space.planet.charon.label": "Charon",
