@@ -591,7 +591,7 @@
     "iron.will.break.confirmation.msg": "这会结束钢铁意志，你确定吗?",
     "kittens.craft.confirmation.title": "确定要这样做吗?",
     "kittens.craft.confirmation.msg": "你的小猫会死",
-    "craft.msg.notEnoughCatnip": "猫薄荷不足!",
+    "craft.msg.notEnoughCatnip": "猫薄荷储量即将消耗殆尽",
     "log.clear": "清空日志",
     "menu.about": "关于",
     "menu.close": "关闭",
