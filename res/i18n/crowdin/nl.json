@@ -194,6 +194,7 @@
     "buildings.solarfarm.desc": "Biedt een extra energiebron, afhankelijk van de seizoenen.",
     "buildings.steamworks.label": "Stoomfabriek",
     "buildings.steamworks.desc": "Als deze actief is verlaagt dit de steenkool productie significant. Doet niks nuttigs normaal, maar kan heel veel coole dingen met upgrades",
+    "buildings.steamworks.desc.automation": ".",
     "buildings.steamworks.flavor": "Ik doe hier een dutje en het lijkt alsof ik werk",
     "buildings.brewery.label": "Brouwerij",
     "buildings.brewery.desc": "Brouw catnip tot een pittige drank. Vergroot festival effecten.",
