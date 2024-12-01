@@ -319,6 +319,7 @@
     "effectsMgr.statics.corruptionBoostRatio.title": "Korrupsjonsbonus",
     "effectsMgr.statics.corruptionRatio.title": "Korrupsjonsrate",
     "effectsMgr.statics.cultureMaxRatio.title": "Maksimal kulturbonus",
+    "effectsMgr.statics.deficitRecoveryRatio.title": "",
     "effectsMgr.statics.energyConsumption.title": "Kraftforbruk",
     "effectsMgr.statics.energyProduction.title": "Kraftproduksjon",
     "effectsMgr.statics.energyProductionRatio.title": "Energiproduksjonsbonus",
