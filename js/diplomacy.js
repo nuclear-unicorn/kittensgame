@@ -692,6 +692,11 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				elders.energy = markerCap;
 			}
 
+			var unicornTearsChallenge = this.game.challenges.getChallenge("unicornTears");
+			if (elders.energy >= unicornTearsChallenge.leviEnergyToUnlock) {
+				unicornTearsChallenge.unlocked = true;
+			}
+
 			ncorns.value -= amt;
 			this.game.msg($I("trade.msg.elders.pleased"), "notice");
 		} else {

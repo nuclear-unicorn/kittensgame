@@ -368,7 +368,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		},
 		stackOptions: {
 			"bonfireTearsPriceRatioChallenge": { noStack: true, LDRLimit: 2.5 },
-			"scienceTearsPricesChallenge": { LDRLimit: 100 },
+			"scienceTearsPricesChallenge": { LDRLimit: 75 },
 			"workshopTearsPricesChallenge": { LDRLimit: 1 },
 			"cathPollutionPerTearOvercapped": { noStack: true },
 			"unicornsMax": { noStack: true },
@@ -377,6 +377,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"zigguratIvoryPriceRatio": { LDRLimit: 0.15 },
 			"zigguratIvoryCostIncrease": { LDRLimit: 1 }
 		},
+		leviEnergyToUnlock: 25, //Used by the unlock condition logic
 		/**
 		 * Calculate the total weight of all resources involved in the price of an item.
 		 * @param prices A prices object, which is an array where each element has the format: { name: "slab", val: 1000 }
@@ -434,6 +435,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"tears": -Infinity,
 			"megalith": -Infinity,
 			"default": 10 //Used for any resource not explicitly specified
+		},
+		checkCompletionCondition: function(game) {
+			return game.resPool.get("necrocorn").value >= 1;
 		}
 	},{
 		name: "postApocalypse",
