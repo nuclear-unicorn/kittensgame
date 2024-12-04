@@ -333,6 +333,12 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"zigguratIvoryCostIncrease": 0.01
 		},
 		calculateEffects: function(self, game) {
+			if(!game.getFeatureFlag("UNICORN_TEARS_CHALLENGE")) {
+				for (var key in self.effects) {
+					self.effects[key] = 0;
+				}
+				return;
+			}
 			if (self.active) {
 				//Base challenge: Price ratio of ×1.2 determining added costs in the Bonfire tab.
 				//Increasing challenge: +0.03 to the price ratio for each additional completion.
@@ -566,6 +572,14 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				this.getChallenge("energy").unlocked = true;
 			}
 		} 
+		//Disable challenge if the feature flag for it is disabled
+		if (!this.game.getFeatureFlag("UNICORN_TEARS_CHALLENGE")) {
+			var chall = this.getChallenge("unicornTears");
+			//Lock the challenge, kick the player out of it, & don't let them re-enter it.
+			chall.active = false;
+			chall.pending = false;
+			chall.unlocked = false;
+		}
 
 		//Iron Will has special rules.  Just make the UI more obvious when the game is in IW mode:
 		this.getChallenge("ironWill").active = this.game.ironWill;

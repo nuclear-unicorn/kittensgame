@@ -1935,6 +1935,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			beta: true,
 			main: true,
 			mobile: true
+		},
+		UNICORN_TEARS_CHALLENGE: {
+			beta: true,
+			main: false,
+			mobile: false
 		}
 	},
 
