@@ -1459,6 +1459,8 @@
     "trade.buys": "買入",
     "trade.sells": "銷售",
     "trade.bcoin.buy.desc": "用遺跡換取黑幣",
+    "trade.embassy.label": "大使館",
+    "trade.embassy.desc": "透過設立大使館來增強外交關係",
     "trade.embassy.pinned": "釘選",
     "ui.filter.all": "全部",
     "ui.filter.available": "可建造",
