@@ -771,7 +771,15 @@ body.scheme_grayish {
 .scheme_grayish .census-block.simLeader {
 	background-color: #ebebeb;
 }
-.scheme_grayish .census-block.simLeader a.leaderHref {
+.scheme_grayish .census-block .links-container span {
+	border-radius: 50%; /*make it a circle!*/
+}
+.scheme_grayish .census-block.simLeader .leaderHref {
+	background: transparent;
+	border: none;
+}
+.scheme_grayish .census-block.simLeader .leaderHref,
+.scheme_grayish .census-block.simFavorite .favoriteHref {
 	color: #1867c8;
 }
 .scheme_grayish .census-block .info { /* info of kitten */

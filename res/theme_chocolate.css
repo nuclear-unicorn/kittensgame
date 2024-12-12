@@ -685,7 +685,13 @@ body.scheme_chocolate.with_background_image {
 .scheme_chocolate .census-block.simLeader:hover {
 	border-color: #eddcc7;
 }
-.scheme_chocolate .census-block.simLeader a.leaderHref {
+.scheme_chocolate .census-block .links-container span {
+	border-radius: 1px;
+	border: none !important;
+	color: #c0a787;
+}
+.scheme_chocolate .census-block.simLeader .leaderHref,
+.scheme_chocolate .census-block.simFavorite .favoriteHref {
 	color: #96e8df;
 }
 .scheme_chocolate .census-block .info { /* info of kitten */
@@ -831,6 +837,9 @@ body.scheme_chocolate.with_background_image {
 	border-bottom-color: rgba(217, 190, 163, 0.8);
 	box-shadow: inset 1px 1px 3px rgba(255, 255, 255, 0.4), inset -2px -2px 3px #202020,
 				1px 1px 3px #101010;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_chocolate .achievement:hover {
 	color: #eddcc7;

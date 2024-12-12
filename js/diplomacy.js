@@ -383,7 +383,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				            "winter": -0.5};
 				}
 			}
-		 }
+		}
+
 	},
 
 	onLeavingIW: function(){
@@ -520,8 +521,12 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 
 		//-------------- 10% chance to get blueprint ---------------
+		var blueprintTradeChance = 0.1;
+		if (race.name == "nagas") {
+			blueprintTradeChance += this.game.getEffect("nagaBlueprintTradeChance");
+		}
 		boughtResources["blueprint"] = Math.floor(
-			this.game.math.binominalRandomInteger(successfullTradeAmount, 0.1)
+			this.game.math.binominalRandomInteger(successfullTradeAmount, blueprintTradeChance)
 		);
 
 		//-------------- 15% + 0.35% chance per ship to get titanium ---------------
@@ -534,6 +539,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		//Update Trade Stats
 		this.game.stats.getStat("totalTrades").val = Math.min(this.game.stats.getStat("totalTrades").val + successfullTradeAmount, Number.MAX_VALUE);
 		this.game.stats.getStatCurrent("totalTrades").val += successfullTradeAmount;
+		this.game.upgrade({policies : ["sharkRelationsMerchants"]});
 
 		return boughtResources;
 	},
@@ -684,6 +690,13 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 			if (elders.energy > markerCap){
 				elders.energy = markerCap;
+			}
+
+			if (this.game.getFeatureFlag("UNICORN_TEARS_CHALLENGE")) {
+				var chall = this.game.challenges.getChallenge("unicornTears");
+				if (elders.energy >= chall.leviEnergyToUnlock) {
+					chall.unlocked = true;
+				}
 			}
 
 			ncorns.value -= amt;
@@ -1029,12 +1042,14 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 
 	buyItem: function(model, event, callback) {
 		this.inherited(arguments);
+		this.game.upgrade({policies: ["lizardRelationsDiplomats", "nagaRelationsArchitects", "spiderRelationsGeologists"]}); //Upgrade, since the policy is based on number of embassies.
+		this.game.science.unlockRelations(); //Check if we can unlock new relation policies based on number of embassies.
 		this.game.ui.render();
 	},
 
 	incrementValue: function(model) {
 		this.inherited(arguments);
-		model.options.race.embassyLevel++;
+		model.options.race.embassyLevel++;		
 	},
 
 	hasSellLink: function(model){

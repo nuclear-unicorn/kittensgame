@@ -66,12 +66,17 @@ body.scheme_space.with_background_image {
 	border: solid 1px rgba(20, 240, 216, 0.6);
  	cursor: pointer !important;
 }
+.scheme_space .census-block .links-container span,
 .scheme_space .btn.modern:not(.disabled) span.btnTitle { /* to change only the properties of the button name for buttons enabled */
 	color: #9FA5D6;
 }
+.scheme_space .census-block .links-container span:hover
 .scheme_space .btn.modern:not(.disabled):hover span.btnTitle {
 	color: #ffffff;
 	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9), rgba(20, 240, 216) 1px 0 7px;
+}
+.scheme_space .census-block .links-container span.btn.modern:active {
+	background-color: rgba(31, 150, 186, 0.8);
 }
 .scheme_space a {
 	color: #89A4CD;
@@ -721,7 +726,13 @@ body.scheme_space.with_background_image {
 	background-color: rgba(18, 231, 209, 0.1);
 	border: solid 1px rgba(20, 240, 216, 1);
 }
-.scheme_space .census-block.simLeader a.leaderHref {
+.scheme_space .census-block.simLeader .leaderHref {
+	background: transparent !important;
+	border: none !important;
+	color: #1B9CC2;
+}
+.scheme_space .census-block.simLeader .leaderHref,
+.scheme_space .census-block.simFavorite .favoriteHref {
 	color: #1B9CC2;
 }
 .scheme_space .census-block .info { /* info of kitten */
@@ -835,6 +846,9 @@ body.scheme_space.with_background_image {
     cursor: default !important;
 	border-color : #14F0D8;
 	border-radius: 5px;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_space .achievement.badge {
     margin: 10px 0 0 0;
