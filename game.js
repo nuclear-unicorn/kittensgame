@@ -1676,6 +1676,14 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.workshopTearsPricesChallenge.title"),
 				type: "ratio"
 			},
+			"zigguratIvoryPriceRatio": {
+				title: $I("effectsMgr.statics.zigguratIvoryPriceRatio.title"),
+				type: "ratio"
+			},
+			"zigguratIvoryCostIncrease": {
+				title: $I("effectsMgr.statics.zigguratIvoryCostIncrease.title"),
+				type: "ratio"
+			},
 			"cryochamberSupport":{
 				title: $I("effectsMgr.statics.cryochamberSupport.title"),
 			},
@@ -1927,6 +1935,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			beta: true,
 			main: true,
 			mobile: true
+		},
+		UNICORN_TEARS_CHALLENGE: {
+			beta: true,
+			main: false,
+			mobile: false
 		}
 	},
 

@@ -2021,7 +2021,12 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		evaluateLocks: function(game){
 			return game.science.getPolicy("environmentalism").researched && game.science.get("ecology").researched;
 		}
-    }, {
+    },
+    /*{
+		//Possible future content: policies specific to the unicorn tears challenge
+		//I'd like to have some method of automatic/afk/offline income for tears
+    },*/
+    {
         name: "cryochamberExtraction",
         label: $I("policy.cryochamberExtraction.label"),
         description: $I("policy.cryochamberExtraction.desc"),
