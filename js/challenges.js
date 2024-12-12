@@ -326,9 +326,19 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"cathPollutionPerTearOvercapped": 0, //Overcapped unicorn tears evaporate into a smoky substance
 			"unicornsMax": 0,
 			"tearsMax": 0,
-			"alicornMax": 0
+			"alicornMax": 0,
+			//Reward amounts are chosen such that building less than 20 buildings gets *more* expensive,
+			//	but building more than 20 buildings is less expensive than before.
+			"zigguratIvoryPriceRatio": -0.001,
+			"zigguratIvoryCostIncrease": 0.01
 		},
 		calculateEffects: function(self, game) {
+			if(!game.getFeatureFlag("UNICORN_TEARS_CHALLENGE")) {
+				for (var key in self.effects) {
+					self.effects[key] = 0;
+				}
+				return;
+			}
 			if (self.active) {
 				//Base challenge: Price ratio of ×1.2 determining added costs in the Bonfire tab.
 				//Increasing challenge: +0.03 to the price ratio for each additional completion.
@@ -346,6 +356,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["unicornsMax"] = 10;
 				self.effects["tearsMax"] = 1;
 				self.effects["alicornMax"] = 0.2;
+				//Disable the reward:
+				self.effects["zigguratIvoryPriceRatio"] = 0;
+				self.effects["zigguratIvoryCostIncrease"] = 0;
 			} else {
 				self.effects["bonfireTearsPriceRatioChallenge"] = 0;
 				self.effects["scienceTearsPricesChallenge"] = 0;
@@ -354,17 +367,23 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["unicornsMax"] = 0;
 				self.effects["tearsMax"] = 0;
 				self.effects["alicornMax"] = 0;
+				//Enable the reward:
+				self.effects["zigguratIvoryPriceRatio"] = -0.001;
+				self.effects["zigguratIvoryCostIncrease"] = 0.01;
 			}
 		},
 		stackOptions: {
 			"bonfireTearsPriceRatioChallenge": { noStack: true, LDRLimit: 2.5 },
-			"scienceTearsPricesChallenge": { LDRLimit: 100 },
+			"scienceTearsPricesChallenge": { LDRLimit: 75 },
 			"workshopTearsPricesChallenge": { LDRLimit: 1 },
 			"cathPollutionPerTearOvercapped": { noStack: true },
 			"unicornsMax": { noStack: true },
 			"tearsMax": { noStack: true },
-			"alicornMax": { noStack: true }
+			"alicornMax": { noStack: true },
+			"zigguratIvoryPriceRatio": { LDRLimit: 0.15 },
+			"zigguratIvoryCostIncrease": { LDRLimit: 1 }
 		},
+		leviEnergyToUnlock: 25, //Used by the unlock condition logic
 		/**
 		 * Calculate the total weight of all resources involved in the price of an item.
 		 * @param prices A prices object, which is an array where each element has the format: { name: "slab", val: 1000 }
@@ -422,6 +441,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"tears": -Infinity,
 			"megalith": -Infinity,
 			"default": 10 //Used for any resource not explicitly specified
+		},
+		checkCompletionCondition: function(game) {
+			return game.resPool.get("necrocorn").value >= 1;
 		}
 	},{
 		name: "postApocalypse",
@@ -550,6 +572,14 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				this.getChallenge("energy").unlocked = true;
 			}
 		} 
+		//Disable challenge if the feature flag for it is disabled
+		if (!this.game.getFeatureFlag("UNICORN_TEARS_CHALLENGE")) {
+			var chall = this.getChallenge("unicornTears");
+			//Lock the challenge, kick the player out of it, & don't let them re-enter it.
+			chall.active = false;
+			chall.pending = false;
+			chall.unlocked = false;
+		}
 
 		//Iron Will has special rules.  Just make the UI more obvious when the game is in IW mode:
 		this.getChallenge("ironWill").active = this.game.ironWill;
