@@ -764,7 +764,7 @@
     "opts.notation.e": "Scientific",
     "opts.notation.sie": "Simplified (SI+E)",
 
-    "msg.necrocornDeficit.info": "Necrocorn deficit: {0}. Due to the deficit your pacts have {1}% effectivness. Deficit is consuming additional {2}% of necrocorns per day and is deminishing {3} per day (if you have enough necrocorns).",
+    "msg.necrocornDeficit.info": "Necrocorn deficit: {0}. Due to the deficit your pacts have {1}% effectiveness. Deficit is consuming additional {2}% of necrocorns per day and is diminishing {3} per day (if you have enough necrocorns).",
     "msg.pacts.info": "Karma kittens per millenia are based on available pacts. Pacts do not persist. Available pacts: {0}. Every pact devours {1} necrocorns per day.",
     "msg.pacts.fractured": "You didn't fulfill your part of the deal... You lost {0} alicorns!",
 
@@ -1069,7 +1069,7 @@
     "religion.sacrificeBtn.sacrifice.msg": "{0} unicorns have been sacrificed. You've got {1} unicorn tears!",
     "religion.sacrificeBtn.sacrifice.msg.overcap": "{0} tears spilled, vanishing into black smoke.",
     "religion.transcend.confirmation.title": "Transcend?",
-    "religion.transcend.confirmation.msg": "Are you sure you want to discard part of your epiphany?\n\nYou can reach special transcendence tiers by sacrificing part of your epiphany.\n\nEach tier will boost the effectiveness of worship conversion (Adore the stars).\n\nEvery level requires proportionally more epiphany to be sacrificed.\n\nThis bonus will stack and carry over through resets.\n\nCLICKING THIS BUTTON WILL ERASE PART OF YOUR EPIPHANY AND PRAISING EFFICIENCY.",
+    "religion.transcend.confirmation.msg": "Are you sure you want to discard part of your epiphany?\n\nYou can reach special transcendence tiers by sacrificing part of your epiphany.\n\nEach tier will boost the effectiveness of worship conversion (Adore the galaxy).\n\nEvery level requires proportionally more epiphany to be sacrificed.\n\nThis bonus will stack and carry over through resets.\n\nCLICKING THIS BUTTON WILL ERASE PART OF YOUR EPIPHANY AND PRAISING EFFICIENCY.",
     "religion.transcend.msg.failure": "One step closer: {0}%",
     "religion.transcend.msg.success": "You have transcended the mortal limits. T-level: {0}",
     "religion.transcendBtn.label": "Transcend",
