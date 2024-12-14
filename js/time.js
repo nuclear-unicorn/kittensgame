@@ -1,6 +1,6 @@
 dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager, {
     game: null,
-    testShatter: 0, //0 is current function call, 1 is shatterInGroupCycles, 2 is shatterInCycles
+    testShatter: 0, //0 is current function call, 1 is shatterInGroupCycles, 2 is shatterInCycles (deprecated)
     /*
      * Amount of years skipped by CF time jumps
      */
@@ -17,7 +17,15 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     constructor: function(game){
         this.game = game;
 
-		this.registerMeta("stackable", this.chronoforgeUpgrades, null);
+		this.registerMeta(false, this.chronoforgeUpgrades, {
+		//Custom provider: Don't count effects of Temporal Presses if we haven't researched Chronoforge yet.
+		//If TPs are carried over, they can make Energy challenges harder for no good reason.
+		getEffect: function(cfu, effectName){
+			if (!game.workshop.get("chronoforge").researched) {
+				return 0;
+			}
+			return (cfu.effects) ? cfu.effects[effectName] * cfu.on : 0;
+		}});
 		this.registerMeta("stackable", this.voidspaceUpgrades, null);
 		this.setEffectsCachedExisting();
         this.queue = new classes.queue.manager(game);
@@ -108,7 +116,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
 		// Update temporalFluxMax from values loaded
         this.game.updateCaches();
-        this.game.resPool.update();
+        this.game.resPool.updateMaxValueByName("temporalFlux");
 
 		var temporalAccelerator = this.getCFU("temporalAccelerator");
 		var energyRatio = 1 + (temporalAccelerator.val * temporalAccelerator.effects["timeRatio"]);
@@ -293,7 +301,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             numberEvents = this.applyRedshift(daysOffset);
         }
 
-        this.game.msg($I("time.redshift", [daysOffset]) + (numberEvents ? $I("time.redshift.ext",[numberEvents]) : ""));
+        this.game.msg($I("time.redshift", [daysOffset]) + (numberEvents ? " " + $I("time.redshift.ext",[numberEvents]) : ""));
     },
 
 	chronoforgeUpgrades: [{
@@ -698,6 +706,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     3)calculates Millenium production
     4)calculates flux
     likely to be deprecated after shatterInGroupCycles is finished
+       Note from another dev: it's deprecated already, so does that mean shatterInGroupCycles is finished now?
     */
     shatterInCycles: function(amt){
         amt = amt || 1;
@@ -942,7 +951,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 this.shatter(shatters);
             }
             var oldShatterD2 = new Date();
-            console.log("oldShatterAverafe = " + (oldShatterD2.getTime() - oldShatterD1.getTime())/times);
+            //Average time in milliseconds to resolve 1 batch of *shatters* shatters, averaged across *times* trials
+            console.log("Old shatter average = " + (oldShatterD2.getTime() - oldShatterD1.getTime())/times + " ms");
         }
         if (!ignoreGroupCycles){
             var newShatterD1 = new Date();
@@ -950,15 +960,16 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 this.shatterInGroupCycles(shatters);
             }
             var newShatterD2 = new Date();
-            console.log("Group shatter average = " + (newShatterD2.getTime() - newShatterD1.getTime())/times);
+            console.log("Group shatter average = " + (newShatterD2.getTime() - newShatterD1.getTime())/times + " ms");
         }
         if(!ignoreShatterInCycles){
+            //shatterInCycles is currently deprecated
             var new1ShatterD1 = new Date();
             for (var i = 0; i < times; i++){
                 this.shatterInCycles(shatters);
             }
             var new1ShatterD2 = new Date();
-            if(!ignoreShatterInCycles) {console.log("Cycle shatter average= " + (new1ShatterD2.getTime() - new1ShatterD1.getTime())/times);}
+            console.log("Cycle shatter average = " + (new1ShatterD2.getTime() - new1ShatterD1.getTime())/times + " ms");
         }
 
         if(!ignoreOldFunction && !ignoreGroupCycles){
@@ -966,6 +977,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         }
 
         if(!ignoreOldFunction && !ignoreShatterInCycles){
+            //shatterInCycles is currently deprecated
             console.log("new1Efficensy = " + (oldShatterD2.getTime() - oldShatterD1.getTime())/(new1ShatterD2.getTime() - new1ShatterD1.getTime()));
         }
     },
@@ -1094,11 +1106,14 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 
     _newLink: function(model, shatteredQuantity) {
         var self = this;
+        var isVisible = true; //Always true if showNonApplicableButtons is true
+        if (!this.game.opts.showNonApplicableButtons) {
+            var prices = this.getPricesMultiple(model, shatteredQuantity);
+            isVisible = (prices.timeCrystal <= this.game.resPool.get("timeCrystal").value) &&
+                        (prices.void <= this.game.resPool.get("void").value);
+        }
         return {
-            visible: this.game.opts.showNonApplicableButtons ||
-                (this.getPricesMultiple(model, shatteredQuantity).timeCrystal <= this.game.resPool.get("timeCrystal").value &&
-                (this.getPricesMultiple(model, shatteredQuantity).void <= this.game.resPool.get("void").value)
-            ),
+            visible: isVisible,
             title: "x" + shatteredQuantity,
             handler: function(event) {
                 self.doShatterAmt(model, shatteredQuantity);
@@ -1114,53 +1129,34 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         return name;
     },
 
+    /**
+     * @return A prices object, which is an array of objects that each have "name" & "val" properties.
+     */
     getPrices: function(model) {
-		var prices_cloned = $.extend(true, [], model.options.prices);
+        //Calculate the price using the same algorithm so the code is easier to maintain:
+        var price = this.getPricesMultiple(model, 1);
 
-        if(this.game.getEffect("shatterVoidCost")){
-            var shatterVoidCost = this.game.getEffect("shatterVoidCost");
-            prices_cloned.push({
-                name: "void",
-                val: shatterVoidCost
-            });
-        }
-
-		for (var i in prices_cloned) {
-			var price = prices_cloned[i];
-			if (price["name"] == "timeCrystal") {
-                var darkYears = this.game.calendar.darkFutureYears(true);
-                if (darkYears > 0) {
-                    price["val"] = 1 + ((darkYears) / 1000) * 0.01;
-                }
-                var heatMax = this.game.getEffect("heatMax");
-                if (this.game.time.heat > heatMax) {
-                    price["val"] *= (1 + (this.game.time.heat - heatMax) * 0.01);  //1% per excessive heat unit
-                }
-
-                //LDR for the effect "shatterCostReduction" is specified in challenges.js
-                price["val"] *= (1 + this.game.getEffect("shatterCostReduction") + this.game.getEffect("shatterCostIncreaseChallenge"));
-            }
-            else if(price["name"] == "void"){
-                var heatMax = this.game.getEffect("heatMax");
-                if (this.game.time.heat > heatMax) {
-                    price["val"] *= (1 + (this.game.time.heat - heatMax) * 0.01);  //1% per excessive heat unit
-                }
+        //getPricesMultiple returns an object in a different format than we want
+        //So we just need to convert it to the format we DO want
+        var retVal = [];
+        for (var key in price) {
+            if (price[key]) {
+                retVal.push({ name: key, val: price[key] });
             }
         }
-		return prices_cloned;
+        return retVal;
 	},
 
+    /**
+     * Updated function that doesn't lag for high values of amt.
+     * @return An object with 2 keys: void & timeCrystal, which contain the prices of shattering amt times.
+     */
 	getPricesMultiple: function(model, amt) {
 		var pricesTotal = {
             void: 0,
             timeCrystal: 0
         };
-
 		var prices_cloned = $.extend(true, [], model.options.prices);
-        var heatMax = this.game.getEffect("heatMax");
-
-        var heatFactor = this.game.challenges.getChallenge("1000Years").researched ? 5 : 10;
-
         if(this.game.getEffect("shatterVoidCost")){
             var shatterVoidCost = this.game.getEffect("shatterVoidCost");
             prices_cloned.push({
@@ -1169,34 +1165,91 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
             });
         }
 
-		for (var k = 0; k < amt; k++) {
-			for (var i in prices_cloned) {
-				var price = prices_cloned[i];
-				if (price["name"] == "timeCrystal") {
-					var priceLoop = price["val"];
-                        var darkYears = this.game.calendar.darkFutureYears(true);
-	                if (darkYears > 0) {
-	                    priceLoop = 1 + ((darkYears) / 1000) * 0.01;
-	                }
-	                if ((this.game.time.heat + k * heatFactor) > heatMax) {
-	                    priceLoop *= (1 + (this.game.time.heat + k * heatFactor - heatMax) * 0.01);  //1% per excessive heat unit
-	                }
+        //Number of units of heat we can have before penalties start being applied:
+        var heatMax = this.game.getEffect("heatMax");
+        //Number of units of heat generated for each shatter performed:
+        var heatPerShatter = this.game.challenges.getChallenge("1000Years").researched ? 5 : 10;
+        //Number of units of heat we had before we started calculating the prices:
+        var heatCurrent = this.game.time.heat;
+        //Each unit of heat above heatMax increases the cost by this ratio:
+        var penaltyPerHeat = 0.01; //1% per excessive heat unit
 
-                    //LDR for the effect "shatterCostReduction" is specified in challenges.js
-                    priceLoop *= (1 + this.game.getEffect("shatterCostReduction") +
-                        this.game.getEffect("shatterCostIncreaseChallenge"));
+        //How many shatters we can do before heat starts affecting them:
+        var shattersBeforeHeat = (heatMax - heatCurrent) / heatPerShatter; //Not guaranteed to be an integer or even positive
+        shattersBeforeHeat = Math.max(0, Math.min(Math.ceil(shattersBeforeHeat), amt)); //Clamp & ceiling
+        if (shattersBeforeHeat < 0 ) { shattersBeforeHeat = 0; }
+        if (shattersBeforeHeat > amt ) { shattersBeforeHeat = amt; }
+        //How many shatters we do where each one generates heat which increases the price of the next:
+        var shattersAfterHeat = amt - shattersBeforeHeat;
 
-                    pricesTotal.timeCrystal += priceLoop;
+        //How many years we are into the Dark Future penalty:
+        var darkYears = this.game.calendar.darkFutureYears(true);
+        //Each year into the penalty region increases the cost by this ratio:
+        var penaltyPerDarkYear = 0.00001; //1% for every 1000 years
 
-				}else if (price["name"] == "void"){
-                    var priceLoop = price["val"];
-	                if ((this.game.time.heat + k * heatFactor) > heatMax) {
-	                    priceLoop *= (1 + (this.game.time.heat + k * heatFactor - heatMax) * 0.01);  //1% per excessive heat unit
-                    }
-                    pricesTotal.void += priceLoop;
-                }
-			}
+        //How many shatters we can do before the Dark Future penalty starts affecting them:
+        // (Remember that we can build Time Impedances to delay the onset of this penalty.)
+        var shattersBeforeDF = -darkYears; //Should already be an integer!
+        shattersBeforeDF = Math.max(0, Math.min(shattersBeforeDF, amt)); //Clamp
+        //How many shatters we do where each shatter takes us deeper into the Dark Future penalty:
+        var shattersAfterDF = amt - shattersBeforeDF;
+
+        //There's a thing called discrete integrals which are EXACTLY what I want in this situation.
+        //Imagine integrating Ax^2 + Bx + C, except you don't want a smooth integral, you just want the area under a "staircase" looking thing.
+        //To simplify things a little bit, we're taking the definite integral from 0 to T, where T is a positive integer.
+        //The result turns out to be A*T*(T-1)*(2*T-1)/6 + B*T*(T-1)/2 + C*T.
+
+        //I'm going to break this into 4 segments:
+        // Constant-cost
+        // Linear cost (heat penalty only)
+        // Linear cost (Dark Future penalty only)
+        // Quadratic cost (both penalties)
+
+        var shattersConstant = Math.min(shattersBeforeDF, shattersBeforeHeat);
+        var shattersLinearHeatOnly = Math.max(0, shattersBeforeDF - shattersConstant);
+        var shattersLinearDFOnly = Math.max(0, shattersBeforeHeat - shattersConstant);
+        var shattersQuadratic = Math.min(shattersAfterDF, shattersAfterHeat);
+
+        //console.log("Shatters before/after heat = " + shattersBeforeHeat + "/" + shattersAfterHeat + ", DF = " + shattersBeforeDF + "/" + shattersAfterDF);
+        //console.log("Shatters per category: constant = " + shattersConstant + ", heat only = " + shattersLinearHeatOnly + ", DF only = " + shattersLinearDFOnly + ", quadratic = " + shattersQuadratic);
+
+        //Alright, now time to evaluate these 4 segments.
+        //All of these are stored as temp variables so you can use console.log to query them.
+        var resultConstant = 1 * shattersConstant;
+
+        var slopeHeat = penaltyPerHeat * heatPerShatter; //How much 1 shatter causes the cost to increase by
+        var yInterceptHeat = 1 + (heatCurrent + heatPerShatter * shattersBeforeHeat - heatMax) * penaltyPerHeat; //Cost of the first one that falls in this linear category
+        var resultLinearHeatOnly = slopeHeat * shattersLinearHeatOnly * (shattersLinearHeatOnly-1)/2 + yInterceptHeat * shattersLinearHeatOnly;
+
+        var slopeDF = penaltyPerDarkYear * 1; //How much 1 shatter causes the cost to increase by
+        var yInterceptDF = 1 + (darkYears + 1 * shattersBeforeDF) * penaltyPerDarkYear; //Cost of the first one that falls in this linear category
+        var resultLinearDFOnly = slopeDF * shattersLinearDFOnly * (shattersLinearDFOnly-1)/2 + yInterceptDF * shattersLinearDFOnly;
+
+        //Now for the quadratic part, the y-intercepts need to be updated
+        yInterceptHeat = 1 + (heatCurrent + heatPerShatter * (amt - shattersQuadratic) - heatMax) * penaltyPerHeat;
+        yInterceptDF = 1 + (darkYears + 1 * (amt - shattersQuadratic)) * penaltyPerDarkYear;
+        var coefficientA = slopeHeat * slopeDF;
+        var coefficientB = slopeHeat * yInterceptDF + slopeDF * yInterceptHeat;
+        var coefficientC = yInterceptHeat * yInterceptDF;
+        var shattersQuadraticS = shattersQuadratic * (shattersQuadratic-1); // T*(T-1) is a term that occurs twice, so cache it here
+        var resultQuadratic = coefficientA*shattersQuadraticS*(2*shattersQuadratic-1)/6 + coefficientB*shattersQuadraticS/2 + coefficientC*shattersQuadratic;
+
+        var resultTotal = resultConstant + resultLinearHeatOnly + resultLinearDFOnly + resultQuadratic;
+
+        //console.log("Integral results: constant = " + resultConstant + ", heat only = " + resultLinearHeatOnly + ", DF only = " + resultLinearDFOnly + ", quadratic = " + resultQuadratic);
+
+        //After all that math we did above, we take the base price times the area of our discrete integral:
+        for (var i in prices_cloned) {
+			var price = prices_cloned[i];
+            pricesTotal[price.name] = price.val * resultTotal;
+            //Previously, void costs didn't increase in Dark Future.
+            //I changed it so now both void & TC costs are affected by Dark Future, but I think it's
+            // fine because shattering only costs void in a 1000 Years Challenge, so you complete the
+            // 1000 Years Challenge long before reaching any Dark Future penalties.
 		}
+        //Apply effects to specific resources:
+        //LDR for the effect "shatterCostReduction" is specified in challenges.js
+        pricesTotal.timeCrystal *= (1 + this.game.getEffect("shatterCostReduction") + this.game.getEffect("shatterCostIncreaseChallenge"));
         pricesTotal.void = Math.round(pricesTotal.void * 1000) / 1000;
 		return pricesTotal;
 	},
@@ -1241,20 +1294,40 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
     },
 
     doShatter: function(model, amt) {
-        var factor = this.game.challenges.getChallenge("1000Years").researched ? 5 : 10;
-        var heat_acutoconverted = 1 - 1/(1 + this.game.getEffect("heatCompression"));
-        if (heat_acutoconverted){
-            this.game.time.heat += amt * factor * (1 - heat_acutoconverted);
-            var efficiency = 1 + this.game.getEffect("heatEfficiency");
-            this.game.time.getCFU("blastFurnace").heat += amt * factor * heat_acutoconverted * efficiency;
-        }else{
-            this.game.time.heat += amt * factor;
+        var game = this.game;
+        var timeManager = game.time;
+        if (game.calendar.day < 0 && amt >= 500) {
+            var badge = game.achievements.getBadge("whatYearIsIt");
+            //One-time bonus: gain void upon unlocking the basge
+            if (!badge.unlocked) {
+                var voidAmtGained = 3; //This is more of a joke than anything, so the amount is small
+                game.resPool.addResEvent("void", voidAmtGained);
+                game.achievements.unlockBadge("whatYearIsIt");
+                game.msg($I("badges.whatYearIsIt.get", [voidAmtGained]));
+            }
+            //Silly thing: randomize the fur color of the leader kitten
+            if (game.village.leader != null) {
+                game.village.leader.color = game.createRandomVarietyAndColor(100 /*chance for rare color*/, 0 /*chance for variety*/)[0]; //extract color information
+            }
         }
-        //this.game.time.shatter(amt);
-        if(this.game.time.testShatter == 1) {this.game.time.shatterInGroupCycles(amt);}
-        //else if(this.game.time.testShatter == 2) {this.game.time.shatterInCycles(amt);}
+        if (game.space.getProgram("orbitalLaunch").val == 0) {
+            game.achievements.unlockBadge("tardis");
+        }
+
+        var factor = game.challenges.getChallenge("1000Years").researched ? 5 : 10;
+        var heat_acutoconverted = 1 - 100/(100 + game.getEffect("heatCompression"));
+        if (heat_acutoconverted){
+            timeManager.heat += amt * factor * (1 - heat_acutoconverted);
+            var efficiency = 1 + this.game.getEffect("heatEfficiency");
+            timeManager.getCFU("blastFurnace").heat += amt * factor * heat_acutoconverted * efficiency;
+        }else{
+            timeManager.heat += amt * factor;
+        }
+        //timeManager.shatter(amt);
+        if(timeManager.testShatter == 1) {timeManager.shatterInGroupCycles(amt);}
+        //else if(timeManager.testShatter == 2) {timeManager.shatterInCycles(amt);}
         //shatterInCycles is deprecated
-        else {this.game.time.shatter(amt);}
+        else {timeManager.shatter(amt);}
     },
 
     updateVisible: function(model){
@@ -1289,7 +1362,16 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
             dojo.destroy(this.custom.link);
             this.custom = undefined;
         }
-        this.updateLink(this.custom, this.model.customLink); //need this to sync the changes of effect and shatter number.
+        if (this.custom && this.model.customLink && this.model.customLink.title != this.custom.link.innerHTML) {
+            //Change the value of the custom link if needed.
+            //We can't just call updateLink() because we need to change the link handler as well!
+            //Instead, destroy the old link & create a new one.
+            dojo.destroy(this.custom.link);
+            this.custom = this.addLink(this.model.customLink);
+        }
+        if (this.custom && this.model.customLink) {
+            dojo.style(this.custom.link, "display", this.model.customLink.visible ? "" : "none");
+        }
 
         if  (this.model.tenErasLink.visible) {
             dojo.addClass(this.tenEras.link,"rightestLink");
