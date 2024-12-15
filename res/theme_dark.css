@@ -185,3 +185,7 @@
 	padding-left: 28px;
 	font-weight: bold;
 }
+
+.scheme_dark .census-block .links-container span:hover {
+	background-color: #333333;
+}

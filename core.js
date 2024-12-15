@@ -44,6 +44,9 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 	 * >>
 	 * >>  constructor: function() { this.arrayField = []; }
 	 */
+
+	//effectsCachedExisting is a table of the names of every possible effect on each item in this game tab.
+	//If an effect somehow isn't in here, the TabManager doesn't know it exists.
 	effectsCachedExisting: null,
 	meta: null,
 	panelData: null,
@@ -125,16 +128,21 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 			effectsBase = this.game.resPool.addBarnWarehouseRatio(effectsBase);
 		}
 
+		//Initialize effectsCachedExisting to effectsBase
+		for (var name in this.effectsCachedExisting) {
+			this.effectsCachedExisting[name] = (effectsBase && effectsBase[name]) ? effectsBase[name] : 0;
+		}
+
 		for (var i = 0; i < this.meta.length; i++){
+			//This will collect all meta effects into effectsCachedExisting
+			//We're just using it as a temporary holding area
 			this.updateMetaEffectCached(this.meta[i]);
 		}
 
+		var globalEffects = this.game.globalEffectsCached;
 		for (var name in this.effectsCachedExisting) {
-			// Add effect from meta
-			var effect = 0;
-			for (var i = 0; i < this.meta.length; i++){
-				effect += this.getMetaEffect(name, this.meta[i]);
-			}
+			var effect = this.effectsCachedExisting[name];
+			this.effectsCachedExisting[name] = 0; //zero it out after using it
 
 			// Previously, catnip demand (or other buildings that both affect the same resource)
 			// could have theoretically had more than 100% reduction because they diminished separately,
@@ -143,20 +151,20 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 				effect = this.game.getLimitedDR(effect, 1);
 			}
 
-			// Add effect from effectsBase
-			if (effectsBase && effectsBase[name]) {
-				effect += effectsBase[name];
-			}
-
 			// Add effect in globalEffectsCached, in addition of other managers
-			this.game.globalEffectsCached[name] = typeof(this.game.globalEffectsCached[name]) == "number" ? this.game.globalEffectsCached[name] + effect : effect;
+			globalEffects[name] = typeof(globalEffects[name]) == "number" ? globalEffects[name] + effect : effect;
 		}
 	},
 
 	updateMetaEffectCached: function (metadata) {
+		//The object named "metadata" is a group of items from a panel in a tab in the game.
+		//For example, all Bonfire buildings, or all Order of the Sun upgrades, or all policies.
 		for (var i = 0; i < metadata.meta.length; i++){
 			var meta = metadata.meta[i];
 			meta.totalEffectsCached = {};
+			//The object named "meta" is an individual item in the game.
+
+			//Populate totalEffectsCached by looping through all types of effects we know about
 			for (var effectName in this.effectsCachedExisting){
 				var effect;
 				if (metadata.provider){
@@ -164,7 +172,12 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 				} else {
 					effect = meta.effects[effectName] || 0;
 				}
-				meta.totalEffectsCached[effectName] = effect;
+				if (effect != 0) { //ONLY create the entry if it matters
+					meta.totalEffectsCached[effectName] = effect;
+					//Hack to reduce number of nested loops:
+					// temporarily collect the values in effectsCachedExisting.
+					this.effectsCachedExisting[effectName] += effect;
+				}
 			}
 		}
 	},
@@ -488,7 +501,16 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 		this.ui.renderConsoleLog();
 	},
 
-
+	//Sets a single filter to be not unlocked anymore
+	lockFilter: function(filterName) {
+		var filter = this.filters[filterName];
+		if (filter) {
+			filter.unlocked = false;
+			this.ui.renderFilters();
+		} else {
+			console.error("Error: Invalid filter name passed to lockFilter.");
+		}
+	},
 
 	resetState: function (){
 		for (var fId in this.filters){
@@ -1180,6 +1202,9 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 		var hasRes = res.value >= price.val;
 
 		var hasLimitIssue = res.maxValue && ((price.val > res.maxValue && !indent) || price.baseVal > res.maxValue);
+		if (price.val == Infinity && !indent) {
+			hasLimitIssue = true; //The player can't have infinite of any resource.
+		}
 		var asterisk = hasLimitIssue ? "*" : "";	//mark limit issues with asterisk
 
 		var displayValue = hasRes || simplePrices
@@ -1209,24 +1234,22 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 			hasLimitIssue: hasLimitIssue
 		};
 
-
 		//unroll prices to the raw resources
 		if (!hasRes && res.craftable && !simplePrices && res.name != "wood") {
 			var craft = this.game.workshop.getCraft(res.name);
-			if (craft.unlocked) {
+			var diff = price.val - res.value;
+			//Only unroll if we've unlocked the craft; don't unroll infinite prices
+			if (craft.unlocked && isFinite(diff)) {
 				var craftRatio = this.game.getResCraftRatio(res.name);
 				result.title = "+ " + result.title;
 				result.children = [];
 
 				var components = this.game.workshop.getCraftPrice(craft);
 				for (var j in components) {
-
-					var diff = price.val - res.value;
-
 					// Round up to the nearest craftable amount
 					var val = Math.ceil(components[j].val * diff / (1 + craftRatio));
 					var remainder = val % components[j].val;
-					if (remainder != 0) {
+					if (remainder != 0 && isFinite(remainder)) {
 						val += components[j].val - remainder;
 					}
 
@@ -2110,6 +2133,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 			var zebraOutpostMeta = this.game.bld.getBuildingExt("zebraOutpost").meta;
 			zebraOutpostMeta.calculateEffects(zebraOutpostMeta, this.game);
 			zebraOutpostMeta.jammed = false;
+			this.game.upgrade({policies : ["sharkRelationsBotanists"]});
 			this.game.diplomacy.onLeavingIW();
 		}
 

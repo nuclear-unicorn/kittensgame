@@ -112,7 +112,7 @@ WResourceRow = React.createClass({
             game.getResourcePerTick(res.name, false) || 
             game.getResourcePerTickConvertion(res.name) ? 
             game.getDisplayValueExt(perTick, true, false) + postfix : 
-            (res.calculatePerDay)? game.getDisplayValueExt((game.getResourcePerDay(res.name)) *((res.name == "necrocorn")? 1 + game.timeAccelerationRatio():1), true, false) + "/" + $I("unit.d"):
+            (res.calculatePerDay)? game.getDisplayValueExt((game.getResourcePerDay(res.name)), true, false) + "/" + $I("unit.d"):
             (res.calculateOnYear)? game.getDisplayValueExt(game.getResourceOnYearProduction(res.name), true, false) + "/" + $I("unit.y"): "";
             // "(" + game.getDisplayValueExt(perTick, true, false) + postfix + ")" : "";
 
@@ -413,7 +413,12 @@ WCraftRow = React.createClass({
     },
 
     getInitialState: function(){
-        return {visible: !this.props.resource.isHidden};
+        var res = this.props.resource;
+        if (res.name == "wood") {
+            return {visible: !res.isHiddenFromCrafting};
+        } else {
+            return {visible: !res.isHidden};
+        }
     },
 
     shouldComponentUpdate: function(nextProp, nextState){
@@ -503,7 +508,12 @@ WCraftRow = React.createClass({
 
     toggleView: function(){
         this.setState({visible: !this.state.visible});
-        this.props.resource.isHidden = this.state.visible; 
+        var res = this.props.resource;
+        if (res.name == "wood") {
+            res.isHiddenFromCrafting = this.state.visible;
+        } else {
+            res.isHidden = this.state.visible;
+        }
     },
 
     componentDidMount: function(){
@@ -712,6 +722,19 @@ WPins = React.createClass({
                         this.props.game.diplomacy.tradeAll(race); 
                     }.bind(this, race)
                 });
+            }
+        }
+
+        for (var i in this.props.game.village.loadoutController.loadouts) {
+            var loadout = this.props.game.village.loadoutController.loadouts[i];
+
+            if (loadout.pinned){
+                pins.push({
+                    title: $I("left.loadout.do", [loadout.title]),
+                    handler: function(loadout){ 
+                        loadout.setLoadout(true);
+                    }.bind(this, loadout)
+                })
             }
         }
         return pins;

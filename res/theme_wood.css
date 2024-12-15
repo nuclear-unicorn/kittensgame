@@ -925,7 +925,8 @@ body.scheme_wood.with_background_image {
 	border-image-width: 6px 6px 6px 6px;
 	border-image-slice: 12 12 12 12;
 }
-.scheme_wood .census-block.simLeader a.leaderHref {
+.scheme_wood .census-block.simLeader .leaderHref,
+.scheme_wood .census-block.simFavorite .favoriteHref {
 	color: #d4b356;
 }
 .scheme_wood .census-block .info { /* info of kitten */
@@ -1058,6 +1059,9 @@ body.scheme_wood.with_background_image {
 	border-image-outset: 0;
 	border-image-repeat: round;
 	box-shadow: inset 1px 1px 2px #000000, 1px 1px 1px #000000;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_wood .achievement:hover {
 	box-shadow: inset -1px -1px 2px #000000, 2px 2px 5px #000000, 0 -1px 2px #403939;
@@ -1138,7 +1142,7 @@ body.scheme_wood.with_background_image {
 .scheme_wood #calendarSign:hover {
    cursor: default;
 }
-.scheme_wood .right-tab-header { /* Log | Chat link on right column */
+.scheme_wood .right-tab-header { /* Log | Queue link on right column */
 	/* default margin-top: 10px; */
 	font-size: 90%;
 	text-shadow: 0 -2px 1px #000000;
@@ -1159,9 +1163,6 @@ body.scheme_wood.with_background_image {
 .scheme_wood div#observeButton {
 	margin-top: 5px; /* default margin-top: 15px */
 	height: 45px; /* default height: 30px; */
-}
-.scheme_wood #rightTabChat {
-	margin-top: 15px;
 }
 .scheme_wood div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #585145;

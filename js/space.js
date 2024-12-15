@@ -750,8 +750,11 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				effects: {
 					"maxKittens": 1
 				},
-				action: function(self, game) {
+				updateEffects: function(self, game) {
 					self.effects["maxKittens"] = 1 + game.getEffect("terraformingMaxKittensRatio");
+				},
+				action: function(self, game) {
+					self.updateEffects(self, game);
 				},
 				unlocks: {
 					tabs: ["village"]
@@ -895,6 +898,14 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 						self.effects["hashRateLevel"] = 0;
 					}
 					self.effects["gflopsConsumption"] = 0.1;
+
+					//Hide all hash-related things from the tooltip if we don't have any hashes:
+					if (hr == 0) {
+						self.effects["hashrate"] = 0;
+						self.effects["nextHashLevelAt"] = 0;
+						self.effects["hrProgress"] = 0;
+						self.effects["hashRateLevel"] = 0;
+					}
 				}
 			}
 		]
@@ -1106,7 +1117,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					}
 				}
 
-				if (bld.action && bld.val > 0){
+				if (bld.action && (bld.val > 0 || bld.name == "entangler")){ //Entanglers need to update hashrate level if we import a save that has 0 of them
 					var amt = bld.action(bld, this.game);
 					if (typeof(amt) != "undefined") {
 						bld.lackResConvert = amt != 1 && bld.on != 0;
@@ -1247,6 +1258,10 @@ dojo.declare("com.nuclearunicorn.game.ui.SpaceProgramBtnController", com.nuclear
         for (var i = 0; i < prices.length; i++){
             if (prices[i].name == "oil"){
                 var reductionRatio = this.game.getLimitedDR(this.game.getEffect("oilReductionRatio"), 0.75);
+                prices[i].val *= (1 - reductionRatio);
+			}
+			if (prices[i].name == "manpower"){
+                var reductionRatio = this.game.getLimitedDR(this.game.getEffect("catpowerReductionRatio"), 0.75);
                 prices[i].val *= (1 - reductionRatio);
 			}
 		}

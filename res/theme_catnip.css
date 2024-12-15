@@ -759,11 +759,25 @@ body.scheme_catnip {
 .scheme_catnip .census-block a {
 	color: #b6bda2;
 }
+.scheme_catnip .census-block .links-container span.btn.modern {
+	color: #b6bda2;
+	background-color: rgba(113, 148 , 64, 0.5);
+}
 .scheme_catnip .census-block a:hover {
 	color: #ebede5;
 }
-.scheme_catnip .census-block.simLeader a.leaderHref {
-	color: #00b5bf;
+.scheme_catnip .census-block .links-container span.btn.modern:hover {
+	color: #ebede5;
+	background-color: rgba(113, 148 , 64, 0.75);
+}
+.scheme_catnip .census-block.simLeader .leaderHref {
+	background: transparent !important;
+	border: none !important;
+}
+.scheme_catnip .census-block.simLeader .leaderHref,
+.scheme_catnip .census-block.simFavorite .favoriteHref {
+	color: #00b5bf !important;
+	text-shadow: 0 0 2px #fafbf9;
 }
 .scheme_catnip .census-block .info { /* info of kitten */
 	font-size: 0.9em;
@@ -889,6 +903,8 @@ body.scheme_catnip {
 }
 .scheme_catnip .achievement:not(.unethical).unlocked {
 	background-color: rgba(128, 128, 128, 0.1);
+}
+.scheme_catnip .achievement:not(.unethical, .name).unlocked {
 	color: #366208;
 }
 .scheme_catnip .achievement:not(.unethical).unlocked:hover {
@@ -982,7 +998,7 @@ body.scheme_catnip {
 .scheme_catnip #calendarSign:hover {
    cursor: default;
 }
-.scheme_catnip .right-tab-header { /* Log | Chat link on right column */
+.scheme_catnip .right-tab-header { /* Log | Queue link on right column */
 	/* default margin-top: 10px; */
 	font-size: 80%;
 }
@@ -1009,9 +1025,6 @@ body.scheme_catnip {
 	margin-top: 20px;/* default margin-top: 15px */
 	height: 35px; /* default height: 30px; */
 	margin-bottom: 3px;
-}
-.scheme_catnip #rightTabChat {
-	margin-top: 10px;
 }
 .scheme_catnip div.console-intro { /* Text on right column: "You are a kitten in a catnip forest." */
 	color: #87a84c;

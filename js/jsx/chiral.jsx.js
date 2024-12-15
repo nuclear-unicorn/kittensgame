@@ -160,7 +160,7 @@ WChiral = React.createClass({
         });
     },
 
-    componentWillUmount: function(){
+    componentWillUnmount: function(){
         dojo.unsubscribe(this.updateHandler);
     },
 

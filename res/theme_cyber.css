@@ -91,9 +91,11 @@ body.scheme_cyber {
 				linear-gradient(270deg, rgba(0, 0, 0, 0.5) 0%, transparent 50%, transparent 100%),
 				local repeat top left url('img/theme_cyber_texture_02.png'), #0b0b0b;
 }
+.scheme_cyber .census-block .links-container span,
 .scheme_cyber .btn.modern:not(.disabled) span.btnTitle { /* to change only the properties of the button name for buttons enabled */
 	color: #b6bec0;
 }
+.scheme_cyber .census-block .links-container span:hover,
 .scheme_cyber .btn.modern:not(.disabled):hover span.btnTitle {
 	color: #79d9ff;
 }
@@ -827,7 +829,8 @@ body.scheme_cyber {
 .scheme_cyber .census-block.simLeader {
 	border-image-source: url('img/theme_cyber_frame_03.png');
 }
-.scheme_cyber .census-block.simLeader a.leaderHref {
+.scheme_cyber .census-block.simLeader .leaderHref,
+.scheme_cyber .census-block.simFavorite .favoriteHref {
 	color: #FFE279;
 }
 .scheme_cyber .census-block .info { /* info of kitten */
@@ -951,6 +954,9 @@ body.scheme_cyber {
 	letter-spacing: 1px;
 	border: solid 1px transparent;
 	background: local repeat top left url('img/theme_cyber_texture_03.png'), #0b0b0b;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_cyber .achievement:hover {
 	border-image-source: url('img/theme_cyber_frame_06.png');
@@ -1053,7 +1059,7 @@ body.scheme_cyber {
 .scheme_cyber #calendarSign:hover {
    cursor: default;
 }
-.scheme_cyber .right-tab-header { /* Log | Chat link on right column */
+.scheme_cyber .right-tab-header { /* Log | Queue link on right column */
 	/* default margin-top: 10px; */
 	font-size: 80%;
 }
@@ -1075,9 +1081,6 @@ body.scheme_cyber {
 	margin-top: 5px; /* default margin-top: 15px */
 	/* default height: 30px; */
 	margin-bottom: 3px;
-}
-.scheme_cyber #rightTabChat {
-	margin-top: 10px;
 }
 .scheme_cyber div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #646464;

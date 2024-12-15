@@ -794,7 +794,11 @@ body.scheme_dune {
 .scheme_dune .census-block.simLeader:hover {
 	border-color: #fad5b4;
 }
-.scheme_dune .census-block.simLeader a.leaderHref {
+.scheme_dune .census-block .links-container span:hover {
+	color: #fee0dd;
+}
+.scheme_dune .census-block.simLeader .leaderHref,
+.scheme_dune .census-block.simFavorite .favoriteHref {
 	color: #fad5b4;
 }
 .scheme_dune .census-block .info { /* info of kitten */
@@ -907,11 +911,13 @@ body.scheme_dune {
 .scheme_dune .achievement {
     margin: 3px 5px;
     background-color: rgba(157, 93, 224, 0.1);
-    color: #e3e3eb;
     text-shadow: 1px 0 7px #e3e3eb;
     letter-spacing: 1px;
-	border-color : rgba(157, 93, 224, 0.3);
 	border-radius: 5px;
+}
+.scheme_dune .achievement:not(.name) {
+	color: #e3e3eb;
+	border-color : rgba(157, 93, 224, 0.3);
 }
 .scheme_dune .achievement:hover {
     background-color: rgba(157, 93, 224, 0.3);
@@ -1000,16 +1006,13 @@ body.scheme_dune {
 .scheme_dune #calendarSign:hover {
 	cursor: default;
 }
-.scheme_dune .right-tab-header { /* Log | Chat link on right column */
+.scheme_dune .right-tab-header { /* Log | Queue link on right column */
 	font-size: 90%;
 }
 .scheme_dune .right-tab-header a.active {
     color: #fca9fe;
 	text-shadow: 1px 1px 1px #000000;
 	border-top-color: transparent; /* default: border-top: 1px solid rgba(128, 128, 128, 0.4); in default.css */
-}
-.scheme_dune #rightTabChat {
-	margin-top: 20px;
 }
 .scheme_dune div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #701e79;

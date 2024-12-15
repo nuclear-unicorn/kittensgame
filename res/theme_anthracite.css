@@ -38,7 +38,8 @@ body.scheme_anthracite.with_background_image,
 	border-radius: 5px; /* default border-radius: 3px; */
 	width: 280px; /* +10px gained from left column +15px gained from padding default width: 264px; */
 }
-.scheme_anthracite .btn.modern.disabled {
+.scheme_anthracite .btn.modern.disabled,
+.scheme_anthracite .census-block.simLeader > .links-container > .btn.modern.leaderHref {
 	background-color: #202020;
 	border: inset 1px #181818;
 	background-image: url('img/theme_anthracite_button_disabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
@@ -46,7 +47,8 @@ body.scheme_anthracite.with_background_image,
 	background-attachment: local;
 	background-position: top left;
 }
-.scheme_anthracite .btn.modern.disabled:hover {
+.scheme_anthracite .btn.modern.disabled:hover,
+.scheme_anthracite .census-block.simLeader > .links-container > .btn.modern.leaderHref:hover {
 	background-color: #202020;
 	background-image: url('img/theme_anthracite_button_disabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
 	background-repeat: no-repeat;
@@ -676,7 +678,8 @@ body.scheme_anthracite.with_background_image,
 .scheme_anthracite .census-block.simLeader:hover {
 	border-color: #585858;
 }
-.scheme_anthracite .census-block.simLeader a.leaderHref {
+.scheme_anthracite .census-block.simLeader .leaderHref,
+.scheme_anthracite .census-block.simFavorite .favoriteHref {
 	color: #19b0ff;
 }
 .scheme_anthracite .census-block .info { /* info of kitten */
@@ -807,8 +810,6 @@ body.scheme_anthracite.with_background_image,
 .scheme_anthracite .achievement {
 	display: block;
 	font-size: 15px;
-	margin-right: 120px;
-	margin-left: 120px;
 	height: 34px;
 	background-color: transparent;
 	color: #a0a0a0;
@@ -820,6 +821,13 @@ body.scheme_anthracite.with_background_image,
 	background-repeat: no-repeat;
 	background-attachment: local;
 	background-position: top left;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+.scheme_anthracite .achievement:not(.badge) {
+	margin-right: 120px;
+	margin-left: 120px;
 }
 .scheme_anthracite .achievement:hover {
 	color: #f0f0f0;
@@ -907,7 +915,7 @@ body.scheme_anthracite.with_background_image,
 .scheme_anthracite #calendarSign:hover {
    cursor: default;
 }
-.scheme_anthracite .right-tab-header { /* Log | Chat link on right column */
+.scheme_anthracite .right-tab-header { /* Log | Queue link on right column */
 	color: transparent; /* for separator tab | */
 	font-size: 80%;
  }
@@ -936,9 +944,6 @@ body.scheme_anthracite.with_background_image,
 }
 .scheme_anthracite div#observeButton {
 	height: 35px; /* default height: 30px; */
-}
-.scheme_anthracite #rightTabChat {
-	margin-top: 14px;
 }
 .scheme_anthracite div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #646464;

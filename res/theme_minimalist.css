@@ -786,7 +786,8 @@ body.scheme_minimalist.with_background_image,
 .scheme_minimalist .census-block.simLeader:hover {
 	border-color: #5D56A9;
 }
-.scheme_minimalist .census-block.simLeader a.leaderHref {
+.scheme_minimalist .census-block.simLeader .leaderHref,
+.scheme_minimalist .census-block.simFavorite .favoriteHref {
 	color: #5D56A9;
 }
 .scheme_minimalist .census-block .info { /* info of kitten */
@@ -898,11 +899,13 @@ body.scheme_minimalist.with_background_image,
 	font-size: 15px;
     margin: 3px 5px;
     background-color: rgba(93, 86, 169, 0.1); /* color #5D56A9; */
-    color: #D8D8D8;
     text-shadow: rgba(187, 192, 202) 2px 0 10px; /* color #BBC0CA */
     letter-spacing: 1px;
-	border-color : rgba(93, 86, 169, 0.3); /* color #5D56A9; */
 	border-radius: 5px;
+}
+.scheme_minimalist .achievement:not(.name) {
+	color: #D8D8D8;
+	border-color : rgba(93, 86, 169, 0.3); /* color #5D56A9; */
 }
 .scheme_minimalist .achievement:hover {
     background-color: rgba(93, 86, 169, 0.3); /* color #5D56A9; */
@@ -986,16 +989,13 @@ body.scheme_minimalist.with_background_image,
 .scheme_minimalist #calendarSign:hover {
 	cursor: default;
 }
-.scheme_minimalist .right-tab-header { /* Log | Chat link on right column */
+.scheme_minimalist .right-tab-header { /* Log | Queue link on right column */
 	color: #333342; /* for separator tab | */
 	font-size: 80%;
 }
 .scheme_minimalist .right-tab-header a.active {
     color: #B5BAC4;
 	font-weight: bold !important;
-}
-.scheme_minimalist #rightTabChat {
-	margin-top: 20px;
 }
 .scheme_minimalist div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #3b3b4c;
