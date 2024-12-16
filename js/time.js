@@ -1315,7 +1315,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         }
 
         var factor = game.challenges.getChallenge("1000Years").researched ? 5 : 10;
-        var heat_acutoconverted = 1 - 100/(100 + game.getEffect("heatCompression"));
+        var heat_acutoconverted = 1 - 1/(1 + game.getEffect("heatCompression"));
         if (heat_acutoconverted){
             timeManager.heat += amt * factor * (1 - heat_acutoconverted);
             var efficiency = 1 + this.game.getEffect("heatEfficiency");
