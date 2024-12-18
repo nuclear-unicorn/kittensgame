@@ -779,12 +779,13 @@ WLeftPanel = React.createClass({
         var game = this.state.game,
             reqRes = game.getRequiredResources(game.selectedBuilding);
 
+        var huntCost = 100 - game.getEffect("huntCatpowerDiscount");
         var catpower = game.resPool.get("manpower");
-        var huntCount = Math.floor(catpower.value / 100);
+        var huntCount = Math.floor(catpower.value / huntCost);
 
         var canHunt = ((game.resPool.get("paragon").value > 0) || (game.science.get("archery").researched)) &&
             (!game.challenges.isActive("pacifism"));
-        var showFastHunt = (catpower.value >= 100);
+        var showFastHunt = (catpower.value >= huntCost);
 
         //---------- advisor ---------
         var showAdvisor = false;
