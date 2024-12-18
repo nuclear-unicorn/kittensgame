@@ -1854,10 +1854,15 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 	},
 
 	clickHandler: function(model, event){
+		var map = this.game.village.map;
+		if (map.energy <= 0 || map.hp <= 0)
+		{
+			//Not enough resources to explore
+			return;
+		}
 		var biome = model.biome;
 		console.log("CURRENT BIOME:", biome);
 
-		var map = this.game.village.map;
 		map.currentBiome = biome.name;
 	},
 
@@ -1893,6 +1898,17 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 
 	updateVisible: function(model){
 		model.visible = this.biome.unlocked;
+	},
+	updateEnabled: function(model) {
+		var map = this.game.village.map;
+		if (map.energy <= 0 || map.hp <= 0)
+		{
+			//Not enough resources to explore
+			model.enabled = false;
+			return;
+		}
+
+		this.inherited(arguments);
 	}
 });
 
