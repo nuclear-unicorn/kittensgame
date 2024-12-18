@@ -1961,8 +1961,9 @@ dojo.declare("classes.ui.village.BiomeBtn", com.nuclearunicorn.game.ui.ButtonMod
 						innerHTML: fauna.title /*+ " | a:" + fauna.atk + ", d:" + fauna.def*/,
 						style: { float: "left" }
 					}, faunaNode );
+					var game = model.options.controller.game;
 					var statsSpan = dojo.create("span", {
-						innerHTML: this.game.getDisplayValueExt(fauna.hp) + "hp",
+						innerHTML: game.getDisplayValueExt(fauna.hp) + "hp",
 						style: { float: "right" }
 					}, faunaNode );
 
