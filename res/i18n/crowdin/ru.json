@@ -159,7 +159,7 @@
     "buildings.library.desc": "Построить библиотеку для сохранения священного знания кошачества. Каждое улучшение даёт 10% к науке.",
     "buildings.library.flavor": "Всё на котонском.",
     "buildings.logHouse.label": "Избушка",
-    "buildings.logHouse.desc": "Построить избушку (на 1 котёнка).",
+    "buildings.logHouse.desc": "Построить дом (у каждого есть место для 1 котёнка)",
     "buildings.logHouse.flavor": "Хижина в лесу.",
     "buildings.lumberMill.label": "Лесопилка",
     "buildings.lumberMill.desc": "Улучшает производство дерева на 10%.",
