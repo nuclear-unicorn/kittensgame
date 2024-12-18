@@ -1469,7 +1469,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["sharkRelationsScribes", "sharkRelationsBotanists"],
 		calculateEffects: function(self, game) {
 			var trades = game.stats.getStatCurrent("totalTrades").val;
-			self.effects["tradeRatio"] = Math.min(Math.floor(Math.log10(Math.max(trades, 100)) - 1) * 0.03, 0.3);			
+			self.effects["tradeRatio"] = Math.min(Math.round((Math.log10(Math.max(trades, 100)) - 1) * 3) / 100, 0.3);			
 		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("sharks", 20);
