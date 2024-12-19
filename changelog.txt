@@ -13,6 +13,7 @@ Minor:
 * Fix bugs related to Temporal Press
 * Fix bugs related to importing a save
 * Fix math errors related to Holy Genocide
+* Offline gflops should work correctly now.
 
 v 1.4.9.3
 Major:
