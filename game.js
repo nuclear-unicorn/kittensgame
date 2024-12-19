@@ -4379,7 +4379,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		if(!value){ return "0"; }
 		if (value === Infinity) {
-			return "∞";
+			return prefix ? "+∞" : "∞";
+		}
+		if (value === -Infinity) {
+			return "-∞";
 		}
 
 		usePerTickHack &= this.opts.usePerSecondValues;
