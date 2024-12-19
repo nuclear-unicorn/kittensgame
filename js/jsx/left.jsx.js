@@ -47,13 +47,8 @@ WResourceRow = React.createClass({
         return {resource: null, isEditMode: false, isRequired: false, showHiddenResources: false};
     },
 
-    getInitialState: function(){
-        return {
-            visible: !this.props.resource.isHidden
-        };
-    },
-
     //this is a bit ugly, probably React.PureComponent + immutable would be a much better approach
+    //TODO: this function needs a proper rewrite.  I'm pretty sure it doesn't work at all as intended.
     shouldComponentUpdate: function(nextProp, nextState){
         var oldRes = this.oldRes || {},
             newRes = nextProp.resource;
@@ -66,7 +61,7 @@ WResourceRow = React.createClass({
             this.props.isRequired == nextProp.isRequired &&
             this.props.showHiddenResources == nextProp.showHiddenResources &&
             this.props.isTemporalParadox != nextProp.isTemporalParadox &&
-            this.state.visible == nextState.visible;
+            true /*this.state.visible == nextState.visible*/;
 
         if (isEqual){
             return false;
@@ -88,7 +83,7 @@ WResourceRow = React.createClass({
 
         var hasVisibility = (res.unlocked || (res.name == "kittens" && res.maxValue));
 
-        if (!hasVisibility || (!this.state.visible && !this.props.isEditMode)){
+        if (!hasVisibility || (!this.getIsVisible() && !this.props.isEditMode)){
             return null;
         }
 
@@ -214,7 +209,7 @@ WResourceRow = React.createClass({
                 $r("div", {className:"res-cell"},
                     $r("input", {
                         type:"checkbox", 
-                        checked: this.state.visible,
+                        checked: this.getIsVisible(),
 
                         onClick: this.toggleView,
                         style:{display:"inline-block"},
@@ -245,8 +240,11 @@ WResourceRow = React.createClass({
     },
 
     toggleView: function(){
-        this.setState({visible: !this.state.visible});
-        this.props.resource.isHidden = this.state.visible; 
+        this.props.resource.isHidden = !this.props.resource.isHidden;
+    },
+
+    getIsVisible: function() {
+        return !this.props.resource.isHidden;
     },
 
     componentDidMount: function(){
@@ -403,15 +401,6 @@ WCraftRow = React.createClass({
         return {resource: null, isEditMode: false};
     },
 
-    getInitialState: function(){
-        var res = this.props.resource;
-        if (res.name == "wood") {
-            return {visible: !res.isHiddenFromCrafting};
-        } else {
-            return {visible: !res.isHidden};
-        }
-    },
-
     shouldComponentUpdate: function(nextProp, nextState){
         var newRes = nextProp.resource;
 
@@ -435,7 +424,7 @@ WCraftRow = React.createClass({
 
         var recipe = game.workshop.getCraft(res.name);
         var hasVisibility = (res.unlocked && recipe.unlocked /*&& this.workshop.on > 0*/);
-        if (!hasVisibility || (!this.state.visible && !this.props.isEditMode)){
+        if (!hasVisibility || (!this.getIsVisible() && !this.props.isEditMode)){
             return null;
         }
 
@@ -471,7 +460,7 @@ WCraftRow = React.createClass({
                 $r("div", {className:"res-cell"},
                     $r("input", {
                         type:"checkbox", 
-                        checked: this.state.visible,
+                        checked: this.getIsVisible(),
                         onClick: this.toggleView,
                         style:{display:"inline-block"},
                     })
@@ -498,13 +487,21 @@ WCraftRow = React.createClass({
     },
 
     toggleView: function(){
-        this.setState({visible: !this.state.visible});
         var res = this.props.resource;
         if (res.name == "wood") {
-            res.isHiddenFromCrafting = this.state.visible;
+            res.isHiddenFromCrafting = !res.isHiddenFromCrafting;
         } else {
-            res.isHidden = this.state.visible;
+            res.isHidden = !res.isHidden;
         }
+    },
+
+    getIsVisible: function() {
+        var res = this.props.resource;
+        if (res.name == "wood") {
+            //(Wood is special because it appears twice, separately)
+            return !res.isHiddenFromCrafting;
+        }
+        return !res.isHidden;
     },
 
     componentDidMount: function(){
