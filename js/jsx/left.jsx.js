@@ -252,29 +252,20 @@ WResourceRow = React.createClass({
     componentDidMount: function(){
         var node = React.findDOMNode(this.refs.perTickNode);
         if (node){
-            this.tooltipNode = node;
+            this.refs.isTooltipAttached = true;
             game.attachResourceTooltip(node, this.props.resource);
         }
     },
 
     componentDidUpdate: function(prevProps, prevState){
-        if (!this.tooltipNode){
-            var node = React.findDOMNode(this.refs.perTickNode);
-            if (node){
-                this.tooltipNode = node;
-                game.attachResourceTooltip(node, this.props.resource);
-            }
+        var node = React.findDOMNode(this.refs.perTickNode);
+        if(this.refs.isTooltipAttached && !node) {
+            this.refs.isTooltipAttached = false;
         }
-    },
-
-    componentWillUnmount: function(){
-        if (!this.tooltipNode){
-            var node = React.findDOMNode(this.refs.perTickNode);
-            if (node){
-                this.tooltipNode = node;
-            }
+        if (node && !this.refs.isTooltipAttached) {
+            this.refs.isTooltipAttached = true;
+            game.attachResourceTooltip(node, this.props.resource);
         }
-        dojo.destroy(this.tooltipNode);
     }
 });
 
@@ -519,18 +510,19 @@ WCraftRow = React.createClass({
     componentDidMount: function(){
         var node = React.findDOMNode(this.refs.perTickNode);
         if (node){
-            this.tooltipNode = node;
+            this.refs.isTooltipAttached = true;
             game.attachResourceTooltip(node, this.props.resource);
         }
     },
 
     componentDidUpdate: function(prevProps, prevState){
-        if (!this.tooltipNode){
-            var node = React.findDOMNode(this.refs.perTickNode);
-            if (node){
-                this.tooltipNode = node;
-                game.attachResourceTooltip(node, this.props.resource);
-            }
+        var node = React.findDOMNode(this.refs.perTickNode);
+        if(this.refs.isTooltipAttached && !node) {
+            this.refs.isTooltipAttached = false;
+        }
+        if (node && !this.refs.isTooltipAttached) {
+            this.refs.isTooltipAttached = true;
+            game.attachResourceTooltip(node, this.props.resource);
         }
     }
 });
