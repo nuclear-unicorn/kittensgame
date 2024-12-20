@@ -2085,6 +2085,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				self.jammed = false;
 			}
 		},
+		jammed: false,
 		action: function(self, game){
 			if(self.val < 1 || self.jammed){
 				return;
