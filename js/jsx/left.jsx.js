@@ -319,17 +319,16 @@ WCraftShortcut = React.createClass({
 
         var node = React.findDOMNode(this.refs.linkBlock);
         if (node && node.firstChild){
-            this.tooltipNode = node;
-
             UIUtils.attachTooltip(game, node.firstChild, 0, 60, dojo.partial( function(recipe){
 				var tooltip = dojo.create("div", { className: "button_tooltip" }, null);
 				var prices = game.workshop.getCraftPrice(recipe);
 
 				var allCount = game.workshop.getCraftAllCount(recipe.name);
 				var ratioCount = Math.floor(allCount * ratio);
-				if (num < ratioCount){
-					num = ratioCount;
-				}
+
+				//num (craftFixed) specifies the minimum number of crafts
+				//But we want it to scale up with ratioCount as well
+				var craftRowAmt = Math.max(num, ratioCount);
 
 				for (var i = 0; i < prices.length; i++){
 					var price = prices[i];
@@ -343,7 +342,7 @@ WCraftShortcut = React.createClass({
 						}, priceItemNode );
 
 					dojo.create("span", {
-							innerHTML: game.getDisplayValueExt(price.val * num),
+							innerHTML: game.getDisplayValueExt(price.val * craftRowAmt),
 							style: {float: "right", paddingLeft: "6px" }
 						}, priceItemNode );
 				}
