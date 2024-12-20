@@ -2528,6 +2528,7 @@ dojo.declare("classes.village.KittenSim", null, {
 					jobKittens.splice(i, 1); //Delete element from middle of array
 					this.game.village.unassignJob(kitten);
 					amt -= 1; //Decrement counter of kittens to unassign.
+					i -= 1; //Shift index so we don't accidentally skip any array elements.
 				}
 			}
 		}
