@@ -911,7 +911,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
             },
 
 			"temporalParadoxChance": {
-				title: $I("effectsMgr.statics.temporalParadoxChance.title"),
 				type: "hidden"
 			},
 
@@ -3812,14 +3811,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		//hack end
 		this.time.update();
 
-		if (this.undoChange){
-			this.undoChange.ttl--;
-
-			if (this.undoChange.ttl <= 0){
-				this.undoChange = null;
-				this._publish("server/undoStateChanged");
-			}
-		}
         //--------------------
         //  Update UI state
         //--------------------
@@ -4387,7 +4378,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		if(!value){ return "0"; }
 		if (value === Infinity) {
-			return "∞";
+			return prefix ? "+∞" : "∞";
+		}
+		if (value === -Infinity) {
+			return "-∞";
 		}
 
 		usePerTickHack &= this.opts.usePerSecondValues;
@@ -4569,6 +4563,14 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.timer.updateScheduledEvents();
         var fpsElement;
 
+		if (this.undoChange){
+			//"Undo button" countdown should still tick while pawsed
+			this.undoChange.ttl--;
+			if (this.undoChange.ttl <= 0){
+				this.undoChange = null;
+				this._publish("server/undoStateChanged");
+			}
+		}
 		if (this.isPaused){
 			this.ui.update(); //Still update UI if the player gathers catnip while pawsed or something
 			return;

@@ -1854,10 +1854,15 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 	},
 
 	clickHandler: function(model, event){
+		var map = this.game.village.map;
+		if (map.energy <= 0 || map.hp <= 0)
+		{
+			//Not enough resources to explore
+			return;
+		}
 		var biome = model.biome;
 		console.log("CURRENT BIOME:", biome);
 
-		var map = this.game.village.map;
 		map.currentBiome = biome.name;
 	},
 
@@ -1893,6 +1898,17 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 
 	updateVisible: function(model){
 		model.visible = this.biome.unlocked;
+	},
+	updateEnabled: function(model) {
+		var map = this.game.village.map;
+		if (map.energy <= 0 || map.hp <= 0)
+		{
+			//Not enough resources to explore
+			model.enabled = false;
+			return;
+		}
+
+		this.inherited(arguments);
 	}
 });
 
@@ -1961,8 +1977,9 @@ dojo.declare("classes.ui.village.BiomeBtn", com.nuclearunicorn.game.ui.ButtonMod
 						innerHTML: fauna.title /*+ " | a:" + fauna.atk + ", d:" + fauna.def*/,
 						style: { float: "left" }
 					}, faunaNode );
+					var game = model.options.controller.game;
 					var statsSpan = dojo.create("span", {
-						innerHTML: this.game.getDisplayValueExt(fauna.hp) + "hp",
+						innerHTML: game.getDisplayValueExt(fauna.hp) + "hp",
 						style: { float: "right" }
 					}, faunaNode );
 
@@ -2511,6 +2528,7 @@ dojo.declare("classes.village.KittenSim", null, {
 					jobKittens.splice(i, 1); //Delete element from middle of array
 					this.game.village.unassignJob(kitten);
 					amt -= 1; //Decrement counter of kittens to unassign.
+					i -= 1; //Shift index so we don't accidentally skip any array elements.
 				}
 			}
 		}

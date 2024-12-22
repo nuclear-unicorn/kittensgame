@@ -549,13 +549,19 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	},
 
 	getManpowerCost: function() {
-		 var manpowerCost = this.baseManpowerCost - this.game.getEffect("tradeCatpowerDiscount");
-		 return (manpowerCost < 0) ? 0 : manpowerCost;
+		var manpowerCost = this.baseManpowerCost - this.game.getEffect("tradeCatpowerDiscount");
+		if(this.game.challenges.isActive("postApocalypse")) {
+			manpowerCost *= 1 + this.game.bld.getPollutionLevel();
+		}
+		return (manpowerCost < 0) ? 0 : manpowerCost;
 	},
 
 	getGoldCost: function() {
-		 var goldCost = this.baseGoldCost - this.game.getEffect("tradeGoldDiscount");
-		 return (goldCost < 0) ? 0 : goldCost;
+		var goldCost = this.baseGoldCost - this.game.getEffect("tradeGoldDiscount");
+		if(this.game.challenges.isActive("postApocalypse")) {
+			goldCost *= 1 + this.game.bld.getPollutionLevel();
+		}
+		return (goldCost < 0) ? 0 : goldCost;
 	},
 
 	trade: function(race){
@@ -571,10 +577,6 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		//-------------- pay prices ------------------
 		var manpowerCost = this.getManpowerCost();
 		var goldCost = this.getGoldCost();
-		if(this.game.challenges.isActive("postApocalypse")){
-			manpowerCost *= 1 + this.game.bld.getPollutionLevel();
-			goldCost *= 1 + this.game.bld.getPollutionLevel();
-		}
 		this.game.resPool.addResEvent("manpower", -manpowerCost * amt);
 		this.game.resPool.addResEvent("gold", -goldCost * amt);
 		this.game.resPool.addResEvent(race.buys[0].name, -race.buys[0].val * amt);
@@ -625,11 +627,6 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	getMaxTradeAmt: function(race){
 		var manpowerCost = this.getManpowerCost();
 		var goldCost = this.getGoldCost();
-
-		if(this.game.challenges.isActive("postApocalypse")){
-			manpowerCost *= 1 + this.game.bld.getPollutionLevel();
-			goldCost *= 1 + this.game.bld.getPollutionLevel();
-		}
 
 		var amt = [
 			Math.floor(this.game.resPool.get("gold").value /
@@ -1445,10 +1442,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 			}
 
 			var tradePrices = [{ name: "manpower", val: this.game.diplomacy.getManpowerCost()}, { name: "gold", val: this.game.diplomacy.getGoldCost()}];
-			if(this.game.challenges.isActive("postApocalypse")){
-				tradePrices[0].val *= 1 + this.game.bld.getPollutionLevel();
-				tradePrices[1].val *= 1 + this.game.bld.getPollutionLevel();
-			}
 			tradePrices = tradePrices.concat(race.buys);
 
 			var tradeBtn = new com.nuclearunicorn.game.ui.TradeButton({
