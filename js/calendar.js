@@ -288,17 +288,11 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 	},
 
 	observeTimeout: function(){
-
 		this.observeClear();
 
-		var autoChance = this.game.getEffect("starAutoSuccessChance");
-		if (this.game.prestige.getPerk("astromancy").researched){
-			autoChance *= 2;
-		}
-
+		var autoChance = this.getAstroEventAutoChance();
 		var rand = this.game.rand(100);
-		if (this.game.ironWill && rand <= 25
-		 || rand <= autoChance * 100) {
+		if (rand <= autoChance * 100) {
 			this.observeHandler();
 		}
 
@@ -359,6 +353,29 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		}
 
 		return effects;
+	},
+
+	//Returns a number in the interval [0,1]
+	getAstroEventAutoChance: function() {
+		var game = this.game;
+		if (game.workshop.get("seti").researched) {
+			return 1;
+		}
+		//Else, no SETI, so calculate based on Observatories:
+		var autoChance = game.getEffect("starAutoSuccessChance");
+		if (game.prestige.getPerk("astromancy").researched) {
+			autoChance *= 2;
+		}
+
+		if (game.ironWill) {
+			//Minimum 25% auto chance
+			autoChance = Math.max(0.25, autoChance);
+		} else {
+			//Don't go below 0
+			autoChance = Math.max(0, autoChance);
+		}
+		//Cap at 100% chance
+		return Math.min(autoChance, 1);
 	},
 
 	trueYear: function() {
@@ -685,19 +702,11 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
                 eventChance *= 2;
             }
 
-            var autoChance = this.game.getEffect("starAutoSuccessChance");
-            if (this.game.prestige.getPerk("astromancy").researched) {
-                autoChance *= 2;
-            }
-
-            if (this.game.workshop.get("seti").researched) {
-                autoChance = 1;
-            }
-            autoChance = Math.min(autoChance, 1);
+            var autoChance = this.getAstroEventAutoChance();
             //console.log("eventChance="+eventChance+", autoChance="+autoChance);
             numberEvents = Math.round(daysOffset * eventChance * autoChance);
             //console.log("number of startcharts="+numberEvents);
-            if (numberEvents) {
+            if (numberEvents && this.game.science.get("astronomy").researched) {
                 this.game.resPool.addResEvent("starchart", numberEvents);
             }
 
