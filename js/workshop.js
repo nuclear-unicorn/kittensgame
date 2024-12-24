@@ -2889,7 +2889,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 				model.unassignCraftLinks = [
 				  {
 						id: "unassign",
-						title: "[&ndash;]",
+						title: "[-]",
 						handler: function(){
 							self.unassignCraftJob(model, 1);
 						},

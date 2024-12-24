@@ -2085,6 +2085,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				self.jammed = false;
 			}
 		},
+		jammed: false,
 		action: function(self, game){
 			if(self.val < 1 || self.jammed){
 				return;
@@ -2708,12 +2709,22 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			this.cathPollution = Math.max(((this.cathPollution * pdr + uppt) * expon - uppt) / pdr, 0);
 		}
 	},
+	gflopsFastForward: function(ticks) {
+		var game = this.game;
+		var aiCore = this.get("aiCore");
+		var gflopsProduced = aiCore.effects["gflopsPerTickBase"] * aiCore.on * ticks;
+		game.resPool.get("gflops").value += gflopsProduced;
+	},
 	
 	fastforward: function(daysOffset) {
 		var game = this.game;
 
 		this.cacheCathPollutionPerTick();
 		this.cathPollutionFastForward(daysOffset * game.calendar.ticksPerDay);
+
+		if(game.opts.enableRedshiftGflops){
+			this.gflopsFastForward(daysOffset * game.calendar.ticksPerDay);
+		}
 
 		var steamworks = this.get("steamworks");
 		if (steamworks.on < 1 || !game.workshop.get("factoryAutomation").researched) {
@@ -2783,10 +2794,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		plateCrafter.craft();
 		slabCrafter.craft();
 		beamCrafter.craft();
-		if(game.opts.enableRedshiftGflops){
-			var aiCore = this.get("aiCore");
-			game.resPool.get("gflops").value += aiCore.effects["gflopsPerTickBase"] * aiCore.on * daysOffset * game.calendar.ticksPerDay;
-		}
 	},
 
 	undo: function(data){

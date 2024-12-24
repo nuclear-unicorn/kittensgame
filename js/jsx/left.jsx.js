@@ -47,13 +47,8 @@ WResourceRow = React.createClass({
         return {resource: null, isEditMode: false, isRequired: false, showHiddenResources: false};
     },
 
-    getInitialState: function(){
-        return {
-            visible: !this.props.resource.isHidden
-        };
-    },
-
     //this is a bit ugly, probably React.PureComponent + immutable would be a much better approach
+    //TODO: this function needs a proper rewrite.  I'm pretty sure it doesn't work at all as intended.
     shouldComponentUpdate: function(nextProp, nextState){
         var oldRes = this.oldRes || {},
             newRes = nextProp.resource;
@@ -66,7 +61,7 @@ WResourceRow = React.createClass({
             this.props.isRequired == nextProp.isRequired &&
             this.props.showHiddenResources == nextProp.showHiddenResources &&
             this.props.isTemporalParadox != nextProp.isTemporalParadox &&
-            this.state.visible == nextState.visible;
+            true /*this.state.visible == nextState.visible*/;
 
         if (isEqual){
             return false;
@@ -88,7 +83,7 @@ WResourceRow = React.createClass({
 
         var hasVisibility = (res.unlocked || (res.name == "kittens" && res.maxValue));
 
-        if (!hasVisibility || (!this.state.visible && !this.props.isEditMode)){
+        if (!hasVisibility || (!this.getIsVisible() && !this.props.isEditMode)){
             return null;
         }
 
@@ -214,7 +209,7 @@ WResourceRow = React.createClass({
                 $r("div", {className:"res-cell"},
                     $r("input", {
                         type:"checkbox", 
-                        checked: this.state.visible,
+                        checked: this.getIsVisible(),
 
                         onClick: this.toggleView,
                         style:{display:"inline-block"},
@@ -245,36 +240,30 @@ WResourceRow = React.createClass({
     },
 
     toggleView: function(){
-        this.setState({visible: !this.state.visible});
-        this.props.resource.isHidden = this.state.visible; 
+        this.props.resource.isHidden = !this.props.resource.isHidden;
+    },
+
+    getIsVisible: function() {
+        return !this.props.resource.isHidden;
     },
 
     componentDidMount: function(){
         var node = React.findDOMNode(this.refs.perTickNode);
         if (node){
-            this.tooltipNode = node;
+            this.refs.isTooltipAttached = true;
             game.attachResourceTooltip(node, this.props.resource);
         }
     },
 
     componentDidUpdate: function(prevProps, prevState){
-        if (!this.tooltipNode){
-            var node = React.findDOMNode(this.refs.perTickNode);
-            if (node){
-                this.tooltipNode = node;
-                game.attachResourceTooltip(node, this.props.resource);
-            }
+        var node = React.findDOMNode(this.refs.perTickNode);
+        if(this.refs.isTooltipAttached && !node) {
+            this.refs.isTooltipAttached = false;
         }
-    },
-
-    componentWillUnmount: function(){
-        if (!this.tooltipNode){
-            var node = React.findDOMNode(this.refs.perTickNode);
-            if (node){
-                this.tooltipNode = node;
-            }
+        if (node && !this.refs.isTooltipAttached) {
+            this.refs.isTooltipAttached = true;
+            game.attachResourceTooltip(node, this.props.resource);
         }
-        dojo.destroy(this.tooltipNode);
     }
 });
 
@@ -330,17 +319,16 @@ WCraftShortcut = React.createClass({
 
         var node = React.findDOMNode(this.refs.linkBlock);
         if (node && node.firstChild){
-            this.tooltipNode = node;
-
             UIUtils.attachTooltip(game, node.firstChild, 0, 60, dojo.partial( function(recipe){
 				var tooltip = dojo.create("div", { className: "button_tooltip" }, null);
 				var prices = game.workshop.getCraftPrice(recipe);
 
 				var allCount = game.workshop.getCraftAllCount(recipe.name);
 				var ratioCount = Math.floor(allCount * ratio);
-				if (num < ratioCount){
-					num = ratioCount;
-				}
+
+				//num (craftFixed) specifies the minimum number of crafts
+				//But we want it to scale up with ratioCount as well
+				var craftRowAmt = Math.max(num, ratioCount);
 
 				for (var i = 0; i < prices.length; i++){
 					var price = prices[i];
@@ -354,7 +342,7 @@ WCraftShortcut = React.createClass({
 						}, priceItemNode );
 
 					dojo.create("span", {
-							innerHTML: game.getDisplayValueExt(price.val * num),
+							innerHTML: game.getDisplayValueExt(price.val * craftRowAmt),
 							style: {float: "right", paddingLeft: "6px" }
 						}, priceItemNode );
 				}
@@ -412,15 +400,6 @@ WCraftRow = React.createClass({
         return {resource: null, isEditMode: false};
     },
 
-    getInitialState: function(){
-        var res = this.props.resource;
-        if (res.name == "wood") {
-            return {visible: !res.isHiddenFromCrafting};
-        } else {
-            return {visible: !res.isHidden};
-        }
-    },
-
     shouldComponentUpdate: function(nextProp, nextState){
         var newRes = nextProp.resource;
 
@@ -444,7 +423,7 @@ WCraftRow = React.createClass({
 
         var recipe = game.workshop.getCraft(res.name);
         var hasVisibility = (res.unlocked && recipe.unlocked /*&& this.workshop.on > 0*/);
-        if (!hasVisibility || (!this.state.visible && !this.props.isEditMode)){
+        if (!hasVisibility || (!this.getIsVisible() && !this.props.isEditMode)){
             return null;
         }
 
@@ -480,7 +459,7 @@ WCraftRow = React.createClass({
                 $r("div", {className:"res-cell"},
                     $r("input", {
                         type:"checkbox", 
-                        checked: this.state.visible,
+                        checked: this.getIsVisible(),
                         onClick: this.toggleView,
                         style:{display:"inline-block"},
                     })
@@ -507,30 +486,39 @@ WCraftRow = React.createClass({
     },
 
     toggleView: function(){
-        this.setState({visible: !this.state.visible});
         var res = this.props.resource;
         if (res.name == "wood") {
-            res.isHiddenFromCrafting = this.state.visible;
+            res.isHiddenFromCrafting = !res.isHiddenFromCrafting;
         } else {
-            res.isHidden = this.state.visible;
+            res.isHidden = !res.isHidden;
         }
+    },
+
+    getIsVisible: function() {
+        var res = this.props.resource;
+        if (res.name == "wood") {
+            //(Wood is special because it appears twice, separately)
+            return !res.isHiddenFromCrafting;
+        }
+        return !res.isHidden;
     },
 
     componentDidMount: function(){
         var node = React.findDOMNode(this.refs.perTickNode);
         if (node){
-            this.tooltipNode = node;
+            this.refs.isTooltipAttached = true;
             game.attachResourceTooltip(node, this.props.resource);
         }
     },
 
     componentDidUpdate: function(prevProps, prevState){
-        if (!this.tooltipNode){
-            var node = React.findDOMNode(this.refs.perTickNode);
-            if (node){
-                this.tooltipNode = node;
-                game.attachResourceTooltip(node, this.props.resource);
-            }
+        var node = React.findDOMNode(this.refs.perTickNode);
+        if(this.refs.isTooltipAttached && !node) {
+            this.refs.isTooltipAttached = false;
+        }
+        if (node && !this.refs.isTooltipAttached) {
+            this.refs.isTooltipAttached = true;
+            game.attachResourceTooltip(node, this.props.resource);
         }
     }
 });
@@ -779,12 +767,13 @@ WLeftPanel = React.createClass({
         var game = this.state.game,
             reqRes = game.getRequiredResources(game.selectedBuilding);
 
+        var huntCost = 100 - game.getEffect("huntCatpowerDiscount");
         var catpower = game.resPool.get("manpower");
-        var huntCount = Math.floor(catpower.value / 100);
+        var huntCount = Math.floor(catpower.value / huntCost);
 
         var canHunt = ((game.resPool.get("paragon").value > 0) || (game.science.get("archery").researched)) &&
             (!game.challenges.isActive("pacifism"));
-        var showFastHunt = (catpower.value >= 100);
+        var showFastHunt = (catpower.value >= huntCost);
 
         //---------- advisor ---------
         var showAdvisor = false;

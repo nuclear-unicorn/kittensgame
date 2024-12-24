@@ -769,6 +769,9 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             $("#tooltip").detach().appendTo("#game").removeClass("tooltip-in-right-column");
         }
 
+        //It would be nice to have a system for options that would take care of this automatically,
+        //  instead of a dev having to add a new line of code here for every new option that gets added.
+
         $("#workersToggle")[0].checked = game.useWorkers;
         $("#forceHighPrecision")[0].checked = game.opts.forceHighPrecision;
         $("#usePerSecondValues")[0].checked = game.opts.usePerSecondValues;
@@ -781,6 +784,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#hideBGImage")[0].checked = game.opts.hideBGImage;
         $("#tooltipsInRightColumn")[0].checked = game.opts.tooltipsInRightColumn;
         $("#enableRedshift")[0].checked = game.opts.enableRedshift;
+        $("#enableRedshiftGflops")[0].checked = game.opts.enableRedshiftGflops;
         $("#batchSize")[0].value = game.opts.batchSize;
         $("#forceLZ")[0].checked = game.opts.forceLZ;
         $("#compressSaveFile")[0].checked = game.opts.compressSaveFile;
