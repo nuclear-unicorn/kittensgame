@@ -1921,7 +1921,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			mobile: false
 		},
 		SPACE_EXPL: {
-			beta: true,
+			beta: false,
 			main: false,
 			mobile: false
 		},

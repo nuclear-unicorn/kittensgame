@@ -1822,7 +1822,7 @@ dojo.declare("classes.queue.manager", null,{
         }
     },
     cap: 0,
-    baseCap :2,
+    baseCap: 3,
 
     constructor: function(game){
         this.game = game;

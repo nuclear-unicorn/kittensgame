@@ -1068,7 +1068,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		],
 		effects:{
 			"technocracyScienceCap": 0.2,
-			"antimatterPolicyRatio": 0.05,
+			"antimatterPolicyRatio": 0.0625,
 			"queueCap": 2
 		},
 		unlocked: false,
