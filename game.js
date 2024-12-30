@@ -1570,6 +1570,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.unobtainiumPolicyRatio.title"),
 				type: "ratio"
             },
+			"antimatterPolicyRatio":{
+				title: $I("effectsMgr.statics.antimatterPolicyRatio.title"),
+				type: "ratio"
+			},
             "sciencePolicyRatio":{
 				title: $I("effectsMgr.statics.sciencePolicyRatio.title"),
 				type: "ratio"
@@ -3749,6 +3753,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				value: -this.getEffect(res.name + "Production")
 			});
 		}
+		stack.push({
+			name: $I("res.stack.policy"),
+			type: "ratio",
+			value: this.getEffect(res.name + "PolicyRatio")
+		});
 		return stack;
 	},
 	getCMBRBonus: function() {
@@ -3931,14 +3940,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 	getResourceOnYearProduction: function(resName){
 		if (resName == "antimatter"){
-			if(this.resPool.energyProd >= this.resPool.energyCons){
-				return this.getEffect("antimatterProduction");
-			}
-			else{
+			if(this.resPool.energyProd < this.resPool.energyCons){
 				return 0;
 			}
 		}
-		return this.getEffect(resName + "Production"); //this might need to be changed!
+		return this.getEffect(resName + "Production") * (1 + this.getEffect(resName + "PolicyRatio"));
 	},
 	getResourcePerTickConvertion: function(resName) {
 		return this.fixFloatPointNumber(this.getEffect(resName + "PerTickCon"));
@@ -4118,6 +4124,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 			if (!stackElem.value || (stackElem.type != "fixed" && stackElem.type != "perDay" &&
 			stackElem.type != "perYear" && !hasFixed)) {
+				//If hasFixed is false, no need to display ratio effects
 				continue;
 			}
 
@@ -4130,7 +4137,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 
 			resString += this.getStackElemString(stackElem, res);
-			if (stackElem.type == "fixed" || stackElem.type == "perDay") {
+			if (stackElem.type == "fixed" || stackElem.type == "perDay" || stackElem.type == "perYear") {
+				//Below this point, display all ratio effects
 				hasFixed = true;
 			}
 		}
