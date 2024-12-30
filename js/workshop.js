@@ -2621,9 +2621,14 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 		var cultureBonusRaw = Math.floor(this.game.resPool.get("manuscript").value);
 		this.effectsBase["cultureMax"] = this.game.getUnlimitedDR(cultureBonusRaw, 0.01);
-		this.effectsBase["faithMax"] = this.game.getUnlimitedDR(cultureBonusRaw, 0.02) * this.game.getEffect("faithFromManuscripts");
-
 		this.effectsBase["cultureMax"] *= 1 + this.game.getEffect("cultureFromManuscripts");
+
+		var faithFromManuscripts = this.game.getEffect("faithFromManuscripts");
+		if (faithFromManuscripts > 0) {
+			this.effectsBase["faithMax"] = this.game.getLimitedDR(this.game.getUnlimitedDR(cultureBonusRaw, 0.1) * faithFromManuscripts, 100000);
+		} else {
+			this.effectsBase["faithMax"] = 0;
+		}
 
 		//sanity check
 		if (this.game.village.getFreeEngineers() < 0){

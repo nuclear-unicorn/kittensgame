@@ -98,7 +98,8 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			"perks": ["divineProportion"]
 		},
 		effects:{
-			"priceRatio" : -(1 + Math.sqrt(5)) / 200	//Calculates the Golden Ratio
+			"priceRatio" : -(1 + Math.sqrt(5)) / 200,	//Calculates the Golden Ratio
+			"queueCap": 1
 		}
 	},{
 		name: "divineProportion",
@@ -111,7 +112,8 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			"perks": ["vitruvianFeline"]
 		},
 		effects:{
-			"priceRatio" : -16 / 900
+			"priceRatio" : -16 / 900,
+			"queueCap": 2
 		}
 	},{
 		name: "vitruvianFeline",
@@ -134,7 +136,8 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		unlocked: false,
 		researched: false,
 		effects:{
-			"priceRatio" : -0.0225
+			"priceRatio" : -0.0225,
+			"queueCap": 2
 		}
 	},{
 		name: "diplomacy",

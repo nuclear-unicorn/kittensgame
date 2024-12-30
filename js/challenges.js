@@ -566,12 +566,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 	},
 
 	update: function(){
-		// energy
-		if (this.getChallenge("energy").unlocked == false) {
-			if (this.game.resPool.energyProd != 0 || this.game.resPool.energyCons != 0) {
-				this.getChallenge("energy").unlocked = true;
-			}
-		} 
 		//Disable challenge if the feature flag for it is disabled
 		if (!this.game.getFeatureFlag("UNICORN_TEARS_CHALLENGE")) {
 			var chall = this.getChallenge("unicornTears");
@@ -699,16 +693,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		}, function() {
 		});
 	},
-
-	//TODO: rewrite using the general getEffect logic
-
-	/*getChallengeEffect: function(name, type) {
-		var challenge = this.getChallenge(name);
-		if (name == "energy") {
-			return 2 + 0.1 * challenge.val;
-		}
-	},*/
-
 });
 
 dojo.declare("classes.reserveMan", null,{
