@@ -186,6 +186,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 			{name: "thorium",   val: 50000}
 		],
 		unlocks: {
+			challenges: ["energy"],
 			planet: ["centaurusSystem"],
 			spaceMission: ["furthestRingMission"]
 		}
