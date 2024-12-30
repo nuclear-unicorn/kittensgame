@@ -528,6 +528,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 			if (this.game.ironWill){
 				mineralsAmt += mineralsAmt * 0.1;	//+10% of minerals for iron will
+				mineralsAmt *= 1 + this.game.getEffect("mineralsPolicyRatio") / 3;
 			}
 			mineralsAmt *= 1 + minerologyBonus;
 			var mineralsGain = this.game.resPool.addResEvent("minerals", mineralsAmt);

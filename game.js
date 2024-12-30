@@ -3773,7 +3773,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			var policyRefineRatio = this.getEffect("refinePolicyRatio");
 			var refineRatio =  (policyRefineRatio) + (1 + policyRefineRatio) * this.getEffect("refineRatio");
 			return this.ironWill
-				? ((1 + refineRatio) * (1 + this.getEffect("woodRatio"))) - 1
+				? ((1 + refineRatio) * (1 + this.getEffect("woodRatio") + this.getEffect("woodPolicyRatio") / 3)) - 1
 				: refineRatio;
 		}
 
