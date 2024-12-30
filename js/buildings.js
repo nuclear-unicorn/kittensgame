@@ -1650,12 +1650,13 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 
 			var manpower = game.resPool.get("manpower");
 			var mpratio = (manpower.maxValue * 0.007) / 100;
+			var autocracyBonus = game.getEffect("rankLeaderBonusConversion") * ((game.village.leader) ? game.village.leader.rank : 0);
 
 			//hidden 1% boost to mints from village level
 			mpratio *= (1 + game.village.map.villageLevel * 0.005);
 			mpratio *= (1 + game.getEffect("mintRatio"));
-			self.effects["fursPerTickProd"]  = mpratio * 1.25;	//2
-			self.effects["ivoryPerTickProd"] = mpratio * 0.3 * (1 + game.getEffect("mintIvoryRatio"));	//1.5
+			self.effects["fursPerTickProd"]  = mpratio * (1 + autocracyBonus / 2) * 1.25;	//2
+			self.effects["ivoryPerTickProd"] = mpratio * (1 + autocracyBonus / 6) * 0.3 * (1 + game.getEffect("mintIvoryRatio"));	//1.5
 
 			var amt = game.resPool.getAmtDependsOnStock(
 				[{res: "gold", amt: -self.effects["goldPerTickCon"]},
