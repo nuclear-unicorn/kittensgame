@@ -1018,6 +1018,20 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 		return result;
 	},
 
+	getEffects: function(model) {
+		var race = model.options.race;
+		var nagaArchitects = this.game.science.getPolicy("nagaRelationsArchitects");
+		if (race.name == "nagas" && nagaArchitects.researched) {
+			return nagaArchitects.effects;
+		}
+		//Else,there are no effects associated with this embassy.
+		return undefined;
+	},
+	getTotalEffects: function(model) {
+		//Force this to return a falsy value so the game uses normal getEffects() instead
+		return undefined;
+	},
+
 	getMetadata: function(model) {
 		if (!model.metaCached) {
 			var race = model.options.race;
@@ -1102,8 +1116,8 @@ var EmbassyButtonHelper = {
 
 			//You must have done a bunch of trading already (with any race) before embassies show you this advanced info:
 			var TOTAL_TRADES_TO_SEE_CHANCES = 50;
-			//Ability to render effects is replaced with this because I want to try something a little different for embassies.
 			if (controller.game.stats.getStatCurrent("totalTrades").val >= TOTAL_TRADES_TO_SEE_CHANCES) {
+				ButtonModernHelper.renderEffects(tooltip, effects); //from core.js
 				EmbassyButtonHelper.renderResourceChances(tooltip, controller.game, model.options.race);
 			}
 
@@ -1119,7 +1133,6 @@ var EmbassyButtonHelper = {
 						fontStyle: "italic"
 				}}, tooltip);
 			}
-
 		} else {
 			dojo.style(descDiv, "paddingBottom", "4px");
 		}
@@ -1167,6 +1180,7 @@ var EmbassyButtonHelper = {
 			className: "tooltip-divider" + " resEffectsTxt",
 			style: {
 				textAlign: "center",
+				clear: "both",
 				width: "100%",
 				borderBottom: "1px solid gray",
 				paddingBottom: "4px",
