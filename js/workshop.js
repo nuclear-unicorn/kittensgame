@@ -2625,7 +2625,22 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 		var faithFromManuscripts = this.game.getEffect("faithFromManuscripts");
 		if (faithFromManuscripts > 0) {
-			this.effectsBase["faithMax"] = this.game.getLimitedDR(this.game.getUnlimitedDR(cultureBonusRaw, 0.1) * faithFromManuscripts, 100000);
+			var faithMaxBld = this.game.bld.getEffect("faithMax");
+			var unimpededCap = 10000 + faithMaxBld * 0.15;
+			var STRIPE = 0.02; //Scaling parameter for UDR
+			var threshold = this.game.getInverseUnlimitedDR(unimpededCap, STRIPE);
+			if (cultureBonusRaw > threshold) {
+				//Above threshold, use harsher logarithmic scaling.
+				//Every factor of ×10 increases the effect by 5% (additive),
+				//  capped at +900% (tame infinity).
+				var scaling = this.game.getLimitedDR(1 + 0.021715 * Math.log(cultureBonusRaw / threshold), 10);
+				this.effectsBase["faithMax"] = unimpededCap * scaling;
+			} else {
+				//Below threshold, use simple UDR.
+				this.effectsBase["faithMax"] = this.game.getUnlimitedDR(cultureBonusRaw, STRIPE);
+			}
+			//Apply multiplier from policies:
+			this.effectsBase["faithMax"] *= faithFromManuscripts;
 		} else {
 			this.effectsBase["faithMax"] = 0;
 		}
