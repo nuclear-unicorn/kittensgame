@@ -1,7 +1,7 @@
 {
     "console.intro": "Ты - котенок в мятном лесу.",
     "console.intro.zebra": "Ты - зебра в саванне, полной титановых шахт.",
-    "achievements.header": "Достижения: {0} из {1}",
+    "achievements.header": "Достижений: {0} из {1}",
     "achievements.msg.unlock": "Достижение открыто: {0}!",
     "achievements.msg.starUnlock": "Звезда достижения открыта: {0}!",
     "achievements.anachronox.title": "Анахронокс",
@@ -583,7 +583,7 @@
     "opts.theme.dune": "Дюна",
     "opts.theme.factory": "Фабрика",
     "opts.theme.fluid": "Жидкая",
-    "opts.theme.gold": "Золотая",
+    "opts.theme.gold": "Золото",
     "opts.theme.grassy": "Травяная",
     "opts.theme.grayish": "Сероватая",
     "opts.theme.greenish": "Зеленоватый",
@@ -1695,7 +1695,7 @@
     "about.feedback": "Форум обратной связи",
     "about.discord": "Присоединяйтесь к нам в Discord!: ",
     "iron.will.warning.msg": "Это действие завершит режим \"Железная воля\". Вы уверены?",
-    "effectsMgr.heatMax.title": "Максимальная Температура",
+    "effectsMgr.heatMax.title": "Максимум тепла",
     "effectsMgr.timeImpedance.title": "Сопротивление времени",
     "btn.praise": "Хвалить",
     "village.label.na": "Недоступно",
@@ -2063,5 +2063,6 @@
     "workshop.voidEnergy.label": "Энергия пустоты",
     "workshop.voidEnergy.desc": "Энергетические разрывы ещё более эффективны в качестве хранилищ.",
     "workshop.voidReactors.label": "Реакторы пустоты",
-    "workshop.voidReactors.desc": "Научные корабли примерно на 116% эффективнее."
+    "workshop.voidReactors.desc": "Научные корабли примерно на 116% эффективнее.",
+    "workshop.zebraUpgradesPanel.label": "Улучшения зебр"
 }
