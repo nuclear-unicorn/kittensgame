@@ -516,7 +516,7 @@ test("Queue should correctly add and remove items", () => {
     let isRemoved;
 
     queue.update();
-    expect(queue.cap).toBe(2);
+    expect(queue.cap).toBe(3);
 
     //simple add and remove operations should work and keep queue clear
     queue.addToQueue("field", "buildings", "N/A");
@@ -535,9 +535,10 @@ test("Queue should correctly add and remove items", () => {
     //multiple items should stack into one queue entry
     queue.addToQueue("field", "buildings", "N/A");
     queue.addToQueue("field", "buildings", "N/A");
+    queue.addToQueue("field", "buildings", "N/A");
 
     expect(queue.queueItems.length).toBe(1); 
-    expect(queue.queueLength()).toBe(2);
+    expect(queue.queueLength()).toBe(3);
 
     //can't build over the cap
     queue.addToQueue("pasture", "buildings", "N/A");
@@ -549,12 +550,14 @@ test("Queue should correctly add and remove items", () => {
     queue.update();
 
     //multiple entires of the same type should be allowed
-    expect(queue.cap).toBe(12);
+    expect(queue.cap).toBe(13);
     queue.addToQueue("pasture", "buildings", "N/A");
     queue.addToQueue("field", "buildings", "N/A");
     expect(queue.queueItems.length).toBe(3);
     
     //sequential removals should decrement queue, and then clean items
+    queue.remove(0, 1);
+    expect(queue.queueItems.length).toBe(3);
     queue.remove(0, 1);
     expect(queue.queueItems.length).toBe(3);
     queue.remove(0, 1);
@@ -568,11 +571,11 @@ test("Queue should correctly add and remove items", () => {
 
     //test shift key option
     queue.addToQueue("field", "buildings", "N/A", true /*all available*/);
-    expect(queue.queueLength()).toBe(12);
+    expect(queue.queueLength()).toBe(13);
     expect(queue.queueItems.length).toBe(2);
 
     //console.error(queue.queueItems);
-    expect(queue.queueItems[1].value).toBe(11);
+    expect(queue.queueItems[1].value).toBe(12);
 });
 
 test("Queue should correctly skip one-time purchases if already bought", () => {

@@ -545,6 +545,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 			if (this.game.ironWill){
 				mineralsAmt += mineralsAmt * 0.1;	//+10% of minerals for iron will
+				mineralsAmt *= 1 + this.game.getEffect("mineralsPolicyRatio") / 3;
 			}
 			mineralsAmt *= 1 + minerologyBonus;
 			var mineralsGain = this.game.resPool.addResEvent("minerals", mineralsAmt);
@@ -813,7 +814,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		//antimatter
 		var resPool = this.game.resPool;
 		if (resPool.energyProd >= resPool.energyCons) {
-			resPool.addResEvent("antimatter", this.game.getEffect("antimatterProduction") * yearsOffset);
+			resPool.addResEvent("antimatter", this.game.getResourceOnYearProduction("antimatter") * yearsOffset);
 		}
 
 		var beacons = this.game.space.getBuilding("spaceBeacon");
@@ -974,10 +975,10 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 
 		var resPool = this.game.resPool;
 		if (resPool.energyProd >= resPool.energyCons) {
-			resPool.addResEvent("antimatter", this.game.getEffect("antimatterProduction") * years);
+			resPool.addResEvent("antimatter", this.game.getResourceOnYearProduction("antimatter") * years);
 		}
 
-		resPool.addResEvent("temporalFlux", this.game.getEffect("temporalFluxProduction") * years);
+		resPool.addResEvent("temporalFlux", this.game.getResourceOnYearProduction("temporalFlux") * years);
 
 		var aiLevel = this.game.bld.get("aiCore").effects["aiLevel"];
 		if ((aiLevel > 14) && (this.game.science.getPolicy("transkittenism").researched != true)){
@@ -1052,10 +1053,10 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 
 		var resPool = this.game.resPool;
 		if (resPool.energyProd >= resPool.energyCons) {
-			resPool.addResEvent("antimatter", this.game.getEffect("antimatterProduction"));
+			resPool.addResEvent("antimatter", this.game.getResourceOnYearProduction("antimatter"));
 		}
 
-		resPool.addResEvent("temporalFlux", this.game.getEffect("temporalFluxProduction"));
+		resPool.addResEvent("temporalFlux", this.game.getResourceOnYearProduction("temporalFlux"));
 
 		var aiLevel = this.game.bld.get("aiCore").effects["aiLevel"];
 		if ((aiLevel > 14) && (this.game.science.getPolicy("transkittenism").researched != true)){
