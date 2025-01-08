@@ -531,7 +531,7 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
 	margin-bottom: 20px;
     padding: 15px;
     border: 1px solid #B0B0B0;
-    height: calc(100vh - 125px);
+    min-height: calc(100vh - 100px);
 }
 
 #toggleCenter {
