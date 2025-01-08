@@ -685,7 +685,7 @@ WCraftTable = React.createClass({
                         className: "link" + (this.state.isEditMode ? " toggled" : ""), 
                         onClick: this.toggleEdit,
                         onKeyDown: this.onKeyDown,
-                        tabIndex: 1
+                        tabindex: 1
                     }, "⚙")
                 )
             ]),

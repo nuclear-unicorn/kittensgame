@@ -918,6 +918,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 				position: "relative",
 				display: this.model.visible ? "block" : "none"
 			},
+			"aria-description": this.model.description,
 			tabIndex: 0
 		}, btnContainer);
 
@@ -944,11 +945,10 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		}
 
 		this.updateVisible();
+		this.afterRender();
 
 		dojo.connect(this.domNode, "onclick", this, "onClick");
 		dojo.connect(this.domNode, "onkeypress", this, "onKeyPress");
-
-		this.afterRender();
 	},
 
 	animate: function(){
@@ -978,14 +978,13 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 	},
 
-	onKeyPress: function(event){
-		if (event.key == "Enter"){
-			this.onClick(event);
+	onKeyPress: function(e){
+		if (e.key == "Enter"){
+			this.onClick(e);
 		}
 	},
 
 	afterRender: function(){
-
 		var prices = this.model.prices;
 		if (prices.length && !this.tooltip){
 
@@ -1031,8 +1030,11 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			dojo.connect(this.domNode, "onmouseover", this, dojo.partial(function(tooltip){ dojo.style(tooltip, "display", ""); }, tooltip));
 			dojo.connect(this.domNode, "onmouseout", this,  dojo.partial(function(tooltip){ dojo.style(tooltip, "display", "none"); }, tooltip));
 
+
 			this.tooltip = tooltip;
 			this.tooltipPricesNodes = tooltipPricesNodes;
+
+			console.log("this after render", this);
 		}
 	},
 
@@ -2518,7 +2520,7 @@ UIUtils = {
 		var gameNode = dojo.byId("game");
 		var tooltip = dojo.byId("tooltip");
 
-		dojo.connect(container, "onmouseover", this, function() {
+		var showTooltip = function () {
 			game.tooltipUpdateFunc = function(){
 				tooltip.innerHTML = dojo.hitch(game, htmlProvider)();
 			};
@@ -2549,11 +2551,23 @@ UIUtils = {
 			if (tooltip.innerHTML) {
 				dojo.style(tooltip, "display", "");
 			}
-		});
+		};
+
+		dojo.connect(container, "onmouseover", this, showTooltip);
 
 		dojo.connect(container, "onmouseout", this, function(){
 			game.tooltipUpdateFunc = null;
 			dojo.style(tooltip, "display", "none");
+		});
+		
+		dojo.connect(container, "onkeydown", this, function(e){
+			if (e.code == "Space"){
+				e.stopPropagation();
+				e.preventDefault();
+
+				showTooltip();
+				tooltip.focus();
+			}
 		});
 
 		return htmlProvider;

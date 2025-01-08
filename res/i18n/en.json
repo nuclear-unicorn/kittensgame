@@ -690,7 +690,7 @@
     "menu.wipe": "Wipe",
     "menu.getTheApp": "Get the app",
 
-    "mid.buildings.tip": "Ctrl+click to buy/sell multiple buildings (meta+click on macOS). Shift+click to buy/sell all buildings.<br>You can set the batch size for ctrl+click in the game options.<br><br>Hold shift to see total effects of all buildings.",
+    "mid.buildings.tip": "Ctrl+click to buy/sell multiple buildings (meta+click on macOS). Shift+click to buy/sell all buildings.<br>You can set the batch size for ctrl+click in the game options.<br><br>Hold shift to see total effects of all buildings.<br><br>Use `Tab` to select building, `Enter` to buy it and `Space` to see detailed tooltip.",
 
     "navbar.title": "Kittens Game",
     "navbar.menu.title": "Menu",

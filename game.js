@@ -3991,7 +3991,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		dojo.connect(container, "onmouseout", this, function(){
 			dojo.style(container, "fontWeight", "normal");
 		});
-
 	},
 
 	/**

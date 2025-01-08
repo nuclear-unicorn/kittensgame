@@ -7,6 +7,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #FFFFFF;
+    height: 100vh;
 }
 
 img.loader {
@@ -136,6 +137,7 @@ div#gameLog {
 .bldTopContainer {
     padding-bottom: 5px;
 	margin-bottom: 15px;
+    height: 100%;
 }
 
 .bldTopContainer > a, .bldTopContainer > span {
@@ -470,6 +472,7 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
     padding-top: 15px;
     border-top: 1px solid gray;
     margin-top: 10px;
+    height: 100%;
 }
 
 .btn.modern {
