@@ -27,7 +27,9 @@ WCollapsiblePanel = React.createClass({
                     $r("a", {
                             href: "#!",
                             className:"link collapse", 
-                            onClick: this.toggleCollapsed
+                            onClick: this.toggleCollapsed,
+                            tabindex: 1,
+                            title: this.props.title
                         },
                         this.state.isCollapsed ? ">(" +  this.props.title + ")" : "v"
                     )
@@ -226,7 +228,7 @@ WResourceRow = React.createClass({
                 title: (res.title || res.name) + " " + resPercent + "%/" + game.getDisplayValueExt(res.maxValue) + " " + perTickVal,
                 role: "gridcell",
                 userFocus:"normal",
-                tabIndex:"0",
+                tabIndex: 0,
             }, 
                 res.title || res.name
             ),
@@ -570,7 +572,9 @@ WResourceTable = React.createClass({
                     $r("a", {
                             href: "#!", 
                             className:"link collapse", 
-                            onClick: this.toggleCollapsed
+                            onClick: this.toggleCollapsed,
+                            tabindex: 1,
+                            title: "Toggle resources",
                         },
                         this.state.isCollapsed ? ">(" + $I("left.resources") + ")" : "v"
                     )
@@ -581,9 +585,9 @@ WResourceTable = React.createClass({
                         onClick: this.toggleEdit,
                         onKeyDown: this.onKeyDown,
                         title:  "Resource settings",
-                        tabIndex: 0
+                        tabIndex: 1
                     }, "⚙"),
-                    $r(WTooltip, {body:"?"}, 
+                    $r(WTooltip, {body:"?", tabindex: 1}, 
                         $I("left.resources.tip"))
                 
                 )
@@ -669,7 +673,9 @@ WCraftTable = React.createClass({
                 }, 
                     $r("a", {
                             className:"link collapse", 
-                            onClick: this.toggleCollapsed
+                            onClick: this.toggleCollapsed,
+                            tabindex: 1,
+                            title: "Toggle craft",
                         },
                         this.state.isCollapsed ? ">(" + $I("left.craft") + ")" : "v"
                     )
@@ -679,7 +685,7 @@ WCraftTable = React.createClass({
                         className: "link" + (this.state.isEditMode ? " toggled" : ""), 
                         onClick: this.toggleEdit,
                         onKeyDown: this.onKeyDown,
-                        tabIndex: 0
+                        tabIndex: 1
                     }, "⚙")
                 )
             ]),
@@ -865,7 +871,7 @@ WTooltip = React.createClass({
 
     render: function(){
         return $r("div", {
-            tabIndex: 0,
+            tabIndex: this.props.tabindex ?? 0,
             className: "tooltip-block", 
             onMouseOver: this.onMouseOver, 
             onMouseOut: this.onMouseOut,
