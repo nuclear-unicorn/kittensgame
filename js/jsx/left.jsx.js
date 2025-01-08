@@ -205,6 +205,8 @@ WResourceRow = React.createClass({
             (!res.visible ? " hidden" : "")
         ;
 
+        var resPercent = ((res.value / res.maxValue) * 100).toFixed();
+
         return $r("div", {role: "row", className: resRowClass}, [
             this.props.isEditMode ? 
                 $r("div", {className:"res-cell"},
@@ -221,7 +223,7 @@ WResourceRow = React.createClass({
                 className:"res-cell resource-name", 
                 style:resNameCss,
                 onClick: this.onClickName,
-                title: (res.title || res.name) + " " + game.getDisplayValueExt(res.value) + "/" + game.getDisplayValueExt(res.maxValue) + " " + perTickVal,
+                title: (res.title || res.name) + " " + resPercent + "%/" + game.getDisplayValueExt(res.maxValue) + " " + perTickVal,
                 role: "gridcell",
                 userFocus:"normal",
                 tabIndex:"0",
