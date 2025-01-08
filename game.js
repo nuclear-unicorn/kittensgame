@@ -1843,7 +1843,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	//		option settings
 	//=============================
 	forceShowLimits: false,
-	useWorkers: false,
+	useWorkers: true,
 	colorScheme: "",
 	unlockedSchemes: null,
 

@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="en">
 
 	<head>
 		<meta charset="utf-8">
@@ -306,7 +306,7 @@
 	<body>
 		<div id="gamePageContainer">
 
-			<div id="topBar">
+			<div id="topBar" aria-label="Header panel">
 				<div style="padding-left: 10px; min-width: 0px; max-width: 400px; overflow: hidden; text-overflow: ellipsis;">
 					<span class="gameTitle">Kittens Game </span>
 					<span style="font-size: small;">
@@ -363,7 +363,7 @@
 				</div>
 			</div>
 
-			<div id="loadingContainer">
+			<div id="loadingContainer" aria-label="Loading screen">
 				<div class="content">
 					<span style="font-size:18px;"><img class="loader" width="16" height="16" src="res/ajax-loader.gif">&nbsp;Loading...<br></span>
 					<br>
@@ -376,14 +376,14 @@
 				<div id="tooltip" class="button_tooltip"></div>
 
 				<!-- LEFT -->
-				<div id="leftColumn" class="column" style="vertical-align: top;">
+				<div id="leftColumn" class="column" style="vertical-align: top;" aria-label="Resource panel">
 					<div id="leftColumnViewport">
 						Loading...
 					</div>
 				</div>
 
 				<!-- MID -->
-				<div id="midColumn" style="vertical-align: top;" class="column">
+				<div id="midColumn" style="vertical-align: top;" class="column" aria-label="Main panel">
 					<div id="midColumnViewport" style="float:right; padding: 5px;">
 						Loading...
 					</div>
@@ -409,7 +409,7 @@
 				</div>
 
 				<!-- RIGHT -->
-				<div id="rightColumn" class="column">
+				<div id="rightColumn" class="column" aria-label="Game log">
 					<div>
 						<span id="calendarSign" style="cursor:pointer;"></span><span id="calendarDiv" style="cursor:pointer;">Calendar :V</span>
 						<a id="dev_boostCalendar" href="#" onclick="dev_boostCalendar();" style="display: none; text-decoration: none; position: relative; left: 5px;">&gt;&gt;&gt;</a>

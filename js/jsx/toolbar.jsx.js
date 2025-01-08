@@ -341,14 +341,16 @@ WLoginForm = React.createClass({
             {onClick: function (e){ e.stopPropagation(); }},
             [
                 $r("div", {className: "row"}, [
-                    "Email:",
+                    $r("label", {for:"kgnet-email"}, "Email:"),
                         $r("input", {
+                            id:"kgnet-email",
                             type: "email",
                             onChange: this.setLogin,
                             value: this.state.login
                         } ),
-                    "Password:",
+                    $r("label", {for:"kgnet-password"}, "Password:"),
                         $r("input", {
+                            id:"kgnet-password",
                             type: "password",
                             onChange: this.setPassword,
                             value: this.state.password
@@ -646,15 +648,21 @@ WLogin = React.createClass({
         },
             $r("div",
                 {
-                    onClick: this.toggleExpanded
+                    onClick: this.toggleExpanded,
+                    onKeyDown: this.onKeyDown
                 },
                 [
-                    $r("span", {
-                        className: "kgnet-login-link status-indicator-" + (game.server.userProfile ? "online" : "offline")
-                        + (lastBackup >= 7 ? " freshMessage" : "")
-                    }, "* " + (game.server.userProfile ?
-                        $I("ui.kgnet.online") : $I("ui.kgnet.login")
-                    )),
+                    $r("a", {
+                        href:"#!",
+                        onClick: this.toggleExpanded,
+                    }, 
+                        $r("span", {
+                            className: "kgnet-login-link status-indicator-" + (game.server.userProfile ? "online" : "offline")
+                            + (lastBackup >= 7 ? " freshMessage" : "")
+                        }, "* " + (game.server.userProfile ?
+                            $I("ui.kgnet.online") : $I("ui.kgnet.login")
+                        )),
+                    ),
                     this.state.isExpanded && $r("div", {
                         className: "login-popup button_tooltip tooltip-block"
                     },
@@ -677,6 +685,12 @@ WLogin = React.createClass({
         this.setState({
             isExpanded: !this.state.isExpanded
         })
+    },
+
+    onKeyDown: function(e){
+        if(e.key === "Escape") {
+            this.toggleExpanded()
+        }
     }
 });
 

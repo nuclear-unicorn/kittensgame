@@ -25,6 +25,7 @@ WCollapsiblePanel = React.createClass({
                     className:  "left"
                     }, 
                     $r("a", {
+                            href: "#!",
                             className:"link collapse", 
                             onClick: this.toggleCollapsed
                         },
@@ -204,13 +205,13 @@ WResourceRow = React.createClass({
             (!res.visible ? " hidden" : "")
         ;
 
-        return $r("div", {className: resRowClass}, [
+        return $r("div", {role: "row", className: resRowClass}, [
             this.props.isEditMode ? 
                 $r("div", {className:"res-cell"},
                     $r("input", {
                         type:"checkbox", 
                         checked: this.getIsVisible(),
-
+                        title: "Toggle " + $I("resources." + res.name + ".title"),
                         onClick: this.toggleView,
                         style:{display:"inline-block"},
                     })
@@ -220,17 +221,20 @@ WResourceRow = React.createClass({
                 className:"res-cell resource-name", 
                 style:resNameCss,
                 onClick: this.onClickName,
-                title: res.title || res.name
+                title: (res.title || res.name) + " " + game.getDisplayValueExt(res.value) + "/" + game.getDisplayValueExt(res.maxValue) + " " + perTickVal,
+                role: "gridcell",
+                userFocus:"normal",
+                tabIndex:"0",
             }, 
                 res.title || res.name
             ),
-            $r("div", {className:"res-cell " + resAmtClassName + specialClass}, game.getDisplayValueExt(res.value)),
-            $r("div", {className:"res-cell maxRes"}, 
+            $r("div", {className:"res-cell " + resAmtClassName + specialClass, role: "gridcell"}, game.getDisplayValueExt(res.value)),
+            $r("div", {className:"res-cell maxRes", role: "gridcell"}, 
                 res.maxValue ? "/" + game.getDisplayValueExt(res.maxValue) : ""
             ),
-            $r("div", {className:"res-cell resPerTick", ref:"perTickNode"}, 
+            $r("div", {className:"res-cell resPerTick", role: "gridcell", ref:"perTickNode"}, 
                 isTimeParadox ? "???" : perTickVal),
-            $r("div", {className:"res-cell" + (weatherModCss ? " " + weatherModCss : "")}, weatherModValue)
+            $r("div", {className:"res-cell" + (weatherModCss ? " " + weatherModCss : ""), role: "gridcell"}, weatherModValue)
         ]);
     },
     onClickName: function(e){
@@ -556,12 +560,13 @@ WResourceTable = React.createClass({
         }
         //TODO: mixing special stuff like fatih and such here
         
-        return $r("div", null, [
+        return $r("div", {ariaLabel:"Regular resources"}, [
             $r("div", null,[
                 $r("div", {
                     className:"res-toolbar left"
                 }, 
                     $r("a", {
+                            href: "#!", 
                             className:"link collapse", 
                             onClick: this.toggleCollapsed
                         },
@@ -573,6 +578,7 @@ WResourceTable = React.createClass({
                         className: "link" + (this.state.isEditMode ? " toggled" : ""), 
                         onClick: this.toggleEdit,
                         onKeyDown: this.onKeyDown,
+                        title:  "Resource settings",
                         tabIndex: 0
                     }, "⚙"),
                     $r(WTooltip, {body:"?"}, 
@@ -586,7 +592,7 @@ WResourceTable = React.createClass({
                         $r("a", {className:"link", onClick: game.ui.zoomUp.bind(game.ui)}, $I("left.font.inc")),
                         $r("a", {className:"link", onClick: game.ui.zoomDown.bind(game.ui)}, $I("left.font.dec")),
                     ]),
-                    $r("div", {className:"res-table"}, resRows)
+                    $r("div", {className:"res-table", role: "grid"}, resRows)
                 ]),
 
             //TODO: this stuff should not be exposed to beginner player to not overwhelm them
@@ -654,7 +660,7 @@ WCraftTable = React.createClass({
             return null;
         }
 
-        return $r("div", null, [
+        return $r("div", {ariaLabel:"Craftable resources"}, [
             $r("div", null,[
                 $r("div", {
                     className:"res-toolbar left",
