@@ -2621,9 +2621,29 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 		var cultureBonusRaw = Math.floor(this.game.resPool.get("manuscript").value);
 		this.effectsBase["cultureMax"] = this.game.getUnlimitedDR(cultureBonusRaw, 0.01);
-		this.effectsBase["faithMax"] = this.game.getUnlimitedDR(cultureBonusRaw, 0.02) * this.game.getEffect("faithFromManuscripts");
-
 		this.effectsBase["cultureMax"] *= 1 + this.game.getEffect("cultureFromManuscripts");
+
+		var faithFromManuscripts = this.game.getEffect("faithFromManuscripts");
+		if (faithFromManuscripts > 0) {
+			var faithMaxBld = this.game.bld.getEffect("faithMax");
+			var unimpededCap = 10000 + faithMaxBld * 0.15;
+			var STRIPE = 0.02; //Scaling parameter for UDR
+			var threshold = this.game.getInverseUnlimitedDR(unimpededCap, STRIPE);
+			if (cultureBonusRaw > threshold) {
+				//Above threshold, use harsher logarithmic scaling.
+				//Every factor of ×10 increases the effect by 5% (additive),
+				//  capped at +900% (tame infinity).
+				var scaling = this.game.getLimitedDR(1 + 0.021715 * Math.log(cultureBonusRaw / threshold), 10);
+				this.effectsBase["faithMax"] = unimpededCap * scaling;
+			} else {
+				//Below threshold, use simple UDR.
+				this.effectsBase["faithMax"] = this.game.getUnlimitedDR(cultureBonusRaw, STRIPE);
+			}
+			//Apply multiplier from policies:
+			this.effectsBase["faithMax"] *= faithFromManuscripts;
+		} else {
+			this.effectsBase["faithMax"] = 0;
+		}
 
 		//sanity check
 		if (this.game.village.getFreeEngineers() < 0){

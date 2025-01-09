@@ -383,6 +383,7 @@
     "effectsMgr.statics.aiCoreUpgradeBonus.title" : "AI core synergies bonuses",
     "effectsMgr.statics.aiLevel.title": "AI Level",
     "effectsMgr.statics.alicornChance.title": "Alicorns descent chance",
+    "effectsMgr.statics.antimatterPolicyRatio.title": "Antimatter production bonus",
     "effectsMgr.statics.antimatterProduction.title": "Antimatter production",
     "effectsMgr.statics.arrivalSlowdown.title": "Arrival slowdown",
     "effectsMgr.statics.barnRatio.title": "Barn expansion",
@@ -690,7 +691,7 @@
     "menu.wipe": "Wipe",
     "menu.getTheApp": "Get the app",
 
-    "mid.buildings.tip": "Ctrl+click to buy/sell multiple buildings (meta+click on macOS). Shift+click to buy/sell all buildings.<br>You can set the batch size for ctrl+click in the game options.<br><br>Hold shift to see total effects of all buildings.",
+    "mid.buildings.tip": "Ctrl+click to buy/sell multiple buildings (meta+click on macOS). Shift+click to buy/sell all buildings.<br>You can set the batch size for ctrl+click in the game options.<br><br>Hold shift to see total effects of all buildings.<br><br>Use `Tab` to select building, `Enter` to buy it and `Space` to see detailed tooltip.",
 
     "navbar.title": "Kittens Game",
     "navbar.menu.title": "Menu",
@@ -876,7 +877,7 @@
     "policy.sharkRelationsMerchants.label" : "Shark Relations: Merchants",
     "policy.sharkRelationsMerchants.desc" : "The sharks are experts of traveling through water, but not so much on land. Work together with their merchants to discover and share trade routes through water and land.<br>The more you trade, the more effective it becomes",
     "policy.siphoning.label" : "Siphoning",
-    "policy.siphoning.desc" : "Pacts consume alicorns and slow down corruption instead of consuming necrocorns. Lack of alicorns or corruption is compensated by consuming necrocorns.",
+    "policy.siphoning.desc" : "Pacts slow down necrocorn corruption and consume alicorns, instead of directly consuming necrocorns. Lack of alicorns or corruption is compensated by consuming necrocorns.",
     "policy.socialism.label" : "Socialism",
     "policy.socialism.desc" : "Has no effect",
     "policy.spaceBasedTerraforming.label" : "Space-based terraforming",
