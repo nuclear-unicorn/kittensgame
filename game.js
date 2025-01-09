@@ -2231,7 +2231,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	resetState: function(){
 		this.forceShowLimits = false;
-		this.useWorkers = false;
+		this.useWorkers = true;
 		this.colorScheme = "";
 		this.unlockedSchemes = this.ui.defaultSchemes;
 		this.karmaKittens = 0;
@@ -2513,7 +2513,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			this.karmaZebras = (data.karmaZebras !== undefined) ? data.karmaZebras : 0;
 			this.deadKittens = (data.deadKittens !== undefined) ? data.deadKittens : 0;
 			this.ironWill = (data.ironWill !== undefined) ? data.ironWill : true;
-			this.useWorkers = (data.useWorkers !== undefined) ? data.useWorkers : false;
+			this.useWorkers = (data.useWorkers !== undefined) ? data.useWorkers : true;
 
 			this.cheatMode = (data.cheatMode !== undefined) ? data.cheatMode : false;
 			this.startedWithoutChronospheres = (data.startedWithoutChronospheres !== undefined) ? data.startedWithoutChronospheres : false; //false for existing games
