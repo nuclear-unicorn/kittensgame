@@ -1789,6 +1789,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 			}
 		}
 
+		this.metadataHasChanged(model);
 		this.game.upgrade(building.upgrades);
 		this.game.render();
 	},

@@ -1342,7 +1342,10 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocked: false,
 		isRelation: true,
         blocks:["lizardRelationsPriests", "lizardRelationsDiplomats"],
-		calculateEffects: function(self,game){
+		upgrades: {
+			buildings: ["magneto"]
+		},
+		/*calculateEffects: function(self,game){
 			var cathPollution = Math.floor(game.bld.cathPollution);
 			if (cathPollution < 0.5e9) {
 				var boostRatio = Math.round(((0.5e9 - cathPollution) * 2 / 0.5e10) * 1e2) / 1e2;
@@ -1354,7 +1357,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			}
 			game.upgrade({buildings: ["pasture", "aqueduct"]});
 			
-		},
+		},*/
 		evaluateLocks: function(game){
 			return game.science.checkRelation("lizards", 20);
 		}

@@ -170,6 +170,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					effect = effectValue * bld.val;
 				} else {
 					effect = effectValue * bld.on;
+					if (bld.name == "magneto" && effectName == "magnetoRatio") {
+						effect += effectValue * bld.getPhantomMagnetos(bld, game);
+					}
 				}
 
 				//probably not the best place to handle this mechanics
@@ -438,7 +441,10 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
                 effects["energyProduction"] *= 1 + game.getEffect("hydroPlantRatio");
                 stageMeta.effects = effects;
             }
-        }
+		},
+		upgrades: {
+			buildings: ["magneto"]
+		}
 	},
 	//----------------------------------- Population ----------------------------------------
 	{
@@ -1323,11 +1329,38 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"magnetoRatio": 0.02,
 			"cathPollutionPerTickProd": 5
 		},
+		calculateEffects: function(self, game) {
+			var maxPhantoms = self.getMaxPhantoms(self, game);
+			if (maxPhantoms > 0) {
+				self.description = $I("buildings.magneto.desc") + "<br>" + $I("buildings.magneto.phantoms", [maxPhantoms]);
+			} else {
+				self.description = $I("buildings.magneto.desc");
+			}
+		},
 		action: function(self, game){
 			var oil = game.resPool.get("oil");
 			if (oil.value + self.effects["oilPerTick"] <= 0){
 				self.on--;//Turn off one per tick until oil flow is sufficient
 			}
+		},
+		getMaxPhantoms: function(self, game) {
+			var hydroPlant = game.bld.getBuildingExt("aqueduct").meta;
+			if (hydroPlant.stage == 1 && game.science.getPolicy("lizardRelationsEcologists").researched) {
+				return Math.floor(Math.min(hydroPlant.on / 3, self.val * 0.8));
+			}
+			//Else, policy isn't active
+			return 0;
+		},
+		//Phantom Magnetos contribute to production bonus without consuming resources or producing pollution.
+		//Maybe this was a bad name.  They're not like phantom Tradeposts.
+		//These ones have to be built & turned off.
+		getPhantomMagnetos: function(self, game) {
+			if (self.on == 0) {
+				//At least 1 real Magneto must be on to benefit from phantoms.
+				return 0;
+			}
+			//Can't benefit from more phantoms than there are inactive Magnetos
+			return Math.min(self.getMaxPhantoms(self, game), self.val - self.on);
 		}
 	},
 	{
@@ -2957,6 +2990,13 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 
     getName: function(model) {
 		var meta = model.metadata;
+		if (meta.name == "magneto") {
+			var phantoms = meta.getPhantomMagnetos(meta, this.game);
+			if (phantoms) {
+				return meta.label + " (" + meta.on + "+" + phantoms + "/" + meta.val + ")";
+			}
+		}
+
 		var name = this.inherited(arguments);
 
 		var sim = this.game.village.sim;
