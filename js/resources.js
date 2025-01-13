@@ -568,31 +568,37 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 	//put your custom fake resources there
 	getPseudoResources: function(){
+		var pactsManager = this.game.religion.pactsManager;
 		var pseudoResArr = [
 			{
 				name: "worship",
 				title: $I("resources.worship.title"),
 				value: this.game.religion.faith,
-				unlocked: true,
-				visible: false
+				unlocked: this.game.religion.faith > 0,
+				visible: false //Doesn't normally appear in resource table
 			},
 			{
 				name: "epiphany",
 				title: $I("resources.epiphany.title"),
 				value: this.game.religion.faithRatio,
-				unlocked: true,
+				unlocked: this.game.religion.faithRatio > 0 &&
+				          this.game.science.get("theology").researched &&
+				          !this.game.challenges.isActive("atheism"),
 				visible: false
 			},
 			{
 				name: "necrocornDeficit",
 				title: $I("resources.necrocornDeficit.title"),
-				value: this.game.religion.pactsManager.necrocornDeficit,
-				unlocked: true,
+				value: pactsManager.necrocornDeficit,
+				maxValue: pactsManager.fractureNecrocornDeficit,
+				unlocked: pactsManager.necrocornDeficit > 0 ||
+					//Do we have at least 1 pact purchased?
+					dojo.some(pactsManager.pacts, function(pact) {
+						return pact.val > 0;
+					}),
 				visible: false,
 				color: "#E00000"}
 		];
-		//TODO: mixin unlocked and visible automatically
-
 		//Apply settings to mark as hidden:
 		for (var i = 0; i < pseudoResArr.length; i += 1) {
 			pseudoResArr[i].isHidden = this.hiddenPseudoResources.includes(pseudoResArr[i].name);
