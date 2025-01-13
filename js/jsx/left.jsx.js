@@ -248,7 +248,7 @@ WResourceRow = React.createClass({
     },
 
     toggleView: function(){
-        this.props.resource.isHidden = !this.props.resource.isHidden;
+        game.resPool.setResourceIsHidden(this.props.resource.name, !this.props.resource.isHidden);
     },
 
     getIsVisible: function() {
@@ -542,8 +542,7 @@ WResourceTable = React.createClass({
     getInitialState: function(){
         return {
             isEditMode: false,
-            isCollapsed: false,
-            showHiddenResources: false
+            isCollapsed: false
         };
     },
     render: function(){
@@ -557,7 +556,7 @@ WResourceTable = React.createClass({
                     resource: res, 
                     isEditMode: this.state.isEditMode, 
                     isRequired: isRequired,
-                    showHiddenResources: this.state.showHiddenResources,
+                    showHiddenResources: game.resPool.showHiddenResources,
                     isTemporalParadox: game.calendar.day < 0
                 })
             );
@@ -607,7 +606,7 @@ WResourceTable = React.createClass({
             $r("div", {className:"res-toggle-hidden"}, [
                 $r("input", {
                     type:"checkbox", 
-                    checked: this.state.showHiddenResources,
+                    checked: game.resPool.showHiddenResources,
                     onClick: this.toggleHiddenResources,
                     style:{display:"inline-block"},
                 }),
@@ -631,7 +630,7 @@ WResourceTable = React.createClass({
     },
 
     toggleHiddenResources: function(e){
-        this.setState({showHiddenResources: e.target.checked});
+        game.resPool.showHiddenResources = e.target.checked;
     }
 });
 

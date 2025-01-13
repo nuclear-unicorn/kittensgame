@@ -528,12 +528,16 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	energyCons: 0,
 
 	isLocked: false,
+	showHiddenResources: false, //Whether to show stuff like flux, gflops, & pseudo-resources
+	hiddenPseudoResources: null, //Array of names of pseudo-resources to mark as hidden
 
 	constructor: function(game){
 		this.game = game;
 
 		this.resources = [];
 		this.resourceMap = {};
+
+		this.hiddenPseudoResources = [];
 
 		for (var i = 0; i < this.resourceData.length; i++){
 			var res = dojo.clone(this.resourceData[i]);
@@ -564,7 +568,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 	//put your custom fake resources there
 	getPseudoResources: function(){
-		return [
+		var pseudoResArr = [
 			{
 				name: "worship",
 				title: $I("resources.worship.title"),
@@ -588,6 +592,12 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 				color: "#E00000"}
 		];
 		//TODO: mixin unlocked and visible automatically
+
+		//Apply settings to mark as hidden:
+		for (var i = 0; i < pseudoResArr.length; i += 1) {
+			pseudoResArr[i].isHidden = this.hiddenPseudoResources.includes(pseudoResArr[i].name);
+		}
+		return pseudoResArr;
 	},
 
 	createResource: function(name){
@@ -926,6 +936,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 	resetState: function(){
 		this.isLocked = false;
+		this.showHiddenResources = false;
+		this.hiddenPseudoResources = [];
 		for (var i = 0; i < this.resources.length; i++){
 			var res = this.resources[i];
 			res.value = 0;
@@ -942,8 +954,22 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 	save: function(saveData){
 		saveData.res = {
-			isLocked: this.isLocked
+			isLocked: this.isLocked,
+			showHiddenResources: this.showHiddenResources || undefined
 		};
+		//Save flags on which pseudo-resources to hide
+		//But for sanity purposes, only save a pseudo-resource if it actually exists!
+		var pseudoResources = this.getPseudoResources();
+		for (var i = 0; i < pseudoResources.length; i += 1) {
+			var resName = pseudoResources[i].name;
+			if (this.hiddenPseudoResources.includes(resName)) {
+				//We've found a legit pseudo-resource to be marked as hidden
+				if (!saveData.res.hiddenPseudoResources) {
+					saveData.res.hiddenPseudoResources = [];
+				}
+				saveData.res.hiddenPseudoResources.push(resName);
+			}
+		}
 	},
 
 	load: function(saveData){
@@ -951,6 +977,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 		if (saveData.res){
 			this.isLocked = Boolean(saveData.res.isLocked);
+			this.showHiddenResources = Boolean(saveData.res.showHiddenResources);
+			this.hiddenPseudoResources = saveData.res.hiddenPseudoResources || [];
 		}
 	},
 
@@ -1050,6 +1078,41 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 			res.isHidden = false;
 			if (res.name == "wood") {
 				res.isHiddenFromCrafting = false;
+			}
+		}
+	},
+
+	//Sets the "isHidden" flag of a resource or a pseudo-resource.
+	//This exists because the UI code can't know if a resource is real or pseudo.
+	//Wood is a special case because it has 2 flags.  We don't handle that special case here.
+	setResourceIsHidden: function(resName, hide) {
+		if (typeof(resName) != "string") {
+			console.error("Can't set res.isHidden; resource name must be a string.");
+			return;
+		}
+		if (typeof(hide) != "boolean") {
+			console.error("Can't set res.isHidden; flag must be a boolean.");
+			return;
+		}
+
+		var res = this.get(resName);
+		if (res) {
+			//We have a real resource!
+			res.isHidden = hide;
+			return;
+		}
+		//Else, assume we're dealing with a pseudo-resource.
+		if (this.hiddenPseudoResources.includes(resName)) {
+			if (!hide) {
+				//Remove by value
+				this.hiddenPseudoResources = this.hiddenPseudoResources.filter(function(elem) {
+					return elem != resName;
+				});
+			}
+		} else {
+			//Pseudo-resource is not already in array.
+			if (hide) {
+				this.hiddenPseudoResources.push(resName);
 			}
 		}
 	},
