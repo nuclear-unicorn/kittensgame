@@ -47,52 +47,31 @@ WCollapsiblePanel = React.createClass({
 WResourceRow = React.createClass({
 
     getDefaultProperties: function(){
-        return {resource: null, isEditMode: false, isRequired: false, showHiddenResources: false};
+        return {resource: null, isEditMode: false, isRequired: false, showHiddenResources: false, isTemporalParadox: false};
     },
 
-    //this is a bit ugly, probably React.PureComponent + immutable would be a much better approach
-    //TODO: this function needs a proper rewrite.  I'm pretty sure it doesn't work at all as intended.
+    //I'm going for a solution that is technically less accurate, but is much simpler to understand.
+    //This function tells React to skip rendering for invisible resources.
+    //I think it's good enough for now.
     shouldComponentUpdate: function(nextProp, nextState){
-        var oldRes = this.oldRes || {},
-            newRes = nextProp.resource;
-
-        var isEqual = 
-            oldRes.value == newRes.value &&
-            oldRes.maxValue == newRes.maxValue &&
-            oldRes.perTickCached == newRes.perTickCached &&
-            this.props.isEditMode == nextProp.isEditMode &&
-            this.props.isRequired == nextProp.isRequired &&
-            this.props.showHiddenResources == nextProp.showHiddenResources &&
-            this.props.isTemporalParadox != nextProp.isTemporalParadox &&
-            true /*this.state.visible == nextState.visible*/;
-
-        if (isEqual){
-            return false;
+        var newVisibility = this.getIsResInMainTable(nextProp.resource, nextProp);
+        if (this.oldVisibility !== newVisibility) {
+            //Remember new visibility state
+            this.oldVisibility = newVisibility;
+            //Resource will appear/disappear, therefore component should update
+            return true;
         }
-        this.oldRes = {
-            value: newRes.value,
-            maxValue: newRes.maxValue,
-            perTickCached: newRes.perTickCached
-        };
-        return true;
+        //Update component if it will be displayed
+        //Don't update component if it won't be displayed
+        return newVisibility;
     },
 
     render: function(){
         var res = this.props.resource;
 
-        if (!res.visible && !this.props.showHiddenResources){
+        //Only render this resource if it's unlocked, visible, etc.
+        if (!this.getIsResInMainTable()) {
             return null;
-        }
-
-        var hasVisibility = (res.unlocked || (res.name == "kittens" && res.maxValue));
-
-        if (!hasVisibility || (!this.getIsVisible() && !this.props.isEditMode)){
-            return null;
-        }
-
-        //migrate dual resources (e.g. blueprint) to lower table once craft recipe is unlocked
-		if (game.resPool.isNormalCraftableResource(res) && game.workshop.getCraft(res.name).unlocked){
-			return null;
         }
 
         //wtf is this code
@@ -251,8 +230,32 @@ WResourceRow = React.createClass({
         game.resPool.setResourceIsHidden(this.props.resource.name, !this.props.resource.isHidden);
     },
 
-    getIsVisible: function() {
-        return !this.props.resource.isHidden;
+    //Parameter is optional.
+    //If not given, defaults to this.props.resource
+    getIsVisible: function(res) {
+        res = res || this.props.resource;
+        return !res.isHidden;
+    },
+
+    //Both parameters are optional.
+    //If not given, they default to this.props
+    getIsResInMainTable: function(res, props) {
+        res = res || this.props.resource;
+        props = props || this.props;
+
+        if (!res.visible && !props.showHiddenResources){
+            return false;
+        }
+        var hasVisibility = (res.unlocked || (res.name == "kittens" && res.maxValue));
+        if (!hasVisibility || (!this.getIsVisible(res) && !props.isEditMode)){
+            return false;
+        }
+        //migrate dual resources (e.g. blueprint) to lower table once craft recipe is unlocked
+        if (game.resPool.isNormalCraftableResource(res) && game.workshop.getCraft(res.name).unlocked){
+            return false;
+        }
+        //Else, resource is visible && unlocked && not displayed somewhere else instead:
+        return true;
     },
 
     componentDidMount: function(){
@@ -405,33 +408,31 @@ WCraftShortcut = React.createClass({
 WCraftRow = React.createClass({
 
     getDefaultProperties: function(){
-        return {resource: null, isEditMode: false};
+        return {resource: null, isEditMode: false, isRequired: false};
     },
 
+    //I'm going for a solution that is technically less accurate, but is much simpler to understand.
+    //This function tells React to skip rendering for invisible resources.
+    //I think it's good enough for now.
     shouldComponentUpdate: function(nextProp, nextState){
-        var newRes = nextProp.resource;
-
-        /*var isEqual = 
-            oldRes.value == newRes.value &&
-            this.props.isEditMode == nextProp.isEditMode &&
-            this.props.isRequired == nextProp.isRequired &&
-            this.state.visible == nextState.visible;
-
-        if (isEqual){
-            return false;
-        }*/
-        this.oldRes = {
-            value: newRes.value,
-        };
-        return true;
+        var newVisibility = this.getIsResInCraftTable(nextProp.resource, nextProp);
+        if (this.oldVisibility !== newVisibility) {
+            //Remember new visibility state
+            this.oldVisibility = newVisibility;
+            //Resource will appear/disappear, therefore component should update
+            return true;
+        }
+        //Update component if it will be displayed
+        //Don't update component if it won't be displayed
+        return newVisibility;
     },
 
     render: function(){
         var res = this.props.resource;
-
         var recipe = game.workshop.getCraft(res.name);
-        var hasVisibility = (res.unlocked && recipe.unlocked /*&& this.workshop.on > 0*/);
-        if (!hasVisibility || (!this.getIsVisible() && !this.props.isEditMode)){
+
+        //Only render if this resource is unlocked, not marked as hidden, etc.
+        if (!this.getIsResInCraftTable()) {
             return null;
         }
 
@@ -502,13 +503,29 @@ WCraftRow = React.createClass({
         }
     },
 
-    getIsVisible: function() {
-        var res = this.props.resource;
+    //Parameter is optional.
+    //If not given, defaults to this.props.resource
+    getIsVisible: function(res) {
+        res = res || this.props.resource;
         if (res.name == "wood") {
             //(Wood is special because it appears twice, separately)
             return !res.isHiddenFromCrafting;
         }
         return !res.isHidden;
+    },
+
+    //Both parameters are optional.
+    //If not given, they default to this.props
+    getIsResInCraftTable: function(res, props) {
+        res = res || this.props.resource;
+        props = props || this.props;
+
+        var recipe = game.workshop.getCraft(res.name);
+        var hasVisibility = (res.unlocked && recipe.unlocked);
+        if (!hasVisibility || (!this.getIsVisible(res) && !props.isEditMode)){
+            return false;
+        }
+        return true;
     },
 
     componentDidMount: function(){
