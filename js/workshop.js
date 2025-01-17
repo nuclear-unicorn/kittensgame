@@ -2865,8 +2865,15 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 			}
 
 			if (craft.value != 0) {
-				var countdown = (1 / (this.game.workshop.getEffectEngineer(craft.name, false) * this.game.getTicksPerSecondUI())).toFixed(0);
-				desc += "<br />=> " + $I("workshop.craftBtn.desc.countdown", [countdown]);
+				var craftsPerSecond = (this.game.workshop.getEffectEngineer(craft.name, false) * this.game.getTicksPerSecondUI());
+				if (craftsPerSecond <= 0) {
+					desc += "<br />=> " + $I("workshop.craftBtn.desc.countdown", ["&infin;"]);
+				} else if (craftsPerSecond <= 0.5) {
+					var countdown = (1 / craftsPerSecond).toFixed(0);
+					desc += "<br />=> " + $I("workshop.craftBtn.desc.countdown", [countdown]);
+				} else {
+					desc += "<br />=> " + $I("workshop.craftBtn.desc.craftsPerSecond", [this.game.getDisplayValueExt(craftsPerSecond)]);
+				}
 			}
 		}
 		return desc;

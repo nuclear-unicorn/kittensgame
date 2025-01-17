@@ -237,11 +237,15 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				"name", "embassyLevel", "unlocked", "collapsed", "energy", "duration", "pinned"
 			])
 		};
+		if (this.get("leviathans").autoPinned) {
+			saveData.diplomacy.autoPinLeviathans = true;
+		}
 	},
 
 	load: function(saveData){
 		if (saveData.diplomacy) {
 			this.game.bld.loadMetadata(this.races, saveData.diplomacy.races);
+			this.get("leviathans").autoPinned = saveData.diplomacy.autoPinLeviathans || false;
 		}
 	},
 
