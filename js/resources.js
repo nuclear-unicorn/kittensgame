@@ -593,7 +593,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 				maxValue: pactsManager.fractureNecrocornDeficit,
 				unlocked: pactsManager.necrocornDeficit > 0 ||
 					//Do we have at least 1 pact purchased?
-					dojo.some(pactsManager.pacts, function(pact) {
+					pactsManager.pacts.some(function(pact) {
 						return pact.val > 0;
 					}),
 				visible: false,
