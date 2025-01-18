@@ -32,6 +32,17 @@
 		<!-- friends don't let friends use AMD and require.js -->
 		<script src="lib/system.js"></script>
 
+		<script>
+			SystemJS.config({
+				map: {
+					'plugin-babel': 'lib/babel/plugin-babel.js',
+					'systemjs-babel-build': 'lib/babel/systemjs-babel-browser.js'
+				},
+				transpiler: 'plugin-babel'
+			});
+			System.import('js/sample_es6.js');
+		</script>
+
 		<!-- Global site tag (gtag.js) - Google Analytics -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id=G-0QBDX221PR"></script>
 		<script>
@@ -120,10 +131,6 @@
 
 				$("#tooltip").hide();
 
-				SystemJS.config({
-					baseURL: ''
-				});
-
 				var modules = [
 					"js/resources",
 					"js/calendar",
@@ -171,7 +178,7 @@
 
 				var def = $.getJSON("build.version.json?="+now).then(function(json){
 					buildRevision = json.buildRevision;
-					console.log("build revison is" + buildRevision);
+					console.log("build revison is: " + buildRevision);
 					$("#versionLink").html(displayedVersion + ".r" + buildRevision);
 				});
 				def = _import("config", def);
