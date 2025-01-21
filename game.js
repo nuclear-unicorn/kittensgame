@@ -1428,6 +1428,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.harborLimitRatioPolicy.title"),
 				type: "ratio"
 			},
+			"neutralRaceEmbassyStanding": {
+				title: $I("effectsMgr.statics.neutralRaceEmbassyStanding.title"),
+				type: "ratio"
+			},
 			"calcinerSteelRatioBonus":{
 				title: $I("effectsMgr.statics.calcinerSteelRatioBonus.title"),
 				type: "ratio"

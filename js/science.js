@@ -1386,23 +1386,13 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         prices: [
             {name : "culture", val: 2100}
         ],
-        effects:{
-			"culturePolicyRatio": 0
-        },
+		effects:{
+			"neutralRaceEmbassyStanding": 0.001
+		},
         unlocked: false,
         blocked: false,
 		isRelation: true,
         blocks:["lizardRelationsEcologists", "lizardRelationsPriests"],
-		calculateEffects: function(self, game){
-			var raceList = game.diplomacy.races;
-			var embassyCount = 0;
-			for (var i = 0; i < raceList.length; i++ ) {
-				if (raceList[i].embassyLevel) {
-					embassyCount += raceList[i].embassyLevel;
-				}
-			}
-			self.effects["culturePolicyRatio"] = Math.min(0.0004 * embassyCount, 0.15);
-		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("lizards", 20);
 		}
