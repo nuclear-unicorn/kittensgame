@@ -75,7 +75,7 @@
     "btn.all.minor": "todos",
     "btn.all.assign": "[+todo]",
     "btn.all.unassign": "[-todo]",
-    "btn.aoff.tooltip": "Automatización desactivada",
+    "btn.aoff.tooltip": "Automatización deshabilitada",
     "btn.aon.tooltip": "Automatización activada",
     "btn.almostlimited.tooltip": "* - La actualización desactivará la autocracia",
     "btn.pollution.tooltip": "Genera contaminación",
