@@ -3682,9 +3682,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 		if (resName == "necrocorn"){
 			stack.push({
-				name: $I("res.stack.buildings"),
+				name: $I("res.stack.pactsConsumption"),
 				type: "perDay",
-				value: this.getEffect("necrocornPerDay") + this.religion.pactsManager.getSiphonedCorruption(1)
+				value: this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect("necrocornPerDay") +
+						this.religion.pactsManager.getSiphonedCorruption(1)
 			});
 		}else{
 			stack.push({
@@ -3694,22 +3695,39 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			});
 		}
 		if(resName == "necrocorn"){
+			//ReligionManager keeps data on all corruption-related effects
+			var corruptionModifiers = this.religion.corruptionCached || [];
 			var corruptionStack = [];
 			corruptionStack.push({
 				name: $I("res.stack.corruptionPerDay"),
 				type: "perDay",
-				value: this.religion.getCorruptionPerTick() * this.calendar.ticksPerDay
+				value: (corruptionModifiers.finalCorruptionPerTick || 0) * this.calendar.ticksPerDay
 			});
-			corruptionStack.push({
-				name: $I("res.stack.corruptionPerDayProduction"),
-				type: "perDay",
-				value: this.religion.getCorruptionPerTickProduction() * this.calendar.ticksPerDay
-			});
-			corruptionStack.push({
-				name: $I("res.stack.corruptionPerDaySiphoned"),
-				type: "perDay",
-				value: - this.religion.pactsManager.getSiphonedCorruption(1)
-			});
+			for (var i = 0; i < corruptionModifiers.length; i += 1) {
+				var modifier = corruptionModifiers[i];
+				switch(modifier.behavior) {
+				case "additive":
+					//Convert a per-tick effect to a per-day effect.
+					corruptionStack.push({
+						name: modifier.label,
+						type: "perDay",
+						value: modifier.value * this.calendar.ticksPerDay
+					});
+					//Hack to make the total corruption line display if net corruption is 0 due to Siphoning
+					if (modifier.value) {
+						corruptionStack[0].forceDisplay = true;
+					}
+					break;
+				case "multiplicative":
+					//Convert a multiplier to a ratio bonus
+					corruptionStack.push({
+						name: modifier.label,
+						type: "ratio",
+						value: modifier.value - 1
+					});
+					break;
+				}
+			}
 			stack.push(corruptionStack);
 		}
 
@@ -4113,10 +4131,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				continue;
 			}
 
-			if (!stackElem.value || (stackElem.type != "fixed" && stackElem.type != "perDay" &&
-			stackElem.type != "perYear" && !hasFixed)) {
-				//If hasFixed is false, no need to display ratio effects
-				continue;
+			if (!stackElem.forceDisplay) { //Hack to make necrocorn corruption display properly in some situations
+				if (!stackElem.value || (stackElem.type != "fixed" && stackElem.type != "perDay" &&
+				stackElem.type != "perYear" && !hasFixed)) {
+					//If hasFixed is false, no need to display ratio effects
+					continue;
+				}
 			}
 
 			var indent = i == 0 ? depth - 1 : depth;
