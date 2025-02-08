@@ -3207,8 +3207,10 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 		//engineer consumption go here
 		var tdConsumption = dojo.create("td", { className: "craftStuffPanel", style: {paddingLeft: "50px"}}, row2);
 		this.consumptionTd = tdConsumption;
-		this.renderConsumption(this.consumptionTd);
-
+		if (Object.keys(this.game.workshop.getConsumptionEngineers()).length){
+			this.renderConsumption(this.consumptionTd);
+		}
+		
 		//----------------
 		if (!this.game.science.get("construction").researched){
 			craftPanel.setVisible(false);
@@ -3292,7 +3294,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 			this.renderResources(this.resTd);
 		}
 
-		if (this.consumptionTd){
+		if (this.consumptionTd && Object.keys(this.game.workshop.getConsumptionEngineers()).length){
 			this.renderConsumption(this.consumptionTd);
 		}
 
