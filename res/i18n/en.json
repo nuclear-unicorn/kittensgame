@@ -2202,6 +2202,7 @@
     "workshop.craftBtn.desc.tier": "Engineer's optimal rank",
     "workshop.craftPanel.label": "Crafting",
     "workshop.craftPanel.counts.label": "Stuff",
+    "workshop.craftPanel.consumption.label": "Engineer Consumption",
     "workshop.craftPanel.header.freeEngineers": "Free engineers",
     "workshop.craftPanel.header.tooltip": "You will gain one engineer slot per factory.<br>Every engineer can be assigned to the crafting job which they will perform automatically.",
     "workshop.crafted.msg": "+{0} {1} crafted",
