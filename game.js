@@ -3641,6 +3641,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			type: "fixed",
 			value: this.workshop.getEffectEngineer(res.name, true)
 		});
+		stack.push({
+			name: $I("res.stack.engineer"),
+			type: "fixed",
+			value: this.workshop.getConsumptionEngineers(res.name)[res.name] || 0 
+		});
 		// -EARTH CONSUMPTION && -SPACE CONSUMPTION
 		var resMapConsumption = this.village.getResConsumption();
 		var resConsumption = resMapConsumption[res.name] || 0;
@@ -3987,6 +3992,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				|| this.getResourcePerDay(resRef.name) != 0
 				|| (this.getResourceOnYearProduction(resRef.name) != 0 || resRef.name == "antimatter")
 				|| (resRef.name == "kittens" && this.village.sim.kittens.length < this.village.sim.maxKittens)
+				|| this.workshop.getConsumptionEngineers(resRef.name)[resRef.name]
 			){
 				return this.getDetailedResMap(resRef);
 			}
