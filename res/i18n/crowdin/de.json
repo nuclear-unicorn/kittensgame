@@ -1943,7 +1943,7 @@
     "workshop.barges.label": "Lastkähne",
     "workshop.barges.desc": "Häfen lagern mehr Kohle",
     "workshop.biofuel.label": "Biofuel processing",
-    "workshop.biofuel.desc": "Bio-Labore wandeln Katzenminze in Öl um. Jedes verbraucht 1Watt/tick.",
+    "workshop.biofuel.desc": "Biolabore wandeln Katzenminze zu Öl. Jedes Biolabor verbraucht 1Wt/t.",
     "workshop.bolas.label": "Bolas",
     "workshop.bolas.desc": "Wurfwaffe aus schweren Steingewichten. Deine Jäger sind doppelt so effektiv",
     "workshop.bolas.flavor": "Waffen-Garn",
