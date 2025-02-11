@@ -3091,6 +3091,8 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 
 	resTd: null,
 
+	consumptionTd: null,
+
 	constructor: function(tabName, game){
 		this.game = game;
 
@@ -3146,10 +3148,10 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 		var content = craftPanel.render(tabContainer);
 
 		var table = dojo.create("table", {}, content);
-		dojo.create("tr", {}, table);
+		var row1 = dojo.create("tr", { height: "1px" }, table);
 
 		//buttons go there
-		var td = dojo.create("td", {}, table);
+		var td = dojo.create("td", { rowspan: 2 }, row1);
 		var tdTop = dojo.create("td", { colspan: 2, style: {cursor: "pointer"} }, td);
 
 		this.tdTop = tdTop;
@@ -3193,12 +3195,22 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 			zebraUpgradeButton.render(content);
 		}
 	}
+		
 
 		//resources go there
-		var td = dojo.create("td", { className: "craftStuffPanel", style: {paddingLeft: "50px"}}, table);
+		var td = dojo.create("td", { className: "craftStuffPanel", style: {paddingLeft: "50px"}}, row1);
 		this.resTd = td;
 		this.renderResources(this.resTd);
 
+		var row2 = dojo.create("tr", {}, table);
+
+		//engineer consumption go here
+		var tdConsumption = dojo.create("td", { className: "craftStuffPanel", style: {paddingLeft: "50px"}}, row2);
+		this.consumptionTd = tdConsumption;
+		if (Object.keys(this.game.workshop.getConsumptionEngineers()).length){
+			this.renderConsumption(this.consumptionTd);
+		}
+		
 		//----------------
 		if (!this.game.science.get("construction").researched){
 			craftPanel.setVisible(false);
@@ -3230,6 +3242,31 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 		}
 	},
 
+	renderConsumption: function(container){
+
+		dojo.empty(container);
+
+		dojo.create("span", { innerHTML: $I("workshop.craftPanel.consumption.label") + ":" },container);
+
+		var table = dojo.create("table", { style: {
+			paddingTop: "20px"
+		}}, container);
+
+		var resources = this.game.resPool.resources;
+		var engineerConsumption = this.game.workshop.getConsumptionEngineers();
+
+		for (var i = 0; i < resources.length; i++){
+			var res = resources[i];
+
+			if (engineerConsumption[res.name]){
+				var tr = dojo.create("tr", {}, table);
+
+				dojo.create("td", { innerHTML: res.title || res.name + ":" }, tr);
+				dojo.create("td", { innerHTML: this.game.getDisplayValueExt(engineerConsumption[res.name], null, true) }, tr);
+			}
+		}
+	},
+
 	createBtn: function(upgrade) {
 		var controller = new com.nuclearunicorn.game.ui.UpgradeButtonController(this.game);
 		return new com.nuclearunicorn.game.ui.BuildingResearchBtn({id: upgrade.name, controller: controller}, this.game);
@@ -3255,6 +3292,10 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 
 		if (this.resTd){
 			this.renderResources(this.resTd);
+		}
+
+		if (this.consumptionTd && Object.keys(this.game.workshop.getConsumptionEngineers()).length){
+			this.renderConsumption(this.consumptionTd);
 		}
 
 		if (this.tdTop && this.game.science.get("mechanization").researched) {
