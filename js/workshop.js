@@ -3253,7 +3253,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 		}}, container);
 
 		var resources = this.game.resPool.resources;
-		var engineerConsumption = this.game.workshop.getConsumptionEngineers()
+		var engineerConsumption = this.game.workshop.getConsumptionEngineers();
 
 		for (var i = 0; i < resources.length; i++){
 			var res = resources[i];
