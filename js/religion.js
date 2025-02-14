@@ -287,11 +287,13 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 		return this.corruptionCached.corruptionProdPerTick;
 	},
-	//The amount by which Siphoning slows down necrocorn production
+	//The amount of corruption that Siphoning TRIES to consume.
+	//If this is less than the corruption production, it means we'll go into debt.
+	//@return A negative number, or zero.
 	getCorruptionPerTickConsumption: function(){
 		//Grab cached value if we can, recalculate if needed
 		var corruptionData = this.corruptionCached || this.getCorruptionEffects();
-		return corruptionData.corruptionProdPerTick - corruptionData.finalCorruptionPerTick;
+		return corruptionData.finalCorruptionPerTick - corruptionData.corruptionProdPerTick - corruptionData.deficitPerTick;
 	},
 	//If Siphoning is active, the amount by which we go into debt each tick due to not being able to pay for Pacts
 	getCorruptionDeficitPerTick: function(){
