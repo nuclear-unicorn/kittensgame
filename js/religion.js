@@ -15,7 +15,13 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	//an amount of converted faith obtained through the faith reset (aka eupyphany)
 	faithRatio : 0,
 
+	//Progress to generating the next necrocorn.
+	//Will usually be a float value between 0 & 1.
+	//Whenever this reaches 1, poof! 1 alicorn will be converted into 1 necrocorn.
 	corruption: 0,
+	//Array where each element is a separate bonus/effect/modifier to necrocorn production
+	//Additionally, stores important derived values in easily accessible fields
+	corruptionCached: null,
 
 	alicornCounter: 0,
 
@@ -53,6 +59,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	resetState: function(){
 		this.faith = 0;
 		this.corruption = 0;
+		this.corruptionCached = null;
 		this.transcendenceTier = 0;
 		this.faithRatio = 0;
 
@@ -103,6 +110,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 		this.faith = _data.faith || 0;
 		this.corruption = _data.corruption || 0;
+		this.corruptionCached = null; //Recalculate it later.
 		this.faithRatio = _data.faithRatio || 0;
 		this.transcendenceTier = _data.transcendenceTier || 0;
 		this.activeHolyGenocide = _data.activeHolyGenocide || 0;
@@ -140,33 +148,158 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			});
 		}
 	},
-	getCorruptionPerTickProduction: function(pretendExistNecrocorn){
+	/**
+	 * This function does 2 things:
+	 * (1) It calculates necrocorn production in a way that remembers intermediate values.
+	 * (2) It keeps information on the names of all the different modifiers, bonuses, etc.
+	 *     This is the information that will be shown to the player in the production breakdown tooltip.
+	 * 
+	 * My intent here is to make adding a new bonus as easy as possible.  Instead of having to add it to both
+	 * the UI code and to the effects calculation code, which may be in different files,
+	 * it's all contained in one place.
+	 * 
+	 * If a dev wants to add a new upgrade that grants a necrocorn bonus, all they need to do is to add
+	 * just a few lines of code to this function specifying the name of the effect & how it's calculated.
+	 * 
+	 * @param pretendExistNecrocorn bool (optional) There's one specific effect whose value is based on
+	 *                                   whether or not there are a non-zero number of necrocorns already.
+	 *                                   If this flag is true, we pretend we have some necrocorns.
+	 *                                   If false, we pretend we have exactly 0 necrocorns.
+	 *                                   If this flag is omitted (i.e. left undefined), we will check
+	 *                                   how many necrocorns the game-state actually has.
+	 * @return An array.  Each element in the array represents an individual bonus/modifier to necrocorn production.
+	 *         The point of this array is that the code for the UI can process this array to make it human-readable.
+	 *         The array will also contain 3 specific properties with useful information (see below).
+	 * 
+	 * Each element in the array is an object with the following 3 keys:
+	 *	label: string.  What the player will see in the UI as the name for this effect.
+	 *	value: number.  Has different meaning depending on the behavior field.
+	 *	behavior: string.  How this effect interacts with the others in the list.  Can have 2 possible values:
+	 *		"additive" - The value field represents a flat bonus, in units of necrocorns per tick
+	 *		"multiplicative" - All additive effects before this point will be multiplied by the value
+	 * 
+	 * But, if all you want are some quick & easy numbers, fear not!  You need not bother with the array elements.
+	 * The return value will also have 3 additional numerical fields, in addition to being an array.
+	 *	finalCorruptionPerTick: number.  The TOTAL necrocorn production per tick, after applying ALL modifiers.
+	 *	corruptionProdPerTick: number.  Necrocorn production per tick, except we ignore Siphoning.
+	 *	                                The difference between these two numbers is the amount Siphoning consumes.
+	 *	deficitPerTick: number.  How much debt we accumulate each tick, if Siphoning wants to spend
+	 *	                         more necrocorns than we can produce.
+	 *	                         If we have sufficient production to satisfy Siphoning, this will be 0.
+	 *	                         If Siphoning is not active, this will be 0.
+	 */
+	getCorruptionEffects: function(pretendExistNecrocorn) {
+		var existNecrocorn = (pretendExistNecrocorn === undefined) ? (this.game.resPool.get("necrocorn").value > 0) : pretendExistNecrocorn;
+		var effectsList = [];
+		effectsList.finalCorruptionPerTick = 0;
+		effectsList.corruptionProdPerTick = 0;
+		effectsList.deficitPerTick = 0;
+		//effectsList is an ARRAY but it also has properties like an object.  This is intentional.
+
+		//Base production (from Markers, affected by Black Sky Challenge reward)
 		if (this.game.resPool.get("alicorn").value > 0) {
+			effectsList.push({
+				label: $I("res.stack.corruptionFromMarkers"),
+				value: this.game.getEffect("corruptionRatio"),
+				behavior: "additive"
+			});
+		}
+		//Game rule: Necrocorn production is slower if you have necrocorns already.
+		//corruptionBoostRatio reduces this & can eventually turn it into a bonus.
+		if (existNecrocorn) {
+			var multiplier = 0.25 * (1 + this.game.getEffect("corruptionBoostRatio"));
+			effectsList.push({
+				label: $I(multiplier < 1 ? "res.stack.corruptionExistPenalty" : "res.stack.religion"),
+				value: multiplier,
+				behavior: "multiplicative"
+			});
+		}
+		//Black Radiances
+		effectsList.push({
+			label: $I("res.stack.corruptionSorrowBonus"),
 			//30% bls * 20 Radiance should yield ~ 50-75% boost rate which is laughable but we can always buff it
-			var existNecrocorn = (pretendExistNecrocorn === undefined) ? (this.game.resPool.get("necrocorn").value > 0) : pretendExistNecrocorn;
-			var blsBoost = 1 + Math.sqrt(this.game.resPool.get("sorrow").value * this.game.getEffect("blsCorruptionRatio"));
-			var corruptionBoost = existNecrocorn
-				? 0.25 * (1 + this.game.getEffect("corruptionBoostRatio")) // 75% penalty
-				: 1;
-			return this.game.getEffect("corruptionRatio") * blsBoost * corruptionBoost;
-		}
-		return 0;
-	},
-	getCorruptionPerTickConsumption: function(){
+			value: 1 + Math.sqrt(this.game.resPool.get("sorrow").value * this.game.getEffect("blsCorruptionRatio")),
+			behavior: "multiplicative"
+		});
+
+		// >>>here<<< is the place to add new bonuses/modifiers/etc. if the devs want to add more content
+		// Just define a label (the i18n string to show to the player, giving this effect a name)
+		// Give it a value & either "additive" or "multiplicative" behavior
+		// The game will recalculate this once per tick, so you can put in a mathematical formula if you want.
+
+		//Siphoning policy
+		// (Pacts, which normally consume necrocorns directly,
+		// will instead slow down necrocorn production by an equivalent amount)
 		if(this.game.getFeatureFlag("MAUSOLEUM_PACTS") > 0 && this.game.science.getPolicy("siphoning").researched){
-			return this.game.getEffect("necrocornPerDay")/this.game.calendar.ticksPerDay;
+			effectsList.push({
+				label: $I("res.stack.corruptionPerDaySiphoned"),
+				value: - this.game.getEffect("necrocornPerDay")/this.game.calendar.ticksPerDay, //this is a positive number! (or zero)
+				behavior: "siphoning" //Special behavior value, will be overwritten later
+					//The calling function will never see this behavior,
+					// they'll only see "additive" behavior with a negative value
+			});
 		}
-		return 0;
+
+		//Calculation time: Go through every effect & apply them, in order.
+		for (var i = 0; i < effectsList.length; i += 1) {
+			var effect = effectsList[i];
+			switch(effect.behavior) {
+			case "additive":
+				effectsList.finalCorruptionPerTick += effect.value;
+				effectsList.corruptionProdPerTick += effect.value;
+				break;
+			case "multiplicative":
+				effectsList.finalCorruptionPerTick *= effect.value;
+				effectsList.corruptionProdPerTick *= effect.value;
+				break;
+			case "siphoning":
+				if (effect.value < effectsList.finalCorruptionPerTick) {
+					//We can pay siphoned Pacts in full!
+					effectsList.finalCorruptionPerTick -= effect.value;
+				} else {
+					effectsList.deficitPerTick = Math.max(effect.value - effectsList.finalCorruptionPerTick, 0);
+					//Shrink so it doesn't consume more than we have from other sources.
+					effect.value = effectsList.finalCorruptionPerTick;
+					effectsList.finalCorruptionPerTick = 0;
+				}
+				//Leave effectsList.corruptionProdPerTick unchanged.
+				//Flip value from positive to negative & mark as "additive"
+				effect.value *= -1;
+				effect.behavior = "additive";
+				break;
+			}
+		}
+		return effectsList;
 	},
-	getCorruptionDeficitPerTick: function(){
-		return Math.max(-this.getCorruptionPerTickProduction() - this.getCorruptionPerTickConsumption(),0);
-	},
+	//Total necrocorn production
 	getCorruptionPerTick: function(pretendExistNecrocorn){
-		var corruptionProduction = this.getCorruptionPerTickProduction(pretendExistNecrocorn);
-		if(this.game.getFeatureFlag("MAUSOLEUM_PACTS") && corruptionProduction > 0 && this.game.science.getPolicy("siphoning").researched){
-			corruptionProduction += this.getCorruptionPerTickConsumption();
+		//Recalculate if needed, grab cached value if we can
+		if (typeof(pretendExistNecrocorn) === "boolean" || !this.corruptionCached) {
+			return this.getCorruptionEffects(pretendExistNecrocorn).finalCorruptionPerTick;
 		}
-		return Math.max(corruptionProduction, 0);
+		return this.corruptionCached.finalCorruptionPerTick;
+	},
+	//Necrocorn production, ignoring Siphoning
+	getCorruptionPerTickProduction: function(pretendExistNecrocorn){
+		//Recalculate if needed, grab cached value if we can
+		if (typeof(pretendExistNecrocorn) === "boolean" || !this.corruptionCached) {
+			return this.getCorruptionEffects(pretendExistNecrocorn).corruptionProdPerTick;
+		}
+		return this.corruptionCached.corruptionProdPerTick;
+	},
+	//The amount of corruption that Siphoning TRIES to consume.
+	//If this is less than the corruption production, it means we'll go into debt.
+	//@return A negative number, or zero.
+	getCorruptionPerTickConsumption: function(){
+		//Grab cached value if we can, recalculate if needed
+		var corruptionData = this.corruptionCached || this.getCorruptionEffects();
+		return corruptionData.finalCorruptionPerTick - corruptionData.corruptionProdPerTick - corruptionData.deficitPerTick;
+	},
+	//If Siphoning is active, the amount by which we go into debt each tick due to not being able to pay for Pacts
+	getCorruptionDeficitPerTick: function(){
+		//Grab cached value if we can, recalculate if needed
+		var corruptionData = this.corruptionCached || this.getCorruptionEffects();
+		return corruptionData.deficitPerTick;
 	},
 	update: function(){
 		if (this.game.resPool.get("faith").value > 0 || this.game.challenges.isActive("atheism") && this.game.bld.get("ziggurat").val > 0){
@@ -177,6 +310,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		if (isNaN(this.faith)){
 			this.faith = 0;
 		}
+
+		//Update cached corruption-related values (only once per tick!)
+		this.corruptionCached = this.getCorruptionEffects();
 
 		var alicorns = this.game.resPool.get("alicorn");
 		if (alicorns.value > 0) {
