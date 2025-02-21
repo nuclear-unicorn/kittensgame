@@ -2621,9 +2621,29 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 		var cultureBonusRaw = Math.floor(this.game.resPool.get("manuscript").value);
 		this.effectsBase["cultureMax"] = this.game.getUnlimitedDR(cultureBonusRaw, 0.01);
-		this.effectsBase["faithMax"] = this.game.getUnlimitedDR(cultureBonusRaw, 0.02) * this.game.getEffect("faithFromManuscripts");
-
 		this.effectsBase["cultureMax"] *= 1 + this.game.getEffect("cultureFromManuscripts");
+
+		var faithFromManuscripts = this.game.getEffect("faithFromManuscripts");
+		if (faithFromManuscripts > 0) {
+			var faithMaxBld = this.game.bld.getEffect("faithMax");
+			var unimpededCap = 10000 + faithMaxBld * 0.15;
+			var STRIPE = 0.02; //Scaling parameter for UDR
+			var threshold = this.game.getInverseUnlimitedDR(unimpededCap, STRIPE);
+			if (cultureBonusRaw > threshold) {
+				//Above threshold, use harsher logarithmic scaling.
+				//Every factor of ×10 increases the effect by 5% (additive),
+				//  capped at +900% (tame infinity).
+				var scaling = this.game.getLimitedDR(1 + 0.021715 * Math.log(cultureBonusRaw / threshold), 10);
+				this.effectsBase["faithMax"] = unimpededCap * scaling;
+			} else {
+				//Below threshold, use simple UDR.
+				this.effectsBase["faithMax"] = this.game.getUnlimitedDR(cultureBonusRaw, STRIPE);
+			}
+			//Apply multiplier from policies:
+			this.effectsBase["faithMax"] *= faithFromManuscripts;
+		} else {
+			this.effectsBase["faithMax"] = 0;
+		}
 
 		//sanity check
 		if (this.game.village.getFreeEngineers() < 0){
@@ -2845,8 +2865,15 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 			}
 
 			if (craft.value != 0) {
-				var countdown = (1 / (this.game.workshop.getEffectEngineer(craft.name, false) * this.game.getTicksPerSecondUI())).toFixed(0);
-				desc += "<br />=> " + $I("workshop.craftBtn.desc.countdown", [countdown]);
+				var craftsPerSecond = (this.game.workshop.getEffectEngineer(craft.name, false) * this.game.getTicksPerSecondUI());
+				if (craftsPerSecond <= 0) {
+					desc += "<br />=> " + $I("workshop.craftBtn.desc.countdown", ["&infin;"]);
+				} else if (craftsPerSecond <= 0.5) {
+					var countdown = (1 / craftsPerSecond).toFixed(0);
+					desc += "<br />=> " + $I("workshop.craftBtn.desc.countdown", [countdown]);
+				} else {
+					desc += "<br />=> " + $I("workshop.craftBtn.desc.craftsPerSecond", [this.game.getDisplayValueExt(craftsPerSecond)]);
+				}
 			}
 		}
 		return desc;
@@ -3064,6 +3091,8 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 
 	resTd: null,
 
+	consumptionTd: null,
+
 	constructor: function(tabName, game){
 		this.game = game;
 
@@ -3119,10 +3148,10 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 		var content = craftPanel.render(tabContainer);
 
 		var table = dojo.create("table", {}, content);
-		dojo.create("tr", {}, table);
+		var row1 = dojo.create("tr", { height: "1px" }, table);
 
 		//buttons go there
-		var td = dojo.create("td", {}, table);
+		var td = dojo.create("td", { rowspan: 2 }, row1);
 		var tdTop = dojo.create("td", { colspan: 2, style: {cursor: "pointer"} }, td);
 
 		this.tdTop = tdTop;
@@ -3166,12 +3195,22 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 			zebraUpgradeButton.render(content);
 		}
 	}
+		
 
 		//resources go there
-		var td = dojo.create("td", { className: "craftStuffPanel", style: {paddingLeft: "50px"}}, table);
+		var td = dojo.create("td", { className: "craftStuffPanel", style: {paddingLeft: "50px"}}, row1);
 		this.resTd = td;
 		this.renderResources(this.resTd);
 
+		var row2 = dojo.create("tr", {}, table);
+
+		//engineer consumption go here
+		var tdConsumption = dojo.create("td", { className: "craftStuffPanel", style: {paddingLeft: "50px"}}, row2);
+		this.consumptionTd = tdConsumption;
+		if (Object.keys(this.game.workshop.getConsumptionEngineers()).length){
+			this.renderConsumption(this.consumptionTd);
+		}
+		
 		//----------------
 		if (!this.game.science.get("construction").researched){
 			craftPanel.setVisible(false);
@@ -3203,6 +3242,31 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 		}
 	},
 
+	renderConsumption: function(container){
+
+		dojo.empty(container);
+
+		dojo.create("span", { innerHTML: $I("workshop.craftPanel.consumption.label") + ":" },container);
+
+		var table = dojo.create("table", { style: {
+			paddingTop: "20px"
+		}}, container);
+
+		var resources = this.game.resPool.resources;
+		var engineerConsumption = this.game.workshop.getConsumptionEngineers();
+
+		for (var i = 0; i < resources.length; i++){
+			var res = resources[i];
+
+			if (engineerConsumption[res.name]){
+				var tr = dojo.create("tr", {}, table);
+
+				dojo.create("td", { innerHTML: res.title || res.name + ":" }, tr);
+				dojo.create("td", { innerHTML: this.game.getDisplayValueExt(engineerConsumption[res.name], null, true) }, tr);
+			}
+		}
+	},
+
 	createBtn: function(upgrade) {
 		var controller = new com.nuclearunicorn.game.ui.UpgradeButtonController(this.game);
 		return new com.nuclearunicorn.game.ui.BuildingResearchBtn({id: upgrade.name, controller: controller}, this.game);
@@ -3228,6 +3292,10 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 
 		if (this.resTd){
 			this.renderResources(this.resTd);
+		}
+
+		if (this.consumptionTd && Object.keys(this.game.workshop.getConsumptionEngineers()).length){
+			this.renderConsumption(this.consumptionTd);
 		}
 
 		if (this.tdTop && this.game.science.get("mechanization").researched) {

@@ -1428,6 +1428,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.harborLimitRatioPolicy.title"),
 				type: "ratio"
 			},
+			"neutralRaceEmbassyStanding": {
+				title: $I("effectsMgr.statics.neutralRaceEmbassyStanding.title"),
+				type: "ratio"
+			},
 			"calcinerSteelRatioBonus":{
 				title: $I("effectsMgr.statics.calcinerSteelRatioBonus.title"),
 				type: "ratio"
@@ -1569,6 +1573,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.unobtainiumPolicyRatio.title"),
 				type: "ratio"
             },
+			"antimatterPolicyRatio":{
+				title: $I("effectsMgr.statics.antimatterPolicyRatio.title"),
+				type: "ratio"
+			},
             "sciencePolicyRatio":{
 				title: $I("effectsMgr.statics.sciencePolicyRatio.title"),
 				type: "ratio"
@@ -1916,7 +1924,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			mobile: false
 		},
 		SPACE_EXPL: {
-			beta: true,
+			beta: false,
 			main: false,
 			mobile: false
 		},
@@ -3633,6 +3641,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			type: "fixed",
 			value: this.workshop.getEffectEngineer(res.name, true)
 		});
+		stack.push({
+			name: $I("res.stack.engineer"),
+			type: "fixed",
+			value: this.workshop.getConsumptionEngineers()[res.name] || 0 
+		});
 		// -EARTH CONSUMPTION && -SPACE CONSUMPTION
 		var resMapConsumption = this.village.getResConsumption();
 		var resConsumption = resMapConsumption[res.name] || 0;
@@ -3748,6 +3761,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				value: -this.getEffect(res.name + "Production")
 			});
 		}
+		stack.push({
+			name: $I("res.stack.policy"),
+			type: "ratio",
+			value: this.getEffect(res.name + "PolicyRatio")
+		});
 		return stack;
 	},
 	getCMBRBonus: function() {
@@ -3763,7 +3781,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			var policyRefineRatio = this.getEffect("refinePolicyRatio");
 			var refineRatio =  (policyRefineRatio) + (1 + policyRefineRatio) * this.getEffect("refineRatio");
 			return this.ironWill
-				? ((1 + refineRatio) * (1 + this.getEffect("woodRatio"))) - 1
+				? ((1 + refineRatio) * (1 + this.getEffect("woodRatio") + this.getEffect("woodPolicyRatio") / 3)) - 1
 				: refineRatio;
 		}
 
@@ -3922,14 +3940,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 	getResourceOnYearProduction: function(resName){
 		if (resName == "antimatter"){
-			if(this.resPool.energyProd >= this.resPool.energyCons){
-				return this.getEffect("antimatterProduction");
-			}
-			else{
+			if(this.resPool.energyProd < this.resPool.energyCons){
 				return 0;
 			}
 		}
-		return this.getEffect(resName + "Production"); //this might need to be changed!
+		return this.getEffect(resName + "Production") * (1 + this.getEffect(resName + "PolicyRatio"));
 	},
 	getResourcePerTickConvertion: function(resName) {
 		return this.fixFloatPointNumber(this.getEffect(resName + "PerTickCon"));
@@ -3977,6 +3992,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				|| this.getResourcePerDay(resRef.name) != 0
 				|| (this.getResourceOnYearProduction(resRef.name) != 0 || resRef.name == "antimatter")
 				|| (resRef.name == "kittens" && this.village.sim.kittens.length < this.village.sim.maxKittens)
+				|| this.workshop.getConsumptionEngineers()[resRef.name]
 			){
 				return this.getDetailedResMap(resRef);
 			}
@@ -4108,6 +4124,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 			if (!stackElem.value || (stackElem.type != "fixed" && stackElem.type != "perDay" &&
 			stackElem.type != "perYear" && !hasFixed)) {
+				//If hasFixed is false, no need to display ratio effects
 				continue;
 			}
 
@@ -4120,7 +4137,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 
 			resString += this.getStackElemString(stackElem, res);
-			if (stackElem.type == "fixed" || stackElem.type == "perDay") {
+			if (stackElem.type == "fixed" || stackElem.type == "perDay" || stackElem.type == "perYear") {
+				//Below this point, display all ratio effects
 				hasFixed = true;
 			}
 		}

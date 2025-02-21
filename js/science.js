@@ -1067,7 +1067,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name : "culture", val: 150000}
 		],
 		effects:{
-			"technocracyScienceCap": 0.2
+			"technocracyScienceCap": 0.2,
+			"antimatterPolicyRatio": 0.0625,
+			"queueCap": 2
 		},
 		unlocked: false,
 		blocked: false,
@@ -1340,7 +1342,10 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocked: false,
 		isRelation: true,
         blocks:["lizardRelationsPriests", "lizardRelationsDiplomats"],
-		calculateEffects: function(self,game){
+		upgrades: {
+			buildings: ["magneto"]
+		},
+		/*calculateEffects: function(self,game){
 			var cathPollution = Math.floor(game.bld.cathPollution);
 			if (cathPollution < 0.5e9) {
 				var boostRatio = Math.round(((0.5e9 - cathPollution) * 2 / 0.5e10) * 1e2) / 1e2;
@@ -1352,7 +1357,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			}
 			game.upgrade({buildings: ["pasture", "aqueduct"]});
 			
-		},
+		},*/
 		evaluateLocks: function(game){
 			return game.science.checkRelation("lizards", 20);
 		}
@@ -1384,23 +1389,13 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         prices: [
             {name : "culture", val: 2100}
         ],
-        effects:{
-			"culturePolicyRatio": 0
-        },
+		effects:{
+			"neutralRaceEmbassyStanding": 0.001
+		},
         unlocked: false,
         blocked: false,
 		isRelation: true,
         blocks:["lizardRelationsEcologists", "lizardRelationsPriests"],
-		calculateEffects: function(self, game){
-			var raceList = game.diplomacy.races;
-			var embassyCount = 0;
-			for (var i = 0; i < raceList.length; i++ ) {
-				if (raceList[i].embassyLevel) {
-					embassyCount += raceList[i].embassyLevel;
-				}
-			}
-			self.effects["culturePolicyRatio"] = Math.min(0.0004 * embassyCount, 0.15);
-		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("lizards", 20);
 		}
@@ -1469,7 +1464,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["sharkRelationsScribes", "sharkRelationsBotanists"],
 		calculateEffects: function(self, game) {
 			var trades = game.stats.getStatCurrent("totalTrades").val;
-			self.effects["tradeRatio"] = Math.min(Math.floor(Math.log10(Math.max(trades, 100)) - 1) * 0.03, 0.3);			
+			self.effects["tradeRatio"] = Math.min(Math.round((Math.log10(Math.max(trades, 100)) - 1) * 3) / 100, 0.3);			
 		},
 		evaluateLocks: function(game){
 			return game.science.checkRelation("sharks", 20);
