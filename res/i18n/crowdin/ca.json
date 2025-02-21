@@ -67,9 +67,12 @@
     "challendge.ironWill.label": "Voluntat de Ferro",
     "menu.reset": "Reinicia",
     "opts.theme.unicorn": "Unicorn",
+    "prestige.ascoh.desc": "Un consell secret de barrets",
     "religion.btn.refine": "Refinar",
     "religion.pact.fractured.desc": "Has trencat el tracte... ara has de pagar",
     "unit.hour": "fortnite",
+    "science.blackchain.desc": "Tots els gats guais ho estan minant, així que penso que és algun tipus de mineral",
+    "science.calendar.flavor": "Quin dia deies que era?",
     "science.sattelites.flavor": "Escampant vídeos de gats a la velocitat de la llum",
     "space.umbraMission.desc": "Umbra és un forat fosc supermassiu al cor del sistema Helios",
     "tab.name.trade": "Comerciar",
@@ -81,5 +84,7 @@
     "village.census.lbl.leader": "Líder",
     "village.census.page": "Pàgina {0} de {1}",
     "workshop.alloySaw.label": "Serra d'Aleació",
+    "workshop.astrolabe.desc": "Millora el bonus de ciencia màxima del Observatori en un 50%",
+    "workshop.solarSatellites.desc": "Els satèlits generaran energia en comptes de consumir-la",
     "workshop.titaniumMirrors.label": "钛反射器"
 }
