@@ -1615,7 +1615,7 @@
     "ui.loading.msg.13": "正在抚摸鲨鱼",
     "ui.loading.msg.14": "正在铸造黑币",
     "ui.loading.msg.15": "正在修正时间悖论",
-    "ui.autosave.tooltip": "自动保存...",
+    "ui.autosave.tooltip": "自动保存中……",
     "ui.save.tooltip": "已保存!",
     "ui.energy.tooltip": "能量",
     "ui.log.link": "日志",
