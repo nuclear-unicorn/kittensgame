@@ -2155,7 +2155,7 @@
     "workshop.reactorVessel.label": "反应堆槽",
     "workshop.reactorVessel.desc": "每个反应堆都能提高飞船5%的潜力",
     "workshop.refrigeration.label": "冷藏",
-    "workshop.refrigeration.desc": "猫薄荷的存储量增加 75%",
+    "workshop.refrigeration.desc": "增加猫薄荷上限75%",
     "workshop.register.label": "注册",
     "workshop.register.desc": "领导根据经验来分配管理工作",
     "workshop.reinforcedBarns.label": "加强粮仓",
