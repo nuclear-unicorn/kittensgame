@@ -13,8 +13,6 @@
  * 
  * How to use:
  * If you want to GET or SET the value of a setting, just directly read/modify game.opts[optionName].
- * One of the goals of the update which added SettingsManager was that everything would just *work* with the absolute minimum
- * number of changes to code in other files.
  */
 dojo.declare("classes.managers.SettingsManager", com.nuclearunicorn.core.TabManager, {
 	//We inherit from TabManager for a few reasons, one of them being that we can just plug this
@@ -26,17 +24,21 @@ dojo.declare("classes.managers.SettingsManager", com.nuclearunicorn.core.TabMana
 	 * 	name - string - internal name of this option, so you'd access it by game.opts[optionName]
 	 * 	defaultValue - boolean - The value that this option takes if the player doesn't specify otherwise.
 	 * 
-	 * There are also some optional properties: //TODO--update this so that it's up-to-date!!!
+	 * There are also some optional properties:
 	 * 	label - i18n string shown as the name/description for this option in the web version of the game
-	 * 		If an option doesn't have a label, maybe don't show it on the web version of the game?
+	 * 		If an option doesn't have a label, it won't be available in the web version.
+	 * 		So, if you want to make an option mobile-only, don't give it a label.
 	 * 	mobileTitle - i18n string shown as the name for this option in the mobile version of the game
 	 * 	mobileDesc - i18n string shown as the description for this option in the mobile version of the game
-	 * 		Some options currently don't have mobileTitle or mobileDesc because, for the longest time,
-	 * 		most of these options weren't toggleable on mobile.
-	 * 		Maybe the system could only show an option in the menu on web if it has both mobileTitle & mobileDesc defined...
-	 * 	isExtra - boolean - If truthy, this setting is displayed on the web version of the game under the "More..." category.
+	 * 		Maybe the mobile UI system can be set up so that it only shows an option if it has mobileTitle defined...
+	 * 	isExtra - boolean - Determines which category an option is displayed under.
+	 * 		If falsy, the option will be displayed normally in the options menu on web.
+	 * 		If truthy, the option will be displayed under "More..." in the options menu on web.
+	 * 		Currently has no effect on mobile.
+	 * 	triggerUpdateUI - boolean - This is for the web version of the game.
+	 * 		If true, whenever the player toggles this setting, it'll re-render the UI.
 	 * 	devModeOnly - boolean - If truthy, this setting is hidden unless dev mode is active.
-	 * 	showOnlyIfKSDetected - Used on the mobile version for something.
+	 * 	showOnlyIfKSDetected - Used for some experimental things?
 	 */
 	settingsArr: [{
 		name: "useWorkers",
@@ -83,15 +85,17 @@ dojo.declare("classes.managers.SettingsManager", com.nuclearunicorn.core.TabMana
 	}, {
 		name: "hideDowngrade",
 		defaultValue: false,
-		label: $I("ui.option.hide.downgrade"),
+		label: $I("ui.option.hide.downgrade")
 	}, {
 		name: "hideBGImage",
 		defaultValue: false,
 		label: $I("ui.option.hide.bgimage"),
+		triggerUpdateUI: true
 	}, {
 		name: "tooltipsInRightColumn",
 		defaultValue: false,
 		label: $I("ui.option.tooltips.right"),
+		triggerUpdateUI: true
 	}, {
 		name: "noConfirm",
 		defaultValue: false,
@@ -150,7 +154,7 @@ dojo.declare("classes.managers.SettingsManager", com.nuclearunicorn.core.TabMana
 		mobileTitle: $I("opts.enableKS"),
 		mobileDesc: $I("opts.enableKS.desc"), //"This is absolutely unsupported, you have never seen me or this setting"
 		isExtra: true,
-		showOnlyIfKSDetected: true
+		showOnlyIfKSDetected: true //nothing to see here %citizen%
 	}, {
 		name: "forceLZ",
 		defaultValue: false,
@@ -258,6 +262,23 @@ dojo.declare("classes.managers.SettingsManager", com.nuclearunicorn.core.TabMana
 	getSetting: function(name) {
 		return this.getMeta(name, this.settingsArr);
 	}
+
+	/**
+	 * In a perfect world, I'd have wanted ALL reading/writing involving settings to be done through
+	 * the SettingsManager#get or #set functions, respectively.  The thing is, a large chunk of the code
+	 * is built upon using game.opts, & game.opts is still used for the non-boolean options that our
+	 * SettingsManager doesn't manage, so I cannot justify removing game.opts entirely.
+	 * I cannot justify changing every single line of code in both the KG repo & the KGM repo
+	 * that currently references game.opts to instead call a method of game.settings.
+	 * If we don't remove game.opts, that means we're keeping it around, & if we're keeping it around,
+	 * we might as well support it.  So, although one COULD call SettingsManager#get or SettingsManaget#set,
+	 * for the foreseeable future, it's easier to use game.opts, & things will still work well anyways.
+	 * 
+	 * It might be nice to extend SettingsManager functionality someday so it also tracks the game's
+	 * non-boolean options.  However, adding an entire new manager to the game is rather difficult,
+	 * & as a result it's made by brain tired, so I won't do it today.
+	 * The majority of the game's settings are boolean flags anyways, so my focus is on booleans.
+	 */
 });
 
 /**
@@ -297,28 +318,30 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.SettingsTab", com.nuclearunicorn.ga
 	 * @param setting - A metadata object representing the game-option we're rendering.
 	 */
 	renderSetting: function(container, setting) {
+		var settingsManager = this.game.settings;
 		var checkbox = dojo.create("input", {
 			id: setting.name + "I", //I for <input>
 			type: "checkbox",
-			checked: setting.value
+			checked: settingsManager.get(setting)
 		}, container);
 		var label = dojo.create("label", {
 			id: setting.name + "L", //L for <label>
 			for: setting.name + "I",
-			//TODO: replace hardcoded string with something in the i18n for dev mode
-			innerHTML: (!setting.label && setting.mobileTitle ? "(mobile-only) " : "") + //In Dev Mode, flag all mobile-only options
-				(setting.label || setting.mobileTitle || setting.name) //Use setting.name if neither label nor mobileTitle are defined
+			innerHTML: setting.label || setting.mobileTitle || setting.name //Use setting.name if neither label nor mobileTitle are defined
 		}, container);
+		if (setting.devModeOnly) {
+			dojo.attr(label, "title", $I("ui.option.dev.mode.only"));
+		}
 		dojo.create("br", {}, container); //Put each option on a separate line.
 
-		var settingsManager = this.game.settings;
 		//Here is where the magic happens:
 		dojo.connect(checkbox, "onclick", this, function(event) {
 			var theCheckbox = event.target;
 			settingsManager.set(setting, theCheckbox.checked);
-			theCheckbox.checked = setting.value;
+			theCheckbox.checked = settingsManager.get(setting);
+			if (setting.triggerUpdateUI) {
+				this.game.ui.updateOptions();
+			}
 		});
 	}
-
-	//TODO: Refresh options UI whenever you close & re-open the options menu.
 });

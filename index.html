@@ -359,7 +359,7 @@
 
 				<div class="links-block" style="padding-top:3px; display:inline-flex;">
 					<a id="save-link" href="#" onclick="gamePage.saveUI();">Save</a> |
-					<a id="options-link" href="#" onclick="$('#optionsDiv').toggle();">Options</a> |
+					<a id="options-link" href="#" onclick="$('#optionsDiv').toggle(); gamePage.ui.updateOptions();">Options</a> |
 
 					<a id="reset-link" href="#" onclick="gamePage.reset();">Reset</a> |
 					<span id="devModeButton" style="display: none;"><a href="#" id="devBtn" onclick="dev();">DEV</a> |</span>
@@ -548,80 +548,17 @@
 				<br>
 				<br>
 
-				<input id="workersToggle" type="checkbox" onclick="gamePage.useWorkers = $('#workersToggle')[0].checked;">
-				<label id="optionWorkers" for="workersToggle">Use web worker
-					<i>(game works correctly in background tab, may cause performance issues)
-						<br>
-						You need to refresh the browser page for this setting to take effect.
-					</i></label>
-				<br>
-
 				<!-- ===================================== NOTE: FOR FULL I18N SUPPORT ===================================== -->
 				<!-- add new option text into en.json and code for i18n in ui.js:classes.ui.DesktopUI.updateIndexHTMLLanguage -->
-
-				<input id="forceHighPrecision" type="checkbox" onclick="gamePage.opts.forceHighPrecision = $('#forceHighPrecision')[0].checked;">
-				<label id="optionForceHighPrecision" for="forceHighPrecision">Use high precision for resource values</label>
+				<div id="booleanOptionsNormal"></div>
 				<br>
 
-				<input id="usePerSecondValues" type="checkbox" onclick="gamePage.opts.usePerSecondValues = $('#usePerSecondValues')[0].checked;">
-				<label id="optionUsePerSecondValues" for="usePerSecondValues">Use per second values <i>(per tick otherwise)</i></label>
-				<br>
-				<input id="usePercentageResourceValues" type="checkbox" onclick="gamePage.opts.usePercentageResourceValues = $('#usePercentageResourceValues')[0].checked;">
-				<label id="optionUsePercentageResourceValues" for="usePercentageResourceValues">Use percentage resource production values</label>
-				<br>
-				<input id="showNonApplicableButtons" type="checkbox" onclick="gamePage.opts.showNonApplicableButtons = $('#showNonApplicableButtons')[0].checked;">
-				<label id="optionShowNonApplicableButtons" for="showNonApplicableButtons">Always show festivals/trade/sacrifice/shatter buttons even if not applicable</label>
-				<br>
-				<input id="usePercentageConsumptionValues" type="checkbox" onclick="gamePage.opts.usePercentageConsumptionValues = $('#usePercentageConsumptionValues')[0].checked;">
-				<label id="optionUsePercentageConsumptionValues" for="usePercentageConsumptionValues">Use percentage values for craft/trade/sacrifice buttons</label>
-				<br>
-				<input id="highlightUnavailable" type="checkbox" onclick="gamePage.opts.highlightUnavailable = $('#highlightUnavailable')[0].checked;">
-				<label id="optionHighlightUnavailable" for="highlightUnavailable">Highlight buildings limited by storage space</label>
-				<br>
-				<input id="hideSell" type="checkbox" onclick="gamePage.opts.hideSell = $('#hideSell')[0].checked;">
-				<label id="optionHideSell" for="hideSell">Hide 'sell' buttons</label>
-				<br>
-				<input id="hideDowngrade" type="checkbox" onclick="gamePage.opts.hideDowngrade = $('#hideDowngrade')[0].checked;">
-				<label id="optionHideDowngrade" for="hideDowngrade">Hide 'downgrade' buttons</label>
-				<br>
-				<input id="hideBGImage" type="checkbox" onclick="gamePage.opts.hideBGImage = $('#hideBGImage')[0].checked; gamePage.ui.updateOptions();">
-				<label id="optionHideBGImage" for="hideBGImage">Hide background image <i>(for color schemes where applicable)</i></label>
-				<br>
-				<input id="tooltipsInRightColumn" type="checkbox" onclick="gamePage.opts.tooltipsInRightColumn = $('#tooltipsInRightColumn')[0].checked; gamePage.ui.updateOptions();">
-				<label id="optionTooltipsInRightColumn" for="tooltipsInRightColumn">Move tooltips in right column</label>
-				<br>
-                <br>
-
-                <a id="optionMore" href="#" onclick="$('.optsExtra').toggle();">More...</a>
-				<!-- looks like a to niche option to occupy entire setting slot -->
+				<!-- niche options; put them here to reduce clutter in the options menu -->
+				<a id="optionMore" href="#" onclick="$('.optsExtra').toggle();">More...</a>
 				<div class="optsExtra" style="display:none;">
-					<input id="noConfirm" type="checkbox" onclick="gamePage.opts.noConfirm = $('#noConfirm')[0].checked;">
-					<label id="optionNoConfirm" for="noConfirm">Do not confirm when clearing all jobs, researching policy, upgrading buildings, or when buying or selling all (Shift-click)</label>
-					<br>
-                    <input id="IWSmelter" type="checkbox" onclick="gamePage.opts.IWSmelter = $('#IWSmelter')[0].checked;">
-                    <label id="optionIWSmelter" for="IWSmelter">Smelters turn off at 95% max Iron in Iron Will mode</label>
-                    <br>
-					<input id="disableTelemetry" type="checkbox" onclick="gamePage.opts.disableTelemetry = $('#disableTelemetry')[0].checked;">
-					<label id="optionDisableTelemetry" for="disableTelemetry">Disable game telemetry</label>
-					<br>
-					<input id="enableRedshift" type="checkbox" onclick="gamePage.opts.enableRedshift = $('#enableRedshift')[0].checked;">
-					<label id="optionEnableRedshift" for="enableRedshift">Enable offline progression</label>
-					<br>
-					<input id="disablePollution" type="checkbox" onclick="gamePage.opts.disablePollution = $('#disablePollution')[0].checked;">
-					<label id="optionDisablePollution" for="disablePollution">Disable pollution effects</label>
-					<br>
-					<input id="enableRedshiftGflops" type="checkbox" onclick="gamePage.opts.enableRedshiftGflops = $('#enableRedshiftGflops')[0].checked;">
-					<label id="optionEnableRedshiftGflops" for="enableRedshiftGflops">Enable offline gflops production</label>
-					<br>
+					<div id="booleanOptionsExtra"></div>
 					<input id="batchSize" type="number" min="1" max="9999" size="4" oninput="$('#batchSize')[0].value = gamePage.opts.batchSize = Math.max(1, Math.min(9999, $('#batchSize')[0].value));">
 					<label id="optionBatchSize" for="batchSize">Batch size of Ctrl-click</label>
-					<br>
-					<input id="forceLZ" type="checkbox" onclick="gamePage.opts.forceLZ = $('#forceLZ')[0].checked;">
-					<label id="optionForceLZ" for="forceLZ" style="font-size: 75%;">Always compress in-memory save, in UTF-16 <i>(experimental)</i></label>
-					<br>
-					<input id="compressSaveFile" type="checkbox" onclick="gamePage.opts.compressSaveFile = $('#compressSaveFile')[0].checked;">
-					<label id="optionCompressSaveFile" for="compressSaveFile" style="font-size: 75%;">Compress exported save file <i>(experimental)<br>
-						WARNING: it generates save files that are NOT COMPATIBLE with older versions.</i></label>
 				</div>
 
 				<br>

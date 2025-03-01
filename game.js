@@ -2073,6 +2073,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			game.addTab(tabProp);
 		});
 
+		//SettingsTab goes in a separate spot in the UI from normal tabs like Bonfire, Village, Science, etc.
+		game.settingsTab = new com.nuclearunicorn.game.ui.tab.SettingsTab({
+			name: $I("menu.options"),
+			id: "Settings"
+		}, game);
+
 		//vvvv do not forget to toggle tab visibility below (see load method)
 
 		this.timer = new classes.game.Timer();
