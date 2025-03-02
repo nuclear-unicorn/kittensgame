@@ -350,6 +350,7 @@
     "menu.wipe": "Malkreiĝi",
     "menu.getTheApp": "Akiru la Fonprogramon",
     "navbar.title": "Ludo de Katetoj",
+    "navbar.menu.title": "Menuo",
     "navbar.btn.hunters": "Sendi ĉiujn ĉasistojn",
     "navbar.btn.praise": "Preĝu la sunon",
     "navbar.energy.cons": "Malproduktado: {0}Vt",
