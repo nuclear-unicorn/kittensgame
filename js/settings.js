@@ -38,7 +38,7 @@ dojo.declare("classes.managers.SettingsManager", com.nuclearunicorn.core.TabMana
 	 * 	triggerUpdateUI - boolean - This is for the web version of the game.
 	 * 		If true, whenever the player toggles this setting, it'll re-render the UI.
 	 * 	devModeOnly - boolean - If truthy, this setting is hidden unless dev mode is active.
-	 * 	showOnlyIfKSDetected - Used for some experimental things?
+	 * 	showOnlyIfKSDetected - If truthy, this setting is hidden.  (nothing to see here %citizen%)
 	 */
 	settingsArr: [{
 		name: "useWorkers",
@@ -156,7 +156,7 @@ dojo.declare("classes.managers.SettingsManager", com.nuclearunicorn.core.TabMana
 		mobileTitle: $I("opts.enableKS"),
 		mobileDesc: $I("opts.enableKS.desc"), //"This is absolutely unsupported, you have never seen me or this setting"
 		isExtra: true,
-		showOnlyIfKSDetected: true //nothing to see here %citizen%
+		showOnlyIfKSDetected: true
 	}, {
 		name: "forceLZ",
 		defaultValue: false,
