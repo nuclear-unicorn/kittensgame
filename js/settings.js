@@ -115,6 +115,8 @@ dojo.declare("classes.managers.SettingsManager", com.nuclearunicorn.core.TabMana
 		isExtra: true
 	}, {
 		name: "enableRedshift", //Redshift is the game's internal term for offline progression
+		//This setting applies on web only.  The mobile version of the game is specifically programmed
+		// to ignore the value of this setting & always have redshift enabled.
 		defaultValue: false,
 		label: $I("ui.option.enable.redshift"),
 		isExtra: true
@@ -217,10 +219,22 @@ dojo.declare("classes.managers.SettingsManager", com.nuclearunicorn.core.TabMana
 	save: function(saveData) {},
 
 	/**
-	 * Doesn't actually do anything currently--existing code in game.js already handles this functionality.
+	 * At the moment, all this function does is handle situations when a particular option is stored
+	 * in one part of saveData in an old version of the game, but in newer versions of the game it's
+	 * expected to be in a different part of saveData.
+	 * Existing code in game.js already handles the main functionality of changing the game-state
+	 * based on what is stored in the saveData object.
 	 * @param saveData - Object which is used by the game's save/load system to store data.
 	 */
-	load: function(saveData) {},
+	load: function(saveData) {
+		//Move game.useWorkers -> game.opts.useWorkers
+		if (saveData.game && typeof(saveData.game.useWorkers) !== "undefined") {
+			if (!saveData.game.opts) {
+				saveData.game.opts = {};
+			}
+			saveData.game.opts.useWorkers = saveData.game.useWorkers;
+		}
+	},
 
 	/**
 	 * Works very similarly to forEach on an array, which executes the callback on all elements in the array.
