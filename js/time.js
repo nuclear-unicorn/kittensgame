@@ -1354,8 +1354,9 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         else {timeManager.shatter(amt);}
     },
 
+    //Shatter TC button will be visible as long as you've seen a time crystal in this run:
     updateVisible: function(model){
-        model.visible = (this.game.resPool.get("timeCrystal").value >= 1);
+        model.visible = this.game.resPool.get("timeCrystal").unlocked;
     }
 });
 
@@ -1412,6 +1413,7 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
 dojo.declare("classes.ui.time.UseHeatBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	fetchModel: function(options) {
 		var model = this.inherited(arguments);
+		model.useAllLink = this._newLink(model, "all");
 		var shatterYearBoost = this.game.getEffect("shatterYearBoost");
 		if(shatterYearBoost){
 			model.customLink = this._newLink(model, shatterYearBoost); //Creates additional custom shatter link based on the effect
@@ -1421,6 +1423,10 @@ dojo.declare("classes.ui.time.UseHeatBtnController", com.nuclearunicorn.game.ui.
 
 	_newLink: function(model, shatteredQuantity) {
 		var self = this;
+		if (shatteredQuantity == "all") { //"all" means as many as we can afford, minimum of 2
+			shatteredQuantity = Math.max(2, Math.floor(this.game.time.getCFU("blastFurnace").heat / 100));
+		}
+
 		var isVisible = true; //Always true if showNonApplicableButtons is true
 		if (!this.game.opts.showNonApplicableButtons) {
 			var prices = this.getPricesMultiple(model, shatteredQuantity);
@@ -1491,16 +1497,15 @@ dojo.declare("classes.ui.time.UseHeatBtnController", com.nuclearunicorn.game.ui.
 		else {timeManager.shatter(amt);}
 	},
 
-	updateVisible: function(model){
+	updateVisible: function(model) {
 		model.visible = this.game.workshop.get("chronoEncabulator").researched;
-	},
-	updateEnabled: function(model){
-		model.enabled = this.hasResources(model);
 	}
 });
 
 dojo.declare("classes.ui.time.UseHeatBtn", com.nuclearunicorn.game.ui.ButtonModern, {
     renderLinks: function() {
+        this.useAllLink = this.addLink(this.model.useAllLink);
+        dojo.addClass(this.useAllLink.link,"rightestLink");
         if(this.model.customLink){
             this.custom = this.addLink(this.model.customLink);
         }
@@ -1508,6 +1513,18 @@ dojo.declare("classes.ui.time.UseHeatBtn", com.nuclearunicorn.game.ui.ButtonMode
 
     update: function() {
         this.inherited(arguments);
+
+        //If needed, update the value of the "all" link:
+        if (this.model.useAllLink.title != this.useAllLink.link.innerHTML) {
+            dojo.destroy(this.useAllLink.link);
+            this.useAllLink = this.addLink(this.model.useAllLink);
+            dojo.addClass(this.useAllLink.link,"rightestLink");
+            if (this.custom) {
+                dojo.place(this.useAllLink.link, this.custom.link, "before"); //Rearrange DOM
+            }
+        }
+        dojo.style(this.useAllLink.link, "display", this.model.useAllLink.visible ? "" : "none");
+
         if(this.model.customLink && !this.custom) { //Create custom link if needed
             this.custom = this.addLink(this.model.customLink);
         }
@@ -1521,6 +1538,7 @@ dojo.declare("classes.ui.time.UseHeatBtn", com.nuclearunicorn.game.ui.ButtonMode
             //Instead, destroy the old link & create a new one.
             dojo.destroy(this.custom.link);
             this.custom = this.addLink(this.model.customLink);
+            dojo.place(this.custom.link, this.useAllLink.link, "after"); //Rearrange DOM
         }
         if (this.custom && this.model.customLink) {
             dojo.style(this.custom.link, "display", this.model.customLink.visible ? "" : "none");

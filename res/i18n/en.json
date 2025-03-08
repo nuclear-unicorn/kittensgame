@@ -1642,7 +1642,7 @@
     "time.cfu.temporalBattery.desc": "Improves your flux energy capacity by 25%",
     "time.cfu.temporalPress.label": "Temporal Press",
     "time.cfu.temporalPress.desc": "Allows for fine tuning of shattering",
-    "time.cfu.temporalPress.desc.automation": "Automation tweaks the custom shatter amount.",
+    "time.cfu.temporalPress.desc.automation": "Automation increases the custom shatter amount by a factor of 5.",
     "time.cfu.temporalImpedance.label": "Time Impedance",
     "time.cfu.temporalImpedance.desc": "Delay effect of Dark Future temporal penalty by 1000 years.",
     "time.cfu.timeBoiler.label": "Time Boiler",
