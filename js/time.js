@@ -2253,7 +2253,7 @@ dojo.declare("classes.queue.manager", null,{
                 var chronoforgeUpgrades = this.game.time.chronoforgeUpgrades;
                 for (var i in chronoforgeUpgrades){
                     var building = chronoforgeUpgrades[i];
-                    if (building.unlocked){
+                    if (building.unlocked && !(building.limitBuild && building.val >= building.limitBuild)){
                         options.push({
                             name: building.name,
                             label: building.label
