@@ -428,6 +428,24 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			}
 		}
 	},{
+		name: "chronoEncabulator",
+		label: $I("workshop.chronoEncabulator.label"),
+		description: $I("workshop.chronoEncabulator.desc"),
+		flavor: $I("workshop.chronoEncabulator.flavor.0"),
+		prices: [
+			{ name: "science", val: 16000 },
+			{ name: "gear", val: 500 },
+			{ name: "titanium", val: 250 }
+		],
+		calculateEffects: function(self, game) {
+			//Pick a flavor text based on some of the game's numbers.
+			var technicallyNotRandom = Math.floor(game.karmaKittens + game.karmaZebras);
+			self.flavor = $I("workshop.chronoEncabulator.flavor." + (technicallyNotRandom % 4).toFixed(0));
+		},
+		unlocks: {
+			chronoforge: ["controlledDelay"]
+		}
+	},{
 		name: "tachyonAccelerators",
 		label: $I("workshop.tachyonAccelerators.label"),
 		description: $I("workshop.tachyonAccelerators.desc"),
