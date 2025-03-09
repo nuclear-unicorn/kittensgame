@@ -1482,6 +1482,7 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
     },
 
 	buyItem: function(model, event, callback) {
+        var buyType;
         if (this.game.time.getVSU("usedCryochambers").val == 0) {
 			callback(false /*itemBought*/, { reason: "already-bought" });
 			return;
