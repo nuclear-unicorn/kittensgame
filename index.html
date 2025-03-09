@@ -80,6 +80,8 @@
 			var version = "1494";
 			var buildRevision = 0;
 
+			var invalidateCache = false;
+
 			var loadingProgress = 0,
 				progressMax = 0;
 
@@ -98,7 +100,11 @@
 
 				var i = (Math.floor(Math.random() * loadingMessages.length));
 				$("#loadingProgressInfo").html(loadingMessages[i] + "...&nbsp(" + progress.toFixed() + "%)");
-				return System.import(module + ".js?rev_=" + buildRevision + "_" + Date.now());
+				var rev = buildRevision;
+				if (invalidateCache){
+					rev += "_" + Date.now();
+				}
+				return System.import(module + ".js?rev_=" + rev);
 			}
 
 			function _import(module, def){
