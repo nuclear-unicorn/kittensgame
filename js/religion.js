@@ -1332,7 +1332,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
 	defaults: function() {
 		var result = this.inherited(arguments);
-		result.tooltipName = true;
+		result.tooltipName = false;
 		return result;
 	},
 
@@ -1387,7 +1387,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 dojo.declare("com.nuclearunicorn.game.ui.ReligionBtnController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
 	defaults: function() {
 		var result = this.inherited(arguments);
-		result.tooltipName = true;
+		result.tooltipName = false;
 		return result;
 	},
 
@@ -1421,7 +1421,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ReligionBtnController", com.nuclearunic
 dojo.declare("classes.ui.TranscendenceBtnController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
 	defaults: function() {
 		var result = this.inherited(arguments);
-		result.tooltipName = true;
+		result.tooltipName = false;
 		return result;
 	},
 
@@ -1436,7 +1436,8 @@ dojo.declare("classes.ui.TranscendenceBtnController", com.nuclearunicorn.game.ui
 dojo.declare("com.nuclearunicorn.game.ui.PraiseBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	getName: function(model) {
 		if (this.game.religion.faithRatio > 0){
-			return model.options.name + " [" + this.game.getDisplayValueExt(this.game.religion.getApocryphaBonus() * 100, true, false, 3) + "%]";
+			var progressDisplayed = this.game.getDisplayValueExt(this.game.religion.getApocryphaBonus() * 100, true, false, 3);
+			return "<div class='label'><span class='label-content'>" + model.options.name + "</span></div><div class='progress'>[" + progressDisplayed + "%]</div>";
 		} else {
 			return model.options.name;
 		}

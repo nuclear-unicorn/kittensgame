@@ -78,14 +78,14 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 			this.getVSU("usedCryochambers").unlocked = true;
         }
 
-        //console.log("restored save data timestamp as", saveData["time"].timestamp);
+        console.log("restored save data timestamp as", saveData["time"].timestamp);
         var ts = saveData["time"].timestamp || Date.now();
 
         this.gainTemporalFlux(ts);
         this.timestamp = ts;
         this.queue.queueItems = saveData["time"].queueItems || [];
         this.queue.queueSources = saveData["time"].queueSources || this.queue.queueSourcesDefault;
-        if (this.queue.queueSources === {} || typeof(this.queue.queueSources["buildings"]) != "boolean") {
+        if (!Object.keys(this.queue.queueSources).length || typeof(this.queue.queueSources["buildings"]) != "boolean") {
             this.queue.queueSources = this.queue.queueSourcesDefault;
         }
         this.queue.alphabeticalSort = saveData["time"].queueAlphabeticalSort;
@@ -98,9 +98,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.queue.updateQueueSourcesArr();
 
         //TODO: move me to UI
-        if(!this.game.getFeatureFlag("QUEUE")){
+        /*if(!this.game.getFeatureFlag("QUEUE")){
             $("#queueLink").hide();
-        }
+        }*/
 	},
 
 	gainTemporalFlux: function (timestamp){
@@ -186,6 +186,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     applyRedshift: function(daysOffset, ignoreCalendar){
         //populate cached per tickValues
         this.game.resPool.update();
+        this.game.space.update(); // Need to recalc effects based on proper max antimatter
         this.game.updateResources();
         var resourceLimits = this.game.resPool.fastforward(daysOffset);
 
@@ -225,8 +226,10 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         return numberEvents;
     },
     calculateRedshift: function(){
+        var isRedshiftEnabled = true;   //mobile
+
         var currentTimestamp = Date.now();
-        var delta = this.game.opts.enableRedshift
+        var delta = isRedshiftEnabled
             ? currentTimestamp - this.timestamp
             : 0;
         //console.log("redshift delta:", delta, "old ts:", this.timestamp, "new timestamp:", currentTimestamp);
@@ -1399,10 +1402,12 @@ dojo.declare("classes.ui.time.ChronoforgeBtnController", com.nuclearunicorn.game
 
     getName: function(model){
         var meta = model.metadata;
+        var label = this.inherited(arguments);
+
         if (meta.heat){
-            return this.inherited(arguments) + " [" + this.game.getDisplayValueExt(meta.heat) + "%]";
+            return label + "<div class='progress'>[" + this.game.getDisplayValueExt(meta.heat) + "%]</div>";
         }
-        return this.inherited(arguments);
+        return label;
     },
     handleToggleAutomationLinkClick: function(model) { //specify game.upgrade for cronoforge upgrades
 		var building = model.metadata;
@@ -1491,7 +1496,8 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
         }
 
 		if (!event) { event = {}; /*event is an optional parameter*/ }
-		var fixCount = event.shiftKey
+        var isBuyAll = event.shiftKey || buyType == "all";
+		var fixCount = isBuyAll
 			? 1000
 			: event.ctrlKey || event.metaKey /*osx tears*/
 				? this.game.opts.batchSize || 10
@@ -2410,4 +2416,7 @@ dojo.declare("classes.queue.manager", null,{
             }
         });
     }
+});
+
+dojo.declare("classes.tab.QueueTab", com.nuclearunicorn.game.ui.tab, {
 });

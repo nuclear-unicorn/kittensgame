@@ -2682,6 +2682,47 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		if(cathPollution <= 0){return 0;}
 		return Math.max(Math.floor(Math.log10(cathPollution * 10 / this.getPollutionLevelBase())), 0);
 	},
+
+	getDetailedPollutionInfo: function(){
+		var html = "";
+
+		var currentCathPollution = this.game.bld.cathPollution;
+		var currenCathPerTickPollution = this.game.bld.cathPollutionPerTick;
+
+		html = "Pollution is " + Math.floor(currentCathPollution) +
+				" (" + this.game.getDisplayValueExt(currentCathPollution) + ") " +
+				"<br>Polution per tick is " + Math.floor(currenCathPerTickPollution);
+
+		var pollutionLevel = this.game.bld.getPollutionLevel();
+		html += "<br>Pollution level is " + pollutionLevel;
+
+		if(pollutionLevel >= 0){
+			html += "<br>Pollution future effects might be at this pollution level:";
+			html += "<br>— Less catnip production";
+			if(pollutionLevel >= 1){
+				html += "<br>— Less kitten happines: " + this.game.bld.pollutionEffects["pollutionHappines"] + "%";
+			}
+			if(pollutionLevel >= 2){
+				html += "<br>— Kittens arrive " + this.game.bld.pollutionEffects["pollutionArrivalSlowdown"] + " times slower.";
+			}
+			if(pollutionLevel > 4){
+				html += "<br>— SR effect doesn't apply to wood and catnip";
+			}else if(pollutionLevel >= 3){
+				html += "<br>— Less SR effect on wood and catnip";
+			}
+		}
+		if(currenCathPerTickPollution < 0 && currentCathPollution) {
+			var toZero = -currentCathPollution / currenCathPerTickPollution / this.game.calendar.ticksPerDay;
+			html += "<br> To zero " + this.game.toDisplaySeconds(toZero.toFixed());
+		} else if(currenCathPerTickPollution > 0){
+			var toNextLevel = (Math.pow(10, 1 + pollutionLevel) * this.game.bld.getPollutionLevelBase() - currentCathPollution) / currenCathPerTickPollution / this.game.calendar.ticksPerDay;
+			html += "<br> To next level " + this.game.toDisplaySeconds(toNextLevel.toFixed());
+		}
+
+		return html;
+	},
+
+
     //============ dev =============
     devAddStorage: function(){
         this.get("warehouse").val += 10;

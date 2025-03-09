@@ -31,7 +31,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			buildings: ["barn"],
 			jobs: ["farmer"],
-			tech: ["mining", "archery"]
+			tech: ["mining", "archery"],
+			tabs: ["queue"],
 		},
         flavor: $I("science.agriculture.flavor")
 	}, {
@@ -2284,12 +2285,18 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 	},
 
 	unlockAll: function(){
-		for (var i = this.techs.length - 1; i >= 0; i--) {
+		for (var i in this.techs) {
 			var tech = this.techs[i];
 			tech.researched = true;
 			tech.unlocked = true;
 			this.game.unlock(tech.unlocks);
 		}
+		for (var i in this.policies) {
+			var policy = this.policies[i];
+			policy.unlocked = true;
+			this.game.unlock(policy.unlocks);
+		}
+
 		this.game.msg("All techs are unlocked!");
 	},
     /*updateEffectCached: function() {
@@ -2676,39 +2683,12 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Library", com.nuclearunicorn.game.u
 		//detailedPollutionInfo is temporary tag. Don't replace lines belov with i18n lines!
 		if(this.game.detailedPollutionInfo){
 			if(this.detailedPollutionInfo){
-				var currentCathPollution = this.game.bld.cathPollution;
-				var currenCathPerTickPollution = this.game.bld.cathPollutionPerTick;
-				this.detailedPollutionInfo.innerHTML = "Pollution is " + Math.floor(currentCathPollution) +
-					" (" + this.game.getDisplayValueExt(currentCathPollution) + ") " +
-					"<br>Polution per tick is " + Math.floor(currenCathPerTickPollution);
-				var pollutionLevel = this.game.bld.getPollutionLevel();
-				this.detailedPollutionInfo.innerHTML += "<br>Pollution level is " + pollutionLevel;
-				if(pollutionLevel >= 0){
-					this.detailedPollutionInfo.innerHTML += "<br>Pollution future effects might be at this pollution level:";
-					this.detailedPollutionInfo.innerHTML += "<br>— Less catnip production";
-					if(pollutionLevel >= 1){
-						this.detailedPollutionInfo.innerHTML += "<br>— Less kitten happiness: " + this.game.bld.pollutionEffects["pollutionHappines"] + "%";
-					}
-					if(pollutionLevel >= 2){
-						this.detailedPollutionInfo.innerHTML += "<br>— Kittens arrive " + this.game.bld.pollutionEffects["pollutionArrivalSlowdown"] + " times slower.";
-					}
-					if(pollutionLevel > 4){
-						this.detailedPollutionInfo.innerHTML += "<br>— SR effect doesn't apply to wood and catnip";
-					}else if(pollutionLevel >= 3){
-						this.detailedPollutionInfo.innerHTML += "<br>— Less SR effect on wood and catnip";
-					}
-				}
-				if(currenCathPerTickPollution < 0 && currentCathPollution) {
-					var toZero = -currentCathPollution / currenCathPerTickPollution / this.game.calendar.ticksPerDay;
-					this.detailedPollutionInfo.innerHTML += "<br> To zero " + this.game.toDisplaySeconds(toZero.toFixed());
-				}else if(currenCathPerTickPollution > 0){
-					var toNextLevel = (Math.pow(10, 1 + pollutionLevel) * this.game.bld.getPollutionLevelBase() - currentCathPollution) / currenCathPerTickPollution / this.game.calendar.ticksPerDay;
-					this.detailedPollutionInfo.innerHTML += "<br> To next level " + this.game.toDisplaySeconds(toNextLevel.toFixed());
-				}
+
+				this.detailedPollutionInfo.innerHTML = this.game.bld.getDetailedPollutionInfo(); 
 			}
 		}
 	},
-
+	
 	constructor: function(tabName, game){
 		this.game = game;
 	},

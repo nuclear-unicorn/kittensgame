@@ -769,13 +769,13 @@ span.genericWarning,
 
 .trade-race .buys {
     color: #01A9DB;
-    width: 40px;
+    min-width: 40px;
     display: inline-block;
 }
 
 .trade-race .sells {
     color: green;
-    width: 40px;
+    min-width: 40px;
     display: inline-block;
 }
 
