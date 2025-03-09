@@ -242,9 +242,10 @@ select>option {
     line-height: 16px;
 }
 
-/*.btn .btnContent .btnTitle {
-
-}*/
+.btn .btnContent .btnTitle {
+    display: inline-flex;
+    gap: 4px;
+}
 
 .btn.small-text span {
     font-size: 90%;

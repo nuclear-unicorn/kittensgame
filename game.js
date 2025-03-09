@@ -230,11 +230,11 @@ dojo.declare("classes.game.Server", null, {
     getServerUrl: function(){
 		var host = window.location.hostname;
 		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1";
-        if (isLocalhost){
+        if (isLocalhost && !this.game.isMobile()){
             //if you are running chilar locally you should know what you are doing
             return "http://localhost:7780";
         }
-        return "";
+        return "http://kittensgame.com";
     },
 
 	refresh: function(){
@@ -1955,6 +1955,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 	},
 
+	/**
+	 * Should never be changed, override for KGM
+	 */
+	isMobile: function(){
+		return false;
+	},
+
 	constructor: function(containerId){
 		this.id = containerId;
 
@@ -2082,13 +2089,19 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				name: "tab.name.stats",
 				id: "Stats",
 				prop: "statsTab"
-			},
-			{class: classes.tab.QueueTab,
-				name: "tab.name.queue",
-				id: "Queue",
-				prop: "queueTab"
 			}
 		];
+
+		if (this.isMobile()){
+			this.tabRegistry.push(
+				{
+					class: classes.tab.QueueTab,
+					name: "tab.name.queue",
+					id: "Queue",
+					prop: "queueTab"
+				}
+			);
+		}
 
 		var game = this;
 		dojo.forEach(tabRegistry, function(tab){
@@ -5269,7 +5282,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				*/
 				if (!newUnlock){
 					console.trace();
-					console.error("unable to evaluate locks for unlockId", unlockId, "type", type);
+					console.error("unable to evaluate locks for unlockId '" +unlockId +"', type '" + type + "'");
+					continue;
 				}
 				if (newUnlock.evaluateLocks && !newUnlock.evaluateLocks(game)){
 					continue;
