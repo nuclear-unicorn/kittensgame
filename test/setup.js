@@ -96,8 +96,9 @@ try {
     require("../js/workshop");
     require("../js/diplomacy");
     require("../js/religion");
-
     require("../js/achievements");
+    require("../js/settings");
+
     require("../js/space");
     require("../js/prestige");
     require("../js/time");
