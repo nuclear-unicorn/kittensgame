@@ -214,6 +214,11 @@ dojo.declare("classes.game.Server", null, {
 	 */
 	saveData: null,
 
+	/**
+	 * If KS settings are detected in the save, this will be set to true.
+	 */
+	isKSDetected: false,
+
 	constructor: function(game){
 		this.game = game;
 	},
@@ -225,11 +230,11 @@ dojo.declare("classes.game.Server", null, {
     getServerUrl: function(){
 		var host = window.location.hostname;
 		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1";
-        if (isLocalhost){
+        if (isLocalhost && !this.game.isMobile()){
             //if you are running chilar locally you should know what you are doing
             return "http://localhost:7780";
         }
-        return "";
+        return "http://kittensgame.com";
     },
 
 	refresh: function(){
@@ -1165,7 +1170,7 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 type: "ratio"
             },
 
-                        "hydroponics-catnipRatio": {
+			"hydroponics-catnipRatio": {
                 title: $I("effectsMgr.statics.hydroponics-catnipRatio.title"),
                 type: "ratio"
             },
@@ -1290,7 +1295,7 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 
 			"heatMax": {
 				title: $I("effectsMgr.statics.heatMax.title"),
-				type: "fixed"
+				type: "ratio"
 			},
 
 			"heatPerTick": {
@@ -1950,6 +1955,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 	},
 
+	/**
+	 * Should never be changed, override for KGM
+	 */
+	isMobile: function(){
+		return false;
+	},
+
 	constructor: function(containerId){
 		this.id = containerId;
 
@@ -1978,7 +1990,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			// Used only in KG Mobile, hence it's absence in the rest of the code
 			useLegacyTwoInRowLayout: false,
 			forceLZ: false,
-			compressSaveFile: false
+			compressSaveFile: false,
+			ksEnabled: false,
 		};
 
 		this.console = new com.nuclearunicorn.game.log.Console(this);
@@ -2004,7 +2017,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
             { id: "prestige",       class:  "PrestigeManager"   },
             { id: "challenges",     class:  "ChallengesManager" },
             { id: "stats",       	class:  "StatsManager"      },
-			{ id: "void",       	class:  "VoidManager"      }
+			{ id: "void",       	class:  "VoidManager"      	}
         ];
 
         for (var i in managers){
@@ -2078,6 +2091,17 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				prop: "statsTab"
 			}
 		];
+
+		if (this.isMobile()){
+			this.tabRegistry.push(
+				{
+					class: classes.tab.QueueTab,
+					name: "tab.name.queue",
+					id: "Queue",
+					prop: "queueTab"
+				}
+			);
+		}
 
 		var game = this;
 		dojo.forEach(tabRegistry, function(tab){
@@ -2251,6 +2275,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.startedWithoutChronospheres = true;
 		this.isCMBREnabled = false;
 
+		this.isKSDetected = false;
+
 		if (this.pauseTimestamp){
 			this.pauseTimestamp = Date.now();
 		}
@@ -2277,7 +2303,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			// Used only in KG Mobile, hence it's absence in the rest of the code
 			useLegacyTwoInRowLayout: false,
 			forceLZ: false,
-			compressSaveFile: false
+			compressSaveFile: false,
+			//KGM
+			useSwipeNavigation: false
 		};
 
 		this.resPool.resetState();
@@ -2492,8 +2520,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
                 for (var i in this.managers){
 					console.log("game#load - Processing", this.managers[i].id, "...");
                     this.managers[i].load(saveData);
-                }
-
+				}
+				
 				this._publish("server/load", saveData);
 			}
 		} catch (ex) {
@@ -2536,6 +2564,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				}
 				if (data.opts.tooltipsInRightColumn == undefined) {
 					this.opts.tooltipsInRightColumn = this.colorScheme == "sleek";
+				}
+				if (data.opts.fontSize == undefined){
+					this.opts.fontSize = 14;
 				}
 			}
 
@@ -2649,20 +2680,20 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				callback("Unable to save file");
 			} else {
 				var dbxt = new Dropbox.Dropbox({accessToken: e.data["#access_token"]});
-				dbxt.filesUpload({
-					path: "/kittens.save",
-					contents: lzdata,
+			dbxt.filesUpload({
+				path: "/kittens.save",
+				contents: lzdata,
 					mode: "overwrite"
-				}).then(function (response) {
-					game.msg($I("save.export.msg"));
-					callback();
-				}).catch(function (error) {
-					callback("Unable to save file:" + JSON.stringify(error));
-				});
+			}).then(function (response) {
+				game.msg($I("save.export.msg"));
+				callback();
+			}).catch(function (error) {
+				callback("Unable to save file:" + JSON.stringify(error));
+			});
 			}
 		};
 		window.addEventListener("message", handler ,false);
-	},
+    },
 
 	saveImportDropbox: function() {
 		var game = this;
@@ -2674,8 +2705,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		});
 	},
 
-	importFromDropbox: function (callback) {
-		var game = this;
+    importFromDropbox: function (callback) {
+        var game = this;
 		var authUrl = game.getDropboxAuthUrl();
 
 		window.open(authUrl, "DropboxAuthPopup", "dialog=yes,dependent=yes,scrollbars=yes,location=yes");
@@ -2685,20 +2716,20 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				callback("Unable to load file");
 			} else {
 				var dbxt = new Dropbox.Dropbox({accessToken: e.data["#access_token"]});
-				dbxt.filesDownload({path: "/kittens.save"}).then(function (response) {
-					var blob = response.fileBlob;
-					var reader = new FileReader();
-					reader.addEventListener("loadend", function() {
-						game.saveImportDropboxText(reader.result, callback);
-					});
-					reader.readAsText(blob);
-				}).catch(function (error) {
-					callback("Unable to load file:" + JSON.stringify(error));
+			dbxt.filesDownload({path: "/kittens.save"}).then(function (response) {
+				var blob = response.fileBlob;
+				var reader = new FileReader();
+				reader.addEventListener("loadend", function() {
+					game.saveImportDropboxText(reader.result, callback);
 				});
+				reader.readAsText(blob);
+			}).catch(function (error) {
+				callback("Unable to load file:" + JSON.stringify(error));
+			});
 			}
 		};
 		window.addEventListener("message", handler ,false);
-	},
+    },
 
     saveImportDropboxFileRead: function(callback){
         var game = this;
@@ -4243,11 +4274,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			years = this.getDisplayValueExt(years);
 		}
 
-		var timeFormated = "";
-		if ( years ) { timeFormated = years + $I("unit.y") + " "; }
-		if ( days ) { timeFormated += days + $I("unit.d") + " "; }
+		var timeFormatted = "";
+		if ( years ) { timeFormatted = years + $I("unit.y") + " "; }
+		if ( days ) { timeFormatted += days + $I("unit.d") + " "; }
 
-		return timeFormated.trim();
+		return timeFormatted.trim();
 	},
 
 	toDisplayPercentage: function(percentage, precision, precisionFixed) {
@@ -4505,16 +4536,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		tab.game = this;
 	},
 
-	getTabById: function(tabId){
-		for (var i in this.tabs){
-			if (this.tabs[i].id == tabId){
-				return this.tabs[i];
-			}
-		}
-	},
-
 	isWebWorkerSupported: function(){
-		//return false;
+		var config = new classes.KGConfig();
+		if (config.statics.disableWebWorkers) {
+			return false;
+		}
+
 		return !dojo.isIE && window.Worker;
 	},
 
@@ -4553,6 +4580,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 			this._lastFrameTimestamp = this.timestamp();
 		}
+		// Ensure free kitten markers are up-to-date.
+		this.villageTab.updateTab();
+		this.workshopTab.updateTab();
 		this._publish("game/start");
 	},
 
@@ -4701,28 +4731,31 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	discardParagon: function() {
 		var game = this;
 		var confirmDiscard = false;
-		this.ui.confirm("", $I("discardParagon.confirmation.msg1"), function() {
-			if (game.resPool.get("paragon").value <= 100) {
-				confirmDiscard = true;
-			} else {
+
+		if (game.resPool.get("paragon").value <= 100) {
+			game.ui.confirm("", $I("discardParagon.confirmation.msg1"), function() {
+				game.doDiscardParagon();
+			});
+		} else {
+			game.ui.confirm("", $I("discardParagon.confirmation.msg1"), function() {
 				game.ui.confirm("", $I("discardParagon.confirmation.msg2"), function() {
 					if (!game.ironWill || game.achievements.get("spaceOddity").starUnlocked) {
-						confirmDiscard = true;
+						game.doDiscardParagon();
 					} else {
 						game.ui.confirm("", $I("discardParagon.confirmation.msgIW"), function() {
-							confirmDiscard = true;
+							game.doDiscardParagon();
 						});
 					}
 				});
-			}
-		});
-
-		if (confirmDiscard) {
-			this.resPool.get("burnedParagon").value += this.resPool.get("paragon").value;
-			this.resPool.get("paragon").value = 0;
-			this.ironWill &= this.achievements.get("spaceOddity").starUnlocked;
-			//TODO: add some special hidden effect for this mechanics
+			});
 		}
+	},
+
+	doDiscardParagon: function() {
+		this.resPool.get("burnedParagon").value += this.resPool.get("paragon").value;
+		this.resPool.get("paragon").value = 0;
+		this.ironWill &= this.achievements.get("spaceOddity").starUnlocked;
+		//TODO: add some special hidden effect for this mechanics
 	},
 
     _getKarmaKittens: function(kittens){
@@ -5124,22 +5157,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return stripe / 2 * value * (value + 1);
 	},
 
-	getTab: function(name) {
-		switch(name) {
-			case "science":
-				return this.libraryTab;
-			case "village":
-				return this.villageTab;
-			case "workshop":
-				return this.workshopTab;
-			case "space":
-				return this.spaceTab;
-			case "stats":
-				return this.statsTab;
-			case "time":
-				return this.timeTab;
-			case "challenges":
-				return this.challengesTab;
+	getTab: function(tabName) {
+		for (var i in this.tabs){
+			if (this.tabs[i].tabId.toLowerCase() == tabName){
+				return this.tabs[i];
+			}
 		}
 	},
 
@@ -5260,7 +5282,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				*/
 				if (!newUnlock){
 					console.trace();
-					console.error("unable to evaluate locks for unlockId", unlockId, "type", type);
+					console.error("unable to evaluate locks for unlockId '" +unlockId +"', type '" + type + "'");
+					continue;
 				}
 				if (newUnlock.evaluateLocks && !newUnlock.evaluateLocks(game)){
 					continue;

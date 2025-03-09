@@ -2832,7 +2832,11 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 				progressDisplayed = 99;
 			}
 
-			return model.craft.label + " (" + craft.value + ") [" + progressDisplayed + "%]";
+			if (progressDisplayed < 10) {
+				progressDisplayed = "-" + progressDisplayed;
+			}
+
+			return "<div class='label'><span class='label-content'>" + model.craft.label + "</span></div><div>(" + craft.value + ")</div><div class='progress'>[" + progressDisplayed + "%]</div>";
 		} else {
 			return this.inherited(arguments);
 		}
@@ -2895,6 +2899,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 			}
 		}
 		craft.value += valueAdded;
+		this.game.workshopTab.updateTab();
 	},
 
 	unassignCraftJob: function(model, value) { //TODO, aunssign one kitten, not just a value to manage with exp
@@ -2905,6 +2910,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 		for (var i = 0; i < valueCorrected; i++) {
 			this.game.village.sim.unassignCraftJob(craft);
 		}
+		this.game.workshopTab.updateTab();
 	},
 
 
@@ -3316,5 +3322,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 		if (this.domNode) {
 			this.domNode.innerHTML = this.tabName;
 		}
+		dojo.publish("ui/refreshTabNames", [this.game]);
 	}
 });

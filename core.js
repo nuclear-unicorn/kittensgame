@@ -1579,6 +1579,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 				tooltip: model.metadata.on ? $I("btn.on.tooltip") : $I("btn.off.tooltip"),
 				cssClass: model.metadata.on ? "bld-on" : "bld-off",
 				//reserved for mobile
+				//if you remove it one more time I will find where you live
 				enabled: model.metadata.val > 0,
 				handler: function(btn){
 					self.handleTogglableOnOffClick(model);
@@ -1590,6 +1591,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 				title: model.metadata.isAutomationEnabled ? "A" : "*",
 				tooltip: model.metadata.isAutomationEnabled ? $I("btn.aon.tooltip") : $I("btn.aoff.tooltip"),
 				//reserved for mobile
+				//if you remove it one more time I will find where you live
 				enabled: model.metadata.val > 0,
 				cssClass: model.metadata.isAutomationEnabled ? "auto-on" : "auto-off",
 				handler: function(btn){
@@ -1976,12 +1978,14 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 	getName: function(model){
 		var meta = model.metadata;
 
+		var label = "<div class='label'><span class='label-content'>" + meta.label + "</span></div>";
+
 		if (!meta.val) {
-			return meta.label;
+			return label;
 		} else if (meta.noStackable){
-			return meta.label + " " + $I("btn.complete");
+			return label + " " + $I("btn.complete");
 		} else if (meta.togglableOnOff){
-			return meta.label + " (" + meta.val + ")";
+			return label + "<div>(" + meta.val + ")</div>";
 		} else if (meta.togglable) {
 			//it's not so important h
 			/*if (meta.val >= 1000){
@@ -1990,9 +1994,9 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 					(meta.val < 10000 ? ((meta.val/1000).toFixed(1) + "K") : this.game.getDisplayValueExt(meta.val)) +
 				")";
 			}*/
-			return meta.label + " (" + meta.on + "/" + meta.val + ")";
+			return label + "<div>(" + meta.on + "/" + meta.val + ")</div>";
 		} else {
-			return meta.label + " (" + meta.on + ")";
+			return label + "<div>(" + meta.on + ")</div>";
 		}
 	},
 
@@ -2033,6 +2037,11 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 	},
 
 	buyItem: function(model, event, callback) {
+		var buyType;
+		if (event && event.shiftKey){
+			buyType = "all";
+		}
+
 		var isInDevMode = this.game.devMode;
 		if (!this.hasResources(model) && !isInDevMode) {
 			callback(false /*itemBought*/, {reason: "cannot-afford" });
@@ -2062,17 +2071,21 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 				callback(false /*itemBought*/, {reason: "player-denied" /*The player decided not to buy this after all.*/ });
 			});
 		} else {
-			this._buyItem_step2(model, event, callback);
+			this._buyItem_step2(model, event, callback, buyType);
 		}
 	},
 
-	_buyItem_step2: function(model, event, callback) {
+	buyItemAll: function(model, event, callback){
+		this.buyItem(model, event, callback, "all" /*isBuyAll*/);
+	},
+
+	_buyItem_step2: function(model, event, callback, buyType) {
 		if (!event) { event = {}; /*event is an optional parameter*/ }
 		//This is what we pass to the callback function if we succeed:
 		var resultIfBuySuccessful = { reason: (this.game.devMode ? "dev-mode" : "paid-for") };
 
 		var meta = model.metadata;
-		if (!meta.noStackable && event.shiftKey) {
+		if (!meta.noStackable && buyType == "all") {
 			var maxBld = 10000;
 			if (this.game.opts.noConfirm) {
 				this.build(model, maxBld);

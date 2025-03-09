@@ -284,6 +284,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			if(job.name == "hunter"){
 				this.sim.hadKittenHunters = true;
 			}
+			this.game.villageTab.updateTab();
 		}
 	},
 
@@ -298,6 +299,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		game.village.sim.unassignCraftJobIfEngineer(job, kitten);
 
 		kitten.job = null;
+
+		this.game.villageTab.updateTab();
 	},
 	calculateSimMaxKittens: function(){
 		var maxKittensRatio = this.game.getEffect("maxKittensRatio");
@@ -1083,6 +1086,34 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			return [9000,20000];
 		default:
 			return [20000,value];
+		}
+	},
+
+	getStyledName: function(kitten, isLeaderPanel){
+		if(!this.game.religion.getPact("fractured").val || !this.game.getFeatureFlag("MAUSOLEUM_PACTS")){
+		return "<span class='name color-" +
+			((kitten.color && kitten.colors[kitten.color + 1]) ? kitten.colors[kitten.color + 1].color : "none") +
+			" variety-" + ((kitten.variety && kitten.varieties[kitten.variety + 1]) ? kitten.varieties[kitten.variety + 1].style : "none") +
+			"'>" + kitten.name + " " + kitten.surname +
+		"</span>";
+		}
+		else{
+			if(!kitten.randTimer){
+				var color_and_variety;
+				color_and_variety = this.game.createRandomVarietyAndColor(this.game.rand(76), this.game.rand(76));
+				kitten.fakeColor = color_and_variety[0];
+				kitten.fakeName = this.game.createRandomName() + this.game.createRandomName(1, "    -/_") + this.game.createRandomName();
+				kitten.fakeVariety = color_and_variety[1];
+				kitten.randTimer = 10 + this.game.rand(41);
+			}else{
+				kitten.randTimer += -1;
+			}
+			return "<span class='name color-" +
+			((kitten.fakeColor && kitten.colors[kitten.fakeColor + 1]) ? kitten.colors[kitten.fakeColor + 1].color : "none") +
+			" variety-" + ((kitten.fakeVariety && kitten.varieties[kitten.fakeVariety + 1]) ? kitten.varieties[kitten.fakeVariety + 1].style : "none") +
+			"'>" +
+			( /*"shade"*/kitten.fakeName) +
+		"</span>";
 		}
 	}
 });
@@ -3968,7 +3999,9 @@ dojo.declare("classes.ui.village.Census", null, {
 			var title = leader.trait.name == "none"
 				? $I("village.census.trait.none")
 				: leader.trait.title + " (" + $I("village.bonus.desc." + leader.trait.name) + ") [" + $I("village.census.rank") + " " + leader.rank + "]";
-			retVal.leaderInfo = this.getStyledName(leader, true /*is leader panel*/) + ", " + title;
+			var nextRank = Math.floor(this.game.village.getRankExp(leader.rank));
+			retVal.leaderInfo = this.game.village.getStyledName(leader, true /*is leader panel*/) + ", " + title +
+				"<br /> exp: " + this.game.getDisplayValueExt(leader.exp);
 
 			//exp & percentage to next rank
 			var nextRank = Math.floor(this.game.village.getRankExp(leader.rank));
@@ -4244,34 +4277,6 @@ dojo.declare("classes.ui.village.Census", null, {
 		}));
 	},
 
-	getStyledName: function(kitten, isLeaderPanel){
-		if(!this.game.religion.getPact("fractured").val || !this.game.getFeatureFlag("MAUSOLEUM_PACTS")){
-		return "<span class='name color-" +
-			((kitten.color && kitten.colors[kitten.color + 1]) ? kitten.colors[kitten.color + 1].color : "none") +
-			" variety-" + ((kitten.variety && kitten.varieties[kitten.variety + 1]) ? kitten.varieties[kitten.variety + 1].style : "none") +
-			"'>" + kitten.name + " " + kitten.surname +
-		"</span>";
-		}
-		else{
-			if(!kitten.randTimer){
-				var color_and_variety;
-				color_and_variety = this.game.createRandomVarietyAndColor(this.game.rand(76), this.game.rand(76));
-				kitten.fakeColor = color_and_variety[0];
-				kitten.fakeName = this.game.createRandomName() + this.game.createRandomName(1, "    -/_") + this.game.createRandomName();
-				kitten.fakeVariety = color_and_variety[1];
-				kitten.randTimer = 10 + this.game.rand(41);
-			}else{
-				kitten.randTimer += -1;
-			}
-			return "<span class='name color-" +
-			((kitten.fakeColor && kitten.colors[kitten.fakeColor + 1]) ? kitten.colors[kitten.fakeColor + 1].color : "none") +
-			" variety-" + ((kitten.fakeVariety && kitten.varieties[kitten.fakeVariety + 1]) ? kitten.varieties[kitten.fakeVariety + 1].style : "none") +
-			"'>" +
-			( /*"shade"*/kitten.fakeName) +
-		"</span>";
-		}
-	},
-
 	update: function(){
 		//update leader info
 		if (this.governmentDiv) {
@@ -4285,7 +4290,7 @@ dojo.declare("classes.ui.village.Census", null, {
 
 			//Kitten's name, age, trait, & rank
 			record.content.innerHTML =
-				"<div class='info'>" + this.getStyledName(kitten) +
+				"<div class='info'>" + this.game.village.getStyledName(kitten) +
 				 ", " + ((this.game.religion.getPact("fractured").val && this.game.getFeatureFlag("MAUSOLEUM_PACTS"))? "???": kitten.age)
 				+ " " + $I("village.census.age") + ", "
 				+ ((this.game.religion.getPact("fractured").val && this.game.getFeatureFlag("MAUSOLEUM_PACTS"))? "???": kitten.trait["title"])
@@ -4776,7 +4781,9 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		}
 		if (this.domNode) {
 			this.domNode.innerHTML = this.tabName;
-		}
+		} 
+		//consider broadcasting wildcard ui/update
+		dojo.publish("ui/refreshTabNames", [this.game]);
 	},
 
 	evaluateLocks: function() {
