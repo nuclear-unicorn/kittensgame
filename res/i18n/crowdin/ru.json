@@ -803,7 +803,7 @@
     "religion.refineTCsBtn.refine.msg": "{0} кристаллы времени преобразованы, реликвий создано - {1}",
     "religion.refineTearsBtn.desc": "Преобразовать слёзы единорогов в печаль.",
     "religion.refineTearsBtn.label": "Преобразовать слёзы",
-    "religion.refineTearsBtn.refine.msg.failure": "Ничего не произошло",
+    "religion.refineTearsBtn.refine.msg.failure": "Ничего не происходит",
     "religion.resetFaith.confirmation.msg": "Вы уверены что хотите сбросить накопленную веру?\n\nВы получите бонус к вере на основе общего количества собранной веры от молитв.\n\nБонус сохраняется при сбросе.\n\nНАЖАТИЕ ЭТОЙ КНОПКИ ПРИВЕДЕТ К СБРОСУ ВСЕЙ СОБРАННОЙ ВЕРЫ.",
     "religion.ru.apocripha.label": "Апокриф",
     "religion.ru.apocripha.desc": "Даёт возможность отказаться от собранной веры, пропорционально увеличив этим эффективность молитв.",
