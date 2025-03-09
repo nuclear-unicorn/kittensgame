@@ -2038,7 +2038,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 
 	buyItem: function(model, event, callback) {
 		var buyType;
-		if (event.shiftKey){
+		if (event && event.shiftKey){
 			buyType = "all";
 		}
 

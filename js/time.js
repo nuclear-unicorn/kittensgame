@@ -1497,7 +1497,7 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
         }
 
 		if (!event) { event = {}; /*event is an optional parameter*/ }
-        var isBuyAll = event.shiftKey || buyType == "all";
+        var isBuyAll = (event && event.shiftKey) || buyType == "all";
 		var fixCount = isBuyAll
 			? 1000
 			: event.ctrlKey || event.metaKey /*osx tears*/
