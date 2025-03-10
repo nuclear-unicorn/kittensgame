@@ -899,6 +899,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		this.updateEnabled();
 		this.updateVisible();
 
+		//can be potentially dangerous given that we now have markup in the model titles
 		if (this.buttonTitle && this.buttonTitle.innerHTML != this.model.name){
 			this.buttonTitle.innerHTML = this.model.name;
 		}
@@ -1978,7 +1979,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 	getName: function(model){
 		var meta = model.metadata;
 
-		var label = "<div class='label'><span class='label-content'>" + meta.label + "</span></div>";
+		var label = "<div class=\"label\"><span class=\"label-content\">" + meta.label + "</span></div>";
 
 		if (!meta.val) {
 			return label;

@@ -2836,7 +2836,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 				progressDisplayed = "-" + progressDisplayed;
 			}
 
-			return "<div class='label'><span class='label-content'>" + model.craft.label + "</span></div><div>(" + craft.value + ")</div><div class='progress'>[" + progressDisplayed + "%]</div>";
+			return "<div class=\"label\"><span class=\"label-content\">" + model.craft.label + "</span></div><div>(" + craft.value + ")</div><div class=\"progress\">[" + progressDisplayed + "%]</div>";
 		} else {
 			return this.inherited(arguments);
 		}

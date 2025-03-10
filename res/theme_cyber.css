@@ -110,10 +110,10 @@ body.scheme_cyber {
 	color: #79d9ff;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_cyber div {
+.scheme_cyber > div {
 	color: #b0b0b0;
 }
-.scheme_cyber .disabled div { /* color text for disabled */
+.scheme_cyber .disabled > div { /* color text for disabled */
 	color: #606060;
 }
 .scheme_cyber h1 {

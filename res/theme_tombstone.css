@@ -78,10 +78,10 @@ body.scheme_tombstone {
 	color: #fdfeff;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_tombstone div {
+.scheme_tombstone > div {
 	color: #b7b8b9;
 }
-.scheme_tombstone .disabled div { /* color text for disabled */
+.scheme_tombstone .disabled > div { /* color text for disabled */
 	color: #8d8e90;
 }
 .scheme_tombstone h1 {

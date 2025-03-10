@@ -72,10 +72,10 @@ body.scheme_greenish {
 	color: #a04621;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_greenish div {
+.scheme_greenish > div {
 	color: #202020;
 }
-.scheme_greenish .disabled div { /* color text for disabled */
+.scheme_greenish .disabled > div { /* color text for disabled */
 	color: #606060;
 }
 .scheme_greenish h1 {

@@ -83,10 +83,10 @@ body.scheme_oil,
 	color: #ffc900;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_oil div {
+.scheme_oil > div {
 	color: #A9A9A9;
 }
-.scheme_oil .disabled div { /* color text for disabled */
+.scheme_oil .disabled > div { /* color text for disabled */
 	color: #494949;
 }
 .scheme_oil h1 {

@@ -79,10 +79,10 @@ body.scheme_catnip {
 	color: #00979f;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_catnip div {
+.scheme_catnip > div {
 	color: #1e2114;
 }
-.scheme_catnip .disabled div { /* color text for disabled */
+.scheme_catnip .disabled > div { /* color text for disabled */
 	color: #575a4b;
 }
 .scheme_catnip h1 {

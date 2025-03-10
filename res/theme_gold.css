@@ -77,10 +77,10 @@ body.scheme_gold {
 	color: #DFCE99;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_gold div {
+.scheme_gold > div {
 	color: #d9d9d9;
 }
-.scheme_gold .disabled div { /* color text for disabled */
+.scheme_gold .disabled > div { /* color text for disabled */
 	color: #706F64;
 }
 .scheme_gold h1 {

@@ -120,10 +120,10 @@ body.scheme_spooky.with_background_image {
 	color: #9632e3;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_spooky div {
+.scheme_spooky > div {
 	color: #b0b0b0;
 }
-.scheme_spooky .disabled div { /* color text for disabled */
+.scheme_spooky .disabled > div { /* color text for disabled */
 	color: #808080;
 }
 .scheme_spooky h1 {
