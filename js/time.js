@@ -226,7 +226,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         return numberEvents;
     },
     calculateRedshift: function(){
-        var isRedshiftEnabled = true;   //mobile
+        var isRedshiftEnabled = this.game.opts.enableRedshift;
 
         var currentTimestamp = Date.now();
         var delta = isRedshiftEnabled
