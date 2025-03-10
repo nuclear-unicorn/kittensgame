@@ -1437,7 +1437,7 @@ dojo.declare("com.nuclearunicorn.game.ui.PraiseBtnController", com.nuclearunicor
 	getName: function(model) {
 		if (this.game.religion.faithRatio > 0){
 			var progressDisplayed = this.game.getDisplayValueExt(this.game.religion.getApocryphaBonus() * 100, true, false, 3);
-			return "<div class='label'><span class='label-content'>" + model.options.name + "</span></div><div class='progress'>[" + progressDisplayed + "%]</div>";
+			return "<div class=\"label\"><span class=\"label-content\">" + model.options.name + "</span></div><div class=\"progress\">[" + progressDisplayed + "%]</div>";
 		} else {
 			return model.options.name;
 		}
