@@ -98,10 +98,10 @@ body.scheme_fluid,
 	color: #C0C0C0;
 	opacity: 1.0;
 }
-.scheme_fluid div {
+.scheme_fluid > div {
 	color: #B0B0B0;
 }
-.scheme_fluid .disabled div { /* color text for disabled */
+.scheme_fluid .disabled > div { /* color text for disabled */
 	color: #888888;
 }
 .scheme_fluid h1 {

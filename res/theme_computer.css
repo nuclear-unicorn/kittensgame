@@ -92,10 +92,10 @@ body.scheme_computer {
 	color: #f0f0f0;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_computer div {
+.scheme_computer > div {
 	color:#c0c0c0;
 }
-.scheme_computer .disabled div { /* color text for disabled */
+.scheme_computer .disabled > div { /* color text for disabled */
 	color: #606060;
 }
 .scheme_computer h1 {

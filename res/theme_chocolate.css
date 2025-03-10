@@ -91,10 +91,10 @@ body.scheme_chocolate.with_background_image {
 	color: #e8969f;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_chocolate div {
+.scheme_chocolate > div {
 	color: #dccebd;
 }
-.scheme_chocolate .disabled div { /* color text for disabled */
+.scheme_chocolate .disabled > div { /* color text for disabled */
 	color: #857160;
 }
 .scheme_chocolate h1 {

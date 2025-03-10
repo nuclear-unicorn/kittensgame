@@ -98,10 +98,10 @@ body.scheme_anthracite.with_background_image,
 	color: #d0d0d0;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_anthracite div {
+.scheme_anthracite > div {
 	color:#b0b0b0;
 }
-.scheme_anthracite .disabled div { /* color text for disabled */
+.scheme_anthracite .disabled > div { /* color text for disabled */
 	color: #808080;
 }
 .scheme_anthracite h1 {

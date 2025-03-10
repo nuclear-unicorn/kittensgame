@@ -89,10 +89,10 @@ body.scheme_space.with_background_image {
 	color: #12E7D1;
 	opacity: 1.0;
 }
-.scheme_space div {
+.scheme_space > div {
 	color: #DDDDDD;
 }
-.scheme_space .disabled div { /* color text on button disabled */
+.scheme_space .disabled > div { /* color text on button disabled */
 	color: #9FA5D6;
 }
 .scheme_space h1 {

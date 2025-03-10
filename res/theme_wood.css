@@ -110,10 +110,10 @@ body.scheme_wood.with_background_image {
 	color: #c5bc9b;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_wood div {
+.scheme_wood > div {
 	color:#b09b7e;
 }
-.scheme_wood .disabled div { /* color text for disabled */
+.scheme_wood .disabled > div { /* color text for disabled */
 	color: #706464;
 }
 .scheme_wood h1 {

@@ -50,11 +50,11 @@
     opacity: 1.0;
 }
 
-.scheme_sleek div {
+.scheme_sleek > div {
     color: #DCDCDC;
 }
 
-.scheme_sleek .disabled div {
+.scheme_sleek .disabled > div {
     color: #565656;
 }
 
