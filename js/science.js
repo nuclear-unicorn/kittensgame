@@ -2439,12 +2439,7 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 			};
 		}
 		var extendedInfo = this.shouldBeBought(model, this.game);
-		if(extendedInfo.reason !== "paid-for"){
-			return {
-				itemBought: false,
-				reason: extendedInfo.reason
-			};
-		}
+		
 		if (extendedInfo.reason == 'require-confirmation'){
 			var def = new dojo.Deferred();
 			var self = this;
@@ -2458,6 +2453,11 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 				itemBought: false,
 				reason: 'require-confirmation',
 				def: def
+			};
+		} else if(extendedInfo.reason !== "paid-for"){
+			return {
+				itemBought: false,
+				reason: extendedInfo.reason
 			};
 		} else {
 			this._buyItem_step2(model);
