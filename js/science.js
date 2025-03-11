@@ -2404,52 +2404,80 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 			var jobTitle = this.game.village.getJob(model.metadata.requiredLeaderJob).title;
 			this.game.msg($I("msg.policy.wrongLeaderJobForResearch", [model.metadata.label, jobTitle]), "important");
 			return { reason: "blocked" };
-		}else if(model.metadata.name == "transkittenism" && this.game.bld.getBuildingExt("aiCore").meta.effects["aiLevel"] >= 15){
+
+		} else if(model.metadata.name == "transkittenism" && this.game.bld.getBuildingExt("aiCore").meta.effects["aiLevel"] >= 15){
 			this.game.msg($I("msg.policy.aiNotMerges"),"alert", "ai");
 			return { reason: "blocked" };
-		}else if(model.metadata.blocked != true) {
+
+		} else if(model.metadata.blocked != true) {
              for(var i = 0; i < model.metadata.blocks.length; i++){
                 if(this.game.science.getPolicy(model.metadata.blocks[i]).researched){
                     model.metadata.blocked = true;
-				return { reason: "blocked" };
+					return { reason: "blocked" };
                 }
 			}
-			var confirmed = false; //confirmation:
 			if(game.opts.noConfirm){
 				return { reason: "paid-for" };
 			}
-			game.ui.confirm($I("policy.confirmation.title"), $I("policy.confirmation.title"), function() {
-				confirmed = true;
-			});
-			return confirmed ? { reason: "paid-for" } : { reason: "player-denied" };
+			return { reason: "require-confirmation" };
 		}
 		//Else, the policy was blocked:
 		return { reason: "blocked" };
 	},
-	buyItem: function(model, event, callback) {
+	buyItem: function(model, event) {
 		var isInDevMode = this.game.devMode;
 		if (model.metadata.researched && !isInDevMode) {
-			callback(false /*itemBought*/, { reason: "already-bought" });
-			return;
+			return {
+				itemBought: false,
+				reason: "already-bought"
+			};
 		}
 		if (!this.hasResources(model) && !isInDevMode) {
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
-			return;
+			return {
+				itemBought: false,
+				reason: "cannot-afford"
+			};
 		}
 		var extendedInfo = this.shouldBeBought(model, this.game);
 		if(extendedInfo.reason !== "paid-for"){
-			callback(false /*itemBought*/, extendedInfo); //Tell them *why* we failed to buy the item.
-			return;
+			return {
+				itemBought: false,
+				reason: extendedInfo.reason
+			};
 		}
+		if (extendedInfo.reason == 'require-confirmation'){
+			var def = new dojo.Deferred();
+			var self = this;
+			self.game.ui.confirm($I("policy.confirmation.title"), $I("policy.confirmation.title"), function() {
+				self._buyItem_step2(model);
+				def.callback({itemBought: true, reason: "paid-for"});
+			}, function() {
+				def.callback({itemBought: false, reason: "player-denied"});
+			});
+			return {
+				itemBought: false,
+				reason: 'require-confirmation',
+				def: def
+			};
+		} else {
+			this._buyItem_step2(model);
+			return {
+				itemBought: true,
+				reason: (this.game.devMode ? "dev-mode" : "paid-for")
+			};
+		}
+	},
+
+	_buyItem_step2: function(model){
 		this.payPrice(model);
 		this.onPurchase(model);
 		var meta = model.metadata;
 		if (meta.calculateEffects){
 			model.metadata.calculateEffects(meta, this.game);
 		}
-		callback(true /*itemBought*/, { reason: (this.game.devMode ? "dev-mode" : "paid-for") });
 		this.game.render();
 	},
+
 	onPurchase: function(model){
 		this.inherited(arguments);
 		var meta = model.metadata;

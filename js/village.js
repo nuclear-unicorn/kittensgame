@@ -2052,9 +2052,10 @@ dojo.declare("classes.village.ui.map.UpgradeHQController", com.nuclearunicorn.ga
 		return prices;
 	},
 
-	buyItem: function(model, event, callback) {
-		this.inherited(arguments);
+	buyItem: function(model, event) {
 		this.game.ui.render();
+		return this.inherited(arguments);
+		
 	},
 
 	incrementValue: function(model) {
@@ -2099,9 +2100,9 @@ dojo.declare("classes.village.ui.map.UpgradeExplorersController", com.nuclearuni
 		return prices;
 	},
 
-	buyItem: function(model, event, callback) {
-		this.inherited(arguments);
+	buyItem: function(model, event) {
 		this.game.ui.render();
+		return this.inherited(arguments);
 	},
 
 	incrementValue: function(model) {

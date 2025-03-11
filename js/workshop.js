@@ -3009,12 +3009,18 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 		return model;
 	},
 
-	buyItem: function(model, event, callback) {
+	buyItem: function(model, event) {
 		var wasCraftSuccessful = this.game.workshop.craft(model.craft.name, 1);
 		if (wasCraftSuccessful) {
-			callback(true /*itemBought*/, { reason: "paid-for" });
+			return {
+				itemBought: true,
+				reason: "paid-for"
+			};
 		} else {
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
+			return {
+				itemBought: false,
+				reason: "cannot-afford"
+			};
 		}
 	}
 });

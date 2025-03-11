@@ -859,9 +859,12 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 		return $.extend(true, [], model.metadata.prices); // Create a new array to keep original values
 	},
 
-	buyItem: function(model, event, callback) {
+	buyItem: function(model, event) {
 		this.togglePending(model);
-		callback(true /*itemBought*/, {reason: "item-is-free" /*We just toggled the pending state; simple, really*/});
+		return {
+			itemBought: true,
+			reason: "item-is-free" /*It costs no resources to gather catnip, so we can't fail to buy it*/
+		};
 	},
 
 	togglePending: function(model){

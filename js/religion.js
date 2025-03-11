@@ -1504,26 +1504,36 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 		};
 	},
 
-	buyItem: function(model, event, callback) {
+	buyItem: function(model, event) {
 		if (!this.hasResources(model)) {
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
-			return;
+			return {
+				itemBought: false,
+				reason: "cannot-afford"
+			};
 		}
 		if (!model.enabled) {
 			//As far as I can tell, this shouldn't ever happen because being
 			//unable to afford it is the only reason for it to be disabled.
-			callback(false /*itemBought*/, { reason: "not-enabled" });
-			return;
+			return {
+				itemBought: false,
+				reason: "not-enabled"
+			};
 		}
 		if (!event) { event = {}; /*event is an optional parameter*/ }
 		var batchSize = event.shiftKey ? 10000 :
 			event.ctrlKey || event.metaKey ? this.game.opts.batchSize : 1;
 		var didWeSucceed = this._transform(model, batchSize);
 		if (didWeSucceed) {
-			callback(true /*itemBought*/, { reason: "paid-for" });
+			return {
+				itemBought: true,
+				reason: "paid-for"
+			};
 		} else {
 			//_transform(model, amt) returns false if we can't afford it
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
+			return {
+				itemBought: false,
+				reason: "cannot-afford"
+			};
 		}
 	},
 
@@ -1655,7 +1665,8 @@ dojo.declare("classes.ui.religion.RefineTearsBtnController", com.nuclearunicorn.
 				&& self._canAfford(model, count) >= count,
 			title: "x" + count,
 			handler: function (event) {
-				self.buyItem(model, null, this.update.bind(this), count);
+				self.buyItem(model, null, count);
+				this.update();
 			}
 		};
 	},
@@ -1664,22 +1675,28 @@ dojo.declare("classes.ui.religion.RefineTearsBtnController", com.nuclearunicorn.
 		return Math.floor(this.game.resPool.get(model.prices[0].name).value / model.prices[0].val);
 	},
 
-	buyItem: function(model, event, callback, count){
+	buyItem: function(model, event, count){
 		if (!this.hasResources(model)) {
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
-			return;
+			return {
+				itemBought: false,
+				reason: "cannot-afford"
+			};
 		}
 		if (!model.enabled) {
 			//As far as I can tell, this shouldn't ever happen because being
 			//unable to afford it is the only reason for it to be disabled.
-			callback(false /*itemBought*/, { reason: "not-enabled" });
-			return;
+			return {
+				itemBought: false,
+				reason: "not-enabled"
+			};
 		}
 		if (this.game.resPool.get("sorrow").value >= this.game.resPool.get("sorrow").maxValue){
 			//We can't refine because we're at the limit.
 			this.game.msg($I("religion.refineTearsBtn.refine.msg.failure"));
-			callback(false /*itemBought*/, { reason: "already-bought" });
-			return;
+			return {
+				itemBought: false,
+				reason: "already-bought"
+			};
 		}
 		if (!event) { event = {}; /*event is an optional parameter*/ }
 		for (var batchSize = count || (event.ctrlKey ? this.game.opts.batchSize : 1);
@@ -1690,7 +1707,10 @@ dojo.declare("classes.ui.religion.RefineTearsBtnController", com.nuclearunicorn.
 			this.payPrice(model);
 			this.refine();
 		}
-		callback(true /*itemBought*/, { reason: "paid-for" });
+		return {
+			itemBought: true,
+			reason: "paid-for"
+		};
 	},
 
 	refine: function(){
@@ -1784,19 +1804,23 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 	shouldBeBough: function(model, game){
 		return game.getEffect("pactsAvailable") + model.metadata.effects["pactsAvailable"]>=0;
 	},
-	buyItem: function(model, event, callback) {
+	buyItem: function(model, event) {
 		this.game.updateCaches();
 		this.updateEnabled(model);
 
 		if (!this.hasResources(model) && !this.game.devMode) {
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
-			return;
+			return {
+				itemBought: false,
+				reason: "cannot-afford"
+			};
 		}
 		if(!this.shouldBeBough(model, this.game)){
-			callback(false /*itemBought*/, { reason: "already-bought" /*No more pacts available*/ });
-			return;
+			return {
+				itemBought: false,
+				reason: "already-bought"
+			};
 		}
-		this._buyItem_step2(model, event, callback);
+		return this._buyItem_step2(model, event);
 	},
 
 	build: function(model, maxBld){

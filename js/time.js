@@ -1000,21 +1000,25 @@ dojo.declare("classes.ui.time.AccelerateTimeBtnController", com.nuclearunicorn.g
             title: this.game.time.isAccelerated ? $I("btn.on.minor") : $I("btn.off.minor"),
             tooltip: this.game.time.isAccelerated ? $I("time.AccelerateTimeBtn.tooltip.accelerated") : $I("time.AccelerateTimeBtn.tooltip.normal"),
             cssClass: this.game.time.isAccelerated ? "fugit-on" : "fugit-off",
-            handler: function(btn, callback) {
-                self.buyItem(null, null, callback);
+            handler: function(btn) {
+                self.buyItem(null, null);
             }
         };
         return model;
     },
 
-    buyItem: function(model, event, callback) {
+    buyItem: function(model, event) {
+        var self = this;
         if (self.game.resPool.get("temporalFlux").value <= 0) {
             self.game.time.isAccelerated = false;
             self.game.resPool.get("temporalFlux").value = 0;
         } else {
             self.game.time.isAccelerated = !self.game.time.isAccelerated;
         }
-        callback(true /*itemBought*/, { reason: "item-is-free" /*It costs flux, but you can still toggle it freely*/ });
+        return {
+            itemBought: true,
+            reason: "item-is-free" /*It costs flux, but you can still toggle it freely*/
+        };
     }
 });
 
@@ -1257,24 +1261,30 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 		return pricesTotal;
 	},
 
-    buyItem: function(model, event, callback){
+    buyItem: function(model, event){
         if (!this.hasResources(model)) {
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
-			return true;
+            return {
+                itemBought: false,
+                reason: "cannot-afford"
+            };
 		}
 		if (!model.enabled) {
             //As far as I can tell, this shouldn't ever happen because being
             //unable to afford it is the only reason for it to be disabled.
-			callback(false /*itemBought*/, { reason: "not-enabled" });
-			return true;
+            return {
+                itemBought: false,
+                reason: "not-enabled"
+            };
 		}
         var price = this.getPrices(model);
         for (var i in price){
             this.game.resPool.addResEvent(price[i].name, -price[i].val);
         }
         this.doShatter(model, 1);
-        callback(true /*itemBought*/, { reason: "paid-for" });
-        return true;
+        return {
+            itemBought: true,
+            reason: "paid-for" 
+        };
     },
 
     doShatterAmt: function(model, amt) {
@@ -1481,19 +1491,25 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
         return result;
     },
 
-	buyItem: function(model, event, callback) {
+	buyItem: function(model, event) {
         var buyType;
         if (this.game.time.getVSU("usedCryochambers").val == 0) {
-			callback(false /*itemBought*/, { reason: "already-bought" });
-			return;
+            return {
+                itemBought: false,
+                reason: "already-bought"
+            };
         }
 		if (!model.visible) {
-			callback(false /*itemBought*/, { reason: "not-unlocked" });
-			return;
+            return {
+                itemBought: false,
+                reason: "not-unlocked"
+            };
 		}
         if (!this.hasResources(model)) {
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
-			return;
+            return {
+                itemBought: false,
+                reason: "cannot-afford"
+            };
         }
 
 		if (!event) { event = {}; /*event is an optional parameter*/ }
@@ -1513,9 +1529,15 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
         if(fixHappened){
             var cry = this.game.time.getVSU("cryochambers");
             cry.calculateEffects(cry, this.game);
-            callback(true /*itemBought*/, { reason: "paid-for" });
+            return {
+                itemBought: true,
+                reason: "paid-for"
+            };
         } else {
-			callback(false /*itemBought*/, { reason: "not-enabled" });
+            return {
+                itemBought: false,
+                reason: "not-enabled"
+            };
         }
 	},
 
@@ -2345,13 +2367,9 @@ dojo.declare("classes.queue.manager", null,{
             return;
         }
 
-        var wasItemBought = false;
-        var resultOfBuyingItem = null;
-        controllerAndModel.controller.buyItem(controllerAndModel.model, null,
-            function(success, extendedInfo) {
-                wasItemBought = success;
-                resultOfBuyingItem = extendedInfo;
-            });
+        var result = controllerAndModel.controller.buyItem(controllerAndModel.model, null);
+        var wasItemBought = result.itemBought;
+        var resultOfBuyingItem = {reason: result.reason};
 
         if (typeof(wasItemBought) !== "boolean" || typeof(resultOfBuyingItem) !== "object") {
             console.error("Invalid result after attempting to buy item via queue", resultOfBuyingItem);
