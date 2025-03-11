@@ -2050,32 +2050,8 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 	 * buyItem will return {reason: "require-confirmation"} and a deferred object that will be resolved when user confirms the choice
 	 * def objects can chain
 	 */
-	buyItem: function(model, event, buyType) {
-		var result = this.buyItemSync(model, event, buyType);
-		/**
-		 * Asynchronous operation
-		 */
-		if (!result.itemBought && result.reason == "require-confirmation"){
-			var def = new dojo.Deferred();
-			this.game.ui.confirm("", $I("iron.will.break.confirmation.msg"), function() {
-				var _defResult = self._buyItem_step2(model, event);
-				def.callback(_defResult);
-			}, function() {
-				def.callback({
-					itemBought: false,
-					reason: "player-denied"
-				});
-			});
-			return {
-				itemBought: false,
-				reason: "require-confirmation",
-				def: def
-			};
-		}
-		return result;
-	},
 	
-	buyItemSync: function(model, event, buyType) {
+	buyItem: function(model, event, buyType) {
 		if (event && event.shiftKey){
 			buyType = "all";
 		}
@@ -2105,9 +2081,21 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 		var meta = model.metadata;
 		if (this.game.ironWill && meta.effects && meta.effects["maxKittens"] > 0 && this.game.science.get("archery").researched) {
 			//Show a confirmation message if we're building something that would break Iron Will mode.
+			var def = new dojo.Deferred();
+			var self = this;
+			this.game.ui.confirm("", $I("iron.will.break.confirmation.msg"), function() {
+				var _defResult = self._buyItem_step2(model, event);
+				def.callback(_defResult);
+			}, function() {
+				def.callback({
+					itemBought: false,
+					reason: "player-denied"
+				});
+			});
 			return {
 				itemBought: false,
-				reason: "require-confirmation"
+				reason: "require-confirmation",
+				def: def
 			};
 		} else {
 			return this._buyItem_step2(model, event, buyType);
