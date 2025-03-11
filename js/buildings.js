@@ -2941,7 +2941,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 });
 
 dojo.declare("classes.game.ui.GatherCatnipButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
-	buyItem: function(model, event, callback){
+	buyItem: function(model, event){
 		var self = this;
 		clearTimeout(this.game.gatherTimeoutHandler);
 		this.game.gatherTimeoutHandler = setTimeout(function(){ self.game.gatherClicks = 0; }, 2500);	//2.5 sec
@@ -2953,7 +2953,10 @@ dojo.declare("classes.game.ui.GatherCatnipButtonController", com.nuclearunicorn.
 		}
 
 		this.game.bld.gatherCatnip();
-		callback(true /*itemBought*/, {reason: "item-is-free" /*It costs no resources to gather catnip, so we can't fail to buy it*/});
+		return {
+			itemBought: true,
+			reason: "item-is-free" /*It costs no resources to gather catnip, so we can't fail to buy it*/
+		};
 	}
 });
 
