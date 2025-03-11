@@ -66,7 +66,7 @@ try {
                 });
             let promise = {
                 callback: function(arg){ _resolve(arg); return promise; },
-                then: function(_callback) { return capturedPromise.then(_callback); }
+                then: function(_callback) { return capturedPromise.then.apply(capturedPromise, arguments);}
             }
             return promise;
         }

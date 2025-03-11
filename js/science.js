@@ -2446,20 +2446,21 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 			return;
 		}
 		var shouldBeBoughtDef = this.shouldBeBought(model, this.game);
-		shouldBeBoughtDef.then(dojo.hitch(this, function (extendedInfo){
+		var self = this;
+		shouldBeBoughtDef.then(function (extendedInfo){
 			if(extendedInfo.reason !== "paid-for"){
 				callback(false /*itemBought*/, extendedInfo); //Tell them *why* we failed to buy the item.
 				return;
 			}
-			this.payPrice(model);
-			this.onPurchase(model);
+			self.payPrice(model);
+			self.onPurchase(model);
 			var meta = model.metadata;
 			if (meta.calculateEffects){
-				model.metadata.calculateEffects(meta, this.game);
+				model.metadata.calculateEffects(meta, self.game);
 			}
-			callback(true /*itemBought*/, { reason: (this.game.devMode ? "dev-mode" : "paid-for") });
-			this.game.render();
-		}));
+			callback(true /*itemBought*/, { reason: (self.game.devMode ? "dev-mode" : "paid-for") });
+			self.game.render();
+		});
 	},
 
 	onPurchase: function(model){

@@ -578,15 +578,23 @@ test("Queue should correctly add and remove items", () => {
     expect(queue.queueItems[1].value).toBe(12);
 });
 
-test("Queue should correctly skip one-time purchases if already bought", () => {
+test("Queue should correctly skip one-time purchases if already bought", async () => {
     let queue = game.time.queue;
+
+    const updateQueueSync = async (_model, _event) => {
+        return new Promise((resolve, reject) => {
+            queue.update(() => {
+                resolve();
+            });
+        });
+    };
 
     //The queue should skip techs that are already researched:
     game.science.get("calendar").researched = true;
     game.resPool.get("science").value = 30; //Enough to purchase the Calendar tech.
     queue.addToQueue("calendar", "tech", "N/A");
     expect(queue.queueLength()).toBe(1);
-    queue.update();
+    await updateQueueSync();
     expect(queue.queueLength()).toBe(0);
     expect(game.resPool.get("science").value).toBe(30); //We didn't spend any science because we skipped the item
 
@@ -597,9 +605,9 @@ test("Queue should correctly skip one-time purchases if already bought", () => {
     queue.addToQueue("liberty", "policies", "N/A");
     queue.addToQueue("tradition", "policies", "N/A");
     expect(queue.queueLength()).toBe(2);
-    queue.update();
+    await updateQueueSync();
     expect(queue.queueLength()).toBe(1);
-    queue.update();
+    await updateQueueSync();
     expect(queue.queueLength()).toBe(0);
     expect(game.resPool.get("culture").value).toBe(150);
 });
@@ -1024,7 +1032,7 @@ test("buyItem internals should work properly for items with no cost", async () =
             });
         });
     };
-    
+
     let handlerResult = null;
     const handlerFunction = function(model) { handlerResult = model.name; };
     let controller = new com.nuclearunicorn.game.ui.ButtonModernController(game);
