@@ -735,7 +735,6 @@
     "opts.theme": "Color theme",
     "opts.theme.anthracite": "Anthracite",
     "opts.theme.arctic": "Arctic",
-    "opts.theme.black": "Black",
     "opts.theme.bluish": "Bluish",
     "opts.theme.catnip": "Catnip",
     "opts.theme.chocolate": "Chocolate",
@@ -783,7 +782,7 @@
     "opts.enableKS": "Enable Kittens Scientist",
     "opts.enableKS.desc": "This is absolutely unsupported, you have never seen me or this setting",
 
-    "msg.necrocornDeficit.info": "Necrocorn deficit: {0}. Due to the deficit your pacts have {1}% effectivness. Deficit is consuming additional {2}% of necrocorns per day and is deminishing {3} per day (if you have enough necrocorns).",
+    "msg.necrocornDeficit.info": "Necrocorn deficit: {0}. Due to the deficit your pacts have {1}% effectivness. Deficit is consuming additional {2}% of necrocorns per day and is diminishing {3} per day (if you have enough necrocorns).",
     "msg.pacts.info": "Karma kittens per millenia are based on available pacts. Pacts do not persist. Available pacts: {0}. Every pact devours {1} necrocorns per day.",
     "msg.pacts.fractured": "You didn't fulfill your part of the deal... You lost {0} alicorns!",
     "opts.swipeNavigation": "Swipe navigation",
@@ -1857,7 +1856,7 @@
     "ui.option.notation": "Notation:",
     "ui.option.pollution": "Disable pollution effects",
 
-    "queue.alphabeticalToggle": "Sort queue items by alphabet",
+    "queue.alphabeticalToggle": "Sort queue items alphabetically",
     "queue.add": "Add to queue",
 
     "left.resources": "resources",

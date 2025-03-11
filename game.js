@@ -2093,7 +2093,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		];
 
 		if (this.isMobile()){
-			this.tabRegistry.push(
+			tabRegistry.push(
 				{
 					class: classes.tab.QueueTab,
 					name: "tab.name.queue",
@@ -5162,6 +5162,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			if (this.tabs[i].tabId.toLowerCase() == tabName){
 				return this.tabs[i];
 			}
+		}
+		//Hack because QueueTab is a tab that exists only on mobile
+		if (tabName == "queue" && !this.isMobile()) {
+			//We have to return *something* so it doesn't throw an error
+			return { tabName: "dummy tab", tabId: "Queue", visible: false };
 		}
 	},
 

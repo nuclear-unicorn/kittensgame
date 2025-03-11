@@ -226,7 +226,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         return numberEvents;
     },
     calculateRedshift: function(){
-        var isRedshiftEnabled = this.game.opts.enableRedshift;
+        var isRedshiftEnabled = this.game.isMobile() ? true : this.game.opts.enableRedshift;
 
         var currentTimestamp = Date.now();
         var delta = isRedshiftEnabled
@@ -1405,7 +1405,7 @@ dojo.declare("classes.ui.time.ChronoforgeBtnController", com.nuclearunicorn.game
         var label = this.inherited(arguments);
 
         if (meta.heat){
-            return label + "<div class='progress'>[" + this.game.getDisplayValueExt(meta.heat) + "%]</div>";
+            return label + "<div class=\"progress\">[" + this.game.getDisplayValueExt(meta.heat) + "%]</div>";
         }
         return label;
     },
