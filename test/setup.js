@@ -56,7 +56,20 @@ try {
         connect: function(){},
         publish: function(){},
         subscribe: function(){},
-        mixin: function(obj, mixin){return Object.assign(obj, mixin); }
+        mixin: function(obj, mixin){return Object.assign(obj, mixin); },
+        Deferred: function(){
+            var _resolve,
+                _reject,
+                capturedPromise = new Promise(function(resolve, reject){
+                    _resolve = resolve;
+                    _reject  = reject;
+                });
+            let promise = {
+                callback: function(arg){ _resolve(arg); return promise; },
+                then: function(_callback) { return capturedPromise.then(_callback); }
+            }
+            return promise;
+        }
     };
 
     var xhrMock = {

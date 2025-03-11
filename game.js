@@ -5282,7 +5282,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				*/
 				if (!newUnlock){
 					console.trace();
-					console.error("unable to evaluate locks for unlockId '" +unlockId +"', type '" + type + "'");
+					console.warn("unable to evaluate locks for unlockId '" +unlockId +"', type '" + type + "'");
 					continue;
 				}
 				if (newUnlock.evaluateLocks && !newUnlock.evaluateLocks(game)){

@@ -2399,33 +2399,42 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 	//Returns an object with one field:
 	//	reason:		String.  If we can't buy it, why not?  If we can buy it, returns
 	//				"paid-for" regardless of whether we can actually afford it or not.
+	//@returns A Dojo 1.6 Thenable interface
 	shouldBeBought: function(model, game){ //fail checks:
+		var def = new dojo.Deferred();
+
 		if(this.game.village.leader && model.metadata.requiredLeaderJob && this.game.village.leader.job != model.metadata.requiredLeaderJob){
 			var jobTitle = this.game.village.getJob(model.metadata.requiredLeaderJob).title;
 			this.game.msg($I("msg.policy.wrongLeaderJobForResearch", [model.metadata.label, jobTitle]), "important");
-			return { reason: "blocked" };
-		}else if(model.metadata.name == "transkittenism" && this.game.bld.getBuildingExt("aiCore").meta.effects["aiLevel"] >= 15){
+			return def.callback({ reason: "blocked" });
+
+		} else if(model.metadata.name == "transkittenism" && this.game.bld.getBuildingExt("aiCore").meta.effects["aiLevel"] >= 15){
 			this.game.msg($I("msg.policy.aiNotMerges"),"alert", "ai");
-			return { reason: "blocked" };
-		}else if(model.metadata.blocked != true) {
+			return def.callback({ reason: "blocked" });
+		} else if(model.metadata.blocked != true) {
              for(var i = 0; i < model.metadata.blocks.length; i++){
                 if(this.game.science.getPolicy(model.metadata.blocks[i]).researched){
                     model.metadata.blocked = true;
-				return { reason: "blocked" };
+					return def.callback({ reason: "blocked" });
                 }
 			}
-			var confirmed = false; //confirmation:
 			if(game.opts.noConfirm){
-				return { reason: "paid-for" };
+				return def.callback({ reason: "paid-for" });
 			}
-			game.ui.confirm($I("policy.confirmation.title"), $I("policy.confirmation.title"), function() {
-				confirmed = true;
+			
+			game.ui.confirm($I("policy.confirmation.title"), $I("policy.confirmation.title"), 
+			function() {
+				def.callback({ reason: "paid-for" });
+			}, 
+			function() { 
+				def.callback({ reason: "player-denied" }); 
 			});
-			return confirmed ? { reason: "paid-for" } : { reason: "player-denied" };
+			return def;
 		}
 		//Else, the policy was blocked:
-		return { reason: "blocked" };
+		return def.callback({ reason: "blocked" });
 	},
+	
 	buyItem: function(model, event, callback) {
 		var isInDevMode = this.game.devMode;
 		if (model.metadata.researched && !isInDevMode) {
@@ -2436,20 +2445,23 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 			callback(false /*itemBought*/, { reason: "cannot-afford" });
 			return;
 		}
-		var extendedInfo = this.shouldBeBought(model, this.game);
-		if(extendedInfo.reason !== "paid-for"){
-			callback(false /*itemBought*/, extendedInfo); //Tell them *why* we failed to buy the item.
-			return;
-		}
-		this.payPrice(model);
-		this.onPurchase(model);
-		var meta = model.metadata;
-		if (meta.calculateEffects){
-			model.metadata.calculateEffects(meta, this.game);
-		}
-		callback(true /*itemBought*/, { reason: (this.game.devMode ? "dev-mode" : "paid-for") });
-		this.game.render();
+		var shouldBeBoughtDef = this.shouldBeBought(model, this.game);
+		shouldBeBoughtDef.then(dojo.hitch(this, function (extendedInfo){
+			if(extendedInfo.reason !== "paid-for"){
+				callback(false /*itemBought*/, extendedInfo); //Tell them *why* we failed to buy the item.
+				return;
+			}
+			this.payPrice(model);
+			this.onPurchase(model);
+			var meta = model.metadata;
+			if (meta.calculateEffects){
+				model.metadata.calculateEffects(meta, this.game);
+			}
+			callback(true /*itemBought*/, { reason: (this.game.devMode ? "dev-mode" : "paid-for") });
+			this.game.render();
+		}));
 	},
+
 	onPurchase: function(model){
 		this.inherited(arguments);
 		var meta = model.metadata;

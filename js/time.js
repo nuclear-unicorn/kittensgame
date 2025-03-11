@@ -2348,33 +2348,33 @@ dojo.declare("classes.queue.manager", null,{
         var wasItemBought = false;
         var resultOfBuyingItem = null;
         controllerAndModel.controller.buyItem(controllerAndModel.model, null,
-            function(success, extendedInfo) {
+            dojo.hitch(this, function(success, extendedInfo) {
                 wasItemBought = success;
                 resultOfBuyingItem = extendedInfo;
-            });
 
-        if (typeof(wasItemBought) !== "boolean" || typeof(resultOfBuyingItem) !== "object") {
-            console.error("Invalid result after attempting to buy item via queue", resultOfBuyingItem);
-            return;
-        }
-
-        var reason = resultOfBuyingItem.reason; //String explaining *why* we failed to buy the item
-
-        //Depending on the result, do something different:
-        if (wasItemBought){
-            //Item successfully purchased!  Remove it from the queue because we did it :D
-            this.dropLastItem();
-            this.game._publish("ui/update", this.game);
-            //console.log("Successfully built " + el.name + " using the queue because " + reason);
-        } else {
-            if (this._isReasonToSkipItem(reason)) {
-                this.dropLastItem();
-                this.game._publish("ui/update", this.game);
-                //console.log("Dropped " + el.name + " from the queue because " + reason);
-            } else {
-                //console.log("Tried to build " + el.name + " using the queue, but failed because " + reason);
-            }
-        }
+                if (typeof(wasItemBought) !== "boolean" || typeof(resultOfBuyingItem) !== "object") {
+                    console.error("Invalid result after attempting to buy item via queue", resultOfBuyingItem);
+                    return;
+                }
+        
+                var reason = resultOfBuyingItem.reason; //String explaining *why* we failed to buy the item
+        
+                //Depending on the result, do something different:
+                if (wasItemBought){
+                    //Item successfully purchased!  Remove it from the queue because we did it :D
+                    this.dropLastItem();
+                    this.game._publish("ui/update", this.game);
+                    //console.log("Successfully built " + el.name + " using the queue because " + reason);
+                } else {
+                    if (this._isReasonToSkipItem(reason)) {
+                        this.dropLastItem();
+                        this.game._publish("ui/update", this.game);
+                        //console.log("Dropped " + el.name + " from the queue because " + reason);
+                    } else {
+                        //console.log("Tried to build " + el.name + " using the queue, but failed because " + reason);
+                    }
+                }
+            }));
     },
 
     //Determines whether or not we should silently remove an item from the queue
