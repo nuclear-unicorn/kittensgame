@@ -4000,8 +4000,13 @@ dojo.declare("classes.ui.village.Census", null, {
 				? $I("village.census.trait.none")
 				: leader.trait.title + " (" + $I("village.bonus.desc." + leader.trait.name) + ") [" + $I("village.census.rank") + " " + leader.rank + "]";
 			var nextRank = Math.floor(this.game.village.getRankExp(leader.rank));
-			retVal.leaderInfo = this.game.village.getStyledName(leader, true /*is leader panel*/) + ", " + title +
-				"<br /> exp: " + this.game.getDisplayValueExt(leader.exp);
+			retVal.leaderInfo = this.game.village.getStyledName(leader, true /*is leader panel*/) + ", " + title;
+			//This is an ugly hack for mobile.
+			// Web uses expInfo, but mobile only uses leaderInfo.
+			//So put experience-related information inside leaderInfo for the benefit of mobile.
+			if (this.game.isMobile()) {
+				retVal.leaderInfo += "<br /> exp: " + this.game.getDisplayValueExt(leader.exp);
+			}
 
 			//exp & percentage to next rank
 			var nextRank = Math.floor(this.game.village.getRankExp(leader.rank));
