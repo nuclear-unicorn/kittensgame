@@ -880,6 +880,13 @@ body.scheme_catnip {
 	border: 1px solid rgba(0, 0 , 0, 0.25);
 	border-radius: 5px;
 }
+.scheme_catnip .tabInner.Challenges td.craftStuffPanel + td.craftStuffPanel > table { /* list of kittens in reserve */
+	background-color: rgba(0 ,0 ,0 , 0.6); /* copied from census-block because inside we have a list of kitten names*/
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 5px;
+	font-size: 0.9em;
+	color: #d6dacb;
+}
 
 /* ******************************************************** */
 /* ******************* ACHIEVEMENTS TAB ******************* */
