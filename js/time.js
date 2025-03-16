@@ -38,7 +38,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             heat: this.heat,
             testShatter: this.testShatter, //temporary
             isAccelerated: this.isAccelerated,
-            cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "delaySeconds", "unlocked", "isAutomationEnabled"]),
+            cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "delayTicks", "unlocked", "isAutomationEnabled"]),
             vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"]),
             queueItems: this.queue.queueItems,
             queueSources: this.queue.queueSources
@@ -346,10 +346,10 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 self.on = self.val;
             }
             var delay = game.time.getCFU("controlledDelay");
-            if (delay.delaySeconds > 0) {
+            if (delay.delayTicks > 0) {
                 //Timer should count down even if automation is paused.
                 //Not affected by Tempus Fugit.
-                delay.delaySeconds = Math.max(0, delay.delaySeconds - 1 / game.ticksPerSecond);
+                delay.delayTicks -= 1;
                 return;
             }
 
@@ -370,7 +370,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     amt = limit;
                 }
                 self.heat -= 100 * amt;
-                delay.delaySeconds = 0.5 * delay.on;
+                delay.delayTicks = delay.on; //Pause for a duration of 1 game-tick per active Controlled Delay
                 //game.time.shatter(amt);
                 if(test_shatter == 1) {game.time.shatterInGroupCycles(amt);}
                 //else if(game.time.testShatter == 2) {game.time.shatterInCycles(amt);}
@@ -416,16 +416,22 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     },{
         name: "controlledDelay",
         label: $I("time.cfu.controlledDelay.label"),
-        description: $I("time.cfu.controlledDelay.desc"),
+        description: $I("time.cfu.controlledDelay.desc") + "<br>" + $I("time.cfu.controlledDelay.desc2"),
         prices: [
             { name: "timeCrystal", val: 1 },
             { name: "gear", val: 10 }
         ],
         priceRatio: 1, //Affordable scaling
-        limitBuild: 10, //Hard-capped at 5 sec delay.
-        delaySeconds: 0,
+        limitBuild: 25, //Hard-capped at 5 sec delay.
+        calculateEffects: function(self, game) {
+            if (self.isAutomationEnabled == null) { //force non-null value
+                self.isAutomationEnabled = false;
+            }
+        },
+        delayTicks: 0,
+        isAutomationEnabled: false,
         effects: {
-            "energyConsumption": 2
+            "energyConsumption": 0.75
         },
         unlocked: false
     },{
@@ -1560,12 +1566,16 @@ dojo.declare("classes.ui.time.ChronoforgeBtnController", com.nuclearunicorn.game
 
     getName: function(model){
         var meta = model.metadata;
-        if (meta.delaySeconds) {
-            return this.game.getDisplayValueExt(meta.delaySeconds, false /*prefix*/, false /*usePerTickHack*/, 1 /*precision*/) +
-                $I("unit.s") + " " + this.inherited(arguments);
+        var game = this.game;
+        if (meta.delayTicks > 0) {
+            //It's kind of a happy accident that delayTicks has one of 24 different values & that there are 24 clock emoji.
+            var timeStr = meta.isAutomationEnabled ?
+                (String.fromCodePoint(0x1F550 + meta.delayTicks - 1)) :
+                game.getDisplayValueExt(meta.delayTicks / game.ticksPerSecond, false /*prefix*/, false /*usePerTickHack*/, 1 /*precision*/) + $I("unit.s");
+            return timeStr + " " + this.inherited(arguments);
         }
         if (meta.heat){
-            return this.inherited(arguments) + " [" + this.game.getDisplayValueExt(meta.heat) + "%]";
+            return this.inherited(arguments) + " [" + game.getDisplayValueExt(meta.heat) + "%]";
         }
         return this.inherited(arguments);
     },
