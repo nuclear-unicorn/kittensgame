@@ -4665,7 +4665,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		} else if (this.resPool.get("kittens").value <= 35) {
 			msg += " " + $I("reset.confirmation.msg35");
 		}
-		if (this.workshop.get("chronoEncabulator").researched) {
+		if (this.workshop.get("tachyonModerator").researched) {
 			//Add a warning if there is enough stored chrono furnace fuel to get more paragon points
 			var toNextMillennium = 1000 - this.calendar.year % 1000; //Measured in years, from 1 to 1000.
 			if (this.time.getCFU("blastFurnace").heat >= toNextMillennium * 100) {
