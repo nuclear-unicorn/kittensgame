@@ -428,6 +428,19 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			}
 		}
 	},{
+		name: "tachyonModerator",
+		label: $I("workshop.tachyonModerator.label"),
+		description: $I("workshop.tachyonModerator.desc"),
+		flavor: $I("workshop.tachyonModerator.flavor"),
+		prices: [
+			{ name: "science", val: 16000 },
+			{ name: "gear", val: 500 },
+			{ name: "titanium", val: 250 }
+		],
+		unlocks: {
+			chronoforge: ["controlledDelay"]
+		}
+	},{
 		name: "tachyonAccelerators",
 		label: $I("workshop.tachyonAccelerators.label"),
 		description: $I("workshop.tachyonAccelerators.desc"),
