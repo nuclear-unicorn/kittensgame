@@ -379,7 +379,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             }
         },
 		unlocks: {
-			upgrades: ["chronoEncabulator"],
+			upgrades: ["tachyonModerator"],
 			chronoforge: ["timeBoiler"]
 		},
         unlocked: true
@@ -1504,7 +1504,7 @@ dojo.declare("classes.ui.time.UseHeatBtnController", com.nuclearunicorn.game.ui.
 	},
 
 	updateVisible: function(model) {
-		model.visible = this.game.workshop.get("chronoEncabulator").researched;
+		model.visible = this.game.workshop.get("tachyonModerator").researched;
 	}
 });
 
