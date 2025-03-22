@@ -61,10 +61,10 @@ body.scheme_black {
 	color: #d0d0d0;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_black div {
+.scheme_black > div {
 	color:#b0b0b0;
 }
-.scheme_black .disabled div { /* color text for disabled */
+.scheme_black .disabled > div { /* color text for disabled */
 	color: #505050;
 }
 .scheme_black h1 {

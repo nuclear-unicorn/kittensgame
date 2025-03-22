@@ -55,6 +55,7 @@
     "challendge.1000Years.label": "Mil années",
     "challendge.atheism.label": "Malfoy",
     "challendge.blackSky.label": "Cyel noir",
+    "effectsMgr.statics.broadcastTowerRatio.title": "999999999",
     "effectsMgr.statics.catnipJobRatio.title": "Ostils de ferme",
     "effectsMgr.statics.environmentWoodBonus.title": "Prodvction de bois",
     "effectsMgr.statics.maxKittens.title": "Chastons",
@@ -66,6 +67,7 @@
     "opts.theme.factory": "Usyne",
     "opts.theme.oil": "Huyle",
     "opts.theme.wood": "Bois",
+    "policy.knowledgeSharing.label": "Partage des savoirs",
     "religion.sacrificeBtn.all": "tovs",
     "res.stack.faith": "Foy",
     "resources.craftTable.all": "tovs",
@@ -93,6 +95,7 @@
     "village.job.woodcutter": "Bvcheron",
     "village.msg.kitten": "chaston",
     "village.msg.kittens": "chastons",
+    "village.tab.title.metropolis": "7ygiy",
     "workshop.refine.confirmation": "Vostre chastons vont PÉRIR",
     "workshop.titaniumMirrors.flavor": "Ceste lvevr est elle en movance ?"
 }

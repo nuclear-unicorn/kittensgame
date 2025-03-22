@@ -856,7 +856,8 @@ WLeftPanel = React.createClass({
                 $r("a", {href:"#", onClick: this.praiseAll},
                     $I("left.praise")
                 )
-            ),              
+            ),             
+             
             $r(WPins, {game: game}),
             $r(WCraftTable, {resources: game.resPool.resources, reqRes: reqRes})
         ]);

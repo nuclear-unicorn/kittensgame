@@ -98,6 +98,9 @@ WQueueItem = React.createClass({
     isStorageLimited: function() {
         var game = this.props.game;
         var model = game.time.queue.getQueueElementModel(this.props.item);
+        if (!model) { //This might be an invalid queue item
+            return true; //Mark as storage-limited to try to get the player's attention
+        }
         return game.resPool.isStorageLimited(model.prices);
     }
 });

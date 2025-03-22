@@ -1104,7 +1104,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             this.fontSize = uiData.fontSize || 16;
             this.isCenter = uiData.isCenter || false;
         } catch (ex) {
-            console.error("unable to load ui data");
+            console.error("unable to load ui data", ex);
         }
         this.updateFontSize();
         this.updateCenter();

@@ -121,6 +121,7 @@
     "btn.sell.minor": "sell",
     "btn.trade": "Trade",
     "btn.blocked.capital": "(Blocked)",
+    "btn.applyPending": "Apply challenges",
 
     "sell.all.confirmation.title": "",
     "sell.all.confirmation.msg": "Are you sure you want to sell all?",
@@ -680,24 +681,29 @@
     "menu.export": "Export",
     "menu.export.btn": "Save in Dropbox (Beta)",
     "menu.export.text": "Text Export",
+    "menu.export.desc": "Tap once to select and copy text automatically. <br/>⚠Pressing and holding can cause game to crash",
     "menu.export.to": "Export To",
     "menu.import": "Import",
     "menu.import.btn": "Import from text",
     "menu.import.from": "Import From",
     "menu.import.text": "Text Import",
     "menu.import.title": "Dropbox (Beta)",
+    "menu.kgnet": "Cloud Sync",
+    "menu.kgnet.login": "Login",
+    "menu.kgnet.register": "Register",
     "menu.undo": "Undo (Beta)",
     "menu.save": "Save",
     "menu.options": "Options",
     "menu.reset": "Reset",
     "menu.wipe": "Wipe",
     "menu.getTheApp": "Get the app",
+    "menu.fontSize": "Font Size",
 
     "mid.buildings.tip": "Ctrl+click to buy/sell multiple buildings (meta+click on macOS). Shift+click to buy/sell all buildings.<br>You can set the batch size for ctrl+click in the game options.<br><br>Hold shift to see total effects of all buildings.<br><br>Use `Tab` to select building, `Enter` to buy it and `Space` to see detailed tooltip.",
 
     "navbar.title": "Kittens Game",
     "navbar.menu.title": "Menu",
-    "navbar.btn.hunters": "Send all hunters",
+    "navbar.btn.hunters": "Send all hunters: x{0}",
     "navbar.btn.praise": "Praise the sun",
     "navbar.energy.cons": "Consumption: {0}Wt",
     "navbar.energy.cons.short": "Consumption:",
@@ -712,6 +718,7 @@
     "notification.save.desc": "Game was successfully saved",
 
     "navbar.energy": "Energy: {0}Wt",
+    "navbar.pollution" : "Pollution: {0}",
 
     "opts.group.interface": "Interface",
     "opts.hideSell": "Hide sell button",
@@ -728,7 +735,6 @@
     "opts.theme": "Color theme",
     "opts.theme.anthracite": "Anthracite",
     "opts.theme.arctic": "Arctic",
-    "opts.theme.black": "Black",
     "opts.theme.bluish": "Bluish",
     "opts.theme.catnip": "Catnip",
     "opts.theme.chocolate": "Chocolate",
@@ -760,6 +766,7 @@
 
     "opts.theme.classic": "Classic",
     "opts.theme.inverted": "Inverted",
+    "opts.theme.black": "OLED Black",
 
     "opts.yes": "Yes",
     "opts.no": "No",
@@ -767,9 +774,21 @@
     "opts.notation.e": "Scientific",
     "opts.notation.sie": "Simplified (SI+E)",
 
-    "msg.necrocornDeficit.info": "Necrocorn deficit: {0}. Due to the deficit your pacts have {1}% effectiveness. Deficit is consuming additional {2}% of necrocorns per day and is diminishing {3} per day (if you have enough necrocorns).",
+    "opts.font.smallest": "Smallest",
+    "opts.font.small": "Small",
+    "opts.font.normal": "Normal",
+    "opts.font.large": "Large",
+
+    "opts.enableKS": "Enable Kittens Scientist",
+    "opts.enableKS.desc": "This is absolutely unsupported, you have never seen me or this setting",
+
+    "msg.necrocornDeficit.info": "Necrocorn deficit: {0}. Due to the deficit your pacts have {1}% effectivness. Deficit is consuming additional {2}% of necrocorns per day and is diminishing {3} per day (if you have enough necrocorns).",
     "msg.pacts.info": "Karma kittens per millenia are based on available pacts. Pacts do not persist. Available pacts: {0}. Every pact devours {1} necrocorns per day.",
     "msg.pacts.fractured": "You didn't fulfill your part of the deal... You lost {0} alicorns!",
+    "opts.swipeNavigation": "Swipe navigation",
+    "opts.swipeNavigation.desc": "Allow swiping left and right to navigate game tabs",
+    "opts.pollution": "Disable pollution",
+    "opts.pollution.desc": "Disable pollution effects",
 
     "msg.policy.aiNotMerges" : "AI does not want to merge with kittens.",
     "msg.policy.exclusivity" : "Policies with the same numerical cost are mutually exclusive",
@@ -1030,6 +1049,7 @@
 	"religion.pact.fractured.label": "Fractured",
 	"religion.pact.fractured.desc": "You have broken the deal... now you will pay",
     "religion.panel.cryptotheology.label": "Cryptotheology",
+    "religion.panel.pacts.label": "Pacts",
     "religion.panel.orderOfTheSun.label": "Order of the Sun",
     "religion.panel.ziggurat.label": "Ziggurats",
     "religion.praise.msg": "You have converted +{0} units of faith",
@@ -1626,6 +1646,7 @@
     "tab.name.time": "Time",
     "tab.name.trade": "Trade",
     "tab.name.workshop": "Workshop",
+    "tab.name.queue": "Queue",
 
     "techs.panel.label": "Techs",
 
@@ -1749,6 +1770,7 @@
     "trade.embassy.chance": "Chance to get resources",
     "trade.embassy.pinned": "Pinned",
     "trade.embassy.unpinned": "Unpinned",
+    "trade.embassy.open": "Open",
 
     "turnHGOff.confirmation.msg": "Are you sure you want to turn off Holy Genocide for this and future runs?",
 
@@ -1789,7 +1811,7 @@
     "ui.energy.tooltip": "Energy",
     "ui.log.link": "Log",
     "ui.clear.log": "Clear log",
-    "ui.log.filters.block": "[<span id=\"filterIcon\">+</span>] Log Filters",
+    "ui.log.filters.block": "Log Filters",
     "ui.pause": "pawse",
     "ui.unpause": "unpawse",
     "ui.pause.title": "Pause/unpause the game",
@@ -1846,13 +1868,14 @@
     "ui.option.pollution": "Disable pollution effects",
 
     "queue.alphabeticalToggle": "Sort queue items alphabetically",
+    "queue.add": "Add to queue",
 
     "left.resources": "resources",
     "left.resources.tip": "Ctrl+click resource to hide it, use gear icon for more settings.",
     "left.font.inc": "font+",
     "left.font.dec": "font-",
     "left.craft": "craft",
-    "left.trade": "pins",
+    "left.trade": "Trade",
     "left.trade.do": "Trade with {0}",
     "left.loadout.do": "Set loadout {0}",
     "left.hunt": "Send hunters",
@@ -1938,6 +1961,9 @@
     "village.census.sort.color": "Color",
     "village.census.sort.variety": "Variety",
     "village.census.trait.none": "No trait :< ",
+    "village.census.filteredBy": "Filtered by: ",
+    "village.census.filterJob": "Filter by Job",
+    "village.census.filterTrait": "Filter by Trait",
     "village.festival.msg.start": "The cultural festival has started",
     "village.festival.msg.ext": "The cultural festival has been extended",
     "village.festival.msg.deficitEnd": "The cultural festival ended due to lack of luxuries",
@@ -2063,7 +2089,7 @@
 
     "workshop.refine.confirmation":"Your kittens will DIE",
 
-    "res.per.sec":"sec",
+    "res.per.sec":"s",
     "res.per.day":"day",
     "res.per.year":"year",
     "res.energy.wt":"Wt",

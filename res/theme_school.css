@@ -76,10 +76,10 @@ body.scheme_school.with_background_image,
 	color: #B5BAC4;
 	opacity: 1.0;
 }
-.scheme_school div {
+.scheme_school > div {
 	color: #ABAEB7;
 }
-.scheme_school .disabled div { /* color text for disabled */
+.scheme_school .disabled > div { /* color text for disabled */
 	color: #81848C;
 }
 .scheme_school h1 {
