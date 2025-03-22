@@ -827,6 +827,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 	domNode: null,
 	container: null,
+	borderWrapper: null,
 
 	tab: null,
 
@@ -865,33 +866,38 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 		// locked structures are invisible
 		if (this.model.visible){
-			if (this.domNode.style.display === "none"){
-				this.domNode.style.display = "block";
+			if (this.borderWrapper.style.display === "none"){
+				this.borderWrapper.style.display = "block";
 			}
 		} else {
-			if (this.domNode.style.display === "block"){
-				this.domNode.style.display = "none";
+			if (this.borderWrapper.style.display === "block"){
+				this.borderWrapper.style.display = "none";
 			}
 		}
 	},
 
 	updateEnabled: function(){
+		// both the button border and interior nodes need the correct class to display properly
 		if ( this.domNode ){
 			var hasClass = dojo.hasClass(this.domNode, "disabled");
 			var hasClassLimited = dojo.hasClass(this.domNode, "limited");
 			if (this.model.enabled){
 				if (hasClass){
 					dojo.removeClass(this.domNode, "disabled");
+					dojo.removeClass(this.borderWrapper, "disabled");
 				}
 				if (hasClassLimited){
 					dojo.removeClass(this.domNode, "limited");
+					dojo.removeClass(this.borderWrapper, "limited");
 				}
 			} else {
 				if (!hasClass){
 					dojo.addClass(this.domNode, "disabled");
+					dojo.addClass(this.borderWrapper, "disabled");
 				}
 				if (!hasClassLimited && this.model.resourceIsLimited){
 					dojo.addClass(this.domNode, "limited");
+					dojo.addClass(this.borderWrapper, "limited");
 				}
 			}			
 		}
@@ -921,8 +927,15 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 		this.container = btnContainer;
 
-		this.domNode = dojo.create("div", {
+		/* to prevent the border being clickable, remove it from the button and wrap the
+		   button in a bordered div that allows clicks to pass through its interior      */
+		this.borderWrapper = dojo.create("div", {
 			style: {
+				// the wrapper's background generally does need to be transparent, but this causes issues with some themes
+				// the background and certain other styles are set as needed in the applicable css file
+				padding: "0",
+				width: "fit-content",
+				pointerEvents: "none",
 				position: "relative",
 				display: this.model.visible ? "block" : "none"
 			},
@@ -930,9 +943,17 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			tabIndex: 0
 		}, btnContainer);
 
+		this.domNode = dojo.create("div", {
+			style: {
+				border: "none",
+				pointerEvents: "auto",
+				margin: "0"
+			},
+		}, this.borderWrapper);
+
 		if (this.model.twoRow) {
-			dojo.style(this.domNode, "marginLeft", "auto");
-			dojo.style(this.domNode, "marginRight", "auto");
+			dojo.style(this.borderWrapper, "marginLeft", "auto");
+			dojo.style(this.borderWrapper, "marginRight", "auto");
 		}
 
 		this.buttonContent = dojo.create("div", {
@@ -946,10 +967,15 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			style: {}
 		}, this.buttonContent);
 
-		this.domNode.className = "btn nosel";
+		/* removing the border from the button div makes it smaller, so adjustments need 
+		   to be made on a per-theme basis via the btnInterior and btnWrapper classes to
+		   maintain the same appearance                                                  */
+		this.domNode.className = "btn nosel btnInterior";
+		this.borderWrapper.className = "btn nosel btnWrapper";
 
 		if (!this.model.enabled){
 			this.domNode.className += " disabled";
+			this.borderWrapper.className += " disabled";
 		}
 
 		this.updateVisible();
@@ -1507,6 +1533,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 
 	afterRender: function(){
 		dojo.addClass(this.domNode, "modern");
+		dojo.addClass(this.borderWrapper, "modern");
 
 		this.renderLinks();
 		this.attachTooltip(dojo.partial(this.getTooltipHTML(), this.controller, this.model));
@@ -1945,16 +1972,20 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 
 			//--------------- style -------------
 			if(building.val > 9) {
-				dojo.style(this.domNode,"font-size","90%");
+				dojo.addClass(this.domNode, "small-text");
 			}
 
 			if (this.toggle || this.remove || this.add) {
 				dojo.removeClass(this.domNode, "bldEnabled");
+				dojo.removeClass(this.borderWrapper, "bldEnabled");
 				dojo.removeClass(this.domNode, "bldlackResConvert");
+				dojo.removeClass(this.borderWrapper, "bldlackResConvert");
 				if (building.lackResConvert) {
 					dojo.toggleClass(this.domNode, "bldlackResConvert", building.on > 0);
+					dojo.toggleClass(this.borderWrapper, "bldlackResConvert", building.on > 0);
 				} else {
 					dojo.toggleClass(this.domNode, "bldEnabled", building.on > 0);
+					dojo.toggleClass(this.borderWrapper, "bldEnabled", building.on > 0);
 				}
 			}
 

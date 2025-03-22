@@ -145,6 +145,12 @@ body.scheme_spooky.with_background_image {
 .scheme_spooky .modern .btnContent {
     padding: 10px 0 10px 1px; /* 1px left for buttons without power background-image */
 }
+.scheme_spooky .btn.modern.btnInterior {
+	outline: none;
+}
+.scheme_spooky .btn.modern.btnInterior.bldEnabled {
+	border-radius: 3px;
+}
 /* *** green and red light for machine on/off *** */
 .scheme_spooky .btn.bldEnabled div.btnContent,
 .scheme_spooky .btn.bldlackResConvert div.btnContent {

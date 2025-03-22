@@ -124,26 +124,50 @@ body.scheme_computer {
 .scheme_computer .btn.disabled.bldlackResConvert { /* color for lack resources convertion */
 	background: no-repeat border-box linear-gradient(90deg, #f05858 0%, #f05858 12px, #313131 15px, #313131 100%);
 }
+.scheme_computer .btn.disabled.bldlackResConvert.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #f05858 0%, #f05858 10px, #313131 13px, #313131 100%);
+}
 .scheme_computer .btn.disabled.bldlackResConvert:hover {
 	background: no-repeat border-box linear-gradient(90deg, #ec3131 0%, #ec3131 12px, #313131 15px, #313131 100%);
+}
+.scheme_computer .btn.disabled.bldlackResConvert.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #ec3131 0%, #ec3131 10px, #313131 13px, #313131 100%);
 }
 .scheme_computer .btn:not(.disabled).bldlackResConvert {
 	background: no-repeat border-box linear-gradient(90deg, #f05858 0%, #f05858 12px, #7a8490 15px, #7a8490 100%);
 }
+.scheme_computer .btn:not(.disabled).bldlackResConvert.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #f05858 0%, #f05858 10px, #7a8490 13px, #7a8490 100%);
+}
 .scheme_computer .btn:not(.disabled).bldlackResConvert:hover {
 	background: no-repeat border-box linear-gradient(90deg, #ec3131 0%, #ec3131 12px, #6b7480 15px, #6b7480 100%);
+}
+.scheme_computer .btn:not(.disabled).bldlackResConvert.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #ec3131 0%, #ec3131 10px, #6b7480 13px, #6b7480 100%);
 }
 .scheme_computer .btn.disabled.bldEnabled {
 	background: no-repeat border-box linear-gradient(90deg, #58f063 0%, #58f063 12px, #313131 15px, #313131 100%);
 }
+.scheme_computer .btn.disabled.bldEnabled.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #58f063 0%, #58f063 10px, #313131 13px, #313131 100%);
+}
 .scheme_computer .btn.disabled.bldEnabled:hover {
 	background: no-repeat border-box linear-gradient(90deg, #30ec3e 0%, #30ec3e 12px, #313131 15px, #313131 100%);
+}
+.scheme_computer .btn.disabled.bldEnabled.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #30ec3e 0%, #30ec3e 10px, #313131 13px, #313131 100%);
 }
 .scheme_computer .btn:not(.disabled).bldEnabled {
 	background: no-repeat border-box linear-gradient(90deg, #58f063 0%, #58f063 12px, #7a8490 15px, #7a8490 100%);
 }
+.scheme_computer .btn:not(.disabled).bldEnabled.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #58f063 0%, #58f063 10px, #7a8490 13px, #7a8490 100%);
+}
 .scheme_computer .btn:not(.disabled).bldEnabled:hover {
 	background: no-repeat border-box linear-gradient(90deg, #30ec3e 0%, #30ec3e 12px, #6b7480 15px, #6b7480 100%);
+}
+.scheme_computer .btn:not(.disabled).bldEnabled.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #30ec3e 0%, #30ec3e 10px, #6b7480 13px, #6b7480 100%);
 }
 /* *** end of green light for machine on/off *** */
 .scheme_computer .dialog {

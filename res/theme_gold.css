@@ -18,6 +18,13 @@ body.scheme_gold {
 .scheme_gold input[type='button'] {
     font-family: 'PT Sans', sans-serif;
 }
+.scheme_gold .btn.small-text span,
+.scheme_gold .btn.small-text a {
+	font-size: 83.6%;
+}
+.scheme_gold .btnWrapper {
+    background: transparent !important;
+}
 .scheme_gold .btn {
 	color: gray;
 	margin-bottom: 5px; /* default margin-bottom: 10px; */
@@ -94,30 +101,55 @@ body.scheme_gold {
 .scheme_gold .modern .btnContent {
     padding: 10px 0 10px 1px; /* 1px left for buttons without power background-image */
 }
+.scheme_gold .modern.small-text .btnContent {
+    padding: 8px 0 9px 1px;
+}
+.scheme_fluid div.modern.small-text.disabled:not(.bldEnabled):not(.bldlackResConvert) > div.btnContent,
+.scheme_fluid div.modern.small-text:not(.disabled):not(.bldEnabled):not(.bldlackResConvert) > div.btnContent {
+	padding: 8px 0 9px 1px;
+}
 /*** green and red light for machine on/off ***/
 .scheme_gold .btn.bldEnabled div.btnContent,
 .scheme_gold .btn.bldlackResConvert div.btnContent {
     border: none; /* also allows you to remove the height difference with the other buttons (they have no border on div.content) */
-    padding: 10px 0 10px 13px; /* 13px left for power background-image */
+    padding: 8px 0 9px 13px; /* 13px left for power background-image */
 }
 .scheme_gold .btn.disabled.bldlackResConvert {
 	/* color for lack resources convertion */
 	background: no-repeat border-box linear-gradient(90deg, #C83B00 0%, #C83B00 10px, rgba(32, 32, 32, 0.4) 12px, rgba(32, 32, 32, 0.4) 100%);
 }
+/* .scheme_gold .btn.disabled.bldlackResConvert.btnInterior {
+    background: no-repeat border-box linear-gradient(90deg, #C83B00 0%, #C83B00 9px, rgba(32, 32, 32, 0.4) 11px, rgba(32, 32, 32, 0.4) 100%);
+} */
 .scheme_gold .btn:not(.disabled).bldlackResConvert {
 	background: no-repeat border-box linear-gradient(90deg, #C83B00 0%, #C83B00 10px, rgba(87, 78, 64, 0.1) 12px, rgba(87, 78, 64, 0.1) 100%);
+}
+.scheme_gold .btn:not(.disabled).bldlackResConvert.btnInterior {
+    background: no-repeat border-box linear-gradient(90deg, #C83B00 0%, #C83B00 9px, rgba(87, 78, 64, 0.1) 11px, rgba(87, 78, 64, 0.1) 100%);
 }
 .scheme_gold .btn:not(.disabled).bldlackResConvert:hover {
 	background: no-repeat border-box linear-gradient(90deg, #C83B00 0%, #C83B00 10px, rgba(223, 206, 153, 0.3) 12px, rgba(223, 206, 153, 0.3) 100%);
 }
+.scheme_gold .btn:not(.disabled).bldlackResConvert.btnInterior:hover {
+    background: no-repeat border-box linear-gradient(90deg, #C83B00 0%, #C83B00 9px, rgba(223, 206, 153, 0.3) 11px, rgba(223, 206, 153, 0.3) 100%);
+}
 .scheme_gold .btn.disabled.bldEnabled {
 	background: no-repeat padding-box linear-gradient(90deg, #7CB342 0%, #7cb342 10px, rgba(32, 32, 32, 0.4) 12px, rgba(32, 32, 32, 0.4) 100%);
 }
+/* .scheme_gold .btn.disabled.bldEnabled.btnInterior {
+    background: no-repeat padding-box linear-gradient(90deg, #7CB342 0%, #7cb342 9px, rgba(32, 32, 32, 0.4) 11px, rgba(32, 32, 32, 0.4) 100%);
+} */
 .scheme_gold .btn:not(.disabled).bldEnabled {
 	background: no-repeat border-box linear-gradient(90deg, #7cb342 0%, #7cb342 10px, rgba(87, 78, 64, 0.1) 12px, rgba(87, 78, 64, 0.1) 100%);
 }
+.scheme_gold .btn:not(.disabled).bldEnabled.btnInterior {
+    background: no-repeat border-box linear-gradient(90deg, #7cb342 0%, #7cb342 9px, rgba(87, 78, 64, 0.1) 11px, rgba(87, 78, 64, 0.1) 100%);
+}
 .scheme_gold .btn:not(.disabled).bldEnabled:hover {
 	background: no-repeat border-box linear-gradient(90deg, #7cb342 0%, #7cb342 10px, rgba(223, 206, 153, 0.3) 12px, rgba(223, 206, 153, 0.3) 100%);
+}
+.scheme_gold .btn:not(.disabled).bldEnabled.btnInterior:hover {
+    background: no-repeat border-box linear-gradient(90deg, #7cb342 0%, #7cb342 9px, rgba(223, 206, 153, 0.3) 11px, rgba(223, 206, 153, 0.3) 100%);
 }
 /*** end of green light for machine on/off ***/
 .scheme_gold .dialog { /* window options, get the app and credits */
@@ -470,8 +502,11 @@ body.scheme_gold {
     font-weight: normal;
     line-height: 16px;
     background-color: rgba(209, 184, 107, 0.01); /* color #D1B86B */
-    padding: 10px 5px 10px 5px !important; /* default padding: 10px 6px 10px 6px !important; */
+    padding: 12px 5px 10px 5px !important; /* default padding: 10px 6px 10px 6px !important; */
     border-color: #645F4F; /* color pick from button not disabled and hover */
+}
+.scheme_gold .btn.modern:not(.bldEnabled):not(.small-text):not(.disabled) a {
+	padding-top: 10px !important;
 }
 .scheme_gold .btn.modern.disabled a {
     color: #725e55;
