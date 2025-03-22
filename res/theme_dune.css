@@ -80,10 +80,10 @@ body.scheme_dune {
 	color: #fca9fe;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_dune div {
+.scheme_dune > div {
 	color: #e3e3eb;
 }
-.scheme_dune .disabled div { /* color text for disabled */
+.scheme_dune .disabled > div { /* color text for disabled */
 	color: #808080;
 }
 .scheme_dune h1 {

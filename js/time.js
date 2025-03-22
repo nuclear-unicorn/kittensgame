@@ -78,14 +78,14 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 			this.getVSU("usedCryochambers").unlocked = true;
         }
 
-        //console.log("restored save data timestamp as", saveData["time"].timestamp);
+        console.log("restored save data timestamp as", saveData["time"].timestamp);
         var ts = saveData["time"].timestamp || Date.now();
 
         this.gainTemporalFlux(ts);
         this.timestamp = ts;
         this.queue.queueItems = saveData["time"].queueItems || [];
         this.queue.queueSources = saveData["time"].queueSources || this.queue.queueSourcesDefault;
-        if (this.queue.queueSources === {} || typeof(this.queue.queueSources["buildings"]) != "boolean") {
+        if (!Object.keys(this.queue.queueSources).length || typeof(this.queue.queueSources["buildings"]) != "boolean") {
             this.queue.queueSources = this.queue.queueSourcesDefault;
         }
         this.queue.alphabeticalSort = saveData["time"].queueAlphabeticalSort;
@@ -98,9 +98,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.queue.updateQueueSourcesArr();
 
         //TODO: move me to UI
-        if(!this.game.getFeatureFlag("QUEUE")){
+        /*if(!this.game.getFeatureFlag("QUEUE")){
             $("#queueLink").hide();
-        }
+        }*/
 	},
 
 	gainTemporalFlux: function (timestamp){
@@ -186,6 +186,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     applyRedshift: function(daysOffset, ignoreCalendar){
         //populate cached per tickValues
         this.game.resPool.update();
+        this.game.space.update(); // Need to recalc effects based on proper max antimatter
         this.game.updateResources();
         var resourceLimits = this.game.resPool.fastforward(daysOffset);
 
@@ -225,8 +226,10 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         return numberEvents;
     },
     calculateRedshift: function(){
+        var isRedshiftEnabled = this.game.isMobile() ? true : this.game.opts.enableRedshift;
+
         var currentTimestamp = Date.now();
-        var delta = this.game.opts.enableRedshift
+        var delta = isRedshiftEnabled
             ? currentTimestamp - this.timestamp
             : 0;
         //console.log("redshift delta:", delta, "old ts:", this.timestamp, "new timestamp:", currentTimestamp);
@@ -1027,21 +1030,25 @@ dojo.declare("classes.ui.time.AccelerateTimeBtnController", com.nuclearunicorn.g
             title: this.game.time.isAccelerated ? $I("btn.on.minor") : $I("btn.off.minor"),
             tooltip: this.game.time.isAccelerated ? $I("time.AccelerateTimeBtn.tooltip.accelerated") : $I("time.AccelerateTimeBtn.tooltip.normal"),
             cssClass: this.game.time.isAccelerated ? "fugit-on" : "fugit-off",
-            handler: function(btn, callback) {
-                self.buyItem(null, null, callback);
+            handler: function(btn) {
+                self.buyItem(null, null);
             }
         };
         return model;
     },
 
-    buyItem: function(model, event, callback) {
+    buyItem: function(model, event) {
+        var self = this;
         if (self.game.resPool.get("temporalFlux").value <= 0) {
             self.game.time.isAccelerated = false;
             self.game.resPool.get("temporalFlux").value = 0;
         } else {
             self.game.time.isAccelerated = !self.game.time.isAccelerated;
         }
-        callback(true /*itemBought*/, { reason: "item-is-free" /*It costs flux, but you can still toggle it freely*/ });
+        return {
+            itemBought: true,
+            reason: "item-is-free" /*It costs flux, but you can still toggle it freely*/
+        };
     }
 });
 
@@ -1284,24 +1291,30 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 		return pricesTotal;
 	},
 
-    buyItem: function(model, event, callback){
+    buyItem: function(model, event){
         if (!this.hasResources(model)) {
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
-			return true;
+            return {
+                itemBought: false,
+                reason: "cannot-afford"
+            };
 		}
 		if (!model.enabled) {
             //As far as I can tell, this shouldn't ever happen because being
             //unable to afford it is the only reason for it to be disabled.
-			callback(false /*itemBought*/, { reason: "not-enabled" });
-			return true;
+            return {
+                itemBought: false,
+                reason: "not-enabled"
+            };
 		}
         var price = this.getPrices(model);
         for (var i in price){
             this.game.resPool.addResEvent(price[i].name, -price[i].val);
         }
         this.doShatter(model, 1);
-        callback(true /*itemBought*/, { reason: "paid-for" });
-        return true;
+        return {
+            itemBought: true,
+            reason: "paid-for" 
+        };
     },
 
     doShatterAmt: function(model, amt) {
@@ -1567,17 +1580,20 @@ dojo.declare("classes.ui.time.ChronoforgeBtnController", com.nuclearunicorn.game
     getName: function(model){
         var meta = model.metadata;
         var game = this.game;
+        var label = this.inherited(arguments);
+
         if (meta.delayTicks > 0) {
             //It's kind of a happy accident that delayTicks has one of 24 different values & that there are 24 clock emoji.
             var timeStr = meta.isAutomationEnabled ?
                 (String.fromCodePoint(0x1F550 + meta.delayTicks - 1)) :
                 game.getDisplayValueExt(meta.delayTicks / game.ticksPerSecond, false /*prefix*/, false /*usePerTickHack*/, 1 /*precision*/) + $I("unit.s");
-            return timeStr + " " + this.inherited(arguments);
+            return timeStr + " " + label;
         }
+
         if (meta.heat){
-            return this.inherited(arguments) + " [" + game.getDisplayValueExt(meta.heat) + "%]";
+            return label + "<div class=\"progress\">[" + game.getDisplayValueExt(meta.heat) + "%]</div>";
         }
-        return this.inherited(arguments);
+        return label;
     },
     handleToggleAutomationLinkClick: function(model) { //specify game.upgrade for cronoforge upgrades
 		var building = model.metadata;
@@ -1656,22 +1672,30 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
         return result;
     },
 
-	buyItem: function(model, event, callback) {
+	buyItem: function(model, event) {
+        var buyType;
         if (this.game.time.getVSU("usedCryochambers").val == 0) {
-			callback(false /*itemBought*/, { reason: "already-bought" });
-			return;
+            return {
+                itemBought: false,
+                reason: "already-bought"
+            };
         }
 		if (!model.visible) {
-			callback(false /*itemBought*/, { reason: "not-unlocked" });
-			return;
+            return {
+                itemBought: false,
+                reason: "not-unlocked"
+            };
 		}
         if (!this.hasResources(model)) {
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
-			return;
+            return {
+                itemBought: false,
+                reason: "cannot-afford"
+            };
         }
 
 		if (!event) { event = {}; /*event is an optional parameter*/ }
-		var fixCount = event.shiftKey
+        var isBuyAll = (event && event.shiftKey) || buyType == "all";
+		var fixCount = isBuyAll
 			? 1000
 			: event.ctrlKey || event.metaKey /*osx tears*/
 				? this.game.opts.batchSize || 10
@@ -1686,9 +1710,15 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
         if(fixHappened){
             var cry = this.game.time.getVSU("cryochambers");
             cry.calculateEffects(cry, this.game);
-            callback(true /*itemBought*/, { reason: "paid-for" });
+            return {
+                itemBought: true,
+                reason: "paid-for"
+            };
         } else {
-			callback(false /*itemBought*/, { reason: "not-enabled" });
+            return {
+                itemBought: false,
+                reason: "not-enabled"
+            };
         }
 	},
 
@@ -2518,13 +2548,9 @@ dojo.declare("classes.queue.manager", null,{
             return;
         }
 
-        var wasItemBought = false;
-        var resultOfBuyingItem = null;
-        controllerAndModel.controller.buyItem(controllerAndModel.model, null,
-            function(success, extendedInfo) {
-                wasItemBought = success;
-                resultOfBuyingItem = extendedInfo;
-            });
+        var result = controllerAndModel.controller.buyItem(controllerAndModel.model, null);
+        var wasItemBought = result.itemBought;
+        var resultOfBuyingItem = {reason: result.reason};
 
         if (typeof(wasItemBought) !== "boolean" || typeof(resultOfBuyingItem) !== "object") {
             console.error("Invalid result after attempting to buy item via queue", resultOfBuyingItem);
@@ -2590,4 +2616,7 @@ dojo.declare("classes.queue.manager", null,{
             }
         });
     }
+});
+
+dojo.declare("classes.tab.QueueTab", com.nuclearunicorn.game.ui.tab, {
 });

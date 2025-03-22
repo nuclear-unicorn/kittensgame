@@ -78,10 +78,10 @@ body.scheme_unicorn.with_background_image {
 	color: #3c5779;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_unicorn div {
+.scheme_unicorn > div {
 	color:#385170;
 }
-.scheme_unicorn .disabled div {
+.scheme_unicorn .disabled > div {
 	color: #9197a7;
 }
 .scheme_unicorn h1 {

@@ -545,11 +545,14 @@ dojo.declare("classes.ui.PrestigeBtnController", com.nuclearunicorn.game.ui.Buil
         return model.metaCached;
     },
 
-   	buyItem: function(model, event, callback) {
+   	buyItem: function(model, event) {
 		if (this.game.science.get("metaphysics").researched) {
-			this.inherited(arguments);
+			return this.inherited(arguments);
 		} else {
-			callback(false /*itemBought*/, { reason: "not-unlocked" });
+			return {
+				itemBought: true,
+				reason: "not-unlocked"
+			};
 		}
 	},
 

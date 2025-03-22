@@ -92,10 +92,10 @@ body.scheme_minimalist.with_background_image,
 	color: #acafbc;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_minimalist div {
+.scheme_minimalist > div {
 	color: #A6A4B0;
 }
-.scheme_minimalist .disabled div { /* color text for disabled */
+.scheme_minimalist .disabled > div { /* color text for disabled */
 	color: #888888;
 }
 .scheme_minimalist h1 {

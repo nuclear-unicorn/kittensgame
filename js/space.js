@@ -1317,11 +1317,14 @@ dojo.declare("com.nuclearunicorn.game.ui.SpaceProgramBtnController", com.nuclear
 		}
 	},
 
-	buyItem: function(model, event, callback) {
+	buyItem: function(model, event) {
 		if (model.metadata.val == 0) {
-			this.inherited(arguments);
+			return this.inherited(arguments);
 		} else {
-			callback(false /*itemBought*/, { reason: "already-bought" });
+			return {
+				itemBought: false,
+				reason: "already-bought"
+			};
 		}
 	},
 
