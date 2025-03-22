@@ -865,15 +865,6 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		}
 
 		// locked structures are invisible
-		// if (this.model.visible){ // kuile clean up
-		// 	if (this.domNode.style.display === "none"){
-		// 		this.domNode.style.display = "block";
-		// 	}
-		// } else {
-		// 	if (this.domNode.style.display === "block"){
-		// 		this.domNode.style.display = "none";
-		// 	}
-		// }
 		if (this.model.visible){
 			if (this.borderWrapper.style.display === "none"){
 				this.borderWrapper.style.display = "block";
@@ -1892,7 +1883,6 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 		if((building.val > 9 || building.name.length > 10) && this.model.hasSellLink) {
 			//Steamworks and accelerator specifically can be too large when sell button is on
 			//(tested to support max 99 bld count)
-			// dojo.style(this.domNode,"font-size","103%"); // kuile clean up
 			dojo.addClass(this.domNode, "small-text");
 		}
 

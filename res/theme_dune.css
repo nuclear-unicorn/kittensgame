@@ -100,9 +100,6 @@ body.scheme_dune {
 .scheme_dune h1:first-child {
     margin-top: 15px;
 }
-/* .scheme_dune .btn.modern.small-text {
-	font-size: 100%; /* default font-size: 90%; 
-} */
 .scheme_dune .modern .btnContent {
     padding: 10px 0 10px 1px; /* 1px left for buttons without power background-image */
 }
