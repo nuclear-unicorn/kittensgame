@@ -1629,7 +1629,7 @@
     "ui.undo.title": "撤销操作",
     "ui.queue.link": "任务队列",
     "ui.close": "关闭",
-    "ui.option.language": "语言:",
+    "ui.option.language": "语言：",
     "ui.option.language.add": "添加翻译",
     "ui.option.language.apply": "应用更改",
     "ui.option.scheme": "主题：",
