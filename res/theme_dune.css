@@ -22,6 +22,10 @@ body.scheme_dune {
 .scheme_dune input[type='button'] {
 	font-family: 'Signika Negative', sans-serif;
 }
+.scheme_dune .btn.small-text span,
+.scheme_dune .btn.small-text a {
+	font-size: 93%;
+}
 .scheme_dune .btn {
 	color: gray;
 	margin-bottom: 3px; /* default 10px */
@@ -96,41 +100,69 @@ body.scheme_dune {
 .scheme_dune h1:first-child {
     margin-top: 15px;
 }
-.scheme_dune .btn.modern.small-text {
-	font-size: 100% !important; /* default font-size: 90%; */
-}
+/* .scheme_dune .btn.modern.small-text {
+	font-size: 100%; /* default font-size: 90%; 
+} */
 .scheme_dune .modern .btnContent {
     padding: 10px 0 10px 1px; /* 1px left for buttons without power background-image */
+}
+.scheme_dune div.modern.small-text.disabled:not(.bldEnabled):not(.bldlackResConvert) > div.btnContent,
+.scheme_dune div.modern.small-text:not(.disabled):not(.bldEnabled):not(.bldlackResConvert) > div.btnContent {
+	padding: 9px 0 10px 1px;
 }
 /* *** green and red light for machine on/off *** */
 .scheme_dune .btn.bldEnabled div.btnContent,
 .scheme_dune .btn.bldlackResConvert div.btnContent {
-	padding: 10px 0 10px 13px; /* 13px left for power background-image (linear-gradient) */
+	padding: 9px 0 10px 13px; /* 13px left for power background-image (linear-gradient) */
 	border: none; /* also allows you to remove the height difference with the other buttons (they have no border on div.content) */
 }
 .scheme_dune .btn.disabled.bldlackResConvert { /* color for lack resources convertion */
 	background: no-repeat border-box linear-gradient(90deg, #ac0307 0%, #ac0307 10px, #281028 12px, #281028 100%);
 }
+.scheme_dune .btn.disabled.bldlackResConvert.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #ac0307 0%, #ac0307 9px, #281028 11px, #281028 100%);
+}
 .scheme_dune .btn.disabled.bldlackResConvert:hover {
 	background: no-repeat border-box linear-gradient(90deg, #ac0307 0%, #ac0307 10px, #281028 12px, #281028 100%);
+}
+.scheme_dune .btn.disabled.bldlackResConvert.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #ac0307 0%, #ac0307 9px, #281028 11px, #281028 100%);
 }
 .scheme_dune .btn:not(.disabled).bldlackResConvert {
 	background: no-repeat border-box linear-gradient(90deg, #ac0307 0%, #ac0307 10px, #3a1d43 12px, #3a1d43 100%);
 }
+.scheme_dune .btn:not(.disabled).bldlackResConvert.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #ac0307 0%, #ac0307 9px, #3a1d43 11px, #3a1d43 100%);
+}
 .scheme_dune .btn:not(.disabled).bldlackResConvert:hover {
 	background: no-repeat border-box linear-gradient(90deg, #ac0307 0%, #ac0307 10px, #572854 12px, #572854 100%);
+}
+.scheme_dune .btn:not(.disabled).bldlackResConvert.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #ac0307 0%, #ac0307 9px, #572854 11px, #572854 100%);
 }
 .scheme_dune .btn.disabled.bldEnabled { /* color #5cac03 */
 	background: no-repeat border-box linear-gradient(90deg, #5cac03 0%, #5cac03 10px, #281028 12px, #281028 100%);
 }
+.scheme_dune .btn.disabled.bldEnabled.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #5cac03 0%, #5cac03 9px, #281028 11px, #281028 100%);
+}
 .scheme_dune .btn.disabled.bldEnabled:hover {
 	background: no-repeat border-box linear-gradient(90deg, #5cac03 0%, #5cac03 10px, #281028 12px, #281028 100%);
+}
+.scheme_dune .btn.disabled.bldEnabled.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #5cac03 0%, #5cac03 9px, #281028 11px, #281028 100%);
 }
 .scheme_dune .btn:not(.disabled).bldEnabled {
 	background: no-repeat border-box linear-gradient(90deg, #5cac03 0%, #5cac03 10px, #3a1d43 12px, #3a1d43 100%);
 }
+.scheme_dune .btn:not(.disabled).bldEnabled.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #5cac03 0%, #5cac03 9px, #3a1d43 11px, #3a1d43 100%);
+}
 .scheme_dune .btn:not(.disabled).bldEnabled:hover {
 	background: no-repeat border-box linear-gradient(90deg, #5cac03 0%, #5cac03 10px, #572854 12px, #572854 100%);
+}
+.scheme_dune .btn:not(.disabled).bldEnabled.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #5cac03 0%, #5cac03 9px, #572854 11px, #572854 100%);
 }
 /* *** end of green light for machine on/off *** */
 .scheme_dune .dialog { /* window options, credits and get the app */
@@ -585,8 +617,11 @@ body.scheme_dune {
 	font-weight: 300;
 	line-height: 16px;
 	background-color: transparent;
-	padding: 10px 2px 10px 2px !important; /* default :  padding: 10px 6px 10px 6px !important; */
+	padding: 11px 2px 10px 2px !important; /* default :  padding: 10px 6px 10px 6px !important; */
 	text-shadow: none;
+}
+.scheme_dune div.btn.modern.btnInterior:not(.disabled):not(.bldEnabled):not(.bldlackResConvert) a {
+	padding-top: 10px !important;
 }
 .scheme_dune .btn.modern:not(.disabled) a {
 	color: #16bcb8;

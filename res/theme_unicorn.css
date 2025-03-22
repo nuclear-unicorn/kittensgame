@@ -97,6 +97,12 @@ body.scheme_unicorn.with_background_image {
 .scheme_unicorn .modern .btnContent {
     padding: 10px 0 10px 1px; /* 1px left for buttons without power background-image */
 }
+.scheme_unicorn .btnInterior {
+	box-shadow: none m !important;
+}
+.scheme_unicorn .btn.modern.btnInterior.small-text a {
+	margin: -9px 0;
+}
 /* *** green and red light for machine on/off *** */
 .scheme_unicorn .btn.bldEnabled div.btnContent,
 .scheme_unicorn .btn.bldlackResConvert div.btnContent {
@@ -106,26 +112,50 @@ body.scheme_unicorn.with_background_image {
 .scheme_unicorn .btn.disabled.bldlackResConvert { /* color #e43011 */ /* color for lack resources convertion */
 	background: no-repeat border-box linear-gradient(90deg, #e43011 0%, #e43011 11px, #223244 12px, #223244 100%);
 }
+.scheme_unicorn .btn.disabled.bldlackResConvert.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #e43011 0%, #e43011 10px, #223244 11px, #223244 100%);
+}
 .scheme_unicorn .btn.disabled.bldlackResConvert:hover {
 	background: no-repeat border-box linear-gradient(90deg, #e43011 0%, #e43011 11px, #223244 12px, #223244 100%);
+}
+.scheme_unicorn .btn.disabled.bldlackResConvert.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #e43011 0%, #e43011 10px, #223244 11px, #223244 100%);
 }
 .scheme_unicorn .btn:not(.disabled).bldlackResConvert {
 	background: no-repeat border-box linear-gradient(90deg, #e43011 0%, #e43011 11px, #f0ebe1 12px, #f0ebe1 100%);
 }
+.scheme_unicorn .btn:not(.disabled).bldlackResConvert.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #e43011 0%, #e43011 10px, #f0ebe1 11px, #f0ebe1 100%);
+}
 .scheme_unicorn .btn:not(.disabled).bldlackResConvert:hover {
 	background: no-repeat border-box linear-gradient(90deg, #ee4022 0%, #ee4022 11px, #f4f1e9 12px, #f4f1e9 100%);
+}
+.scheme_unicorn .btn:not(.disabled).bldlackResConvert.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #ee4022 0%, #ee4022 10px, #f4f1e9 11px, #f4f1e9 100%);
 }
 .scheme_unicorn .btn.disabled.bldEnabled { /* color #7AA738 */
 	background: no-repeat border-box linear-gradient(90deg, #7AA738 0%, #7AA738 11px, #223244 12px, #223244 100%);
 }
+.scheme_unicorn .btn.disabled.bldEnabled.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #7AA738 0%, #7AA738 10px, #223244 11px, #223244 100%);
+}
 .scheme_unicorn .btn.disabled.bldEnabled:hover {
 	background: no-repeat border-box linear-gradient(90deg, #7AA738 0%, #5D743A 11px, #223244 12px, #223244 100%);
+}
+.scheme_unicorn .btn.disabled.bldEnabled.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #7AA738 0%, #5D743A 10px, #223244 11px, #223244 100%);
 }
 .scheme_unicorn .btn:not(.disabled).bldEnabled {
 	background: no-repeat border-box linear-gradient(90deg, #7AA738 0%, #7AA738 11px, #f0ebe1 12px, #f0ebe1 100%);
 }
+.scheme_unicorn .btn:not(.disabled).bldEnabled.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #7AA738 0%, #7AA738 10px, #f0ebe1 11px, #f0ebe1 100%);
+}
 .scheme_unicorn .btn:not(.disabled).bldEnabled:hover {
 	background: no-repeat border-box linear-gradient(90deg, #94dc23 0%, #94dc23 11px, #f4f1e9 12px, #f4f1e9 100%);
+}
+.scheme_unicorn .btn:not(.disabled).bldEnabled.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #94dc23 0%, #94dc23 10px, #f4f1e9 11px, #f4f1e9 100%);
 }
 /* *** end of green light for machine on/off *** */
 .scheme_unicorn .dialog {

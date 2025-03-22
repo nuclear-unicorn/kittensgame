@@ -28,6 +28,9 @@ body.scheme_oil,
 .scheme_oil .btn.modern {
 	font-family: 'Open Sans', sans-serif;
 }
+.scheme_oil .btn.small-text span {
+    font-size: 97%;
+}
 .scheme_oil .btn {
 	color: gray;
 	margin-bottom: 6px; /* default 10px */

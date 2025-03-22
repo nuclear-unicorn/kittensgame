@@ -65,6 +65,9 @@ body.scheme_arctic.with_background_image {
 	background: no-repeat local top right url('img/theme_arctic_background_03.jpg'), transparent;
 	box-shadow: inset -1px 1px 2px #303030, inset 1px -1px 2px #a0a0a0, 1px -1px 3px #707070, 0 1px 0 #f0f0f0;
 }
+.scheme_arctic .btn.modern.disabled.btnInterior {
+	box-shadow: inset -1px 1px 2px #303030, inset 1px -1px 2px #a0a0a0;
+}
 .scheme_arctic .btn.modern.disabled:hover {
 	border-color: #909090;
 	background: no-repeat local bottom right url('img/theme_arctic_background_03.jpg');
@@ -85,6 +88,9 @@ body.scheme_arctic.with_background_image {
 	background-attachment: local;
 	background-position: top -16px left;
 	box-shadow: 1px 1px 2px #707070;
+}
+.scheme_arctic .btn.modern.btnWrapper {
+	background: transparent;
 }
 .scheme_arctic .btn.modern:not(.disabled):hover {
 	background-color: transparent;

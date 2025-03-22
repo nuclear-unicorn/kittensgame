@@ -28,6 +28,10 @@ body.scheme_minimalist.with_background_image,
 .scheme_minimalist input[type='button'] {
 	 font-family: 'Open Sans', sans-serif;
 }
+.scheme_minimalist .btn.small-text span,
+.scheme_minimalist .btn.small-text a {
+	font-size: 93%;
+}
 .scheme_minimalist .btn {
 	color: gray;
 	margin-bottom: 3px; /* default 10px */
@@ -110,35 +114,65 @@ body.scheme_minimalist.with_background_image,
 .scheme_minimalist .modern .btnContent {
     padding: 10px 0 10px 1px; /* 1px left for buttons without power background-image */
 }
+.scheme_minimalist .modern.small-text .btnContent {
+	padding: 9px 0 10px 1px;
+}
+.scheme_minimalist .btn.modern a {
+	margin: -9px 0;
+}
 /*** green and red light for machine on/off ***/
 .scheme_minimalist .btn.bldEnabled div.btnContent,
 .scheme_minimalist .btn.bldlackResConvert div.btnContent {
-	padding: 10px 0 10px 13px; /* 13px left for power background-image (linear-gradient) */
+	padding: 9px 0 10px 13px; /* 13px left for power background-image (linear-gradient) */
 	border: none; /* also allows you to remove the height difference with the other buttons (they have no border on div.content) */
 }
 .scheme_minimalist .btn.disabled.bldlackResConvert { /* color #be4151 */ /* color for lack resources convertion */
 	background: no-repeat border-box linear-gradient(90deg, #be4151 0%, #be4151 10px, #21212B 12px, #21212B 50%, #313140 95%, #313140 100%);
 }
+.scheme_minimalist .btn.disabled.bldlackResConvert.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #be4151 0%, #be4151 9px, #21212B 11px, #21212B 50%, #313140 95%, #313140 100%);
+}
 .scheme_minimalist .btn.disabled.bldlackResConvert:hover {
 	background: no-repeat border-box linear-gradient(90deg, #be4151 0%, #be4151 10px, #21212B 12px, #21212B 100%);
+}
+.scheme_minimalist .btn.disabled.bldlackResConvert.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #be4151 0%, #be4151 9px, #21212B 11px, #21212B 100%);
 }
 .scheme_minimalist .btn:not(.disabled).bldlackResConvert {
 	background: no-repeat border-box linear-gradient(90deg, #be4151 0%, #be4151 10px, #41414C 12px, #41414C 50%, #51515E 95%, #51515E 100%);
 }
+.scheme_minimalist .btn:not(.disabled).bldlackResConvert.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #be4151 0%, #be4151 9px, #41414C 11px, #41414C 50%, #51515E 95%, #51515E 100%);
+}
 .scheme_minimalist .btn:not(.disabled).bldlackResConvert:hover {
 	background: no-repeat border-box linear-gradient(90deg, #d0172a 0%, #d0172a 10px, #41414C 12px, #41414C 100%);
+}
+.scheme_minimalist .btn:not(.disabled).bldlackResConvert.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #d0172a 0%, #d0172a 9px, #41414C 11px, #41414C 100%);
 }
 .scheme_minimalist .btn.disabled.bldEnabled { /* color #5D743A */
 	background: no-repeat border-box linear-gradient(90deg, #5D743A 0%, #5D743A 10px, #21212B 12px, #21212B 50%, #313140 95%, #313140 100%);
 }
+.scheme_minimalist .btn.disabled.bldEnabled.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #5D743A 0%, #5D743A 9px, #21212B 11px, #21212B 50%, #313140 95%, #313140 100%);
+}
 .scheme_minimalist .btn.disabled.bldEnabled:hover {
 	background: no-repeat border-box linear-gradient(90deg, #5D743A 0%, #5D743A 10px, #21212B 12px, #21212B 100%);
+}
+.scheme_minimalist .btn.disabled.bldEnabled.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #5D743A 0%, #5D743A 9px, #21212B 11px, #21212B 100%);
 }
 .scheme_minimalist .btn:not(.disabled).bldEnabled {
 	background: no-repeat border-box linear-gradient(90deg, #5D743A 0%, #5D743A 10px, #41414C 12px, #41414C 50%, #51515E 95%, #51515E 100%);
 }
+.scheme_minimalist .btn:not(.disabled).bldEnabled.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #5D743A 0%, #5D743A 9px, #41414C 11px, #41414C 50%, #51515E 95%, #51515E 100%);
+}
 .scheme_minimalist .btn:not(.disabled).bldEnabled:hover {
 	background: no-repeat border-box linear-gradient(90deg, #90b23e 0%, #90b23e 10px, #41414C 12px, #41414C 100%);
+}
+.scheme_minimalist .btn:not(.disabled).bldEnabled.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #90b23e 0%, #90b23e 9px, #41414C 11px, #41414C 100%);
 }
 /*** end of green light for machine on/off ***/
 .scheme_minimalist,
@@ -587,6 +621,9 @@ body.scheme_minimalist.with_background_image,
 	background-color: transparent;
 	padding: 10px 2px 10px 2px !important; /* default :  padding: 10px 6px 10px 6px !important; */
 	text-shadow: none;
+}
+.scheme_minimalist .btn.modern:not(.bldEnabled):not(.disabled) a {
+	padding: 9px 2px 10px 2px !important;
 }
 .scheme_minimalist .btn.modern:not(.disabled) a {
 	color: #808799;

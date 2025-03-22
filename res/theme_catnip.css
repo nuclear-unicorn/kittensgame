@@ -61,6 +61,9 @@ body.scheme_catnip {
 	border: 1px solid rgba(0 ,0 ,0 , 0.1);
 	background-color: rgba(113, 148 , 64, 0.85);
 }
+.scheme_catnip .btn.modern.btnInterior {
+	background: transparent;
+}
 .scheme_catnip .btn.modern:not(.disabled):hover {
 	background-color: rgba(113, 148 , 64, 0.98);
 }
@@ -102,6 +105,10 @@ body.scheme_catnip {
 .scheme_catnip .modern .btnContent {
     padding: 10px 0 10px 1px; /* 1px left for buttons without power background-image */
 }
+.scheme_catnip .btn.modern.btnWrapper.disabled:hover {
+	background-color: transparent;
+	background: transparent;
+}
 /* *** green and red light for machine on/off *** */
 .scheme_catnip .btn.bldEnabled div.btnContent,
 .scheme_catnip .btn.bldlackResConvert div.btnContent {
@@ -131,6 +138,9 @@ body.scheme_catnip {
 }
 .scheme_catnip .btn:not(.disabled).bldEnabled:hover {
 	background: no-repeat linear-gradient(90deg, rgba(131, 203, 59, 0.98) 0, rgba(131, 203, 59, 0.98) 9px, transparent 12px, transparent 100%), rgba(113, 148 , 64, 0.98);
+}
+.scheme_catnip .btn.bldEnabled.btnInterior {
+	background: transparent;
 }
 /* *** end of green light for machine on/off *** */
 .scheme_catnip .dialog {

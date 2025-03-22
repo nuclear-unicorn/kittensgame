@@ -30,6 +30,24 @@ body.scheme_grassy {
 	background: rgba(255, 255, 255, 0.2);
 }
 
+.scheme_grassy .btn.small-text span {
+	font-size: 94.3%;
+}
+.scheme_grassy .btn.small-text.modern div.btnContent {
+	padding: 9px 0 10px 10px;
+}
+.scheme_grassy .btn.modern.btnWrapper,
+.scheme_grassy .btn.modern.btnWrapper:hover {
+	background: transparent;
+}
+.scheme_grassy .btn.modern.btnWrapper.disabled:hover {
+	background-color: transparent !important;
+}
+.scheme_grassy .btn.small-text a {
+	margin: -9px 0;
+	font-size: 94.3%;
+}
+
 .scheme_grassy #headerLinks {
 	background: none;
 }

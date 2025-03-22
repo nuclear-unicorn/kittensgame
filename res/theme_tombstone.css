@@ -101,6 +101,9 @@ body.scheme_tombstone {
 .scheme_tombstone .modern .btnContent {
     padding: 10px 0 10px 1px; /* 1px left for buttons without power background-image */
 }
+.scheme_tombstone .btnWrapper {
+	background: transparent !important;
+}
 /* *** green and red light for machine on/off *** */
 .scheme_tombstone .btn.bldEnabled div.btnContent,
 .scheme_tombstone .btn.bldlackResConvert div.btnContent {

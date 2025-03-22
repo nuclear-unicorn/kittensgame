@@ -671,3 +671,22 @@ body.scheme_sleek  {
 	padding-left: 28px;
 	font-weight: bold;
 }
+
+.scheme_sleek .btn.modern.btnWrapper {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+.scheme_sleek .btn.small-text span,
+.scheme_sleek .btn.small-text a {
+    font-size: 90%;
+}
+.scheme_sleek .btn.modern.small-text .btnContent,
+.scheme_sleek .btn.modern.bldEnabled .btnContent {
+    padding: 9px 0 9px 10px;
+}
+.scheme_sleek .btnWrapper a {
+    margin: -9px 0;
+}
+.scheme_sleek .btnInterior:not(.bldEnabled):not(.small-text) a {
+    padding: 9px 6px 10px 6px !important;
+}

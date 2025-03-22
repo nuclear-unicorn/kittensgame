@@ -127,11 +127,15 @@ body.scheme_wood.with_background_image {
 .scheme_wood h1:first-child {
     margin-top: 0;
 }
-/* .scheme_wood .btn.modern.small-text { */
-	/* default font-size: 90%; */
-/* } */
 .scheme_wood .modern .btnContent {
     padding: 10px 0 10px 1px; /* 1px left for buttons without power background-image */
+}
+.scheme_wood .btn.modern.btnInterior,
+.scheme_wood .btn.modern.btnInterior:hover {
+	box-shadow: none;
+}
+.scheme_wood .btn.modern.btnInterior.small-text a {
+	margin: -9px 0;
 }
 /*** green and red light for machine on/off ***/
 .scheme_wood .btn.bldEnabled div.btnContent,
@@ -143,32 +147,64 @@ body.scheme_wood.with_background_image {
 	background: no-repeat border-box linear-gradient(90deg, #a7372c 0%, rgba(167, 55, 44, 0.5) 7px, transparent 15px, transparent 100%),
 		local no-repeat bottom -86px right -30px url('img/theme_wood_background_02.jpg');
 }
+.scheme_wood .btn.disabled.bldlackResConvert.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #a7372c 0%, rgba(167, 55, 44, 0.5) 6px, transparent 14px, transparent 100%),
+		local no-repeat bottom -86px right -30px url('img/theme_wood_background_02.jpg');
+}
 .scheme_wood .btn.disabled.bldlackResConvert:hover {
 	background: no-repeat border-box linear-gradient(90deg, #a7372c 0%, rgba(167, 55, 44, 0.5) 7px, transparent 15px, transparent 100%),
+		local no-repeat bottom -86px right -30px url('img/theme_wood_background_02.jpg');
+}
+.scheme_wood .btn.disabled.bldlackResConvert.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #a7372c 0%, rgba(167, 55, 44, 0.5) 6px, transparent 14px, transparent 100%),
 		local no-repeat bottom -86px right -30px url('img/theme_wood_background_02.jpg');
 }
 .scheme_wood .btn:not(.disabled).bldlackResConvert {
 	background: no-repeat border-box linear-gradient(90deg, #a7372c 0%, rgba(167, 55, 44, 0.5) 7px, transparent 15px, transparent 100%),
 		local no-repeat bottom -62px right url('img/theme_wood_background_01.jpg');
 }
+.scheme_wood .btn:not(.disabled).bldlackResConvert.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #a7372c 0%, rgba(167, 55, 44, 0.5) 6px, transparent 14px, transparent 100%),
+		local no-repeat bottom -62px right url('img/theme_wood_background_01.jpg');
+}
 .scheme_wood .btn:not(.disabled).bldlackResConvert:hover {
 	background: no-repeat border-box linear-gradient(90deg, #a7372c 0%, rgba(167, 55, 44, 0.5) 7px, transparent 15px, transparent 100%),
+		local no-repeat bottom -62px right -10px url('img/theme_wood_background_01.jpg');
+}
+.scheme_wood .btn:not(.disabled).bldlackResConvert.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #a7372c 0%, rgba(167, 55, 44, 0.5) 6px, transparent 14px, transparent 100%),
 		local no-repeat bottom -62px right -10px url('img/theme_wood_background_01.jpg');
 }
 .scheme_wood .btn.disabled.bldEnabled {
 	background: no-repeat border-box linear-gradient(90deg, #9e9527 0%, rgba(158, 149, 39, 0.5) 7px, transparent 15px, transparent 100%),
 		local no-repeat bottom -86px right -30px url('img/theme_wood_background_02.jpg');
 }
+.scheme_wood .btn.disabled.bldEnabled.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #9e9527 0%, rgba(158, 149, 39, 0.5) 6px, transparent 14px, transparent 100%),
+		local no-repeat bottom -86px right -30px url('img/theme_wood_background_02.jpg');
+}
 .scheme_wood .btn.disabled.bldEnabled:hover {
 	background: no-repeat border-box linear-gradient(90deg, #9e9527 0%, rgba(158, 149, 39, 0.5) 7px, transparent 15px, transparent 100%),
+		local no-repeat bottom -86px right -30px url('img/theme_wood_background_02.jpg');
+}
+.scheme_wood .btn.disabled.bldEnabled.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #9e9527 0%, rgba(158, 149, 39, 0.5) 6px, transparent 14px, transparent 100%),
 		local no-repeat bottom -86px right -30px url('img/theme_wood_background_02.jpg');
 }
 .scheme_wood .btn:not(.disabled).bldEnabled {
 	background: no-repeat border-box linear-gradient(90deg, #9e9527 0%, rgba(158, 149, 39, 0.5) 7px, transparent 15px, transparent 100%),
 		local no-repeat bottom -62px right url('img/theme_wood_background_01.jpg');
 }
+.scheme_wood .btn:not(.disabled).bldEnabled.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #9e9527 0%, rgba(158, 149, 39, 0.5) 6px, transparent 14px, transparent 100%),
+		local no-repeat bottom -62px right url('img/theme_wood_background_01.jpg');
+}
 .scheme_wood .btn:not(.disabled).bldEnabled:hover {
 	background: no-repeat border-box linear-gradient(90deg, #b6b042 0%, rgba(182, 176, 66, 0.5) 7px, transparent 15px, transparent 100%),
+		local no-repeat bottom -62px right -10px url('img/theme_wood_background_01.jpg');
+}
+.scheme_wood .btn:not(.disabled).bldEnabled.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #b6b042 0%, rgba(182, 176, 66, 0.5) 6px, transparent 14px, transparent 100%),
 		local no-repeat bottom -62px right -10px url('img/theme_wood_background_01.jpg');
 }
 /*** end of green light for machine on/off ***/

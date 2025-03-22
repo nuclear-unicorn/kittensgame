@@ -26,6 +26,9 @@ body.scheme_chocolate.with_background_image {
 }
 .scheme_chocolate .btn,
 .scheme_chocolate .modern,
+.scheme_chocolate .btn.small-text span {
+    font-size: 97%;
+}
 .scheme_chocolate .btn.modern {
 	font-family: 'Ruluko', sans-serif;
 }
@@ -48,6 +51,10 @@ body.scheme_chocolate.with_background_image {
 	border-bottom-color: rgba(128, 128, 128, 0.6);
 	box-shadow: inset -1px -1px 3px rgba(180, 180, 180, 0.6), inset 2px 2px 3px #202020, 1px 1px 3px #101010;
 }
+.scheme_chocolate .btn.modern.disabled.btnInterior {
+	box-shadow: inset -1px -1px 3px rgba(180, 180, 180, 0.6), inset 2px 2px 3px #202020;
+	border-radius: 7px;
+}
 .scheme_chocolate .btn.modern.disabled:hover {
 	background-color: #c3ae99;
 	border: 2px solid rgba(160, 160, 160, 0.8);
@@ -66,6 +73,15 @@ body.scheme_chocolate.with_background_image {
 	border-bottom-color: rgba(217, 190, 163, 0.8);
 	box-shadow: inset 1px 1px 3px rgba(255, 255, 255, 0.4), inset -2px -2px 3px #202020,
 				1px 1px 3px #101010;
+}
+.scheme_chocolate .btn.modern:not(.disabled):not(.bldEnabled).btnInterior {
+	box-shadow: inset -1px -1px 3px rgba(180, 180, 180, 0.6), inset 2px 2px 3px #202020;
+}
+.scheme_chocolate .btn.modern:not(.disabled).bldEnabled.btnInterior {
+	box-shadow: inset 1px 1px 3px rgba(255, 255, 255, 0.4), inset -2px -2px 3px #202020
+}
+.scheme_chocolate .btn.modern:not(.disabled).bldEnabled.btnWrapper {
+	box-shadow: 1px 1px 3px #101010;
 }
 .scheme_chocolate .btn.modern:not(.disabled):hover {
 	background-color: #513c39;
@@ -119,26 +135,50 @@ body.scheme_chocolate.with_background_image {
 .scheme_chocolate .btn.disabled.bldlackResConvert { /* color #991A22 */ /* color for lack resources convertion */
 	background: no-repeat border-box linear-gradient(90deg, #930000 0%, #930000 10px, #c3ae99 12px, #c3ae99 100%);
 }
+.scheme_chocolate .btn.disabled.bldlackResConvert.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #930000 0%, #930000 8px, #c3ae99 10px, #c3ae99 100%);
+}
 .scheme_chocolate .btn.disabled.bldlackResConvert:hover {
 	background: no-repeat border-box linear-gradient(90deg, #c30000 0%, #c30000 10px, #c3ae99 12px, #c3ae99 100%);
+}
+.scheme_chocolate .btn.disabled.bldlackResConvert.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #c30000 0%, #c30000 8px, #c3ae99 10px, #c3ae99 100%);
 }
 .scheme_chocolate .btn:not(.disabled).bldlackResConvert {
 	background: no-repeat border-box linear-gradient(90deg, #930000 0%, #930000 10px, #2f2220 12px, #2f2220 100%);
 }
+.scheme_chocolate .btn:not(.disabled).bldlackResConvert.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #930000 0%, #930000 8px, #2f2220 10px, #2f2220 100%);
+}
 .scheme_chocolate .btn:not(.disabled).bldlackResConvert:hover {
 	background: no-repeat border-box linear-gradient(90deg, #c30000 0%, #c30000 10px, #513c39 12px, #513c39 100%);
+}
+.scheme_chocolate .btn:not(.disabled).bldlackResConvert.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #c30000 0%, #c30000 8px, #513c39 10px, #513c39 100%);
 }
 .scheme_chocolate .btn.disabled.bldEnabled { /* color #7AA738 */
 	background: no-repeat border-box linear-gradient(90deg, #a7da58 0%, #a7da58 10px, #c3ae99 12px, #c3ae99 100%);
 }
+.scheme_chocolate .btn.disabled.bldEnabled.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #a7da58 0%, #a7da58 8px, #c3ae99 10px, #c3ae99 100%);
+}
 .scheme_chocolate .btn.disabled.bldEnabled:hover {
 	background: no-repeat border-box linear-gradient(90deg, #c8e896 0%, #c8e896 10px, #c3ae99 12px, #c3ae99 100%);
+}
+.scheme_chocolate .btn.disabled.bldEnabled.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #c8e896 0%, #c8e896 8px, #c3ae99 10px, #c3ae99 100%);
 }
 .scheme_chocolate .btn:not(.disabled).bldEnabled {
 	background: no-repeat border-box linear-gradient(90deg, #a7da58 0%, #a7da58 10px, #2f2220 12px, #2f2220 100%);
 }
+.scheme_chocolate .btn:not(.disabled).bldEnabled.btnInterior {
+	background: no-repeat border-box linear-gradient(90deg, #a7da58 0%, #a7da58 8px, #2f2220 10px, #2f2220 100%);
+}
 .scheme_chocolate .btn:not(.disabled).bldEnabled:hover {
 	background: no-repeat border-box linear-gradient(90deg, #c8e896 0%, #c8e896 10px, #513c39 12px, #513c39 100%);
+}
+.scheme_chocolate .btn:not(.disabled).bldEnabled.btnInterior:hover {
+	background: no-repeat border-box linear-gradient(90deg, #c8e896 0%, #c8e896 8px, #513c39 10px, #513c39 100%);
 }
 /*** end of green light for machine on/off ***/
 .scheme_chocolate .dialog { /* window options, credits and get the app */
