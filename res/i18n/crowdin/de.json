@@ -563,7 +563,7 @@
     "effectsMgr.statics.woodJobRatio.title": "Holzfäller-Werkzeuge",
     "effectsMgr.statics.zebraAppeasedGoldPenalty.title": "Gold-Reduktion",
     "effectsMgr.statics.zebraPreparations.title": "Zebra Vorbereitung",
-    "effectsMgr.statics.zebraRelationModifier.title": "Zebrabeziehungensänderung",
+    "effectsMgr.statics.zebraRelationModifier.title": "Zebra Bezieungsmodifikation",
     "effectsMgr.type.resConversion": "{0} Umwandlung",
     "effectsMgr.type.resCraftRatio": "{0} Herstellbonus",
     "effectsMgr.type.resDemandRatio": "{0} Nachfragesreduktion",
