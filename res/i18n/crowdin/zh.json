@@ -564,7 +564,7 @@
     "effectsMgr.statics.zebraAppeasedGoldPenalty.title": "黄金惩罚",
     "effectsMgr.statics.zebraPreparations.title": "斑马准备工作",
     "effectsMgr.statics.zebraRelationModifier.title": "斑马关系修正",
-    "effectsMgr.type.resConversion": "{0} 对话",
+    "effectsMgr.type.resConversion": "{0} 转化",
     "effectsMgr.type.resCraftRatio": "{0} 工艺制作效率",
     "effectsMgr.type.resDemandRatio": "{0} 需求减少",
     "effectsMgr.type.resGlobalCraftRatio": "{0} 工艺效率加成",
