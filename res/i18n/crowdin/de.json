@@ -1759,7 +1759,7 @@
     "village.job.bonus": "Berufsbonus",
     "village.job.engineer": "Ingenieur",
     "village.job.engineer.desc": "Ein Ingenieur kann eine Fabrik steuern, um automatisch Ressourcen zu produzieren.<br />Verwalte deine Ingenieure im Werkstatt-Tab.<br>Stellen automatisch alle 10 Minuten etwas her.",
-    "village.job.farmer": "Landwirt",
+    "village.job.farmer": "Farmer",
     "village.job.farmer.desc": "+5 Katzenminze jede Sekunde",
     "village.job.geologist": "Geologe",
     "village.job.geologist.desc": "+0.075 Kohle pro Sekunde",
