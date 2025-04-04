@@ -38,7 +38,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             heat: this.heat,
             testShatter: this.testShatter, //temporary
             isAccelerated: this.isAccelerated,
-            cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "unlocked", "isAutomationEnabled"]),
+            cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "delayTicks", "unlocked", "isAutomationEnabled"]),
             vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"]),
             queueItems: this.queue.queueItems,
             queueSources: this.queue.queueSources
@@ -348,6 +348,13 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             if (self.on < self.val){
                 self.on = self.val;
             }
+            var delay = game.time.getCFU("controlledDelay");
+            if (delay.delayTicks > 0) {
+                //Timer should count down even if automation is paused.
+                //Not affected by Tempus Fugit.
+                delay.delayTicks -= 1;
+                return;
+            }
 
             if (!self.on || !self.isAutomationEnabled){
                 return;
@@ -366,6 +373,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     amt = limit;
                 }
                 self.heat -= 100 * amt;
+                delay.delayTicks = delay.on; //Pause for a duration of 1 game-tick per active Controlled Delay
                 //game.time.shatter(amt);
                 if(test_shatter == 1) {game.time.shatterInGroupCycles(amt);}
                 //else if(game.time.testShatter == 2) {game.time.shatterInCycles(amt);}
@@ -374,6 +382,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             }
         },
 		unlocks: {
+			upgrades: ["tachyonModerator"],
 			chronoforge: ["timeBoiler"]
 		},
         unlocked: true
@@ -405,6 +414,27 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         },
         action: function(self, game) {
             self.updateEffects(self, game);
+        },
+        unlocked: false
+    },{
+        name: "controlledDelay",
+        label: $I("time.cfu.controlledDelay.label"),
+        description: $I("time.cfu.controlledDelay.desc") + "<br>" + $I("time.cfu.controlledDelay.desc2"),
+        prices: [
+            { name: "timeCrystal", val: 1 },
+            { name: "gear", val: 10 }
+        ],
+        priceRatio: 1, //Affordable scaling
+        limitBuild: 25, //Hard-capped at 5 sec delay.
+        calculateEffects: function(self, game) {
+            if (self.isAutomationEnabled == null) { //force non-null value
+                self.isAutomationEnabled = false;
+            }
+        },
+        delayTicks: 0,
+        isAutomationEnabled: false,
+        effects: {
+            "energyConsumption": 0.75
         },
         unlocked: false
     },{
@@ -1343,8 +1373,9 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         else {timeManager.shatter(amt);}
     },
 
+    //Shatter TC button will be visible as long as you've seen a time crystal in this run:
     updateVisible: function(model){
-        model.visible = (this.game.resPool.get("timeCrystal").value >= 1);
+        model.visible = this.game.resPool.get("timeCrystal").unlocked;
     }
 });
 
@@ -1398,6 +1429,142 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
     }
 });
 
+dojo.declare("classes.ui.time.UseHeatBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
+	fetchModel: function(options) {
+		var model = this.inherited(arguments);
+		model.useAllLink = this._newLink(model, "all");
+		var shatterYearBoost = this.game.getEffect("shatterYearBoost");
+		if(shatterYearBoost){
+			model.customLink = this._newLink(model, shatterYearBoost); //Creates additional custom shatter link based on the effect
+		}
+		return model;
+	},
+
+	_newLink: function(model, shatteredQuantity) {
+		var self = this;
+		if (shatteredQuantity == "all") { //"all" means as many as we can afford, minimum of 2
+			shatteredQuantity = Math.max(2, Math.floor(this.game.time.getCFU("blastFurnace").heat / 100));
+		}
+
+		var isVisible = true; //Always true if showNonApplicableButtons is true
+		if (!this.game.opts.showNonApplicableButtons) {
+			var prices = this.getPricesMultiple(model, shatteredQuantity);
+			var furnaceHeat = this.game.time.getCFU("blastFurnace").heat;
+			isVisible = (prices.heat <= furnaceHeat);
+		}
+		return {
+			visible: isVisible,
+			title: "x" + shatteredQuantity,
+			handler: function(event) {
+				self.doShatterAmt(model, shatteredQuantity);
+			}
+		};
+	},
+
+	getPricesMultiple: function(model, amt) {
+		return { heat: 100 * amt };
+	},
+
+	hasResources: function(model, prices){
+		var furnace = this.game.time.getCFU("blastFurnace");
+		if (!prices){
+			prices = this.getPricesMultiple(model, 1);
+		}
+		if (prices && prices.heat) {
+			return furnace.heat >= prices.heat;
+		}
+		return furnace.heat >= 100;
+	},
+
+	buyItem: function(model, event, callback){
+		var amt = 1;
+		var price = this.getPricesMultiple(model, amt);
+		var furnace = this.game.time.getCFU("blastFurnace");
+		if (furnace.heat < price.heat) {
+			callback(false /*itemBought*/, { reason: "cannot-afford" });
+			return true;
+		}
+		if (!model.enabled) {
+			callback(false /*itemBought*/, { reason: "not-enabled" });
+			return true;
+		}
+		furnace.heat -= price.heat;
+		this.doShatter(model, amt);
+		callback(true /*itemBought*/, { reason: "paid-for" });
+		return true;
+	},
+
+	doShatterAmt: function(model, amt) {
+		if (!model.enabled) {
+			return;
+		}
+		var price = this.getPricesMultiple(model, amt);
+		var furnace = this.game.time.getCFU("blastFurnace");
+		if (furnace.heat >= price.heat) {
+			furnace.heat -= price.heat;
+			this.doShatter(model, amt);
+		}
+	},
+
+	doShatter: function(model, amt) {
+		var game = this.game;
+		var timeManager = game.time;
+		//timeManager.shatter(amt);
+		if(timeManager.testShatter == 1) {timeManager.shatterInGroupCycles(amt);}
+		//else if(timeManager.testShatter == 2) {timeManager.shatterInCycles(amt);}
+		//shatterInCycles is deprecated
+		else {timeManager.shatter(amt);}
+	},
+
+	updateVisible: function(model) {
+		model.visible = this.game.workshop.get("tachyonModerator").researched;
+	}
+});
+
+dojo.declare("classes.ui.time.UseHeatBtn", com.nuclearunicorn.game.ui.ButtonModern, {
+    renderLinks: function() {
+        this.useAllLink = this.addLink(this.model.useAllLink);
+        dojo.addClass(this.useAllLink.link,"rightestLink");
+        if(this.model.customLink){
+            this.custom = this.addLink(this.model.customLink);
+        }
+    },
+
+    update: function() {
+        this.inherited(arguments);
+
+        //If needed, update the value of the "all" link:
+        if (this.model.useAllLink.title != this.useAllLink.link.innerHTML) {
+            dojo.destroy(this.useAllLink.link);
+            this.useAllLink = this.addLink(this.model.useAllLink);
+            dojo.addClass(this.useAllLink.link,"rightestLink");
+            if (this.custom) {
+                dojo.place(this.useAllLink.link, this.custom.link, "before"); //Rearrange DOM
+            }
+        }
+        dojo.style(this.useAllLink.link, "display", this.model.useAllLink.visible ? "" : "none");
+
+        if(this.model.customLink && !this.custom) { //Create custom link if needed
+            this.custom = this.addLink(this.model.customLink);
+        }
+        if(!this.model.customLink && this.custom) { //Destroy custom link if needed
+            dojo.destroy(this.custom.link);
+            this.custom = undefined;
+        }
+        if (this.custom && this.model.customLink && this.model.customLink.title != this.custom.link.innerHTML) {
+            //Change the value of the custom link if needed.
+            //We can't just call updateLink() because we need to change the link handler as well!
+            //Instead, destroy the old link & create a new one.
+            dojo.destroy(this.custom.link);
+            this.custom = this.addLink(this.model.customLink);
+            dojo.place(this.custom.link, this.useAllLink.link, "after"); //Rearrange DOM
+        }
+        if (this.custom && this.model.customLink) {
+            dojo.style(this.custom.link, "display", this.model.customLink.visible ? "" : "none");
+        }
+    }
+});
+
 /**
  * I wonder if we can get rid of such tremendous amounts of boilerplate code
  */
@@ -1412,10 +1579,19 @@ dojo.declare("classes.ui.time.ChronoforgeBtnController", com.nuclearunicorn.game
 
     getName: function(model){
         var meta = model.metadata;
+        var game = this.game;
         var label = this.inherited(arguments);
 
+        if (meta.delayTicks > 0) {
+            //It's kind of a happy accident that delayTicks has one of 24 different values & that there are 24 clock emoji.
+            var timeStr = meta.isAutomationEnabled ?
+                (String.fromCodePoint(0x1F550 + meta.delayTicks - 1)) :
+                game.getDisplayValueExt(meta.delayTicks / game.ticksPerSecond, false /*prefix*/, false /*usePerTickHack*/, 1 /*precision*/) + $I("unit.s");
+            return timeStr + " " + label;
+        }
+
         if (meta.heat){
-            return label + "<div class=\"progress\">[" + this.game.getDisplayValueExt(meta.heat) + "%]</div>";
+            return label + "<div class=\"progress\">[" + game.getDisplayValueExt(meta.heat) + "%]</div>";
         }
         return label;
     },
@@ -1433,6 +1609,11 @@ dojo.declare("classes.ui.ChronoforgeWgt", [mixin.IChildrenAware, mixin.IGameAwar
             description: $I("time.shatter.tc.desc"),
             prices: [{name: "timeCrystal", val: 1}],
             controller: new classes.ui.time.ShatterTCBtnController(game)
+        }, game));
+        this.addChild(new classes.ui.time.UseHeatBtn({
+            name: $I("time.use.heat"),
+            description: $I("time.use.heat.desc"),
+            controller: new classes.ui.time.UseHeatBtnController(game)
         }, game));
         var controller = new classes.ui.time.ChronoforgeBtnController(game);
         for (var i in game.time.chronoforgeUpgrades){
@@ -2112,7 +2293,7 @@ dojo.declare("classes.queue.manager", null,{
                 var chronoforgeUpgrades = this.game.time.chronoforgeUpgrades;
                 for (var i in chronoforgeUpgrades){
                     var building = chronoforgeUpgrades[i];
-                    if (building.unlocked){
+                    if (building.unlocked && !(building.limitBuild && building.val >= building.limitBuild)){
                         options.push({
                             name: building.name,
                             label: building.label

@@ -1855,8 +1855,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	//=============================
 	//		option settings
 	//=============================
-	forceShowLimits: false,
-	useWorkers: true,
 	colorScheme: "",
 	unlockedSchemes: null,
 
@@ -1970,28 +1968,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
         this.managers = [];
 
 		this.opts = {
-			usePerSecondValues: true,
+			//All default values for booleans are now handled in settings.js.
 			notation: "si",
-			forceHighPrecision: false,
-			usePercentageResourceValues: false,
-			showNonApplicableButtons: false,
-			usePercentageConsumptionValues: false,
-			highlightUnavailable: true,
-			hideSell: false,
-			hideDowngrade: false,
-			hideBGImage: false,
-			tooltipsInRightColumn: false,
-			noConfirm: false,
-			IWSmelter: true,
-			disableCMBR: false,
-			enableRedshift: false,
-			enableRedshiftGflops: false,
-			batchSize: 10,
-			// Used only in KG Mobile, hence it's absence in the rest of the code
-			useLegacyTwoInRowLayout: false,
-			forceLZ: false,
-			compressSaveFile: false,
-			ksEnabled: false,
+			batchSize: 10
 		};
 
 		this.console = new com.nuclearunicorn.game.log.Console(this);
@@ -2017,7 +1996,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
             { id: "prestige",       class:  "PrestigeManager"   },
             { id: "challenges",     class:  "ChallengesManager" },
             { id: "stats",       	class:  "StatsManager"      },
-			{ id: "void",       	class:  "VoidManager"      	}
+			{ id: "void",       	class:  "VoidManager"      },
+			{ id: "settings",		class: "SettingsManager" }
         ];
 
         for (var i in managers){
@@ -2115,6 +2095,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 			game.addTab(tabProp);
 		});
+
+		//SettingsTab goes in a separate spot in the UI from normal tabs like Bonfire, Village, Science, etc.
+		game.settingsTab = new com.nuclearunicorn.game.ui.tab.SettingsTab({
+			name: $I("menu.options"),
+			id: "Settings"
+		}, game);
 
 		//vvvv do not forget to toggle tab visibility below (see load method)
 
@@ -2262,8 +2248,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	resetState: function(){
-		this.forceShowLimits = false;
-		this.useWorkers = true;
 		this.colorScheme = "";
 		this.unlockedSchemes = this.ui.defaultSchemes;
 		this.karmaKittens = 0;
@@ -2282,30 +2266,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 
 		this.opts = {
-			usePerSecondValues: true,
+			//All default values for booleans are now handled in settings.js.
 			notation: "si",
-			forceHighPrecision: false,
-			usePercentageResourceValues: false,
-			showNonApplicableButtons: false,
-			usePercentageConsumptionValues: false,
-			highlightUnavailable: true,
-			hideSell: false,
-			hideDowngrade: false,
-			hideBGImage: false,
-			tooltipsInRightColumn: false,
-			noConfirm: false,
-			IWSmelter: true,
-			disableCMBR: false,
-			disableTelemetry: false,
-			enableRedshift: false,
-			enableRedshiftGflops: false,
-			batchSize: 10,
-			// Used only in KG Mobile, hence it's absence in the rest of the code
-			useLegacyTwoInRowLayout: false,
-			forceLZ: false,
-			compressSaveFile: false,
-			//KGM
-			useSwipeNavigation: false
+			batchSize: 10
 		};
 
 		this.resPool.resetState();
@@ -2361,9 +2324,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
         }
 
 		saveData.game = {
-			forceShowLimits: this.forceShowLimits,
 			isCMBREnabled: this.isCMBREnabled,
-			useWorkers: this.useWorkers,
 			colorScheme: this.colorScheme,
 			unlockedSchemes: this.unlockedSchemes,
 			karmaKittens: this.karmaKittens,
@@ -2541,7 +2502,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			var data = saveData.game;
 
 			//something should really be done with this mess there
-			this.forceShowLimits = data.forceShowLimits ? data.forceShowLimits : false;
 			this.colorScheme = data.colorScheme ? data.colorScheme : null;
 			this.unlockedSchemes = data.unlockedSchemes ? data.unlockedSchemes : this.ui.defaultSchemes;
 
@@ -2549,7 +2509,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			this.karmaZebras = (data.karmaZebras !== undefined) ? data.karmaZebras : 0;
 			this.deadKittens = (data.deadKittens !== undefined) ? data.deadKittens : 0;
 			this.ironWill = (data.ironWill !== undefined) ? data.ironWill : true;
-			this.useWorkers = (data.useWorkers !== undefined) ? data.useWorkers : true;
 
 			this.cheatMode = (data.cheatMode !== undefined) ? data.cheatMode : false;
 			this.startedWithoutChronospheres = (data.startedWithoutChronospheres !== undefined) ? data.startedWithoutChronospheres : false; //false for existing games
@@ -3722,9 +3681,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 		if (resName == "necrocorn"){
 			stack.push({
-				name: $I("res.stack.buildings"),
+				name: $I("res.stack.pactsConsumption"),
 				type: "perDay",
-				value: this.getEffect("necrocornPerDay") + this.religion.pactsManager.getSiphonedCorruption(1)
+				value: this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect("necrocornPerDay") +
+						this.religion.pactsManager.getSiphonedCorruption(1)
 			});
 		}else{
 			stack.push({
@@ -3734,22 +3694,39 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			});
 		}
 		if(resName == "necrocorn"){
+			//ReligionManager keeps data on all corruption-related effects
+			var corruptionModifiers = this.religion.corruptionCached || [];
 			var corruptionStack = [];
 			corruptionStack.push({
 				name: $I("res.stack.corruptionPerDay"),
 				type: "perDay",
-				value: this.religion.getCorruptionPerTick() * this.calendar.ticksPerDay
+				value: (corruptionModifiers.finalCorruptionPerTick || 0) * this.calendar.ticksPerDay
 			});
-			corruptionStack.push({
-				name: $I("res.stack.corruptionPerDayProduction"),
-				type: "perDay",
-				value: this.religion.getCorruptionPerTickProduction() * this.calendar.ticksPerDay
-			});
-			corruptionStack.push({
-				name: $I("res.stack.corruptionPerDaySiphoned"),
-				type: "perDay",
-				value: - this.religion.pactsManager.getSiphonedCorruption(1)
-			});
+			for (var i = 0; i < corruptionModifiers.length; i += 1) {
+				var modifier = corruptionModifiers[i];
+				switch(modifier.behavior) {
+				case "additive":
+					//Convert a per-tick effect to a per-day effect.
+					corruptionStack.push({
+						name: modifier.label,
+						type: "perDay",
+						value: modifier.value * this.calendar.ticksPerDay
+					});
+					//Hack to make the total corruption line display if net corruption is 0 due to Siphoning
+					if (modifier.value) {
+						corruptionStack[0].forceDisplay = true;
+					}
+					break;
+				case "multiplicative":
+					//Convert a multiplier to a ratio bonus
+					corruptionStack.push({
+						name: modifier.label,
+						type: "ratio",
+						value: modifier.value - 1
+					});
+					break;
+				}
+			}
 			stack.push(corruptionStack);
 		}
 
@@ -4153,10 +4130,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				continue;
 			}
 
-			if (!stackElem.value || (stackElem.type != "fixed" && stackElem.type != "perDay" &&
-			stackElem.type != "perYear" && !hasFixed)) {
-				//If hasFixed is false, no need to display ratio effects
-				continue;
+			if (!stackElem.forceDisplay) { //Hack to make necrocorn corruption display properly in some situations
+				if (!stackElem.value || (stackElem.type != "fixed" && stackElem.type != "perDay" &&
+				stackElem.type != "perYear" && !hasFixed)) {
+					//If hasFixed is false, no need to display ratio effects
+					continue;
+				}
 			}
 
 			var indent = i == 0 ? depth - 1 : depth;
@@ -4550,7 +4529,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	start: function(){
-		if (this.isWebWorkerSupported() && this.useWorkers){	//IE10 has a nasty security issue with running blob workers
+		if (this.isWebWorkerSupported() && this.opts.useWorkers){	//IE10 has a nasty security issue with running blob workers
 			console.log("starting web worker...");
 			var blob = new Blob([
 				"onmessage = function(e) { setInterval(function(){ postMessage('tick'); }, 1000 / " + this.ticksPerSecond + "); }"]);	//no shitty external js
@@ -4694,6 +4673,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			msg += " " + $I("reset.confirmation.msg60");
 		} else if (this.resPool.get("kittens").value <= 35) {
 			msg += " " + $I("reset.confirmation.msg35");
+		}
+		if (this.workshop.get("tachyonModerator").researched) {
+			//Add a warning if there is enough stored chrono furnace fuel to get more paragon points
+			var toNextMillennium = 1000 - this.calendar.year % 1000; //Measured in years, from 1 to 1000.
+			if (this.time.getCFU("blastFurnace").heat >= toNextMillennium * 100) {
+				msg += "\n\n" + $I("reset.confirmation.stored.chrono.fuel");
+			}
 		}
 		var game = this;
 		game.ui.confirm($I("reset.confirmation.title"), msg, function() {
