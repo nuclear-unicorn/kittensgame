@@ -1084,6 +1084,7 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 			this.game.science.unlockRelations(); //Check if we can unlock new relation policies based on number of embassies.
 			this.game.ui.render();
 		}
+		return result;
 	},
 
 	incrementValue: function(model) {
