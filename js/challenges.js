@@ -795,6 +795,8 @@ dojo.declare("classes.reserveMan", null,{
 			this.game.time.getVSU("usedCryochambers").unlocked = true;
 		}
 		this.game.msg($I("challendge.reservesReclaimed.msg"));
+		//Invalidate achievements that require the player not to use Chronospheres this run.
+		this.game.startedWithoutChronospheres = false;
 	},
 
 	getSaveData: function(){
