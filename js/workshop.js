@@ -2510,6 +2510,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		for (var ind in this.crafts){
 			var craft = this.crafts[ind];
 			var kittenResProduction = (this.game.village.getResProduction()["ES" + craft.name] || 0);
+			kittenResProduction *= kittenResProductionModifier;
 			if (!kittenResProduction){
 				continue;
 			}
