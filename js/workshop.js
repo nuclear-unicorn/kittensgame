@@ -2846,7 +2846,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 			}
 
 			if (progressDisplayed < 10) {
-				progressDisplayed = "-" + progressDisplayed;
+				progressDisplayed = "0" + progressDisplayed;
 			}
 
 			return "<div class=\"label\"><span class=\"label-content\">" + model.craft.label + "</span></div><div>(" + craft.value + ")</div><div class=\"progress\">[" + progressDisplayed + "%]</div>";
