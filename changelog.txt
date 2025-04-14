@@ -1,3 +1,20 @@
+v 1.4.9.4 (12 Dec 2024)
+Major:
+* Loadout system
+* New Foreign Relations Policies
+* New Achievements & Basges
+* Census sorting, favorites, promotion
+
+Minor:
+* Temporal Paradoxes now have more intuitive behavior
+* Performance optimization related to bulk TC shattering
+* UI improvements
+* Clicking buttons no longer generates extra game ticks
+* Fix bugs related to Temporal Press
+* Fix bugs related to importing a save
+* Fix math errors related to Holy Genocide
+* Offline gflops should work correctly now.
+
 v 1.4.9.3
 Major:
 * Spaceport

@@ -186,6 +186,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 			{name: "thorium",   val: 50000}
 		],
 		unlocks: {
+			challenges: ["energy"],
 			planet: ["centaurusSystem"],
 			spaceMission: ["furthestRingMission"]
 		}
@@ -277,14 +278,15 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					self.effects["energyConsumption"] = 1;
 				}
 
+				game.upgrade(self.upgrades); //this way observatories won't have to use action
+
 				if (game.challenges.isActive("blackSky")) {
 					self.effects['starchartPerTickBaseSpace'] *= 1 / (1 + game.getEffect('bskSattelitePenalty'));
 				}
-
-				game.upgrade(self.upgrades); //this way observatories won't have to use action
 			},
 			upgrades: {
-				buildings: ["observatory"]
+				buildings: ["observatory"],
+				challenges: ["blackSky"]
 			},
 			unlockScheme: {
 				name: "space",
@@ -1315,11 +1317,14 @@ dojo.declare("com.nuclearunicorn.game.ui.SpaceProgramBtnController", com.nuclear
 		}
 	},
 
-	buyItem: function(model, event, callback) {
+	buyItem: function(model, event) {
 		if (model.metadata.val == 0) {
-			this.inherited(arguments);
+			return this.inherited(arguments);
 		} else {
-			callback(false /*itemBought*/, { reason: "already-bought" });
+			return {
+				itemBought: false,
+				reason: "already-bought"
+			};
 		}
 	},
 

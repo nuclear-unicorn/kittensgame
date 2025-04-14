@@ -288,17 +288,11 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 	},
 
 	observeTimeout: function(){
-
 		this.observeClear();
 
-		var autoChance = this.game.getEffect("starAutoSuccessChance");
-		if (this.game.prestige.getPerk("astromancy").researched){
-			autoChance *= 2;
-		}
-
+		var autoChance = this.getAstroEventAutoChance();
 		var rand = this.game.rand(100);
-		if (this.game.ironWill && rand <= 25
-		 || rand <= autoChance * 100) {
+		if (rand <= autoChance * 100) {
 			this.observeHandler();
 		}
 
@@ -359,6 +353,29 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		}
 
 		return effects;
+	},
+
+	//Returns a number in the interval [0,1]
+	getAstroEventAutoChance: function() {
+		var game = this.game;
+		if (game.workshop.get("seti").researched) {
+			return 1;
+		}
+		//Else, no SETI, so calculate based on Observatories:
+		var autoChance = game.getEffect("starAutoSuccessChance");
+		if (game.prestige.getPerk("astromancy").researched) {
+			autoChance *= 2;
+		}
+
+		if (game.ironWill) {
+			//Minimum 25% auto chance
+			autoChance = Math.max(0.25, autoChance);
+		} else {
+			//Don't go below 0
+			autoChance = Math.max(0, autoChance);
+		}
+		//Cap at 100% chance
+		return Math.min(autoChance, 1);
 	},
 
 	trueYear: function() {
@@ -528,6 +545,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 			if (this.game.ironWill){
 				mineralsAmt += mineralsAmt * 0.1;	//+10% of minerals for iron will
+				mineralsAmt *= 1 + this.game.getEffect("mineralsPolicyRatio") / 3;
 			}
 			mineralsAmt *= 1 + minerologyBonus;
 			var mineralsGain = this.game.resPool.addResEvent("minerals", mineralsAmt);
@@ -685,19 +703,11 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
                 eventChance *= 2;
             }
 
-            var autoChance = this.game.getEffect("starAutoSuccessChance");
-            if (this.game.prestige.getPerk("astromancy").researched) {
-                autoChance *= 2;
-            }
-
-            if (this.game.workshop.get("seti").researched) {
-                autoChance = 1;
-            }
-            autoChance = Math.min(autoChance, 1);
+            var autoChance = this.getAstroEventAutoChance();
             //console.log("eventChance="+eventChance+", autoChance="+autoChance);
             numberEvents = Math.round(daysOffset * eventChance * autoChance);
             //console.log("number of startcharts="+numberEvents);
-            if (numberEvents) {
+            if (numberEvents && this.game.science.get("astronomy").researched) {
                 this.game.resPool.addResEvent("starchart", numberEvents);
             }
 
@@ -804,7 +814,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		//antimatter
 		var resPool = this.game.resPool;
 		if (resPool.energyProd >= resPool.energyCons) {
-			resPool.addResEvent("antimatter", this.game.getEffect("antimatterProduction") * yearsOffset);
+			resPool.addResEvent("antimatter", this.game.getResourceOnYearProduction("antimatter") * yearsOffset);
 		}
 
 		var beacons = this.game.space.getBuilding("spaceBeacon");
@@ -965,10 +975,10 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 
 		var resPool = this.game.resPool;
 		if (resPool.energyProd >= resPool.energyCons) {
-			resPool.addResEvent("antimatter", this.game.getEffect("antimatterProduction") * years);
+			resPool.addResEvent("antimatter", this.game.getResourceOnYearProduction("antimatter") * years);
 		}
 
-		resPool.addResEvent("temporalFlux", this.game.getEffect("temporalFluxProduction") * years);
+		resPool.addResEvent("temporalFlux", this.game.getResourceOnYearProduction("temporalFlux") * years);
 
 		var aiLevel = this.game.bld.get("aiCore").effects["aiLevel"];
 		if ((aiLevel > 14) && (this.game.science.getPolicy("transkittenism").researched != true)){
@@ -1043,10 +1053,10 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 
 		var resPool = this.game.resPool;
 		if (resPool.energyProd >= resPool.energyCons) {
-			resPool.addResEvent("antimatter", this.game.getEffect("antimatterProduction"));
+			resPool.addResEvent("antimatter", this.game.getResourceOnYearProduction("antimatter"));
 		}
 
-		resPool.addResEvent("temporalFlux", this.game.getEffect("temporalFluxProduction"));
+		resPool.addResEvent("temporalFlux", this.game.getResourceOnYearProduction("temporalFlux"));
 
 		var aiLevel = this.game.bld.get("aiCore").effects["aiLevel"];
 		if ((aiLevel > 14) && (this.game.science.getPolicy("transkittenism").researched != true)){

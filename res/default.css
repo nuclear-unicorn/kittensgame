@@ -7,6 +7,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #FFFFFF;
+    height: 100vh;
 }
 
 img.loader {
@@ -136,6 +137,7 @@ div#gameLog {
 .bldTopContainer {
     padding-bottom: 5px;
 	margin-bottom: 15px;
+    height: 100%;
 }
 
 .bldTopContainer > a, .bldTopContainer > span {
@@ -240,9 +242,10 @@ select>option {
     line-height: 16px;
 }
 
-/*.btn .btnContent .btnTitle {
-
-}*/
+.btn .btnContent .btnTitle {
+    display: inline-flex;
+    gap: 4px;
+}
 
 .btn.small-text span {
     font-size: 90%;
@@ -470,6 +473,7 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
     padding-top: 15px;
     border-top: 1px solid gray;
     margin-top: 10px;
+    height: 100%;
 }
 
 .btn.modern {
@@ -528,6 +532,7 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
 	margin-bottom: 20px;
     padding: 15px;
     border: 1px solid #B0B0B0;
+    min-height: calc(100vh - 100px);
 }
 
 #toggleCenter {
@@ -765,13 +770,13 @@ span.genericWarning,
 
 .trade-race .buys {
     color: #01A9DB;
-    width: 40px;
+    min-width: 40px;
     display: inline-block;
 }
 
 .trade-race .sells {
     color: green;
-    width: 40px;
+    min-width: 40px;
     display: inline-block;
 }
 

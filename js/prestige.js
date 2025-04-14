@@ -98,7 +98,8 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			"perks": ["divineProportion"]
 		},
 		effects:{
-			"priceRatio" : -(1 + Math.sqrt(5)) / 200	//Calculates the Golden Ratio
+			"priceRatio" : -(1 + Math.sqrt(5)) / 200,	//Calculates the Golden Ratio
+			"queueCap": 1
 		}
 	},{
 		name: "divineProportion",
@@ -111,7 +112,8 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			"perks": ["vitruvianFeline"]
 		},
 		effects:{
-			"priceRatio" : -16 / 900
+			"priceRatio" : -16 / 900,
+			"queueCap": 2
 		}
 	},{
 		name: "vitruvianFeline",
@@ -134,7 +136,8 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		unlocked: false,
 		researched: false,
 		effects:{
-			"priceRatio" : -0.0225
+			"priceRatio" : -0.0225,
+			"queueCap": 2
 		}
 	},{
 		name: "diplomacy",
@@ -542,11 +545,14 @@ dojo.declare("classes.ui.PrestigeBtnController", com.nuclearunicorn.game.ui.Buil
         return model.metaCached;
     },
 
-   	buyItem: function(model, event, callback) {
+   	buyItem: function(model, event) {
 		if (this.game.science.get("metaphysics").researched) {
-			this.inherited(arguments);
+			return this.inherited(arguments);
 		} else {
-			callback(false /*itemBought*/, { reason: "not-unlocked" });
+			return {
+				itemBought: true,
+				reason: "not-unlocked"
+			};
 		}
 	},
 

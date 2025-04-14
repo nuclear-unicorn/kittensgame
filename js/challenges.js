@@ -566,12 +566,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 	},
 
 	update: function(){
-		// energy
-		if (this.getChallenge("energy").unlocked == false) {
-			if (this.game.resPool.energyProd != 0 || this.game.resPool.energyCons != 0) {
-				this.getChallenge("energy").unlocked = true;
-			}
-		} 
 		//Disable challenge if the feature flag for it is disabled
 		if (!this.game.getFeatureFlag("UNICORN_TEARS_CHALLENGE")) {
 			var chall = this.getChallenge("unicornTears");
@@ -699,16 +693,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		}, function() {
 		});
 	},
-
-	//TODO: rewrite using the general getEffect logic
-
-	/*getChallengeEffect: function(name, type) {
-		var challenge = this.getChallenge(name);
-		if (name == "energy") {
-			return 2 + 0.1 * challenge.val;
-		}
-	},*/
-
 });
 
 dojo.declare("classes.reserveMan", null,{
@@ -875,9 +859,12 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 		return $.extend(true, [], model.metadata.prices); // Create a new array to keep original values
 	},
 
-	buyItem: function(model, event, callback) {
+	buyItem: function(model, event) {
 		this.togglePending(model);
-		callback(true /*itemBought*/, {reason: "item-is-free" /*We just toggled the pending state; simple, really*/});
+		return {
+			itemBought: true,
+			reason: "item-is-free" /*It costs no resources to gather catnip, so we can't fail to buy it*/
+		};
 	},
 
 	togglePending: function(model){
@@ -1110,7 +1097,6 @@ dojo.declare("classes.ui.ReservesPanel", com.nuclearunicorn.game.ui.Panel, {
 		if (resKit.length && this.game.prestige.getPerk("ascoh").researched) {
 			//Create a list of all the cryochambers we have stored in reserved & all kittens in them:
 			var kittensTable = dojo.create("table", {}, panelContainer);
-			var census = new classes.ui.village.Census(this.game);
 			for (var i = 0; i < resKit.length; i += 1) {
 				var kitten = resKit[i];
 	
@@ -1122,7 +1108,7 @@ dojo.declare("classes.ui.ReservesPanel", com.nuclearunicorn.game.ui.Panel, {
 					break;
 				}
 				//Otherwise, we still can display more kittens:
-				dojo.create("td", { innerHTML: census.getStyledName(kitten, false /*is leader panel*/), style: "padding-right: 8px" }, tr);
+				dojo.create("td", { innerHTML: this.game.village.getStyledName(kitten, false /*is leader panel*/), style: "padding-right: 8px" }, tr);
 				var traitLabel = kitten.trait.title;
 				var rank = kitten.rank;
 				//Note that if we are fractured, the name will be randomized, & we'll obscure other info as well.
