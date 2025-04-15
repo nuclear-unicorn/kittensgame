@@ -553,7 +553,7 @@ dojo.declare("classes.ui.PrestigeBtnController", com.nuclearunicorn.game.ui.Buil
 			return this.inherited(arguments);
 		} else {
 			return {
-				itemBought: true,
+				itemBought: false,
 				reason: "not-unlocked"
 			};
 		}

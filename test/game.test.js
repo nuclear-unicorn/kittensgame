@@ -777,14 +777,14 @@ test("buyItem internals should work properly for Calendar", () => {
 test("buyItem internals should work properly for Liberty & Tradition", () => {
     const controller = new classes.ui.PolicyBtnController(game);
     let model = controller.fetchModel({ id: "liberty" });
-    
+
     //Before we get started, this test assumes certain things about Liberty:
     //We assume it costs 150 culture.
     //Liberty should be representative of most policies in the game.
     //Some policies have special conditions under which they're blocked; I won't test those here.
 
     game.opts.noConfirm = true;
-    
+
     //Try buying an item, but we have 0 culture so it should fail:
     controller.updateEnabled(model);
     var {itemBought, reason} = controller.buyItem(model, null);
@@ -992,6 +992,44 @@ test("buyItem internals should work properly for items with no cost", () => {
     expect(itemBought).toBe(true);
     expect(reason).toBe("item-is-free");
     expect(model.metadata.pending).toBe(false);
+});
+
+test("buyItem internals should work properly for Renaissance", () => {
+    let controller = new classes.ui.PrestigeBtnController(game);
+    let model = controller.fetchModel({ id: "renaissance" });
+
+    expect(game.prestige.getPerk("renaissance").researched).toBe(false);
+
+    //Buying should FAIL if we don't have Metaphysics researched.
+    controller.updateEnabled(model);
+    var {itemBought, reason} = controller.buyItem(model, null);
+    expect(itemBought).toBe(false);
+    expect(reason).toBe("not-unlocked");
+    expect(game.prestige.getPerk("renaissance").researched).toBe(false);
+
+    game.science.get("metaphysics").researched = true;
+
+    //Buying should still fail because we don't have paragon points...
+    controller.updateEnabled(model);
+    var {itemBought, reason} = controller.buyItem(model, null);
+    expect(itemBought).toBe(false);
+    expect(reason).toBe("cannot-afford");
+    expect(game.prestige.getPerk("renaissance").researched).toBe(false);
+
+    game.resPool.addResEvent("paragon", 100000);
+
+    //Now, buying should succeed...
+    controller.updateEnabled(model);
+    var {itemBought, reason} = controller.buyItem(model, null);
+    expect(itemBought).toBe(true);
+    expect(reason).toBe("paid-for");
+    expect(game.prestige.getPerk("renaissance").researched).toBe(true);
+
+    //Buying should fail again, since it's a one-time purchase
+    controller.updateEnabled(model);
+    var {itemBought, reason} = controller.buyItem(model, null);
+    expect(itemBought).toBe(false);
+    expect(reason).toBe("already-bought");
 });
 
 test("Refine Catnip ×100 should fail if there isn't enough catnip", () => {
