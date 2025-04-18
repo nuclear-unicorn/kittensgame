@@ -1985,6 +1985,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.resPool.setVillage(this.village);
 
         var managers = [
+		{ id: "challenges",     class:  "ChallengesManager" }, //challenges must be *before* space for a certain policy to work.
             { id: "workshop",       class:  "WorkshopManager"   },
             { id: "diplomacy",      class:  "DiplomacyManager"  },
             { id: "bld",            class:  "BuildingsManager"  },
@@ -1994,7 +1995,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
             { id: "space",          class:  "SpaceManager"      },
 			{ id: "time",           class:  "TimeManager"       },
             { id: "prestige",       class:  "PrestigeManager"   },
-            { id: "challenges",     class:  "ChallengesManager" },
             { id: "stats",       	class:  "StatsManager"      },
 			{ id: "void",       	class:  "VoidManager"      },
 			{ id: "settings",		class: "SettingsManager" }

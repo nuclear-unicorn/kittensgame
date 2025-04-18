@@ -3640,7 +3640,7 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 	},
 	getFlavor: function(model) {
 		var job = model.job;
-		return job.flavour;
+		return job.flavor;
 	}
 });
 

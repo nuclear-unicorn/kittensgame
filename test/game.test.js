@@ -777,14 +777,14 @@ test("buyItem internals should work properly for Calendar", () => {
 test("buyItem internals should work properly for Liberty & Tradition", () => {
     const controller = new classes.ui.PolicyBtnController(game);
     let model = controller.fetchModel({ id: "liberty" });
-    
+
     //Before we get started, this test assumes certain things about Liberty:
     //We assume it costs 150 culture.
     //Liberty should be representative of most policies in the game.
     //Some policies have special conditions under which they're blocked; I won't test those here.
 
     game.opts.noConfirm = true;
-    
+
     //Try buying an item, but we have 0 culture so it should fail:
     controller.updateEnabled(model);
     var {itemBought, reason} = controller.buyItem(model, null);
@@ -992,4 +992,77 @@ test("buyItem internals should work properly for items with no cost", () => {
     expect(itemBought).toBe(true);
     expect(reason).toBe("item-is-free");
     expect(model.metadata.pending).toBe(false);
+});
+
+test("buyItem internals should work properly for Renaissance", () => {
+    let controller = new classes.ui.PrestigeBtnController(game);
+    let model = controller.fetchModel({ id: "renaissance" });
+
+    expect(game.prestige.getPerk("renaissance").researched).toBe(false);
+
+    //Buying should FAIL if we don't have Metaphysics researched.
+    controller.updateEnabled(model);
+    var {itemBought, reason} = controller.buyItem(model, null);
+    expect(itemBought).toBe(false);
+    expect(reason).toBe("not-unlocked");
+    expect(game.prestige.getPerk("renaissance").researched).toBe(false);
+
+    game.science.get("metaphysics").researched = true;
+
+    //Buying should still fail because we don't have paragon points...
+    controller.updateEnabled(model);
+    var {itemBought, reason} = controller.buyItem(model, null);
+    expect(itemBought).toBe(false);
+    expect(reason).toBe("cannot-afford");
+    expect(game.prestige.getPerk("renaissance").researched).toBe(false);
+
+    game.resPool.addResEvent("paragon", 100000);
+
+    //Now, buying should succeed...
+    controller.updateEnabled(model);
+    var {itemBought, reason} = controller.buyItem(model, null);
+    expect(itemBought).toBe(true);
+    expect(reason).toBe("paid-for");
+    expect(game.prestige.getPerk("renaissance").researched).toBe(true);
+
+    //Buying should fail again, since it's a one-time purchase
+    controller.updateEnabled(model);
+    var {itemBought, reason} = controller.buyItem(model, null);
+    expect(itemBought).toBe(false);
+    expect(reason).toBe("already-bought");
+});
+
+test("Refine Catnip ×100 should fail if there isn't enough catnip", () => {
+    let controller = new classes.game.ui.RefineCatnipButtonController(game);
+    let model = controller.fetchModel({
+        prices: [{ name: "catnip", val: 100 }]
+    });
+
+    //If we have 0 resources, nothing should happen!
+    expect(game.resPool.get("catnip").value).toBe(0);
+    expect(game.resPool.get("wood").value).toBe(0);
+    controller.handleX100Click(model);
+    expect(game.resPool.get("catnip").value).toBe(0);
+    expect(game.resPool.get("wood").value).toBe(0);
+
+    //If we have plenty of resources, it should work!
+    game.resPool.addResEvent("catnip", 19999); //Enough for 1 craft, not enough for 2.
+    expect(game.resPool.get("catnip").value).toBe(19999);
+    expect(game.resPool.get("wood").value).toBe(0);
+    controller.handleX100Click(model);
+    expect(game.resPool.get("catnip").value).toBe(9999); //Should have consumed 10k catnip
+    expect(game.resPool.get("wood").value).toBe(100); //No craft bonuses currently active
+
+    //If we have some but not quite enough resources, nothing should happen!
+    controller.handleX100Click(model);
+    expect(game.resPool.get("catnip").value).toBe(9999);
+    expect(game.resPool.get("wood").value).toBe(100);
+
+    //Adding 1 catnip should make the craft work this time
+    game.resPool.addResEvent("catnip", 1);
+    expect(game.resPool.get("catnip").value).toBe(10000);
+    expect(game.resPool.get("wood").value).toBe(100);
+    controller.handleX100Click(model);
+    expect(game.resPool.get("catnip").value).toBe(0); //Should have consumed 10k catnip
+    expect(game.resPool.get("wood").value).toBe(200); //Crafted 100 more wood
 });
