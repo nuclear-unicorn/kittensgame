@@ -2398,12 +2398,18 @@ dojo.declare("classes.queue.manager", null,{
                 }
                 for (var i in religionUpgrades){
                     var upgrade = religionUpgrades[i];
-                    if (upgrade.faith <= this.game.religion.faith && (!upgrade.noStackable || !upgrade.val)){
-                        options.push({
-                            name: upgrade.name,
-                            label: upgrade.label
-                        });
+                    if (upgrade.noStackable && upgrade.val) { //Already bought item
+                        continue;
                     }
+                    if (!upgrade.val && this.game.religion.faith < upgrade.faith) {
+                        //Item is not visible (see religion.js, ReligionBtnController#updateVisible)
+                        //After purchasing the item at least once previously, it will remain visible even if worship decreases again
+                        continue;
+                    }
+                    options.push({
+                        name: upgrade.name,
+                        label: upgrade.label
+                    });
                 }
                 return options;
 
