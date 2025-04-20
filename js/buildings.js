@@ -170,6 +170,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					effect = effectValue * bld.val;
 				} else {
 					effect = effectValue * bld.on;
+					if (bld.name == "magneto" && effectName == "magnetoRatio") {
+						effect += effectValue * bld.getPhantomMagnetos(bld, game);
+					}
 				}
 
 				//probably not the best place to handle this mechanics
@@ -438,7 +441,10 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
                 effects["energyProduction"] *= 1 + game.getEffect("hydroPlantRatio");
                 stageMeta.effects = effects;
             }
-        }
+		},
+		upgrades: {
+			buildings: ["magneto"]
+		}
 	},
 	//----------------------------------- Population ----------------------------------------
 	{
@@ -1323,11 +1329,38 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"magnetoRatio": 0.02,
 			"cathPollutionPerTickProd": 5
 		},
+		calculateEffects: function(self, game) {
+			var maxPhantoms = self.getMaxPhantoms(self, game);
+			if (maxPhantoms > 0) {
+				self.description = $I("buildings.magneto.desc") + "<br>" + $I("buildings.magneto.phantoms", [maxPhantoms]);
+			} else {
+				self.description = $I("buildings.magneto.desc");
+			}
+		},
 		action: function(self, game){
 			var oil = game.resPool.get("oil");
 			if (oil.value + self.effects["oilPerTick"] <= 0){
 				self.on--;//Turn off one per tick until oil flow is sufficient
 			}
+		},
+		getMaxPhantoms: function(self, game) {
+			var hydroPlant = game.bld.getBuildingExt("aqueduct").meta;
+			if (hydroPlant.stage == 1 && game.science.getPolicy("lizardRelationsEcologists").researched) {
+				return Math.floor(Math.min(hydroPlant.on / 3, self.val * 0.8));
+			}
+			//Else, policy isn't active
+			return 0;
+		},
+		//Phantom Magnetos contribute to production bonus without consuming resources or producing pollution.
+		//Maybe this was a bad name.  They're not like phantom Tradeposts.
+		//These ones have to be built & turned off.
+		getPhantomMagnetos: function(self, game) {
+			if (self.on == 0) {
+				//At least 1 real Magneto must be on to benefit from phantoms.
+				return 0;
+			}
+			//Can't benefit from more phantoms than there are inactive Magnetos
+			return Math.min(self.getMaxPhantoms(self, game), self.val - self.on);
 		}
 	},
 	{
@@ -2649,6 +2682,47 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		if(cathPollution <= 0){return 0;}
 		return Math.max(Math.floor(Math.log10(cathPollution * 10 / this.getPollutionLevelBase())), 0);
 	},
+
+	getDetailedPollutionInfo: function(){
+		var html = "";
+
+		var currentCathPollution = this.game.bld.cathPollution;
+		var currenCathPerTickPollution = this.game.bld.cathPollutionPerTick;
+
+		html = "Pollution is " + Math.floor(currentCathPollution) +
+				" (" + this.game.getDisplayValueExt(currentCathPollution) + ") " +
+				"<br>Polution per tick is " + Math.floor(currenCathPerTickPollution);
+
+		var pollutionLevel = this.game.bld.getPollutionLevel();
+		html += "<br>Pollution level is " + pollutionLevel;
+
+		if(pollutionLevel >= 0){
+			html += "<br>Pollution future effects might be at this pollution level:";
+			html += "<br>— Less catnip production";
+			if(pollutionLevel >= 1){
+				html += "<br>— Less kitten happines: " + this.game.bld.pollutionEffects["pollutionHappines"] + "%";
+			}
+			if(pollutionLevel >= 2){
+				html += "<br>— Kittens arrive " + this.game.bld.pollutionEffects["pollutionArrivalSlowdown"] + " times slower.";
+			}
+			if(pollutionLevel > 4){
+				html += "<br>— SR effect doesn't apply to wood and catnip";
+			}else if(pollutionLevel >= 3){
+				html += "<br>— Less SR effect on wood and catnip";
+			}
+		}
+		if(currenCathPerTickPollution < 0 && currentCathPollution) {
+			var toZero = -currentCathPollution / currenCathPerTickPollution / this.game.calendar.ticksPerDay;
+			html += "<br> To zero " + this.game.toDisplaySeconds(toZero.toFixed());
+		} else if(currenCathPerTickPollution > 0){
+			var toNextLevel = (Math.pow(10, 1 + pollutionLevel) * this.game.bld.getPollutionLevelBase() - currentCathPollution) / currenCathPerTickPollution / this.game.calendar.ticksPerDay;
+			html += "<br> To next level " + this.game.toDisplaySeconds(toNextLevel.toFixed());
+		}
+
+		return html;
+	},
+
+
     //============ dev =============
     devAddStorage: function(){
         this.get("warehouse").val += 10;
@@ -2867,7 +2941,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 });
 
 dojo.declare("classes.game.ui.GatherCatnipButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
-	buyItem: function(model, event, callback){
+	buyItem: function(model, event){
 		var self = this;
 		clearTimeout(this.game.gatherTimeoutHandler);
 		this.game.gatherTimeoutHandler = setTimeout(function(){ self.game.gatherClicks = 0; }, 2500);	//2.5 sec
@@ -2879,7 +2953,10 @@ dojo.declare("classes.game.ui.GatherCatnipButtonController", com.nuclearunicorn.
 		}
 
 		this.game.bld.gatherCatnip();
-		callback(true /*itemBought*/, {reason: "item-is-free" /*It costs no resources to gather catnip, so we can't fail to buy it*/});
+		return {
+			itemBought: true,
+			reason: "item-is-free" /*It costs no resources to gather catnip, so we can't fail to buy it*/
+		};
 	}
 });
 
@@ -2905,6 +2982,7 @@ dojo.declare("classes.game.ui.RefineCatnipButtonController", com.nuclearunicorn.
 
 		if (catnipVal < 100 * catnipCost) {
 			this.game.msg($I("craft.msg.notEnoughCatnip"));
+			return;
 		}
 
 		this.game.resPool.addResEvent("catnip", -100 * catnipCost);
@@ -2957,6 +3035,13 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 
     getName: function(model) {
 		var meta = model.metadata;
+		if (meta.name == "magneto") {
+			var phantoms = meta.getPhantomMagnetos(meta, this.game);
+			if (phantoms) {
+				return meta.label + " (" + meta.on + "+" + phantoms + "/" + meta.val + ")";
+			}
+		}
+
 		var name = this.inherited(arguments);
 
 		var sim = this.game.village.sim;

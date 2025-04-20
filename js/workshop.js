@@ -428,6 +428,19 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			}
 		}
 	},{
+		name: "tachyonModerator",
+		label: $I("workshop.tachyonModerator.label"),
+		description: $I("workshop.tachyonModerator.desc"),
+		flavor: $I("workshop.tachyonModerator.flavor"),
+		prices: [
+			{ name: "science", val: 16000 },
+			{ name: "gear", val: 500 },
+			{ name: "titanium", val: 250 }
+		],
+		unlocks: {
+			chronoforge: ["controlledDelay"]
+		}
+	},{
 		name: "tachyonAccelerators",
 		label: $I("workshop.tachyonAccelerators.label"),
 		description: $I("workshop.tachyonAccelerators.desc"),
@@ -2497,6 +2510,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		for (var ind in this.crafts){
 			var craft = this.crafts[ind];
 			var kittenResProduction = (this.game.village.getResProduction()["ES" + craft.name] || 0);
+			kittenResProduction *= kittenResProductionModifier;
 			if (!kittenResProduction){
 				continue;
 			}
@@ -2832,7 +2846,11 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 				progressDisplayed = 99;
 			}
 
-			return model.craft.label + " (" + craft.value + ") [" + progressDisplayed + "%]";
+			if (progressDisplayed < 10) {
+				progressDisplayed = "0" + progressDisplayed;
+			}
+
+			return "<div class=\"label\"><span class=\"label-content\">" + model.craft.label + "</span></div><div>(" + craft.value + ")</div><div class=\"progress\">[" + progressDisplayed + "%]</div>";
 		} else {
 			return this.inherited(arguments);
 		}
@@ -2865,8 +2883,15 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 			}
 
 			if (craft.value != 0) {
-				var countdown = (1 / (this.game.workshop.getEffectEngineer(craft.name, false) * this.game.getTicksPerSecondUI())).toFixed(0);
-				desc += "<br />=> " + $I("workshop.craftBtn.desc.countdown", [countdown]);
+				var craftsPerSecond = (this.game.workshop.getEffectEngineer(craft.name, false) * this.game.getTicksPerSecondUI());
+				if (craftsPerSecond <= 0) {
+					desc += "<br />=> " + $I("workshop.craftBtn.desc.countdown", ["&infin;"]);
+				} else if (craftsPerSecond <= 0.5) {
+					var countdown = (1 / craftsPerSecond).toFixed(0);
+					desc += "<br />=> " + $I("workshop.craftBtn.desc.countdown", [countdown]);
+				} else {
+					desc += "<br />=> " + $I("workshop.craftBtn.desc.craftsPerSecond", [this.game.getDisplayValueExt(craftsPerSecond)]);
+				}
 			}
 		}
 		return desc;
@@ -2888,6 +2913,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 			}
 		}
 		craft.value += valueAdded;
+		this.game.workshopTab.updateTab();
 	},
 
 	unassignCraftJob: function(model, value) { //TODO, aunssign one kitten, not just a value to manage with exp
@@ -2898,6 +2924,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 		for (var i = 0; i < valueCorrected; i++) {
 			this.game.village.sim.unassignCraftJob(craft);
 		}
+		this.game.workshopTab.updateTab();
 	},
 
 
@@ -2996,12 +3023,18 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 		return model;
 	},
 
-	buyItem: function(model, event, callback) {
+	buyItem: function(model, event) {
 		var wasCraftSuccessful = this.game.workshop.craft(model.craft.name, 1);
 		if (wasCraftSuccessful) {
-			callback(true /*itemBought*/, { reason: "paid-for" });
+			return {
+				itemBought: true,
+				reason: "paid-for"
+			};
 		} else {
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
+			return {
+				itemBought: false,
+				reason: "cannot-afford"
+			};
 		}
 	}
 });
@@ -3084,6 +3117,8 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 
 	resTd: null,
 
+	consumptionTd: null,
+
 	constructor: function(tabName, game){
 		this.game = game;
 
@@ -3139,10 +3174,10 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 		var content = craftPanel.render(tabContainer);
 
 		var table = dojo.create("table", {}, content);
-		dojo.create("tr", {}, table);
+		var row1 = dojo.create("tr", { height: "1px" }, table);
 
 		//buttons go there
-		var td = dojo.create("td", {}, table);
+		var td = dojo.create("td", { rowspan: 2 }, row1);
 		var tdTop = dojo.create("td", { colspan: 2, style: {cursor: "pointer"} }, td);
 
 		this.tdTop = tdTop;
@@ -3186,12 +3221,22 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 			zebraUpgradeButton.render(content);
 		}
 	}
+		
 
 		//resources go there
-		var td = dojo.create("td", { className: "craftStuffPanel", style: {paddingLeft: "50px"}}, table);
+		var td = dojo.create("td", { className: "craftStuffPanel", style: {paddingLeft: "50px"}}, row1);
 		this.resTd = td;
 		this.renderResources(this.resTd);
 
+		var row2 = dojo.create("tr", {}, table);
+
+		//engineer consumption go here
+		var tdConsumption = dojo.create("td", { className: "craftStuffPanel", style: {paddingLeft: "50px"}}, row2);
+		this.consumptionTd = tdConsumption;
+		if (Object.keys(this.game.workshop.getConsumptionEngineers()).length){
+			this.renderConsumption(this.consumptionTd);
+		}
+		
 		//----------------
 		if (!this.game.science.get("construction").researched){
 			craftPanel.setVisible(false);
@@ -3223,6 +3268,31 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 		}
 	},
 
+	renderConsumption: function(container){
+
+		dojo.empty(container);
+
+		dojo.create("span", { innerHTML: $I("workshop.craftPanel.consumption.label") + ":" },container);
+
+		var table = dojo.create("table", { style: {
+			paddingTop: "20px"
+		}}, container);
+
+		var resources = this.game.resPool.resources;
+		var engineerConsumption = this.game.workshop.getConsumptionEngineers();
+
+		for (var i = 0; i < resources.length; i++){
+			var res = resources[i];
+
+			if (engineerConsumption[res.name]){
+				var tr = dojo.create("tr", {}, table);
+
+				dojo.create("td", { innerHTML: res.title || res.name + ":" }, tr);
+				dojo.create("td", { innerHTML: this.game.getDisplayValueExt(engineerConsumption[res.name], null, true) }, tr);
+			}
+		}
+	},
+
 	createBtn: function(upgrade) {
 		var controller = new com.nuclearunicorn.game.ui.UpgradeButtonController(this.game);
 		return new com.nuclearunicorn.game.ui.BuildingResearchBtn({id: upgrade.name, controller: controller}, this.game);
@@ -3250,6 +3320,10 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 			this.renderResources(this.resTd);
 		}
 
+		if (this.consumptionTd && Object.keys(this.game.workshop.getConsumptionEngineers()).length){
+			this.renderConsumption(this.consumptionTd);
+		}
+
 		if (this.tdTop && this.game.science.get("mechanization").researched) {
 			this.tdTop.innerHTML = $I("workshop.craftPanel.header.freeEngineers") + ": " + this.game.village.getFreeEngineers() + " / " + this.game.village.getWorkerKittens("engineer");
 		} else {
@@ -3268,5 +3342,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 		if (this.domNode) {
 			this.domNode.innerHTML = this.tabName;
 		}
+		dojo.publish("ui/refreshTabNames", [this.game]);
 	}
 });

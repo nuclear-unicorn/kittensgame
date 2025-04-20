@@ -237,11 +237,15 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				"name", "embassyLevel", "unlocked", "collapsed", "energy", "duration", "pinned"
 			])
 		};
+		if (this.get("leviathans").autoPinned) {
+			saveData.diplomacy.autoPinLeviathans = true;
+		}
 	},
 
 	load: function(saveData){
 		if (saveData.diplomacy) {
 			this.game.bld.loadMetadata(this.races, saveData.diplomacy.races);
+			this.get("leviathans").autoPinned = saveData.diplomacy.autoPinLeviathans || false;
 		}
 	},
 
@@ -459,9 +463,9 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
             this.game.unlock(race.unlocks);
 		}
 		var printMessages = totalTradeAmount == 1;
-		var standingRatio = this.game.getEffect("standingRatio") + this.game.diplomacy.calculateStandingFromPolicies(race.name, this.game);
+		var standing = this.getFinalStanding(race);
 
-		var failedTradeAmount = race.standing < 0 ? this.game.math.binominalRandomInteger(totalTradeAmount, -(race.standing + standingRatio)) : 0;
+		var failedTradeAmount = standing < 0 ? this.game.math.binominalRandomInteger(totalTradeAmount, -standing) : 0;
 		var successfullTradeAmount = totalTradeAmount - failedTradeAmount;
 
 		if (successfullTradeAmount == 0) {
@@ -474,7 +478,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		// at most 1 year + 1 season per energy unit
 		race.duration = Math.min(race.duration, this.game.calendar.daysPerSeason * (this.game.calendar.seasonsPerYear + race.energy));
 
-		var bonusTradeAmount = race.standing > 0 ? this.game.math.binominalRandomInteger(totalTradeAmount, race.standing + standingRatio / 2) : 0;
+		var bonusTradeAmount = standing > 0 ? this.game.math.binominalRandomInteger(totalTradeAmount, standing) : 0;
 		var normalTradeAmount = successfullTradeAmount - bonusTradeAmount;
 
 		if (bonusTradeAmount > 0) {
@@ -651,6 +655,26 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 		return min;
 	},
+	//Returns a number representing that race's attitude towards the player,
+	// taking into account all policies, effects, etc.
+	getFinalStanding: function(race) {
+		var bonusStanding = this.game.getEffect("standingRatio") + this.calculateStandingFromPolicies(race.name, this.game);
+		if (race.standing < 0) {
+			//We can make hostile races neutral, but that's the limit
+			return Math.min(race.standing + bonusStanding, 0);
+		} else if (race.standing == 0) {
+			if (this.game.science.getPolicy("lizardRelationsDiplomats").researched) {
+				bonusStanding += race.embassyLevel * this.game.getEffect("neutralRaceEmbassyStanding");
+				//Need 25% or more to reach friendly relations
+				return Math.max((bonusStanding - 0.25) / 3, 0);
+			}
+			//Else, neutral races are not affected at all
+			return 0;
+		} else {
+			//For friendly races, bonuses are only half as effective
+			return race.standing + bonusStanding / 2;
+		}
+	},
 	getSpiceTradeChance: function(race) {
 		var embassyEffect = this.game.ironWill ? 0.0025 : 0.01;
 		return 0.35 * (1 + (race.embassyPrices ?  race.embassyLevel * embassyEffect : 0));
@@ -764,12 +788,14 @@ dojo.declare("classes.diplomacy.ui.RacePanel", com.nuclearunicorn.game.ui.Panel,
 	},
 
 	render: function(container) {
-        var attitudeFromPolicies = this.game.diplomacy.calculateStandingFromPolicies(this.race.name, this.game);
+		var finalStanding = this.game.diplomacy.getFinalStanding(this.race);
 		var attitude = this.race.standing > 0
 			? "friendly"
 			: this.race.standing == 0
-				? "neutral"
-				: this.race.standing + this.game.getEffect("standingRatio") + attitudeFromPolicies < 0
+				? finalStanding > 0
+					? "nowFriendly"
+					: "neutral"
+				: finalStanding < 0
 					? "hostile"
 					: "nowNeutral";
 		this.name = this.race.title + " <span class='attitude'>" + $I("trade.attitude." + attitude) + "</span>";
@@ -1051,11 +1077,14 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 		return prices;
 	},
 
-	buyItem: function(model, event, callback) {
-		this.inherited(arguments);
-		this.game.upgrade({policies: ["lizardRelationsDiplomats", "nagaRelationsArchitects", "spiderRelationsGeologists"]}); //Upgrade, since the policy is based on number of embassies.
-		this.game.science.unlockRelations(); //Check if we can unlock new relation policies based on number of embassies.
-		this.game.ui.render();
+	buyItem: function(model, event) {
+		var result = this.inherited(arguments);
+		if (result.itemBought){
+			this.game.upgrade({policies: ["lizardRelationsDiplomats", "nagaRelationsArchitects", "spiderRelationsGeologists"]}); //Upgrade, since the policy is based on number of embassies.
+			this.game.science.unlockRelations(); //Check if we can unlock new relation policies based on number of embassies.
+			this.game.ui.render();
+		}
+		return result;
 	},
 
 	incrementValue: function(model) {

@@ -38,7 +38,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             heat: this.heat,
             testShatter: this.testShatter, //temporary
             isAccelerated: this.isAccelerated,
-            cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "unlocked", "isAutomationEnabled"]),
+            cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "delayTicks", "unlocked", "isAutomationEnabled"]),
             vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"]),
             queueItems: this.queue.queueItems,
             queueSources: this.queue.queueSources
@@ -78,14 +78,14 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 			this.getVSU("usedCryochambers").unlocked = true;
         }
 
-        //console.log("restored save data timestamp as", saveData["time"].timestamp);
+        console.log("restored save data timestamp as", saveData["time"].timestamp);
         var ts = saveData["time"].timestamp || Date.now();
 
         this.gainTemporalFlux(ts);
         this.timestamp = ts;
         this.queue.queueItems = saveData["time"].queueItems || [];
         this.queue.queueSources = saveData["time"].queueSources || this.queue.queueSourcesDefault;
-        if (this.queue.queueSources === {} || typeof(this.queue.queueSources["buildings"]) != "boolean") {
+        if (!Object.keys(this.queue.queueSources).length || typeof(this.queue.queueSources["buildings"]) != "boolean") {
             this.queue.queueSources = this.queue.queueSourcesDefault;
         }
         this.queue.alphabeticalSort = saveData["time"].queueAlphabeticalSort;
@@ -98,9 +98,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.queue.updateQueueSourcesArr();
 
         //TODO: move me to UI
-        if(!this.game.getFeatureFlag("QUEUE")){
+        /*if(!this.game.getFeatureFlag("QUEUE")){
             $("#queueLink").hide();
-        }
+        }*/
 	},
 
 	gainTemporalFlux: function (timestamp){
@@ -186,6 +186,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     applyRedshift: function(daysOffset, ignoreCalendar){
         //populate cached per tickValues
         this.game.resPool.update();
+        this.game.space.update(); // Need to recalc effects based on proper max antimatter
         this.game.updateResources();
         var resourceLimits = this.game.resPool.fastforward(daysOffset);
 
@@ -225,8 +226,10 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         return numberEvents;
     },
     calculateRedshift: function(){
+        var isRedshiftEnabled = this.game.isMobile() ? true : this.game.opts.enableRedshift;
+
         var currentTimestamp = Date.now();
-        var delta = this.game.opts.enableRedshift
+        var delta = isRedshiftEnabled
             ? currentTimestamp - this.timestamp
             : 0;
         //console.log("redshift delta:", delta, "old ts:", this.timestamp, "new timestamp:", currentTimestamp);
@@ -345,6 +348,13 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             if (self.on < self.val){
                 self.on = self.val;
             }
+            var delay = game.time.getCFU("controlledDelay");
+            if (delay.delayTicks > 0) {
+                //Timer should count down even if automation is paused.
+                //Not affected by Tempus Fugit.
+                delay.delayTicks -= 1;
+                return;
+            }
 
             if (!self.on || !self.isAutomationEnabled){
                 return;
@@ -363,6 +373,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     amt = limit;
                 }
                 self.heat -= 100 * amt;
+                delay.delayTicks = delay.on; //Pause for a duration of 1 game-tick per active Controlled Delay
                 //game.time.shatter(amt);
                 if(test_shatter == 1) {game.time.shatterInGroupCycles(amt);}
                 //else if(game.time.testShatter == 2) {game.time.shatterInCycles(amt);}
@@ -371,6 +382,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             }
         },
 		unlocks: {
+			upgrades: ["tachyonModerator"],
 			chronoforge: ["timeBoiler"]
 		},
         unlocked: true
@@ -402,6 +414,27 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         },
         action: function(self, game) {
             self.updateEffects(self, game);
+        },
+        unlocked: false
+    },{
+        name: "controlledDelay",
+        label: $I("time.cfu.controlledDelay.label"),
+        description: $I("time.cfu.controlledDelay.desc") + "<br>" + $I("time.cfu.controlledDelay.desc2"),
+        prices: [
+            { name: "timeCrystal", val: 1 },
+            { name: "gear", val: 10 }
+        ],
+        priceRatio: 1, //Affordable scaling
+        limitBuild: 25, //Hard-capped at 5 sec delay.
+        calculateEffects: function(self, game) {
+            if (self.isAutomationEnabled == null) { //force non-null value
+                self.isAutomationEnabled = false;
+            }
+        },
+        delayTicks: 0,
+        isAutomationEnabled: false,
+        effects: {
+            "energyConsumption": 0.75
         },
         unlocked: false
     },{
@@ -997,21 +1030,25 @@ dojo.declare("classes.ui.time.AccelerateTimeBtnController", com.nuclearunicorn.g
             title: this.game.time.isAccelerated ? $I("btn.on.minor") : $I("btn.off.minor"),
             tooltip: this.game.time.isAccelerated ? $I("time.AccelerateTimeBtn.tooltip.accelerated") : $I("time.AccelerateTimeBtn.tooltip.normal"),
             cssClass: this.game.time.isAccelerated ? "fugit-on" : "fugit-off",
-            handler: function(btn, callback) {
-                self.buyItem(null, null, callback);
+            handler: function(btn) {
+                self.buyItem(null, null);
             }
         };
         return model;
     },
 
-    buyItem: function(model, event, callback) {
+    buyItem: function(model, event) {
+        var self = this;
         if (self.game.resPool.get("temporalFlux").value <= 0) {
             self.game.time.isAccelerated = false;
             self.game.resPool.get("temporalFlux").value = 0;
         } else {
             self.game.time.isAccelerated = !self.game.time.isAccelerated;
         }
-        callback(true /*itemBought*/, { reason: "item-is-free" /*It costs flux, but you can still toggle it freely*/ });
+        return {
+            itemBought: true,
+            reason: "item-is-free" /*It costs flux, but you can still toggle it freely*/
+        };
     }
 });
 
@@ -1254,24 +1291,30 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
 		return pricesTotal;
 	},
 
-    buyItem: function(model, event, callback){
+    buyItem: function(model, event){
         if (!this.hasResources(model)) {
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
-			return true;
+            return {
+                itemBought: false,
+                reason: "cannot-afford"
+            };
 		}
 		if (!model.enabled) {
             //As far as I can tell, this shouldn't ever happen because being
             //unable to afford it is the only reason for it to be disabled.
-			callback(false /*itemBought*/, { reason: "not-enabled" });
-			return true;
+            return {
+                itemBought: false,
+                reason: "not-enabled"
+            };
 		}
         var price = this.getPrices(model);
         for (var i in price){
             this.game.resPool.addResEvent(price[i].name, -price[i].val);
         }
         this.doShatter(model, 1);
-        callback(true /*itemBought*/, { reason: "paid-for" });
-        return true;
+        return {
+            itemBought: true,
+            reason: "paid-for" 
+        };
     },
 
     doShatterAmt: function(model, amt) {
@@ -1330,8 +1373,9 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         else {timeManager.shatter(amt);}
     },
 
+    //Shatter TC button will be visible as long as you've seen a time crystal in this run:
     updateVisible: function(model){
-        model.visible = (this.game.resPool.get("timeCrystal").value >= 1);
+        model.visible = this.game.resPool.get("timeCrystal").unlocked;
     }
 });
 
@@ -1385,6 +1429,142 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
     }
 });
 
+dojo.declare("classes.ui.time.UseHeatBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
+	fetchModel: function(options) {
+		var model = this.inherited(arguments);
+		model.useAllLink = this._newLink(model, "all");
+		var shatterYearBoost = this.game.getEffect("shatterYearBoost");
+		if(shatterYearBoost){
+			model.customLink = this._newLink(model, shatterYearBoost); //Creates additional custom shatter link based on the effect
+		}
+		return model;
+	},
+
+	_newLink: function(model, shatteredQuantity) {
+		var self = this;
+		if (shatteredQuantity == "all") { //"all" means as many as we can afford, minimum of 2
+			shatteredQuantity = Math.max(2, Math.floor(this.game.time.getCFU("blastFurnace").heat / 100));
+		}
+
+		var isVisible = true; //Always true if showNonApplicableButtons is true
+		if (!this.game.opts.showNonApplicableButtons) {
+			var prices = this.getPricesMultiple(model, shatteredQuantity);
+			var furnaceHeat = this.game.time.getCFU("blastFurnace").heat;
+			isVisible = (prices.heat <= furnaceHeat);
+		}
+		return {
+			visible: isVisible,
+			title: "x" + shatteredQuantity,
+			handler: function(event) {
+				self.doShatterAmt(model, shatteredQuantity);
+			}
+		};
+	},
+
+	getPricesMultiple: function(model, amt) {
+		return { heat: 100 * amt };
+	},
+
+	hasResources: function(model, prices){
+		var furnace = this.game.time.getCFU("blastFurnace");
+		if (!prices){
+			prices = this.getPricesMultiple(model, 1);
+		}
+		if (prices && prices.heat) {
+			return furnace.heat >= prices.heat;
+		}
+		return furnace.heat >= 100;
+	},
+
+	buyItem: function(model, event, callback){
+		var amt = 1;
+		var price = this.getPricesMultiple(model, amt);
+		var furnace = this.game.time.getCFU("blastFurnace");
+		if (furnace.heat < price.heat) {
+			callback(false /*itemBought*/, { reason: "cannot-afford" });
+			return true;
+		}
+		if (!model.enabled) {
+			callback(false /*itemBought*/, { reason: "not-enabled" });
+			return true;
+		}
+		furnace.heat -= price.heat;
+		this.doShatter(model, amt);
+		callback(true /*itemBought*/, { reason: "paid-for" });
+		return true;
+	},
+
+	doShatterAmt: function(model, amt) {
+		if (!model.enabled) {
+			return;
+		}
+		var price = this.getPricesMultiple(model, amt);
+		var furnace = this.game.time.getCFU("blastFurnace");
+		if (furnace.heat >= price.heat) {
+			furnace.heat -= price.heat;
+			this.doShatter(model, amt);
+		}
+	},
+
+	doShatter: function(model, amt) {
+		var game = this.game;
+		var timeManager = game.time;
+		//timeManager.shatter(amt);
+		if(timeManager.testShatter == 1) {timeManager.shatterInGroupCycles(amt);}
+		//else if(timeManager.testShatter == 2) {timeManager.shatterInCycles(amt);}
+		//shatterInCycles is deprecated
+		else {timeManager.shatter(amt);}
+	},
+
+	updateVisible: function(model) {
+		model.visible = this.game.workshop.get("tachyonModerator").researched;
+	}
+});
+
+dojo.declare("classes.ui.time.UseHeatBtn", com.nuclearunicorn.game.ui.ButtonModern, {
+    renderLinks: function() {
+        this.useAllLink = this.addLink(this.model.useAllLink);
+        dojo.addClass(this.useAllLink.link,"rightestLink");
+        if(this.model.customLink){
+            this.custom = this.addLink(this.model.customLink);
+        }
+    },
+
+    update: function() {
+        this.inherited(arguments);
+
+        //If needed, update the value of the "all" link:
+        if (this.model.useAllLink.title != this.useAllLink.link.innerHTML) {
+            dojo.destroy(this.useAllLink.link);
+            this.useAllLink = this.addLink(this.model.useAllLink);
+            dojo.addClass(this.useAllLink.link,"rightestLink");
+            if (this.custom) {
+                dojo.place(this.useAllLink.link, this.custom.link, "before"); //Rearrange DOM
+            }
+        }
+        dojo.style(this.useAllLink.link, "display", this.model.useAllLink.visible ? "" : "none");
+
+        if(this.model.customLink && !this.custom) { //Create custom link if needed
+            this.custom = this.addLink(this.model.customLink);
+        }
+        if(!this.model.customLink && this.custom) { //Destroy custom link if needed
+            dojo.destroy(this.custom.link);
+            this.custom = undefined;
+        }
+        if (this.custom && this.model.customLink && this.model.customLink.title != this.custom.link.innerHTML) {
+            //Change the value of the custom link if needed.
+            //We can't just call updateLink() because we need to change the link handler as well!
+            //Instead, destroy the old link & create a new one.
+            dojo.destroy(this.custom.link);
+            this.custom = this.addLink(this.model.customLink);
+            dojo.place(this.custom.link, this.useAllLink.link, "after"); //Rearrange DOM
+        }
+        if (this.custom && this.model.customLink) {
+            dojo.style(this.custom.link, "display", this.model.customLink.visible ? "" : "none");
+        }
+    }
+});
+
 /**
  * I wonder if we can get rid of such tremendous amounts of boilerplate code
  */
@@ -1399,10 +1579,21 @@ dojo.declare("classes.ui.time.ChronoforgeBtnController", com.nuclearunicorn.game
 
     getName: function(model){
         var meta = model.metadata;
-        if (meta.heat){
-            return this.inherited(arguments) + " [" + this.game.getDisplayValueExt(meta.heat) + "%]";
+        var game = this.game;
+        var label = this.inherited(arguments);
+
+        if (meta.delayTicks > 0) {
+            //It's kind of a happy accident that delayTicks has one of 24 different values & that there are 24 clock emoji.
+            var timeStr = meta.isAutomationEnabled ?
+                (String.fromCodePoint(0x1F550 + meta.delayTicks - 1)) :
+                game.getDisplayValueExt(meta.delayTicks / game.ticksPerSecond, false /*prefix*/, false /*usePerTickHack*/, 1 /*precision*/) + $I("unit.s");
+            return timeStr + " " + label;
         }
-        return this.inherited(arguments);
+
+        if (meta.heat){
+            return label + "<div class=\"progress\">[" + game.getDisplayValueExt(meta.heat) + "%]</div>";
+        }
+        return label;
     },
     handleToggleAutomationLinkClick: function(model) { //specify game.upgrade for cronoforge upgrades
 		var building = model.metadata;
@@ -1418,6 +1609,11 @@ dojo.declare("classes.ui.ChronoforgeWgt", [mixin.IChildrenAware, mixin.IGameAwar
             description: $I("time.shatter.tc.desc"),
             prices: [{name: "timeCrystal", val: 1}],
             controller: new classes.ui.time.ShatterTCBtnController(game)
+        }, game));
+        this.addChild(new classes.ui.time.UseHeatBtn({
+            name: $I("time.use.heat"),
+            description: $I("time.use.heat.desc"),
+            controller: new classes.ui.time.UseHeatBtnController(game)
         }, game));
         var controller = new classes.ui.time.ChronoforgeBtnController(game);
         for (var i in game.time.chronoforgeUpgrades){
@@ -1476,22 +1672,30 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
         return result;
     },
 
-	buyItem: function(model, event, callback) {
+	buyItem: function(model, event) {
+        var buyType;
         if (this.game.time.getVSU("usedCryochambers").val == 0) {
-			callback(false /*itemBought*/, { reason: "already-bought" });
-			return;
+            return {
+                itemBought: false,
+                reason: "already-bought"
+            };
         }
 		if (!model.visible) {
-			callback(false /*itemBought*/, { reason: "not-unlocked" });
-			return;
+            return {
+                itemBought: false,
+                reason: "not-unlocked"
+            };
 		}
         if (!this.hasResources(model)) {
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
-			return;
+            return {
+                itemBought: false,
+                reason: "cannot-afford"
+            };
         }
 
 		if (!event) { event = {}; /*event is an optional parameter*/ }
-		var fixCount = event.shiftKey
+        var isBuyAll = (event && event.shiftKey) || buyType == "all";
+		var fixCount = isBuyAll
 			? 1000
 			: event.ctrlKey || event.metaKey /*osx tears*/
 				? this.game.opts.batchSize || 10
@@ -1506,9 +1710,15 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
         if(fixHappened){
             var cry = this.game.time.getVSU("cryochambers");
             cry.calculateEffects(cry, this.game);
-            callback(true /*itemBought*/, { reason: "paid-for" });
+            return {
+                itemBought: true,
+                reason: "paid-for"
+            };
         } else {
-			callback(false /*itemBought*/, { reason: "not-enabled" });
+            return {
+                itemBought: false,
+                reason: "not-enabled"
+            };
         }
 	},
 
@@ -2083,7 +2293,7 @@ dojo.declare("classes.queue.manager", null,{
                 var chronoforgeUpgrades = this.game.time.chronoforgeUpgrades;
                 for (var i in chronoforgeUpgrades){
                     var building = chronoforgeUpgrades[i];
-                    if (building.unlocked){
+                    if (building.unlocked && !(building.limitBuild && building.val >= building.limitBuild)){
                         options.push({
                             name: building.name,
                             label: building.label
@@ -2188,12 +2398,18 @@ dojo.declare("classes.queue.manager", null,{
                 }
                 for (var i in religionUpgrades){
                     var upgrade = religionUpgrades[i];
-                    if (upgrade.faith <= this.game.religion.faith && (!upgrade.noStackable || !upgrade.val)){
-                        options.push({
-                            name: upgrade.name,
-                            label: upgrade.label
-                        });
+                    if (upgrade.noStackable && upgrade.val) { //Already bought item
+                        continue;
                     }
+                    if (!upgrade.val && this.game.religion.faith < upgrade.faith) {
+                        //Item is not visible (see religion.js, ReligionBtnController#updateVisible)
+                        //After purchasing the item at least once previously, it will remain visible even if worship decreases again
+                        continue;
+                    }
+                    options.push({
+                        name: upgrade.name,
+                        label: upgrade.label
+                    });
                 }
                 return options;
 
@@ -2338,13 +2554,9 @@ dojo.declare("classes.queue.manager", null,{
             return;
         }
 
-        var wasItemBought = false;
-        var resultOfBuyingItem = null;
-        controllerAndModel.controller.buyItem(controllerAndModel.model, null,
-            function(success, extendedInfo) {
-                wasItemBought = success;
-                resultOfBuyingItem = extendedInfo;
-            });
+        var result = controllerAndModel.controller.buyItem(controllerAndModel.model, null);
+        var wasItemBought = result.itemBought;
+        var resultOfBuyingItem = {reason: result.reason};
 
         if (typeof(wasItemBought) !== "boolean" || typeof(resultOfBuyingItem) !== "object") {
             console.error("Invalid result after attempting to buy item via queue", resultOfBuyingItem);
@@ -2410,4 +2622,7 @@ dojo.declare("classes.queue.manager", null,{
             }
         });
     }
+});
+
+dojo.declare("classes.tab.QueueTab", com.nuclearunicorn.game.ui.tab, {
 });

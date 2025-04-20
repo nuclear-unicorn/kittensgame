@@ -769,28 +769,10 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             $("#tooltip").detach().appendTo("#game").removeClass("tooltip-in-right-column");
         }
 
-        //It would be nice to have a system for options that would take care of this automatically,
-        //  instead of a dev having to add a new line of code here for every new option that gets added.
+        game.settingsTab.render($("#optionsDiv")[0]);
 
-        $("#workersToggle")[0].checked = game.useWorkers;
-        $("#forceHighPrecision")[0].checked = game.opts.forceHighPrecision;
-        $("#usePerSecondValues")[0].checked = game.opts.usePerSecondValues;
-        $("#usePercentageResourceValues")[0].checked = game.opts.usePercentageResourceValues;
-        $("#showNonApplicableButtons")[0].checked = game.opts.showNonApplicableButtons;
-        $("#usePercentageConsumptionValues")[0].checked = game.opts.usePercentageConsumptionValues;
-        $("#highlightUnavailable")[0].checked = game.opts.highlightUnavailable;
-        $("#hideSell")[0].checked = game.opts.hideSell;
-        $("#hideDowngrade")[0].checked = game.opts.hideDowngrade;
-        $("#hideBGImage")[0].checked = game.opts.hideBGImage;
-        $("#tooltipsInRightColumn")[0].checked = game.opts.tooltipsInRightColumn;
-        $("#enableRedshift")[0].checked = game.opts.enableRedshift;
-        $("#enableRedshiftGflops")[0].checked = game.opts.enableRedshiftGflops;
+        //The settingsTab above only handles boolean options; we must still handle non-booleans ourselves.
         $("#batchSize")[0].value = game.opts.batchSize;
-        $("#forceLZ")[0].checked = game.opts.forceLZ;
-        $("#compressSaveFile")[0].checked = game.opts.compressSaveFile;
-        $("#disableTelemetry")[0].checked = game.opts.disableTelemetry;
-        $("#noConfirm")[0].checked = game.opts.noConfirm;
-        $("#IWSmelter")[0].checked = game.opts.IWSmelter;
 
         var selectedLang = i18nLang.getLanguage();
         var locales = i18nLang.getAvailableLocales();
@@ -952,29 +934,12 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#optionLanguage").text($I("ui.option.language"));
         $("#addTranslationLink").text($I("ui.option.language.add"));
         $("#languageApplyLink").text($I("ui.option.language.apply"));
+        $("#optionNotation").text($I("ui.option.notation"));
         $("#optionScheme").text($I("ui.option.scheme"));
         $("#schemeRelock").text($I("ui.option.scheme.relock"));
         $("#schemeTip").text($I("ui.option.scheme.tip"));
-        $("#optionWorkers").html($I("ui.option.workers"));
-        $("#optionForceHighPrecision").text($I("ui.option.force.high.precision"));
-        $("#optionUsePerSecondValues").html($I("ui.option.use.per.second.values"));
-        $("#optionUsePercentageResourceValues").text($I("ui.option.use.percentage.resource.values"));
-        $("#optionShowNonApplicableButtons").text($I("ui.option.show.non.applicable.buttons"));
-        $("#optionUsePercentageConsumptionValues").text($I("ui.option.use.percentage.consumption.values"));
-        $("#optionHighlightUnavailable").text($I("ui.option.highlight.unavailable"));
-        $("#optionHideSell").text($I("ui.option.hide.sell"));
-        $("#optionHideDowngrade").text($I("ui.option.hide.downgrade"));
-        $("#optionHideBGImage").html($I("ui.option.hide.bgimage"));
-        $("#optionTooltipsInRightColumn").text($I("ui.option.tooltips.right"));
         $("#optionMore").text($I("ui.option.more"));
-        $("#optionNoConfirm").text($I("ui.option.no.confirm"));
-        $("#optionIWSmelter").text($I("ui.option.iw.smelter"));
-        $("#optionDisableTelemetry").text($I("ui.option.disable.telemetry"));
-        $("#optionEnableRedshift").text($I("ui.option.enable.redshift"));
-        $("#optionEnableRedshiftGflops").text($I("ui.option.enable.redshiftGflops"));
         $("#optionBatchSize").text($I("ui.option.batch.size"));
-        $("#optionForceLZ").text($I("ui.option.force.lz"));
-        $("#optionCompressSaveFile").html($I("ui.option.compress.savefile"));
         $("#exportButton").attr("value", $I("ui.option.export.button"));
         $("#importButton").attr("value", $I("ui.option.import.button"));
         $("#exportTo").text($I("ui.option.export"));
@@ -992,8 +957,6 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#appText").text($I("ui.option.app.text"));
         $("#appAndroid").text($I("ui.option.app.android"));
         $("#appIOS").text($I("ui.option.app.ios"));
-        $("#optionNotation").text($I("ui.option.notation"));
-        $("#optionDisablePollution").text($I("ui.option.pollution"));
     },
 
     _createFilter: function(filter, fId, filtersDiv){
@@ -1141,7 +1104,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             this.fontSize = uiData.fontSize || 16;
             this.isCenter = uiData.isCenter || false;
         } catch (ex) {
-            console.error("unable to load ui data");
+            console.error("unable to load ui data", ex);
         }
         this.updateFontSize();
         this.updateCenter();

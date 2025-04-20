@@ -72,10 +72,10 @@ body.scheme_grayish {
 	color: #343434;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_grayish div {
+.scheme_grayish > div {
 	color: #2c2c2c;
 }
-.scheme_grayish .disabled div { /* color text for disabled */
+.scheme_grayish .disabled > div { /* color text for disabled */
 	color: #4b5373;
 }
 .scheme_grayish h1 {

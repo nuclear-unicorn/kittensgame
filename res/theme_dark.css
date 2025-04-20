@@ -75,10 +75,10 @@
 	opacity: 1.0;
 }
 
-.scheme_dark div {
+.scheme_dark > div {
 	color: #DCDCDC;
 }
-.scheme_dark .disabled div {
+.scheme_dark .disabled > div {
 	color: #565656;
 }
 

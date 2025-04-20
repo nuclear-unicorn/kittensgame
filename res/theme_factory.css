@@ -5,7 +5,7 @@
 /* ************* */
 /* *** FONTS *** */
 /* ************* */
-@import url("https://fonts.googleapis.com/css2?family=Libre+Franklin:wght,CASL@,300..700,0..1&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,100..900;1,100..900&display=swap");
 
 /* ******************************************** */
 /* ******************* GAME ******************* */
@@ -76,10 +76,10 @@ body.scheme_factory {
 	color: #e39827;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_factory div {
+.scheme_factory > div {
 	color: #ededed;
 }
-.scheme_factory .disabled div { /* color text for disabled */
+.scheme_factory .disabled > div { /* color text for disabled */
 	color: #575657;
 }
 .scheme_factory h1 {

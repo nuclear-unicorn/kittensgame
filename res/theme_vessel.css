@@ -99,10 +99,10 @@ body.scheme_vessel {
 	color: #A0A0A0;
 	opacity: 1.0;
 }
-.scheme_vessel div {
+.scheme_vessel > div {
 	color: #BBBBBB;
 }
-.scheme_vessel .disabled div {
+.scheme_vessel .disabled > div {
 	color: #888888;
 }
 .scheme_vessel h1 {

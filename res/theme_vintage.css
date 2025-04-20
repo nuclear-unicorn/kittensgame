@@ -90,10 +90,10 @@ body.scheme_vintage {
 	color: #f8edd0;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_vintage div {
+.scheme_vintage > div {
 	color:#c0c0c0;
 }
-.scheme_vintage .disabled div { /* color text for disabled */
+.scheme_vintage .disabled > div { /* color text for disabled */
 	color: #606060;
 }
 .scheme_vintage h1 {

@@ -18,7 +18,7 @@
 /* ************* */
 /* *** FONTS *** */
 /* ************* */
-@import url(https://fonts.googleapis.com/css?family=Source+Sans+KR:wght@300,400,700&display=swap);
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:wght@300,400,700&display=swap);
 
 /* ******************************************** */
 /* ******************* GAME ******************* */
@@ -115,10 +115,10 @@ body.scheme_arctic.with_background_image {
 	text-shadow: 0 -1px 1px #93c4cf;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_arctic div {
+.scheme_arctic > div {
 	color:#303030;
 }
-.scheme_arctic .disabled div { /* color text for disabled */
+.scheme_arctic .disabled > div { /* color text for disabled */
 	color: #808080;
 }
 .scheme_arctic h1 {

@@ -764,16 +764,20 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	 * 									"cannot-afford"	The player can't afford the price of this item right now.
 	 * 									"not-enabled"		For some unspecified reason, this item is not available.
 	 * 				If the callback function returns anything, the return value from that function is ignored.
-	 * @return		No return value.  We communicate with the rest of the program using the callback function.
+	 * @returns BuyItemResult
 	 */
-	buyItem: function(model, event, callback){
+	buyItem: function(model, event){
 		if (!this.hasResources(model)) {
-			callback(false /*itemBought*/, {reason: "cannot-afford" });
-			return;
+			return {
+				itemBought: false,
+				reason: "cannot-afford"
+			};
 		}
 		if (!model.enabled) {
-			callback(false /*itemBought*/, {reason: "not-enabled" });
-			return;
+			return {
+				itemBought: false,
+				reason: "not-enabled"
+			};
 		}
 		//Else, we meet all requirements to buy this item:
 		if (!event) { event = {}; /*event is an optional parameter*/ }
@@ -785,7 +789,10 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		}
 
 		//A lot of normal UI buttons that don't involve building things use this method, so check if things are free:
-		callback(true /*itemBought*/, {reason: ((model.prices && model.prices.length) ? "paid-for" : "item-is-free") });
+		return {
+			itemBought: true,
+			reason: ((model.prices && model.prices.length) ? "paid-for" : "item-is-free")
+		};
 	},
 
 	refund: function(model){
@@ -899,6 +906,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		this.updateEnabled();
 		this.updateVisible();
 
+		//can be potentially dangerous given that we now have markup in the model titles
 		if (this.buttonTitle && this.buttonTitle.innerHTML != this.model.name){
 			this.buttonTitle.innerHTML = this.model.name;
 		}
@@ -966,16 +974,10 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 	onClick: function(event){
 		this.animate();
 		var self = this;
-		this.controller.buyItem(this.model, event, function(itemBought, extendedInfo) {
-			if (typeof(itemBought) !== "boolean" || typeof(extendedInfo) !== "object") {
-				console.error("Invalid arguments passed to callback function.");
-				return;
-			}
-			if (itemBought) {
-				self.update();
-			}
-		});
-
+		var result = this.controller.buyItem(this.model, event);
+		if (result.itemBought){
+			self.update();
+		}
 	},
 
 	onKeyPress: function(e){
@@ -1579,6 +1581,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 				tooltip: model.metadata.on ? $I("btn.on.tooltip") : $I("btn.off.tooltip"),
 				cssClass: model.metadata.on ? "bld-on" : "bld-off",
 				//reserved for mobile
+				//if you remove it one more time I will find where you live
 				enabled: model.metadata.val > 0,
 				handler: function(btn){
 					self.handleTogglableOnOffClick(model);
@@ -1590,6 +1593,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 				title: model.metadata.isAutomationEnabled ? "A" : "*",
 				tooltip: model.metadata.isAutomationEnabled ? $I("btn.aon.tooltip") : $I("btn.aoff.tooltip"),
 				//reserved for mobile
+				//if you remove it one more time I will find where you live
 				enabled: model.metadata.val > 0,
 				cssClass: model.metadata.isAutomationEnabled ? "auto-on" : "auto-off",
 				handler: function(btn){
@@ -1791,6 +1795,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 			}
 		}
 
+		this.metadataHasChanged(model);
 		this.game.upgrade(building.upgrades);
 		this.game.render();
 	},
@@ -1975,12 +1980,14 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 	getName: function(model){
 		var meta = model.metadata;
 
+		var label = "<div class=\"label\"><span class=\"label-content\">" + meta.label + "</span></div>";
+
 		if (!meta.val) {
-			return meta.label;
+			return label;
 		} else if (meta.noStackable){
-			return meta.label + " " + $I("btn.complete");
+			return label + " " + $I("btn.complete");
 		} else if (meta.togglableOnOff){
-			return meta.label + " (" + meta.val + ")";
+			return label + "<div>(" + meta.val + ")</div>";
 		} else if (meta.togglable) {
 			//it's not so important h
 			/*if (meta.val >= 1000){
@@ -1989,9 +1996,9 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 					(meta.val < 10000 ? ((meta.val/1000).toFixed(1) + "K") : this.game.getDisplayValueExt(meta.val)) +
 				")";
 			}*/
-			return meta.label + " (" + meta.on + "/" + meta.val + ")";
+			return label + "<div>(" + meta.on + "/" + meta.val + ")</div>";
 		} else {
-			return meta.label + " (" + meta.on + ")";
+			return label + "<div>(" + meta.on + ")</div>";
 		}
 	},
 
@@ -2031,11 +2038,30 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 
 	},
 
-	buyItem: function(model, event, callback) {
+	/**
+	 * @returns BuyResultOperation
+	 * 
+	 * where BuyResultOperation is {
+	 * 	itemBought: boolean
+	 *  reason: string
+	 *  def?: Thenable<BuyResultOperation>
+	 * }
+	 * 
+	 * buyItem will return {reason: "require-confirmation"} and a deferred object that will be resolved when user confirms the choice
+	 * def objects can chain
+	 */
+	
+	buyItem: function(model, event, buyType) {
+		if (event && event.shiftKey){
+			buyType = "all";
+		}
+
 		var isInDevMode = this.game.devMode;
 		if (!this.hasResources(model) && !isInDevMode) {
-			callback(false /*itemBought*/, {reason: "cannot-afford" });
-			return;
+			return {
+				itemBought: false,
+				reason: "cannot-afford"
+			};
 		}
 		if (!model.enabled && !isInDevMode) {
 			//Give a more detailed reason of why we can't buy it at this time:
@@ -2046,51 +2072,88 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 			} else if (meta.on && meta.noStackable){
 				whyArentWeEnabled = "already-bought";
 			}
-
-			callback(false /*itemBought*/, {reason: whyArentWeEnabled });
-			return;
+			return {
+				itemBought: false,
+				reason: whyArentWeEnabled
+			};
 		}
 		//Else, we meet all the requirements for being able to buy this item:
 		var meta = model.metadata;
 		if (this.game.ironWill && meta.effects && meta.effects["maxKittens"] > 0 && this.game.science.get("archery").researched) {
 			//Show a confirmation message if we're building something that would break Iron Will mode.
+			var def = new dojo.Deferred();
 			var self = this;
 			this.game.ui.confirm("", $I("iron.will.break.confirmation.msg"), function() {
-				self._buyItem_step2(model, event, callback);
+				var _defResult = self._buyItem_step2(model, event);
+				def.callback(_defResult);
 			}, function() {
-				callback(false /*itemBought*/, {reason: "player-denied" /*The player decided not to buy this after all.*/ });
+				def.callback({
+					itemBought: false,
+					reason: "player-denied"
+				});
 			});
+			return {
+				itemBought: false,
+				reason: "require-confirmation",
+				def: def
+			};
 		} else {
-			this._buyItem_step2(model, event, callback);
+			return this._buyItem_step2(model, event, buyType);
 		}
 	},
+	
 
-	_buyItem_step2: function(model, event, callback) {
+	buyItemAll: function(model, event, callback){
+		return this.buyItem(model, event, "all" /*isBuyAll*/);
+	},
+
+	_buyItem_step2: function(model, event, buyType) {
 		if (!event) { event = {}; /*event is an optional parameter*/ }
 		//This is what we pass to the callback function if we succeed:
-		var resultIfBuySuccessful = { reason: (this.game.devMode ? "dev-mode" : "paid-for") };
+		var resultIfBuySuccessful = this.game.devMode ? "dev-mode" : "paid-for";
 
 		var meta = model.metadata;
-		if (!meta.noStackable && event.shiftKey) {
+		if (!meta.noStackable && buyType == "all") {
 			var maxBld = 10000;
 			if (this.game.opts.noConfirm) {
 				this.build(model, maxBld);
-				callback(true /*itemBought*/, resultIfBuySuccessful);
+				return {
+					itemBought: true,
+					reason: resultIfBuySuccessful
+				};
 			} else {
 				var self = this;
+				var def = new dojo.Deferred();
 				this.game.ui.confirm($I("construct.all.confirmation.title"), $I("construct.all.confirmation.msg"), function() {
 					self.build(model, maxBld);
-					callback(true /*itemBought*/, resultIfBuySuccessful);
+					def.callback({
+						itemBought: true,
+						reason: resultIfBuySuccessful
+					});
 				}, function() {
-					callback(false /*itemBought*/, {reason: "player-denied" /*The player decided not to buy this after all.*/});
+					def.callback({
+						itemBought: false,
+						reason: "player-denied"
+					});
 				});
+				return {
+					itemBought: false,
+					reason: "require-confirmation",
+					def: def
+				};
 			}
 		} else if (!meta.noStackable && (event.ctrlKey || event.metaKey /*osx tears*/)) {
 			this.build(model, this.game.opts.batchSize || 10);
-			callback(true /*itemBought*/, resultIfBuySuccessful);
+			return {
+				itemBought: true,
+				reason: resultIfBuySuccessful
+			};
 		} else {
             this.build(model, 1);
-		  callback(true /*itemBought*/, resultIfBuySuccessful);
+			return {
+				itemBought: true,
+				reason: resultIfBuySuccessful
+			};
         }
 	},
 
@@ -2220,20 +2283,26 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingNotStackableBtnController", com
 	buyItem: function(model, event, callback) {
 		var isInDevMode = this.game.devMode;
 		if (model.metadata.researched && !isInDevMode) {
-			callback(false /*itemBought*/, {reason: "already-bought" });
-			return;
+			return {
+				itemBought: false,
+				reason: "already-bought"
+			};
 		}
 		if (!this.hasResources(model) && !isInDevMode) {
-			callback(false /*itemBought*/, {reason: "cannot-afford" });
-			return;
+			return {
+				itemBought: false,
+				reason: "cannot-afford"
+			};
 		}
 		//Else, we can buy it:
 		this.payPrice(model);
 		this.onPurchase(model);
 		
-		callback(true /*itemBought*/, {reason: (isInDevMode ? "dev-mode" : "paid-for") });
 		this.game.render();
-		return;
+		return {
+			itemBought: true,
+			reason: (isInDevMode ? "dev-mode" : "paid-for")
+		};
 	},
 
 	onPurchase: function(model){

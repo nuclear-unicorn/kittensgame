@@ -150,6 +150,9 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		effects:{
 			"standingRatio" : 0.1
 		},
+		handler: function(game) { //Called when this is purchased
+			game.science.unlockRelations();
+		},
 		upgrades:{
 			policies: ["lizardRelationsEcologists"]
 		},
@@ -545,11 +548,14 @@ dojo.declare("classes.ui.PrestigeBtnController", com.nuclearunicorn.game.ui.Buil
         return model.metaCached;
     },
 
-   	buyItem: function(model, event, callback) {
+   	buyItem: function(model, event) {
 		if (this.game.science.get("metaphysics").researched) {
-			this.inherited(arguments);
+			return this.inherited(arguments);
 		} else {
-			callback(false /*itemBought*/, { reason: "not-unlocked" });
+			return {
+				itemBought: false,
+				reason: "not-unlocked"
+			};
 		}
 	},
 

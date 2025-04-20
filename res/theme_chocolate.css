@@ -91,10 +91,10 @@ body.scheme_chocolate.with_background_image {
 	color: #e8969f;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_chocolate div {
+.scheme_chocolate > div {
 	color: #dccebd;
 }
-.scheme_chocolate .disabled div { /* color text for disabled */
+.scheme_chocolate .disabled > div { /* color text for disabled */
 	color: #857160;
 }
 .scheme_chocolate h1 {
@@ -811,6 +811,13 @@ body.scheme_chocolate.with_background_image {
 	margin-top: 2px;
 	padding: 10px 20px; /* default padding-top: 20px; */
 	color: #120f0c;
+}
+.scheme_chocolate .tabInner.Challenges td.craftStuffPanel + td.craftStuffPanel > table { /* list of kittens in reserve */
+	background-color: rgba(36, 27, 19, 0.25); /* copied from census-block because inside we have a list of kitten names*/
+	border: 1px solid;
+	border-radius: 9px;
+	font-size: 0.9em;
+	color: #c0a787;
 }
 
 /**********************************************************/
