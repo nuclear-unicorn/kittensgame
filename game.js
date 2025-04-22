@@ -322,7 +322,7 @@ dojo.declare("classes.game.Server", null, {
 		{
 			//pre-parsing guid to avoid checking it on the backend side
 			guid: this.game.telemetry.guid,
-			saveData: this.game.compressLZData(JSON.stringify(saveData), true),
+			saveData: this.game.compressLZData(JSON.stringify(saveData, this.game.JSONreplacer), true),
 			metadata: {
 				calendar: {
 					year: game.calendar.year,
@@ -2302,6 +2302,17 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		window.location.reload();
 	},
 
+
+
+	/**
+	 * Do not serialize properties with undefined values even if they exist on the metadata
+	 */
+	JSONreplacer: function(key, value) {
+		return (value == undefined)
+			? undefined
+			: value;
+	},
+
 	save: function(){
 		this.ticksBeforeSave = this.autosaveFrequency;
 
@@ -2358,7 +2369,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	_saveDataToString: function(saveData) {
-		var saveDataString = JSON.stringify(saveData);
+		var saveDataString = JSON.stringify(saveData, this.JSONreplacer);
 		//5mb limit workaround
 		if (saveDataString.length > 5000000 || this.opts.forceLZ) {
 			console.log("compressing the save file...");
