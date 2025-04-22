@@ -350,10 +350,6 @@ body.scheme_tombstone {
 .scheme_tombstone #footerLinks a:hover {
 	color: #fdfeff;
 }
-.scheme_tombstone #crowdjet-expand-container {
-	color: #c9c9ca;
-	font-family: 'Delius', cursive;
-}
 
 /* *********************************************** */
 /* ******************* TOOLTIP ******************* */
