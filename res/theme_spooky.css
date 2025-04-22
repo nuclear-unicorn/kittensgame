@@ -443,13 +443,8 @@ body.scheme_spooky.with_background_image {
 .scheme_spooky #footerLinks a {
 	color: #d0d0d0;
 }
-.scheme_spooky #footerLinks a:hover,
-.scheme_spooky #crowdjet-expand-container:hover {
+.scheme_spooky #footerLinks a:hover{
 	color: #982ee4;
-}
-.scheme_spooky #crowdjet-expand-container {
-	color: #d0d0d0;
-	font-family: 'Delius', cursive;
 }
 
 /* *********************************************** */
