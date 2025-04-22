@@ -359,13 +359,6 @@ body.scheme_space.with_background_image {
 	bottom: 6px;
 	color: #0A2450; /* a link separator : | on header and footer links */
 }
-.scheme_space #crowdjet-expand-container {
-	color: #89A4CD;
-	font-family: 'Oxanium', cursive;
-}
-.scheme_space #crowdjet-expand-container:hover {
-	color: #12E7D1;
-}
 
 /*************************************************/
 /******************** TOOLTIP ********************/

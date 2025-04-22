@@ -1783,18 +1783,6 @@ div.leet {
     padding-left: 5px;
 }
 
-#crowdjet-expand-container{
-    bottom: 40px;
-    right: 20px;
-    width: 60px !important;
-    height: 15px !important;
-    cursor: pointer;
-}
-
-#crowdjet-expand-container iframe {
-    display: none;
-}
-
 .queue-container .queue-label {
     cursor: pointer;
 }
