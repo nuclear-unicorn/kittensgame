@@ -287,7 +287,15 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 		}
 	},
 
-	filterMetadata: function(meta, fields){
+	/**
+	 * 
+	 * @param {*} meta 
+	 * @param {*} fields 
+	 * @param {*} replacer - function(key, value)
+	 * If returns undefined, metadata field will not be serialized
+	 * @returns 
+	 */
+	filterMetadata: function(meta, fields, replacer){
 		var filtered = [];
 		for(var i = 0; i < meta.length; i++){
 			var clone = {};
@@ -297,7 +305,17 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 				/*if (!meta[i].hasOwnProperty(fld)){
 					console.warn("Can't find elem." + fld + " in", meta[i]);
 				}*/
-				clone[fld] = meta[i][fld];
+
+				var value = meta[i][fld];
+				if (replacer){
+					value = replacer(fld, meta[i][fld]);
+				} else {
+					value = meta[i][fld];
+				}
+
+				if (value !== undefined){
+					clone[fld] = value;
+				}
 			}
 			filtered.push(clone);
 		}

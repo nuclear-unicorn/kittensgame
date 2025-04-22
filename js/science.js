@@ -1120,7 +1120,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		blocks:["necrocracy", "radicalXenophobia"],
 		upgrades: {
 			buildings:["library"],
-			spaceBuilding: ["moonOutpost"]
+			spaceBuilding: ["moonBase"]
 		},
 	},
 	{

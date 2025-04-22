@@ -675,7 +675,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 	save: function(saveData){
 		var kittens = [];
 		for (var i in this.sim.kittens){
-			var _kitten = this.sim.kittens[i].save(this.game.opts.compressSaveFile, this.jobNames);
+			var _kitten = this.sim.kittens[i].save(true /*this.game.opts.compressSaveFile*/, this.jobNames);
 			kittens.push(_kitten);
 		}
 
@@ -1286,6 +1286,23 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 		}
 	},
 
+	/**
+	 * Courtesy of lodash
+	 * TODO: move me to the game/core?
+	 */
+	precisionRound: function(number, precision) { 
+		number = Number(number); 
+		if (precision) { 
+			// Shift with exponential notation to avoid floating-point issues. 
+			var pair = (number.toString() + 'e').split('e'); 
+			var value = Math.round(pair[0] + 'e' + (Number(pair[1]) + precision)); 
+			pair = (value.toString() + 'e').split('e'); 
+			return Number(pair[0] + 'e' + (Number(pair[1]) - precision)); 
+		} 
+
+		return Math.round(number); 
+	},
+
 	loadCompressed: function(data, jobNames) {
 		var ssn = this._splitSSN(data.ssn, 7);
 		this.name = data.name || this.names[ssn[0]];
@@ -1340,7 +1357,10 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 		var saveSkills = {};
 		for (var job in this.skills){
 			if (this.skills[job] > 0){
-				saveSkills[job] = this.skills[job];
+				/*
+					Round skill exp to the x.y precision to avoid long numbers in saves
+				*/
+				saveSkills[job] = this.precisionRound(this.skills[job], 1);
 			}
 		}
 		// don't serialize falsy values
@@ -1369,7 +1389,7 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 		var maxSkill = -minSkill;
 		for (var i = 0; i < jobNames.length; ++i) {
 			var skill = this.skills[jobNames[i]] || 0;
-			skills[i] = skill;
+			skills[i] = this.precisionRound(skill, 1);
 			minSkill = Math.min(skill, minSkill);
 			maxSkill = Math.max(skill, maxSkill);
 		}
@@ -1390,7 +1410,7 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 				this.variety,
 				this.rarity]),
 			skills: skills || undefined,
-			exp: this.exp || undefined,
+			exp: this.precisionRound(this.exp, 1) || undefined,
 			job: this.job ? jobNames.indexOf(this.job) : undefined,
 			engineerSpeciality: this.engineerSpeciality || undefined,
 			rank: this.rank || undefined,
@@ -3640,7 +3660,7 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 	},
 	getFlavor: function(model) {
 		var job = model.job;
-		return job.flavour;
+		return job.flavor;
 	}
 });
 

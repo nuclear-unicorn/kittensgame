@@ -2510,6 +2510,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		for (var ind in this.crafts){
 			var craft = this.crafts[ind];
 			var kittenResProduction = (this.game.village.getResProduction()["ES" + craft.name] || 0);
+			kittenResProduction *= kittenResProductionModifier;
 			if (!kittenResProduction){
 				continue;
 			}
@@ -2846,7 +2847,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 			}
 
 			if (progressDisplayed < 10) {
-				progressDisplayed = "-" + progressDisplayed;
+				progressDisplayed = "0" + progressDisplayed;
 			}
 
 			return "<div class=\"label\"><span class=\"label-content\">" + model.craft.label + "</span></div><div>(" + craft.value + ")</div><div class=\"progress\">[" + progressDisplayed + "%]</div>";
