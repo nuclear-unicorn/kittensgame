@@ -2612,7 +2612,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				if (key == "val" || key == "on") {
 					return value === 0 ? undefined : value;
 				}
-				if (key == "unlocked" || key == "jammed" || key == "isAutomationEnabled"){
+				if (key == "unlocked" || key == "jammed" /*isAutomationEnabled is true by default*/){
 					return value === false ? undefined: value;
 				}
 				return value;
