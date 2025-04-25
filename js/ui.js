@@ -720,11 +720,16 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
     //--------------------------------------------
 
     updateUndoButton: function(){
-        var isVisible = (this.game.undoChange !== null);
+        var undoState = this.game.undoChange;
+        var isVisible = (undoState !== null);
         $("#undoBtn").toggle(isVisible);
 
         if (isVisible) {
-            $("#undoBtn").text($I("ui.undo", [Math.floor(this.game.undoChange.ttl / this.game.ticksPerSecond)]));
+            var desc = undoState.getEventDescription(undoState.events[0]);
+            $("#undoBtn").text($I("ui.undo", [Math.floor(undoState.ttl / this.game.ticksPerSecond)]));
+            UIUtils.attachTooltip(this.game, $("#undoBtn")[0], -30, -30, function() {
+                return desc; //Calculate desc only once & reuse its saved value
+            });
         }
     },
 

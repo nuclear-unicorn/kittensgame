@@ -1817,6 +1817,12 @@
     "ui.pause.title": "Pause/unpause the game",
     "ui.undo": "undo ({0}s)",
     "ui.undo.title": "Undo the change",
+    "ui.undo.bld.build": "Undo building {0}× {1}.",
+    "ui.undo.bld.downgrade": "Undo downgrading {0} into {1}.",
+    "ui.undo.bld.sell": "Undo selling {0}× {1}.",
+    "ui.undo.bld.upgrade": "Undo upgrading {0} into {1}.",
+    "ui.undo.religion.refine": "Undo refining {0}× {1} into {2}× {3}.",
+    "ui.undo.workshop.craft": "Undo crafting {0}× {1}.",
     "ui.queue.link": "Queue",
 
     "ui.close": "close",

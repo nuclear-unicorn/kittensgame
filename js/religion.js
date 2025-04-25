@@ -1747,6 +1747,10 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 			}
 		}
 
+		var descriptiveStrings = [this.game.getDisplayValueExt(priceCount),
+			this.game.resPool.get(model.prices[0].name).title, //TODO: Stop calling resPool#get so much; just cache the return value
+			this.game.getDisplayValueExt(actualGainCount),
+			this.game.resPool.get(this.controllerOpts.gainedResource).title];
 		var undo = this.game.registerUndoChange();
 		undo.addEvent("religion", {
 			action:"refine",
@@ -1754,7 +1758,7 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 			resTo: this.controllerOpts.gainedResource,
 			valFrom: priceCount,
 			valTo: actualGainCount
-		});
+		}, $I("ui.undo.religion.refine", descriptiveStrings));
 
 		this.game.msg($I(this.controllerOpts.logTextID, [this.game.getDisplayValueExt(priceCount), this.game.getDisplayValueExt(actualGainCount)]), "", this.controllerOpts.logfilterID);
 

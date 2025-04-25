@@ -399,24 +399,61 @@ dojo.declare("classes.game.Server", null, {
  * Undo Change state. Represents a change in one or multiple managers
  */
 dojo.declare("classes.game.UndoChange", null, {
-    _static:{
-        DEFAULT_TTL : 20
-    },
-    ttl: 0,
-    events: null,
+	_static:{
+		DEFAULT_TTL : 20
+	},
+	ttl: 0,
+	events: null,
 
-    constructor: function(){
-        this.events = [];
-    },
+	constructor: function(){
+		this.events = [];
+	},
 
-    addEvent: function(managerId, data){
-        var event = {
-            managerId: managerId,
-            data: data
-        };
+	/**
+	 * Adds an "event" (game-action) to the list of "things that will un-happen if you push the undo button."
+	 * Note to the dev: We gotta come up with a shorter name for that list.
+	 * 
+	 * Usage:
+	 * Call this function whenever the player performs an action that can be undone.
+	 * Supply (as arguments) all the relevant data to reconstruct that action, or, if necessary, undo it.
+	 * 
+	 * @param managerId	string	Which manager class will handle the relevant undo operation.
+	 * 						Typically corresponds to which subsystem of the game is associated with that action.
+	 * @param data	object	Any relevant data to reconstruct the action to be undone.
+	 * 					For example, if the action is "build 10 Log Houses," then the data would somehow specify
+	 * 						that Log Houses are involved & that there are 10 of them.
+	 * 					The UndoChange system doesn't understand the data here--it is specific to the associated manager.
+	 * 					This allows each different manager to track all the data they care about & nothing more.
+	 * @param description string	An i18n string containing a general human-language description of this undo action.
+	 * 						The idea is that this would be displayed somewhere in the UI so the player will know
+	 * 							what is being undone before they commit to undoing an action.
+	 */
+	addEvent: function(managerId, data, description){
+		var event = {
+			managerId: managerId,
+			data: data,
+			description: description
+		};
 
-        this.events.push(event);
-    }
+		this.events.push(event);
+	},
+
+	/**
+	 * Converts an event object into a short, human-language description of what it is.
+	 * @param event	object	An object describing an event, like what would be created from the addEvent function.
+	 * @return string	If the event is valid, it's an i18n string which describes said event, ideally using concise language.
+	 * 				If the event is not valid, it's a debug string which hopefully the devs can make use of.
+	 */
+	getEventDescription: function(event) {
+		if (typeof(event) !== "object" || !event) {
+			return "Error in getEventDescription: event is invalid.";
+		}
+		if (typeof(event.description) !== "string") {
+			return "Error in getEventDescription: the event has no description defined.\nTell the developers it is from the \"" + event.managerId + "\" manager.";
+		}
+		//Else, the event exists & its description is a string.
+		return event.description;
+	}
 });
 
 /*

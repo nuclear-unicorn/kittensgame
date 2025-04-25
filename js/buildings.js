@@ -3075,11 +3075,11 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 			{name: model.options.building, val: counter}
 		);
 		var undo = this.game.registerUndoChange();
-        undo.addEvent("building", {
-			action:"build",
+		undo.addEvent("building", {
+			action: "build",
 			metaId: model.options.building,
 			val: counter
-		});
+		}, $I("ui.undo.bld.build", [counter, model.metadata.label]));
 	},
 
 	sell: function(event, model){
@@ -3091,7 +3091,7 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 				action: "sell",
 				metaId: model.metadata.name,
 				val: amtSold
-			});
+			}, $I("ui.undo.bld.sell", [amtSold, model.metadata.label]));
 		}
 	},
 
@@ -3199,11 +3199,15 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 	deltagrade: function(model, delta) {
 		var metadataRaw = this.getMetadataRaw(model);
 		var undo = this.game.registerUndoChange();
+		var labelBefore = metadataRaw.stages[metadataRaw.stage].label;
+		var labelAfter = metadataRaw.stages[Math.max(0, metadataRaw.stage + delta)].label;
 		undo.addEvent("building", {
 			action:"deltagrade",
 			metaId: model.options.building,
 			val: delta
-		});
+		}, (delta > 0 ?
+			$I("ui.undo.bld.upgrade", [labelBefore, labelAfter]) :
+			$I("ui.undo.bld.downgrade", [labelBefore, labelAfter])));
 
 		if (metadataRaw.val > 0) { //Sell until 0 are left (to refund to the player)
 			undo.addEvent("building", { //The order of these undo events matters A LOT

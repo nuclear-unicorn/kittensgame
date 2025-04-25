@@ -2482,15 +2482,15 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			this.game.stats.getStat("totalCrafts").val++;
 			this.game.stats.getStatCurrent("totalCrafts").val++;
 
-            if (!suppressUndo) {
-                var undo = this.game.registerUndoChange();
-                undo.addEvent("workshop", /* TODO: use manager.id and pass it in proper way as manager constructor*/
-                    {
-						metaId:res,
-						val: amt
-					}
-				);
-            }
+			if (!suppressUndo) {
+				var undo = this.game.registerUndoChange();
+				undo.addEvent("workshop", /* TODO: use manager.id and pass it in proper way as manager constructor*/
+				{
+					metaId: res,
+					val: amt
+				}, $I("ui.undo.workshop.craft", [this.game.getDisplayValueExt(craftAmt), this.game.resPool.get(res).title]));
+				// (Note: We use res.title instead of craft.label because this way the English version makes consistent grammatical sense.)
+			}
 
             return true;
 		} else if (forceAll) {
