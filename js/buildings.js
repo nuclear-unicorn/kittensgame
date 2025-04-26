@@ -1283,7 +1283,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 						: 0,
 					craft: function() {
 						if (this.numberOfCrafts > 0) {
-							game.workshop.craft(craftedResourceName, this.numberOfCrafts);
+							game.workshop.craft(craftedResourceName, this.numberOfCrafts, true /*suppressUndo*/);
 							// Automated production, metallurgist leader won't help here
 							game.msg($I("bld.msg.automation." + craftedResourceName + "s", [game.getDisplayValueExt(consumedQuantity), game.getDisplayValueExt(this.numberOfCrafts * (1 + game.getCraftRatio()))]), null, "workshopAutomation", true);
 						}
