@@ -438,6 +438,11 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 				enabled: true,
 				unlocked: false
 			},
+			"undo": {
+				title: $I("console.filter.undo"),
+				enabled: true,
+				unlocked: false
+			}
 		}
 	},
 

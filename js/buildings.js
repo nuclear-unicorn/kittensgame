@@ -3214,7 +3214,7 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 				action:"sell",
 				metaId: model.options.building,
 				val: metadataRaw.val
-			});
+			}, $I("ui.undo.bld.sell", [metadataRaw.val, labelBefore]));
 			this.sellInternal(model, 0, false /*requireSellLink*/);
 		}
 		if (metadataRaw.stage) { metadataRaw.stage = Math.max(0, metadataRaw.stage + delta); }

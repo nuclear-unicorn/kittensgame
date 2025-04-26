@@ -1453,9 +1453,16 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				and refund it proportionally, but I am to lazy to code it in 
 			*/
 			if (resConverted.value >= data.valTo) {
-				this.game.resPool.addResEvent(data.resFrom, data.valFrom);
+				var actualAmountRecovered = this.game.resPool.addResEvent(data.resFrom, data.valFrom);
 				this.game.resPool.addResEvent(data.resTo, -data.valTo);
-				this.game.msg($I("workshop.undo.msg", [this.game.getDisplayValueExt(data.valTo), (resConverted.title || resConverted.name)]));
+				var resRefunded = resPool.get(data.resFrom);
+				if (actualAmountRecovered == data.valFrom) {
+					//I dunno about this--this message contains no new information that isn't already displayed.
+					//this.game.msg($I("religion.undo.refine.complete", [this.game.getDisplayValueExt(actualAmountRecovered), (resRefunded.title || resRefunded.name)]), null, "undo", true /*noBullet*/);
+				} else {
+					//This would occur, for instance, if the player un-sacrificed unicorns during a Unicorn Tears Challenge.
+					this.game.msg($I("religion.undo.refine.incomplete", [this.game.getDisplayValueExt(actualAmountRecovered), (resRefunded.title || resRefunded.name)]), "important", "undo", true /*noBullet*/);
+				}
 			}
 		}
 	}

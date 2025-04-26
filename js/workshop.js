@@ -2551,16 +2551,12 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		return effectPerTick * (1 + (afterCraft ? this.game.getResCraftRatio(resName) : 0));
 	},
 
-    undo: function(data){
+	undo: function(data){
 		var metaId = data.metaId,
 			val = data.val;
 
-		if (this.craft(metaId, -val, true /*do not create cyclic undo*/)){
-			var res = this.game.resPool.get(metaId);
-			var craftRatio = this.game.getResCraftRatio(metaId);
-			this.game.msg( $I("workshop.undo.msg", [this.game.getDisplayValueExt(val * (1 + craftRatio)), (res.title || res.name)]));
-		}
-    },
+		this.craft(metaId, -val, true /*do not create cyclic undo*/);
+	},
 
 	//returns a total number of resoruces possible to craft for this recipe
 	getCraftAllCount: function(craftName){

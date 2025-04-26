@@ -5384,32 +5384,34 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
         return undoChange;
     },
 
-    undo: function(){
-        if (!this.undoChange) {
-            return;
-        }
+	undo: function() {
+		if (!this.undoChange) {
+			return;
+		}
 
-        /**
-         * I am too tired to write proper logic, let it be simple hashmap of references
-         */
-        var managers = {
-		   "workshop": this.workshop,
-		   "building": this.bld,
-		   "religion": this.religion
-        };
+		/**
+		 * I am too tired to write proper logic, let it be simple hashmap of references
+		 */
+		var managers = {
+			"workshop": this.workshop,
+			"building": this.bld,
+			"religion": this.religion
+		};
 
-        for (var i in this.undoChange.events){
-            var event = this.undoChange.events[i];
-            var mgr = managers[event.managerId];
+		for (var i in this.undoChange.events){
+			var event = this.undoChange.events[i];
+			var mgr = managers[event.managerId];
 
-            if (mgr && mgr.undo){
-                mgr.undo(event.data);
-            }
-        }
+			if (mgr && mgr.undo){
+				mgr.undo(event.data);
+				//As a neat side effect, any messages generated within mgr.undo will appear *underneath* this one:
+				this.msg(this.undoChange.getEventDescription(event), "notice", "undo");
+			}
+		}
 
-        this.undoChange = null;
+		this.undoChange = null;
 		this._publish("server/undoStateChanged");
-    },
+	},
 
 	//-----------------------------------------------------------------
 	//TODO: use me on mobile version
