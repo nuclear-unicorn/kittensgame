@@ -1712,22 +1712,30 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 	},
 
 	_transform: function(model, amt) {
+		//Save references to values we'll use a lot:
+		// "res from" refers to the resource consumed by the transform action
+		// "res to" refers to the resource produced by the transform action
+		var resFromName = model.prices[0].name;
+		var resToName = this.controllerOpts.gainedResource;
+		var resFromObj = this.game.resPool.get(resFromName); //Reference to the resource object
+		var resToObj = this.game.resPool.get(resToName);
+
 		var priceCount = model.prices[0].val * amt;
-		if (priceCount > this.game.resPool.get(model.prices[0].name).value) {
+		if (priceCount > resFromObj.value) {
 			return false;
 		}
 
 		var attemptedGainCount = this.controllerOpts.gainMultiplier.call(this) * amt;
 
-		this.game.resPool.addResEvent(model.prices[0].name, -priceCount);
+		this.game.resPool.addResEvent(resFromName, -priceCount);
 
 		//Gain the resource & remember the amount we gained, taking into account resource storage limits:
-		var actualGainCount = this.game.resPool.addResEvent(this.controllerOpts.gainedResource, attemptedGainCount);
+		var actualGainCount = this.game.resPool.addResEvent(resToName, attemptedGainCount);
 
 		//Amount of the resource we failed to gain because we hit the cap:
 		var overcap = attemptedGainCount - actualGainCount;
 		if (actualGainCount == 0 && attemptedGainCount > 0 &&
-			this.game.resPool.get(this.controllerOpts.gainedResource).value / attemptedGainCount > 1e15) {
+			resToObj.value / attemptedGainCount > 1e15) {
 			//We are in territory where overcap will be triggered due to floating-point precision limits.
 			overcap = 0;
 		}
@@ -1737,7 +1745,7 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 		}
 
 		if (overcap > 0.001) { //Don't trigger from floating-point errors
-			if (this.controllerOpts.gainedResource == "tears") {
+			if (resToName == "tears") {
 				//Tears evaporate into a smoky substance
 				this.game.bld.cathPollution += overcap * this.game.getEffect("cathPollutionPerTearOvercapped");
 			}
@@ -1748,14 +1756,14 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 		}
 
 		var descriptiveStrings = [this.game.getDisplayValueExt(priceCount),
-			this.game.resPool.get(model.prices[0].name).title, //TODO: Stop calling resPool#get so much; just cache the return value
+			resFromObj.title,
 			this.game.getDisplayValueExt(actualGainCount),
-			this.game.resPool.get(this.controllerOpts.gainedResource).title];
+			resToObj.title];
 		var undo = this.game.registerUndoChange();
 		undo.addEvent("religion", {
 			action:"refine",
-			resFrom: model.prices[0].name,
-			resTo: this.controllerOpts.gainedResource,
+			resFrom: resFromName,
+			resTo: resToName,
 			valFrom: priceCount,
 			valTo: actualGainCount
 		}, $I("ui.undo.religion.refine", descriptiveStrings));
