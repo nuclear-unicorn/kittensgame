@@ -2739,7 +2739,17 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 
 	refineCatnip: function() {
 		var craftRatio = this.game.getResCraftRatio("wood");
-		this.game.resPool.addResEvent("wood", 1 + craftRatio);
+		var actualAmtGained = this.game.resPool.addResEvent("wood", 1 + craftRatio);
+
+		//Add an undo event:
+		var isEnriched = this.game.workshop.get("advancedRefinement").researched;
+		var undo = this.game.registerUndoChange();
+		undo.addEvent("workshop",
+		{
+			metaId: "wood",
+			resGainedAmt: actualAmtGained,
+			resSpent: [ { name : "catnip", val: (isEnriched ? 50 : 100) }]
+		}, $I("ui.undo.workshop.craft", [this.game.getDisplayValueExt(actualAmtGained), this.game.resPool.get("wood").title]));
 	},
 
 	getUndissipatedPollutionPerTick: function(){
@@ -2988,7 +2998,19 @@ dojo.declare("classes.game.ui.RefineCatnipButtonController", com.nuclearunicorn.
 		this.game.resPool.addResEvent("catnip", -100 * catnipCost);
 
 		var craftRatio = this.game.getResCraftRatio("wood");
-		this.game.resPool.addResEvent("wood", 100 * (1 + craftRatio));
+		var craftAmt = 100 * (1 + craftRatio);
+		var actualAmtGained = this.game.resPool.addResEvent("wood", craftAmt);
+		var undo = this.game.registerUndoChange();
+		var priceTimes100 = [];
+		model.prices.forEach(function(priceLine) {
+			priceTimes100.push({ name: priceLine.name, val: priceLine.val * 100 });
+		});
+		undo.addEvent("workshop",
+		{
+			metaId: "wood",
+			resGainedAmt: actualAmtGained,
+			resSpent: priceTimes100
+		}, $I("ui.undo.workshop.craft", [this.game.getDisplayValueExt(actualAmtGained), this.game.resPool.get("wood").title]));
 	}
 });
 

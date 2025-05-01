@@ -2474,7 +2474,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 		if (bypassResourceCheck || this.game.resPool.hasRes(prices)) {
 			this.game.resPool.payPrices(prices);
-			this.game.resPool.addResEvent(res,craftAmt);
+			var actualAmtGained = this.game.resPool.addResEvent(res,craftAmt);
 			if (craft.upgrades){
 				this.game.upgrade(craft.upgrades);
 			}
@@ -2487,9 +2487,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				undo.addEvent("workshop", /* TODO: use manager.id and pass it in proper way as manager constructor*/
 				{
 					metaId: res, //Internal ID of the craft recipe & also of the resource that's the product
-					resGainedAmt: craftAmt,
+					resGainedAmt: actualAmtGained,
 					resSpent: prices
-				}, $I("ui.undo.workshop.craft", [this.game.getDisplayValueExt(craftAmt), this.game.resPool.get(res).title]));
+				}, $I("ui.undo.workshop.craft", [this.game.getDisplayValueExt(actualAmtGained), this.game.resPool.get(res).title]));
 				// (Note: We use res.title instead of craft.label because this way the English version makes consistent grammatical sense.)
 			}
 
@@ -2557,8 +2557,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 	 * undo commands to this function here.
 	 * If the product of the craft cannot be returned (like, if it's been spent), the undo will fail & nothing will be refunded.
 	 * Otherwise, the player will get a full refund, regaining the resources that were actually spent.
-	 * If, in the intervening time (between crafting & getting a refund), the craft ratio changes, the refund uses
-	 * 	the value that the craft ratio had at the time the original craft was performed.
+	 * If, in the intervening time (between crafting & getting a refund), the craft ratio changes,
+	 * 	the refund uses the value that the craft ratio had at the time the original craft was performed.
+	 * 	(No exploit by changing leaders!)
 	 * @param data		object	Contains all pertinent information needed to undo the craft.
 	 * 		metaId: string, name of the resource produced as a result of the craft
 	 * 		resGainedAmt: number, amount of the resource produced as a result of the craft
@@ -2573,6 +2574,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			return;
 		}
 		//Else, player is eligible for a full refund:
+		resPool.addResEvent(data.metaId, -data.resGainedAmt);
 		data.resSpent.forEach(function(priceLine) {
 			var amt = resPool.addResEvent(priceLine.name, priceLine.val);
 			if(amt) {
