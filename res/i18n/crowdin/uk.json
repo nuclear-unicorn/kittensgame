@@ -338,6 +338,7 @@
     "opts.notation.si": "Класичний",
     "opts.notation.e": "Науковий",
     "opts.notation.sie": "Спрощений (SI+E)",
+    "msg.policy.exclusivity": "Одночасне застосування стратегій з однаковою вартістю неможливе",
     "policy.autocracy.label": "Автократія",
     "policy.bigStickPolicy.label": "Політика Big Stick",
     "policy.communism.label": "Комунізм",
