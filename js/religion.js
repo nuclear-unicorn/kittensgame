@@ -1337,11 +1337,18 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 	praise: function(){
 		var faith = this.game.resPool.get("faith");
-		this.faith += faith.value * (1 + this.getApocryphaBonus()); //starting up from 100% ratio will work surprisingly bad
+		var worshipGainedAmt = faith.value * (1 + this.getApocryphaBonus()); //starting up from 100% ratio will work surprisingly bad
+		this.faith += worshipGainedAmt;
 		this.faith = Math.min(this.faith, Number.MAX_VALUE);
 		this.game.msg($I("religion.praise.msg", [this.game.getDisplayValueExt(faith.value, false, false, 0)]), "", "faith");
+		//Here we go, trying to make more game actions reversible
+		var undo = this.game.registerUndoChange();
+		undo.addEvent("religion", {
+			action: "praise",
+			faithSpent: faith.value,
+			worshipGained: worshipGainedAmt
+		}, $I("ui.undo.religion.praise", [this.game.getDisplayValueExt(worshipGainedAmt)]));
 		faith.value = 0.0001;	//have a nice autoclicking
-
 	},
 
 	getApocryphaResetBonus: function(bonusRatio){
@@ -1453,8 +1460,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				and refund it proportionally, but I am to lazy to code it in 
 			*/
 			if (resConverted.value >= data.valTo) {
-				var actualAmountRecovered = this.game.resPool.addResEvent(data.resFrom, data.valFrom);
-				this.game.resPool.addResEvent(data.resTo, -data.valTo);
+				var actualAmountRecovered = resPool.addResEvent(data.resFrom, data.valFrom);
+				resPool.addResEvent(data.resTo, -data.valTo);
 				var resRefunded = resPool.get(data.resFrom);
 				if (actualAmountRecovered == data.valFrom) {
 					//I dunno about this--this message contains no new information that isn't already displayed.
@@ -1464,9 +1471,22 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 					this.game.msg($I("religion.undo.refine.incomplete", [this.game.getDisplayValueExt(actualAmountRecovered), (resRefunded.title || resRefunded.name)]), "important", "undo", true /*noBullet*/);
 				}
 			}
+		} else if (data.action === "praise") {
+			if (this.faith >= data.worshipGained) {
+				this.faith -= data.worshipGained;
+				var amtRecovered = resPool.addResEvent("faith", data.faithSpent);
+				if (amtRecovered > 0) {
+					this.game.msg($I("religion.undo.praise.regained", [this.game.getDisplayValueExt(amtRecovered)]), null, "undo", true /*noBullet*/);
+				} else {
+					//This would happen, for example, if the player had such high faith production that it was capped already
+					this.game.msg($I("religion.undo.praise.nogain"), "important", "undo", true /*noBullet*/);
+				}
+			} else {
+				//This would happen, for example, if the player had adored the galaxy immediately after praising.
+				this.game.msg($I("religion.undo.praise.failure"), "alert", "undo", true /*noBullet*/);
+			}
 		}
 	}
-
 });
 
 /**
