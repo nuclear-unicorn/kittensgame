@@ -1132,12 +1132,12 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 	names: ["Angel", "Charlie", "Mittens", "Oreo", "Lily", "Ellie", "Amber", "Molly", "Jasper",
 			"Oscar", "Theo", "Maddie", "Cassie", "Timber", "Meeko", "Micha", "Tami", "Plato",
 			"Bea", "Cedar", "Cleo", "Dali", "Fiona", "Hazel", "Iggi", "Jasmine", "Kali", "Luna",
-			"Reilly", "Reo", "Rikka", "Ruby", "Tammy"],
+			"Reilly", "Reo", "Rikka", "Ruby", "Tammy", "Amy", "Henry"],
 	// 100 surnames MAX!
 	// Add new surnames at the end of the list
 	surnames: ["Smoke", "Dust", "Chalk", "Fur", "Clay", "Paws", "Tails", "Sand", "Scratch", "Berry", "Shadow",
 				"Ash", "Bark", "Bowl", "Brass", "Dusk", "Gaze", "Gleam", "Grass", "Moss", "Plaid", "Puff", "Rain",
-				"Silk", "Silver", "Speck", "Stripes", "Tingle", "Wool", "Yarn"],
+				"Silk", "Silver", "Speck", "Stripes", "Tingle", "Wool", "Yarn", "Snail", "Rabbit"],
 
 	traits: [{
 		name: "scientist",
@@ -1166,19 +1166,19 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 	}],
 
 	colors: [{
-		color: "brown"
+		color: "#b17b3e"
 	},{
-		color: "cinamon"
+		color: "#433219"
 	},{
-		color: "cream"
+		color: "#dbb673"
 	},{
 		color: "black"
 	},{
-		color: "fawn"
+		color: "#9d6d28"
 	},{
 		color: "white"
 	},{
-		color: "lilac"
+		color: "#cfa660"
 	}],
 
 	varieties: [{

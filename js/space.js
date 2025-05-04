@@ -171,8 +171,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 			{name: "thorium",   val: 35000}
 		],
 		unlocks: {
-			planet: ["charon"],
-			spaceMission: ["charonMission"]
+			planet: ["charon"]
 		}
 	},{
 		name: "centaurusSystemMission",
