@@ -1166,19 +1166,19 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 	}],
 
 	colors: [{
-		color: "brown"
+		color: "#b17b3e"
 	},{
-		color: "cinamon"
+		color: "#433219"
 	},{
-		color: "cream"
+		color: "#dbb673"
 	},{
 		color: "black"
 	},{
-		color: "fawn"
+		color: "#9d6d28"
 	},{
 		color: "white"
 	},{
-		color: "lilac"
+		color: "#cfa660"
 	}],
 
 	varieties: [{
