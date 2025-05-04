@@ -1485,6 +1485,23 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				//This would happen, for example, if the player had adored the galaxy immediately after praising.
 				this.game.msg($I("religion.undo.praise.failure"), "alert", "undo", true /*noBullet*/);
 			}
+		} else if (data.action === "buildZU") {
+			//This process requires 2 things: the controller & the model.
+			var bld = this.getZU(data.metaId);
+			var props = { //Essential for obtaining the model correctly.
+				id:            bld.name,
+				name:           bld.label,
+				description:    bld.description,
+				building:       bld.name
+			};
+			props.controller = new com.nuclearunicorn.game.ui.ZigguratBtnController(this.game);
+			var model = props.controller.fetchModel(props); //We need the model to actually change the data of the building
+			model.refundPercentage = 1.0;	//full refund for undo
+			props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
+		} else if (data.action === "buildRU") {
+			this.game.msg("not implemented yet");
+		} else if (data.action === "sellRU") {
+			this.game.msg("not implemented yet");
 		}
 	}
 });
@@ -1540,6 +1557,19 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 			});
 		}
 		return prices;
+	},
+
+	build: function(model, opts) {
+		var counter = this.inherited(arguments);
+		if (!counter) {
+			return; //Skip undo if nothing was built
+		}
+		var undo = this.game.registerUndoChange();
+		undo.addEvent("religion", {
+			action: "buildZU",
+			metaId: model.metadata.name,
+			val: counter
+		}, $I("ui.undo.bld.build", [counter, model.metadata.label]));
 	}
 });
 
