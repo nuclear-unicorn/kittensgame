@@ -2484,7 +2484,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 			if (!suppressUndo) {
 				var undo = this.game.registerUndoChange();
-				undo.addEvent("workshop", /* TODO: use manager.id and pass it in proper way as manager constructor*/
+				undo.addEvent(this.id,
 				{
 					metaId: res, //Internal ID of the craft recipe & also of the resource that's the product
 					resGainedAmt: actualAmtGained,

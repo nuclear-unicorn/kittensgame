@@ -1343,7 +1343,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		this.game.msg($I("religion.praise.msg", [this.game.getDisplayValueExt(faith.value, false, false, 0)]), "", "faith");
 		//Here we go, trying to make more game actions reversible
 		var undo = this.game.registerUndoChange();
-		undo.addEvent("religion", {
+		undo.addEvent(this.id, {
 			action: "praise",
 			faithSpent: faith.value,
 			worshipGained: worshipGainedAmt
@@ -1445,7 +1445,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		var resPool = this.game.resPool;
 		if (data.action == "refine"){
 			/*
-			  undo.addEvent("religion", {
+			  undo.addEvent(this.game.religion.id, {
 				action:"refine",
 				resFrom: model.prices[0].name,
 				resTo: this.controllerOpts.gainedResource,
@@ -1591,7 +1591,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 			return; //Skip undo if nothing was built
 		}
 		var undo = this.game.registerUndoChange();
-		undo.addEvent("religion", {
+		undo.addEvent(this.game.religion.id, {
 			action: "buildZU",
 			metaId: model.metadata.name,
 			val: counter
@@ -1641,7 +1641,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ReligionBtnController", com.nuclearunic
 			return; //Skip undo if nothing was built
 		}
 		var undo = this.game.registerUndoChange();
-		undo.addEvent("religion", {
+		undo.addEvent(this.game.religion.id, {
 			action: "buildRU",
 			metaId: model.metadata.name,
 			val: counter
@@ -1653,7 +1653,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ReligionBtnController", com.nuclearunic
 
 		if (amtSold > 0) {
 			var undo = this.game.registerUndoChange();
-			undo.addEvent("religion", {
+			undo.addEvent(this.game.religion.id, {
 				action: "sellRU",
 				metaId: model.metadata.name,
 				val: amtSold
@@ -1869,7 +1869,7 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 			this.game.getDisplayValueExt(actualGainCount),
 			resToObj.title];
 		var undo = this.game.registerUndoChange();
-		undo.addEvent("religion", {
+		undo.addEvent(this.game.religion.id, {
 			action:"refine",
 			resFrom: resFromName,
 			resTo: resToName,

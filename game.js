@@ -5374,6 +5374,27 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		$("#filterIcon")[0].innerHTML = filtersDiv.is(":visible") ? "-" : "+";
 	},
 
+	/**
+	 * Finds the manager object with the given ID.
+	 * @return The requested manager object, or null if the requested object could not be found.
+	 */
+	getManager: function(managerId) {
+		if (typeof(managerId) !== "string") {
+			console.error("Error in game#getManager: managerId must be a string!  (Got a " + typeof(managerId) + ".)");
+			return null;
+		}
+		//Search the array of managers; return the one that matches
+		for (var i = 0; i < this.managers.length; i += 1) {
+			var man = this.managers[i];
+			if (man.id == managerId) {
+				return man;
+			}
+		}
+		//Else, manager not found
+		console.error("Error in game#getManager: manager not found!  (Trying to find \"" + managerId + "\" manager.)");
+		return null;
+	},
+
     registerUndoChange: function(){
         var undoChange = new classes.game.UndoChange();
         undoChange.ttl = undoChange._static.DEFAULT_TTL * this.ticksPerSecond;
@@ -5389,23 +5410,16 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			return;
 		}
 
-		/**
-		 * I am too tired to write proper logic, let it be simple hashmap of references
-		 */
-		var managers = {
-			"workshop": this.workshop,
-			"building": this.bld,
-			"religion": this.religion
-		};
-
 		for (var i in this.undoChange.events){
 			var event = this.undoChange.events[i];
-			var mgr = managers[event.managerId];
+			var mgr = this.getManager(event.managerId);
 
 			if (mgr && mgr.undo){
 				mgr.undo(event.data);
 				//As a neat side effect, any messages generated within mgr.undo will appear *underneath* this one:
 				this.msg(this.undoChange.getEventDescription(event), "notice", "undo");
+			} else {
+				console.error("Error trying to undo event--the given managerId either doesn't exist or doesn't have an undo function.");
 			}
 		}
 

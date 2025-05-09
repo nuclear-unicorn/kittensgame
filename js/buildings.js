@@ -2744,8 +2744,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		//Add an undo event:
 		var isEnriched = this.game.workshop.get("advancedRefinement").researched;
 		var undo = this.game.registerUndoChange();
-		undo.addEvent("workshop",
-		{
+		undo.addEvent(this.game.workshop.id, { //This is a crafting event, so its undo should be with the crafting manager
 			metaId: "wood",
 			resGainedAmt: actualAmtGained,
 			resSpent: [ { name : "catnip", val: (isEnriched ? 50 : 100) }]
@@ -3005,8 +3004,7 @@ dojo.declare("classes.game.ui.RefineCatnipButtonController", com.nuclearunicorn.
 		model.prices.forEach(function(priceLine) {
 			priceTimes100.push({ name: priceLine.name, val: priceLine.val * 100 });
 		});
-		undo.addEvent("workshop",
-		{
+		undo.addEvent(this.game.workshop.id, { //This is a crafting event, so its undo should be with the crafting manager
 			metaId: "wood",
 			resGainedAmt: actualAmtGained,
 			resSpent: priceTimes100
@@ -3097,7 +3095,7 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 			{name: model.options.building, val: counter}
 		);
 		var undo = this.game.registerUndoChange();
-		undo.addEvent("building", {
+		undo.addEvent(this.game.bld.id, {
 			action: "build",
 			metaId: model.options.building,
 			val: counter
@@ -3109,7 +3107,7 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 
 		if (amtSold > 0) {
 			var undo = this.game.registerUndoChange();
-			undo.addEvent("building", {
+			undo.addEvent(this.game.bld.id, {
 				action: "sell",
 				metaId: model.metadata.name,
 				val: amtSold
@@ -3223,7 +3221,7 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 		var undo = this.game.registerUndoChange();
 		var labelBefore = metadataRaw.stages[metadataRaw.stage].label;
 		var labelAfter = metadataRaw.stages[Math.max(0, metadataRaw.stage + delta)].label;
-		undo.addEvent("building", {
+		undo.addEvent(this.game.bld.id, {
 			action:"deltagrade",
 			metaId: model.options.building,
 			val: delta
@@ -3232,7 +3230,7 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 			$I("ui.undo.bld.downgrade", [labelBefore, labelAfter])));
 
 		if (metadataRaw.val > 0) { //Sell until 0 are left (to refund to the player)
-			undo.addEvent("building", { //The order of these undo events matters A LOT
+			undo.addEvent(this.game.bld.id, { //The order of these undo events matters A LOT
 				action:"sell",
 				metaId: model.options.building,
 				val: metadataRaw.val
