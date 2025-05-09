@@ -446,6 +446,30 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
         }
 	},
 
+	undo: function(data) {
+		if (data.action == "buildEmbassy") {
+			var props = {
+				race: data.race,
+				prices: data.race.embassyPrices
+			};
+			props.controller = new classes.diplomacy.ui.EmbassyButtonController(this.game);
+			var model = props.controller.fetchModel(props);
+			model.refundPercentage = 1.0;	//full refund for undo
+			props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
+
+			this.triggerOnEmbassyCountChanged();
+		}
+	},
+
+	//Some unlocks require embassies.
+	//Some upgrades care about the number of embassies there are.
+	//Call this function to recalculate this, as needed:
+	triggerOnEmbassyCountChanged: function() {
+		this.game.upgrade({policies: ["lizardRelationsDiplomats", "nagaRelationsArchitects", "spiderRelationsGeologists"]});
+		this.game.science.unlockRelations();
+		this.game.ui.render();
+	},
+
 	tradeImpl: function(race, totalTradeAmount) {
 
 		 // BSK early unlocks!
@@ -1077,19 +1101,14 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 		return prices;
 	},
 
-	buyItem: function(model, event) {
-		var result = this.inherited(arguments);
-		if (result.itemBought){
-			this.game.upgrade({policies: ["lizardRelationsDiplomats", "nagaRelationsArchitects", "spiderRelationsGeologists"]}); //Upgrade, since the policy is based on number of embassies.
-			this.game.science.unlockRelations(); //Check if we can unlock new relation policies based on number of embassies.
-			this.game.ui.render();
-		}
-		return result;
-	},
-
 	incrementValue: function(model) {
 		this.inherited(arguments);
-		model.options.race.embassyLevel++;		
+		model.options.race.embassyLevel++;
+	},
+
+	decrementValue: function(model) {
+		this.inherited(arguments);
+		model.options.race.embassyLevel--;
 	},
 
 	hasSellLink: function(model){
@@ -1098,7 +1117,27 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 
 	updateVisible: function(model){
 		model.visible = this.game.science.get("writing").researched;
-	}
+	},
+
+	build: function(model, opts) {
+		var counter = this.inherited(arguments);
+		if (!counter) {
+			return; //Skip triggers & undo if nothing was built
+		}
+
+		this.game.diplomacy.triggerOnEmbassyCountChanged();
+
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.game.diplomacy.id, {
+			action: "buildEmbassy",
+			race: model.options.race, //Reference to the race object
+			val: counter
+		}, (counter == 1 ?
+			$I("ui.undo.diplomacy.build.one.embassy", [model.options.race.title])
+			:
+			$I("ui.undo.diplomacy.build.many.embassies", [counter, model.options.race.title])
+		));
+	},
 });
 
 //Embassy Buttons have a custom tooltip:

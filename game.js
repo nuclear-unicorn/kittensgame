@@ -5413,13 +5413,16 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		for (var i in this.undoChange.events){
 			var event = this.undoChange.events[i];
 			var mgr = this.getManager(event.managerId);
-
-			if (mgr && mgr.undo){
-				mgr.undo(event.data);
-				//As a neat side effect, any messages generated within mgr.undo will appear *underneath* this one:
-				this.msg(this.undoChange.getEventDescription(event), "notice", "undo");
+			if (mgr) {
+				if (typeof(mgr.undo) === "function") {
+					mgr.undo(event.data);
+					//As a neat side effect, any messages generated within mgr.undo will appear *underneath* this one:
+					this.msg(this.undoChange.getEventDescription(event), "notice", "undo");
+				} else {
+					console.error("Error in game#undo--the " + mgr.id + " manager doesn't have an undo function.");
+				}
 			} else {
-				console.error("Error trying to undo event--the given managerId either doesn't exist or doesn't have an undo function.");
+				console.error("Error in game#undo--tried to process an event with the", event.managerId, "manager, which doesn't exist.");
 			}
 		}
 

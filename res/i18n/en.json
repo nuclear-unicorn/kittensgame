@@ -1826,6 +1826,8 @@
     "ui.undo.bld.downgrade": "Undo downgrading {0} into {1}.",
     "ui.undo.bld.sell": "Undo selling {0}x {1}.",
     "ui.undo.bld.upgrade": "Undo upgrading {0} into {1}.",
+    "ui.undo.diplomacy.build.one.embassy": "Undo building an Embassy ({0}).",
+    "ui.undo.diplomacy.build.many.embassies": "Undo building {0}x Embassies ({1}).",
     "ui.undo.religion.praise": "Un-praise the sun for {0} worship.",
     "ui.undo.religion.refine": "Undo refining {0} {1} into {2} {3}.",
     "ui.undo.workshop.craft": "Undo crafting {0} {1}.",
