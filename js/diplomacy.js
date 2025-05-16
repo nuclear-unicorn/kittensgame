@@ -470,6 +470,59 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		this.game.ui.render();
 	},
 
+	/**
+	 * Call this function when performing a trade (one or multiple).
+	 * This function decides how many of those trades fall into these 3 categories:
+	 * 	* Failed (because the {race} hate you for no reason)
+	 * 	* Normal
+	 * 	* Bonus (because the {race} think your kittens are adorable :3)
+	 * This function has no side effects (the calling function is expected to handle those).
+	 * @param standing number	Encodes how much the {race} like you.
+	 *                       	If less than 0, trades have a chance to fail.  For example, -0.2 means 20% chance of failure.
+	 *                       	If exactly 0, trades are always normal.
+	 *                       	If greater than 0, trades have a chance to grant bonus resources.  For example, 0.15 means 15% chance of bonus resources.
+	 * @param numTrades number	The total number of trades we're going to do.  It's expected to be a nonnegative integer.
+	 * @param nonRandom number	The number of trades suffering from a "non-random" penalty.  (Usually 0, but sometimes positive.)
+	 *                        	These ones ignore randomness & always pick the worst option when given a choice.
+	 * @return an object with 3 numeric fields: failed, normal, bonus
+	 */
+	calculateFailedNormalBonusTrades: function(standing, numTrades, nonRandom) {
+		var tradeResults = { failed: 0, normal: 0, bonus: 0 };
+		//Validate inputs
+		if (typeof(standing) !== "number" || typeof(numTrades) !== "number" || typeof(nonRandom) !== "number") {
+			console.error("Error in calculateFailedNormalBonusTrades: Parameter was of wrong type (requires 3 numbers).");
+			return tradeResults;
+		}
+		if (numTrades < 0 || nonRandom < 0) {
+			console.error("Error in calculateFailedNormalBonusTrades: numTrades & nonRandom must be nonnegative.");
+			//Ideally, they should also be integers, but I'm too lazy to check that now.
+			return tradeResults;
+		}
+
+		if (standing < 0) { //We have a chance to fail some trades!
+			tradeResults.failed = Math.min(nonRandom, numTrades); //The first nonRandom are guaranteed to fail
+			var randomEligible = Math.max(numTrades - nonRandom, 0); //Use randomness for the remaining
+			tradeResults.failed += this.game.math.binominalRandomInteger(randomEligible, -standing); //Roll
+			tradeResults.normal = numTrades - tradeResults.failed; //If a trade didn't fail, then it was normal.
+		} else if (standing > 0) { //We have a chance to have some bonus trades!  :3 are cute, after all
+			if (standing >= 1) { //All trades are guaranteed to have bonuses
+				tradeResults.bonus = numTrades;
+			} else { //Use randomness
+				var randomEligible = Math.max(numTrades - nonRandom, 0); //Randomness is for non-nonRandom trades only
+				tradeResults.bonus = this.game.math.binominalRandomInteger(randomEligible, standing); //Roll
+				tradeResults.normal = numTrades - tradeResults.bonus; //If a trade isn't bonus, then it's normal
+			}
+		} else { //standing is exactly equal to 0
+			//Trades will not ever fail or have bonuses.  There is no need for randomness.
+			tradeResults.normal = numTrades;
+		}
+		//Verify that things add up:
+		if (tradeResults.failed + tradeResults.normal + tradeResults.bonus != numTrades) {
+			console.error("Error in calculateFailedNormalBonusTrades: Something didn't add up correctly!");
+		}
+		return tradeResults;
+	},
+
 	tradeImpl: function(race, totalTradeAmount) {
 
 		 // BSK early unlocks!
@@ -487,10 +540,13 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
             this.game.unlock(race.unlocks);
 		}
 		var printMessages = totalTradeAmount == 1;
-		var standing = this.getFinalStanding(race);
 
-		var failedTradeAmount = standing < 0 ? this.game.math.binominalRandomInteger(totalTradeAmount, -standing) : 0;
-		var successfullTradeAmount = totalTradeAmount - failedTradeAmount;
+		//Decide how many of these trades fail (because they hate us) or give bonus resources (because we're adorable)
+		var tradeResults = this.calculateFailedNormalBonusTrades(this.getFinalStanding(race), totalTradeAmount, 0 /*for now, will become this.nonRandomTrades later*/);
+		//TODO: reduce nonRandomTrades by 1 for each failure, down to a minimum of 0--because if there are ANY failures at all, the first N are guaranteed to have happened as a result of nonRandomTrades
+		var normalTradeAmount = tradeResults.normal;
+		var bonusTradeAmount = tradeResults.bonus;
+		var successfullTradeAmount = normalTradeAmount + bonusTradeAmount;
 
 		if (successfullTradeAmount == 0) {
 			if (printMessages) {
@@ -501,9 +557,6 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 		// at most 1 year + 1 season per energy unit
 		race.duration = Math.min(race.duration, this.game.calendar.daysPerSeason * (this.game.calendar.seasonsPerYear + race.energy));
-
-		var bonusTradeAmount = standing > 0 ? this.game.math.binominalRandomInteger(totalTradeAmount, standing) : 0;
-		var normalTradeAmount = successfullTradeAmount - bonusTradeAmount;
 
 		if (bonusTradeAmount > 0) {
 			if (printMessages) {
