@@ -11,6 +11,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	baseManpowerCost: 50,
 
 	nonRandomTrades: 0, //Way to prevent using the undo feature to exploit RNG
+	nonRandomResetDays: 0, //nonRandomTrades will get reset to 0 after enough game-days have passed
 
 	races: [{
 		name: "lizards",
@@ -232,6 +233,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			race.duration = 0;
 		}
 		this.nonRandomTrades = 0;
+		this.nonRandomResetDays = 0;
 	},
 
 	save: function(saveData){
@@ -251,6 +253,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			this.get("leviathans").autoPinned = saveData.diplomacy.autoPinLeviathans || false;
 		}
 		this.nonRandomTrades = 0; //Don't preserve this in the save-state (has very little meaningful gameplay value)
+		this.nonRandomResetDays = 0;
 	},
 
 	hasUnlockedRaces: function(){
@@ -434,7 +437,15 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
         this.game.msg($I("trade.msg.elders"), "urgent", "elders");
     },
 
-    onNewDay: function(){
+	onNewDay: function() {
+		//nonRandomTrades is an anti-exploit mechanism
+		//But if enough time elapses, it's safe to assume the player is not trying to exploit it.
+		if (this.nonRandomResetDays > 0) {
+			this.nonRandomResetDays--;
+		} else {
+			this.nonRandomTrades = 0;
+		}
+
         var elders = this.get("leviathans");
         if (elders.duration <= 0  && elders.unlocked){
 			elders.unlocked = false;
@@ -484,8 +495,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			for (var resName in data.resSpent) { //Un-spend the requirements
 				this.game.resPool.addResEvent(resName, data.resSpent[resName]);
 			}
-			//TODO: have this thing where after a real-life minute, nonRandomTrades is set to 0.
 			this.nonRandomTrades += data.val; //Prevent exploiting RNG
+			this.nonRandomResetDays = 45; //After some real-life time (45 game-days = 90 IRL-sec) has passed, reset the anti-exploit mechanism
 		}
 	},
 
