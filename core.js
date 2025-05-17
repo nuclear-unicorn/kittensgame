@@ -456,6 +456,11 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 				enabled: true,
 				unlocked: false
 			},
+			"undo": {
+				title: $I("console.filter.undo"),
+				enabled: true,
+				unlocked: false
+			}
 		}
 	},
 
@@ -1771,8 +1776,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 				var self = this;
 				var amtSold = 0;
 				this.game.ui.confirm($("sell.all.confirmation.title"), $I("sell.all.confirmation.msg"), function() {
-					self.sellInternal(model, end, true /*requireSellLink*/);
-					amtSold = start;
+					amtSold = self.sellInternal(model, end, true /*requireSellLink*/);
 				});
 				return amtSold;
 			}
@@ -1793,6 +1797,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 	 * 						This feature exists so that Order of the Sun upgrades can have additional requirements
 	 * 						for when they can be sold, but also so that those requirements can be bypassed
 	 * 						for purposes such as the implementation of the undo feature.
+	 * @return The number of buildings actually sold.
 	 */
 	sellInternal: function(model, end, requireSellLink){
 		//Check input parameters for validity.
@@ -1801,9 +1806,11 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 			requireSellLink = false;
 		}
 
+		var counter = 0;
 		var building = model.metadata;
 		while (building.val > end) {
 			this.decrementValue(model);
+			counter += 1;
 
 			model.prices = this.getPrices(model);
 			this.refund(model);
@@ -1816,6 +1823,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		this.metadataHasChanged(model);
 		this.game.upgrade(building.upgrades);
 		this.game.render();
+		return counter;
 	},
 
 	decrementValue: function(model) {

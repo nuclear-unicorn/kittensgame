@@ -349,7 +349,19 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
     setGame: function(game){
         this.game = game;
 
-        //this.toolbar = new classes.ui.Toolbar(game);
+        //This tooltip needs to be created EXACTLY ONCE.
+        //(Calling it more than once would create performance issues because (in the current implementation) old event
+        // listeners don't ever get un-attached, which can cause noticeable lag when thousands of event listeners fire
+        // simultaneously.  Un-attaching event listeners is hard because we're implementing them using anonymous functions.)
+        //It needs to be created AFTER the game is created, so it can't happen in the DesktopUI#constructor.
+        UIUtils.attachTooltip(game, $("#undoBtn")[0], -30, -30, function() {
+            var undoState = game.undoChange;
+            if (undoState) {
+                return undoState.getEventDescription(undoState.events[0]);
+            }
+            //Else, undoState doesn't exist currently:
+            return "";
+        });
     },
 
     render: function(){
@@ -720,11 +732,12 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
     //--------------------------------------------
 
     updateUndoButton: function(){
-        var isVisible = (this.game.undoChange !== null);
+        var undoState = this.game.undoChange;
+        var isVisible = (undoState !== null);
         $("#undoBtn").toggle(isVisible);
 
         if (isVisible) {
-            $("#undoBtn").text($I("ui.undo", [Math.floor(this.game.undoChange.ttl / this.game.ticksPerSecond)]));
+            $("#undoBtn").text($I("ui.undo", [Math.floor(undoState.ttl / this.game.ticksPerSecond)]));
         }
     },
 

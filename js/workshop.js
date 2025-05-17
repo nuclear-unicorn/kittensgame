@@ -2474,7 +2474,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 		if (bypassResourceCheck || this.game.resPool.hasRes(prices)) {
 			this.game.resPool.payPrices(prices);
-			this.game.resPool.addResEvent(res,craftAmt);
+			var actualAmtGained = this.game.resPool.addResEvent(res,craftAmt);
 			if (craft.upgrades){
 				this.game.upgrade(craft.upgrades);
 			}
@@ -2482,15 +2482,16 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			this.game.stats.getStat("totalCrafts").val++;
 			this.game.stats.getStatCurrent("totalCrafts").val++;
 
-            if (!suppressUndo) {
-                var undo = this.game.registerUndoChange();
-                undo.addEvent("workshop", /* TODO: use manager.id and pass it in proper way as manager constructor*/
-                    {
-						metaId:res,
-						val: amt
-					}
-				);
-            }
+			if (!suppressUndo) {
+				var undo = this.game.registerUndoChange();
+				undo.addEvent(this.id,
+				{
+					metaId: res, //Internal ID of the craft recipe & also of the resource that's the product
+					resGainedAmt: actualAmtGained,
+					resSpent: prices
+				}, $I("ui.undo.workshop.craft", [this.game.getDisplayValueExt(actualAmtGained), this.game.resPool.get(res).title]));
+				// (Note: We use res.title instead of craft.label because this way the English version makes consistent grammatical sense.)
+			}
 
             return true;
 		} else if (forceAll) {
@@ -2551,16 +2552,38 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		return effectPerTick * (1 + (afterCraft ? this.game.getResCraftRatio(resName) : 0));
 	},
 
-    undo: function(data){
-		var metaId = data.metaId,
-			val = data.val;
-
-		if (this.craft(metaId, -val, true /*do not create cyclic undo*/)){
-			var res = this.game.resPool.get(metaId);
-			var craftRatio = this.game.getResCraftRatio(metaId);
-			this.game.msg( $I("workshop.undo.msg", [this.game.getDisplayValueExt(val * (1 + craftRatio)), (res.title || res.name)]));
+	/**
+	 * This function un-crafts something.  The idea is that the undo system will delegate any crafting-related
+	 * undo commands to this function here.
+	 * If the product of the craft cannot be returned (like, if it's been spent), the undo will fail & nothing will be refunded.
+	 * Otherwise, the player will get a full refund, regaining the resources that were actually spent.
+	 * If, in the intervening time (between crafting & getting a refund), the craft ratio changes,
+	 * 	the refund uses the value that the craft ratio had at the time the original craft was performed.
+	 * 	(No exploit by changing leaders!)
+	 * @param data		object	Contains all pertinent information needed to undo the craft.
+	 * 		metaId: string, name of the resource produced as a result of the craft
+	 * 		resGainedAmt: number, amount of the resource produced as a result of the craft
+	 * 		resSpent: array of objects, names & amounts of resources spent as a part of the craft
+	 * 			Objects have the structure { name: <string>, val: <number> }
+	 */
+	undo: function(data){
+		var resPool = this.game.resPool;
+		//Fail the un-craft if we cannot get the player a full refund:
+		if(resPool.get(data.metaId).value < data.resGainedAmt) {
+			this.game.msg($I("workshop.undo.failure", [resPool.get(data.metaId).title]), "alert", "undo", true /*noBullet*/);
+			return;
 		}
-    },
+		//Else, player is eligible for a full refund:
+		resPool.addResEvent(data.metaId, -data.resGainedAmt);
+		data.resSpent.forEach(function(priceLine) {
+			var amt = resPool.addResEvent(priceLine.name, priceLine.val);
+			if(amt) {
+				//amt could be 0 due to a rounding error.  In that case, don't show it.
+				this.game.msg($I("workshop.undo.regain", [this.game.getDisplayValueExt(amt), resPool.get(priceLine.name).title]),
+					null, "undo", true /*noBullet*/);
+			}
+		});
+	},
 
 	//returns a total number of resoruces possible to craft for this recipe
 	getCraftAllCount: function(craftName){
