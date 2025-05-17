@@ -10,6 +10,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	baseGoldCost: 15,
 	baseManpowerCost: 50,
 
+	nonRandomTrades: 0, //Way to prevent using the undo feature to exploit RNG
+
 	races: [{
 		name: "lizards",
 		title: $I("trade.race.lizards"),
@@ -229,6 +231,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			race.energy = 0;
 			race.duration = 0;
 		}
+		this.nonRandomTrades = 0;
 	},
 
 	save: function(saveData){
@@ -247,6 +250,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			this.game.bld.loadMetadata(this.races, saveData.diplomacy.races);
 			this.get("leviathans").autoPinned = saveData.diplomacy.autoPinLeviathans || false;
 		}
+		this.nonRandomTrades = 0; //Don't preserve this in the save-state (has very little meaningful gameplay value)
 	},
 
 	hasUnlockedRaces: function(){
@@ -458,6 +462,30 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
 
 			this.triggerOnEmbassyCountChanged();
+		} else if (data.action == "trade") {
+			//The player can only undo the trade if they haven't spent any of the resources gained this way.
+			//If they cannot return the merchandise, they cannot get a refund.
+			var canUndo = true;
+			for (var resName in data.resGained) {
+				var required = data.resGained[resName];
+				var have = this.game.resPool.get(resName).value;
+				if (have < required) {
+					this.game.msg($I("trade.undo.missing", [this.game.resPool.get(resName).title]), "alert", "undo", true /*noBullet*/);
+					canUndo = false;
+				}
+			}
+			if (!canUndo) {
+				return;
+			}
+			//Else, we have determined that it is valid to undo this trade.
+			for (var resName in data.resGained) { //Un-gain trade resources
+				this.game.resPool.addResEvent(resName, -data.resGained[resName]);
+			}
+			for (var resName in data.resSpent) { //Un-spend the requirements
+				this.game.resPool.addResEvent(resName, data.resSpent[resName]);
+			}
+			//TODO: have this thing where after a real-life minute, nonRandomTrades is set to 0.
+			this.nonRandomTrades += data.val; //Prevent exploiting RNG
 		}
 	},
 
@@ -542,8 +570,9 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		var printMessages = totalTradeAmount == 1;
 
 		//Decide how many of these trades fail (because they hate us) or give bonus resources (because we're adorable)
-		var tradeResults = this.calculateFailedNormalBonusTrades(this.getFinalStanding(race), totalTradeAmount, 0 /*for now, will become this.nonRandomTrades later*/);
-		//TODO: reduce nonRandomTrades by 1 for each failure, down to a minimum of 0--because if there are ANY failures at all, the first N are guaranteed to have happened as a result of nonRandomTrades
+		var tradeResults = this.calculateFailedNormalBonusTrades(this.getFinalStanding(race), totalTradeAmount, this.nonRandomTrades);
+		//If there are failures, they may have been caused by nonRandomTrades.
+		this.nonRandomTrades = Math.max(this.nonRandomTrades - tradeResults.failed, 0);
 		var normalTradeAmount = tradeResults.normal;
 		var bonusTradeAmount = tradeResults.bonus;
 		var successfullTradeAmount = normalTradeAmount + bonusTradeAmount;
@@ -576,13 +605,26 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				continue;
 			}
 
-			var resourcePassedNormalTradeAmount = this.game.math.binominalRandomInteger(normalTradeAmount, tradeChance);
-			var resourcePassedBonusTradeAmount = this.game.math.binominalRandomInteger(bonusTradeAmount, tradeChance);
+			var eligibleForResNormal = normalTradeAmount;
+			var eligibleForResBonus = bonusTradeAmount;
+			//If a trade isn't guaranteed (i.e. if there's randomness), a non-random trade will NEVER get it.
+			//Non-random trades should take away from normal trades first, then bonus ones, in that order.
+			//Non-random trades will NEVER take away from something that's guaranteed
+			if (tradeChance < 1 && this.nonRandomTrades) {
+				eligibleForResNormal = Math.max(normalTradeAmount - this.nonRandomTrades, 0);
+				eligibleForResBonus = Math.max(bonusTradeAmount - Math.max(this.nonRandomTrades - normalTradeAmount, 0), 0);
+			}
+
+			//Roll the dice to see how many pass the tradeChance:
+			var resourcePassedNormalTradeAmount = this.game.math.binominalRandomInteger(eligibleForResNormal, tradeChance);
+			var resourcePassedBonusTradeAmount = this.game.math.binominalRandomInteger(eligibleForResBonus, tradeChance);
 
 			if (resourcePassedNormalTradeAmount + resourcePassedBonusTradeAmount == 0) {
 				continue;
 			}
 
+			//Theoretically, we could make non-random trades always give the lowest possible amount...
+			// ...but I don't care about that enough to program in the logic for that to happen.
 			var fuzzedNormalAmount = this._fuzzGainedAmount(resourcePassedNormalTradeAmount, sellResource.width);
 			var fuzzedBonusAmount = this._fuzzGainedAmount(resourcePassedBonusTradeAmount, sellResource.width);
 			var resourceSeasonTradeRatio = 1 + (sellResource.seasons ? sellResource.seasons[currentSeason] : 0);
@@ -592,8 +634,12 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 		//-------------------- 35% chance to get spice + 1% per embassy lvl ------------------
 		var spiceChance = this.getSpiceTradeChance(race);
+		var eligibleForSpice = successfullTradeAmount;
+		if (spiceChance < 1 && this.nonRandomTrades) { //Non-random trades won't give spice unless it's guaranteed
+			eligibleForSpice = Math.max(successfullTradeAmount - this.nonRandomTrades, 0);
+		}
 		var spiceTradeAmount = this.game.math.binominalRandomInteger(
-			successfullTradeAmount, spiceChance
+			eligibleForSpice, spiceChance
 		);
 		boughtResources["spice"] = 25 * spiceTradeAmount +
 			50 * tradeRatio * this.game.math.irwinHallRandom(spiceTradeAmount);
@@ -606,21 +652,44 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		if (race.name == "nagas") {
 			blueprintTradeChance += this.game.getEffect("nagaBlueprintTradeChance");
 		}
+		var eligibleForBlueprint = successfullTradeAmount;
+		if (blueprintTradeChance < 1 && this.nonRandomTrades) { //Non-random trades won't give blueprints unless it's guaranteed
+			eligibleForBlueprint = Math.max(successfullTradeAmount - this.nonRandomTrades, 0);
+		}
 		boughtResources["blueprint"] = Math.floor(
-			this.game.math.binominalRandomInteger(successfullTradeAmount, blueprintTradeChance)
+			this.game.math.binominalRandomInteger(eligibleForBlueprint, blueprintTradeChance)
 		);
 
 		//-------------- 15% + 0.35% chance per ship to get titanium ---------------
 		if (race.name == "zebras") {
 			var shipAmount = this.game.resPool.get("ship").value;
 			var zebraRelationModifierTitanium = this.game.getEffect("zebraRelationModifier") * this.game.bld.getBuildingExt("tradepost").meta.effects["tradeRatio"];
-			boughtResources["titanium"] = (1.5 + shipAmount * 0.03) * (1 + zebraRelationModifierTitanium) * this.game.math.binominalRandomInteger(successfullTradeAmount, 0.15 + shipAmount * 0.0035);
+			var titaniumTradeChance = 0.15 + shipAmount * 0.0035;
+			var eligibleForTitanium = successfullTradeAmount;
+			if (titaniumTradeChance < 1 && this.nonRandomTrades) { //Non-random trades won't give titanium unless it's guaranteed
+				eligibleForTitanium = Math.max(successfullTradeAmount - this.nonRandomTrades, 0);
+			}
+			boughtResources["titanium"] = (1.5 + shipAmount * 0.03) * (1 + zebraRelationModifierTitanium) * this.game.math.binominalRandomInteger(eligibleForTitanium, titaniumTradeChance);
 		}
 
 		//Update Trade Stats
 		this.game.stats.getStat("totalTrades").val = Math.min(this.game.stats.getStat("totalTrades").val + successfullTradeAmount, Number.MAX_VALUE);
 		this.game.stats.getStatCurrent("totalTrades").val += successfullTradeAmount;
 		this.game.upgrade({policies : ["sharkRelationsMerchants"]});
+
+		//Consume non-random trades:
+		this.nonRandomTrades = Math.max(this.nonRandomTrades - successfullTradeAmount, 0);
+
+		var undo = this.game.registerUndoChange();
+		var resSpent = { "manpower": this.getManpowerCost() * totalTradeAmount,
+			"gold": this.getGoldCost() * totalTradeAmount };
+		resSpent[race.buys[0].name] = race.buys[0].val * totalTradeAmount;
+		undo.addEvent(this.id, {
+			action: "trade",
+			val: totalTradeAmount,
+			resSpent: resSpent,
+			resGained: boughtResources
+		}, $I("ui.undo.diplomacy.trade", [this.game.getDisplayValueExt(totalTradeAmount), race.title]));
 
 		return boughtResources;
 	},
