@@ -399,24 +399,61 @@ dojo.declare("classes.game.Server", null, {
  * Undo Change state. Represents a change in one or multiple managers
  */
 dojo.declare("classes.game.UndoChange", null, {
-    _static:{
-        DEFAULT_TTL : 20
-    },
-    ttl: 0,
-    events: null,
+	_static:{
+		DEFAULT_TTL : 20
+	},
+	ttl: 0,
+	events: null,
 
-    constructor: function(){
-        this.events = [];
-    },
+	constructor: function(){
+		this.events = [];
+	},
 
-    addEvent: function(managerId, data){
-        var event = {
-            managerId: managerId,
-            data: data
-        };
+	/**
+	 * Adds an "event" (game-action) to the list of "things that will un-happen if you push the undo button."
+	 * Note to the dev: We gotta come up with a shorter name for that list.
+	 * 
+	 * Usage:
+	 * Call this function whenever the player performs an action that can be undone.
+	 * Supply (as arguments) all the relevant data to reconstruct that action, or, if necessary, undo it.
+	 * 
+	 * @param managerId	string	Which manager class will handle the relevant undo operation.
+	 * 						Typically corresponds to which subsystem of the game is associated with that action.
+	 * @param data	object	Any relevant data to reconstruct the action to be undone.
+	 * 					For example, if the action is "build 10 Log Houses," then the data would somehow specify
+	 * 						that Log Houses are involved & that there are 10 of them.
+	 * 					The UndoChange system doesn't understand the data here--it is specific to the associated manager.
+	 * 					This allows each different manager to track all the data they care about & nothing more.
+	 * @param description string	An i18n string containing a general human-language description of this undo action.
+	 * 						The idea is that this would be displayed somewhere in the UI so the player will know
+	 * 							what is being undone before they commit to undoing an action.
+	 */
+	addEvent: function(managerId, data, description){
+		var event = {
+			managerId: managerId,
+			data: data,
+			description: description
+		};
 
-        this.events.push(event);
-    }
+		this.events.push(event);
+	},
+
+	/**
+	 * Converts an event object into a short, human-language description of what it is.
+	 * @param event	object	An object describing an event, like what would be created from the addEvent function.
+	 * @return string	If the event is valid, it's an i18n string which describes said event, ideally using concise language.
+	 * 				If the event is not valid, it's a debug string which hopefully the devs can make use of.
+	 */
+	getEventDescription: function(event) {
+		if (typeof(event) !== "object" || !event) {
+			return "Error in getEventDescription: event is invalid.";
+		}
+		if (typeof(event.description) !== "string") {
+			return "Error in getEventDescription: the event has no description defined.\nTell the developers it is from the \"" + event.managerId + "\" manager.";
+		}
+		//Else, the event exists & its description is a string.
+		return event.description;
+	}
 });
 
 /*
@@ -5348,6 +5385,27 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		$("#filterIcon")[0].innerHTML = filtersDiv.is(":visible") ? "-" : "+";
 	},
 
+	/**
+	 * Finds the manager object with the given ID.
+	 * @return The requested manager object, or null if the requested object could not be found.
+	 */
+	getManager: function(managerId) {
+		if (typeof(managerId) !== "string") {
+			console.error("Error in game#getManager: managerId must be a string!  (Got a " + typeof(managerId) + ".)");
+			return null;
+		}
+		//Search the array of managers; return the one that matches
+		for (var i = 0; i < this.managers.length; i += 1) {
+			var man = this.managers[i];
+			if (man.id == managerId) {
+				return man;
+			}
+		}
+		//Else, manager not found
+		console.error("Error in game#getManager: manager not found!  (Trying to find \"" + managerId + "\" manager.)");
+		return null;
+	},
+
     registerUndoChange: function(){
         var undoChange = new classes.game.UndoChange();
         undoChange.ttl = undoChange._static.DEFAULT_TTL * this.ticksPerSecond;
@@ -5358,32 +5416,30 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
         return undoChange;
     },
 
-    undo: function(){
-        if (!this.undoChange) {
-            return;
-        }
+	undo: function() {
+		if (!this.undoChange) {
+			return;
+		}
 
-        /**
-         * I am too tired to write proper logic, let it be simple hashmap of references
-         */
-        var managers = {
-		   "workshop": this.workshop,
-		   "building": this.bld,
-		   "religion": this.religion
-        };
+		for (var i in this.undoChange.events){
+			var event = this.undoChange.events[i];
+			var mgr = this.getManager(event.managerId);
+			if (mgr) {
+				if (typeof(mgr.undo) === "function") {
+					mgr.undo(event.data);
+					//As a neat side effect, any messages generated within mgr.undo will appear *underneath* this one:
+					this.msg(this.undoChange.getEventDescription(event), "notice", "undo");
+				} else {
+					console.error("Error in game#undo--the " + mgr.id + " manager doesn't have an undo function.");
+				}
+			} else {
+				console.error("Error in game#undo--tried to process an event with the", event.managerId, "manager, which doesn't exist.");
+			}
+		}
 
-        for (var i in this.undoChange.events){
-            var event = this.undoChange.events[i];
-            var mgr = managers[event.managerId];
-
-            if (mgr && mgr.undo){
-                mgr.undo(event.data);
-            }
-        }
-
-        this.undoChange = null;
+		this.undoChange = null;
 		this._publish("server/undoStateChanged");
-    },
+	},
 
 	//-----------------------------------------------------------------
 	//TODO: use me on mobile version

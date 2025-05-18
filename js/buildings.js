@@ -1283,7 +1283,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 						: 0,
 					craft: function() {
 						if (this.numberOfCrafts > 0) {
-							game.workshop.craft(craftedResourceName, this.numberOfCrafts);
+							game.workshop.craft(craftedResourceName, this.numberOfCrafts, true /*suppressUndo*/);
 							// Automated production, metallurgist leader won't help here
 							game.msg($I("bld.msg.automation." + craftedResourceName + "s", [game.getDisplayValueExt(consumedQuantity), game.getDisplayValueExt(this.numberOfCrafts * (1 + game.getCraftRatio()))]), null, "workshopAutomation", true);
 						}
@@ -2750,7 +2750,16 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 
 	refineCatnip: function() {
 		var craftRatio = this.game.getResCraftRatio("wood");
-		this.game.resPool.addResEvent("wood", 1 + craftRatio);
+		var actualAmtGained = this.game.resPool.addResEvent("wood", 1 + craftRatio);
+
+		//Add an undo event:
+		var isEnriched = this.game.workshop.get("advancedRefinement").researched;
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.game.workshop.id, { //This is a crafting event, so its undo should be with the crafting manager
+			metaId: "wood",
+			resGainedAmt: actualAmtGained,
+			resSpent: [ { name : "catnip", val: (isEnriched ? 50 : 100) }]
+		}, $I("ui.undo.workshop.craft", [this.game.getDisplayValueExt(actualAmtGained), this.game.resPool.get("wood").title]));
 	},
 
 	getUndissipatedPollutionPerTick: function(){
@@ -2999,7 +3008,18 @@ dojo.declare("classes.game.ui.RefineCatnipButtonController", com.nuclearunicorn.
 		this.game.resPool.addResEvent("catnip", -100 * catnipCost);
 
 		var craftRatio = this.game.getResCraftRatio("wood");
-		this.game.resPool.addResEvent("wood", 100 * (1 + craftRatio));
+		var craftAmt = 100 * (1 + craftRatio);
+		var actualAmtGained = this.game.resPool.addResEvent("wood", craftAmt);
+		var undo = this.game.registerUndoChange();
+		var priceTimes100 = [];
+		model.prices.forEach(function(priceLine) {
+			priceTimes100.push({ name: priceLine.name, val: priceLine.val * 100 });
+		});
+		undo.addEvent(this.game.workshop.id, { //This is a crafting event, so its undo should be with the crafting manager
+			metaId: "wood",
+			resGainedAmt: actualAmtGained,
+			resSpent: priceTimes100
+		}, $I("ui.undo.workshop.craft", [this.game.getDisplayValueExt(actualAmtGained), this.game.resPool.get("wood").title]));
 	}
 });
 
@@ -3086,11 +3106,11 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 			{name: model.options.building, val: counter}
 		);
 		var undo = this.game.registerUndoChange();
-        undo.addEvent("building", {
-			action:"build",
+		undo.addEvent(this.game.bld.id, {
+			action: "build",
 			metaId: model.options.building,
 			val: counter
-		});
+		}, $I("ui.undo.bld.build", [counter, model.metadata.label]));
 	},
 
 	sell: function(event, model){
@@ -3098,11 +3118,11 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 
 		if (amtSold > 0) {
 			var undo = this.game.registerUndoChange();
-			undo.addEvent("building", {
+			undo.addEvent(this.game.bld.id, {
 				action: "sell",
 				metaId: model.metadata.name,
 				val: amtSold
-			});
+			}, $I("ui.undo.bld.sell", [amtSold, model.metadata.label]));
 		}
 	},
 
@@ -3210,18 +3230,22 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 	deltagrade: function(model, delta) {
 		var metadataRaw = this.getMetadataRaw(model);
 		var undo = this.game.registerUndoChange();
-		undo.addEvent("building", {
+		var labelBefore = metadataRaw.stages[metadataRaw.stage].label;
+		var labelAfter = metadataRaw.stages[Math.max(0, metadataRaw.stage + delta)].label;
+		undo.addEvent(this.game.bld.id, {
 			action:"deltagrade",
 			metaId: model.options.building,
 			val: delta
-		});
+		}, (delta > 0 ?
+			$I("ui.undo.bld.upgrade", [labelBefore, labelAfter]) :
+			$I("ui.undo.bld.downgrade", [labelBefore, labelAfter])));
 
 		if (metadataRaw.val > 0) { //Sell until 0 are left (to refund to the player)
-			undo.addEvent("building", { //The order of these undo events matters A LOT
+			undo.addEvent(this.game.bld.id, { //The order of these undo events matters A LOT
 				action:"sell",
 				metaId: model.options.building,
 				val: metadataRaw.val
-			});
+			}, $I("ui.undo.bld.sell", [metadataRaw.val, labelBefore]));
 			this.sellInternal(model, 0, false /*requireSellLink*/);
 		}
 		if (metadataRaw.stage) { metadataRaw.stage = Math.max(0, metadataRaw.stage + delta); }

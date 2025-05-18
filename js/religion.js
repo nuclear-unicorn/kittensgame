@@ -1337,11 +1337,18 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 	praise: function(){
 		var faith = this.game.resPool.get("faith");
-		this.faith += faith.value * (1 + this.getApocryphaBonus()); //starting up from 100% ratio will work surprisingly bad
+		var worshipGainedAmt = faith.value * (1 + this.getApocryphaBonus()); //starting up from 100% ratio will work surprisingly bad
+		this.faith += worshipGainedAmt;
 		this.faith = Math.min(this.faith, Number.MAX_VALUE);
 		this.game.msg($I("religion.praise.msg", [this.game.getDisplayValueExt(faith.value, false, false, 0)]), "", "faith");
+		//Here we go, trying to make more game actions reversible
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.id, {
+			action: "praise",
+			faithSpent: faith.value,
+			worshipGained: worshipGainedAmt
+		}, $I("ui.undo.religion.praise", [this.game.getDisplayValueExt(worshipGainedAmt)]));
 		faith.value = 0.0001;	//have a nice autoclicking
-
 	},
 
 	getApocryphaResetBonus: function(bonusRatio){
@@ -1438,7 +1445,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		var resPool = this.game.resPool;
 		if (data.action == "refine"){
 			/*
-			  undo.addEvent("religion", {
+			  undo.addEvent(this.game.religion.id, {
 				action:"refine",
 				resFrom: model.prices[0].name,
 				resTo: this.controllerOpts.gainedResource,
@@ -1453,13 +1460,76 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				and refund it proportionally, but I am to lazy to code it in 
 			*/
 			if (resConverted.value >= data.valTo) {
-				this.game.resPool.addResEvent(data.resFrom, data.valFrom);
-				this.game.resPool.addResEvent(data.resTo, -data.valTo);
-				this.game.msg($I("workshop.undo.msg", [this.game.getDisplayValueExt(data.valTo), (resConverted.title || resConverted.name)]));
+				var actualAmountRecovered = resPool.addResEvent(data.resFrom, data.valFrom);
+				resPool.addResEvent(data.resTo, -data.valTo);
+				var resRefunded = resPool.get(data.resFrom);
+				if (actualAmountRecovered == data.valFrom) {
+					//I dunno about this--this message contains no new information that isn't already displayed.
+					//this.game.msg($I("religion.undo.refine.complete", [this.game.getDisplayValueExt(actualAmountRecovered), (resRefunded.title || resRefunded.name)]), null, "undo", true /*noBullet*/);
+				} else {
+					//This would occur, for instance, if the player un-sacrificed unicorns during a Unicorn Tears Challenge.
+					this.game.msg($I("religion.undo.refine.incomplete", [this.game.getDisplayValueExt(actualAmountRecovered), (resRefunded.title || resRefunded.name)]), "important", "undo", true /*noBullet*/);
+				}
 			}
+		} else if (data.action === "praise") {
+			if (this.faith >= data.worshipGained) {
+				this.faith -= data.worshipGained;
+				var amtRecovered = resPool.addResEvent("faith", data.faithSpent);
+				if (amtRecovered > 0) {
+					this.game.msg($I("religion.undo.praise.regained", [this.game.getDisplayValueExt(amtRecovered)]), null, "undo", true /*noBullet*/);
+				} else {
+					//This would happen, for example, if the player had such high faith production that it was capped already
+					this.game.msg($I("religion.undo.praise.nogain"), "important", "undo", true /*noBullet*/);
+				}
+			} else {
+				//This would happen, for example, if the player had adored the galaxy immediately after praising.
+				this.game.msg($I("religion.undo.praise.failure"), "alert", "undo", true /*noBullet*/);
+			}
+		} else if (data.action === "buildZU") {
+			//This process requires 2 things: the controller & the model.
+			var bld = this.getZU(data.metaId);
+			var props = { //Essential for obtaining the model correctly.
+				id:            bld.name,
+				name:           bld.label,
+				description:    bld.description,
+				building:       bld.name
+			};
+			props.controller = new com.nuclearunicorn.game.ui.ZigguratBtnController(this.game);
+			var model = props.controller.fetchModel(props); //We need the model to actually change the data of the building
+			model.refundPercentage = 1.0;	//full refund for undo
+			props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
+		} else if (data.action === "buildRU") {
+			var bld = this.getRU(data.metaId);
+			var props = {
+				id:            bld.name,
+				name:           bld.label,
+				description:    bld.description,
+				building:       bld.name
+			};
+			props.controller = new com.nuclearunicorn.game.ui.ReligionBtnController(this.game);
+			var model = props.controller.fetchModel(props);
+			model.refundPercentage = 1.0;	//full refund for undo
+			props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
+		} else if (data.action === "sellRU") {
+			var bld = this.getRU(data.metaId);
+			var props = {
+				id:            bld.name,
+				name:           bld.label,
+				description:    bld.description,
+				building:       bld.name
+			};
+			props.controller = new com.nuclearunicorn.game.ui.ReligionBtnController(this.game);
+			var model = props.controller.fetchModel(props);
+
+			//The meat of the function: un-sell the buildings.
+			//Since buildings are sold for a 50% refund, we need to un-refund everything
+			for (var i = 0; i < data.val; i += 1) {
+				props.controller.incrementValue(model);
+				props.controller.payPriceForUndoRefund(model);
+			}
+			this.game.render();
 		}
 	}
-
 });
 
 /**
@@ -1513,6 +1583,19 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 			});
 		}
 		return prices;
+	},
+
+	build: function(model, opts) {
+		var counter = this.inherited(arguments);
+		if (!counter) {
+			return; //Skip undo if nothing was built
+		}
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.game.religion.id, {
+			action: "buildZU",
+			metaId: model.metadata.name,
+			val: counter
+		}, $I("ui.undo.bld.build", [counter, model.metadata.label]));
 	}
 });
 
@@ -1550,7 +1633,33 @@ dojo.declare("com.nuclearunicorn.game.ui.ReligionBtnController", com.nuclearunic
 
 	updateVisible: function(model){
 		model.visible = model.metadata.on > 0 || this.game.religion.faith >= model.metadata.faith;
-	}
+	},
+
+	build: function(model, opts) {
+		var counter = this.inherited(arguments);
+		if (!counter) {
+			return; //Skip undo if nothing was built
+		}
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.game.religion.id, {
+			action: "buildRU",
+			metaId: model.metadata.name,
+			val: counter
+		}, $I("ui.undo.bld.build", [counter, model.metadata.label]));
+	},
+
+	sell: function(event, model){
+		var amtSold = this.inherited(arguments);
+
+		if (amtSold > 0) {
+			var undo = this.game.registerUndoChange();
+			undo.addEvent(this.game.religion.id, {
+				action: "sellRU",
+				metaId: model.metadata.name,
+				val: amtSold
+			}, $I("ui.undo.bld.sell", [amtSold, model.metadata.label]));
+		}
+	},
 });
 
 
@@ -1712,22 +1821,30 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 	},
 
 	_transform: function(model, amt) {
+		//Save references to values we'll use a lot:
+		// "res from" refers to the resource consumed by the transform action
+		// "res to" refers to the resource produced by the transform action
+		var resFromName = model.prices[0].name;
+		var resToName = this.controllerOpts.gainedResource;
+		var resFromObj = this.game.resPool.get(resFromName); //Reference to the resource object
+		var resToObj = this.game.resPool.get(resToName);
+
 		var priceCount = model.prices[0].val * amt;
-		if (priceCount > this.game.resPool.get(model.prices[0].name).value) {
+		if (priceCount > resFromObj.value) {
 			return false;
 		}
 
 		var attemptedGainCount = this.controllerOpts.gainMultiplier.call(this) * amt;
 
-		this.game.resPool.addResEvent(model.prices[0].name, -priceCount);
+		this.game.resPool.addResEvent(resFromName, -priceCount);
 
 		//Gain the resource & remember the amount we gained, taking into account resource storage limits:
-		var actualGainCount = this.game.resPool.addResEvent(this.controllerOpts.gainedResource, attemptedGainCount);
+		var actualGainCount = this.game.resPool.addResEvent(resToName, attemptedGainCount);
 
 		//Amount of the resource we failed to gain because we hit the cap:
 		var overcap = attemptedGainCount - actualGainCount;
 		if (actualGainCount == 0 && attemptedGainCount > 0 &&
-			this.game.resPool.get(this.controllerOpts.gainedResource).value / attemptedGainCount > 1e15) {
+			resToObj.value / attemptedGainCount > 1e15) {
 			//We are in territory where overcap will be triggered due to floating-point precision limits.
 			overcap = 0;
 		}
@@ -1737,7 +1854,7 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 		}
 
 		if (overcap > 0.001) { //Don't trigger from floating-point errors
-			if (this.controllerOpts.gainedResource == "tears") {
+			if (resToName == "tears") {
 				//Tears evaporate into a smoky substance
 				this.game.bld.cathPollution += overcap * this.game.getEffect("cathPollutionPerTearOvercapped");
 			}
@@ -1747,14 +1864,18 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 			}
 		}
 
+		var descriptiveStrings = [this.game.getDisplayValueExt(priceCount),
+			resFromObj.title,
+			this.game.getDisplayValueExt(actualGainCount),
+			resToObj.title];
 		var undo = this.game.registerUndoChange();
-		undo.addEvent("religion", {
+		undo.addEvent(this.game.religion.id, {
 			action:"refine",
-			resFrom: model.prices[0].name,
-			resTo: this.controllerOpts.gainedResource,
+			resFrom: resFromName,
+			resTo: resToName,
 			valFrom: priceCount,
 			valTo: actualGainCount
-		});
+		}, $I("ui.undo.religion.refine", descriptiveStrings));
 
 		this.game.msg($I(this.controllerOpts.logTextID, [this.game.getDisplayValueExt(priceCount), this.game.getDisplayValueExt(actualGainCount)]), "", this.controllerOpts.logfilterID);
 
