@@ -4613,15 +4613,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			return;
 		}
 
-
-
-		var timestampStart = new Date().getTime();
+		var timestampStart = Date.now;
 
 		this.update();
 		this.calendar.tick();
 		this.ticks++;
 
-		var timestampEnd = new Date().getTime();
+		var timestampEnd = Date.now;
 		//if (this.isLocalhost) {	//always collect fps metrics
 			this.totalUpdateTimeTicks++;
 
