@@ -543,7 +543,6 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		//Update Trade Stats
 		this.game.stats.getStat("totalTrades").val = Math.min(this.game.stats.getStat("totalTrades").val + successfullTradeAmount, Number.MAX_VALUE);
 		this.game.stats.getStatCurrent("totalTrades").val += successfullTradeAmount;
-		this.game.upgrade({policies : ["sharkRelationsMerchants"]});
 
 		return boughtResources;
 	},
@@ -769,7 +768,12 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	calculateTradeBonusFromPolicies: function(raceName, game){
 		var tradepostsTradeRatio = game.bld.getBuildingExt("tradepost").meta.effects["tradeRatio"];
 		var phantomTradeposts = game.diplomacy.calculatePhantomTradeposts(raceName, game);
-		return phantomTradeposts * tradepostsTradeRatio;
+
+		// Apply effects from sharkRelationsMerchants policy.
+		var trades = game.stats.getStatCurrent("totalTrades").val;
+		var sharkRelationsMerchantsRatio = Math.min(Math.round((Math.log10(Math.max(trades, 100)) - 1) * 3) / 100, 0.3);
+
+		return phantomTradeposts * tradepostsTradeRatio * sharkRelationsMerchantsRatio;
 	}
 });
 
