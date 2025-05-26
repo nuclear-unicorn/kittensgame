@@ -488,7 +488,11 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 
 		var boughtResources = {};
-		var tradeRatio = 1 + this.game.diplomacy.getTradeRatio() + this.game.diplomacy.calculateTradeBonusFromPolicies(race.name, this.game) + this.game.challenges.getChallenge("pacifism").getTradeBonusEffect(this.game);
+		var tradeRatio = 
+			1
+			+ this.game.diplomacy.getTradeRatio()
+			+ this.game.diplomacy.calculateTradeBonusFromPolicies(race.name, this.game)
+			+ this.game.challenges.getChallenge("pacifism").getTradeBonusEffect(this.game);
 		var raceRatio = 1 + race.energy * 0.02;
 		var currentSeason = this.game.calendar.getCurSeason().name;
 
@@ -771,9 +775,9 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 		// Apply effects from sharkRelationsMerchants policy.
 		var trades = game.stats.getStatCurrent("totalTrades").val;
-		var sharkRelationsMerchantsRatio = Math.min(Math.round((Math.log10(Math.max(trades, 100)) - 1) * 3) / 100, 0.3);
+		var sharkRelationsMerchantsBonus = Math.min(Math.round((Math.log10(Math.max(trades, 100)) - 1) * 3) / 100, 0.3);
 
-		return phantomTradeposts * tradepostsTradeRatio * sharkRelationsMerchantsRatio;
+		return sharkRelationsMerchantsBonus + phantomTradeposts * tradepostsTradeRatio;
 	}
 });
 
