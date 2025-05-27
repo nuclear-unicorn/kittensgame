@@ -278,7 +278,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			}
 			this.game.resPool.addResEvent("starchart", starcharts);
 		}
-		else{
+		else {
 			var sciGain = this.game.resPool.addResEvent("science", sciBonus);
 
 			if (sciGain > 0 && !isSilent){
@@ -330,7 +330,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 				}
 			}
 		}
-		if(building_name == "sattelite"){	
+		if (building_name == "sattelite"){	
 			this.game.upgrade({
 				buildings: ["observatory"]
 			});
@@ -388,9 +388,9 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 	},
 
 	tick: function() {
-		if(this.observeRemainingTime > 0){
+		if (this.observeRemainingTime > 0){
 			this.observeRemainingTime--;
-			if(this.observeRemainingTime == 0){
+			if (this.observeRemainingTime == 0){
 				this.observeTimeout();
 			}
 		}
@@ -460,8 +460,8 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 	onNewDay: function(){
 		if (this.festivalDays){
 			this.festivalDays--;
-			if(this.game.getEffect("festivalLuxuryConsumptionRatio")){
-				if(!this.game.resPool.get("furs").value || !this.game.resPool.get("ivory").value || !this.game.resPool.get("spice").value){
+			if (this.game.getEffect("festivalLuxuryConsumptionRatio")){
+				if (!this.game.resPool.get("furs").value || !this.game.resPool.get("ivory").value || !this.game.resPool.get("spice").value){
 					this.game.msg($I("village.festival.msg.deficitEnd"), "important", "festival");
 					this.festivalDays = 0;
 				}
@@ -486,7 +486,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		this.game.religion.getPact("payDebt").onNewDay(this.game);
 
 		//-------------------------  consequenses of accumulating too much necrocorn deficit -------------------------
-		if(this.game.religion.pactsManager.necrocornDeficit>=this.game.religion.pactsManager.fractureNecrocornDeficit){
+		if (this.game.religion.pactsManager.necrocornDeficit>=this.game.religion.pactsManager.fractureNecrocornDeficit){
 			this.game.religion.pactsManager.necrocornDeficitPunishment();
 		}
 		//------------------------- astronomical events -------------------------
@@ -574,7 +574,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		}
 
 		//------------------------- 0.035% chance of spawning unicorns in pacifism -----------------
-		if(this.game.challenges.isActive("pacifism")){
+		if (this.game.challenges.isActive("pacifism")){
 			var animal = this.game.science.get("animal");
 			var unicorns = this.game.resPool.get("unicorns");
 			if (this.game.rand(100000) <= 17 * unicornChanceRatio && unicorns.value < 2 && animal.researched){
@@ -605,7 +605,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 					this.game.ui.render();
 				}
 			}
-		}else{
+		} else {
 			var zTreshold = 0;
 			if (this.game.prestige.getPerk("zebraDiplomacy").researched){
 				zTreshold = Math.floor(0.10 * (this.game.karmaZebras + 1));   //5 - 10% of hunters will stay
@@ -771,7 +771,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			}
 		}
 		//------------------------- 0.035% chance of spawning unicorns in Pacifism -----------------
-		if(this.game.challenges.isActive("pacifism")){
+		if (this.game.challenges.isActive("pacifism")){
 			var animal = this.game.science.get("animal");
 			var unicorns = this.game.resPool.get("unicorns");
 			if (unicorns.value < 2 && animal.researched){
@@ -891,10 +891,10 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 				this.weather = "warm";
 			} else if (rand < warmChance + coldChance){
 				this.weather = "cold";
-			} else{
+			} else {
 				this.weather = null;
 			}
-		}else{
+		} else {
 			this.weather = null;
 		}
 
@@ -931,7 +931,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			this.game.bld.get("steamworks").jammed = false;	//reset jammed status
 		}
 
-		if(milleniumChangeCalculated){
+		if (milleniumChangeCalculated){
 			this.calculateMilleniumProduction(this.getMilleniaChanged(this.year - years, this.year));
 		}
 
@@ -955,7 +955,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			this.cycleYear = this.cycleYear % this.yearsPerCycle;
 			if (cyclesChange + this.cycle >= this.cyclesPerEra) {
 				this.cycle = (cyclesChange + this.cycle)%this.cyclesPerEra;
-			} else{
+			} else {
 				this.cycle += cyclesChange;
 			}
 		}
@@ -983,7 +983,7 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 		var aiLevel = this.game.bld.get("aiCore").effects["aiLevel"];
 		if ((aiLevel > 14) && (this.game.science.getPolicy("transkittenism").researched != true)){
 			var aiApocalypseLevel = aiLevel - 14;
-			if(!this.game.getEffect("shatterTCGain")){
+			if (!this.game.getEffect("shatterTCGain")){
 				for (var i in this.game.resPool.resources){
 					var res = this.game.resPool.resources[i];
 					if (res.aiCanDestroy) {

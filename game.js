@@ -2958,7 +2958,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		if (save.saveVersion == 9) {
 			if (save.buildings) {
-				for(var i = 0; i < save.buildings.length; i++){
+				for (var i = 0; i < save.buildings.length; i++){
 					save.buildings[i].unlockable = save.buildings[i].unlocked;
 					save.buildings[i].unlocked = false;
 				}
@@ -2982,7 +2982,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		if (save.saveVersion == 10) {
 			if (save.resources){
-				for(var i = 0; i < save.resources.length; i++){
+				for (var i = 0; i < save.resources.length; i++){
 					save.resources[i].unlocked = false;
 				}
 			}
@@ -3208,7 +3208,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		perTick *= 1 + paragonProductionRatio;
 
 		// *POLLUTION MODIFIER
-		if(res.name == "catnip"){
+		if (res.name == "catnip"){
 			perTick *= 1 + this.bld.pollutionEffects["catnipPollutionRatio"];
 		}
 
@@ -3297,7 +3297,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		perTick *= 1 + pyramidGlobalProductionRatio;
 
 		//pyramid faith ratio
-		if(res.name=="faith"){
+		if (res.name=="faith"){
 			var pyramidFaithRatio = this.getEffect("pyramidFaithRatio");
 			perTick *= 1 + pyramidFaithRatio;
 		}
@@ -3313,7 +3313,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 	addGlobalModToStack: function(array, resName){
 		var game = this;
-		if(game.science.getPolicy("necrocracy").researched){
+		if (game.science.getPolicy("necrocracy").researched){
 			array.push({
 				name: $I("res.stack.necrocracy"),
 				type: "ratio",
@@ -3465,7 +3465,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		});
 
 		// *POLLUTION MODIFIER
-		if(res.name == "catnip"){
+		if (res.name == "catnip"){
 			stack.push({
 				name: $I("res.stack.pollution"),
 				type: "ratio",
@@ -3533,7 +3533,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			type: "ratio",
 			value: this.religion.getSolarRevolutionRatio()
 		});
-		if((res.name == "wood" || res.name == "catnip") && this.religion.getSolarRevolutionRatio() > 0){
+		if ((res.name == "wood" || res.name == "catnip") && this.religion.getSolarRevolutionRatio() > 0){
 			stack.push({
 				name: $I("res.stack.pollution"),
 				type: "ratioIndent",
@@ -3555,7 +3555,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
         //policy effects:
 		//necrocracy global effect
 		//TODO: consider moving it to calculateEffects
-        if(this.science.getPolicy("necrocracy").researched){
+        if (this.science.getPolicy("necrocracy").researched){
             stack.push({
                 name: $I("res.stack.necrocracy"),
                 type: "ratio",
@@ -3569,7 +3569,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			value: pyramidGlobalProductionRatio
 		});
 		var pyramidFaithRatio = this.getEffect("pyramidFaithRatio");
-		if(res.name == "faith"){
+		if (res.name == "faith"){
 			stack.push({
                 name: $I("res.stack.extermination"),
 				type: "ratio",
@@ -3734,14 +3734,14 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				value: this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect("necrocornPerDay") +
 						this.religion.pactsManager.getSiphonedCorruption(1)
 			});
-		}else{
+		} else {
 			stack.push({
 				name: $I("res.stack.buildings"),
 				type: "perDay",
 				value: this.getEffect(res.name + "PerDay")
 			});
 		}
-		if(resName == "necrocorn"){
+		if (resName == "necrocorn"){
 			//ReligionManager keeps data on all corruption-related effects
 			var corruptionModifiers = this.religion.corruptionCached || [];
 			var corruptionStack = [];
@@ -3752,7 +3752,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			});
 			for (var i = 0; i < corruptionModifiers.length; i += 1) {
 				var modifier = corruptionModifiers[i];
-				switch(modifier.behavior) {
+				switch (modifier.behavior) {
 				case "additive":
 					//Convert a per-tick effect to a per-day effect.
 					corruptionStack.push({
@@ -3778,7 +3778,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			stack.push(corruptionStack);
 		}
 
-		if(resName == "alicorn"){
+		if (resName == "alicorn"){
 			stack.push({
 				name: $I("res.stack.corruptionPerDaySiphoned"),
 				type: "perDay",
@@ -3809,7 +3809,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			type: "perYear",
 			value: this.getEffect(res.name + "Production")
 		});
-		if(resName == "antimatter" && this.resPool.energyProd < this.resPool.energyCons){
+		if (resName == "antimatter" && this.resPool.energyProd < this.resPool.energyCons){
 
 			stack.push({
 				name: $I("ui.energy.tooltip"), //kinda hack text
@@ -3943,7 +3943,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		//pollution per tick
 		this.bld.cathPollution += this.bld.cathPollutionPerTick;
-		if(this.bld.cathPollution < 0) {this.bld.cathPollution = 0;}
+		if (this.bld.cathPollution < 0) {this.bld.cathPollution = 0;}
 
 		//nah, kittens are not a resource anymore (?)
 		var kittens = this.resPool.get("kittens");
@@ -3988,7 +3988,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	getResourcePerDay: function(resName){
-		if(resName == "necrocorn"){
+		if (resName == "necrocorn"){
 			return (this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect(resName + "PerDay") + this.religion.pactsManager.getSiphonedCorruption(1) +
 			this.religion.getCorruptionPerTick() * this.calendar.ticksPerDay);
 		}
@@ -3996,7 +3996,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 	getResourceOnYearProduction: function(resName){
 		if (resName == "antimatter"){
-			if(this.resPool.energyProd < this.resPool.energyCons){
+			if (this.resPool.energyProd < this.resPool.energyCons){
 				return 0;
 			}
 		}
@@ -4069,7 +4069,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * Returns a flat map of resource production
 	 */
 	getDetailedResMap: function(res){
-		if(res.calculatePerDay){
+		if (res.calculatePerDay){
 			var resStack = this.getResourcePerDayStack(res.name),
 				resString = this.processResourcePerTickStack(resStack, res, 0), //processResourcePerTickStack can work with perDay stack
 				resPerDay = this.getResourcePerDay(res.name);
@@ -4097,26 +4097,26 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				}
 				resString += "<br>" + $I("res.toZero") + ": " + this.toDisplaySeconds(toZero.toFixed());
 			}
-			if(res.name == "necrocorn"){
+			if (res.name == "necrocorn"){
 				var toNextNecrocorn = (1 - this.religion.corruption)/(this.religion.getCorruptionPerTick() * this.getTicksPerSecondUI());
-				if(toNextNecrocorn > 0){
+				if (toNextNecrocorn > 0){
 					resString += "<br>" + $I("res.toNextNecrocorn") + ": " + this.toDisplaySeconds(toNextNecrocorn.toFixed());
 				}
 			}
 			return resString;
-		}else if(res.calculateOnYear){
+		} else if (res.calculateOnYear){
 			var resStack = this.getResourceOnYearStack(res.name),
 				resString = this.processResourcePerTickStack(resStack, res, 0), //processResourcePerTickStack can work with perDay stack
 				resPerYear = this.getResourceOnYearProduction(res.name);
 				if (this.opts.usePercentageResourceValues){
 					resString += "<br> " + $I("res.netGain") + ": " + this.getDisplayValueExt(resPerYear, true, true);
 				}
-				if(res.name == "antimatter" && resPerYear && this.resPool.energyWinterProd < this.resPool.energyCons){
+				if (res.name == "antimatter" && resPerYear && this.resPool.energyWinterProd < this.resPool.energyCons){
 					resString += "<br> " + $I("effectsMgr.winterEnergy.warning.title");
 				}
 			return resString;
 		}
-		if(res.name == "kittens"){
+		if (res.name == "kittens"){
 			var nextKittenProgress = this.village.sim.nextKittenProgress;
 			var kittensPerTick = this.village.calculateKittensPerTick();
 			var resString =  " [" + ( nextKittenProgress * 100 ).toFixed()  + "%]";
@@ -4220,7 +4220,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				resString += "+";
 			}
 			resString += this.getDisplayValueExt((stackElem.value)) + "/" + $I("res.per.day");
-		} else if(stackElem.type == "perYear"){
+		} else if (stackElem.type == "perYear"){
 			if (stackElem.value > 0){
 				resString += "+";
 			}
@@ -4451,7 +4451,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 */
 	getDisplayValueExt: function(value, prefix, usePerTickHack, precision, postfix){
 
-		if(!value){ return "0"; }
+		if (!value){ return "0"; }
 		if (value === Infinity) {
 			return prefix ? "+∞" : "∞";
 		}
@@ -4497,9 +4497,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			case "si":
 			default:
 				var absValue = Math.abs(value);
-				for(var i = 0; i < this.postfixes.length; i++) {
+				for (var i = 0; i < this.postfixes.length; i++) {
 					var p = this.postfixes[i];
-					if(absValue >= p.limit){
+					if (absValue >= p.limit){
 						if (usePerTickHack) { // Prevent recursive * this.ticksPerSecond;
 							value = value / this.ticksPerSecond;
 						}
@@ -4745,8 +4745,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			for (var i = 0; i < game.challenges.challenges.length; i++){
 				game.challenges.challenges[i].pending = false;
 			}
-			if(game.village.loadoutController.loadouts){
-				if(game.village.loadoutController.loadouts.length == 0){
+			if (game.village.loadoutController.loadouts){
+				if (game.village.loadoutController.loadouts.length == 0){
 					game.village.loadoutController.toggleDefaultLoadouts();
 				}
 			}
@@ -5016,13 +5016,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			var usedCryochambers_reset = this.time.filterMetadata([this.time.getVSU("usedCryochambers")], ["name", "val", "on"]);
 			usedCryochambers_reset[0]["val"] = cryochambers;
 			usedCryochambers_reset[0]["on"] = cryochambers;
-		}else{
+		} else {
 			var usedCryochambers_reset = this.time.filterMetadata([this.time.getVSU("usedCryochambers")], ["name", "val", "on"]);
 			usedCryochambers_reset[0]["val"] = 0;
 			usedCryochambers_reset[0]["on"] = 0;
 		}
-		if(this.challenges.getChallenge("postApocalypse").pending){
-			if(newKittens.length > 0){
+		if (this.challenges.getChallenge("postApocalypse").pending){
+			if (newKittens.length > 0){
 				var catnip = this.resPool.get("catnip");
 				if (!catnip){
 					catnip = this.resPool.createResource("catnip");
@@ -5038,7 +5038,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		if (temporalPressSaved > 0){
 			temporalPress_reset[0].on = Math.min(temporalPress_reset[0].on, temporalPressSaved);
 			temporalPress_reset[0].val = Math.min(temporalPressSaved);
-		}else{
+		} else {
 			temporalPress_reset[0].on = 0;
 			temporalPress_reset[0].val = 0;
 			temporalPress_reset[0].isAutomationEnabled = null;
@@ -5062,7 +5062,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				challenge.pending = false;
 				challenge.active = true;
 			}
-			else{
+			else {
 				challenge.active = false;
 			}
 		}
@@ -5232,7 +5232,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	getUnlockByName: function(unlockId, type){
-		switch(type) {
+		switch (type) {
 			case "tech":
 				return this.science.get(unlockId);
 			case "policies":
@@ -5463,35 +5463,35 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 
 		var gift = "Karma";
-		if(this.resPool.get("paragon").value >= 100) {
+		if (this.resPool.get("paragon").value >= 100) {
 			gift = "Paragon";
 		}
-		if(this.resPool.get("timeCrystal").value && this.prestige.getPerk("anachronomancy").researched && this.workshop.get("stasisChambers").researched) {
+		if (this.resPool.get("timeCrystal").value && this.prestige.getPerk("anachronomancy").researched && this.workshop.get("stasisChambers").researched) {
 			gift = "TimeCrystal";
 		}
-		if(this.resPool.get("sorrow").value / this.resPool.get("sorrow").maxValue < 0.25 && this.prestige.getPerk("megalomania").researched && this.religion.getZU("blackPyramid").val < 3) {
+		if (this.resPool.get("sorrow").value / this.resPool.get("sorrow").maxValue < 0.25 && this.prestige.getPerk("megalomania").researched && this.religion.getZU("blackPyramid").val < 3) {
 			gift = "BLS";
 		}
-		if(this.religion.getRU("apocripha").on) {
+		if (this.religion.getRU("apocripha").on) {
 			gift = "Apocrypha";
 		}
 		if (this.religion.getRU("transcendence").on && this.religion.transcendenceTier <= 10) {
 			gift = "Transcendence";
 		}
-		if(this.prestige.getPerk("engeneering").researched && !this.prestige.getPerk("renaissance").researched) {
+		if (this.prestige.getPerk("engeneering").researched && !this.prestige.getPerk("renaissance").researched) {
 			gift = "Metaphysics";
 		}
-		if(this.bld.get("chronosphere").on) {
+		if (this.bld.get("chronosphere").on) {
 			gift = "Compendiums";
 		}
-		if(this.diplomacy.get("leviathans").energy == this.diplomacy.getMarkerCap()){
+		if (this.diplomacy.get("leviathans").energy == this.diplomacy.getMarkerCap()){
 			gift = "BurnedParagon";
 		}
 		var ucfirst = function (string) { return string.charAt(0).toUpperCase() + string.slice(1); };
 
 		switch (gift) {
 			case "Karma":
-				if(this.resPool.get("karma").value > 50) {
+				if (this.resPool.get("karma").value > 50) {
 					var amt = 25 * Math.min(this.karmaKittens, 25000);
 				} else {
 					var amt = 5000;
@@ -5503,7 +5503,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				break;
 
 			case "Paragon":
-				if(this.resPool.get("paragon").value > 500) {
+				if (this.resPool.get("paragon").value > 500) {
 					var amt = Math.min(this.resPool.get("paragon").value, 1000);
 				} else {
 					var amt = 100;
@@ -5513,7 +5513,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				break;
 
 			case "TimeCrystal":
-				if(this.resPool.get("timeCrystal").value > 100) {
+				if (this.resPool.get("timeCrystal").value > 100) {
 					var amt = Math.min(this.resPool.get("timeCrystal").value, 2000);
 				} else {
 					var amt = 50;
@@ -5529,7 +5529,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				break;
 
 			case "Apocrypha":
-				if(this.religion.faithRatio > 10) {
+				if (this.religion.faithRatio > 10) {
 					var amt = 4 * Math.min(this.religion.faithRatio, 1000);
 				} else {
 					var amt = 5;
@@ -5547,7 +5547,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				break;
 
 			case "Metaphysics":
-				if(!this.prestige.getPerk("goldenRatio").researched) {
+				if (!this.prestige.getPerk("goldenRatio").researched) {
 					this.prestige.getPerk("goldenRatio").researched = true;
 					this.unlock(this.prestige.getPerk("goldenRatio").unlocks);
 					var perk = "Golden Ratio";
@@ -5570,7 +5570,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				break;
 
 			case "Compendiums":
-				if(this.resPool.get("compedium").value > 500000) {
+				if (this.resPool.get("compedium").value > 500000) {
 					var amt = 4 * this.resPool.get("compedium").value;
 				} else {
 					var amt = 100000;
@@ -5596,7 +5596,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				this.resPool.addResEvent("necrocorn", amt1);
 				break;
 			case "BurnedParagon":
-				if(this.resPool.get("burnedParagon").value > 500){
+				if (this.resPool.get("burnedParagon").value > 500){
 					var amt = Math.min(this.resPool.get("burnedParagon").value, 1500);
 				} else {
 					var amt = 150;
@@ -5624,11 +5624,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return (date.getMonth() == 11 && date.getDate() >= 15  && date.getDate() <= 31);
 	},
 	createRandomName: function(lenConst, charPool) {
-		if(!charPool) {
+		if (!charPool) {
 			charPool = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■◆◆åœ∑ß≈ç∂´®ƒ√∫©†¥˙˜µ∆¨ˆ˚µ≤¬øπ≥…π“æ÷æ«§¡™£¢∞§¶•ªº≠"; //◆ 
 		}
 		var nameLength = Math.floor(Math.random() * 6 + 5);
-		if(lenConst) {
+		if (lenConst) {
 			nameLength = lenConst - 1;
 		}
 		var name = "";
@@ -5639,10 +5639,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	createRandomVarietyAndColor: function(ch1, ch2){
-		if(ch1 == null) {
+		if (ch1 == null) {
 			ch1 = 10;
 		}
-		if(ch2 == null) {
+		if (ch2 == null) {
 			ch2 = 10;
 		}
 		function rand(ratio){

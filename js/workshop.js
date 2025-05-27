@@ -423,7 +423,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "relic",     	val: 5 }
 		],
 		calculateEffects: function(self, game){
-			if(self.researched){
+			if (self.researched){
 				game.time.queue.unlockQueueSource("chronoforge");
 			}
 		}
@@ -2526,7 +2526,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				var price = craft.prices[priceInd];
 				if (!result[price.name]){
 					result[price.name] = -price.val * effectPerTick;
-				}else{
+				} else {
 					result[price.name] -= price.val * effectPerTick;
 				}
 			}
@@ -2569,7 +2569,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 	undo: function(data){
 		var resPool = this.game.resPool;
 		//Fail the un-craft if we cannot get the player a full refund:
-		if(resPool.get(data.metaId).value < data.resGainedAmt) {
+		if (resPool.get(data.metaId).value < data.resGainedAmt) {
 			this.game.msg($I("workshop.undo.failure", [resPool.get(data.metaId).title]), "alert", "undo", true /*noBullet*/);
 			return;
 		}
@@ -2577,7 +2577,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		resPool.addResEvent(data.metaId, -data.resGainedAmt);
 		data.resSpent.forEach(function(priceLine) {
 			var amt = resPool.addResEvent(priceLine.name, priceLine.val);
-			if(amt) {
+			if (amt) {
 				//amt could be 0 due to a rounding error.  In that case, don't show it.
 				this.game.msg($I("workshop.undo.regain", [this.game.getDisplayValueExt(amt), resPool.get(priceLine.name).title]),
 					null, "undo", true /*noBullet*/);
@@ -3121,7 +3121,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ZebraUpgradeButtonController", com.nucl
 		var upgrade = model.metadata;
 		if (!upgrade.unlocked){
 			model.visible = false;
-		}else{
+		} else {
 			model.visible = true;
 		}
 
@@ -3229,7 +3229,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 	//---------------------------------------------------------------------
 
 	var zebraUpgradesPanel = new com.nuclearunicorn.game.ui.Panel($I("workshop.zebraUpgradesPanel.label"), this.game.workshop);
-	if(this.game.bld.getBuildingExt("zebraWorkshop").meta.val>0){
+	if (this.game.bld.getBuildingExt("zebraWorkshop").meta.val>0){
 		var content = zebraUpgradesPanel.render(tabContainer);
 
 		for (var i = 0; i < this.game.workshop.zebraUpgrades.length; i++){

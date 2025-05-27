@@ -145,7 +145,11 @@ div#gameLog {
     text-decoration: none;
 }
 
-.activeTab {
+.tabsContainer a.tab {
+    color: black;
+}
+
+.tabsContainer a.tab.activeTab {
     color: black;
 }
 
