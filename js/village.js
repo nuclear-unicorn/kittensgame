@@ -1461,6 +1461,9 @@ dojo.declare("classes.village.Map", null, {
 	// point on map currently being explored
 	currentBiome: null,
 
+	//current map id
+	activeMapId: "cath",
+
 	//level of expedition squad
 	explorersLevel: 0,
 
@@ -2258,8 +2261,11 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		this.upgradeHQBtn.render(btnsContainer);
 		//----------------------
 
-		dojo.create("div", {innerHTML: "Maps", style: { paddingBottom: "10px"} }, div);
-		this.mapsDiv = dojo.create("div", null, div);
+		var _div = dojo.create("div", {innerHTML: "Maps", style: { paddingBottom: "10px"} }, div);
+		this.mapsDiv = dojo.create("div", null, _div);
+
+		var currentMap = map.getMap(map.activeMapId);
+		dojo.create("div", {innerHTML: "Current map: " + currentMap.name + "<br>" + currentMap.description }, this.mapsDiv);
 
 		//Map selector (map is an aggregation of biomes)
 		var mapSelect = dojo.create("select", {style: {float: "right"}}, this.mapsDiv);
