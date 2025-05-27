@@ -1703,7 +1703,7 @@ dojo.declare("classes.village.Map", null, {
 	{
 		name: "redmoon",
 		title: "Redmoon",
-		description : "Little pale green dot",
+		description : "Red moon description",
 		terrainPenalty: 20,
 		lore: {
 		},
