@@ -4612,13 +4612,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			return;
 		}
 
-		var timestampStart = Date.now;
+		var timestampStart = Date.now();
 
 		this.update();
 		this.calendar.tick();
 		this.ticks++;
 
-		var timestampEnd = Date.now;
+		var timestampEnd = Date.now();
 
 		this.totalUpdateTimeTicks++;
 
