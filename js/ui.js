@@ -769,11 +769,9 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             game.colorScheme = "default";
         }
         $("body").removeClass();
-        if (game.colorScheme != "default") {
-            $("body").addClass("scheme_" + game.colorScheme);
-            if (!game.opts.hideBGImage) {
-                $("body").addClass("with_background_image");
-            }
+        $("body").addClass("scheme_" + game.colorScheme);
+        if (!game.opts.hideBGImage) {
+            $("body").addClass("with_background_image");
         }
 
         if (game.opts.tooltipsInRightColumn) {

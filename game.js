@@ -229,7 +229,7 @@ dojo.declare("classes.game.Server", null, {
 
     getServerUrl: function(){
 		var host = window.location.hostname;
-		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1";
+		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1" || host.startsWith("192.168");
         if (isLocalhost && !this.game.isMobile()){
             //if you are running chilar locally you should know what you are doing
             return "http://localhost:7780";
@@ -2166,7 +2166,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	getFeatureFlag: function(flagId){
 		var host = window.location.hostname;
-		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1";
+		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1" || host.startsWith("192.168");
 
 		if (isLocalhost){
 			return true;

@@ -145,16 +145,12 @@ div#gameLog {
     text-decoration: none;
 }
 
-.tabsContainer a.tab {
+.scheme_default .tabsContainer a.tab {
     color: black;
 }
 
-.tabsContainer a.tab.activeTab {
-    color: black;
-}
-
-.bldTopContainer > a.activeTab {
-    color: #444444;
+.scheme_default .tabsContainer a.tab.activeTab {
+    color: #500000;
 }
 
 .resourceRow {

@@ -1473,6 +1473,9 @@ dojo.declare("classes.village.Map", null, {
 	//hp of a current squad
 	hp: 10,
 
+	//Combat frame. Every tick frame is increased by X. There are 100 frames in a round, and every combatan can attack once per X fames adjusted for agi.
+	frame: 0,
+
 	//energy/stamina/supplies of your exploration squad
 	energy: 70,
 
@@ -1789,7 +1792,7 @@ dojo.declare("classes.village.Map", null, {
 
 			//5% of chance to spawn enemy per tick
 			if (!biome.fauna || !biome.fauna.length){
-				var spawnChance = 10 * (biome.faunaPenalty || 1.0);
+				var spawnChance = 100 * (biome.faunaPenalty || 1.0);
 				if (this.game.rand(10000) <= spawnChance){
 					biome.fauna = [{
 						title: faunaName,
@@ -1877,6 +1880,17 @@ dojo.declare("classes.village.Map", null, {
 
 	combat: function(){
 		var biome = this.game.village.getBiome(this.currentBiome);
+
+		this.frame++;
+		if (this.frame > 100){
+			this.frame = 0;
+		}
+
+		//TODO: handle individual attacker speed
+		if (this.frame % 8 != 0){
+			return;
+		}
+
 		for (var i in biome.fauna ){
 			var fauna = biome.fauna[i];
 
@@ -2051,8 +2065,6 @@ dojo.declare("classes.ui.village.BiomeBtn", com.nuclearunicorn.game.ui.ButtonMod
 	getTooltipHTML: function(){
 		return function(controller, model){
 			controller.fetchExtendedModel(model);
-
-			console.log("biome model:", model);
 			var tooltip = dojo.create("div", { className: "tooltip-inner" }, null);
 
 			if (model.tooltipName) {
@@ -2329,10 +2341,10 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 
 			this.explorationDiv.innerHTML = "Currently exploring: [" + biome.title + "], " +
 			(biome.cp / toLevel * 100).toFixed(0) +
-			"%";	//<-- link TBD
+			"%";	
 			
 		} else {
-			//this.biomeDiv.innerHTML = "Explorers awaiting at the base";
+			this.explorationDiv.innerHTML = "";
 		}
 		dojo.style(this.cancelExplorationLink, "display", biome ? "" : "none");
 
@@ -2341,6 +2353,11 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 
 		this.teamDiv.innerHTML = "Supplies [" + map.energy.toFixed(0) + " days]";
 		this.explorerDiv.innerHTML = "Explorers: HP: " + map.hp.toFixed(1) + "/" + map.getMaxHP().toFixed(1);
+		if (biome && biome.fauna && biome.fauna.length){
+			this.explorerDiv.innerHTML += " | " + biome.fauna[0].title + " lvl.1 HP: " + biome.fauna[0].hp.toFixed(1);
+		}
+		
+		
 		this.inherited(arguments);
 	}
 });
