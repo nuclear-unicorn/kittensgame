@@ -2287,6 +2287,11 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		dojo.create("div", {innerHTML: "Biomes", style: { paddingBottom: "10px"} }, div);
 		//this.villageDiv = dojo.create("div", null, div);
 		this.explorationDiv = dojo.create("div", null, div);
+		this.cancelExplorationLink = dojo.create("a", {
+			href: "#",
+			innerHTML: "[Cancel]"
+		}, div);
+		dojo.connect(this.cancelExplorationLink, "onclick", this, this.cancelExploration);
 
 		/*this.biomeDiv = dojo.create("div", {
 			innerHTML: "Biome: lv. 1, cp. 666/999, penalty: 1.1, etc"
@@ -2306,6 +2311,11 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		this.inherited(arguments, [btnsContainer]);
 	},
 
+	cancelExploration: function(){
+		var map = this.game.village.map;
+		map.currentBiome = null;
+	},
+
 	update: function() {
 		var map = this.game.village.map;
 
@@ -2319,10 +2329,12 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 
 			this.explorationDiv.innerHTML = "Currently exploring: [" + biome.title + "], " +
 			(biome.cp / toLevel * 100).toFixed(0) +
-			"% [Cancel]";	//<-- link TBD
+			"%";	//<-- link TBD
+			
 		} else {
 			//this.biomeDiv.innerHTML = "Explorers awaiting at the base";
 		}
+		dojo.style(this.cancelExplorationLink, "display", biome ? "" : "none");
 
 		this.upgradeExplorersBtn.update();
 		this.upgradeHQBtn.update();
