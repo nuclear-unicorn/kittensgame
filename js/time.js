@@ -1019,7 +1019,35 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             this.cfu[i].unlocked = true;
         }
         this.game.msg("All time upgrades are unlocked");
-    }
+	},
+
+	undo: function(data) {
+		if (data.action === "buildCFU") {
+			var bld = this.getCFU(data.metaId);
+			var props = {
+				id:            bld.name,
+				name:           bld.label,
+				description:    bld.description,
+				building:       bld.name
+			};
+			props.controller = new classes.ui.time.ChronoforgeBtnController(this.game);
+			var model = props.controller.fetchModel(props);
+			model.refundPercentage = 1.0;	//full refund for undo
+			props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
+		} else if (data.action === "buildVSU") {
+			var bld = this.getVSU(data.metaId);
+			var props = {
+				id:            bld.name,
+				name:           bld.label,
+				description:    bld.description,
+				building:       bld.name
+			};
+			props.controller = new classes.ui.time.VoidSpaceBtnController(this.game);
+			var model = props.controller.fetchModel(props);
+			model.refundPercentage = 1.0;	//full refund for undo
+			props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
+		}
+	}
 });
 
 dojo.declare("classes.ui.time.AccelerateTimeBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
@@ -1599,6 +1627,18 @@ dojo.declare("classes.ui.time.ChronoforgeBtnController", com.nuclearunicorn.game
 		var building = model.metadata;
 		building.isAutomationEnabled = !building.isAutomationEnabled;
 			this.game.upgrade({chronoforge: [building.name]});
+	},
+	build: function(model, opts) {
+		var counter = this.inherited(arguments);
+		if (!counter) {
+			return; //Skip undo if nothing was built
+		}
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.game.time.id, {
+			action: "buildCFU",
+			metaId: model.metadata.name,
+			val: counter
+		}, $I("ui.undo.bld.build", [counter, model.metadata.label]));
 	}
 });
 
@@ -1662,6 +1702,19 @@ dojo.declare("classes.ui.time.VoidSpaceBtnController", com.nuclearunicorn.game.u
 			}
 		}
 		return prices;
+	},
+
+	build: function(model, opts) {
+		var counter = this.inherited(arguments);
+		if (!counter) {
+			return; //Skip undo if nothing was built
+		}
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.game.time.id, {
+			action: "buildVSU",
+			metaId: model.metadata.name,
+			val: counter
+		}, $I("ui.undo.bld.build", [counter, model.metadata.label]));
 	}
 });
 
