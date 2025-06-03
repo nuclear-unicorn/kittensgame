@@ -1471,7 +1471,16 @@ dojo.declare("classes.village.Map", null, {
 	hqLevel: 0,
 
 	//hp of a current squad
+	//@deprecated
 	hp: 10,
+
+	//stats go there
+	squad: {
+		hp: 10,
+		prevHp: 10,
+		atk: 1,
+		def: 1
+	},
 
 	//Combat frame. Every tick frame is increased by X. There are 100 frames in a round, and every combatan can attack once per X fames adjusted for agi.
 	frame: 0,
@@ -1794,31 +1803,38 @@ dojo.declare("classes.village.Map", null, {
 			if (!biome.fauna || !biome.fauna.length){
 				var spawnChance = 100 * (biome.faunaPenalty || 1.0);
 				if (this.game.rand(10000) <= spawnChance){
+					var hp = this.game.rand(10) + 5;
 					biome.fauna = [{
 						title: faunaName,
-						hp: this.game.rand(10) + 5,
+						prevHp: hp,
+						hp: hp,
 						atk: 1,
 						def: 1
 					}];
 				}
 			}
 		}
+		//always regenerate HP slowly
+		if (this.hp < this.getMaxHP()) {
+			this.hp += 0.01;
+		}
+		if (this.hp > this.getMaxHP()) {
+			this.hp = this.getMaxHP();
+		}
+
+		//only regenerate stamina outside of the combat
 		if (this.currentBiome){
 			this.explore(this.currentBiome);
 		} else {
 			if (this.energy < this.getMaxEnergy()) {
 				this.energy += 0.5;
 			}
-			if (this.hp < this.getMaxHP()) {
-				this.hp += 0.01;
-			}
+			
 			//cap eneergy and hp
 			if (this.energy > this.getMaxEnergy()) {
 				this.energy = this.getMaxEnergy();
 			}
-			if (this.hp > this.getMaxHP()) {
-				this.hp = this.getMaxHP();
-			}
+			
 		}
 	},
 
@@ -1855,8 +1871,9 @@ dojo.declare("classes.village.Map", null, {
 		}
 
 		if (this.energy <= 0){
-			this.currentBiome = null;
-			this.game.msg("Your explorers have returned from expedition", "important", "explore");
+			this.energy = 0;
+			//this.currentBiome = null;
+			//this.game.msg("Your explorers have returned from expedition", "important", "explore");
 		}
 
 		//get biome level price based on the terrain difficulty and current explored level
@@ -2351,10 +2368,16 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		this.upgradeExplorersBtn.update();
 		this.upgradeHQBtn.update();
 
-		this.teamDiv.innerHTML = "Supplies [" + map.energy.toFixed(0) + " days]";
+		this.teamDiv.innerHTML = "Stamina: " + map.energy.toFixed(0) + " [" + ((map.energy / map.getMaxEnergy()) * 100).toFixed() + "%]";
 		this.explorerDiv.innerHTML = "Explorers: HP: " + map.hp.toFixed(1) + "/" + map.getMaxHP().toFixed(1);
 		if (biome && biome.fauna && biome.fauna.length){
-			this.explorerDiv.innerHTML += " | " + biome.fauna[0].title + " lvl.1 HP: " + biome.fauna[0].hp.toFixed(1);
+			var fauna =  biome.fauna[0];
+			var hpInfo = "<span class='hp'>" + fauna.hp.toFixed(1) + "</span>";
+			if (fauna.hp != fauna.prevHp){
+				var hpInfo = "<span class='hp flash-red'>" + fauna.hp.toFixed(1) + "</span>";
+				fauna.prevHp = fauna.hp;
+			}
+			this.explorerDiv.innerHTML += " | " + fauna.title + " lvl.1 HP: " + hpInfo;
 		}
 		
 		

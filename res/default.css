@@ -1455,6 +1455,17 @@ a.link.collapse:hover {
     width: 120px;
 }
 
+.hp {
+    animation-timing-function: ease;
+    animation-name: color;
+    animation-duration: 0.3s;
+    animation-direction: alternate-reverse;
+}
+
+.flash-red {
+    color: #ff4444 !important;
+}
+
 
 div.blaze {
             animation: blaze-rainbow 3s linear infinite;
