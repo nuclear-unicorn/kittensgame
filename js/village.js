@@ -1472,6 +1472,7 @@ dojo.declare("classes.village.Map", null, {
 
 	//current explorer squad
 	squad: {
+		level: 1,
 		hp: 50,
 		prevHp: 50,
 		atk: 2,
@@ -1504,7 +1505,7 @@ dojo.declare("classes.village.Map", null, {
 	 *   | 												/
 	 *  plain       -\   ...    /->  coast -> stone ocean
 	 *   |
-	 *  village . . .  > hills  ->   mountain 	->
+	 *  village . . .  > hills  ->   mountain 	-> volcano
 	 *   |
 	 *  forest      _/	 ...	\->  swamps
 	 *   |											\
@@ -1542,6 +1543,7 @@ dojo.declare("classes.village.Map", null, {
 		title: "Village",
 		desc: "Improves exploration rate of all biomes",
 		terrainPenalty: 1.0,
+		mobLevel: 1,
 		faunaPenalty: 0,
 		unlocked: true,
 	},
@@ -1550,6 +1552,7 @@ dojo.declare("classes.village.Map", null, {
 		title: "Plains",
 		desc: "Improves catnip generation by 1% per level",
 		terrainPenalty: 1.0,
+		mobLevel: 3,
 		unlocked: true,
 		unlocks: {
 			biomes: ["hills"]
@@ -1579,6 +1582,7 @@ dojo.declare("classes.village.Map", null, {
 		name: "hills",
 		title: "Hills",
 		desc: "TBD",
+		mobLevel: 3,
 		terrainPenalty: 1.2,
 		unlocked: false,
 		unlocks: {
@@ -1595,6 +1599,7 @@ dojo.declare("classes.village.Map", null, {
 		name: "forest",
 		title: "Forest",
 		desc: "Improves your wood production by 1% per level",
+		mobLevel: 5,
 		lore: {
 			5: "It smells really nice",
 			10: "The forest is rumored to be endless and covering half of the planet",
@@ -1614,6 +1619,7 @@ dojo.declare("classes.village.Map", null, {
 		name: "boneForest",
 		title: "Bone Forest",
 		terrainPenalty: 1.9,
+		mobLevel: 30,
 		unlocked: false,
 		evaluateLocks: function(game){
 			return game.village.getBiome("forest").level >= 25 && game.village.getBiome("rainForest").level >= 5;
@@ -1626,6 +1632,7 @@ dojo.declare("classes.village.Map", null, {
 		title: "Rain Forest",
 		description: "TBD",
 		terrainPenalty: 1.4,
+		mobLevel: 15,
 		unlocked: false,
 		5: "The trees are so tall you don't see where it ends. When the rain starts it can go for hundreds of years.",
 		10: "In the fog you can see the mountains. The mountains have eyes and sometimes change places."
@@ -1634,6 +1641,7 @@ dojo.declare("classes.village.Map", null, {
 		name: "mountain",
 		title: "Mountain",
 		description: "Improves mineral generation by 1% per level",
+		mobLevel: 35,
 		terrainPenalty: 1.2,
 		lore: {
 			5: "Remember to grab your mandatory 50 meters of rope. The ascend will take quite some time.",
@@ -1659,6 +1667,7 @@ dojo.declare("classes.village.Map", null, {
 		description: "TBD",
 		terrainPenalty: 3.5,
 		unlocked: false,
+		mobLevel: 50,
 		lore: {
 			5: "TBD"
 		},
@@ -1671,6 +1680,7 @@ dojo.declare("classes.village.Map", null, {
 		title: "Desert",
 		description: "Improves solar panel effectiveness by 1% per level",
 		terrainPenalty: 1.5,
+		mobLevel: 7,
 		unlocked: false,
 		lore: {
 			5: "An endless white desert with occasional red rock formations"
@@ -1685,6 +1695,7 @@ dojo.declare("classes.village.Map", null, {
 		name: "bloodDesert",
 		title: "Crimson Desert",
 		description: "",
+		mobLevel: 75,
 		terrainPenalty: 1.5,
 		lore: {
 			5: "There are tales of horrible monsters and lost cities and endless deserts of red sand",
@@ -1695,6 +1706,7 @@ dojo.declare("classes.village.Map", null, {
 	},{
 		name: "swamp",
 		title: "Swamp",
+		mobLevel: 25,
 		description : "Everything that is edible is poisonous and so are the trees and the grass and the air is also poisonous slightly",
 		terrainPenalty: 1.95,
 		lore: {
@@ -1802,16 +1814,20 @@ dojo.declare("classes.village.Map", null, {
 			if (!biome.fauna || !biome.fauna.length){
 				var spawnChance = 1000 * (biome.faunaPenalty || 1.0);
 				if (this.game.rand(10000) <= spawnChance){
-					var hp = this.game.rand(10) + 5;
+					var mobLevel = Math.round(biome.mobLevel * Math.pow(1.05, biome.level));	//adjust by +- 15%
+					
+					
+					var hp = Math.round((this.game.rand(10) + 5) * Math.pow(1.05, mobLevel));
 					biome.fauna = [{
 						title: faunaName,
+						level: mobLevel,
 						prevHp: hp,
 						hp: hp,
-						atk: 2.5,
-						def: 1,
-						str: 1,
-						agi: 1,
-						spd: 1
+						atk: 2.5 * Math.pow(1.05, mobLevel),
+						def: (1 + mobLevel) * Math.pow(1.01, mobLevel),
+						str: (1 + mobLevel) * Math.pow(1.01, mobLevel),
+						agi: (1 + mobLevel) * Math.pow(1.01, mobLevel),
+						spd: (1 + mobLevel) * Math.pow(1.01, mobLevel)
 					}];
 				}
 			}
@@ -1938,6 +1954,28 @@ dojo.declare("classes.village.Map", null, {
 			hitRate = 100;
 		}
 		return hitRate;
+	},
+
+	/**
+	 * Returns an EXP value that {src} will get for killing {tgt}
+	 * @param {*} src 
+	 * @param {*} tgt 
+	 * @returns 
+	 */
+	getExp: function(src, tgt){
+		/**
+		 * let df = 1; let ld = this.lvl-you.lvl; 
+		 * if(ld<0) df=Math.sqrt(Math.abs(ld))+Math.abs(ld)*.1*Math.abs(ld);
+    		giveExp(this.exp+(this.exp*this.lvl/10<<0)/df);
+		 */
+
+		var levelDiff = tgt.level - src.level;
+		var df = 1;
+		if (levelDiff < 0){
+			df = Math.sqrt(Math.abs(levelDiff)) + Math.abs(levelDiff) * .1 * Math.abs(levelDiff);
+		}
+		var exp = (src.exp * tgt.lvl / 10 << 0) / df;
+		return exp;
 	},
 
 	attack: function(src, tgt){
@@ -2364,7 +2402,8 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 			if (biome && biome.fauna && biome.fauna.length){
 				var fauna =  biome.fauna[0];
 				var hitRate = map.getHitRate(map.squad, fauna);
-				var tooltipContent = "Hit chance: " + hitRate.toFixed(0) + "%<br>" + "Dodge chance: TBD";
+				var dodgeRate = 100 - map.getHitRate(fauna, map.squad);
+				var tooltipContent = "Hit chance: " + hitRate.toFixed(0) + "%<br>" + "Dodge chance: " + dodgeRate.toFixed(0) + "%";
 			}
 			return tooltipContent;
 		}));
@@ -2424,7 +2463,7 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 				hpInfo = "<span class='hp flash-red'>" + fauna.hp.toFixed(0) + "</span>";
 				fauna.prevHp = fauna.hp;
 			}
-			this.explorerDiv.innerHTML += " | " + fauna.title + " lvl.1 HP: " + hpInfo;
+			this.explorerDiv.innerHTML += " | " + fauna.title + " lvl." + fauna.level + " HP: " + hpInfo;
 		}
 		
 		
