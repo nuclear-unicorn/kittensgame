@@ -597,7 +597,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             game: this.game
         }), document.getElementById("midColumnViewport"));
 
-        if(this.game.getFeatureFlag("QUEUE")){
+        if (this.game.getFeatureFlag("QUEUE")){
             React.render($r(WQueue, {
                 game: this.game
             }), document.getElementById("queueViewport"));
@@ -769,11 +769,9 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             game.colorScheme = "default";
         }
         $("body").removeClass();
-        if (game.colorScheme != "default") {
-            $("body").addClass("scheme_" + game.colorScheme);
-            if (!game.opts.hideBGImage) {
-                $("body").addClass("with_background_image");
-            }
+        $("body").addClass("scheme_" + game.colorScheme);
+        if (!game.opts.hideBGImage) {
+            $("body").addClass("with_background_image");
         }
 
         if (game.opts.tooltipsInRightColumn) {
@@ -935,7 +933,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#autosaveTooltip").text($I("ui.autosave.tooltip"));
         $("#saveTooltip").text($I("ui.save.tooltip"));
         $("#logLink").text($I("ui.log.link"));
-        if(this.game.getFeatureFlag("QUEUE")){
+        if (this.game.getFeatureFlag("QUEUE")){
             $("#queueLink").text($I("ui.queue.link"));
         }
         $("#clearLogHref").text($I("ui.clear.log"));

@@ -209,7 +209,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	},
 
 	get: function(raceName){
-		for( var i = 0; i < this.races.length; i++){
+		for ( var i = 0; i < this.races.length; i++){
 			if (this.races[i].name == raceName){
 				return this.races[i];
 			}
@@ -283,7 +283,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			if (!this.races[i].unlocked ){
 				if (!this.races[i].hidden){
 					unmetRaces.push(this.races[i]);
-				}else{
+				} else {
 					hasLockedHiddenRaces = true;
 				}
 			}
@@ -350,7 +350,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			this.game.msg($I("trade.msg.emissary", [race.title]), "notice");
 		}
 
-		 if(this.game.ironWill && this.game.challenges.isActive('blackSky')) {
+		 if (this.game.ironWill && this.game.challenges.isActive('blackSky')) {
 
 			// BSK+IW emissaries
 			var sharks = this.get("sharks");
@@ -376,7 +376,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 			// BSK+IW discount!
 			for (var i = 0; i < griffins.buys.length; i++) {
-				if(griffins.buys[i].name == "wood") {
+				if (griffins.buys[i].name == "wood") {
 					griffins.buys[i].val = 400;
 				}
 			}
@@ -384,7 +384,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			// sharks got science!
 			for (var i = 0; i < sharks.sells.length; i++) {
 			    var sellResource = sharks.sells[i];
-				if(sellResource["name"] == "catnip") {
+				if (sellResource["name"] == "catnip") {
 					sellResource.name = "science";
 					sellResource.value = 80;
 					sellResource.seasons = {
@@ -402,7 +402,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		var sharks = this.get("sharks");
 		var griffins = this.get("griffins");
 		for (var i = 0; i < griffins.buys.length; i++) {
-			if(griffins.buys[i].name == "wood") {
+			if (griffins.buys[i].name == "wood") {
 				griffins.buys[i].val = 500;
 			}
 		}
@@ -410,7 +410,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		this.baseManpowerCost = this.defaultManpowerCost;
 		for (var i = 0; i < sharks.sells.length; i++) {
 			var sellResource = sharks.sells[i];
-			if(sellResource["name"] == "science") {
+			if (sellResource["name"] == "science") {
 				sellResource.name = "catnip";
 				sellResource.value = 35000;
 				sellResource.seasons = {
@@ -432,7 +432,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
         // 5 years + 1 year per energy unit
         elders.duration = this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear *  (5  + elders.energy);
 
-		if(elders.autoPinned){elders.pinned = true;}
+		if (elders.autoPinned){elders.pinned = true;}
 
         this.game.msg($I("trade.msg.elders"), "urgent", "elders");
     },
@@ -565,17 +565,17 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	tradeImpl: function(race, totalTradeAmount) {
 
 		 // BSK early unlocks!
-		 if(this.game.ironWill && this.game.challenges.isActive('blackSky')) {
-			if(race.name == "griffins") {
+		 if (this.game.ironWill && this.game.challenges.isActive('blackSky')) {
+			if (race.name == "griffins") {
 				this.game.resPool.get('iron').unlocked = true;
 			}
-			if(race.name == "sharks") {
+			if (race.name == "sharks") {
 				this.game.resPool.get('science').unlocked = true;
 			}
 		 }
 
 
-		if(race.unlocks){
+		if (race.unlocks){
             this.game.unlock(race.unlocks);
 		}
 		var printMessages = totalTradeAmount == 1;
@@ -711,7 +711,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 	getManpowerCost: function() {
 		var manpowerCost = this.baseManpowerCost - this.game.getEffect("tradeCatpowerDiscount");
-		if(this.game.challenges.isActive("postApocalypse")) {
+		if (this.game.challenges.isActive("postApocalypse")) {
 			manpowerCost *= 1 + this.game.bld.getPollutionLevel();
 		}
 		return (manpowerCost < 0) ? 0 : manpowerCost;
@@ -719,7 +719,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 	getGoldCost: function() {
 		var goldCost = this.baseGoldCost - this.game.getEffect("tradeGoldDiscount");
-		if(this.game.challenges.isActive("postApocalypse")) {
+		if (this.game.challenges.isActive("postApocalypse")) {
 			goldCost *= 1 + this.game.bld.getPollutionLevel();
 		}
 		return (goldCost < 0) ? 0 : goldCost;
@@ -911,9 +911,9 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	calculatePhantomTradeposts: function(raceName, game){
 		var phantomTradeposts = 0;
         phantomTradeposts += game.getEffect("globalRelationsBonus");
-        if(raceName == "zebras"){
+        if (raceName == "zebras"){
 			phantomTradeposts += game.getEffect("zebraRelationModifier");
-        }else{
+        } else {
 			phantomTradeposts += game.getEffect("nonZebraRelationModifier");
         }
 		return phantomTradeposts;
@@ -1616,7 +1616,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 			dojo.addClass(rightColumn, "right");
 			dojo.addClass(clear, "clear");
 
-			if(racePanel.feedBtn){
+			if (racePanel.feedBtn){
 				var leviathansInfo = dojo.create("div", {
 					innerHTML: ""
 				}, leftColumn);
@@ -1684,7 +1684,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 				}, this.game);
 				racePanel.embassyButton = embassyButton;
 				embassyButton.render(rightColumn);
-			} else{
+			} else {
 				var autoPinnedButton = new classes.diplomacy.ui.autoPinnedButton({
 					name: $I("trade.autopinned.labelOff"),
 					description: $I("trade.autopinned.desc"),

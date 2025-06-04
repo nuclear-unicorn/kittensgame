@@ -259,7 +259,7 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 			return;
 		}
 
-		for(var i = 0; i < saveMeta.length; i++){
+		for (var i = 0; i < saveMeta.length; i++){
 			var savedMetaElem = saveMeta[i];
 
 			if (savedMetaElem != null){
@@ -297,7 +297,7 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 	 */
 	filterMetadata: function(meta, fields, replacer){
 		var filtered = [];
-		for(var i = 0; i < meta.length; i++){
+		for (var i = 0; i < meta.length; i++){
 			var clone = {};
 
 			for (var j = 0; j < fields.length; j++){
@@ -604,7 +604,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		var priceModels = [];
 
 		if (prices) {
-			for( var i = 0; i < prices.length; i++){
+			for ( var i = 0; i < prices.length; i++){
 				var price = prices[i];
 				priceModels.push(this.createPriceLineModel(model, price));
 
@@ -703,7 +703,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	adjustPrice:function(model, ratio ){
 		var prices = this.getPrices(model);
 		if (prices.length){
-			for( var i = 0; i < prices.length; i++){
+			for ( var i = 0; i < prices.length; i++){
 				var price = prices[i];
 
 				price.val = price.val * ratio;
@@ -719,7 +719,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	rejustPrice: function(model, ratio){
 		var prices = model.prices;
 		if (prices.length){
-			for( var i = 0; i < prices.length; i++){
+			for ( var i = 0; i < prices.length; i++){
 				var price = prices[i];
 
 				price.val = price.val / ratio;
@@ -740,7 +740,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 			console.warn("unable pay prices for undo refund a building, no prices specified in metadata :O");
 			return;
 		}
-		for( var i = 0; i < model.prices.length; i++){
+		for ( var i = 0; i < model.prices.length; i++){
 			var price = model.prices[i];
 
 			var res = this.game.resPool.get(price.name);
@@ -823,7 +823,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 			console.warn("unable to refund building, no prices specified in metadata :O");
 			return;
 		}
-		for( var i = 0; i < model.prices.length; i++){
+		for ( var i = 0; i < model.prices.length; i++){
 			var price = model.prices[i];
 
 			var res = this.game.resPool.get(price.name);
@@ -1037,7 +1037,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 			var tooltipPricesNodes = [];
 
-			for( var i = 0; i < prices.length; i++){
+			for ( var i = 0; i < prices.length; i++){
 				var price = prices[i];
 
 				var priceItemNode = dojo.create("div", {
@@ -1454,7 +1454,7 @@ ButtonModernHelper = {
 		if (!prices.length){
 			return;
 		}
-		for( var i = 0; i < prices.length; i++){
+		for ( var i = 0; i < prices.length; i++){
 			var price = prices[i];
 			var span = ButtonModernHelper._renderPriceLine(tooltip, price);
 		}
@@ -1699,7 +1699,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 
 		if (building.on >= amt){
 			building.on -= amt;
-			if(building.stages){
+			if (building.stages){
 				model.metaAccessor.meta.on -= amt; //stage hack
 			}
 			this.metadataHasChanged(model);
@@ -1711,7 +1711,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		var building = model.metadata;
 		if (building.on){
 			building.on = 0;
-			if(building.stages){
+			if (building.stages){
 				model.metaAccessor.meta.on = 0; //stage hack
 			}
 			this.metadataHasChanged(model);
@@ -1731,7 +1731,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 
 		if (building.on + amt <= building.val ){
 			building.on += amt;
-			if(building.stages){
+			if (building.stages){
 				model.metaAccessor.meta.on += amt; //stage hack
 			}
 			this.metadataHasChanged(model);
@@ -1743,7 +1743,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		var building = model.metadata;
 		if (building.on < building.val) {
 			building.on = building.val;
-			if(building.stages){
+			if (building.stages){
 				model.metaAccessor.meta.on = building.val; //stage hack
 			}
 			this.metadataHasChanged(model);
@@ -1760,7 +1760,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		// Allow buildings to override sell button with custom actions
 		// But, proceed with normal action as well if true returned.
 		if (building.canSell) {
-			if(!building.canSell(building, this.game)) {
+			if (!building.canSell(building, this.game)) {
 				return 0;
 			}
 		}
@@ -1879,7 +1879,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 		}
 
 		//--------------- style -------------
-		if((building.val > 9 || building.name.length > 10) && this.model.hasSellLink) {
+		if ((building.val > 9 || building.name.length > 10) && this.model.hasSellLink) {
 			//Steamworks and accelerator specifically can be too large when sell button is on
 			//(tested to support max 99 bld count)
 			dojo.addClass(this.domNode, "small-text");
@@ -1970,7 +1970,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 			}
 
 			//--------------- style -------------
-			if(building.val > 9) {
+			if (building.val > 9) {
 				dojo.style(this.domNode,"font-size","90%");
 			}
 

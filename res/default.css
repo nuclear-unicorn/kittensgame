@@ -145,12 +145,12 @@ div#gameLog {
     text-decoration: none;
 }
 
-.activeTab {
+.scheme_default .tabsContainer a.tab {
     color: black;
 }
 
-.bldTopContainer > a.activeTab {
-    color: #444444;
+.scheme_default .tabsContainer a.tab.activeTab {
+    color: #500000;
 }
 
 .resourceRow {
@@ -1453,6 +1453,17 @@ a.link.collapse:hover {
 
 .map-dashboard .btn {
     width: 120px;
+}
+
+.hp {
+    animation-timing-function: ease;
+    animation-name: color;
+    animation-duration: 0.3s;
+    animation-direction: alternate-reverse;
+}
+
+.flash-red {
+    color: #ff4444 !important;
 }
 
 
