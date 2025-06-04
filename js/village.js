@@ -1801,14 +1801,14 @@ dojo.declare("classes.village.Map", null, {
 
 			//5% of chance to spawn enemy per tick
 			if (!biome.fauna || !biome.fauna.length){
-				var spawnChance = 100 * (biome.faunaPenalty || 1.0);
+				var spawnChance = 1000 * (biome.faunaPenalty || 1.0);
 				if (this.game.rand(10000) <= spawnChance){
 					var hp = this.game.rand(10) + 5;
 					biome.fauna = [{
 						title: faunaName,
 						prevHp: hp,
 						hp: hp,
-						atk: 1,
+						atk: 2.5,
 						def: 1
 					}];
 				}
@@ -2368,13 +2368,19 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		this.upgradeExplorersBtn.update();
 		this.upgradeHQBtn.update();
 
+		var hpInfo = "<span class='hp'>" + (map.hp * 10).toFixed(0) + "</span>";
+		if (map.squad.prevHp > map.hp){
+			hpInfo = "<span class='hp flash-red'>" + (map.hp * 10).toFixed(0) + "</span>";
+			map.squad.prevHp = map.hp;
+		}
+
 		this.teamDiv.innerHTML = "Stamina: " + map.energy.toFixed(0) + " [" + ((map.energy / map.getMaxEnergy()) * 100).toFixed() + "%]";
-		this.explorerDiv.innerHTML = "Explorers: HP: " + map.hp.toFixed(1) + "/" + map.getMaxHP().toFixed(1);
+		this.explorerDiv.innerHTML = "Explorers: HP: " + hpInfo + "/" + (map.getMaxHP() * 10).toFixed(0);
 		if (biome && biome.fauna && biome.fauna.length){
 			var fauna =  biome.fauna[0];
-			var hpInfo = "<span class='hp'>" + fauna.hp.toFixed(1) + "</span>";
+			var hpInfo = "<span class='hp'>" + (fauna.hp * 10).toFixed(0) + "</span>";
 			if (fauna.hp != fauna.prevHp){
-				var hpInfo = "<span class='hp flash-red'>" + fauna.hp.toFixed(1) + "</span>";
+				hpInfo = "<span class='hp flash-red'>" + (fauna.hp * 10).toFixed(0) + "</span>";
 				fauna.prevHp = fauna.hp;
 			}
 			this.explorerDiv.innerHTML += " | " + fauna.title + " lvl.1 HP: " + hpInfo;
