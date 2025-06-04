@@ -1470,16 +1470,15 @@ dojo.declare("classes.village.Map", null, {
 	//level of your supply depo
 	hqLevel: 0,
 
-	//hp of a current squad
-	//@deprecated
-	hp: 10,
-
-	//stats go there
+	//current explorer squad
 	squad: {
-		hp: 10,
-		prevHp: 10,
-		atk: 1,
-		def: 1
+		hp: 50,
+		prevHp: 50,
+		atk: 2,
+		def: 1,
+		agi: 1,
+		str: 1,
+		spd: 1
 	},
 
 	//Combat frame. Every tick frame is increased by X. There are 100 frames in a round, and every combatan can attack once per X fames adjusted for agi.
@@ -1809,17 +1808,20 @@ dojo.declare("classes.village.Map", null, {
 						prevHp: hp,
 						hp: hp,
 						atk: 2.5,
-						def: 1
+						def: 1,
+						str: 1,
+						agi: 1,
+						spd: 1
 					}];
 				}
 			}
 		}
 		//always regenerate HP slowly
-		if (this.hp < this.getMaxHP()) {
-			this.hp += 0.01;
+		if (this.squad.hp < this.getMaxHP()) {
+			this.squad.hp += 0.1;
 		}
-		if (this.hp > this.getMaxHP()) {
-			this.hp = this.getMaxHP();
+		if (this.squad.hp > this.getMaxHP()) {
+			this.squad.hp = this.getMaxHP();
 		}
 
 		//only regenerate stamina outside of the combat
@@ -1863,7 +1865,7 @@ dojo.declare("classes.village.Map", null, {
 			//todo: combat round timeout
 			this.combat();
 
-			if (this.hp <= 0){
+			if (this.squad.hp <= 0){
 				this.currentBiome = null;
 				this.game.msg("All contact with the expedition have been lost", "important", "explore");
 			}
@@ -1911,15 +1913,37 @@ dojo.declare("classes.village.Map", null, {
 		for (var i in biome.fauna ){
 			var fauna = biome.fauna[i];
 
-			var combatSpeed = 0.1;
+			/*var combatSpeed = 0.1;
 			if (fauna.hp > 0){
 				this.hp = this.hp - fauna.atk * combatSpeed;
-				fauna.hp -= 2 /*this.atk */ * combatSpeed;
-			}
+				fauna.hp -= 2  * combatSpeed;
+			}*/
+			this.attack(this.squad, fauna);
+			this.attack(fauna, this.squad);
+
 		}
 		biome.fauna = biome.fauna.filter(function(fauna) {
 			return fauna.hp > 0;
 		});
+	},
+
+	attack: function(src, tgt){
+		//hit change
+		//formulas are courtesy of proto23
+
+		//return ((you.agl+agl_bonus/2)*you.efficiency())/((spd+global.current_m.agl+global.current_m.eva))*130+5;
+
+		var efficiency = src.efficiency ? src.efficiency : 1.0;
+		var hitChance = ((src.agi) * efficiency) / (( /*tgt.spd */ + tgt.agi /*+ tgt.evasion*/)) * 130 + 5;
+
+		if (hitChance > 100){
+			hitChance = 100;
+		}
+
+		console.log(src, "attacks", tgt, "hit chance:", hitChance);
+		if (this.game.rand(100) <= hitChance) {
+			tgt.hp -= src.atk;
+		}
 	},
 
 	onLevelUp: function(biome){
@@ -2012,7 +2036,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 
 	clickHandler: function(model, event){
 		var map = this.game.village.map;
-		if (map.energy <= 0 || map.hp <= 0)
+		if (map.energy <= 0 || map.squad.hp <= 0)
 		{
 			//Not enough resources to explore
 			return;
@@ -2058,7 +2082,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 	},
 	updateEnabled: function(model) {
 		var map = this.game.village.map;
-		if (map.energy <= 0 || map.hp <= 0)
+		if (map.energy <= 0 || map.squad.hp <= 0)
 		{
 			//Not enough resources to explore
 			model.enabled = false;
@@ -2331,7 +2355,7 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		}, div);
 
 		this.explorerDiv = dojo.create("div", {
-			innerHTML: "Explorers: lvl 0, HP: " + map.hp.toFixed(1) + "/" + map.getMaxHP()
+			innerHTML: "Explorers: lvl 0, HP: " + map.squad.hp.toFixed(0) + "/" + map.getMaxHP()
 		}, div);
 
 		var btnsContainer = dojo.create("div", {style:{paddingTop:"20px"}}, div);
@@ -2368,10 +2392,10 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		this.upgradeExplorersBtn.update();
 		this.upgradeHQBtn.update();
 
-		var hpInfo = "<span class='hp'>" + (map.hp * 10).toFixed(0) + "</span>";
-		if (map.squad.prevHp > map.hp){
-			hpInfo = "<span class='hp flash-red'>" + (map.hp * 10).toFixed(0) + "</span>";
-			map.squad.prevHp = map.hp;
+		var hpInfo = "<span class='hp'>" + map.squad.hp.toFixed(0) + "</span>";
+		if (map.squad.prevHp > map.squad.hp){
+			hpInfo = "<span class='hp flash-red'>" + map.squad.hp.toFixed(0) + "</span>";
+			map.squad.prevHp = map.squad.hp;
 		}
 
 		this.teamDiv.innerHTML = "Stamina: " + map.energy.toFixed(0) + " [" + ((map.energy / map.getMaxEnergy()) * 100).toFixed() + "%]";
