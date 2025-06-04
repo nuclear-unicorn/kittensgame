@@ -1820,9 +1820,6 @@ dojo.declare("classes.village.Map", null, {
 		if (this.squad.hp < this.getMaxHP()) {
 			this.squad.hp += 0.1;
 		}
-		if (this.squad.hp > this.getMaxHP()) {
-			this.squad.hp = this.getMaxHP();
-		}
 
 		//only regenerate stamina outside of the combat
 		if (this.currentBiome){
@@ -1836,7 +1833,11 @@ dojo.declare("classes.village.Map", null, {
 			if (this.energy > this.getMaxEnergy()) {
 				this.energy = this.getMaxEnergy();
 			}
-			
+			this.squad.hp += 0.1;	//TODO: scale the hp regeneration proportionally to the max HP
+		}
+
+		if (this.squad.hp > this.getMaxHP()) {
+			this.squad.hp = this.getMaxHP();
 		}
 	},
 
@@ -1845,7 +1846,7 @@ dojo.declare("classes.village.Map", null, {
 	},
 
 	getMaxHP: function(){
-		return (10 + this.explorersLevel * 0.1) * (1 + (0.01 * this.explorersLevel));
+		return (10 + this.explorersLevel * 0.2) * (2 + (0.02 * this.explorersLevel));
 	},
 
 	explore: function(biomeId){
@@ -1927,18 +1928,21 @@ dojo.declare("classes.village.Map", null, {
 		});
 	},
 
+	getHitRate: function(src, tgt){
+		//formulas are courtesy of proto23
+		//return ((you.agl+agl_bonus/2)*you.efficiency())/((spd+global.current_m.agl+global.current_m.eva))*130+5;
+		var efficiency = src.efficiency ? src.efficiency : 1.0;
+		var hitRate = ((src.agi) * efficiency) / (( /*tgt.spd */ + tgt.agi /*+ tgt.evasion*/)) * 130 + 5;
+
+		if (hitRate > 100){
+			hitRate = 100;
+		}
+		return hitRate;
+	},
+
 	attack: function(src, tgt){
 		//hit change
-		//formulas are courtesy of proto23
-
-		//return ((you.agl+agl_bonus/2)*you.efficiency())/((spd+global.current_m.agl+global.current_m.eva))*130+5;
-
-		var efficiency = src.efficiency ? src.efficiency : 1.0;
-		var hitChance = ((src.agi) * efficiency) / (( /*tgt.spd */ + tgt.agi /*+ tgt.evasion*/)) * 130 + 5;
-
-		if (hitChance > 100){
-			hitChance = 100;
-		}
+		var hitChance = this.getHitRate(src, tgt);
 
 		console.log(src, "attacks", tgt, "hit chance:", hitChance);
 		if (this.game.rand(100) <= hitChance) {
@@ -2306,6 +2310,7 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 	},
 
 	render: function(container){
+		var self = this;
 		var map = this.game.village.map;
 		var div = dojo.create("div", null, container);
 
@@ -2330,7 +2335,6 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 				selected: _map.name == map.activeMapId
 			}, mapSelect);
 		}
-		var self = this;
 		dojo.connect(mapSelect, "onchange", this.game.village.map, function (event) {
 			var mapId = event.target.value;
 			self.game.village.map.setMap(mapId);
@@ -2354,6 +2358,17 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 			innerHTML: "Explorers: Supplies []"
 		}, div);
 
+		UIUtils.attachTooltip(this.game, this.teamDiv, 0, 150, dojo.hitch(this, function(){
+			var biome = map.currentBiome ? self.game.village.getBiome(map.currentBiome) : null;
+			var tooltipContent = "You are currently not in combat";
+			if (biome && biome.fauna && biome.fauna.length){
+				var fauna =  biome.fauna[0];
+				var hitRate = map.getHitRate(map.squad, fauna);
+				var tooltipContent = "Hit chance: " + hitRate.toFixed(0) + "%<br>" + "Dodge chance: TBD";
+			}
+			return tooltipContent;
+		}));
+
 		this.explorerDiv = dojo.create("div", {
 			innerHTML: "Explorers: lvl 0, HP: " + map.squad.hp.toFixed(0) + "/" + map.getMaxHP()
 		}, div);
@@ -2371,7 +2386,6 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 
 	update: function() {
 		var map = this.game.village.map;
-
 		var biome = map.currentBiome ? this.game.village.getBiome(map.currentBiome) : null;
 
 		if (biome){
@@ -2398,13 +2412,16 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 			map.squad.prevHp = map.squad.hp;
 		}
 
-		this.teamDiv.innerHTML = "Stamina: " + map.energy.toFixed(0) + " [" + ((map.energy / map.getMaxEnergy()) * 100).toFixed() + "%]";
-		this.explorerDiv.innerHTML = "Explorers: HP: " + hpInfo + "/" + (map.getMaxHP() * 10).toFixed(0);
+		var efficiency = map.energy / map.getMaxEnergy();
+		map.squad.efficiency = efficiency;
+
+		this.teamDiv.innerHTML = "Stamina: " + map.energy.toFixed(0) + " [" + (efficiency * 100).toFixed() + "%]";
+		this.explorerDiv.innerHTML = "Explorers: HP: " + hpInfo + "/" + map.getMaxHP().toFixed(0);
 		if (biome && biome.fauna && biome.fauna.length){
 			var fauna =  biome.fauna[0];
-			var hpInfo = "<span class='hp'>" + (fauna.hp * 10).toFixed(0) + "</span>";
+			var hpInfo = "<span class='hp'>" + fauna.hp.toFixed(0) + "</span>";
 			if (fauna.hp != fauna.prevHp){
-				hpInfo = "<span class='hp flash-red'>" + (fauna.hp * 10).toFixed(0) + "</span>";
+				hpInfo = "<span class='hp flash-red'>" + fauna.hp.toFixed(0) + "</span>";
 				fauna.prevHp = fauna.hp;
 			}
 			this.explorerDiv.innerHTML += " | " + fauna.title + " lvl.1 HP: " + hpInfo;
