@@ -1046,6 +1046,19 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 			var model = props.controller.fetchModel(props);
 			model.refundPercentage = 1.0;	//full refund for undo
 			props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
+		} else if (data.action === "fixCryochamber") {
+			//Update the building metadata:
+			var controller = new classes.ui.time.FixCryochamberBtnController(this.game);
+			var amtFixed = controller.undoFixCryochambers(data.val);
+
+			//Update resource amounts (full refund):
+			var prices = controller.getPrices({} /*model*/); //Due to how it's implemented, we can get away with using an empty object as our model
+			var resPool = this.game.resPool;
+			prices.forEach(function(priceLine) { //priceLine has the form {name: string, val: number}
+				var refundVal = resPool.addResEvent(priceLine.name, priceLine.val * amtFixed);
+				this.game.msg($I("workshop.undo.regain", [this.game.getDisplayValueExt(refundVal),
+					resPool.get(priceLine.name).title]), null, "undo", true /*noBullet*/);
+			});
 		}
 	}
 });
@@ -1748,19 +1761,29 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
 
 		if (!event) { event = {}; /*event is an optional parameter*/ }
         var isBuyAll = (event && event.shiftKey) || buyType == "all";
-		var fixCount = isBuyAll
+		var fixCount = isBuyAll //Represents how many we *intend* to fix
 			? 1000
 			: event.ctrlKey || event.metaKey /*osx tears*/
 				? this.game.opts.batchSize || 10
 				: 1;
 		fixCount = Math.min(fixCount, this.game.time.getVSU("usedCryochambers").val);
 
-		var fixHappened = false;
-		for (var count = 0; count < fixCount && this.hasResources(model); ++count) {
+		var numFixed = 0; //Count the amount we actually fixed
+		for (var i = 0; i < fixCount && this.hasResources(model); ++i) {
 			this.payPrice(model);
-			fixHappened |= this.doFixCryochamber(model);
+			if (this.doFixCryochamber(model)) {
+				numFixed++;
+			}
 		}
-        if(fixHappened){
+		if(numFixed){
+			var undo = this.game.registerUndoChange();
+			undo.addEvent(this.game.time.id, {
+				action: "fixCryochamber",
+				metaId: "usedCryochambers", //Just in case a future dev wants to add multiple types of Cryochambers
+				val: numFixed
+			}, numFixed == 1 ?
+				$I("ui.undo.fix.one.cryochamber") :
+				$I("ui.undo.fix.many.cryochambers", [numFixed]));
             var cry = this.game.time.getVSU("cryochambers");
             cry.calculateEffects(cry, this.game);
             return {
@@ -1790,6 +1813,22 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
 		}
         return false;
     },
+
+	/**
+	 * @param amountToFix number How many Cryochambers to turn back into Used Cryochambers
+	 * @return number of Cryochambers actually fixed.
+	 */
+	undoFixCryochambers: function(amountToFix) {
+		var cry = this.game.time.getVSU("cryochambers");
+		var usedCry = this.game.time.getVSU("usedCryochambers");
+		amountToFix = Math.min(cry.val, amountToFix);
+		usedCry.val += amountToFix;
+		usedCry.on += amountToFix;
+		usedCry.unlocked = true;
+		cry.val -= amountToFix;
+		cry.on -= amountToFix;
+		return amountToFix;
+	},
 
 	updateVisible: function(model) {
 		model.visible = this.game.workshop.get("chronoforge").researched && this.game.time.getVSU("usedCryochambers").val != 0;
