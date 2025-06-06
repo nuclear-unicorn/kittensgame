@@ -1956,14 +1956,31 @@ dojo.declare("classes.ui.religion.RefineTearsBtnController", com.nuclearunicorn.
 			};
 		}
 		if (!event) { event = {}; /*event is an optional parameter*/ }
+		var amtRefined = 0;
+		var sorrowObj = this.game.resPool.get("sorrow");
 		for (var batchSize = count || (event.ctrlKey ? this.game.opts.batchSize : 1);
 			 batchSize > 0
 			 && this.hasResources(model)
-			 && this.game.resPool.get("sorrow").value < this.game.resPool.get("sorrow").maxValue;
+			 && sorrowObj.value < sorrowObj.maxValue;
 			 batchSize--) {
 			this.payPrice(model);
 			this.refine();
+			amtRefined++;
 		}
+		var priceCount = model.prices[0].val * amtRefined;
+		var priceName = model.prices[0].name;
+		var descriptiveStrings = [this.game.getDisplayValueExt(priceCount),
+			this.game.resPool.get(priceName).title,
+			this.game.getDisplayValueExt(amtRefined),
+			sorrowObj.title];
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.game.religion.id, {
+			action: "refine",
+			resFrom: priceName,
+			resTo:  sorrowObj.name,
+			valFrom: priceCount,
+			valTo: amtRefined
+		}, $I("ui.undo.religion.refine", descriptiveStrings));
 		return {
 			itemBought: true,
 			reason: "paid-for"
