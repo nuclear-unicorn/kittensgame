@@ -1361,6 +1361,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 
 	resetFaith: function(bonusRatio, withConfirmation) {
+		var worshipBefore = this.faith;
+		var epiphanyBefore = this.faithRatio;
 		if (withConfirmation && !this.game.opts.noConfirm) {
 			var self = this;
 			this.game.ui.confirm("", $I("religion.adore.confirmation.msg"), function() {
@@ -1369,6 +1371,16 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		} else {
 			this._resetFaithInternal(bonusRatio);
 		}
+		var worshipAfter = this.faith;
+		var epiphanyAfter = this.faithRatio;
+
+		//Here we go, trying to make more game actions reversible
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.id, {
+			action: "adore",
+			worshipBefore: worshipBefore,
+			epiphanyGained: epiphanyAfter - epiphanyBefore
+		}, $I("ui.undo.religion.adore"));
 	},
 
 	_resetFaithInternal: function(bonusRatio) {
@@ -1484,6 +1496,15 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			} else {
 				//This would happen, for example, if the player had adored the galaxy immediately after praising.
 				this.game.msg($I("religion.undo.praise.failure"), "alert", "undo", true /*noBullet*/);
+			}
+		} else if (data.action === "adore") {
+			if (this.faithRatio >= data.epiphanyGained) {
+				this.faithRatio -= data.epiphanyGained;
+				this.faith = data.worshipBefore;
+				this.game.msg($I("religion.undo.adore.regained", [this.game.getDisplayValueExt(data.worshipBefore)]), null, "undo", true /*noBullet*/);
+			} else {
+				//This would happen, for example, if the player had transcended immediately after adoring the galaxy.
+				this.game.msg($I("religion.undo.adore.failure"), "alert", "undo", true /*noBullet*/);
 			}
 		} else if (data.action === "buildZU") {
 			//This process requires 2 things: the controller & the model.
