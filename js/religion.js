@@ -1208,7 +1208,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		unlocked: false,
 		unlocks: {
 			pacts: ["pactOfCleansing", "pactOfDestruction",  "pactOfExtermination", "pactOfPurity"],
-			policies: ["siphoning"]
+			policies: ["siphoning", "feedingFrenzy", "upfrontPayment"]
 		},
 		calculateEffects: function (self, game){
 			if(!game.getFeatureFlag("MAUSOLEUM_PACTS")){

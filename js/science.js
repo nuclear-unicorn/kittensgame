@@ -2079,25 +2079,79 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         }*/
 	//pact policy
 	{
-        name: "siphoning",
+		name: "siphoning",
 		label: $I("policy.siphoning.label"),
-        description: $I("policy.siphoning.desc"),
-        prices: [
-            {name : "necrocorn", val: 1}
-        ],
-		calculateEffect: function(game, self){
-			if(!game.getFeatureFlag("MAUSOLEUM_PACTS")){
+		description: $I("policy.siphoning.desc"),
+		prices: [
+			{name : "necrocorn", val: 1}
+		],
+		effects: { //TODO: remove old effect (slowing down corruption & consuming alicorns)
+			"smallDebtPunishmentExemption": 5, //TODO: remove debt penalties if debt is less than 5 units
+			"repayDebtOnNecrocornGeneration": 1 //TODO: have generated necrocorns be spent to pay back debt if debt > 1
+		},
+		calculateEffect: function(game, self) {
+			if(!game.getFeatureFlag("MAUSOLEUM_PACTS")) {
 				self.unlocked = false;
 				return;
 			}
 		},
-		evaluateLocks: function(game){
-			return game.getFeatureFlag("MAUSOLEUM_PACTS");
+		evaluateLocks: function(game) { //TODO: test to ensure this unlock condition works as I intended
+			return game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val && game.resPool.get("necrocorn").unlocked;
 		},
-        unlocked: false,
-        blocked: false,
-        blocks:[]
-    }
+		unlocked: false,
+		blocked: false,
+		blocks:["feedingFrenzy", "upfrontPayment"]
+	},
+	{
+		name: "feedingFrenzy",
+		label: $I("policy.feedingFrenzy.label"),
+		description: $I("policy.feedingFrenzy.desc"),
+		prices: [
+			{name : "necrocorn", val: 1}
+		],
+		effects: {
+			"feedCostReductionPerPact": 0.02, //TODO: decrease feeding cost slightly if using Pacts (by 2% per unique Pact, up to a max of 10%)
+			"fullNecrocornGenerationLimit": 1 //TODO: allow full 4x necrocorn generation up to a max of 2 necrocorns
+			//TODO: slight debuff to something else, if needed for balancing
+		},
+		calculateEffect: function(game, self) {
+			if(!game.getFeatureFlag("MAUSOLEUM_PACTS")) {
+				self.unlocked = false;
+				return;
+			}
+		},
+		evaluateLocks: function(game) { //TODO: test to ensure this unlock condition works as I intended
+			return game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val && game.resPool.get("necrocorn").unlocked;
+		},
+		unlocked: false,
+		blocked: false,
+		blocks:["siphoning", "upfrontPayment"]
+	},
+	{
+		name: "upfrontPayment",
+		label: $I("policy.upfrontPayment.label"),
+		description: $I("policy.upfrontPayment.desc"),
+		prices: [
+			{name : "necrocorn", val: 1}
+		],
+		effects: {
+			"pactNecrocornConsumption": 5e-5, //This should decrease Pact upkeep (by 10%).  Subject to balancing
+			"pactUpfrontCost": 2, //TODO: remove immediate debt accumulation from buying a Pact.  Instead, Pacts cost 2 full necrocorns at the time you buy them
+			"debtPunishmentHarshness": 1 //TODO: make debt more punishing if there is any debt.
+		},
+		calculateEffect: function(game, self) {
+			if(!game.getFeatureFlag("MAUSOLEUM_PACTS")) {
+				self.unlocked = false;
+				return;
+			}
+		},
+		evaluateLocks: function(game) { //TODO: test to ensure this unlock condition works as I intended
+			return game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val && game.resPool.get("necrocorn").unlocked;
+		},
+		unlocked: false,
+		blocked: false,
+		blocks:["siphoning", "upfrontPayment"]
+	}
 ],
 
 	metaCache: null,
