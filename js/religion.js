@@ -1528,7 +1528,40 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				props.controller.payPriceForUndoRefund(model);
 			}
 			this.game.render();
+		} else if (data.action === "buyPact") {
+			if (this.getPact("fractured").on) { //should fail if fractured
+				this.game.msg($I("religion.undo.buy.pact.fractured"), "alert", "undo", true /*noBullet*/);
+			} else {
+				var pact = this.getPact(data.metaId);
+				var props = {
+					id:            pact.name,
+					name:           pact.label,
+					description:    pact.description,
+					building:       pact.name
+				};
+				props.controller = new com.nuclearunicorn.game.ui.PactsBtnController(this.game);
+				var model = props.controller.fetchModel(props);
+				model.refundPercentage = 1.0;	//full refund for undo
+				props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
+
+				//Un-incur necrocorn debt:
+				if(!model.metadata.notAddDeficit){
+					console.log("removing 0.5 necrocornDeficit");
+					this.pactsManager.necrocornDeficit = Math.max(this.pactsManager.necrocornDeficit - 0.5 * data.val, 0);
+				}
+				//Update effects:
+				if(model.metadata.updatePreDeficitEffects){
+					model.metadata.updatePreDeficitEffects(this.game);
+				}
+				if(!model.metadata.special){
+					this.game.upgrade(
+						{pacts: ["payDebt"]}
+						);
+				}
+				this.getZU("blackPyramid").jammed = false;
+			}
 		}
+		this.game.render();
 	}
 });
 
@@ -2152,6 +2185,14 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 			}
         }
 
+		if(counter && meta.name != "payDebt") { //The player cannot un-pay their debts (I'm lazy & don't feel like making the code work properly for that one)
+			var undo = this.game.registerUndoChange();
+			undo.addEvent(this.game.religion.id, {
+				action: "buyPact",
+				metaId: model.metadata.name,
+				val: counter
+			}, $I("ui.undo.religion.pact", [counter, model.metadata.label]));
+		}
 		return counter;
     },
 
