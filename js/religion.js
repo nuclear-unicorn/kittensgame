@@ -1269,7 +1269,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		this.game.upgrade(
 			{
 				transcendenceUpgrades:["mausoleum"],
-				policies:["radicalXenophobia"],
+				policies:["radicalXenophobia", "feedingFrenzy"],
 				pacts:["fractured"]
 			}
 		);
@@ -2125,10 +2125,11 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 			if(meta.updatePreDeficitEffects){
 				meta.updatePreDeficitEffects(this.game);
 			}
-			if(!meta.special){
-				this.game.upgrade(
-					{pacts: ["payDebt"]}
-					);
+			if(!meta.special) { //Potential performance optimization where we batch this in with the previous call a few lines above here, so we only call game.upgrade once.
+				this.game.upgrade({
+					policies: ["feedingFrenzy"],
+					pacts: ["payDebt"]}
+				);
 			}
 			if(meta.name != "payDebt"){
 				this.game.religion.getZU("blackPyramid").jammed = false;
@@ -2343,7 +2344,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 		this.game.upgrade(
 			{
 				transcendenceUpgrades:["mausoleum"],
-				policies:["radicalXenophobia"],
+				policies:["radicalXenophobia", "feedingFrenzy"],
 				pacts:["fractured"]
 			}
 		);
@@ -2470,6 +2471,29 @@ dojo.declare("classes.religion.pactsManager", null, {
 		}
 		return 0;
 	},
+	/**
+	 * This function counts how many unique Pacts the player is running.
+	 * For the purposes of this function, special objects like "pay the debt" or "fractured" don't count.
+	 * We're talking about regular Pacts here.
+	 * @return A number.  Specifically a nonnegative integer, because that's the type of number you usually use when counting something.
+	 */
+	countUniqueActivePacts: function() {
+		if (!this.game.getFeatureFlag("MAUSOLEUM_PACTS")) {
+			return 0;
+		}
+		var counter = 0;
+		for (var i = 0; i < this.pacts.length; i++) {
+			var pact = this.pacts[i];
+			if (pact.name === "fractured" && pact.on) { //There can be game-states where Fractured is on but so are some other Pacts (such as in the middle of the tick when fracturing triggers, before the engine has finished updating things)
+				return 0;
+			}
+			if (pact.special) { continue; } //Skip counting this one
+			if (pact.on) {
+				counter++;
+			}
+		}
+		return counter;
+	}
 });
 dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.game.ui.tab, {
 

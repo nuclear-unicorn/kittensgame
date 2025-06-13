@@ -1643,6 +1643,15 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.goldPolicyRatio.title"),
 				type: "ratio"
 			},
+			//Necrocorn-related Policy effects
+			"feedEldersEfficiencyRatio": {
+				title: $I("effectsMgr.statics.feedEldersEfficiencyRatio.title"),
+				type: "ratio"
+			},
+			"feedEldersSpiceCost": {
+				title: $I("effectsMgr.statics.feedEldersSpiceCost.title"),
+				type: "fixed"
+			},
 			//challenges
 			"springCatnipRatio": {
 				title: $I("effectsMgr.statics.springCatnipRatio.title"),

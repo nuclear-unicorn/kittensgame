@@ -430,7 +430,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
         elders.unlocked = true;
         // 5 years + 1 year per energy unit
-        elders.duration = this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear *  (5  + elders.energy);
+        elders.duration = this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear *  (5  + Math.floor(elders.energy));
 
 		if(elders.autoPinned){elders.pinned = true;}
 
@@ -596,7 +596,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 
 		// at most 1 year + 1 season per energy unit
-		race.duration = Math.min(race.duration, this.game.calendar.daysPerSeason * (this.game.calendar.seasonsPerYear + race.energy));
+		race.duration = Math.min(race.duration, this.game.calendar.daysPerSeason * (this.game.calendar.seasonsPerYear + Math.floor(race.energy)));
 
 		if (bonusTradeAmount > 0) {
 			if (printMessages) {
@@ -860,9 +860,15 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		var ncorns = this.game.resPool.get("necrocorn");
 		var elders = this.game.diplomacy.get("leviathans");
 		var cleanRequest = Math.max(amtRequested, 1) || 1;
-		var amt = Math.floor(Math.min(cleanRequest, ncorns.value));
-		if (amt >= 1){
-			elders.energy += amt;
+		var amt = Math.min(cleanRequest, ncorns.value);
+		if (!this.game.science.getPolicy("feedingFrenzy").researched) {
+			//Feeding Frenzy policy allows feeding fractional necrocorns
+			//Therefore, without this policy, we can only feed integer necrocorns
+			amt = Math.floor(amt);
+		}
+		if (amt > 0){
+			var efficiency = 1 + this.game.getLimitedDR(this.game.getEffect("feedEldersEfficiencyRatio"), 0.5); //The efficiency increase is capped at 50% bonus
+			elders.energy += amt * efficiency;
 
 			var markerCap = this.game.diplomacy.getMarkerCap();
 
@@ -879,6 +885,11 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 			ncorns.value -= amt;
 			this.game.msg($I("trade.msg.elders.pleased"), "notice");
+			var spiceRequested = amt * this.game.getEffect("feedEldersSpiceCost");
+			if (spiceRequested > 0) {
+				//Consume spice if we need to, but there's no penalty if we run out of spice.
+				this.game.resPool.addResEvent("spice", -spiceRequested);
+			}
 		} else {
 			ncorns.value = 0;
 			this.game.msg($I("trade.msg.elders.displeased"), "notice");
@@ -1764,6 +1775,10 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 			if (leviathans.energy) {
 				var markerCap = this.game.diplomacy.getMarkerCap();
 				var leviathansInfoEnergy = leviathans.energy ? leviathans.energy + " / " + markerCap : "N/A";
+				if (leviathans.energy > 0 && this.game.science.getPolicy("feedingFrenzy").researched) {
+					//Display energy to 1 decimal place (any more than that is excessive)
+					leviathansInfoEnergy = leviathans.energy.toFixed(1) + " / " + markerCap.toFixed(1);
+				}
 				this.leviathansInfo.innerHTML += $I("trade.leviathans.energy") + leviathansInfoEnergy + "<br />";
 			}
 			//Time to leave:
