@@ -2095,8 +2095,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 				return;
 			}
 		},
-		evaluateLocks: function(game) { //TODO: test to ensure this unlock condition works as I intended
-			return game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val && game.resPool.get("necrocorn").unlocked;
+		evaluateLocks: function(game) {
+			return game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val && game.religion.getZU("marker").val;
 		},
 		unlocked: false,
 		blocked: false,
@@ -2120,8 +2120,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			}
 			self.effects["feedEldersEfficiencyRatio"] = 0.1 * game.religion.pactsManager.countUniqueActivePacts();
 		},
-		evaluateLocks: function(game) { //TODO: test to ensure this unlock condition works as I intended
-			return game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val && game.resPool.get("necrocorn").unlocked;
+		evaluateLocks: function(game) {
+			return game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val && game.religion.getZU("marker").val;
 		},
 		unlocked: false,
 		blocked: false,
@@ -2145,12 +2145,12 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 				return;
 			}
 		},
-		evaluateLocks: function(game) { //TODO: test to ensure this unlock condition works as I intended
-			return game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val && game.resPool.get("necrocorn").unlocked;
+		evaluateLocks: function(game) {
+			return game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val && game.religion.getZU("marker").val;
 		},
 		unlocked: false,
 		blocked: false,
-		blocks:["siphoning", "upfrontPayment"]
+		blocks:["siphoning", "feedingFrenzy"]
 	}
 ],
 

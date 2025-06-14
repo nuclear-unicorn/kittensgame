@@ -747,6 +747,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			self.effects["corruptionRatio"] = 0.000001 * (1 + game.getEffect("corruptionBoostRatioChallenge")); //LDR specified in challenges.js
 		},
 		unlocked: false,
+		unlocks: {
+			policies: ["siphoning", "feedingFrenzy", "upfrontPayment"]
+		},
 		getEffectiveValue: function(game) {
 			return this.val * (1 + game.getEffect("corruptionBoostRatioChallenge")); //LDR specified in challenges.js
 		},
