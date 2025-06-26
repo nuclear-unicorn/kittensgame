@@ -630,7 +630,7 @@ dojo.declare("classes.ui.AchievementsPanel", com.nuclearunicorn.game.ui.Panel, {
 		var desiredStarText = this.generateStarText(completedStars, uncompletedStars);
 		//The inner HTML has taken the &#; format & rendered it as Unicode; we must do something similar.
 		var starTextForCompare = String.fromCharCode.apply(null, desiredStarText.replaceAll("&#", "").split(";").slice(0, -1));
-		if(this.achievementsHeader.firstElementChild.innerHTML != starTextForCompare) {
+		if (this.achievementsHeader.firstElementChild.innerHTML != starTextForCompare) {
 			this.achievementsHeader.firstElementChild.innerHTML = desiredStarText;
 		}
 	},
