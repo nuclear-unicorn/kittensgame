@@ -1776,7 +1776,7 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
 			}
 		}
 
-		if(numFixed){
+		if (numFixed){
 			var undo = this.game.registerUndoChange();
 			undo.addEvent(this.game.time.id, {
 				action: "fixCryochamber",

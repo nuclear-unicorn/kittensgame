@@ -1566,15 +1566,15 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
 
 				//Un-incur necrocorn debt:
-				if(!model.metadata.notAddDeficit){
+				if (!model.metadata.notAddDeficit){
 					console.log("removing 0.5 necrocornDeficit");
 					this.pactsManager.necrocornDeficit = Math.max(this.pactsManager.necrocornDeficit - 0.5 * data.val, 0);
 				}
 				//Update effects:
-				if(model.metadata.updatePreDeficitEffects){
+				if (model.metadata.updatePreDeficitEffects){
 					model.metadata.updatePreDeficitEffects(this.game);
 				}
-				if(!model.metadata.special){
+				if (!model.metadata.special){
 					this.game.upgrade(
 						{pacts: ["payDebt"]}
 						);
@@ -2206,7 +2206,7 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 			}
         }
 
-		if(counter && meta.name != "payDebt") { //The player cannot un-pay their debts (I'm lazy & don't feel like making the code work properly for that one)
+		if (counter && meta.name != "payDebt") { //The player cannot un-pay their debts (I'm lazy & don't feel like making the code work properly for that one)
 			var undo = this.game.registerUndoChange();
 			undo.addEvent(this.game.religion.id, {
 				action: "buyPact",
