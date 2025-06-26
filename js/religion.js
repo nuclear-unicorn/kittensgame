@@ -1361,6 +1361,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 
 	resetFaith: function(bonusRatio, withConfirmation) {
+		var worshipBefore = this.faith;
+		var epiphanyBefore = this.faithRatio;
 		if (withConfirmation && !this.game.opts.noConfirm) {
 			var self = this;
 			this.game.ui.confirm("", $I("religion.adore.confirmation.msg"), function() {
@@ -1369,6 +1371,16 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		} else {
 			this._resetFaithInternal(bonusRatio);
 		}
+		var worshipAfter = this.faith;
+		var epiphanyAfter = this.faithRatio;
+
+		//Here we go, trying to make more game actions reversible
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.id, {
+			action: "adore",
+			worshipBefore: worshipBefore,
+			epiphanyGained: epiphanyAfter - epiphanyBefore
+		}, $I("ui.undo.religion.adore"));
 	},
 
 	_resetFaithInternal: function(bonusRatio) {
@@ -1485,6 +1497,15 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				//This would happen, for example, if the player had adored the galaxy immediately after praising.
 				this.game.msg($I("religion.undo.praise.failure"), "alert", "undo", true /*noBullet*/);
 			}
+		} else if (data.action === "adore") {
+			if (this.faithRatio >= data.epiphanyGained) {
+				this.faithRatio -= data.epiphanyGained;
+				this.faith = data.worshipBefore;
+				this.game.msg($I("religion.undo.adore.regained", [this.game.getDisplayValueExt(data.worshipBefore)]), null, "undo", true /*noBullet*/);
+			} else {
+				//This would happen, for example, if the player had transcended immediately after adoring the galaxy.
+				this.game.msg($I("religion.undo.adore.failure"), "alert", "undo", true /*noBullet*/);
+			}
 		} else if (data.action === "buildZU") {
 			//This process requires 2 things: the controller & the model.
 			var bld = this.getZU(data.metaId);
@@ -1528,7 +1549,40 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				props.controller.payPriceForUndoRefund(model);
 			}
 			this.game.render();
+		} else if (data.action === "buyPact") {
+			if (this.getPact("fractured").on) { //should fail if fractured
+				this.game.msg($I("religion.undo.buy.pact.fractured"), "alert", "undo", true /*noBullet*/);
+			} else {
+				var pact = this.getPact(data.metaId);
+				var props = {
+					id:            pact.name,
+					name:           pact.label,
+					description:    pact.description,
+					building:       pact.name
+				};
+				props.controller = new com.nuclearunicorn.game.ui.PactsBtnController(this.game);
+				var model = props.controller.fetchModel(props);
+				model.refundPercentage = 1.0;	//full refund for undo
+				props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
+
+				//Un-incur necrocorn debt:
+				if(!model.metadata.notAddDeficit){
+					console.log("removing 0.5 necrocornDeficit");
+					this.pactsManager.necrocornDeficit = Math.max(this.pactsManager.necrocornDeficit - 0.5 * data.val, 0);
+				}
+				//Update effects:
+				if(model.metadata.updatePreDeficitEffects){
+					model.metadata.updatePreDeficitEffects(this.game);
+				}
+				if(!model.metadata.special){
+					this.game.upgrade(
+						{pacts: ["payDebt"]}
+						);
+				}
+				this.getZU("blackPyramid").jammed = false;
+			}
 		}
+		this.game.render();
 	}
 });
 
@@ -1956,14 +2010,31 @@ dojo.declare("classes.ui.religion.RefineTearsBtnController", com.nuclearunicorn.
 			};
 		}
 		if (!event) { event = {}; /*event is an optional parameter*/ }
+		var amtRefined = 0;
+		var sorrowObj = this.game.resPool.get("sorrow");
 		for (var batchSize = count || (event.ctrlKey ? this.game.opts.batchSize : 1);
 			 batchSize > 0
 			 && this.hasResources(model)
-			 && this.game.resPool.get("sorrow").value < this.game.resPool.get("sorrow").maxValue;
+			 && sorrowObj.value < sorrowObj.maxValue;
 			 batchSize--) {
 			this.payPrice(model);
 			this.refine();
+			amtRefined++;
 		}
+		var priceCount = model.prices[0].val * amtRefined;
+		var priceName = model.prices[0].name;
+		var descriptiveStrings = [this.game.getDisplayValueExt(priceCount),
+			this.game.resPool.get(priceName).title,
+			this.game.getDisplayValueExt(amtRefined),
+			sorrowObj.title];
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.game.religion.id, {
+			action: "refine",
+			resFrom: priceName,
+			resTo:  sorrowObj.name,
+			valFrom: priceCount,
+			valTo: amtRefined
+		}, $I("ui.undo.religion.refine", descriptiveStrings));
 		return {
 			itemBought: true,
 			reason: "paid-for"
@@ -2135,6 +2206,14 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 			}
         }
 
+		if(counter && meta.name != "payDebt") { //The player cannot un-pay their debts (I'm lazy & don't feel like making the code work properly for that one)
+			var undo = this.game.registerUndoChange();
+			undo.addEvent(this.game.religion.id, {
+				action: "buyPact",
+				metaId: model.metadata.name,
+				val: counter
+			}, $I("ui.undo.religion.pact", [counter, model.metadata.label]));
+		}
 		return counter;
     },
 
