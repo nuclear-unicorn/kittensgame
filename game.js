@@ -322,7 +322,7 @@ dojo.declare("classes.game.Server", null, {
 		{
 			//pre-parsing guid to avoid checking it on the backend side
 			guid: this.game.telemetry.guid,
-			saveData: this.game.compressLZData(JSON.stringify(saveData), true),
+			saveData: this.game.compressLZData(JSON.stringify(saveData, this.game.JSONreplacer), true),
 			metadata: {
 				calendar: {
 					year: game.calendar.year,
@@ -1985,6 +1985,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.resPool.setVillage(this.village);
 
         var managers = [
+		{ id: "challenges",     class:  "ChallengesManager" }, //challenges must be *before* space for a certain policy to work.
             { id: "workshop",       class:  "WorkshopManager"   },
             { id: "diplomacy",      class:  "DiplomacyManager"  },
             { id: "bld",            class:  "BuildingsManager"  },
@@ -1994,7 +1995,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
             { id: "space",          class:  "SpaceManager"      },
 			{ id: "time",           class:  "TimeManager"       },
             { id: "prestige",       class:  "PrestigeManager"   },
-            { id: "challenges",     class:  "ChallengesManager" },
             { id: "stats",       	class:  "StatsManager"      },
 			{ id: "void",       	class:  "VoidManager"      },
 			{ id: "settings",		class: "SettingsManager" }
@@ -2302,6 +2302,17 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		window.location.reload();
 	},
 
+
+
+	/**
+	 * Do not serialize properties with undefined values even if they exist on the metadata
+	 */
+	JSONreplacer: function(key, value) {
+		return (value == undefined)
+			? undefined
+			: value;
+	},
+
 	save: function(){
 		this.ticksBeforeSave = this.autosaveFrequency;
 
@@ -2358,7 +2369,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	_saveDataToString: function(saveData) {
-		var saveDataString = JSON.stringify(saveData);
+		var saveDataString = JSON.stringify(saveData, this.JSONreplacer);
 		//5mb limit workaround
 		if (saveDataString.length > 5000000 || this.opts.forceLZ) {
 			console.log("compressing the save file...");
@@ -4583,63 +4594,59 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 
 	tick: function(){
-		/**
-		 * Even if the game is paused, scheduler should still be able to obtain a focus to handle cases like save/load/reset
-		 */
+		// Even if the game is paused, scheduler should still be able to obtain a focus
+		// to handle cases like save/load/reset
 		this.timer.updateScheduledEvents();
-        var fpsElement;
 
-		if (this.undoChange){
-			//"Undo button" countdown should still tick while pawsed
+		if (this.undoChange) {
+			// "Undo button" countdown should still tick while pawsed
 			this.undoChange.ttl--;
-			if (this.undoChange.ttl <= 0){
+			if (this.undoChange.ttl <= 0) {
 				this.undoChange = null;
 				this._publish("server/undoStateChanged");
 			}
 		}
-		if (this.isPaused){
-			this.ui.update(); //Still update UI if the player gathers catnip while pawsed or something
+		if (this.isPaused) {
+			// Still update UI if the player gathers catnip while pawsed or something
+			this.ui.update();
 			return;
 		}
 
-
-
-		var timestampStart = new Date().getTime();
+		var timestampStart = Date.now();
 
 		this.update();
 		this.calendar.tick();
 		this.ticks++;
 
-		var timestampEnd = new Date().getTime();
-		//if (this.isLocalhost) {	//always collect fps metrics
-			this.totalUpdateTimeTicks++;
+		var timestampEnd = Date.now();
 
-			var tsDiff = timestampEnd - timestampStart;
-			this.totalUpdateTime[this.totalUpdateTimeCurrent] += tsDiff;
-			this.totalUpdateTimeCurrent = this.totalUpdateTimeCurrent == 4 ? 0 : this.totalUpdateTimeCurrent + 1;
+		this.totalUpdateTimeTicks++;
 
-			var avg = (this.totalUpdateTime[0] + this.totalUpdateTime[1] + this.totalUpdateTime[2] + this.totalUpdateTime[3] + this.totalUpdateTime[4]) / this.totalUpdateTimeTicks;
-			var avg0 = this.totalUpdateTime[0] / Math.floor((this.totalUpdateTimeTicks - 1) / 5);
-			var avg1 = this.totalUpdateTime[1] / Math.floor((this.totalUpdateTimeTicks - 2) / 5);
-			var avg2 = this.totalUpdateTime[2] / Math.floor((this.totalUpdateTimeTicks - 3) / 5);
-			var avg3 = this.totalUpdateTime[3] / Math.floor((this.totalUpdateTimeTicks - 4) / 5);
-			var avg4 = this.totalUpdateTime[4] / Math.floor((this.totalUpdateTimeTicks - 5) / 5);
+		var tsDiff = timestampEnd - timestampStart;
+		this.totalUpdateTime[this.totalUpdateTimeCurrent] += tsDiff;
+		this.totalUpdateTimeCurrent = this.totalUpdateTimeCurrent == 4 ? 0 : this.totalUpdateTimeCurrent + 1;
 
-			if (tsDiff < 10) {
-				tsDiff = 10;
-			}
-			this.fps = {
-				ms: tsDiff,
-				avg: avg,
-				avg0: avg0,
-				avg1: avg1,
-				avg2: avg2,
-				avg3: avg3,
-				avg4: avg4
-			};
-		//}
+		var avg = (this.totalUpdateTime[0] + this.totalUpdateTime[1] + this.totalUpdateTime[2] + this.totalUpdateTime[3] + this.totalUpdateTime[4]) / this.totalUpdateTimeTicks;
+		var avg0 = this.totalUpdateTime[0] / Math.floor((this.totalUpdateTimeTicks - 1) / 5);
+		var avg1 = this.totalUpdateTime[1] / Math.floor((this.totalUpdateTimeTicks - 2) / 5);
+		var avg2 = this.totalUpdateTime[2] / Math.floor((this.totalUpdateTimeTicks - 3) / 5);
+		var avg3 = this.totalUpdateTime[3] / Math.floor((this.totalUpdateTimeTicks - 4) / 5);
+		var avg4 = this.totalUpdateTime[4] / Math.floor((this.totalUpdateTimeTicks - 5) / 5);
 
-		//collect fps info every minute or so
+		if (tsDiff < 10) {
+			tsDiff = 10;
+		}
+		this.fps = {
+			ms: tsDiff,
+			avg: avg,
+			avg0: avg0,
+			avg1: avg1,
+			avg2: avg2,
+			avg3: avg3,
+			avg4: avg4
+		};
+
+		// Collect fps info every minute or so
 		if (this.ticks % (this.ticksPerSecond * 60) == 0 && this.telemetry) {
 			var memory = null;
 			if (window.performance && window.performance.memory) {

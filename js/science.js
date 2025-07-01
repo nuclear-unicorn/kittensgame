@@ -1120,7 +1120,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		blocks:["necrocracy", "radicalXenophobia"],
 		upgrades: {
 			buildings:["library"],
-			spaceBuilding: ["moonOutpost"]
+			spaceBuilding: ["moonBase"]
 		},
 	},
 	{
@@ -1451,26 +1451,22 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		}
 	}, {
 		name: "sharkRelationsMerchants",
-        label: $I("policy.sharkRelationsMerchants.label"),
-        description: $I("policy.sharkRelationsMerchants.desc"),
-        prices: [
-            {name : "culture", val: 2200}
-        ],
-        effects:{
-            "tradeRatio" : 0
-        },
-        unlocked: false,
-        blocked: false,
-		isRelation: true,
-        blocks:["sharkRelationsScribes", "sharkRelationsBotanists"],
-		calculateEffects: function(self, game) {
-			var trades = game.stats.getStatCurrent("totalTrades").val;
-			self.effects["tradeRatio"] = Math.min(Math.round((Math.log10(Math.max(trades, 100)) - 1) * 3) / 100, 0.3);			
+		label: $I("policy.sharkRelationsMerchants.label"),
+		description: $I("policy.sharkRelationsMerchants.desc"),
+		prices: [
+			{name : "culture", val: 2200}
+		],
+		effects: {
+			"tradeRatio" : 0
 		},
-		evaluateLocks: function(game){
+		unlocked: false,
+		blocked: false,
+		isRelation: true,
+		blocks: ["sharkRelationsScribes", "sharkRelationsBotanists"],
+		evaluateLocks: function(game) {
 			return game.science.checkRelation("sharks", 20);
 		}
-	},{
+	}, {
 		name: "sharkRelationsBotanists",
         label: $I("policy.sharkRelationsBotanists.label"),
         description: $I("policy.sharkRelationsBotanists.desc"),

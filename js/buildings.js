@@ -2606,7 +2606,18 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	},
 
 	save: function(saveData){
-		saveData.buildings = this.filterMetadata(this.buildingsData, ["name", "unlocked", "val", "on", "stage", "jammed", "isAutomationEnabled"]);
+		saveData.buildings = this.filterMetadata(this.buildingsData, ["name", "unlocked", "val", "on", "stage", "jammed", "isAutomationEnabled"], 
+			function (key, value){
+				//discard empty props
+				if (key == "val" || key == "on") {
+					return value === 0 ? undefined : value;
+				}
+				if (key == "unlocked" || key == "jammed" /*isAutomationEnabled is true by default*/){
+					return value === false ? undefined: value;
+				}
+				return value;
+			}
+		);
 		if (!saveData.bldData){
 			saveData.bldData = {};
 		}
@@ -2982,6 +2993,7 @@ dojo.declare("classes.game.ui.RefineCatnipButtonController", com.nuclearunicorn.
 
 		if (catnipVal < 100 * catnipCost) {
 			this.game.msg($I("craft.msg.notEnoughCatnip"));
+			return;
 		}
 
 		this.game.resPool.addResEvent("catnip", -100 * catnipCost);

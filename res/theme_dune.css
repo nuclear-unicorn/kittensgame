@@ -332,13 +332,6 @@ body.scheme_dune {
 	bottom: 3px; /* default bottom: 10px; */
 	color: transparent;
 }
-.scheme_dune #crowdjet-expand-container {
-	color: #16bcb8;
-	font-family: 'Signika Negative', sans-serif;
-}
-.scheme_dune #crowdjet-expand-container:hover {
-	color: #fca9fe;
-}
 /* *********************************************** */
 /* ******************* TOOLTIP ******************* */
 /* *********************************************** */

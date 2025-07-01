@@ -372,15 +372,6 @@ body.scheme_factory {
 	transition: all 0.2s ease-out;
 	-webkit-transition: all 0.2s ease-out;
 }
-.scheme_factory #crowdjet-expand-container {
-	color: #8e8e8e;
-	font-family: 'Libre Franklin', sans-serif;
-	transition: all 0.2s ease-out;
-	-webkit-transition: all 0.2s ease-out;
-}
-.scheme_factory #crowdjet-expand-container:hover {
-	color: #e39827;
-}
 
 /* *********************************************** */
 /* ******************* TOOLTIP ******************* */

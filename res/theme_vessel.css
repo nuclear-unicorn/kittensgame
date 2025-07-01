@@ -22,8 +22,7 @@ body.scheme_vessel {
 .scheme_vessel .btn,
 .scheme_vessel .modern,
 .scheme_vessel .btn.modern,
-.scheme_vessel input[type='button'],
-.scheme_vessel #crowdjet-expand-container {
+.scheme_vessel input[type='button'] {
 	 font-family: 'Play', sans-serif;
 }
 .scheme_vessel .btn.disabled,
@@ -321,12 +320,6 @@ body.scheme_vessel {
 	bottom: 6px; /* default bottom: 10px; */
 	/* default right: 5px; */
 	color: rgba(90, 90, 90, 0.5); /* color #5A5A5A *//* a link separator : | on footer links */
-}
-.scheme_vessel #crowdjet-expand-container {
-	color: #dddddd;
-}
-.scheme_vessel #crowdjet-expand-container:hover {
-	color: #a0a0a0;
 }
 
 /* *********************************************** */

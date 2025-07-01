@@ -50,9 +50,10 @@ WToolbarHappiness = React.createClass({
         this.game = this.props.game;    //hack
 
         var base = this.game.getEffect("happiness");
-		//var population = this.game.village.getKittens() *  2;
-		var tooltip = $I("village.happiness.base") + ": 100%<br>" +
-			   $I("village.happiness.buildings") + ": +" + (Math.floor(base)) + "%<br>";
+		var challengeHappiness = this.game.getEffect("challengeHappiness");
+		// "base" is usually 100%, but it gets reduced in certain Challenges
+		var tooltip = $I("village.happiness.base") + ": " + this.game.getDisplayValueExt(100 + challengeHappiness, false, false, 0) + "%<br>";
+		tooltip += $I("village.happiness.buildings") + ": +" + (Math.floor(base)) + "%<br>";
 
 		//----------------------
 		var resHappiness = 0;
