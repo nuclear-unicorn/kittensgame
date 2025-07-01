@@ -408,7 +408,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//calculate amount of void earned on average per day, then multiply by days and percentage of time in paradox
 			var daysInParadox = 10 + this.game.getEffect("temporalParadoxDay");
 			var daysBetweenParadox = daysInParadox + 100 * Math.max( 1 , 1 / temporalParadoxChance );
-			percentTimeInParadox = Math.floor(daysOffset * (daysInParadox / daysBetweenParadox)) / daysOffset;
+			percentTimeInParadox = Math.floor(days * (daysInParadox / daysBetweenParadox)) / days;
 		}
 		//------------------------- necrocorns pacts -------------------------
 		//deficit changing
