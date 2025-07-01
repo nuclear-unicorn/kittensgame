@@ -785,6 +785,7 @@
     "opts.enableKS.desc": "This is absolutely unsupported, you have never seen me or this setting",
 
     "msg.necrocornDeficit.info": "Necrocorn deficit: {0}. Due to the deficit your pacts have {1}% effectivness. Deficit is consuming additional {2}% of necrocorns per day and is diminishing {3} per day (if you have enough necrocorns).",
+    "msg.necrocornDeficit.upfrontPayment.penalty": "The deficit also reduces the effectiveness of karma points.",
     "msg.pacts.info": "Karma kittens per millenia are based on available pacts. Pacts do not persist. Available pacts: {0}. Every pact devours {1} necrocorns per day.",
     "msg.pacts.fractured": "You didn't fulfill your part of the deal... You lost {0} alicorns!",
     "opts.swipeNavigation": "Swipe navigation",
@@ -927,6 +928,8 @@
     "policy.tradition.desc" : "Good for culture-oriented societies. Reduces manuscript price and increases their effect. This will affect what policies are available in the future!",
     "policy.transkittenism.label" : "Transkittenism",
     "policy.transkittenism.desc" : "Give up kittenhood and merge with the AI. AI cores will be twice as effective, and there is no downside to AI level.",
+    "policy.upfrontPayment.label": "Upfront Payment",
+    "policy.upfrontPayment.desc": "Making Pacts will now cost additional necrocorns, but upkeep costs are reduced by 10%. However, debt is more punishing.",
     "policy.zebraRelationsAppeasement.label" : "Zebra Relations: Appeasement",
     "policy.zebraRelationsAppeasement.desc" : "Try to befriend the zebras, even though they hate you. The terms of trade will be less harsh, but gold income will be slightly lower.",
     "policy.zebraRelationsBellicosity.label" : "Zebra Relations: Bellicosity",

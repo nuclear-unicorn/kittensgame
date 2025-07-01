@@ -2135,9 +2135,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name : "necrocorn", val: 1}
 		],
 		effects: {
-			"pactNecrocornConsumption": 5e-5, //This should decrease Pact upkeep (by 10%).  Subject to balancing
-			"pactUpfrontCost": 2, //TODO: remove immediate debt accumulation from buying a Pact.  Instead, Pacts cost 2 full necrocorns at the time you buy them
-			"debtPunishmentHarshness": 1 //TODO: make debt more punishing if there is any debt.
+			"pactNecrocornConsumption": 5e-5 //This should be a 10% reduction to Pact upkeep
+			//(See village.js for how we make debt more punishing.)
+			//(See religion.js for how we make Pacts cost necrocorns upfront.)
 		},
 		calculateEffects: function(self, game) {
 			if(!game.getFeatureFlag("MAUSOLEUM_PACTS")) {

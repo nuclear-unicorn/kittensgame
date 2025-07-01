@@ -2061,6 +2061,15 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 			model.enabled = false;
 		}
 	},
+
+	getPrices: function(model) {
+		var retVal = this.inherited(arguments);
+		if (this.game.science.getPolicy("upfrontPayment").researched) {
+			retVal.push({ name: "necrocorn", val: 2 });
+		}
+		return retVal;
+	},
+
 	shouldBeBough: function(model, game){
 		return game.getEffect("pactsAvailable") + model.metadata.effects["pactsAvailable"]>=0;
 	},
@@ -2100,7 +2109,8 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 	            maxBld--;
 	        }
 
-			if(!meta.notAddDeficit){
+			if(!meta.notAddDeficit && !this.game.science.getPolicy("upfrontPayment").researched){
+				//(Upfront Payment policy removes immediate debt accumulation when you buy a Pact)
 				this.game.religion.pactsManager.necrocornDeficit += 0.5 * counter;
 			}
 	        if (counter > 1) {

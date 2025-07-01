@@ -1754,6 +1754,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio"
 			},
 			//pacts
+			"pactNecrocornConsumption": {
+				title: $I("effectsMgr.statics.necrocornPerDay.pact.title"),
+				type: "perDay"
+			},
             "pactsAvailable":{
 				title: $I("effectsMgr.statics.pactsAvailable.title"),
 				type: "fixed"
