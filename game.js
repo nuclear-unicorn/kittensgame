@@ -2170,6 +2170,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			this.updateCaches();
 		}), 5);		//once per 5 ticks
 
+		this.timer.addEvent(dojo.hitch(this, function() {
+			var policy = this.science.getPolicy("upfrontPayment");
+			policy.calculateEffects(policy, this); //Update description of policy
+		}), 25);		//every 5 seconds
+
 		var ONE_MIN = this.ticksPerSecond * 60;
 		this.timer.addEvent(dojo.hitch(this, function(){ this.achievements.update(); }), 50);	//once per 50 ticks, we hardly need this
 		this.timer.addEvent(dojo.hitch(this, function(){ this.server.refresh(); }), ONE_MIN * 10);	//reload MOTD and server info every 10 minutes

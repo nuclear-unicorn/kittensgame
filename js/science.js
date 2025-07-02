@@ -2144,10 +2144,11 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 				self.unlocked = false;
 				return;
 			}
-			//Add a warning to the description if the player is in debt.
-			//TODO: put the text in a warning color!
-			this.description = $I("policy.upfrontPayment.desc") +
-				(!self.researched && game.religion.pactsManager.necrocornDeficit ? "<br>" + $I("policy.upfrontPayment.warning") : "");
+			this.description = $I("policy.upfrontPayment.desc");
+			//Add a warning to the description iff the player is in debt.
+			if (!self.researched && game.religion.pactsManager.necrocornDeficit) {
+				this.description += "<br><span class=\"genericWarning\">" + $I("policy.upfrontPayment.warning") + "</span>";
+			}
 		},
 		evaluateLocks: function(game) {
 			return game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val && game.religion.getZU("marker").val;
