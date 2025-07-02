@@ -801,7 +801,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["relicStation"]
 		},
 		calculateEffects: function(self, game){
-			if(self.researched){
+			if (self.researched){
 				game.time.queue.unlockQueueSource("transcendenceUpgrades");
 			}
 		}
@@ -822,7 +822,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			challenges: ["atheism"]
 		},
         calculateEffects: function(self, game){
-			if(self.researched){
+			if (self.researched){
 				game.time.queue.unlockQueueSource("voidSpace");
 			}
         },
@@ -923,13 +923,13 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		calculateEffects: function(self, game){
 			var uncappedHousing = 0;
 			for (var i = 0; i < game.bld.buildingGroups.length; i++){
-				if(game.bld.buildingGroups[i].name == "population"){
+				if (game.bld.buildingGroups[i].name == "population"){
 					for (var k = 0; k < game.bld.buildingGroups[i].buildings.length; k++){
 						var building = game.bld.getBuildingExt(game.bld.buildingGroups[i].buildings[k]);
-						if(!game.resPool.isStorageLimited(game.bld.getPrices(building.meta.name))){
+						if (!game.resPool.isStorageLimited(game.bld.getPrices(building.meta.name))){
 							uncappedHousing += 1;
 							building.meta.almostLimited = self.researched && game.resPool.isStorageLimited(game.bld.getPrices(building.meta.name, 1));
-						}else{
+						} else {
 							building.meta.almostLimited = false;
 						}
 					}
@@ -1154,7 +1154,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		},
 		calculateEffects: function (self, game){
 			self.effects["pactsAvailable"] = 5;
-			if(game.religion.getPact("fractured").on >= 1 || !game.getFeatureFlag("MAUSOLEUM_PACTS")){
+			if (game.religion.getPact("fractured").on >= 1 || !game.getFeatureFlag("MAUSOLEUM_PACTS")){
 				self.effects["pactsAvailable"] = 0;
 			}
 			game.updateCaches();
@@ -1437,8 +1437,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 				}
 				for (i = 0; i < sharks.buys.length; i++) {
 					var buy = sharks.buys[i]["name"];
-					if(buy == "iron") {
-						if(self.researched){
+					if (buy == "iron") {
+						if (self.researched){
 							sharks.buys[i].val = 100 * (1 + self.effects["ironBuyRatioIncrease"]);
 						} else {
 							sharks.buys[i].val = 100;
@@ -1672,11 +1672,11 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			for (var i = 0; i < spiders.sells.length; i++) {
 				var sell = spiders.sells[i]["name"];
 				sells.push(sell);
-				if(sell == "kerosene"){
+				if (sell == "kerosene"){
 					spiders.sells.splice(i); //Remove kerosene on load
 				}
 			}
-			if(spiderRelations) {
+			if (spiderRelations) {
 				spiders.sells.push({name: "kerosene", value: 5, chance: 0.1, width: 0.1, minLevel: 10});
 			}
 		}
@@ -2090,7 +2090,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			"repayDebtOnNecrocornGeneration": 1 //TODO: have generated necrocorns be spent to pay back debt if debt > 1
 		},
 		calculateEffects: function(self, game) {
-			if(!game.getFeatureFlag("MAUSOLEUM_PACTS")) {
+			if (!game.getFeatureFlag("MAUSOLEUM_PACTS")) {
 				self.unlocked = false;
 				return;
 			}
@@ -2114,7 +2114,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			"feedEldersSpiceCost": 100 //Costs this much spice for each necrocorn fed
 		},
 		calculateEffects: function(self, game) { //The intent is to call this whenever we gain or lose a Pact.
-			if(!game.getFeatureFlag("MAUSOLEUM_PACTS")) {
+			if (!game.getFeatureFlag("MAUSOLEUM_PACTS")) {
 				self.unlocked = false;
 				return;
 			}
@@ -2140,7 +2140,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			//(See village.js for how we make debt more punishing.)
 		},
 		calculateEffects: function(self, game) {
-			if(!game.getFeatureFlag("MAUSOLEUM_PACTS")) {
+			if (!game.getFeatureFlag("MAUSOLEUM_PACTS")) {
 				self.unlocked = false;
 				return;
 			}
@@ -2254,8 +2254,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		prices_result = this.game.village.getEffectLeader("scientist", prices_result);
 
 		// this is to force Gold Ore pathway in BSK+IW and avoid soft locks
-		if(this.game.ironWill && this.game.challenges.isActive('blackSky')) {
-			if(tech.name == 'construction') {
+		if (this.game.ironWill && this.game.challenges.isActive('blackSky')) {
+			if (tech.name == 'construction') {
 				prices_result = prices_result.concat([{name: "gold", val: 5}]);
 			}
 		}
@@ -2267,7 +2267,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 				//If the tech costs compendia, add unicorn tears to the price.
 				//If the tech costs blueprints, add alicorns to the price.
 				for (var i = 0; i < prices.length; i += 1) {
-					switch(prices[i].name) {
+					switch (prices[i].name) {
 					case "manuscript":
 						prices_result = prices_result.concat([{name: "unicorns", val: prices[i].val * priceScaling}]);
 						break;
@@ -2467,12 +2467,12 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 	//	reason:		String.  If we can't buy it, why not?  If we can buy it, returns
 	//				"paid-for" regardless of whether we can actually afford it or not.
 	shouldBeBought: function(model, game){ //fail checks:
-		if(this.game.village.leader && model.metadata.requiredLeaderJob && this.game.village.leader.job != model.metadata.requiredLeaderJob){
+		if (this.game.village.leader && model.metadata.requiredLeaderJob && this.game.village.leader.job != model.metadata.requiredLeaderJob){
 			var jobTitle = this.game.village.getJob(model.metadata.requiredLeaderJob).title;
 			this.game.msg($I("msg.policy.wrongLeaderJobForResearch", [model.metadata.label, jobTitle]), "important");
 			return { reason: "blocked" };
 
-		} else if(model.metadata.name == "transkittenism" && this.game.bld.getBuildingExt("aiCore").meta.effects["aiLevel"] >= 15){
+		} else if (model.metadata.name == "transkittenism" && this.game.bld.getBuildingExt("aiCore").meta.effects["aiLevel"] >= 15){
 			this.game.msg($I("msg.policy.aiNotMerges"),"alert", "ai");
 			return { reason: "blocked" };
 
@@ -2484,14 +2484,14 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 			this.game.msg($I("msg.policy.cannotPayUpfront", [requiredPayment, this.game.resPool.get("necrocorn").title]), "important");
 			return { reason: "blocked" };
 
-		} else if(model.metadata.blocked != true) {
-             for(var i = 0; i < model.metadata.blocks.length; i++){
-                if(this.game.science.getPolicy(model.metadata.blocks[i]).researched){
+		} else if (model.metadata.blocked != true) {
+             for (var i = 0; i < model.metadata.blocks.length; i++){
+                if (this.game.science.getPolicy(model.metadata.blocks[i]).researched){
                     model.metadata.blocked = true;
 					return { reason: "blocked" };
                 }
 			}
-			if(game.opts.noConfirm){
+			if (game.opts.noConfirm){
 				return { reason: "paid-for" };
 			}
 			return { reason: "require-confirmation" };
@@ -2529,7 +2529,7 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 				reason: 'require-confirmation',
 				def: def
 			};
-		} else if(extendedInfo.reason !== "paid-for"){
+		} else if (extendedInfo.reason !== "paid-for"){
 			return {
 				itemBought: false,
 				reason: extendedInfo.reason
@@ -2562,7 +2562,7 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 					policy.blocked = true;
 				}
 			}
-			if(meta.onResearch){
+			if (meta.onResearch){
 				meta.onResearch(this.game);
 			}
 		}
@@ -2768,7 +2768,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Library", com.nuclearunicorn.game.u
 			this.metaphysicsPanel.game = this.game;
 			this.metaphysicsPanel.render(tabContainer);
 		}
-		if(this.game.detailedPollutionInfo){
+		if (this.game.detailedPollutionInfo){
 			this.detailedPollutionInfo = dojo.create("span", { style: { display: "inline-block", marginBottom: "20px"}}, tabContainer);
 		}
 		this.update();
@@ -2784,8 +2784,8 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Library", com.nuclearunicorn.game.u
 			this.policyPanel.update();
 		}
 		//detailedPollutionInfo is temporary tag. Don't replace lines belov with i18n lines!
-		if(this.game.detailedPollutionInfo){
-			if(this.detailedPollutionInfo){
+		if (this.game.detailedPollutionInfo){
+			if (this.detailedPollutionInfo){
 
 				this.detailedPollutionInfo.innerHTML = this.game.bld.getDetailedPollutionInfo(); 
 			}

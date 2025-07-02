@@ -768,7 +768,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		maxValue = Math.min(this.addResMaxRatios(res, maxValue), Number.MAX_VALUE);
 		
 		var challengeEffect = this.game.getEffect(res.name + "MaxChallenge");
-		if(challengeEffect){
+		if (challengeEffect){
 			// Negative effect, no need to cap again to Number.MAX_VALUE
 			challengeEffect = this.game.getLimitedDR(this.addResMaxRatios(res, challengeEffect), maxValue - 1 - game.bld.effectsBase[res.name +'Max']||0);
 			maxValue += challengeEffect;
@@ -834,7 +834,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	//Hack to reach the maxValue in resTable
 	//AB: Questionable
 	resConsHackForResTable: function() {
-		if( this.game.calendar.day >= 0) {
+		if ( this.game.calendar.day >= 0) {
 			for (var i in this.resources){
 				var res = this.resources[i];
 				if (res.maxValue) {
@@ -921,12 +921,12 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		
         //policies
 		//technocracy policy bonus
-		if(res.name == "science"){
+		if (res.name == "science"){
 			maxValue *= (1 + this.game.getEffect("technocracyScienceCap"));
 		}
 
         //city on a hill bonus
-        if(res.name == "culture"){
+        if (res.name == "culture"){
             maxValue *= (1 + this.game.getEffect("onAHillCultureCap"));
         }
 		return maxValue;
@@ -998,7 +998,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 		var hasRes = true;
 		if (prices.length){
-			for( var i = 0; i < prices.length; i++){
+			for ( var i = 0; i < prices.length; i++){
 				var price = prices[i];
 
 				var res = this.get(price.name);
@@ -1036,7 +1036,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 	payPrices: function(prices){
 		if (prices.length){
-			for( var i = 0; i < prices.length; i++){
+			for ( var i = 0; i < prices.length; i++){
 				var price = prices[i];
 				this.addResEvent(price.name, -price.val);
 			}
@@ -1044,7 +1044,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	},
 
 	maxAll: function(){
-		for(var i = 0; i < this.resources.length; i++){
+		for (var i = 0; i < this.resources.length; i++){
 			var res = this.resources[i];
 			if (res.maxValue && res.value < res.maxValue){
 				res.value = res.maxValue;
@@ -1079,7 +1079,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
     },
 
 	setDisplayAll: function() {
-		for(var i = 0; i < this.resources.length; i++){
+		for (var i = 0; i < this.resources.length; i++){
 			var res = this.resources[i];
 			res.isHidden = false;
 			if (res.name == "wood") {

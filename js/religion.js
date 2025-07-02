@@ -32,7 +32,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		this.game = game;
 		this.registerMeta(/*"stackable"*/false, this.zigguratUpgrades, {
 			getEffect : function(bld, effect){
-				if(bld.name == "blackPyramid") {
+				if (bld.name == "blackPyramid") {
 					return (bld.effects) ? bld.effects[effect] * bld.getEffectiveValue(game) : 0;
 				}
 				return (bld.effects) ? bld.effects[effect] * bld.on : 0;
@@ -131,18 +131,18 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			if (this.transcendenceTier >= tu.tier && (!tu.evaluateLocks || tu.evaluateLocks(this.game))) {
 				tu.unlocked = true;
 			}
-			if(tu.val > 0 && tu.unlocks){
+			if (tu.val > 0 && tu.unlocks){
 				this.game.unlock(tu.unlocks);
 			}
 		}
 		//necrocorn deficit affecting 
 		var pacts = this.pactsManager.pacts;
-		for(var i = 0; i < pacts.length; i++){
+		for (var i = 0; i < pacts.length; i++){
 			pacts[i].calculateEffects(pacts[i], this.game);
 		}
 		this.getZU("blackPyramid").updateEffects(this.getZU("blackPyramid"), this.game);
 		console.log("pactsAdjustment");
-		if(!this.getPact("fractured").researched && this.getZU("blackPyramid").val > 0 && (this.game.religion.getTU("mausoleum").val > 0 || this.game.science.getPolicy("radicalXenophobia").researched)){
+		if (!this.getPact("fractured").researched && this.getZU("blackPyramid").val > 0 && (this.game.religion.getTU("mausoleum").val > 0 || this.game.science.getPolicy("radicalXenophobia").researched)){
 			this.game.unlock({
 				pacts: ["pactOfCleansing", "pactOfDestruction",  "pactOfExtermination", "pactOfPurity"]
 			});
@@ -230,7 +230,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		//Siphoning policy
 		// (Pacts, which normally consume necrocorns directly,
 		// will instead slow down necrocorn production by an equivalent amount)
-		if(this.game.getFeatureFlag("MAUSOLEUM_PACTS") > 0 && this.game.science.getPolicy("siphoning").researched){
+		if (this.game.getFeatureFlag("MAUSOLEUM_PACTS") > 0 && this.game.science.getPolicy("siphoning").researched){
 			effectsList.push({
 				label: $I("res.stack.corruptionPerDaySiphoned"),
 				value: - this.game.getEffect("necrocornPerDay")/this.game.calendar.ticksPerDay, //this is a positive number! (or zero)
@@ -243,7 +243,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		//Calculation time: Go through every effect & apply them, in order.
 		for (var i = 0; i < effectsList.length; i += 1) {
 			var effect = effectsList[i];
-			switch(effect.behavior) {
+			switch (effect.behavior) {
 			case "additive":
 				effectsList.finalCorruptionPerTick += effect.value;
 				effectsList.corruptionProdPerTick += effect.value;
@@ -369,14 +369,14 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				// this.corruption is <= 1 at this point, no need to check if 1-this.corruption is negative
 				? Math.min(Math.ceil((1 - this.corruption) / corruptionPerTick), times)
 				: 0;
-			if(ticksBeforeFirstNecrocorn > 0 && ticksBeforeFirstNecrocorn < times){
+			if (ticksBeforeFirstNecrocorn > 0 && ticksBeforeFirstNecrocorn < times){
 				//this.game.resPool.get("necrocorn").value = 1;
 				this.corruption = 1;
 				var ticksAfterFirstNecrocorn = times - ticksBeforeFirstNecrocorn;
 				var corruptionPerTickAfterFirstNecrocorn = this.getCorruptionPerTick(true);
 				this.corruption += ticksAfterFirstNecrocorn * corruptionPerTickAfterFirstNecrocorn;
 				this.game.resPool.get("necrocorn").value = 0;
-			} else{
+			} else {
 				this.corruption += corruptionPerTick * times;
 			}
 		}
@@ -388,9 +388,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	},
 	
 	gesSiphoningAlicornConsumptionPerDay: function(){
-		if(this.game.science.getPolicy(["siphoning"]).researched){
+		if (this.game.science.getPolicy(["siphoning"]).researched){
 			var necrocornDeficitRepaymentModifier = 1;
-			if(this.pactsManager.necrocornDeficit > 0){
+			if (this.pactsManager.necrocornDeficit > 0){
 				necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
 			}
 			return this.game.getEffect("necrocornPerDay") * necrocornDeficitRepaymentModifier;
@@ -401,7 +401,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		//------------------------- necrocorns pacts -------------------------
 		//deficit changing
 		var necrocornDeficitRepaymentModifier = 1;
-		if(this.pactsManager.necrocornDeficit > 0){
+		if (this.pactsManager.necrocornDeficit > 0){
 			necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
 		}
 		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
@@ -409,7 +409,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		var corruptionWithExisting = this.game.religion.getCorruptionPerTickProduction(true);
 		var worstPerTickDelta = corruptionWithExisting * this.game.calendar.ticksPerDay + necrocornPerDay;
 		//if(!this.game.science.getPolicy(["siphoning"]).researched){
-		if(
+		if (
 			(worstPerTickDelta >= 0)
 			||((worstPerTickDelta < 0 && necrocornVal + worstPerTickDelta * days > 0)&&
 			(this.game.resPool.get("alicorn").value - 1 + necrocornPerDay * days >= 0))){ //naive solution here
@@ -419,7 +419,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		//}
 		var corruptionWithoutExisting = this.game.religion.getCorruptionPerTickProduction(false);
 		//here we chech if the necrocorns will get into cycles of being produced and spent, which also works with syphening
-		if(corruptionWithExisting * this.game.calendar.ticksPerDay + necrocornPerDay < 0 &&
+		if (corruptionWithExisting * this.game.calendar.ticksPerDay + necrocornPerDay < 0 &&
 		corruptionWithoutExisting * this.game.calendar.ticksPerDay + necrocornPerDay > 0
 		){
 			var alicornsResult = this.game.resPool.get("alicorn").value - 1 + necrocornPerDay * days;
@@ -434,7 +434,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			var timePeriodWorking = Math.floor(days - necrocornVal * daysUntilSpentOne);
 
 
-			if(alicornsResult < 0){
+			if (alicornsResult < 0){
 				this.pactsManager.deficit -= alicornsResult;
 				alicornsSpent += alicornsResult;
 				timePeriodWorking += alicornsResult/necrocornPerDay; 
@@ -454,7 +454,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			if (state < daysUntilCorrupted){
 				this.game.resPool.get("necrocorn").value = 0;
 				this.corruption += necrocornPerDay * state + corruptionWithoutExisting * this.game.calendar.ticksPerDay * state;
-			}else{
+			} else {
 				this.game.resPool.get("necrocorn").value = (state - daysUntilCorrupted)/daysUntilSpentOne;
 			}
 			this.game.resPool.addResPerTick("alicorn", alicornsSpent);
@@ -462,7 +462,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 		var compensatedNecrocorns = 0;
 		var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
-		if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
+		if (this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
 			this.game.resPool.addResPerTick("alicorn",consumedAlicorns);
 		}
 		//var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
@@ -472,10 +472,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		this.game.resPool.addResPerTick("alicorn", compensatedNecrocorns);
 	
 		//if siphening is not enough to pay for per day consumption ALSO consume necrocorns;
-		if((this.game.resPool.get("necrocorn").value + necrocornPerDay * days * necrocornDeficitRepaymentModifier - compensatedNecrocorns) < 0){
+		if ((this.game.resPool.get("necrocorn").value + necrocornPerDay * days * necrocornDeficitRepaymentModifier - compensatedNecrocorns) < 0){
 			this.necrocornDeficit += Math.max(-necrocornPerDay * days - this.game.resPool.get("necrocorn").value + compensatedNecrocorns, 0);
 			necrocornDeficitRepaymentModifier = 1;
-		}else if(this.necrocornDeficit > 0){
+		} else if (this.necrocornDeficit > 0){
 			this.necrocornDeficit += necrocornPerDay *(0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")) * days);
 			this.necrocornDeficit = Math.max(this.necrocornDeficit, 0);
 		}
@@ -822,15 +822,15 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		},
 		calculateEffects: function(self, game) {
 			self.togglable = false;
-			if(!game.getFeatureFlag("MAUSOLEUM_PACTS")){
+			if (!game.getFeatureFlag("MAUSOLEUM_PACTS")){
 				for (var eff in self.effects){
 					self.effects[eff] = 0;
 				}
 				return;
 			}
 			var pacts = game.religion.pactsManager.pacts;
-			for(var i = 0; i < pacts.length; i++){
-				if(pacts[i].updatePreDeficitEffects){
+			for (var i = 0; i < pacts.length; i++){
+				if (pacts[i].updatePreDeficitEffects){
 					pacts[i].updatePreDeficitEffects(game);
 				}
 			}
@@ -838,18 +838,18 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		cashPreDeficitEffects: function (game) {
 			var transcendenceTierModifier = Math.max(game.religion.transcendenceTier - 24, 1);
 			var self = game.religion.getZU("blackPyramid");
-			for(var counter in self.simpleEffectNames){
+			for (var counter in self.simpleEffectNames){
 				self.effectsPreDeficit["pyramid" + self.simpleEffectNames[counter]] = game.getEffect("pact" + self.simpleEffectNames[counter]) * transcendenceTierModifier;
 			}
 			self.effectsPreDeficit["deficitRecoveryRatio"] = game.getEffect("pactDeficitRecoveryRatio");
 			var pactBlackLibraryBoost = game.getEffect("pactBlackLibraryBoost") * transcendenceTierModifier;
-			if(pactBlackLibraryBoost) {
+			if (pactBlackLibraryBoost) {
 				var unicornGraveyard = game.religion.getZU("unicornGraveyard");
 				self.effectsPreDeficit["blackLibraryBonus"] = pactBlackLibraryBoost * unicornGraveyard.effects["blackLibraryBonus"] * (1 + unicornGraveyard.on);
 			}
 		},
 		updateEffects: function(self, game){
-			if(!self.jammed){
+			if (!self.jammed){
 				self.cashPreDeficitEffects(game);
 				self.jammed = true;
 			}
@@ -858,16 +858,16 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			var deficiteModifier = (1 - game.religion.pactsManager.necrocornDeficit/50);
 			var existsDifference = false;
 			//console.warn(deficiteModifier);
-			for(var name in self.effectsPreDeficit){
-				if(name != "deficitRecoveryRatio"){
+			for (var name in self.effectsPreDeficit){
+				if (name != "deficitRecoveryRatio"){
 					var old = self.effects[name];
 					self.effects[name] = self.effectsPreDeficit[name] * deficiteModifier;
-					if(self.effects[name] != old){
+					if (self.effects[name] != old){
 						existsDifference = true;
 					}
 				}
 			}
-			if(existsDifference) {
+			if (existsDifference) {
 				game.upgrade(self.upgrades);
 			}
 		},
@@ -1214,7 +1214,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			policies: ["siphoning", "feedingFrenzy", "upfrontPayment"]
 		},
 		calculateEffects: function (self, game){
-			if(!game.getFeatureFlag("MAUSOLEUM_PACTS")){
+			if (!game.getFeatureFlag("MAUSOLEUM_PACTS")){
 				self.effects["pactsAvailable"] = 0;
 				self.unlocked = false;
 				game.updateCaches();
@@ -1223,7 +1223,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			self.effects = {
 				"pactsAvailable": 1 + game.getEffect("mausoleumBonus")
 			};
-			if(game.religion.getPact("fractured").on >= 1){
+			if (game.religion.getPact("fractured").on >= 1){
 				self.effects["pactsAvailable"] = 0;
 			}
 			game.updateCaches();
@@ -1261,9 +1261,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		//Holy Memecide
 	],
 	necrocornDeficitPunishment: function(){
-		for(var kitten in this.game.village.sim.kittens){
+		for (var kitten in this.game.village.sim.kittens){
 			var skills = this.game.village.sim.kittens[kitten].skills;
-			for(var job in skills){
+			for (var job in skills){
 				skills[job] = 0;
 			}
 		}
@@ -1364,6 +1364,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 
 	resetFaith: function(bonusRatio, withConfirmation) {
+		var worshipBefore = this.faith;
+		var epiphanyBefore = this.faithRatio;
 		if (withConfirmation && !this.game.opts.noConfirm) {
 			var self = this;
 			this.game.ui.confirm("", $I("religion.adore.confirmation.msg"), function() {
@@ -1372,6 +1374,16 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		} else {
 			this._resetFaithInternal(bonusRatio);
 		}
+		var worshipAfter = this.faith;
+		var epiphanyAfter = this.faithRatio;
+
+		//Here we go, trying to make more game actions reversible
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.id, {
+			action: "adore",
+			worshipBefore: worshipBefore,
+			epiphanyGained: epiphanyAfter - epiphanyBefore
+		}, $I("ui.undo.religion.adore"));
 	},
 
 	_resetFaithInternal: function(bonusRatio) {
@@ -1399,7 +1411,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 				//In the future, we might add more things that care about Transcendence Tier.
 				game.calculateAllEffects();
-				if(game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val){
+				if (game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val){
 					var blackPyramid = game.religion.getZU("blackPyramid");
 					blackPyramid.cashPreDeficitEffects(game);
 				}
@@ -1488,6 +1500,15 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				//This would happen, for example, if the player had adored the galaxy immediately after praising.
 				this.game.msg($I("religion.undo.praise.failure"), "alert", "undo", true /*noBullet*/);
 			}
+		} else if (data.action === "adore") {
+			if (this.faithRatio >= data.epiphanyGained) {
+				this.faithRatio -= data.epiphanyGained;
+				this.faith = data.worshipBefore;
+				this.game.msg($I("religion.undo.adore.regained", [this.game.getDisplayValueExt(data.worshipBefore)]), null, "undo", true /*noBullet*/);
+			} else {
+				//This would happen, for example, if the player had transcended immediately after adoring the galaxy.
+				this.game.msg($I("religion.undo.adore.failure"), "alert", "undo", true /*noBullet*/);
+			}
 		} else if (data.action === "buildZU") {
 			//This process requires 2 things: the controller & the model.
 			var bld = this.getZU(data.metaId);
@@ -1531,7 +1552,40 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				props.controller.payPriceForUndoRefund(model);
 			}
 			this.game.render();
+		} else if (data.action === "buyPact") {
+			if (this.getPact("fractured").on) { //should fail if fractured
+				this.game.msg($I("religion.undo.buy.pact.fractured"), "alert", "undo", true /*noBullet*/);
+			} else {
+				var pact = this.getPact(data.metaId);
+				var props = {
+					id:            pact.name,
+					name:           pact.label,
+					description:    pact.description,
+					building:       pact.name
+				};
+				props.controller = new com.nuclearunicorn.game.ui.PactsBtnController(this.game);
+				var model = props.controller.fetchModel(props);
+				model.refundPercentage = 1.0;	//full refund for undo
+				props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
+
+				//Un-incur necrocorn debt:
+				if (!model.metadata.notAddDeficit){
+					console.log("removing 0.5 necrocornDeficit");
+					this.pactsManager.necrocornDeficit = Math.max(this.pactsManager.necrocornDeficit - 0.5 * data.val, 0);
+				}
+				//Update effects:
+				if (model.metadata.updatePreDeficitEffects){
+					model.metadata.updatePreDeficitEffects(this.game);
+				}
+				if (!model.metadata.special){
+					this.game.upgrade(
+						{pacts: ["payDebt"]}
+						);
+				}
+				this.getZU("blackPyramid").jammed = false;
+			}
 		}
+		this.game.render();
 	}
 });
 
@@ -1959,14 +2013,31 @@ dojo.declare("classes.ui.religion.RefineTearsBtnController", com.nuclearunicorn.
 			};
 		}
 		if (!event) { event = {}; /*event is an optional parameter*/ }
+		var amtRefined = 0;
+		var sorrowObj = this.game.resPool.get("sorrow");
 		for (var batchSize = count || (event.ctrlKey ? this.game.opts.batchSize : 1);
 			 batchSize > 0
 			 && this.hasResources(model)
-			 && this.game.resPool.get("sorrow").value < this.game.resPool.get("sorrow").maxValue;
+			 && sorrowObj.value < sorrowObj.maxValue;
 			 batchSize--) {
 			this.payPrice(model);
 			this.refine();
+			amtRefined++;
 		}
+		var priceCount = model.prices[0].val * amtRefined;
+		var priceName = model.prices[0].name;
+		var descriptiveStrings = [this.game.getDisplayValueExt(priceCount),
+			this.game.resPool.get(priceName).title,
+			this.game.getDisplayValueExt(amtRefined),
+			sorrowObj.title];
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.game.religion.id, {
+			action: "refine",
+			resFrom: priceName,
+			resTo:  sorrowObj.name,
+			valFrom: priceCount,
+			valTo: amtRefined
+		}, $I("ui.undo.religion.refine", descriptiveStrings));
 		return {
 			itemBought: true,
 			reason: "paid-for"
@@ -2057,7 +2128,7 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 
 	updateEnabled: function(model){
 		this.inherited(arguments);
-		if(this.game.getEffect("pactsAvailable")<=0 && model.metadata.effects["pactsAvailable"] != 0){
+		if (this.game.getEffect("pactsAvailable")<=0 && model.metadata.effects["pactsAvailable"] != 0){
 			model.enabled = false;
 		}
 	},
@@ -2084,7 +2155,7 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 				reason: "cannot-afford"
 			};
 		}
-		if(!this.shouldBeBough(model, this.game)){
+		if (!this.shouldBeBough(model, this.game)){
 			return {
 				itemBought: false,
 				reason: "already-bought"
@@ -2099,7 +2170,7 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 		if (typeof meta.limitBuild == "number" && meta.limitBuild - meta.val < maxBld){
 			maxBld = meta.limitBuild - meta.val;
 		}
-		if(meta.effects["pactsAvailable"] != 0){
+		if (meta.effects["pactsAvailable"] != 0){
 			maxBld = Math.min(maxBld, this.game.getEffect("pactsAvailable")/(-meta.effects["pactsAvailable"]));
 		}
         if (model.enabled && this.hasResources(model) || this.game.devMode ){
@@ -2110,7 +2181,7 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 	            maxBld--;
 	        }
 
-			if(!meta.notAddDeficit && this.game.getEffect("pactNecrocornUpfrontCost") <= 0){
+			if (!meta.notAddDeficit && this.game.getEffect("pactNecrocornUpfrontCost") <= 0){
 				//Having positive "pactNecrocornUpfrontCost" removes immediate debt accumulation when the player buys a Pact.
 				this.game.religion.pactsManager.necrocornDeficit += 0.5 * counter;
 			}
@@ -2136,20 +2207,28 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 				}
 				this.game.upgrade(meta.upgrades);
 			}
-			if(meta.updatePreDeficitEffects){
+			if (meta.updatePreDeficitEffects){
 				meta.updatePreDeficitEffects(this.game);
 			}
-			if(!meta.special) { //Potential performance optimization where we batch this in with the previous call a few lines above here, so we only call game.upgrade once.
+			if (!meta.special) { //Potential performance optimization where we batch this in with the previous call a few lines above here, so we only call game.upgrade once.
 				this.game.upgrade({
 					policies: ["feedingFrenzy"],
 					pacts: ["payDebt"]}
 				);
 			}
-			if(meta.name != "payDebt"){
+			if (meta.name != "payDebt"){
 				this.game.religion.getZU("blackPyramid").jammed = false;
 			}
         }
 
+		if (counter && meta.name != "payDebt") { //The player cannot un-pay their debts (I'm lazy & don't feel like making the code work properly for that one)
+			var undo = this.game.registerUndoChange();
+			undo.addEvent(this.game.religion.id, {
+				action: "buyPact",
+				metaId: model.metadata.name,
+				val: counter
+			}, $I("ui.undo.religion.pact", [counter, model.metadata.label]));
+		}
 		return counter;
     },
 
@@ -2196,7 +2275,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 			},
 			unlocked: false,
 			calculateEffects: function(self, game){
-				if(!game.getFeatureFlag("MAUSOLEUM_PACTS")){
+				if (!game.getFeatureFlag("MAUSOLEUM_PACTS")){
 					return;
 				}
 				self.effects["necrocornPerDay"] = game.getEffect("pactNecrocornConsumption");
@@ -2221,7 +2300,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 			},
 			unlocked: false,
 			calculateEffects: function(self, game){
-				if(!game.getFeatureFlag("MAUSOLEUM_PACTS")){
+				if (!game.getFeatureFlag("MAUSOLEUM_PACTS")){
 					return;
 				}
 				self.effects["necrocornPerDay"] = game.getEffect("pactNecrocornConsumption");
@@ -2241,7 +2320,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 			},
 			unlocked: false,
 			calculateEffects: function(self, game){
-				if(!game.getFeatureFlag("MAUSOLEUM_PACTS")){
+				if (!game.getFeatureFlag("MAUSOLEUM_PACTS")){
 					return;
 				}
 				self.effects["necrocornPerDay"] = game.getEffect("pactNecrocornConsumption");
@@ -2267,7 +2346,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 			},
 			unlocked: false,
 			calculateEffects: function(self, game){
-				if(!game.getFeatureFlag("MAUSOLEUM_PACTS")){
+				if (!game.getFeatureFlag("MAUSOLEUM_PACTS")){
 					return;
 				}
 				self.effects["necrocornPerDay"] = game.getEffect("pactNecrocornConsumption");
@@ -2291,7 +2370,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 			unlocked: false,
 			calculateEffects: function(self, game){
 				self.onNewDay(game);
-				if(self.val > 0){
+				if (self.val > 0){
 					self.on = 0;
 					self.val = 0;
 					game.religion.pactsManager.necrocornDeficit = 0;
@@ -2325,7 +2404,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 			special: true,
 			unlocked: false,
 			calculateEffects: function(self, game){
-				if(!game.getFeatureFlag("MAUSOLEUM_PACTS")){
+				if (!game.getFeatureFlag("MAUSOLEUM_PACTS")){
 					self.effects = {
 						"pyramidGlobalResourceRatio" : 0,
 						"pyramidGlobalProductionRatio" : 0,
@@ -2334,8 +2413,8 @@ dojo.declare("classes.religion.pactsManager", null, {
 					};
 					return;
 				}
-				if(self.on>=1){
-					for(var i = 0; i<game.religion.pactsManager.pacts.length; i++){
+				if (self.on>=1){
+					for (var i = 0; i<game.religion.pactsManager.pacts.length; i++){
 						game.religion.pactsManager.pacts[i].on = 0;
 						game.religion.pactsManager.pacts[i].val = 0;
 						game.religion.pactsManager.pacts[i].unlocked = game.religion.pactsManager.pacts[i].name =="fractured";
@@ -2347,9 +2426,9 @@ dojo.declare("classes.religion.pactsManager", null, {
 		}
 	],
 	necrocornDeficitPunishment: function(){
-		for(var kitten in this.game.village.sim.kittens){
+		for (var kitten in this.game.village.sim.kittens){
 			var skills = this.game.village.sim.kittens[kitten].skills;
-			for(var job in skills){
+			for (var job in skills){
 				skills[job] = 0;
 			}
 		}
@@ -2379,7 +2458,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 		//console.warn(this)
 		//console.warn(this.game.religion.pactsManager)
 		//console.warn(this.game.religion.pactsManager.pacts);
-		for(var i in this.game.religion.pactsManager.pacts){
+		for (var i in this.game.religion.pactsManager.pacts){
 			this.game.religion.pactsManager.pacts[i].on = 0;
 			this.game.religion.pactsManager.pacts[i].val = 0;
 			this.game.religion.pactsManager.pacts[i].unlocked = false;
@@ -2389,7 +2468,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 		return $I("msg.pacts.info", [this.game.getEffect("pactsAvailable"), -this.game.getEffect("pactNecrocornConsumption")]); //Every TT above 25 adds 100% to pact effects (not consumption) and 10% to karma per millenia effect
 	},
 	getPactsTextDeficit: function(){
-		if(this.game.religion.pactsManager.necrocornDeficit > 0){
+		if (this.game.religion.pactsManager.necrocornDeficit > 0){
 			return $I("msg.necrocornDeficit.info", [Math.round(this.game.religion.pactsManager.necrocornDeficit * 10000)/10000, 
 				-Math.round(100*
 				((this.game.religion.pactsManager.necrocornDeficit/50))),
@@ -2397,7 +2476,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 					(0.15 *(1 + this.game.getEffect("deficitRecoveryRatio")/2)))/100,
 					-Math.round((this.game.getEffect("necrocornPerDay") *(0.15 *(1 + this.game.getEffect("deficitRecoveryRatio"))))*1000000)/1000000
 				]);
-			}else{
+			} else {
 				return "";
 			}
 	},
@@ -2406,14 +2485,14 @@ dojo.declare("classes.religion.pactsManager", null, {
 			return 1;
 		}
 		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
-		if(this.game.science.getPolicy(["siphoning"]).researched){
-			if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay >= 1){ //check if siphening is enough to pay for per day consumption
+		if (this.game.science.getPolicy(["siphoning"]).researched){
+			if (this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay >= 1){ //check if siphening is enough to pay for per day consumption
 				return 1;
 			}
 		}
 		var necrocornDeficitRepaymentModifier = 1;
 		necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
-		if((this.game.resPool.get("necrocorn").value + necrocornPerDay * necrocornDeficitRepaymentModifier) < 0){
+		if ((this.game.resPool.get("necrocorn").value + necrocornPerDay * necrocornDeficitRepaymentModifier) < 0){
 			necrocornDeficitRepaymentModifier = Math.max((necrocornPerDay * necrocornDeficitRepaymentModifier + this.game.resPool.get("necrocorn").value)/necrocornPerDay, 0);
 			return necrocornDeficitRepaymentModifier;
 		}
@@ -2422,8 +2501,8 @@ dojo.declare("classes.religion.pactsManager", null, {
 	//how much corruption siphening spends in x days
 	getSiphonedCorruption: function(days){
 		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
-		if(this.game.science.getPolicy(["siphoning"]).researched){
-			if(this.game.religion.getCorruptionDeficitPerTick() <= 0){
+		if (this.game.science.getPolicy(["siphoning"]).researched){
+			if (this.game.religion.getCorruptionDeficitPerTick() <= 0){
 				return -necrocornPerDay * days;
 			}
 			return Math.min(-necrocornPerDay * days, this.game.religion.getCorruptionPerTickProduction()*this.game.calendar.ticksPerDay * days);
@@ -2436,8 +2515,8 @@ dojo.declare("classes.religion.pactsManager", null, {
 		var necrocornDeficitRepaymentModifier = 1;
 		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
 		var compensatedNecrocorns = 0;
-		if(this.game.science.getPolicy(["siphoning"]).researched){
-			if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
+		if (this.game.science.getPolicy(["siphoning"]).researched){
+			if (this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
 				this.game.resPool.addResPerTick("alicorn", necrocornPerDay * days);
 				return;
 			}
@@ -2447,13 +2526,13 @@ dojo.declare("classes.religion.pactsManager", null, {
 			this.game.resPool.addResPerTick("alicorn", compensatedNecrocorns);
 		}
 		//if siphening is not enough to pay for per day consumption ALSO consume necrocorns;
-		if(this.necrocornDeficit > 0){
+		if (this.necrocornDeficit > 0){
 			necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
 		}
-		if((this.game.resPool.get("necrocorn").value + necrocornPerDay * days * necrocornDeficitRepaymentModifier - compensatedNecrocorns) < 0){
+		if ((this.game.resPool.get("necrocorn").value + necrocornPerDay * days * necrocornDeficitRepaymentModifier - compensatedNecrocorns) < 0){
 			this.necrocornDeficit += Math.max(-necrocornPerDay * days - this.game.resPool.get("necrocorn").value + compensatedNecrocorns, 0);
 			necrocornDeficitRepaymentModifier = 1;
-		}else if(this.necrocornDeficit > 0){
+		} else if (this.necrocornDeficit > 0){
 			this.necrocornDeficit += necrocornPerDay *(0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")) * days);
 			this.necrocornDeficit = Math.max(this.necrocornDeficit, 0);
 		}
