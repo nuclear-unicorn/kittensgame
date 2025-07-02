@@ -2135,18 +2135,30 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name : "necrocorn", val: 1}
 		],
 		effects: {
-			"pactNecrocornConsumption": 5e-5 //This should be a 10% reduction to Pact upkeep
+			"pactNecrocornConsumption": 5e-5, //This should be a 10% reduction to Pact upkeep
+			"pactNecrocornUpfrontCost": 2
 			//(See village.js for how we make debt more punishing.)
-			//(See religion.js for how we make Pacts cost necrocorns upfront.)
 		},
 		calculateEffects: function(self, game) {
 			if(!game.getFeatureFlag("MAUSOLEUM_PACTS")) {
 				self.unlocked = false;
 				return;
 			}
+			//Add a warning to the description if the player is in debt.
+			//TODO: put the text in a warning color!
+			this.description = $I("policy.upfrontPayment.desc") +
+				(!self.researched && game.religion.pactsManager.necrocornDeficit ? "<br>" + $I("policy.upfrontPayment.warning") : "");
 		},
 		evaluateLocks: function(game) {
 			return game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val && game.religion.getZU("marker").val;
+		},
+		onResearch: function(game) {
+			//Upon purchasing this policy, the player must immediately pay the upfront cost for all active Pacts.
+			var requiredPayment = this.effects["pactNecrocornUpfrontCost"] * game.religion.pactsManager.countActivePacts();
+			if (requiredPayment > 0) {
+				game.resPool.addResEvent("necrocorn", -requiredPayment);
+				game.msg($I("policy.upfrontPayment.payment.complete", [requiredPayment]));
+			}
 		},
 		unlocked: false,
 		blocked: false,
@@ -2461,6 +2473,14 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 
 		} else if(model.metadata.name == "transkittenism" && this.game.bld.getBuildingExt("aiCore").meta.effects["aiLevel"] >= 15){
 			this.game.msg($I("msg.policy.aiNotMerges"),"alert", "ai");
+			return { reason: "blocked" };
+
+		} else if (model.metadata.name == "upfrontPayment" &&
+			this.game.resPool.get("necrocorn").value < //Check to see if the player can afford the upfront cost for all active Pacts
+				(model.metadata.effects["pactNecrocornUpfrontCost"] * this.game.religion.pactsManager.countActivePacts()) + //requiredPayment
+				this.getPrices(model)[0].val ) { //costOfThisPolicy, which takes into account increase from Pacifism Challenge
+			var requiredPayment = model.metadata.effects["pactNecrocornUpfrontCost"] * this.game.religion.pactsManager.countActivePacts(); //This code duplication makes me frowny
+			this.game.msg($I("msg.policy.cannotPayUpfront", [requiredPayment, this.game.resPool.get("necrocorn").title]), "important");
 			return { reason: "blocked" };
 
 		} else if(model.metadata.blocked != true) {

@@ -2064,8 +2064,9 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 
 	getPrices: function(model) {
 		var retVal = this.inherited(arguments);
-		if (this.game.science.getPolicy("upfrontPayment").researched) {
-			retVal.push({ name: "necrocorn", val: 2 });
+		var upfront = this.game.getEffect("pactNecrocornUpfrontCost");
+		if (!model.metadata.special && upfront > 0) {
+			retVal.push({ name: "necrocorn", val: upfront });
 		}
 		return retVal;
 	},
@@ -2109,8 +2110,8 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 	            maxBld--;
 	        }
 
-			if(!meta.notAddDeficit && !this.game.science.getPolicy("upfrontPayment").researched){
-				//(Upfront Payment policy removes immediate debt accumulation when you buy a Pact)
+			if(!meta.notAddDeficit && this.game.getEffect("pactNecrocornUpfrontCost") <= 0){
+				//Having positive "pactNecrocornUpfrontCost" removes immediate debt accumulation when the player buys a Pact.
 				this.game.religion.pactsManager.necrocornDeficit += 0.5 * counter;
 			}
 	        if (counter > 1) {
@@ -2506,6 +2507,27 @@ dojo.declare("classes.religion.pactsManager", null, {
 			}
 		}
 		return counter;
+	},
+	/**
+	 * This function counts how many total Pacts the player is running.
+	 * For the purposes of this function, special objects like "pay the debt" or "fractured" don't count.
+	 * We're talking about regular Pacts here.
+	 * @return A nonnegative integer
+	 */
+	countActivePacts: function() {
+		if (!this.game.getFeatureFlag("MAUSOLEUM_PACTS")) {
+			return 0;
+		}
+		var sum = 0;
+		for (var i = 0; i < this.pacts.length; i++) {
+			var pact = this.pacts[i];
+			if (pact.name === "fractured" && pact.on) { //There can be game-states where Fractured is on but so are some other Pacts (such as in the middle of the tick when fracturing triggers, before the engine has finished updating things)
+				return 0;
+			}
+			if (pact.special) { continue; } //Skip counting this one
+			sum += pact.on;
+		}
+		return sum;
 	}
 });
 dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.game.ui.tab, {

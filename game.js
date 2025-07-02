@@ -1758,6 +1758,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.necrocornPerDay.pact.title"),
 				type: "perDay"
 			},
+			"pactNecrocornUpfrontCost": {
+				title: $I("effectsMgr.statics.necrocornUpfrontCost.title"),
+				type: "fixed"
+			},
             "pactsAvailable":{
 				title: $I("effectsMgr.statics.pactsAvailable.title"),
 				type: "fixed"
