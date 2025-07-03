@@ -2096,14 +2096,22 @@ dojo.declare("classes.ui.PactsWGT", [mixin.IChildrenAware, mixin.IGameAware], {
 
 	render: function(container){
 		var div = dojo.create("div", null, container);
-		var span1 = dojo.create("span", {innerHTML: this.game.religion.pactsManager.getPactsTextSum()}, div);
+		this.span1 = dojo.create("span", {innerHTML: this.game.religion.pactsManager.getPactsTextSum()}, div);
 		var btnsContainer = dojo.create("div", null, div);
-		var span2 = dojo.create("span", {innerHTML: this.game.religion.pactsManager.getPactsTextDeficit()}, div);
+		this.span2 = dojo.create("span", {innerHTML: this.game.religion.pactsManager.getPactsTextDeficit()}, div);
+		dojo.create("br", {}, div);
+		this.span3 = dojo.create("span", {innerHTML: this.game.religion.pactsManager.getPactsTextKarmaPunishment()}, div);
 		this.inherited(arguments, [btnsContainer]);
 	},
 
 	update: function(){
 		this.inherited(arguments);
+
+		//Potential performance problem with calling this every frame...
+		//Maybe have this only update once every 2 seconds or something
+		this.span1.innerHTML = this.game.religion.pactsManager.getPactsTextSum();
+		this.span2.innerHTML = this.game.religion.pactsManager.getPactsTextDeficit();
+		this.span3.innerHTML = this.game.religion.pactsManager.getPactsTextKarmaPunishment();
 	}
 });
 dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
@@ -2470,7 +2478,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 	getPactsTextDeficit: function(){
 		if (this.game.religion.pactsManager.necrocornDeficit > 0){
 			return $I("msg.necrocornDeficit.info", [Math.round(this.game.religion.pactsManager.necrocornDeficit * 10000)/10000, 
-				-Math.round(100*
+				"-" + Math.round(100*
 				((this.game.religion.pactsManager.necrocornDeficit/50))),
 				Math.round(10000*
 					(0.15 *(1 + this.game.getEffect("deficitRecoveryRatio")/2)))/100,
@@ -2479,6 +2487,24 @@ dojo.declare("classes.religion.pactsManager", null, {
 			} else {
 				return "";
 			}
+	},
+	getPactsTextKarmaPunishment: function() {
+		if (!this.game.science.getPolicy("upfrontPayment").researched) {
+			return "";
+		}
+		//Upfront payment reduces karma effectiveness
+		var pactsMan = this.game.religion.pactsManager;
+		var karmaEffectiveness = 1 - pactsMan.necrocornDeficit / pactsMan.fractureNecrocornDeficit;
+		if (this.game.religion.getPact("fractured").on) {
+			karmaEffectiveness = 0;
+		}
+		karmaEffectiveness = Math.max(karmaEffectiveness, 0.1); //Capped at -90% reduction
+
+		if (karmaEffectiveness < 1) {
+			return $I("msg.necrocornDeficit.upfrontPayment.penalty", [(100-100*karmaEffectiveness).toFixed(0)]);
+		}
+		//Else, there's nothing to say.
+		return "";
 	},
 	getNecrocornDeficitConsumptionModifier: function(){
 		if (this.necrocornDeficit <= 0){

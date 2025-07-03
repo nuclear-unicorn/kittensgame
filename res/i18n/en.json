@@ -786,7 +786,7 @@
     "opts.enableKS.desc": "This is absolutely unsupported, you have never seen me or this setting",
 
     "msg.necrocornDeficit.info": "Necrocorn deficit: {0}. Due to the deficit your pacts have {1}% effectivness. Deficit is consuming additional {2}% of necrocorns per day and is diminishing {3} per day (if you have enough necrocorns).",
-    "msg.necrocornDeficit.upfrontPayment.penalty": "The deficit also reduces the effectiveness of karma points.",
+    "msg.necrocornDeficit.upfrontPayment.penalty": "Due to the terms of Upfront Payment, karma is {0}% less effective.",
     "msg.pacts.info": "Karma kittens per millenia are based on available pacts. Pacts do not persist. Available pacts: {0}. Every pact devours {1} necrocorns per day.",
     "msg.pacts.fractured": "You didn't fulfill your part of the deal... You lost {0} alicorns!",
     "opts.swipeNavigation": "Swipe navigation",
