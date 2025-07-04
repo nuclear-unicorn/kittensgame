@@ -2081,6 +2081,9 @@ dojo.declare("classes.ui.CryptotheologyPanel", com.nuclearunicorn.game.ui.Panel,
 });
 
 dojo.declare("classes.ui.PactsWGT", [mixin.IChildrenAware, mixin.IGameAware], {
+	updateInterval: 10, //Once every 2 sec
+	ticksSinceUpdate: 0,
+
 	constructor: function(game){
 		var self = this;
 		var controller = com.nuclearunicorn.game.ui.PactsBtnController(game);
@@ -2097,22 +2100,32 @@ dojo.declare("classes.ui.PactsWGT", [mixin.IChildrenAware, mixin.IGameAware], {
 
 	render: function(container){
 		var div = dojo.create("div", null, container);
-		this.span1 = dojo.create("span", {innerHTML: this.game.religion.pactsManager.getPactsTextSum()}, div);
+		this.spanPactsInfo = dojo.create("span", {
+			id: "pactsTextSum",
+			innerHTML: this.game.religion.pactsManager.getPactsTextSum()}, div);
 		var btnsContainer = dojo.create("div", null, div);
-		this.span2 = dojo.create("span", {innerHTML: this.game.religion.pactsManager.getPactsTextDeficit()}, div);
-		dojo.create("br", {}, div);
-		this.span3 = dojo.create("span", {innerHTML: this.game.religion.pactsManager.getPactsTextKarmaPunishment()}, div);
+		this.spanDeficitInfo = dojo.create("span", {
+			id: "pactsTextDeficit",
+			innerHTML: this.game.religion.pactsManager.getPactsTextDeficit()}, div);
+		//Create this <span> inside an anonymous <div> to vertically separate it from the previous <span>.
+		this.spanDeficitKarma = dojo.create("span", {
+			id: "pactsTextKarmaPunishment",
+			innerHTML: this.game.religion.pactsManager.getPactsTextKarmaPunishment()}, dojo.create("div", null, div));
 		this.inherited(arguments, [btnsContainer]);
+		this.ticksSinceUpdate = 0;
 	},
 
 	update: function(){
 		this.inherited(arguments);
 
-		//Potential performance problem with calling this every frame...
-		//Maybe have this only update once every 2 seconds or something
-		this.span1.innerHTML = this.game.religion.pactsManager.getPactsTextSum();
-		this.span2.innerHTML = this.game.religion.pactsManager.getPactsTextDeficit();
-		this.span3.innerHTML = this.game.religion.pactsManager.getPactsTextKarmaPunishment();
+		//Update Pact-related text frequently, but not too often
+		this.ticksSinceUpdate++;
+		if (this.ticksSinceUpdate >= this.updateInterval) {
+			this.spanPactsInfo.innerHTML = this.game.religion.pactsManager.getPactsTextSum();
+			this.spanDeficitInfo.innerHTML = this.game.religion.pactsManager.getPactsTextDeficit();
+			this.spanDeficitKarma.innerHTML = this.game.religion.pactsManager.getPactsTextKarmaPunishment();
+			this.ticksSinceUpdate = 0;
+		}
 	}
 });
 dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
@@ -2500,7 +2513,11 @@ dojo.declare("classes.religion.pactsManager", null, {
 		karmaEffectiveness = Math.max(karmaEffectiveness, 0.1); //Capped at -90% reduction
 
 		if (karmaEffectiveness < 1) {
-			return $I("msg.necrocornDeficit.upfrontPayment.penalty", [(100-100*karmaEffectiveness).toFixed(0)]);
+			//Transform into a percent:
+			var reduction = 100 - 100*karmaEffectiveness;
+			return $I("msg.necrocornDeficit.upfrontPayment.penalty", [
+				"<span class=\"resource-name\">" + this.game.resPool.get("karma").title + "</span>", //Will be styled with CSS
+				"<span title=\"" + reduction.toFixed(4) + "%\">" + reduction.toFixed(0) + "%</span>"]);
 		}
 		//Else, there's nothing to say.
 		return "";
