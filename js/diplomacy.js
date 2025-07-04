@@ -1769,11 +1769,13 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 			//Energy:
 			if (leviathans.energy) {
 				var markerCap = this.game.diplomacy.getMarkerCap();
-				var leviathansInfoEnergy = leviathans.energy ? leviathans.energy + " / " + markerCap : "N/A";
-				if (leviathans.energy > 0 && this.game.science.getPolicy("feedingFrenzy").researched) {
-					//Display energy to 1 decimal place (any more than that is excessive)
-					leviathansInfoEnergy = leviathans.energy.toFixed(1) + " / " + markerCap.toFixed(1);
-				}
+				//Display to 1 decimal place, but only if needed.
+				//Not triggered by machine-precision floating-point rounding errors.
+				//Can be triggered by effects like ldr on "feedEldersEfficiencyRatio" or similar.
+				//This is intentional.  (7.0 is NOT the same as 7 when it's actually 6.979166666666668.)
+				var isInteger = function(num) { return Math.abs(num - Math.round(num)) < 0.0001; };
+				var energyDisp = leviathans.energy.toFixed(isInteger(leviathans.energy) ? 0 : 1);
+				var leviathansInfoEnergy = leviathans.energy ? energyDisp + " / " + markerCap : "N/A";
 				this.leviathansInfo.innerHTML += $I("trade.leviathans.energy") + leviathansInfoEnergy + "<br />";
 			}
 			//Time to leave:
