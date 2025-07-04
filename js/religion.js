@@ -1569,8 +1569,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
 
 				//Un-incur necrocorn debt:
-				if (!model.metadata.notAddDeficit){
-					console.log("removing 0.5 necrocornDeficit");
+				if (!model.metadata.notAddDeficit && this.game.getEffect("pactNecrocornUpfrontCost") <= 0) {
+					//(Necrocorn debt is not incurred if "pactNecrocornUpfrontCost" is positive)
 					this.pactsManager.necrocornDeficit = Math.max(this.pactsManager.necrocornDeficit - 0.5 * data.val, 0);
 				}
 				//Update effects:
@@ -1578,9 +1578,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 					model.metadata.updatePreDeficitEffects(this.game);
 				}
 				if (!model.metadata.special){
-					this.game.upgrade(
-						{pacts: ["payDebt"]}
-						);
+					this.game.upgrade({pacts: ["payDebt"]});
 				}
 				this.getZU("blackPyramid").jammed = false;
 			}
