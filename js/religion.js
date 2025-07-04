@@ -2274,7 +2274,6 @@ dojo.declare("classes.religion.pactsManager", null, {
 			unlocks: {
 				//"pacts": ["pactOfFanaticism"]
 			},
-			priceRatio: 1,
 			effects: {
 				"pactsAvailable": -1,
 				"necrocornPerDay" : 0,
@@ -2296,7 +2295,6 @@ dojo.declare("classes.religion.pactsManager", null, {
 			prices: [				
 				{ name : "relic", val: 100},
 			],
-			priceRatio: 1,
 			unlocks: {
 				//"pacts": ["pactOfGlowing"] will deal with this later
 			},
@@ -2321,7 +2319,6 @@ dojo.declare("classes.religion.pactsManager", null, {
 			prices: [
 				{ name : "relic", val: 100},
 			],
-			priceRatio: 1.02,
 			effects: {
 				"pactsAvailable": -1,
 				"necrocornPerDay" : 0,
@@ -2344,7 +2341,6 @@ dojo.declare("classes.religion.pactsManager", null, {
 			//unlocks: {
 				//"pacts": ["pactOfFlame", "pactOfFanaticism"]
 			//},
-			priceRatio: 1,
 			effects: {
 				"pactsAvailable": -1,
 				"necrocornPerDay": 0,
@@ -2371,7 +2367,6 @@ dojo.declare("classes.religion.pactsManager", null, {
 			upgrades: {
 				pacts: ["payDebt"]
 			},
-			priceRatio: 1,
 			effects: {
 				"pactsAvailable": 0,
 			},
@@ -2462,6 +2457,9 @@ dojo.declare("classes.religion.pactsManager", null, {
 	},
 	constructor: function(game){
 		this.game = game;
+
+		//Enforce rule: all Pacts must have price ratio of 1 exactly.
+		this.pacts.forEach(function(meta) { meta.priceRatio = 1; });
 	},
 	resetState: function(){
 		//console.warn(this)
