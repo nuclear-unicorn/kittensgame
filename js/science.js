@@ -2119,6 +2119,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 				return;
 			}
 			self.effects["feedEldersEfficiencyRatio"] = 0.1 * game.religion.pactsManager.countUniqueActivePacts();
+			//Spice cost should scale with the player's ability to generate spice.
+			self.effects["feedEldersSpiceCost"] = 100 + 50 * game.space.getBuilding("spiceRefinery").on;
 		},
 		evaluateLocks: function(game) {
 			return game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val && game.religion.getZU("marker").val;

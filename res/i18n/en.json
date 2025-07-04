@@ -845,7 +845,7 @@
     "policy.fascism.label" : "Fascism",
     "policy.fascism.desc" : "Lebensraum! Population penalties to happiness are eliminated, and log cabins cost half as much.",
     "policy.feedingFrenzy.label": "Feeding Frenzy",
-    "policy.feedingFrenzy.desc": "Increase the efficiency of feeding Leviathans by 10% for each unique active Pact, and allow feeding fractional necrocorns. However, feeding now costs spice in addition to necrocorns.",
+    "policy.feedingFrenzy.desc": "Increase the efficiency of feeding Leviathans by 10% for each unique active Pact. However, feeding now consumes spice in addition to necrocorns.",
     "policy.frugality.label": "Frugality",
     "policy.frugality.desc": "Stoic philosophers are placed in charge of the mints, making them more effective by reducing corruption.",
     "policy.fullIndustrialization.label" : "Full Industrialization",

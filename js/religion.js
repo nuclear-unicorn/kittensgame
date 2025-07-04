@@ -1578,7 +1578,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 					model.metadata.updatePreDeficitEffects(this.game);
 				}
 				if (!model.metadata.special){
-					this.game.upgrade({pacts: ["payDebt"]});
+					this.game.upgrade({
+						policies: ["feedingFrenzy"],
+						pacts: ["payDebt"]
+					});
 				}
 				this.getZU("blackPyramid").jammed = false;
 			}

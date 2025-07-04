@@ -860,12 +860,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		var ncorns = this.game.resPool.get("necrocorn");
 		var elders = this.game.diplomacy.get("leviathans");
 		var cleanRequest = Math.max(amtRequested, 1) || 1;
-		var amt = Math.min(cleanRequest, ncorns.value);
-		if (!this.game.science.getPolicy("feedingFrenzy").researched) {
-			//Feeding Frenzy policy allows feeding fractional necrocorns
-			//Therefore, without this policy, we can only feed integer necrocorns
-			amt = Math.floor(amt);
-		}
+		var amt = Math.floor(Math.min(cleanRequest, ncorns.value));
 		if (amt > 0){
 			var efficiency = 1 + this.game.getLimitedDR(this.game.getEffect("feedEldersEfficiencyRatio"), 0.5); //The efficiency increase is capped at 50% bonus
 			elders.energy += amt * efficiency;

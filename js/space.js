@@ -495,6 +495,9 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					"spicePerTickAutoprodSpace": 0.025
 				};
 			},
+			upgrades: {
+				policies: ["feedingFrenzy"] //Policy downside scales with player's progression
+			},
 			unlockScheme: {
 				name: "dune",
 				threshold: 10
