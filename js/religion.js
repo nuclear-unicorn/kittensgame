@@ -149,6 +149,14 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 	},
 	/**
+	 * Game rule: If the current number of necrocorns is strictly greater than a certain value,
+	 * a penalty is applied to necrocorn corruption rate.  This function returns where that threshold is.
+	 * @return A number in units of necrocorns, intended for use in necrocorn-related calculations
+	 */
+	getExistNecrocornThreshold: function() {
+		return this.game.science.getPolicy("feedingFrenzy").researched ? 1 : 0;
+	},
+	/**
 	 * This function does 2 things:
 	 * (1) It calculates necrocorn production in a way that remembers intermediate values.
 	 * (2) It keeps information on the names of all the different modifiers, bonuses, etc.
@@ -189,7 +197,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	 *	                         If Siphoning is not active, this will be 0.
 	 */
 	getCorruptionEffects: function(pretendExistNecrocorn) {
-		var existNecrocorn = (pretendExistNecrocorn === undefined) ? (this.game.resPool.get("necrocorn").value > 0) : pretendExistNecrocorn;
+		var existNecrocorn = (pretendExistNecrocorn === undefined) ? (this.game.resPool.get("necrocorn").value > this.getExistNecrocornThreshold()) : pretendExistNecrocorn;
 		var effectsList = [];
 		effectsList.finalCorruptionPerTick = 0;
 		effectsList.corruptionProdPerTick = 0;
