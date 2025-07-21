@@ -1150,7 +1150,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			"pactsAvailable" : 5
 		},
 		upgrades: {
-			transcendenceUpgrades:["mausoleum"]
+			transcendenceUpgrades:["mausoleum"],
+			policies: ["feedingFrenzy"]
 		},
 		calculateEffects: function (self, game){
 			self.effects["pactsAvailable"] = 5;
@@ -2110,8 +2111,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name : "necrocorn", val: 1}
 		],
 		effects: {
-			"feedEldersEfficiencyRatio": 0, //Feeding the Leviathans is more efficient.  LDR, caps at 50%, see diplomacy.js
-			"feedEldersSpiceCost": 100 //Costs this much spice for each necrocorn fed
+			"feedEldersEfficiencyRatio": 0, //Feeding the Leviathans is more efficient.
+			"feedEldersEfficiencyRatio2": 0, //Feeding the Leviathans is more efficient; multiplies with previous effect.
+			"necrocornCorruptionInterference": -0.1 //The policy's downside: reduce necrocorn income by 10%
 		},
 		calculateEffects: function(self, game) { //The intent is to call this whenever we gain or lose a Pact.
 			if (!game.getFeatureFlag("MAUSOLEUM_PACTS")) {
@@ -2119,8 +2121,12 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 				return;
 			}
 			self.effects["feedEldersEfficiencyRatio"] = 0.1 * game.religion.pactsManager.countUniqueActivePacts();
-			//Spice cost should scale with the player's ability to generate spice.
-			self.effects["feedEldersSpiceCost"] = 100 + 50 * game.space.getBuilding("spiceRefinery").on;
+			//  0 unspent Pacts -->   0% bonus
+			// 10 unspent Pacts -->  44% bonus
+			// 25 unspent Pacts -->  70% bonus
+			// 50 unspent Pacts --> 100% bonus
+			//100 unspent Pacts --> 141% bonus
+			self.effects["feedEldersEfficiencyRatio2"] = Math.round(game.getUnlimitedDR(game.getEffect("pactsAvailable"), 0.01 )) / 100;
 		},
 		evaluateLocks: function(game) {
 			return game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val && game.religion.getZU("marker").val;

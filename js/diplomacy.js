@@ -863,6 +863,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		var amt = Math.floor(Math.min(cleanRequest, ncorns.value));
 		if (amt > 0){
 			var efficiency = 1 + this.game.getLimitedDR(this.game.getEffect("feedEldersEfficiencyRatio"), 0.5); //The efficiency increase is capped at 50% bonus
+			efficiency *= this.game.getEffect("feedEldersEfficiencyRatio2");
 			elders.energy += amt * efficiency;
 
 			var markerCap = this.game.diplomacy.getMarkerCap();
@@ -880,11 +881,6 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 			ncorns.value -= amt;
 			this.game.msg($I("trade.msg.elders.pleased"), "notice");
-			var spiceRequested = amt * this.game.getEffect("feedEldersSpiceCost");
-			if (spiceRequested > 0) {
-				//Consume spice if we need to, but there's no penalty if we run out of spice.
-				this.game.resPool.addResEvent("spice", -spiceRequested);
-			}
 		} else {
 			ncorns.value = 0;
 			this.game.msg($I("trade.msg.elders.displeased"), "notice");

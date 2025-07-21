@@ -229,6 +229,12 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			value: 1 + Math.sqrt(this.game.resPool.get("sorrow").value * this.game.getEffect("blsCorruptionRatio")),
 			behavior: "multiplicative"
 		});
+		//Downside of the policy, "Feeding Frenzy"
+		effectsList.push({
+			label: $I("res.stack.corruptionInterference"),
+			value: 1 + this.game.getEffect("necrocornCorruptionInterference"),
+			behavior: "multiplicative"
+		});
 
 		// >>>here<<< is the place to add new bonuses/modifiers/etc. if the devs want to add more content
 		// Just define a label (the i18n string to show to the player, giving this effect a name)
@@ -1214,7 +1220,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"pactsAvailable": 1
 		},
 		upgrades: {
-			pacts: ["fractured"]
+			pacts: ["fractured"],
+			policies: ["feedingFrenzy"]
 		},
 		unlocked: false,
 		unlocks: {
