@@ -2087,7 +2087,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name : "necrocorn", val: 1}
 		],
 		effects: { //TODO: remove old effect (slowing down corruption & consuming alicorns)
-			"smallDebtPunishmentExemption": 5, //TODO: remove debt penalties if debt is less than 5 units
+			"smallDebtPunishmentExemption": 5,
 			"repayDebtOnNecrocornGeneration": 1 //TODO: have generated necrocorns be spent to pay back debt if debt > 1
 		},
 		calculateEffects: function(self, game) {

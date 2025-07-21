@@ -189,6 +189,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	 * But, if all you want are some quick & easy numbers, fear not!  You need not bother with the array elements.
 	 * The return value will also have 3 additional numerical fields, in addition to being an array.
 	 *	finalCorruptionPerTick: number.  The TOTAL necrocorn production per tick, after applying ALL modifiers.
+	 * TODO: blah blah blah, remove Siphoning's old effect
 	 *	corruptionProdPerTick: number.  Necrocorn production per tick, except we ignore Siphoning.
 	 *	                                The difference between these two numbers is the amount Siphoning consumes.
 	 *	deficitPerTick: number.  How much debt we accumulate each tick, if Siphoning wants to spend
@@ -241,19 +242,6 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		// Give it a value & either "additive" or "multiplicative" behavior
 		// The game will recalculate this once per tick, so you can put in a mathematical formula if you want.
 
-		//Siphoning policy
-		// (Pacts, which normally consume necrocorns directly,
-		// will instead slow down necrocorn production by an equivalent amount)
-		if (this.game.getFeatureFlag("MAUSOLEUM_PACTS") > 0 && this.game.science.getPolicy("siphoning").researched){
-			effectsList.push({
-				label: $I("res.stack.corruptionPerDaySiphoned"),
-				value: - this.game.getEffect("necrocornPerDay")/this.game.calendar.ticksPerDay, //this is a positive number! (or zero)
-				behavior: "siphoning" //Special behavior value, will be overwritten later
-					//The calling function will never see this behavior,
-					// they'll only see "additive" behavior with a negative value
-			});
-		}
-
 		//Calculation time: Go through every effect & apply them, in order.
 		for (var i = 0; i < effectsList.length; i += 1) {
 			var effect = effectsList[i];
@@ -266,7 +254,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				effectsList.finalCorruptionPerTick *= effect.value;
 				effectsList.corruptionProdPerTick *= effect.value;
 				break;
-			case "siphoning":
+			case "siphoning": //Back in the old days, the Siphoning polcy used to work differently.
 				if (effect.value < effectsList.finalCorruptionPerTick) {
 					//We can pay siphoned Pacts in full!
 					effectsList.finalCorruptionPerTick -= effect.value;
@@ -305,15 +293,13 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	//If this is less than the corruption production, it means we'll go into debt.
 	//@return A negative number, or zero.
 	getCorruptionPerTickConsumption: function(){
-		//Grab cached value if we can, recalculate if needed
-		var corruptionData = this.corruptionCached || this.getCorruptionEffects();
-		return corruptionData.finalCorruptionPerTick - corruptionData.corruptionProdPerTick - corruptionData.deficitPerTick;
+		return 0;
+		//TODO: Blah blah blah, remove Siphoning's old effect.
 	},
 	//If Siphoning is active, the amount by which we go into debt each tick due to not being able to pay for Pacts
 	getCorruptionDeficitPerTick: function(){
-		//Grab cached value if we can, recalculate if needed
-		var corruptionData = this.corruptionCached || this.getCorruptionEffects();
-		return corruptionData.deficitPerTick;
+		return 0;
+		//TODO: Blah blah blah, remove Siphoning's old effect.
 	},
 	update: function(){
 		if (this.game.resPool.get("faith").value > 0 || this.game.challenges.isActive("atheism") && this.game.bld.get("ziggurat").val > 0){
@@ -362,9 +348,16 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		// Prevents alicorn count to fall to 0, which would stop the per-tick generation
 		var maxAlicornsToCorrupt = Math.ceil(alicorns.value) - 1;
 		var alicornsToCorrupt = Math.floor(Math.min(this.corruption, maxAlicornsToCorrupt));
+		var debtToPay = this.game.getEffect("repayDebtOnNecrocornGeneration") ?
+			Math.floor(this.pactsManager.necrocornDeficit) : 0;
 		if (alicornsToCorrupt > 0) {
 			this.corruption -= alicornsToCorrupt;
 			alicorns.value -= alicornsToCorrupt;
+			if (debtToPay > 0) { //Instead of generating necrocorns, pay back debt.
+				debtToPay = Math.min(debtToPay, alicornsToCorrupt);
+				this.pactsManager.necrocornDeficit -= debtToPay;
+				alicornsToCorrupt -= debtToPay;
+			}
 			this.game.resPool.get("necrocorn").value += alicornsToCorrupt;
 			this.game.upgrade({
 				zigguratUpgrades: ["skyPalace", "unicornUtopia", "sunspire"]
@@ -402,13 +395,6 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	},
 	
 	gesSiphoningAlicornConsumptionPerDay: function(){
-		if (this.game.science.getPolicy(["siphoning"]).researched){
-			var necrocornDeficitRepaymentModifier = 1;
-			if (this.pactsManager.necrocornDeficit > 0){
-				necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
-			}
-			return this.game.getEffect("necrocornPerDay") * necrocornDeficitRepaymentModifier;
-		}
 		return 0;
 	},
 	necrocornFastForward: function(days, times){
@@ -2559,10 +2545,9 @@ dojo.declare("classes.religion.pactsManager", null, {
 			return 1;
 		}
 		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
-		if (this.game.science.getPolicy(["siphoning"]).researched){
-			if (this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay >= 1){ //check if siphening is enough to pay for per day consumption
-				return 1;
-			}
+		if (this.game.getEffect("repayDebtOnNecrocornGeneration")) {
+			//The new effect of Siphoning policy changes how you pay for Pacts
+			return 1;
 		}
 		var necrocornDeficitRepaymentModifier = 1;
 		necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
@@ -2574,30 +2559,20 @@ dojo.declare("classes.religion.pactsManager", null, {
 	},
 	//how much corruption siphening spends in x days
 	getSiphonedCorruption: function(days){
-		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
-		if (this.game.science.getPolicy(["siphoning"]).researched){
-			if (this.game.religion.getCorruptionDeficitPerTick() <= 0){
-				return -necrocornPerDay * days;
-			}
-			return Math.min(-necrocornPerDay * days, this.game.religion.getCorruptionPerTickProduction()*this.game.calendar.ticksPerDay * days);
-		}
+		//TODO: remove old effect of Siphoning
 		return 0;
 	},
 	necrocornConsumptionDays: function(days){
 		//------------------------- necrocorns pacts -------------------------
 		//deficit changing
 		var necrocornDeficitRepaymentModifier = 1;
-		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
+		var necrocornPerDay = this.game.getEffect("necrocornPerDay"); //This is a NEGATIVE NUMBER if we have active Pacts
 		var compensatedNecrocorns = 0;
-		if (this.game.science.getPolicy(["siphoning"]).researched){
-			if (this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
-				this.game.resPool.addResPerTick("alicorn", necrocornPerDay * days);
-				return;
-			}
-			var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
-			var siphenedNecrocorns = this.getSiphonedCorruption(days);
-			compensatedNecrocorns = Math.max(consumedAlicorns, -siphenedNecrocorns);
-			this.game.resPool.addResPerTick("alicorn", compensatedNecrocorns);
+		if (this.game.getEffect("repayDebtOnNecrocornGeneration")) {
+			//Debt is not paid in fractional necrocorns each day; rather, it is paid when we generate necrocorns.
+			//We do accumulate debt each day, though.
+			this.necrocornDeficit -= necrocornPerDay * days;
+			return;
 		}
 		//if siphening is not enough to pay for per day consumption ALSO consume necrocorns;
 		if (this.necrocornDeficit > 0){

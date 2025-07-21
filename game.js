@@ -1644,6 +1644,14 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio"
 			},
 			//Necrocorn-related Policy effects
+			"smallDebtPunishmentExemption": {
+				title: $I("effectsMgr.statics.smallDebtPunishmentExemption.title"),
+				type: "fixed"
+			},
+			"repayDebtOnNecrocornGeneration": {
+				title: $I("effectsMgr.statics.repayDebtOnNecrocornGeneration.title"),
+				type: "fixed"
+			},
 			"feedEldersEfficiencyRatio": {
 				title: $I("effectsMgr.statics.feedEldersEfficiencyRatio.title"),
 				type: "ratio"
@@ -1655,6 +1663,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"necrocornCorruptionInterference": {
 				title: $I("effectsMgr.statics.necrocornCorruptionInterference.title"),
 				type: "ratio"
+			},
+			"pactNecrocornUpfrontCost": {
+				title: $I("effectsMgr.statics.necrocornUpfrontCost.title"),
+				type: "fixed"
 			},
 			//challenges
 			"springCatnipRatio": {
@@ -1761,10 +1773,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"pactNecrocornConsumption": {
 				title: $I("effectsMgr.statics.necrocornPerDay.pact.title"),
 				type: "perDay"
-			},
-			"pactNecrocornUpfrontCost": {
-				title: $I("effectsMgr.statics.necrocornUpfrontCost.title"),
-				type: "fixed"
 			},
             "pactsAvailable":{
 				title: $I("effectsMgr.statics.pactsAvailable.title"),
