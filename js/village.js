@@ -783,11 +783,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 		//Policy whose downside reduces karma effectiveness if you're in Pact debt
 		if (game.science.getPolicy("upfrontPayment").researched) {
-			var pactsMan = game.religion.pactsManager;
-			var debtMultiplier = 1 - pactsMan.necrocornDeficit / pactsMan.fractureNecrocornDeficit;
-			if (game.religion.getPact("fractured").on) {
-				debtMultiplier = 0;
-			}
+			var debtMultiplier = game.religion.pactsManager.getDebtPenaltyRatio();
 			debtMultiplier = Math.max(debtMultiplier, 0.1); //Capped at -90% reduction
 			karma *= debtMultiplier;
 		}
