@@ -357,6 +357,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				debtToPay = Math.min(debtToPay, alicornsToCorrupt);
 				this.pactsManager.necrocornDeficit -= debtToPay;
 				alicornsToCorrupt -= debtToPay;
+				this.game.msg($I("religion.msg.siphoned"), null, "alicornCorruption");
 			}
 			this.game.resPool.get("necrocorn").value += alicornsToCorrupt;
 			this.game.upgrade({

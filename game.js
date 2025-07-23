@@ -3812,14 +3812,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			stack.push(corruptionStack);
 		}
 
-		if (resName == "alicorn"){
-			stack.push({
-				name: $I("res.stack.corruptionPerDaySiphoned"),
-				type: "perDay",
-				value: this.religion.gesSiphoningAlicornConsumptionPerDay()
-			});
-		}
-
 		return stack;
 	},
 

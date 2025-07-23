@@ -1045,6 +1045,7 @@
     "religion.faithCount.pool": "Worship: {0}",
     "religion.adore.confirmation.msg": "Are you sure you want to convert all worship to epiphany?\n\nYou will get a bonus to faith conversion (Praise the sun) based on your total amount of epiphany.\n\nEpiphany and this bonus will carry over through resets.\n\nCLICKING THIS BUTTON WILL ERASE ALL WORSHIP AND RESET SOLAR REVOLUTION PRODUCTION BONUS.",
     "religion.msg.corruption": "Your alicorn has been corrupted by the markers!",
+    "religion.msg.siphoned": "Your alicorn was siphoned away to pay off debt.",
     "religion.pact.pactOfAnnihilation.label" : "Pact of Annihilation",
     "religion.pact.pactOfAnnihilation.desc" : "Harness destructive power, increasing antimatter storage",
 	"religion.pact.pactOfCleansing.label": "Pact of Cleansing",
