@@ -2528,7 +2528,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 	 * @return A number from 0 to 1, inclusive.
 	 */
 	getDebtPenaltyRatio: function() {
-		if (this.game.religion.getPact("fractured").on) {
+		if (this.game.religion.getPact("fractured").on || this.necrocornDeficit >= this.fractureNecrocornDeficit) {
 			return 0; //Maximum debt
 		}
 		//Account for punishment exemption (0 by default):
