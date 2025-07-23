@@ -848,7 +848,7 @@
     "policy.fascism.label" : "Fascism",
     "policy.fascism.desc" : "Lebensraum! Population penalties to happiness are eliminated, and log cabins cost half as much.",
     "policy.feedingFrenzy.label": "Feeding Frenzy",
-    "policy.feedingFrenzy.desc": "Increase the efficiency of feeding Leviathans by based on number of active Pacts & unspent Pacts, and allow full necrocorn corruption rate up to a max of 1 necrocorn. However, the frenzy causes interference which reduces necrocorn corruption rate.",
+    "policy.feedingFrenzy.desc": "Your divine feast is more effective (based on available Pacts) but causes interference with necrocorn corruption.",
     "policy.frugality.label": "Frugality",
     "policy.frugality.desc": "Stoic philosophers are placed in charge of the mints, making them more effective by reducing corruption.",
     "policy.fullIndustrialization.label" : "Full Industrialization",

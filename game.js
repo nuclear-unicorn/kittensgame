@@ -1656,10 +1656,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.feedEldersEfficiencyRatio.title"),
 				type: "ratio"
 			},
-			"feedEldersEfficiencyRatio2": {
-				title: $I("effectsMgr.statics.feedEldersEfficiencyRatio.title"),
-				type: "ratio"
-			},
 			"necrocornCorruptionInterference": {
 				title: $I("effectsMgr.statics.necrocornCorruptionInterference.title"),
 				type: "ratio"

@@ -2111,22 +2111,20 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name : "necrocorn", val: 1}
 		],
 		effects: {
-			"feedEldersEfficiencyRatio": 0, //Feeding the Leviathans is more efficient.
-			"feedEldersEfficiencyRatio2": 0, //Feeding the Leviathans is more efficient; multiplies with previous effect.
-			"necrocornCorruptionInterference": -0.1 //The policy's downside: reduce necrocorn income by 10%
+			"feedEldersEfficiencyRatio": 0, //Feeding the Leviathans gives more energy per unit necrocorn spent
+			"necrocornCorruptionInterference": -0.1 //Reduce necrocorn income
 		},
 		calculateEffects: function(self, game) { //The intent is to call this whenever we gain or lose a Pact.
 			if (!game.getFeatureFlag("MAUSOLEUM_PACTS")) {
 				self.unlocked = false;
 				return;
 			}
-			self.effects["feedEldersEfficiencyRatio"] = 0.1 * game.religion.pactsManager.countUniqueActivePacts();
 			//  0 unspent Pacts -->   0% bonus
-			// 10 unspent Pacts -->  44% bonus
-			// 25 unspent Pacts -->  70% bonus
+			// 10 unspent Pacts -->  31% bonus
+			// 25 unspent Pacts -->  62% bonus
 			// 50 unspent Pacts --> 100% bonus
-			//100 unspent Pacts --> 141% bonus
-			self.effects["feedEldersEfficiencyRatio2"] = Math.round(game.getUnlimitedDR(game.getEffect("pactsAvailable"), 0.01 )) / 100;
+			//100 unspent Pacts --> 156% bonus
+			self.effects["feedEldersEfficiencyRatio"] = game.getUnlimitedDR(game.getEffect("pactsAvailable"), 50 );
 		},
 		evaluateLocks: function(game) {
 			return game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val && game.religion.getZU("marker").val;

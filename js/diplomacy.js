@@ -862,8 +862,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		var cleanRequest = Math.max(amtRequested, 1) || 1;
 		var amt = Math.floor(Math.min(cleanRequest, ncorns.value));
 		if (amt > 0){
-			var efficiency = 1 + this.game.getLimitedDR(this.game.getEffect("feedEldersEfficiencyRatio"), 0.5); //The efficiency increase is capped at 50% bonus
-			efficiency *= this.game.getEffect("feedEldersEfficiencyRatio2");
+			var efficiency = 1 + this.game.getEffect("feedEldersEfficiencyRatio");
 			elders.energy += amt * efficiency;
 
 			var markerCap = this.game.diplomacy.getMarkerCap();
