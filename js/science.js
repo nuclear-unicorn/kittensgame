@@ -2086,9 +2086,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		prices: [
 			{name : "necrocorn", val: 1}
 		],
-		effects: { //TODO: remove old effect (slowing down corruption & consuming alicorns)
+		effects: {
 			"smallDebtPunishmentExemption": 5,
-			"repayDebtOnNecrocornGeneration": 1 //TODO: have generated necrocorns be spent to pay back debt if debt > 1
+			"repayDebtOnNecrocornGeneration": 1
 		},
 		calculateEffects: function(self, game) {
 			if (!game.getFeatureFlag("MAUSOLEUM_PACTS")) {

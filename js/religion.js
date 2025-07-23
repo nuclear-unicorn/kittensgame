@@ -2490,17 +2490,23 @@ dojo.declare("classes.religion.pactsManager", null, {
 		return $I("msg.pacts.info", [this.game.getEffect("pactsAvailable"), -this.game.getEffect("pactNecrocornConsumption")]); //Every TT above 25 adds 100% to pact effects (not consumption) and 10% to karma per millenia effect
 	},
 	getPactsTextDeficit: function(){
-		if (this.game.religion.pactsManager.necrocornDeficit > 0){
-			return $I("msg.necrocornDeficit.info", [Math.round(this.game.religion.pactsManager.necrocornDeficit * 10000)/10000, 
+		if (this.game.religion.pactsManager.necrocornDeficit <= 0) {
+			return ""; //No deficit.  Nothing to see here.
+		}
+		if (this.game.getEffect("repayDebtOnNecrocornGeneration")) {
+			//We have deficit, but it gets paid off with Siphoning.
+			return $I("msg.necrocornDeficit.info.with.siphoning", [Math.round(this.game.religion.pactsManager.necrocornDeficit * 10000)/10000, 
+				"-" + Math.round(100*
+				((1 - this.game.religion.pactsManager.getDebtPenaltyRatio())))]);
+		}
+		//Else, we have deficit, & it makes Pacts consume more necrocorns to slowly pay it off.
+		return $I("msg.necrocornDeficit.info", [Math.round(this.game.religion.pactsManager.necrocornDeficit * 10000)/10000, 
 				"-" + Math.round(100*
 				((1 - this.game.religion.pactsManager.getDebtPenaltyRatio()))),
 				Math.round(10000*
 					(0.15 *(1 + this.game.getEffect("deficitRecoveryRatio")/2)))/100,
 					-Math.round((this.game.getEffect("necrocornPerDay") *(0.15 *(1 + this.game.getEffect("deficitRecoveryRatio"))))*1000000)/1000000
 				]);
-			} else {
-				return "";
-			}
 	},
 	getPactsTextKarmaPunishment: function() {
 		if (!this.game.science.getPolicy("upfrontPayment").researched) {
