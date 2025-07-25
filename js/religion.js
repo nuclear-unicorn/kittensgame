@@ -177,7 +177,6 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	 *                                   how many necrocorns the game-state actually has.
 	 * @return An array.  Each element in the array represents an individual bonus/modifier to necrocorn production.
 	 *         The point of this array is that the code for the UI can process this array to make it human-readable.
-	 *         The array will also contain 3 specific properties with useful information (see below).
 	 * 
 	 * Each element in the array is an object with the following 3 keys:
 	 *	label: string.  What the player will see in the UI as the name for this effect.
@@ -187,15 +186,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	 *		"multiplicative" - All additive effects before this point will be multiplied by the value
 	 * 
 	 * But, if all you want are some quick & easy numbers, fear not!  You need not bother with the array elements.
-	 * The return value will also have 3 additional numerical fields, in addition to being an array.
+	 * The return value will also have an additional numerical field, in addition to being an array.
 	 *	finalCorruptionPerTick: number.  The TOTAL necrocorn production per tick, after applying ALL modifiers.
-	 * TODO: blah blah blah, remove Siphoning's old effect
-	 *	corruptionProdPerTick: number.  Necrocorn production per tick, except we ignore Siphoning.
-	 *	                                The difference between these two numbers is the amount Siphoning consumes.
-	 *	deficitPerTick: number.  How much debt we accumulate each tick, if Siphoning wants to spend
-	 *	                         more necrocorns than we can produce.
-	 *	                         If we have sufficient production to satisfy Siphoning, this will be 0.
-	 *	                         If Siphoning is not active, this will be 0.
 	 */
 	getCorruptionEffects: function(pretendExistNecrocorn) {
 		var existNecrocorn = (pretendExistNecrocorn === undefined) ? (this.game.resPool.get("necrocorn").value > this.getExistNecrocornThreshold()) : pretendExistNecrocorn;
@@ -273,7 +265,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 		return effectsList;
 	},
-	//Total necrocorn production
+	/**
+	 * Gets the amount of necrocorns corrupted per tick.
+	 * @param pretendExistNecrocorn boolean (optional) --If omitted, checks the game-state we're actually in right now.
+	 */
 	getCorruptionPerTick: function(pretendExistNecrocorn){
 		//Recalculate if needed, grab cached value if we can
 		if (typeof(pretendExistNecrocorn) === "boolean" || !this.corruptionCached) {
@@ -281,25 +276,14 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 		return this.corruptionCached.finalCorruptionPerTick;
 	},
-	//Necrocorn production, ignoring Siphoning
 	getCorruptionPerTickProduction: function(pretendExistNecrocorn){
-		//Recalculate if needed, grab cached value if we can
-		if (typeof(pretendExistNecrocorn) === "boolean" || !this.corruptionCached) {
-			return this.getCorruptionEffects(pretendExistNecrocorn).corruptionProdPerTick;
-		}
-		return this.corruptionCached.corruptionProdPerTick;
+		console.error("Deprecated; use getCorruptionPerTick instead");
 	},
-	//The amount of corruption that Siphoning TRIES to consume.
-	//If this is less than the corruption production, it means we'll go into debt.
-	//@return A negative number, or zero.
 	getCorruptionPerTickConsumption: function(){
-		return 0;
-		//TODO: Blah blah blah, remove Siphoning's old effect.
+		console.error("Deprecated; use 0 instead");
 	},
-	//If Siphoning is active, the amount by which we go into debt each tick due to not being able to pay for Pacts
 	getCorruptionDeficitPerTick: function(){
-		return 0;
-		//TODO: Blah blah blah, remove Siphoning's old effect.
+		console.error("Deprecated; use 0 instead");
 	},
 	update: function(){
 		if (this.game.resPool.get("faith").value > 0 || this.game.challenges.isActive("atheism") && this.game.bld.get("ziggurat").val > 0){
@@ -343,6 +327,13 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 		this.triggerOrderOfTheVoid(times);
 	},
+	/**
+	 * If the necrocorn corruption progress has reached 100%, convert alicorns into necrocorns at a 1:1 ratio.
+	 * If the Siphoning policy is active, these necrocorns are immediately used to repay debt.
+	 * Otherwise, the player gets to keep them.
+	 * If there are not enough alicorns, the corruption progress remains at 100%.
+	 * @return The number of necrocorns gained from this.  (Necrocorns spent to pay debt due to Siphoning don't count.  We only count necrocorns if the player gets to keep them.)
+	 */
 	corruptNecrocorns: function(){
 		var alicorns = this.game.resPool.get("alicorn");
 		// Prevents alicorn count to fall to 0, which would stop the per-tick generation
@@ -369,6 +360,15 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 		return alicornsToCorrupt;
 	},
+	/**
+	 * A naive function for calculating how the amount of necrocorns evolves over time.
+	 * It's inaccurate because it calculates all necrocorn production first, then all consumption.
+	 * It doesn't take into account the fact that necrocorns are consumed continuously over time.
+	 * On top of that, it doesn't take into account the effect of Feeding Frenzy to change where the "exist-necrocorn threshold" is.
+	 * Nor does it take into account that Siphoning will consume some as they're eaten.
+	 * @param daysOffset number The number of days that elapse (used to calculate Pact consumption)
+	 * @param times number The number of ticks that elapse (used to calculate corruption)
+	 */
 	necrocornsNaiveFastForward: function(daysOffset, times){
 		var alicorns = this.game.resPool.get("alicorn");
 		if (alicorns.value > 0) {
@@ -396,8 +396,14 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	},
 	
 	gesSiphoningAlicornConsumptionPerDay: function(){
+		console.error("Deprecated, use 0 instead");
 		return 0;
 	},
+	/**
+	 * NEEDS TO BE UPDATED FOR NEW SIPHONING EFFECT!
+	 * @param daysOffset number The number of days that elapse (used to calculate Pact consumption)
+	 * @param times number The number of ticks that elapse (used to calculate corruption)
+	 */
 	necrocornFastForward: function(days, times){
 		//------------------------- necrocorns pacts -------------------------
 		//deficit changing
