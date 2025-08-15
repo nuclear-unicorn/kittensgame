@@ -3761,8 +3761,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			stack.push({
 				name: $I("res.stack.pactsConsumption"),
 				type: "perDay",
-				value: this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect("necrocornPerDay") +
-						this.religion.pactsManager.getSiphonedCorruption(1)
+				value: this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect("necrocornPerDay")
 			});
 		} else {
 			stack.push({
@@ -4011,7 +4010,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	getResourcePerDay: function(resName){
 		if (resName == "necrocorn"){
-			return (this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect(resName + "PerDay") + this.religion.pactsManager.getSiphonedCorruption(1) +
+			return (this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect(resName + "PerDay") +
 			this.religion.getCorruptionPerTick() * this.calendar.ticksPerDay);
 		}
 		return this.getEffect(resName + "PerDay");
@@ -4103,8 +4102,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				var fractionOfCurrentDayElapsed = this.calendar.day - Math.floor(this.calendar.day);
 				if (res.name == "necrocorn") {
 					//Fast-forward a fractional amount of days' worth of pacts consumption:
-					var perDayConsumption = this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect("necrocornPerDay")
-					                        + this.religion.pactsManager.getSiphonedCorruption(1);
+					var perDayConsumption = this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect("necrocornPerDay");
 					resourceValue += fractionOfCurrentDayElapsed * perDayConsumption;
 					//Count corruption as fractional necrocorns:
 					resourceValue += this.religion.corruption;
