@@ -394,27 +394,21 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				var projectedDebt = debtBefore + ticksElapsed * avgDebtPerTick; //Amount of debt we'd have at this point in time
 				var targetNecrocorns = BASEnecrocornsToPassThreshold + Math.floor(projectedDebt); //How many necrocorns we WANT to have made by this time
 
-				console.log("By the time we generate " + tryNumber + " necrocorns, it'll have taken us " + ticksElapsed + " ticks.\n" +
-					"By this time, our current amount of necrocorn debt will have increased to " + projectedDebt + ", so the effective threshold has moved to " + targetNecrocorns + " necrocorns.");
+				/*Debug info
+				console.log("By the time we generate " + tryNumber + " necrocorns, it'll have taken " +
+					"us " + ticksElapsed + " ticks.\nBy this time, our current amount of necrocorn " +
+					"debt will have increased to " + projectedDebt + ", so the effective threshold " +
+					"has moved to " + targetNecrocorns + " necrocorns."); //*/
 
-				if (tryNumber > targetNecrocorns) {
-					console.warn("oops, we went too far into the future");
-					break;
-				} else if (tryNumber == targetNecrocorns) {
-					console.log("Bingo!  We found the right number");
+				if (tryNumber >= targetNecrocorns) {
 					break;
 				} else {
-					//Not quite there yet
 					//This method of making multiple steps may be inefficient
-					//If the difference isn't shrinking each time, abandon search
 					//Ideally, we could find a way to do this in 3 steps or less
-					console.log("We are " + (targetNecrocorns - tryNumber) + " necrocorns short--but the number to keep track of is " + (BASEnecrocornsToPassThreshold + projectedDebt - tryNumber) + " necrocorns.");
 					tryNumber = targetNecrocorns;
-
 					if (avgDebtPerTick >= corruptionPerTickUnpenalized && tryNumber > (BASEnecrocornsToPassThreshold + debtBefore) * 2) {
 						//We are clearly not getting any closer to an answer.
 						//This means we will NEVER reach the threshold from where we currently are.
-						console.log("Ah, clearly we'll never reach the threshold like this.");
 						tryNumber = Infinity;
 						break;
 					}
@@ -428,7 +422,6 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			if (ticksUnpenalized < 0) { ticksUnpenalized = 0; } //This would happen if we're above the threshold already.
 			if (ticksUnpenalized > times) { ticksUnpenalized = times; } //This would happen if we are fast-forwarding for a very short duration only
 			//So, by now we should have found the correct numbers, or we passed the edge.
-			console.log("End of loop.  tryNumber = " + tryNumber + " necrocorns; ticksElapsed = " + ticksElapsed + " (clamped to " + ticksUnpenalized + ") ticks");
 		}
 		//How many ticks we'll get of necrocorn production while > the threshold:
 		var ticksPenalized = times - ticksUnpenalized;
@@ -438,7 +431,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 		var daysPenalized = daysOffset - daysUnpenalized;
 		
-		//*Debug info, so you can check my math:
+		/*Debug info, so you can check my math:
 		console.log("ReligionManager#necrocornsNaiveFastForward for a total of " + daysOffset + " days, corresponding to " + times +
 			" ticks:\nWe are currently at " + necrocornRes.value + " necrocorns, & the threshold is at " +
 			threshold + " necrocorns.\n> " + daysUnpenalized + " days (" + ticksUnpenalized + " ticks) are at base production rate (" +
@@ -454,9 +447,6 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			this.corruption += corruptionPerTickUnpenalized * ticksUnpenalized;
 			this.corruptNecrocorns();
 		}
-		console.log("After simulating " + daysUnpenalized + " days (" + ticksUnpenalized + " ticks), we have:\n> " +
-			necrocornRes.value + " necrocorns (compare to a threshold of " + threshold + ")\n> " +
-			this.pactsManager.necrocornDeficit + " debt\n> " + this.corruption + " leftover corruption.");
 		//Penalized:
 		if (daysPenalized > 0) {
 			this.pactsManager.necrocornConsumptionDays(daysPenalized);
@@ -468,7 +458,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			this.corruption += corruptionPerTickPenalized * ticksPenalized;
 		}
 
-		//*Debug info, so you can check my math:
+		/*Debug info, so you can check my math:
 		console.log("After simulating " + daysPenalized + " days (" + ticksPenalized + " ticks), we have:\n> " +
 			necrocornRes.value + " necrocorns (compare to a threshold of " + threshold + ")\n> " +
 			this.pactsManager.necrocornDeficit + " debt\n> " + this.corruption + " leftover corruption.\n" +
@@ -502,7 +492,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			this.corruption += corruptionPerTickUnpenalized * ticksUnpenalized + corruptionPerTickPenalized * ticksPenalized;
 		}
 
-		//*Debug info, so you can check my math:
+		/*Debug info, so you can check my math:
 		console.log("ReligionManager#necrocornsNaiveFastForward for a total of " + daysOffset + " days, corresponding to " + times +
 			" ticks:\nWe are currently at " + necrocornsBefore + " necrocorns, & the threshold is at " +
 			threshold + " necrocorns.\nWe need to produce " + necrocornsToPassThreshold + " necrocorns to pass the threshold.\n> " + ticksUnpenalized + " ticks are at base production rate (" +
@@ -558,25 +548,19 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		//Set up a loop!
 		//All variables defined above this point are CONSTANT within the loop.
 		for (var daysRemaining = days, timesRemaining = times, i = 0; daysRemaining > 0 || timesRemaining > 0; i++ ) {
-			console.log("daysRemaining: " + daysRemaining + ", timesRemaining: " + timesRemaining + ", loop iteration: " + (i+1));
 			//Calculate the projected amount of time until we hit edge case #1:
 			var daysUntilWeHitEdgeCase1 = 0;
 			if (continuouslyConsumeNecrocorns && necrocornPerDay < 0) {
 				if (necrocornRes.value > threshold) {
 					var consumptionRate = -necrocornPerDay * this.pactsManager.getNecrocornDeficitConsumptionModifier(); //Positive value, in units of necrocorn/day
 					daysUntilWeHitEdgeCase1 = Math.ceil((necrocornRes.value - threshold) / consumptionRate);
-					console.log("Edge case #1: Due to our consumption (" + consumptionRate + " necrocorn/day), we will fall below the threshold in " + daysUntilWeHitEdgeCase1 + " days.");
 				} else {
 					//We'll need to check for edge case #1 again after we go above the threshold
 					var ticksUntilReachThreshold = Math.ceil((1 + Math.floor(threshold - necrocornRes.value) - this.corruption) / this.getCorruptionPerTick(false /*we are below threshold*/));
 					daysUntilWeHitEdgeCase1 = Math.ceil(ticksUntilReachThreshold / ticksPerDay);
-					console.log("Edge case #1: We're below the threshold now, but we'll go above it in " + daysUntilWeHitEdgeCase1 + " days.");
 				}
-			} else {
-				//We are in a situation where edge case #1 cannot happen
+			} else { //We are in a situation where edge case #1 cannot happen
 				daysUntilWeHitEdgeCase1 = Infinity;
-				console.log("Edge case #1: Literally not a problem.");
-
 			}
 
 			if (isNaN(daysUntilWeHitEdgeCase1)) { //Sanity check
@@ -591,14 +575,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			this.necrocornsNaiveFastForward(daysToSimulate, timesToSimulate);
 			daysRemaining -= daysToSimulate;
 			timesRemaining -= timesToSimulate;
-			
-			//SAFETY CHECK:
-			if (i>15) {
-				console.warn("Exiting necrocorn fast-forward loop after iteration number " + (i+1));
-				break;
-			}
 		}
-		console.log("Finished necrocornFastForward algorithm.");
 	},
 
 	// Converts the equivalent of 10 % (improved by Void Resonators) of produced faith, but with only a quarter of apocrypha bonus
