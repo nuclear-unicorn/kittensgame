@@ -2151,9 +2151,14 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 				return;
 			}
 			this.description = $I("policy.upfrontPayment.desc");
-			//Add a warning to the description iff the player is in debt.
-			if (!self.researched && game.religion.pactsManager.necrocornDeficit) {
-				this.description += "<br><span class=\"genericWarning\">" + $I("policy.upfrontPayment.warning") + "</span>";
+			//Add a warning to the description
+			if (!self.researched) {
+				if (game.religion.getPact("fractured").on) {
+					this.description += "<br><span class=\"genericWarning\">" + $I("policy.upfrontPayment.fractured") + "</span>";
+				}
+				else if (game.religion.pactsManager.necrocornDeficit) {
+					this.description += "<br><span class=\"genericWarning\">" + $I("policy.upfrontPayment.warning") + "</span>";
+				}
 			}
 		},
 		evaluateLocks: function(game) {
