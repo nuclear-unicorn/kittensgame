@@ -857,7 +857,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			}
 			self.effects["deficitRecoveryRatio"] = self.effectsPreDeficit["deficitRecoveryRatio"];
 			//applying deficit
-			var deficiteModifier = (1 - game.religion.pactsManager.necrocornDeficit/50);
+			var deficiteModifier = game.religion.pactsManager.getDebtPenaltyRatio();
 			var existsDifference = false;
 			//console.warn(deficiteModifier);
 			for (var name in self.effectsPreDeficit){
@@ -2084,6 +2084,9 @@ dojo.declare("classes.ui.CryptotheologyPanel", com.nuclearunicorn.game.ui.Panel,
 });
 
 dojo.declare("classes.ui.PactsWGT", [mixin.IChildrenAware, mixin.IGameAware], {
+	updateInterval: 10, //Once every 2 sec
+	ticksSinceUpdate: 0,
+
 	constructor: function(game){
 		var self = this;
 		var controller = com.nuclearunicorn.game.ui.PactsBtnController(game);
@@ -2100,14 +2103,32 @@ dojo.declare("classes.ui.PactsWGT", [mixin.IChildrenAware, mixin.IGameAware], {
 
 	render: function(container){
 		var div = dojo.create("div", null, container);
-		var span1 = dojo.create("span", {innerHTML: this.game.religion.pactsManager.getPactsTextSum()}, div);
+		this.spanPactsInfo = dojo.create("span", {
+			id: "pactsTextSum",
+			innerHTML: this.game.religion.pactsManager.getPactsTextSum()}, div);
 		var btnsContainer = dojo.create("div", null, div);
-		var span2 = dojo.create("span", {innerHTML: this.game.religion.pactsManager.getPactsTextDeficit()}, div);
+		this.spanDeficitInfo = dojo.create("span", {
+			id: "pactsTextDeficit",
+			innerHTML: this.game.religion.pactsManager.getPactsTextDeficit()}, div);
+		//Create this <span> inside an anonymous <div> to vertically separate it from the previous <span>.
+		this.spanDeficitKarma = dojo.create("span", {
+			id: "pactsTextKarmaPunishment",
+			innerHTML: this.game.religion.pactsManager.getPactsTextKarmaPunishment()}, dojo.create("div", null, div));
 		this.inherited(arguments, [btnsContainer]);
+		this.ticksSinceUpdate = 0;
 	},
 
 	update: function(){
 		this.inherited(arguments);
+
+		//Update Pact-related text frequently, but not too often
+		this.ticksSinceUpdate++;
+		if (this.ticksSinceUpdate >= this.updateInterval) {
+			this.spanPactsInfo.innerHTML = this.game.religion.pactsManager.getPactsTextSum();
+			this.spanDeficitInfo.innerHTML = this.game.religion.pactsManager.getPactsTextDeficit();
+			this.spanDeficitKarma.innerHTML = this.game.religion.pactsManager.getPactsTextKarmaPunishment();
+			this.ticksSinceUpdate = 0;
+		}
 	}
 });
 dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
@@ -2470,17 +2491,62 @@ dojo.declare("classes.religion.pactsManager", null, {
 		return $I("msg.pacts.info", [this.game.getEffect("pactsAvailable"), -this.game.getEffect("pactNecrocornConsumption")]); //Every TT above 25 adds 100% to pact effects (not consumption) and 10% to karma per millenia effect
 	},
 	getPactsTextDeficit: function(){
-		if (this.game.religion.pactsManager.necrocornDeficit > 0){
-			return $I("msg.necrocornDeficit.info", [Math.round(this.game.religion.pactsManager.necrocornDeficit * 10000)/10000, 
-				-Math.round(100*
-				((this.game.religion.pactsManager.necrocornDeficit/50))),
+		if (this.game.religion.pactsManager.necrocornDeficit <= 0) {
+			return ""; //No deficit.  Nothing to see here.
+		}
+		if (this.game.getEffect("repayDebtOnNecrocornGeneration")) {
+			//We have deficit, but it gets paid off with Siphoning.
+			return $I("msg.necrocornDeficit.info.with.siphoning", [Math.round(this.game.religion.pactsManager.necrocornDeficit * 10000)/10000, 
+				"-" + Math.round(100*
+				((1 - this.game.religion.pactsManager.getDebtPenaltyRatio())))]);
+		}
+		//Else, we have deficit, & it makes Pacts consume more necrocorns to slowly pay it off.
+		return $I("msg.necrocornDeficit.info", [Math.round(this.game.religion.pactsManager.necrocornDeficit * 10000)/10000, 
+				"-" + Math.round(100*
+				((1 - this.game.religion.pactsManager.getDebtPenaltyRatio()))),
 				Math.round(10000*
 					(0.15 *(1 + this.game.getEffect("deficitRecoveryRatio")/2)))/100,
 					-Math.round((this.game.getEffect("necrocornPerDay") *(0.15 *(1 + this.game.getEffect("deficitRecoveryRatio"))))*1000000)/1000000
 				]);
-			} else {
-				return "";
-			}
+	},
+	getPactsTextKarmaPunishment: function() {
+		if (!this.game.science.getPolicy("upfrontPayment").researched) {
+			return "";
+		}
+		//Upfront Payment reduces karma effectiveness
+		var karmaEffectiveness = this.getDebtPenaltyRatio();
+		karmaEffectiveness = Math.max(karmaEffectiveness, 0.1); //Capped at -90% reduction
+
+		if (karmaEffectiveness < 1) {
+			//Transform into a percent:
+			var reduction = 100 - 100*karmaEffectiveness;
+			return $I("msg.necrocornDeficit.upfrontPayment.penalty", [
+				"<span class=\"resource-name\">" + this.game.resPool.get("karma").title + "</span>", //Will be styled with CSS
+				"<span title=\"" + reduction.toFixed(4) + "%\">" + reduction.toFixed(0) + "%</span>"]);
+		}
+		//Else, there's nothing to say.
+		return "";
+	},
+	/**
+	 * If there is Pact debt, certain game-effects are reduced based on how deep into debt the player is.
+	 * This function calculates a ratio that effects are multiplied with.
+	 * At low debt, returns a number closer to 1.  At high debt, returns a number closer to 0.
+	 * If Pacts are Fractured, it's treated as though we have maximum debt.
+	 * @return A number from 0 to 1, inclusive.
+	 */
+	getDebtPenaltyRatio: function() {
+		if (this.game.religion.getPact("fractured").on || this.necrocornDeficit >= this.fractureNecrocornDeficit) {
+			return 0; //Maximum debt
+		}
+		//Account for punishment exemption (0 by default):
+		var lowerBound = this.game.getEffect("smallDebtPunishmentExemption");
+		if (this.necrocornDeficit <= lowerBound) {
+			return 1; //0 debt
+		}
+		if (lowerBound >= this.fractureNecrocornDeficit) {
+			console.warn("smallDebtPunishmentExemption is too high relative to fractureNecrocornDeficit; cannot calculate debt penalty ratio!");
+		}
+		return 1 - (this.necrocornDeficit - lowerBound) / (this.fractureNecrocornDeficit - lowerBound);
 	},
 	getNecrocornDeficitConsumptionModifier: function(){
 		if (this.necrocornDeficit <= 0){
@@ -2888,24 +2954,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 		var canSeePacts = !this.game.religion.getPact("fractured").researched && this.game.religion.getZU("blackPyramid").val > 0 && (this.game.religion.getTU("mausoleum").val > 0 || this.game.science.getPolicy("radicalXenophobia").researched);
 		canSeePacts = canSeePacts && this.game.getFeatureFlag("MAUSOLEUM_PACTS");
 		this.ptPanel.setVisible(canSeePacts);
-		
-		//dojo.forEach(this.pactUpgradeButtons, function(e, i){ e.update(); });
-		/*if(this.necrocornDeficitMsgBox){
-			if(this.game.religion.necrocornDeficit > 0){
-				this.necrocornDeficitMsgBox.innerHTML = $I("msg.necrocornDeficit.info", [Math.round(this.game.religion.necrocornDeficit * 10000)/10000, 
-					-Math.round(100*
-					((1 - this.game.religion.necrocornDeficit/50) > 0 ? 
-					(this.game.religion.necrocornDeficit/50) * 100: 
-					this.game.getLimitedDR(this.game.religion.necrocornDeficit*2, 500))
-				)/100|| 0, Math.round(10000*
-					(0.15 *(1 + this.game.getEffect("deficitRecoveryRatio")/2)))/100,
-					-Math.round((this.game.getEffect("necrocornPerDay") *(0.15 *(1 + this.game.getEffect("deficitRecoveryRatio"))))*1000000)/1000000
-				]);
-			}
-			else {
-				this.necrocornDeficitMsgBox.innerHTML = null;
-			}
-		}*/
 	}
 
 });
