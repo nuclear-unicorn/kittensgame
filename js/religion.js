@@ -221,24 +221,17 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			value: 1 + Math.sqrt(this.game.resPool.get("sorrow").value * this.game.getEffect("blsCorruptionRatio")),
 			behavior: "multiplicative"
 		});
+		//Downside of the policy, "Feeding Frenzy"
+		effectsList.push({
+			label: $I("res.stack.corruptionInterference"),
+			value: 1 + this.game.getEffect("necrocornCorruptionInterference"),
+			behavior: "multiplicative"
+		});
 
 		// >>>here<<< is the place to add new bonuses/modifiers/etc. if the devs want to add more content
 		// Just define a label (the i18n string to show to the player, giving this effect a name)
 		// Give it a value & either "additive" or "multiplicative" behavior
 		// The game will recalculate this once per tick, so you can put in a mathematical formula if you want.
-
-		//Siphoning policy
-		// (Pacts, which normally consume necrocorns directly,
-		// will instead slow down necrocorn production by an equivalent amount)
-		if (this.game.getFeatureFlag("MAUSOLEUM_PACTS") > 0 && this.game.science.getPolicy("siphoning").researched){
-			effectsList.push({
-				label: $I("res.stack.corruptionPerDaySiphoned"),
-				value: - this.game.getEffect("necrocornPerDay")/this.game.calendar.ticksPerDay, //this is a positive number! (or zero)
-				behavior: "siphoning" //Special behavior value, will be overwritten later
-					//The calling function will never see this behavior,
-					// they'll only see "additive" behavior with a negative value
-			});
-		}
 
 		//Calculation time: Go through every effect & apply them, in order.
 		for (var i = 0; i < effectsList.length; i += 1) {
@@ -252,7 +245,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				effectsList.finalCorruptionPerTick *= effect.value;
 				effectsList.corruptionProdPerTick *= effect.value;
 				break;
-			case "siphoning":
+			case "siphoning": //Back in the old days, the Siphoning polcy used to work differently.
 				if (effect.value < effectsList.finalCorruptionPerTick) {
 					//We can pay siphoned Pacts in full!
 					effectsList.finalCorruptionPerTick -= effect.value;
@@ -348,9 +341,18 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		// Prevents alicorn count to fall to 0, which would stop the per-tick generation
 		var maxAlicornsToCorrupt = Math.ceil(alicorns.value) - 1;
 		var alicornsToCorrupt = Math.floor(Math.min(this.corruption, maxAlicornsToCorrupt));
+		var debtToPay = this.game.getEffect("repayDebtOnNecrocornGeneration") ?
+			Math.floor(this.pactsManager.necrocornDeficit) : 0;
 		if (alicornsToCorrupt > 0) {
 			this.corruption -= alicornsToCorrupt;
 			alicorns.value -= alicornsToCorrupt;
+			if (debtToPay > 0) { //Instead of generating necrocorns, pay back debt.
+				debtToPay = Math.min(debtToPay, alicornsToCorrupt);
+				this.pactsManager.necrocornDeficit -= debtToPay;
+				alicornsToCorrupt -= debtToPay;
+				this.game.msg((debtToPay == 1 ? $I("religion.msg.siphoned.one") : $I("religion.msg.siphoned.many", [debtToPay])),
+					null, "alicornCorruption");
+			}
 			this.game.resPool.get("necrocorn").value += alicornsToCorrupt;
 			this.game.upgrade({
 				zigguratUpgrades: ["skyPalace", "unicornUtopia", "sunspire"]
@@ -1570,8 +1572,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
 
 				//Un-incur necrocorn debt:
-				if (!model.metadata.notAddDeficit){
-					console.log("removing 0.5 necrocornDeficit");
+				if (!model.metadata.notAddDeficit && this.game.getEffect("pactNecrocornUpfrontCost") <= 0) {
+					//(Necrocorn debt is not incurred if "pactNecrocornUpfrontCost" is positive)
 					this.pactsManager.necrocornDeficit = Math.max(this.pactsManager.necrocornDeficit - 0.5 * data.val, 0);
 				}
 				//Update effects:
@@ -2134,6 +2136,16 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 			model.enabled = false;
 		}
 	},
+
+	getPrices: function(model) {
+		var retVal = this.inherited(arguments);
+		var upfront = this.game.getEffect("pactNecrocornUpfrontCost");
+		if (!model.metadata.special && upfront > 0) {
+			retVal.push({ name: "necrocorn", val: upfront });
+		}
+		return retVal;
+	},
+
 	shouldBeBough: function(model, game){
 		return game.getEffect("pactsAvailable") + model.metadata.effects["pactsAvailable"]>=0;
 	},
@@ -2173,7 +2185,8 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 	            maxBld--;
 	        }
 
-			if (!meta.notAddDeficit){
+			if (!meta.notAddDeficit && this.game.getEffect("pactNecrocornUpfrontCost") <= 0){
+				//Having positive "pactNecrocornUpfrontCost" removes immediate debt accumulation when the player buys a Pact.
 				this.game.religion.pactsManager.necrocornDeficit += 0.5 * counter;
 			}
 	        if (counter > 1) {

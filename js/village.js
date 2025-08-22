@@ -771,6 +771,26 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		return this.getKittens() - this.sim.maxKittens;
 	},
 
+	/**
+	 * Calculates the amount of happiness bonus that is granted by the player's current karma points.
+	 * @return A number, measured in percentage points.  Example: 10 means the bonus is +10% happiness
+	 */
+	getHappinessFromKarma: function() {
+		var game = this.game;
+
+		//+1% to the production per karma point
+		var karma = game.resPool.get("karma").value;
+
+		//Policy whose downside reduces karma effectiveness if you're in Pact debt
+		if (game.science.getPolicy("upfrontPayment").researched) {
+			var debtMultiplier = game.religion.pactsManager.getDebtPenaltyRatio();
+			debtMultiplier = Math.max(debtMultiplier, 0.1); //Capped at -90% reduction
+			karma *= debtMultiplier;
+		}
+
+		return karma;
+	},
+
 	/** Calculates a total happiness where result is a value of [0..1] **/
 	updateHappines: function(){
 		var happiness = 100;
@@ -805,8 +825,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			happiness += 30 * (1 + this.game.getEffect("festivalRatio"));
 		}
 
-		var karma = this.game.resPool.get("karma");
-		happiness += karma.value;	//+1% to the production per karma point
+		//+1% to the production per karma point
+		happiness += this.getHappinessFromKarma();
 
 		var overpopulation = this.getOverpopulation();
 		if (overpopulation > 0){
