@@ -149,6 +149,14 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 	},
 	/**
+	 * Game rule: If the current number of necrocorns is strictly greater than a certain value,
+	 * a penalty is applied to necrocorn corruption rate.  This function returns where that threshold is.
+	 * @return A number in units of necrocorns, intended for use in necrocorn-related calculations
+	 */
+	getExistNecrocornThreshold: function() {
+		return this.game.science.getPolicy("feedingFrenzy").researched ? 1 : 0;
+	},
+	/**
 	 * This function does 2 things:
 	 * (1) It calculates necrocorn production in a way that remembers intermediate values.
 	 * (2) It keeps information on the names of all the different modifiers, bonuses, etc.
@@ -169,7 +177,6 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	 *                                   how many necrocorns the game-state actually has.
 	 * @return An array.  Each element in the array represents an individual bonus/modifier to necrocorn production.
 	 *         The point of this array is that the code for the UI can process this array to make it human-readable.
-	 *         The array will also contain 3 specific properties with useful information (see below).
 	 * 
 	 * Each element in the array is an object with the following 3 keys:
 	 *	label: string.  What the player will see in the UI as the name for this effect.
@@ -179,17 +186,11 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	 *		"multiplicative" - All additive effects before this point will be multiplied by the value
 	 * 
 	 * But, if all you want are some quick & easy numbers, fear not!  You need not bother with the array elements.
-	 * The return value will also have 3 additional numerical fields, in addition to being an array.
+	 * The return value will also have an additional numerical field, in addition to being an array.
 	 *	finalCorruptionPerTick: number.  The TOTAL necrocorn production per tick, after applying ALL modifiers.
-	 *	corruptionProdPerTick: number.  Necrocorn production per tick, except we ignore Siphoning.
-	 *	                                The difference between these two numbers is the amount Siphoning consumes.
-	 *	deficitPerTick: number.  How much debt we accumulate each tick, if Siphoning wants to spend
-	 *	                         more necrocorns than we can produce.
-	 *	                         If we have sufficient production to satisfy Siphoning, this will be 0.
-	 *	                         If Siphoning is not active, this will be 0.
 	 */
 	getCorruptionEffects: function(pretendExistNecrocorn) {
-		var existNecrocorn = (pretendExistNecrocorn === undefined) ? (this.game.resPool.get("necrocorn").value > 0) : pretendExistNecrocorn;
+		var existNecrocorn = (pretendExistNecrocorn === undefined) ? (this.game.resPool.get("necrocorn").value > this.getExistNecrocornThreshold()) : pretendExistNecrocorn;
 		var effectsList = [];
 		effectsList.finalCorruptionPerTick = 0;
 		effectsList.corruptionProdPerTick = 0;
@@ -264,35 +265,16 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 		return effectsList;
 	},
-	//Total necrocorn production
+	/**
+	 * Gets the amount of necrocorns corrupted per tick.
+	 * @param pretendExistNecrocorn boolean (optional) --If omitted, checks the game-state we're actually in right now.
+	 */
 	getCorruptionPerTick: function(pretendExistNecrocorn){
 		//Recalculate if needed, grab cached value if we can
 		if (typeof(pretendExistNecrocorn) === "boolean" || !this.corruptionCached) {
 			return this.getCorruptionEffects(pretendExistNecrocorn).finalCorruptionPerTick;
 		}
 		return this.corruptionCached.finalCorruptionPerTick;
-	},
-	//Necrocorn production, ignoring Siphoning
-	getCorruptionPerTickProduction: function(pretendExistNecrocorn){
-		//Recalculate if needed, grab cached value if we can
-		if (typeof(pretendExistNecrocorn) === "boolean" || !this.corruptionCached) {
-			return this.getCorruptionEffects(pretendExistNecrocorn).corruptionProdPerTick;
-		}
-		return this.corruptionCached.corruptionProdPerTick;
-	},
-	//The amount of corruption that Siphoning TRIES to consume.
-	//If this is less than the corruption production, it means we'll go into debt.
-	//@return A negative number, or zero.
-	getCorruptionPerTickConsumption: function(){
-		//Grab cached value if we can, recalculate if needed
-		var corruptionData = this.corruptionCached || this.getCorruptionEffects();
-		return corruptionData.finalCorruptionPerTick - corruptionData.corruptionProdPerTick - corruptionData.deficitPerTick;
-	},
-	//If Siphoning is active, the amount by which we go into debt each tick due to not being able to pay for Pacts
-	getCorruptionDeficitPerTick: function(){
-		//Grab cached value if we can, recalculate if needed
-		var corruptionData = this.corruptionCached || this.getCorruptionEffects();
-		return corruptionData.deficitPerTick;
 	},
 	update: function(){
 		if (this.game.resPool.get("faith").value > 0 || this.game.challenges.isActive("atheism") && this.game.bld.get("ziggurat").val > 0){
@@ -336,6 +318,13 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 		this.triggerOrderOfTheVoid(times);
 	},
+	/**
+	 * If the necrocorn corruption progress has reached 100%, convert alicorns into necrocorns at a 1:1 ratio.
+	 * If the Siphoning policy is active, these necrocorns are immediately used to repay debt.
+	 * Otherwise, the player gets to keep them.
+	 * If there are not enough alicorns, the corruption progress remains at 100%.
+	 * @return The number of necrocorns gained from this.  (Necrocorns spent to pay debt due to Siphoning don't count.  We only count necrocorns if the player gets to keep them.)
+	 */
 	corruptNecrocorns: function(){
 		var alicorns = this.game.resPool.get("alicorn");
 		// Prevents alicorn count to fall to 0, which would stop the per-tick generation
@@ -363,127 +352,230 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 		return alicornsToCorrupt;
 	},
-	necrocornsNaiveFastForward: function(daysOffset, times){
-		var alicorns = this.game.resPool.get("alicorn");
-		if (alicorns.value > 0) {
-			var corruptionPerTick = this.getCorruptionPerTick();
-			var ticksBeforeFirstNecrocorn = this.game.resPool.get("necrocorn").value == 0
-				// this.corruption is <= 1 at this point, no need to check if 1-this.corruption is negative
-				? Math.min(Math.ceil((1 - this.corruption) / corruptionPerTick), times)
-				: 0;
-			if (ticksBeforeFirstNecrocorn > 0 && ticksBeforeFirstNecrocorn < times){
-				//this.game.resPool.get("necrocorn").value = 1;
-				this.corruption = 1;
-				var ticksAfterFirstNecrocorn = times - ticksBeforeFirstNecrocorn;
-				var corruptionPerTickAfterFirstNecrocorn = this.getCorruptionPerTick(true);
-				this.corruption += ticksAfterFirstNecrocorn * corruptionPerTickAfterFirstNecrocorn;
-				this.game.resPool.get("necrocorn").value = 0;
-			} else {
-				this.corruption += corruptionPerTick * times;
+	/**
+	 * Internal helper function
+	 * Makes assumptions: We have Siphoning Policy, we'll never run out of alicorns to corrupt.
+	 * This implementation is designed to properly handle the edge case where Siphoning might prevent
+	 * us from generating a necrocorn & transitioning from below to above the threshold.
+	 * TODO: Write a test suite to ensure it works properly
+	 * It might be theoretically possible to complete this by simulating a max of 3 points, rather than looping.
+	 */
+	_necrocornsNaiveFastForward_withSiphoning: function(daysOffset, times) {
+		//Normally, the number of ticks per day is a well-defined constant
+		// (but could change in the future due if redshift paradox handling gets changed)
+		var TICKS_PER_DAY = times / daysOffset;
+		//Nonnegative number, in units of necrocorns per tick:
+		var avgDebtPerTick = -this.game.getEffect("necrocornPerDay") / TICKS_PER_DAY; //game.getEffect returns a NEGATIVE NUMBER if we have active Pacts
+		var corruptionBefore = this.corruption;
+		var debtBefore = this.pactsManager.necrocornDeficit;
+		var threshold = this.getExistNecrocornThreshold();
+		var necrocornRes = this.game.resPool.get("necrocorn"); //Resource object
+		var corruptionPerTickUnpenalized = this.getCorruptionPerTick(false /*pretendExistNecrocorn*/);
+		var corruptionPerTickPenalized = this.getCorruptionPerTick(true /*pretendExistNecrocorn*/);
+
+		//---------------------- Calculate # of ticks to spend above/below threshold ----------------------//
+
+		//How many ticks we'll get of necrocorn production while <= the threshold:
+		var ticksUnpenalized = 0;
+		if (necrocornRes.value <= threshold && times > 0) { //Calculate when we'll reach threshold--but due to debt, it effectively moves!
+			//Number of necrocorns we *would* need to generate to surpass threshold
+			// if debt were always zero...
+			var BASEnecrocornsToPassThreshold = 1 + Math.floor(threshold - necrocornRes.value);
+
+			//We'll perform this in a number of steps
+			var tryNumber = BASEnecrocornsToPassThreshold;
+			var ticksElapsed = 0;
+			while (ticksElapsed < times) {
+				//Let's project into the future, after we've generated tryNumber necrocorns.
+				//Then we'll see how many more *additional* necrocorns we need in order to pay for the debt we would've accumulated by that time
+				//Then we update tryNumber
+				//STOP when we either run out of time OR we find a tryNumber that's enough
+				ticksElapsed = Math.ceil((tryNumber - corruptionBefore) / corruptionPerTickUnpenalized);
+				var projectedDebt = debtBefore + ticksElapsed * avgDebtPerTick; //Amount of debt we'd have at this point in time
+				var targetNecrocorns = BASEnecrocornsToPassThreshold + Math.floor(projectedDebt); //How many necrocorns we WANT to have made by this time
+
+				/*Debug info
+				console.log("By the time we generate " + tryNumber + " necrocorns, it'll have taken " +
+					"us " + ticksElapsed + " ticks.\nBy this time, our current amount of necrocorn " +
+					"debt will have increased to " + projectedDebt + ", so the effective threshold " +
+					"has moved to " + targetNecrocorns + " necrocorns."); //*/
+
+				if (tryNumber >= targetNecrocorns) {
+					break;
+				} else {
+					//This method of making multiple steps may be inefficient
+					//Ideally, we could find a way to do this in 3 steps or less
+					tryNumber = targetNecrocorns;
+					if (avgDebtPerTick >= corruptionPerTickUnpenalized && tryNumber > (BASEnecrocornsToPassThreshold + debtBefore) * 2) {
+						//We are clearly not getting any closer to an answer.
+						//This means we will NEVER reach the threshold from where we currently are.
+						tryNumber = Infinity;
+						break;
+					}
+				}
 			}
+			//By now, we've found a solution--either tryNumber contains the exact number of necrocorns
+			// we need in order to reach the effective threshold, or tryNumber is larger than the number
+			// of necrocorns we'll produce in the time period we're calculating.
+			ticksElapsed = Math.ceil((tryNumber - corruptionBefore) / corruptionPerTickUnpenalized);
+			ticksUnpenalized = ticksElapsed;
+			if (ticksUnpenalized < 0) { ticksUnpenalized = 0; } //This would happen if we're above the threshold already.
+			if (ticksUnpenalized > times) { ticksUnpenalized = times; } //This would happen if we are fast-forwarding for a very short duration only
+			//So, by now we should have found the correct numbers, or we passed the edge.
+		}
+		//How many ticks we'll get of necrocorn production while > the threshold:
+		var ticksPenalized = times - ticksUnpenalized;
+		var daysUnpenalized = Math.floor(ticksUnpenalized / TICKS_PER_DAY);
+		if (isNaN(daysUnpenalized)) { //Sanity check
+			daysUnpenalized = 0;
+		}
+		var daysPenalized = daysOffset - daysUnpenalized;
+
+		/*Debug info, so you can check my math:
+		console.log("ReligionManager#necrocornsNaiveFastForward for a total of " + daysOffset + " days, corresponding to " + times +
+			" ticks:\nWe are currently at " + necrocornRes.value + " necrocorns, & the threshold is at " +
+			threshold + " necrocorns.\n> " + daysUnpenalized + " days (" + ticksUnpenalized + " ticks) are at base production rate (" +
+			corruptionPerTickUnpenalized + " necrocorn/tick),\n> the remaining " + daysPenalized + " days (" + ticksPenalized +
+			" ticks) are penalized (" + corruptionPerTickPenalized + " necrocorn/tick).");//*/
+
+		//Alright, we'll do this in 2 stages.  First we do unpenalized, then we do penalized.
+		//Within each stage, we do Pact upkeep first, then corruption.
+		if (daysUnpenalized > 0) {
+			this.pactsManager.necrocornConsumptionDays(daysUnpenalized);
+		}
+		if (ticksUnpenalized > 0) {
+			this.corruption += corruptionPerTickUnpenalized * ticksUnpenalized;
+			this.corruptNecrocorns();
+		}
+		//Penalized:
+		if (daysPenalized > 0) {
+			this.pactsManager.necrocornConsumptionDays(daysPenalized);
+		}
+		if (ticksPenalized > 0) {
+			if (necrocornRes.value <= threshold) {
+				console.warn("Logic error: We should not be producing necrocorns at the unpenalized rate right now!");
+			}
+			this.corruption += corruptionPerTickPenalized * ticksPenalized;
 		}
 
+		/*Debug info, so you can check my math:
+		console.log("After simulating " + daysPenalized + " days (" + ticksPenalized + " ticks), we have:\n> " +
+			necrocornRes.value + " necrocorns (compare to a threshold of " + threshold + ")\n> " +
+			this.pactsManager.necrocornDeficit + " debt\n> " + this.corruption + " leftover corruption.\n" +
+			"Finished ReligionManager#necrocornsNaiveFastForward for a total of " + daysOffset + " days, corresponding to " + times +
+			" ticks.");//*/
 		this.corruptNecrocorns();
+	},
+	/**
+	 * Internal helper function.
+	 * Makes assumptions: We don't have Siphoning Policy, we'll never run out of alicorns to corrupt.
+	 * Does NOT handle the edge case where consumption could take us from above to below the threshold.
+	 * TODO: Write a test suite to ensure it works
+	 */
+	_necrocornsNaiveFastForward_withoutSiphoning: function(daysOffset, times) {
+		var corruptionBefore = this.corruption;
+		var threshold = this.getExistNecrocornThreshold();
+		//Number of necrocorns we had at the start:
+		var necrocornsBefore = this.game.resPool.get("necrocorn").value;
+		var corruptionPerTickUnpenalized = this.getCorruptionPerTick(false /*pretendExistNecrocorn*/);
+		if (corruptionPerTickUnpenalized > 0) { //Avoid divide-by-zero errors
+			var corruptionPerTickPenalized = this.getCorruptionPerTick(true /*pretendExistNecrocorn*/);
+			//Number of necrocorns we need to generate in order to surpass the threshold
+			var necrocornsToPassThreshold = 1 + Math.floor(threshold - necrocornsBefore);
+			//How many ticks we'll get of necrocorn production while <= the threshold:
+			var ticksUnpenalized = Math.ceil((necrocornsToPassThreshold - this.corruption) / corruptionPerTickUnpenalized);
+			if (ticksUnpenalized < 0) { ticksUnpenalized = 0; } //This would happen if we're above the threshold already.
+			if (ticksUnpenalized > times) { ticksUnpenalized = times; } //This would happen if we are fast-forwarding for a very short duration only
+			//How many ticks we'll get of necrocorn production while > the threshold:
+			var ticksPenalized = times - ticksUnpenalized;
 
-		//------------------------- necrocorns pacts -------------------------
+			this.corruption += corruptionPerTickUnpenalized * ticksUnpenalized + corruptionPerTickPenalized * ticksPenalized;
+		}
+
+		/*Debug info, so you can check my math:
+		console.log("ReligionManager#necrocornsNaiveFastForward for a total of " + daysOffset + " days, corresponding to " + times +
+			" ticks:\nWe are currently at " + necrocornsBefore + " necrocorns, & the threshold is at " +
+			threshold + " necrocorns.\nWe need to produce " + necrocornsToPassThreshold + " necrocorns to pass the threshold.\n> " + ticksUnpenalized + " ticks are at base production rate (" +
+			corruptionPerTickUnpenalized + " necrocorn/tick),\n> the remaining " + ticksPenalized +
+			" ticks are penalized (" + corruptionPerTickPenalized + " necrocorn/tick).\nWe started at " +
+			corruptionBefore + " corruption; we ended at " + this.corruption + " corruption (increase of " +
+			(this.corruption - corruptionBefore) + ").");//*/
+
+		this.corruptNecrocorns();
+		//------------------------- Pacts consume necrocorns/accumulate debt -------------------------
 		this.pactsManager.necrocornConsumptionDays(daysOffset);
 	},
-	
-	gesSiphoningAlicornConsumptionPerDay: function(){
-		if (this.game.science.getPolicy(["siphoning"]).researched){
-			var necrocornDeficitRepaymentModifier = 1;
-			if (this.pactsManager.necrocornDeficit > 0){
-				necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
-			}
-			return this.game.getEffect("necrocornPerDay") * necrocornDeficitRepaymentModifier;
-		}
-		return 0;
-	},
-	necrocornFastForward: function(days, times){
-		//------------------------- necrocorns pacts -------------------------
-		//deficit changing
-		var necrocornDeficitRepaymentModifier = 1;
-		if (this.pactsManager.necrocornDeficit > 0){
-			necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
-		}
-		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
-		var necrocornVal = this.game.resPool.get("necrocorn").value;
-		var corruptionWithExisting = this.game.religion.getCorruptionPerTickProduction(true);
-		var worstPerTickDelta = corruptionWithExisting * this.game.calendar.ticksPerDay + necrocornPerDay;
-		//if(!this.game.science.getPolicy(["siphoning"]).researched){
-		if (
-			(worstPerTickDelta >= 0)
-			||((worstPerTickDelta < 0 && necrocornVal + worstPerTickDelta * days > 0)&&
-			(this.game.resPool.get("alicorn").value - 1 + necrocornPerDay * days >= 0))){ //naive solution here
-			this.necrocornsNaiveFastForward(days, times);
-			return;
-		}
-		//}
-		var corruptionWithoutExisting = this.game.religion.getCorruptionPerTickProduction(false);
-		//here we chech if the necrocorns will get into cycles of being produced and spent, which also works with syphening
-		if (corruptionWithExisting * this.game.calendar.ticksPerDay + necrocornPerDay < 0 &&
-		corruptionWithoutExisting * this.game.calendar.ticksPerDay + necrocornPerDay > 0
-		){
-			var alicornsResult = this.game.resPool.get("alicorn").value - 1 + necrocornPerDay * days;
-			var alicornsSpent = necrocornPerDay * days;
-			if (corruptionWithoutExisting * days/this.game.calendar.ticksPerDay + necrocornPerDay * necrocornDeficitRepaymentModifier> 0
-				&& this.pactsManager.necrocornDeficit>0
-			){
-				corruptionWithoutExisting += necrocornPerDay * (necrocornDeficitRepaymentModifier - 1);
-			}
-			var daysUntilSpentOne = - Math.ceil(1/(necrocornPerDay + corruptionWithExisting/this.game.calendar.ticksPerDay));
-			var daysUntilCorrupted = -Math.ceil(1/(necrocornPerDay + corruptionWithoutExisting/this.game.calendar.ticksPerDay));
-			var timePeriodWorking = Math.floor(days - necrocornVal * daysUntilSpentOne);
-
-
-			if (alicornsResult < 0){
-				this.pactsManager.deficit -= alicornsResult;
-				alicornsSpent += alicornsResult;
-				timePeriodWorking += alicornsResult/necrocornPerDay; 
-			}
-			if (daysUntilCorrupted + daysUntilSpentOne == 0){
-				return;
-			}
-			var state = timePeriodWorking%(daysUntilCorrupted + daysUntilSpentOne);
-			
-			//this.pactsManager.necrocornDeficit += timePeriodWorking * daysUntilCorrupted/(daysUntilCorrupted + daysUntilSpentOne)* necrocornPerDay * (necrocornDeficitRepaymentModifier - 1);
-			//if (this.pactsManager.necrocornDeficit < 0){
-			//	this.pactsManager.necrocornDeficit = 0;
-			//}
-			//let's return to deficit delta later
-
-			this.pactsManager.necrocornDeficit = 0;
-			if (state < daysUntilCorrupted){
-				this.game.resPool.get("necrocorn").value = 0;
-				this.corruption += necrocornPerDay * state + corruptionWithoutExisting * this.game.calendar.ticksPerDay * state;
+	/**
+	 * A naive function for calculating how the amount of necrocorns evolves over time.
+	 * It's inaccurate because it calculates all necrocorn production & all consumption in single chunks.
+	 * It doesn't take into account the fact that, without Siphoning, necrocorns are consumed continuously,
+	 * which could cause us to fall below the threshold & start generating necrocorns faster all of a sudden.
+	 * This DOES take into account how debt increases continuously over time if the player has Siphoning.
+	 * It also doesn't take into account what happens if the player runs out of alicorns partway through.
+	 * @param daysOffset number The number of days that elapse (used to calculate Pact consumption)
+	 * @param times number The number of ticks that elapse (used to calculate corruption)
+	 */
+	necrocornsNaiveFastForward: function(daysOffset, times) {
+		var alicorns = this.game.resPool.get("alicorn");
+		if (alicorns.value > 0) { //We can corrupt necrocorns
+			if (this.game.getEffect("repayDebtOnNecrocornGeneration")) {
+				this._necrocornsNaiveFastForward_withSiphoning(daysOffset, times);
 			} else {
-				this.game.resPool.get("necrocorn").value = (state - daysUntilCorrupted)/daysUntilSpentOne;
+				this._necrocornsNaiveFastForward_withoutSiphoning(daysOffset, times);
 			}
-			this.game.resPool.addResPerTick("alicorn", alicornsSpent);
-			return;
+		} else { //No alicorns, so we can't corrupt necrocorns...but we must still pay for Pacts
+			this.pactsManager.necrocornConsumptionDays(daysOffset);
 		}
-		var compensatedNecrocorns = 0;
-		var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
-		if (this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
-			this.game.resPool.addResPerTick("alicorn",consumedAlicorns);
-		}
-		//var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
+	},
+	/**
+	 * A function for calculating how the amount of necrocorns evolves over time.
+	 * Markers corrupt alicorns into necrocorns, & Pacts consume necrocorns.
+	 * This is better than the naive version because it deals with edge cases.
+	 * @param daysOffset number The number of days that elapse (used to calculate Pact consumption)
+	 * @param times number The number of ticks that elapse (used to calculate corruption)
+	 */
+	necrocornFastForward: function(days, times) {
+		//The idea is that necrocornsNaiveFastForward is accurate unless one of the following occurs:
+		// (1) We continuously consume necrocorns & it causes us to transition from *above* to *below* the "exist-necrocorn threshold."
+		//So, the plan is that we'll use the naive solution until we hit one of the above edge cases, fix the edge case, then continue onwards.
+		var threshold = this.getExistNecrocornThreshold();
+		var necrocornRes = this.game.resPool.get("necrocorn"); //Resource object
+		var necrocornPerDay = this.game.getEffect("necrocornPerDay"); //This is a NEGATIVE NUMBER if we have active Pacts
+		var continuouslyConsumeNecrocorns = !(this.game.getEffect("repayDebtOnNecrocornGeneration"));
+		//Normally, the number of ticks per day is a well-defined constant--but this might not be the case in the future if redshift paradox handling gets changed.
+		var ticksPerDay = times / days;
 
-		var siphenedNecrocorns = this.pactsManager.getSiphonedCorruption(days);
-		compensatedNecrocorns = Math.max(consumedAlicorns, -siphenedNecrocorns);
-		this.game.resPool.addResPerTick("alicorn", compensatedNecrocorns);
-	
-		//if siphening is not enough to pay for per day consumption ALSO consume necrocorns;
-		if ((this.game.resPool.get("necrocorn").value + necrocornPerDay * days * necrocornDeficitRepaymentModifier - compensatedNecrocorns) < 0){
-			this.necrocornDeficit += Math.max(-necrocornPerDay * days - this.game.resPool.get("necrocorn").value + compensatedNecrocorns, 0);
-			necrocornDeficitRepaymentModifier = 1;
-		} else if (this.necrocornDeficit > 0){
-			this.necrocornDeficit += necrocornPerDay *(0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")) * days);
-			this.necrocornDeficit = Math.max(this.necrocornDeficit, 0);
+		//Set up a loop!
+		//All variables defined above this point are CONSTANT within the loop.
+		for (var daysRemaining = days, timesRemaining = times, i = 0; daysRemaining > 0 || timesRemaining > 0; i++ ) {
+			//Calculate the projected amount of time until we hit edge case #1:
+			var daysUntilWeHitEdgeCase1 = 0;
+			if (continuouslyConsumeNecrocorns && necrocornPerDay < 0) {
+				if (necrocornRes.value > threshold) {
+					var consumptionRate = -necrocornPerDay * this.pactsManager.getNecrocornDeficitConsumptionModifier(); //Positive value, in units of necrocorn/day
+					daysUntilWeHitEdgeCase1 = Math.ceil((necrocornRes.value - threshold) / consumptionRate);
+				} else {
+					//We'll need to check for edge case #1 again after we go above the threshold
+					var ticksUntilReachThreshold = Math.ceil((1 + Math.floor(threshold - necrocornRes.value) - this.corruption) / this.getCorruptionPerTick(false /*we are below threshold*/));
+					daysUntilWeHitEdgeCase1 = Math.ceil(ticksUntilReachThreshold / ticksPerDay);
+				}
+			} else { //We are in a situation where edge case #1 cannot happen
+				daysUntilWeHitEdgeCase1 = Infinity;
+			}
+
+			if (isNaN(daysUntilWeHitEdgeCase1)) { //Sanity check
+				daysUntilWeHitEdgeCase1 = Infinity;
+			}
+			//Alright, now how many do we simulate?
+			var daysToSimulate = Math.min(daysRemaining, daysUntilWeHitEdgeCase1);
+			var timesToSimulate = Math.min(Math.ceil(daysToSimulate * ticksPerDay), timesRemaining);
+			if (daysToSimulate < 1) { //If we sim 0 days, let's use up all remaining ticks at once.
+				timesToSimulate = timesRemaining;
+			}
+			this.necrocornsNaiveFastForward(daysToSimulate, timesToSimulate);
+			daysRemaining -= daysToSimulate;
+			timesRemaining -= timesToSimulate;
 		}
-		this.game.resPool.addResPerTick("necrocorn",  necrocornPerDay * necrocornDeficitRepaymentModifier * days - compensatedNecrocorns);
-		this.corruption += this.getCorruptionPerTick() * times;
-		this.corruptNecrocorns();
 	},
 
 	// Converts the equivalent of 10 % (improved by Void Resonators) of produced faith, but with only a quarter of apocrypha bonus
@@ -2553,58 +2645,40 @@ dojo.declare("classes.religion.pactsManager", null, {
 			return 1;
 		}
 		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
-		if (this.game.science.getPolicy(["siphoning"]).researched){
-			if (this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay >= 1){ //check if siphening is enough to pay for per day consumption
-				return 1;
-			}
+		if (this.game.getEffect("repayDebtOnNecrocornGeneration")) {
+			//The new effect of Siphoning policy changes how you pay for Pacts
+			return 1;
 		}
-		var necrocornDeficitRepaymentModifier = 1;
-		necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
+		var necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
 		if ((this.game.resPool.get("necrocorn").value + necrocornPerDay * necrocornDeficitRepaymentModifier) < 0){
 			necrocornDeficitRepaymentModifier = Math.max((necrocornPerDay * necrocornDeficitRepaymentModifier + this.game.resPool.get("necrocorn").value)/necrocornPerDay, 0);
 			return necrocornDeficitRepaymentModifier;
 		}
 		return necrocornDeficitRepaymentModifier;
 	},
-	//how much corruption siphening spends in x days
-	getSiphonedCorruption: function(days){
-		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
-		if (this.game.science.getPolicy(["siphoning"]).researched){
-			if (this.game.religion.getCorruptionDeficitPerTick() <= 0){
-				return -necrocornPerDay * days;
-			}
-			return Math.min(-necrocornPerDay * days, this.game.religion.getCorruptionPerTickProduction()*this.game.calendar.ticksPerDay * days);
-		}
-		return 0;
-	},
 	necrocornConsumptionDays: function(days){
 		//------------------------- necrocorns pacts -------------------------
 		//deficit changing
 		var necrocornDeficitRepaymentModifier = 1;
-		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
-		var compensatedNecrocorns = 0;
-		if (this.game.science.getPolicy(["siphoning"]).researched){
-			if (this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
-				this.game.resPool.addResPerTick("alicorn", necrocornPerDay * days);
-				return;
-			}
-			var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
-			var siphenedNecrocorns = this.getSiphonedCorruption(days);
-			compensatedNecrocorns = Math.max(consumedAlicorns, -siphenedNecrocorns);
-			this.game.resPool.addResPerTick("alicorn", compensatedNecrocorns);
+		var necrocornPerDay = this.game.getEffect("necrocornPerDay"); //This is a NEGATIVE NUMBER if we have active Pacts
+		if (this.game.getEffect("repayDebtOnNecrocornGeneration")) {
+			//Debt is not paid in fractional necrocorns each day; rather, it is paid when we generate necrocorns.
+			//We do accumulate debt each day, though.
+			this.necrocornDeficit -= necrocornPerDay * days;
+			return;
 		}
 		//if siphening is not enough to pay for per day consumption ALSO consume necrocorns;
 		if (this.necrocornDeficit > 0){
 			necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
 		}
-		if ((this.game.resPool.get("necrocorn").value + necrocornPerDay * days * necrocornDeficitRepaymentModifier - compensatedNecrocorns) < 0){
-			this.necrocornDeficit += Math.max(-necrocornPerDay * days - this.game.resPool.get("necrocorn").value + compensatedNecrocorns, 0);
+		if ((this.game.resPool.get("necrocorn").value + necrocornPerDay * days * necrocornDeficitRepaymentModifier) < 0){
+			this.necrocornDeficit += Math.max(-necrocornPerDay * days - this.game.resPool.get("necrocorn").value, 0);
 			necrocornDeficitRepaymentModifier = 1;
 		} else if (this.necrocornDeficit > 0){
 			this.necrocornDeficit += necrocornPerDay *(0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")) * days);
 			this.necrocornDeficit = Math.max(this.necrocornDeficit, 0);
 		}
-		this.game.resPool.addResPerTick("necrocorn", necrocornPerDay * necrocornDeficitRepaymentModifier * days - compensatedNecrocorns);
+		this.game.resPool.addResPerTick("necrocorn", necrocornPerDay * necrocornDeficitRepaymentModifier * days);
 	},
 	pactsMilleniumKarmaKittens: function(millenium){
 		//pacts karma effect
