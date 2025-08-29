@@ -469,6 +469,10 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
     padding: 0px;
 }
 
+#pactsTextKarmaPunishment span:hover {
+    color: orange;
+}
+
 .bldGroupContainer {
     padding-top: 15px;
     border-top: 1px solid gray;

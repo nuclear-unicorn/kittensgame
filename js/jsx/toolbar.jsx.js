@@ -74,9 +74,9 @@ WToolbarHappiness = React.createClass({
 		}
 		tooltip += $I("village.happiness.rare.resources") + ": +" + this.game.getDisplayValueExt(resHappiness, false, false, 0) + "%<br>";
 		//---------------------
-		var karma = this.game.resPool.get("karma");
-		if (karma.value > 0){
-			tooltip += $I("village.happiness.karma") + ": +" + this.game.getDisplayValueExt(karma.value, false, false, 0) + "%<br>";
+		var karma = this.game.village.getHappinessFromKarma();
+		if (karma > 0){
+			tooltip += $I("village.happiness.karma") + ": +" + this.game.getDisplayValueExt(karma, false, false, 0) + "%<br>";
 		}
 
 		if (this.game.calendar.festivalDays > 0){

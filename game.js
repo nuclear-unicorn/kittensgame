@@ -1643,6 +1643,27 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.goldPolicyRatio.title"),
 				type: "ratio"
 			},
+			//Necrocorn-related Policy effects
+			"smallDebtPunishmentExemption": {
+				title: $I("effectsMgr.statics.smallDebtPunishmentExemption.title"),
+				type: "fixed"
+			},
+			"repayDebtOnNecrocornGeneration": {
+				title: $I("effectsMgr.statics.repayDebtOnNecrocornGeneration.title"),
+				type: "fixed"
+			},
+			"feedEldersEfficiencyRatio": {
+				title: $I("effectsMgr.statics.feedEldersEfficiencyRatio.title"),
+				type: "ratio"
+			},
+			"necrocornCorruptionInterference": {
+				title: $I("effectsMgr.statics.necrocornCorruptionInterference.title"),
+				type: "ratio"
+			},
+			"pactNecrocornUpfrontCost": {
+				title: $I("effectsMgr.statics.necrocornUpfrontCost.title"),
+				type: "fixed"
+			},
 			//challenges
 			"springCatnipRatio": {
 				title: $I("effectsMgr.statics.springCatnipRatio.title"),
@@ -1745,6 +1766,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio"
 			},
 			//pacts
+			"pactNecrocornConsumption": {
+				title: $I("effectsMgr.statics.necrocornPerDay.pact.title"),
+				type: "perDay"
+			},
             "pactsAvailable":{
 				title: $I("effectsMgr.statics.pactsAvailable.title"),
 				type: "fixed"
@@ -2152,6 +2177,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.timer.addEvent(dojo.hitch(this, function(){
 			this.updateCaches();
 		}), 5);		//once per 5 ticks
+
+		this.timer.addEvent(dojo.hitch(this, function() {
+			var policy = this.science.getPolicy("upfrontPayment");
+			policy.calculateEffects(policy, this); //Update description of policy
+		}), 25);		//every 5 seconds
 
 		var ONE_MIN = this.ticksPerSecond * 60;
 		this.timer.addEvent(dojo.hitch(this, function(){ this.achievements.update(); }), 50);	//once per 50 ticks, we hardly need this
@@ -3731,8 +3761,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			stack.push({
 				name: $I("res.stack.pactsConsumption"),
 				type: "perDay",
-				value: this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect("necrocornPerDay") +
-						this.religion.pactsManager.getSiphonedCorruption(1)
+				value: this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect("necrocornPerDay")
 			});
 		} else {
 			stack.push({
@@ -3776,14 +3805,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				}
 			}
 			stack.push(corruptionStack);
-		}
-
-		if (resName == "alicorn"){
-			stack.push({
-				name: $I("res.stack.corruptionPerDaySiphoned"),
-				type: "perDay",
-				value: this.religion.gesSiphoningAlicornConsumptionPerDay()
-			});
 		}
 
 		return stack;
@@ -3989,7 +4010,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	getResourcePerDay: function(resName){
 		if (resName == "necrocorn"){
-			return (this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect(resName + "PerDay") + this.religion.pactsManager.getSiphonedCorruption(1) +
+			return (this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect(resName + "PerDay") +
 			this.religion.getCorruptionPerTick() * this.calendar.ticksPerDay);
 		}
 		return this.getEffect(resName + "PerDay");
@@ -4081,8 +4102,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				var fractionOfCurrentDayElapsed = this.calendar.day - Math.floor(this.calendar.day);
 				if (res.name == "necrocorn") {
 					//Fast-forward a fractional amount of days' worth of pacts consumption:
-					var perDayConsumption = this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect("necrocornPerDay")
-					                        + this.religion.pactsManager.getSiphonedCorruption(1);
+					var perDayConsumption = this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect("necrocornPerDay");
 					resourceValue += fractionOfCurrentDayElapsed * perDayConsumption;
 					//Count corruption as fractional necrocorns:
 					resourceValue += this.religion.corruption;
