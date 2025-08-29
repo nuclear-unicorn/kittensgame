@@ -1006,6 +1006,7 @@
     "res.effect": "効果",
     "res.effects": "効果",
     "res.netGain": "純利益",
+    "res.netGainPerDay": "1日当たりの正味の増加量",
     "res.notify.msg": "{0} が利用できるようになれば通知されます。",
     "res.notify.ready.title": "購入するのに十分な資源があります。",
     "res.notify.ready": "{0} の準備が整った。",
