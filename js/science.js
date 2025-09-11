@@ -2160,6 +2160,14 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 					this.description += "<br><span class=\"genericWarning\">" + $I("policy.upfrontPayment.warning") + "</span>";
 				}
 			}
+
+			if (!self.upgrades) { //This will happen only once.
+				//Set upgrades table to include ALL Pacts in the game.
+				//This way, it'll automatically include new Pacts added by any future updates!
+				self.upgrades = { pacts: game.religion.pactsManager.pacts.map(
+					function(pactMeta) {return pactMeta.name;}
+				)};
+			}
 		},
 		evaluateLocks: function(game) {
 			return game.getFeatureFlag("MAUSOLEUM_PACTS") && game.religion.getTU("mausoleum").val && game.religion.getZU("marker").val;
@@ -2172,6 +2180,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 				game.msg($I("policy.upfrontPayment.payment.complete", [requiredPayment]));
 			}
 		},
+		upgrades: null, //To be initialized later
 		unlocked: false,
 		blocked: false,
 		blocks:["siphoning", "feedingFrenzy"]
