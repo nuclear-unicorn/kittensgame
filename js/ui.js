@@ -937,7 +937,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             $("#queueLink").text($I("ui.queue.link"));
         }
         $("#clearLogHref").text($I("ui.clear.log"));
-        $("#logFiltersBlockText").html($I("ui.log.filters.block"));
+        $("#logFiltersBlockText").html("[<span id=\"filterIcon\">+</span>] " + $I("ui.log.filters.block")); //We don't want to have <span> tags inside the i18n text, so we'll move it here instead.
         $("#pauseBtn").text($I("ui.pause"));
         $("#pauseBtn").attr("title", $I("ui.pause.title"));
         $("#undoBtn").attr("title", $I("ui.undo.title"));
