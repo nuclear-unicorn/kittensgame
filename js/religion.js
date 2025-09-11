@@ -619,7 +619,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 						faithMax = 3000;
 					}
 				}
-				self.effects["faithMax"] = faithMax;
+				self.effects["faithMax"] = faithMax * 2 /*subject to balance changes*/;
 			}
 		},
 		unlocked: true,
