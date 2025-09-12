@@ -3853,61 +3853,62 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 	fetchModel: function(options){
 		var model = this.inherited(arguments);
 		var self = this;
-		model.unassignLinks = [
-		  {
-				id: "unassign",
-				title: "[&ndash;]",
-				alt: "minus",
-				handler: function(){
-					self.unassignJobs(model, 1);
-				}
-		   },{
-				id: "unassign5",
-				title: "[-5]",
-				handler: function(){
-					self.unassignJobs(model, 5);
-				}
-		   },{
-				id: "unassign25",
-				title: "[-25]",
-				handler: function(){
-					self.unassignJobs(model, 25);
-				}
-		   },{
-				id: "unassignAll",
-				title: $I("btn.all.unassign"),
-				handler: function(){
-					self.unassignAllJobs(model);
-				}
-		   }];
+		//We will generate links for assigning/unassigning this many kittens:
+		var LINK_AMOUNTS = [5, 25, 100];
 
-		model.assignLinks = [
-			{
-				id: "assign",
-				title: "[+]",
-				alt: "plus",
-				handler: function(){
-					self.assignJobs(model, 1);
+		//Links for +/- 1
+		model.unassignLinks = [{
+			id: "unassign",
+			title: "[&ndash;]",
+			alt: "minus",
+			handler: function() {
+				self.unassignJobs(model, 1);
+			}
+		}];
+		model.assignLinks = [{
+			id: "assign",
+			title: "[+]",
+			alt: "plus",
+			handler: function() {
+				self.assignJobs(model, 1);
+			}
+		}];
+		//Links for +/- amt, where amt is specified in LINK_AMOUNTS
+		//(Generate only if we have at least 2x as many kittens as amt.)
+		LINK_AMOUNTS.forEach(function(amt) {
+			if (this.game.village.getKittens() < amt * 2) {
+				return; //Skip generating links for this amt
+			}
+			model.unassignLinks.push({
+				id: "unassign" + amt,
+				title: "[-" + amt + "]",
+				handler: function() {
+					self.unassignJobs(model, amt);
 				}
-		   },{
-				id: "assign5",
-				title: "[+5]",
+			});
+			model.assignLinks.push({
+				id: "assign" + amt,
+				title: "[+" + amt + "]",
 				handler: function(){
-					self.assignJobs(model, 5);
+					self.assignJobs(model, amt);
 				}
-		   },{
-				id: "assign25",
-				title: "[+25]",
-				handler: function(){
-					self.assignJobs(model, 25);
-				}
-		   },{
-				id: "assignall",
-				title: $I("btn.all.assign"),
-				handler: function(){
-					self.assignAllJobs(model);
-				}
-		   }];
+			});
+		});
+		//Links for +/- ALL
+		model.unassignLinks.push({
+			id: "unassignAll",
+			title: $I("btn.all.unassign"),
+			handler: function() {
+				self.unassignAllJobs(model);
+			}
+		});
+		model.assignLinks.push({
+			id: "assignall",
+			title: $I("btn.all.assign"),
+			handler: function() {
+				self.assignAllJobs(model);
+			}
+		});
 		return model;
 	},
 
