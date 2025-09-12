@@ -3879,6 +3879,9 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 			if (this.game.village.getKittens() < amt * 2) {
 				return; //Skip generating links for this amt
 			}
+			if (this.game.village.getJobLimit(model.job.name) < amt) {
+				return; //Doesn't make sense to assign +/- N to a job if the max is less than that...
+			}
 			model.unassignLinks.push({
 				id: "unassign" + amt,
 				title: "[-" + amt + "]",
