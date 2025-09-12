@@ -125,7 +125,14 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		this.loadMetadata(this.religionUpgrades, _data.ru);
 		this.loadMetadata(this.transcendenceUpgrades, _data.tu);
 		this.loadMetadata(this.pactsManager.pacts, _data.pact);
-
+	},
+	/**
+	 * This function is meant to be called while loading a savefile, AFTER everything has been initialized.
+	 * In here, we handle matters which require communication with other systems of the game.
+	 * For example: Properly unlock different game features based on permanent religion upgrades
+	 */
+	afterLoad: function() {
+		//Cryptotheology-based unlock conditions
 		for (var i = 0; i < this.transcendenceUpgrades.length; i++){
 			var tu = this.transcendenceUpgrades[i];
 			if (this.transcendenceTier >= tu.tier && (!tu.evaluateLocks || tu.evaluateLocks(this.game))) {
