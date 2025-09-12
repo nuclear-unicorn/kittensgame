@@ -1958,12 +1958,6 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 			callback(false /*itemBought*/, { reason: "cannot-afford" });
 			return;
 		}
-		if (!model.enabled) {
-			//As far as I can tell, this shouldn't ever happen because being
-			//unable to afford it is the only reason for it to be disabled.
-			callback(false /*itemBought*/, { reason: "not-enabled" });
-			return;
-		}
 		var didWeSucceed = this._transform(model, amt);
 		if (didWeSucceed) {
 			callback(true /*itemBought*/, { reason: "paid-for" });
