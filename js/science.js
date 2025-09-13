@@ -2483,10 +2483,19 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 		}
 	},
 
-	//Returns an object with one field:
-	//	reason:		String.  If we can't buy it, why not?  If we can buy it, returns
-	//				"paid-for" regardless of whether we can actually afford it or not.
-	shouldBeBought: function(model, game){ //fail checks:
+	/**
+	 * This function is to be called when the player (or the queue) tries to buy a policy.
+	 * Determines if a policy has a specific reason why the player cannot buy it at the current time.
+	 * @param model   object   The model representing the policy
+	 * @param game    object   The game object
+	 * @param skipConfirmation   boolean   If true, policies will be bought without asking the player "are you sure?"
+	 * 			If true, this overrides game.opts.noConfirm.
+	 * 			If false, respects game.opts.noConfirm.
+	 * @return An object with one field:
+	 * 	reason	string	If we can't buy it, why not?  If we can buy it, returns
+	 *	      	      	"paid-for" regardless of whether we can actually afford it or not.
+	 */
+	shouldBeBought: function(model, game, skipConfirmation) { //fail checks:
 		if (this.game.village.leader && model.metadata.requiredLeaderJob && this.game.village.leader.job != model.metadata.requiredLeaderJob){
 			var jobTitle = this.game.village.getJob(model.metadata.requiredLeaderJob).title;
 			this.game.msg($I("msg.policy.wrongLeaderJobForResearch", [model.metadata.label, jobTitle]), "important");
@@ -2511,7 +2520,7 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 					return { reason: "blocked" };
                 }
 			}
-			if (game.opts.noConfirm){
+			if (game.opts.noConfirm || skipConfirmation) {
 				return { reason: "paid-for" };
 			}
 			return { reason: "require-confirmation" };
@@ -2533,7 +2542,7 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 				reason: "cannot-afford"
 			};
 		}
-		var extendedInfo = this.shouldBeBought(model, this.game);
+		var extendedInfo = this.shouldBeBought(model, this.game, event && event.boughtByQueue /*skipConfirmation*/);
 		
 		if (extendedInfo.reason == 'require-confirmation'){
 			var def = new dojo.Deferred();

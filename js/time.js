@@ -2647,7 +2647,7 @@ dojo.declare("classes.queue.manager", null,{
             return;
         }
 
-        var result = controllerAndModel.controller.buyItem(controllerAndModel.model, null);
+        var result = controllerAndModel.controller.buyItem(controllerAndModel.model, { boughtByQueue: true });
         var wasItemBought = result.itemBought;
         var resultOfBuyingItem = {reason: result.reason};
 
