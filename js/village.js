@@ -853,12 +853,19 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			this.game.resPool.addResEvent("manpower", -squads * manpowerCost);
 			this.gainHuntRes(squads);
 		}
+	},
+
+	/**
+	 * Gain resources from hunting: furs, ivory, unicorns, etc.
+	 * Also checks the unlock requirement for the Pacifism Challenge, since that cares about hunts.
+	 * This function does NOT spend any resources; that code is handled elsewhere.
+	 * @param squads	number	Essentially acts like a multiplier to resources gained.
+	 */
+	gainHuntRes: function (squads) {
 		if (squads >= 1000&&!this.game.challenges.getChallenge("pacifism").unlocked){
 			this.game.challenges.getChallenge("pacifism").unlocked = true;
 		}
-	},
 
-	gainHuntRes: function (squads) {
 		var unicorns = this.game.resPool.addResEvent("unicorns", this.game.math.binominalRandomInteger(squads, 0.05));
 		if (unicorns > 0) {
 			var unicornMsg = unicorns == 1
@@ -901,6 +908,16 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			msg += " " + $I("village.msg.hunt.from", [squads]);
 		}
 		this.game.msg(msg, null, "hunt");
+	},
+
+	/**
+	 * Calculates how many squads of hunters the player can afford to send right now,
+	 * with their current amount of catpower.
+	 * @returns number
+	 */
+	getMaxHuntAmt: function() {
+		var huntCost = 100 - this.game.getEffect("huntCatpowerDiscount");
+		return Math.floor(this.game.resPool.get("manpower").value / huntCost);
 	},
 
 	holdFestival: function(amt){
@@ -4628,6 +4645,50 @@ dojo.declare("classes.village.ui.VillageButtonController", com.nuclearunicorn.ga
 	}
 });
 
+dojo.declare("classes.village.ui.HuntButtonController", classes.village.ui.VillageButtonController, {
+
+	updateVisible: function (model) {
+		model.visible = this.game.science.get("archery").researched && (!this.game.challenges.isActive("pacifism"));
+	},
+	//TODO: 20% link, 50% link kind of like what trade buttons have
+
+	//Works with CTRL/SHIFT
+	buyItem: function(model, event /*optional parameter*/) {
+		if (!event) { event = {}; }
+		var batchSize = this.game.opts.batchSize || 10;
+		var squadCount = event.shiftKey ? Infinity : (event.ctrlKey || event.metaKey ? batchSize : 1);
+		//Cap squadCount based on the resources the player ACTUALLY has right now.
+		squadCount = Math.min(this.game.village.getMaxHuntAmt(), squadCount);
+
+		if (squadCount < 1) {
+			return {
+				itemBought: false,
+				reason: "cannot-afford"
+			};
+		}
+
+		this.payPriceMultiple(model, squadCount);
+		this.game.village.gainHuntRes(squadCount);
+		return {
+			itemBought: true,
+			reason: "paid-for"
+		};
+	},
+
+	/**
+	 * Very similar to the payPrice function except we can specify how many times to pay it.
+	 * @param model	The model for the item whose price we will pay
+	 * @param multiplier	number	All price values will be multiplied by this amount.
+	 */
+	payPriceMultiple: function(model, multiplier) {
+		var multiPrices = [];
+		this.getPrices(model).forEach(function(price) { //Populate multiPrices based on model's prices
+			multiPrices.push({ name: price.name, val: price.val * multiplier });
+		});
+		this.game.resPool.payPrices(multiPrices);
+	}
+});
+
 dojo.declare("classes.village.ui.FestivalButtonController", classes.village.ui.VillageButtonController, {
 	fetchModel: function(options) {
 		var model = this.inherited(arguments);
@@ -4915,11 +4976,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 					this.sendHunterSquad();
 				}),
 				prices: [{ name : "manpower", val: manpowerCost }],
-				controller: new classes.village.ui.VillageButtonController(this.game, {
-					updateVisible: function (model) {
-						model.visible = this.game.science.get("archery").researched && (!this.game.challenges.isActive("pacifism"));
-					}
-				})
+				controller: new classes.village.ui.HuntButtonController(this.game)
 		}, this.game);
 		huntBtn.render(controlsTd);
 		this.huntBtn = huntBtn;
