@@ -1,5 +1,5 @@
 {
-    "console.intro": "Eres un gatito en un bosque de gavilán",
+    "console.intro": "Eres un gatito en un bosque de gavilán.",
     "console.intro.zebra": "Eres una cebra en una sabana llena de minas de titanio.",
     "achievements.header": "Logros: {0} de {1}",
     "achievements.msg.unlock": "Logro desbloqueado: {0}!",
@@ -1405,6 +1405,7 @@
     "space.planet.helios.sunforge.desc": "Usa el calor del sol para fundir materiales en plasma supercondensado. Cada nivel de Sunforge mejora el espacio de almacenamiento de sus metales base en un 1%",
     "space.planet.helios.sunlifter.label": "Amplificador Solar",
     "space.planet.helios.sunlifter.desc": "Genera antimateria una vez al año. Inactivo si la producción de energía es negativa",
+    "space.planet.kairo.label": "Kairo",
     "space.planet.kairo.spaceBeacon.label": "Faro Espacial",
     "space.planet.kairo.spaceBeacon.desc": "Una estación espacial AM utilizada para la investigación y la navegación interestelar.",
     "space.planet.moon.label": "Redmoon",
