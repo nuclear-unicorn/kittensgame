@@ -845,10 +845,19 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		this.gainHuntRes(1);
 	},
 
-	huntAll: function() {
+	huntFifth: function() { this.huntFraction(5); },
+	huntHalf: function() { this.huntFraction(2); },
+	huntAll: function() { this.huntFraction(1); },
+	/**
+	 * Hunts 1/divisor times as many as you can afford.
+	 * This incluldes spending the cost & gaining rewards.
+	 * i.e. If the divisor is 10, & we can afford to do 57 hunts currently, it does 5 hunts.
+	 * @param divisor	number
+	 */
+	huntFraction: function(divisor) {
 		var manpowerCost = 100 - this.game.getEffect("huntCatpowerDiscount");
-
 		var squads = Math.floor(this.game.resPool.get("manpower").value / manpowerCost);
+		squads = Math.floor(squads / divisor);
 		if (squads >= 1) {
 			this.game.resPool.addResEvent("manpower", -squads * manpowerCost);
 			this.gainHuntRes(squads);
@@ -4645,12 +4654,54 @@ dojo.declare("classes.village.ui.VillageButtonController", com.nuclearunicorn.ga
 	}
 });
 
+//Blatant copy of MultiLinkBtn logic from religion.js
+dojo.declare("classes.village.ui.HuntBtn", com.nuclearunicorn.game.ui.ButtonModern, {
+	huntFifthHref: null,
+	huntHalfHref: null,
+	huntAllHref: null,
+
+	renderLinks: function() {
+		this.huntAllHref = this.addLink(this.model.allLink);
+		this.huntHalfHref = this.addLink(this.model.halfLink);
+		this.huntFifthHref = this.addLink(this.model.fifthLink);
+	},
+	update: function() {
+		this.inherited(arguments);
+		this.updateLink(this.huntFifthHref, this.model.fifthLink);
+		this.updateLink(this.huntHalfHref, this.model.halfLink);
+		this.updateLink(this.huntAllHref, this.model.allLink);
+	}
+});
+
 dojo.declare("classes.village.ui.HuntButtonController", classes.village.ui.VillageButtonController, {
+	fetchModel: function(options) {
+		var model = this.inherited(arguments);
+		var village = this.game.village;
+		//We use bind(village) to ensure that the huntFraction functions work properly.
+		model.fifthLink = this._newLink(model, 5, village.huntFifth.bind(village));
+		model.halfLink = this._newLink(model, 2, village.huntHalf.bind(village));
+		model.allLink = this._newLink(model, 1, village.huntAll.bind(village));
+		return model;
+	},
+
+	_newLink: function(model, divider, handlerFunc) {
+		var squadsToSend = Math.floor(this.game.village.getMaxHuntAmt() / divider);
+		var self = this;
+		return {
+			visible: this.game.opts.showNonApplicableButtons || squadsToSend > 1,
+			title: divider == 1
+				? $I("btn.all.minor")
+				: this.game.opts.usePercentageConsumptionValues
+					? (100 / divider) + "%"
+					: "x" + this.game.getDisplayValueExt(squadsToSend, null, false, 0),
+			tooltip:  divider == 1 || this.game.opts.usePercentageConsumptionValues ? "x" + this.game.getDisplayValueExt(squadsToSend, null, false, 0) : (100 / divider) + "%",
+			handler: handlerFunc
+		};
+	},
 
 	updateVisible: function (model) {
 		model.visible = this.game.science.get("archery").researched && (!this.game.challenges.isActive("pacifism"));
 	},
-	//TODO: 20% link, 50% link kind of like what trade buttons have
 
 	//Works with CTRL/SHIFT
 	buyItem: function(model, event /*optional parameter*/) {
@@ -4969,7 +5020,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		var controlsTd = dojo.create("td", {}, tr);
 		var manpowerCost = 100 - this.game.getEffect("huntCatpowerDiscount");
 		//hunt
-		var huntBtn = new com.nuclearunicorn.game.ui.ButtonModern({
+		var huntBtn = new classes.village.ui.HuntBtn({
 				name: $I("village.btn.hunters"),
 				description: $I("village.btn.hunters.desc"),
 				handler: dojo.hitch(this, function(){
