@@ -2556,10 +2556,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				this.telemetry.load(saveData);
 				this.ui.renderFilters();
 
-                for (var i in this.managers){
+				for (var i in this.managers) {
 					console.log("game#load - Processing", this.managers[i].id, "...");
-                    this.managers[i].load(saveData);
+					this.managers[i].load(saveData);
 				}
+				//Ensure Cryptotheology-based unlock conditions for various things work properly:
+				this.religion.afterLoad(); //Kind of unelegant, but it works
 				
 				this._publish("server/load", saveData);
 			}

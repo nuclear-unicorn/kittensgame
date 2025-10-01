@@ -845,20 +845,36 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		this.gainHuntRes(1);
 	},
 
-	huntAll: function() {
+	huntFifth: function() { this.huntFraction(5); },
+	huntHalf: function() { this.huntFraction(2); },
+	huntAll: function() { this.huntFraction(1); },
+	/**
+	 * Hunts 1/divisor times as many as you can afford.
+	 * This incluldes spending the cost & gaining rewards.
+	 * i.e. If the divisor is 10, & we can afford to do 57 hunts currently, it does 5 hunts.
+	 * @param divisor	number
+	 */
+	huntFraction: function(divisor) {
 		var manpowerCost = 100 - this.game.getEffect("huntCatpowerDiscount");
-
 		var squads = Math.floor(this.game.resPool.get("manpower").value / manpowerCost);
+		squads = Math.floor(squads / divisor);
 		if (squads >= 1) {
 			this.game.resPool.addResEvent("manpower", -squads * manpowerCost);
 			this.gainHuntRes(squads);
 		}
+	},
+
+	/**
+	 * Gain resources from hunting: furs, ivory, unicorns, etc.
+	 * Also checks the unlock requirement for the Pacifism Challenge, since that cares about hunts.
+	 * This function does NOT spend any resources; that code is handled elsewhere.
+	 * @param squads	number	Essentially acts like a multiplier to resources gained.
+	 */
+	gainHuntRes: function (squads) {
 		if (squads >= 1000&&!this.game.challenges.getChallenge("pacifism").unlocked){
 			this.game.challenges.getChallenge("pacifism").unlocked = true;
 		}
-	},
 
-	gainHuntRes: function (squads) {
 		var unicorns = this.game.resPool.addResEvent("unicorns", this.game.math.binominalRandomInteger(squads, 0.05));
 		if (unicorns > 0) {
 			var unicornMsg = unicorns == 1
@@ -901,6 +917,16 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			msg += " " + $I("village.msg.hunt.from", [squads]);
 		}
 		this.game.msg(msg, null, "hunt");
+	},
+
+	/**
+	 * Calculates how many squads of hunters the player can afford to send right now,
+	 * with their current amount of catpower.
+	 * @returns number
+	 */
+	getMaxHuntAmt: function() {
+		var huntCost = 100 - this.game.getEffect("huntCatpowerDiscount");
+		return Math.floor(this.game.resPool.get("manpower").value / huntCost);
 	},
 
 	holdFestival: function(amt){
@@ -3853,61 +3879,65 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 	fetchModel: function(options){
 		var model = this.inherited(arguments);
 		var self = this;
-		model.unassignLinks = [
-		  {
-				id: "unassign",
-				title: "[&ndash;]",
-				alt: "minus",
-				handler: function(){
-					self.unassignJobs(model, 1);
-				}
-		   },{
-				id: "unassign5",
-				title: "[-5]",
-				handler: function(){
-					self.unassignJobs(model, 5);
-				}
-		   },{
-				id: "unassign25",
-				title: "[-25]",
-				handler: function(){
-					self.unassignJobs(model, 25);
-				}
-		   },{
-				id: "unassignAll",
-				title: $I("btn.all.unassign"),
-				handler: function(){
-					self.unassignAllJobs(model);
-				}
-		   }];
+		//We will generate links for assigning/unassigning this many kittens:
+		var LINK_AMOUNTS = [5, 25, 100];
 
-		model.assignLinks = [
-			{
-				id: "assign",
-				title: "[+]",
-				alt: "plus",
-				handler: function(){
-					self.assignJobs(model, 1);
+		//Links for +/- 1
+		model.unassignLinks = [{
+			id: "unassign",
+			title: "[&ndash;]",
+			alt: "minus",
+			handler: function() {
+				self.unassignJobs(model, 1);
+			}
+		}];
+		model.assignLinks = [{
+			id: "assign",
+			title: "[+]",
+			alt: "plus",
+			handler: function() {
+				self.assignJobs(model, 1);
+			}
+		}];
+		//Links for +/- amt, where amt is specified in LINK_AMOUNTS
+		//(Generate only if we have at least 2x as many kittens as amt.)
+		LINK_AMOUNTS.forEach(function(amt) {
+			if (this.game.village.getKittens() < amt * 2) {
+				return; //Skip generating links for this amt
+			}
+			if (this.game.village.getJobLimit(model.job.name) < amt) {
+				return; //Doesn't make sense to assign +/- N to a job if the max is less than that...
+			}
+			model.unassignLinks.push({
+				id: "unassign" + amt,
+				title: "[-" + amt + "]",
+				handler: function() {
+					self.unassignJobs(model, amt);
 				}
-		   },{
-				id: "assign5",
-				title: "[+5]",
+			});
+			model.assignLinks.push({
+				id: "assign" + amt,
+				title: "[+" + amt + "]",
 				handler: function(){
-					self.assignJobs(model, 5);
+					self.assignJobs(model, amt);
 				}
-		   },{
-				id: "assign25",
-				title: "[+25]",
-				handler: function(){
-					self.assignJobs(model, 25);
-				}
-		   },{
-				id: "assignall",
-				title: $I("btn.all.assign"),
-				handler: function(){
-					self.assignAllJobs(model);
-				}
-		   }];
+			});
+		});
+		//Links for +/- ALL
+		model.unassignLinks.push({
+			id: "unassignAll",
+			title: $I("btn.all.unassign"),
+			handler: function() {
+				self.unassignAllJobs(model);
+			}
+		});
+		model.assignLinks.push({
+			id: "assignall",
+			title: $I("btn.all.assign"),
+			handler: function() {
+				self.assignAllJobs(model);
+			}
+		});
 		return model;
 	},
 
@@ -4624,6 +4654,92 @@ dojo.declare("classes.village.ui.VillageButtonController", com.nuclearunicorn.ga
 	}
 });
 
+//Blatant copy of MultiLinkBtn logic from religion.js
+dojo.declare("classes.village.ui.HuntBtn", com.nuclearunicorn.game.ui.ButtonModern, {
+	huntFifthHref: null,
+	huntHalfHref: null,
+	huntAllHref: null,
+
+	renderLinks: function() {
+		this.huntAllHref = this.addLink(this.model.allLink);
+		this.huntHalfHref = this.addLink(this.model.halfLink);
+		this.huntFifthHref = this.addLink(this.model.fifthLink);
+	},
+	update: function() {
+		this.inherited(arguments);
+		this.updateLink(this.huntFifthHref, this.model.fifthLink);
+		this.updateLink(this.huntHalfHref, this.model.halfLink);
+		this.updateLink(this.huntAllHref, this.model.allLink);
+	}
+});
+
+dojo.declare("classes.village.ui.HuntButtonController", classes.village.ui.VillageButtonController, {
+	fetchModel: function(options) {
+		var model = this.inherited(arguments);
+		var village = this.game.village;
+		//We use bind(village) to ensure that the huntFraction functions work properly.
+		model.fifthLink = this._newLink(model, 5, village.huntFifth.bind(village));
+		model.halfLink = this._newLink(model, 2, village.huntHalf.bind(village));
+		model.allLink = this._newLink(model, 1, village.huntAll.bind(village));
+		return model;
+	},
+
+	_newLink: function(model, divider, handlerFunc) {
+		var squadsToSend = Math.floor(this.game.village.getMaxHuntAmt() / divider);
+		var self = this;
+		return {
+			visible: this.game.opts.showNonApplicableButtons || squadsToSend > 1,
+			title: divider == 1
+				? $I("btn.all.minor")
+				: this.game.opts.usePercentageConsumptionValues
+					? (100 / divider) + "%"
+					: "x" + this.game.getDisplayValueExt(squadsToSend, null, false, 0),
+			tooltip:  divider == 1 || this.game.opts.usePercentageConsumptionValues ? "x" + this.game.getDisplayValueExt(squadsToSend, null, false, 0) : (100 / divider) + "%",
+			handler: handlerFunc
+		};
+	},
+
+	updateVisible: function (model) {
+		model.visible = this.game.science.get("archery").researched && (!this.game.challenges.isActive("pacifism"));
+	},
+
+	//Works with CTRL/SHIFT
+	buyItem: function(model, event /*optional parameter*/) {
+		if (!event) { event = {}; }
+		var batchSize = this.game.opts.batchSize || 10;
+		var squadCount = event.shiftKey ? Infinity : (event.ctrlKey || event.metaKey ? batchSize : 1);
+		//Cap squadCount based on the resources the player ACTUALLY has right now.
+		squadCount = Math.min(this.game.village.getMaxHuntAmt(), squadCount);
+
+		if (squadCount < 1) {
+			return {
+				itemBought: false,
+				reason: "cannot-afford"
+			};
+		}
+
+		this.payPriceMultiple(model, squadCount);
+		this.game.village.gainHuntRes(squadCount);
+		return {
+			itemBought: true,
+			reason: "paid-for"
+		};
+	},
+
+	/**
+	 * Very similar to the payPrice function except we can specify how many times to pay it.
+	 * @param model	The model for the item whose price we will pay
+	 * @param multiplier	number	All price values will be multiplied by this amount.
+	 */
+	payPriceMultiple: function(model, multiplier) {
+		var multiPrices = [];
+		this.getPrices(model).forEach(function(price) { //Populate multiPrices based on model's prices
+			multiPrices.push({ name: price.name, val: price.val * multiplier });
+		});
+		this.game.resPool.payPrices(multiPrices);
+	}
+});
+
 dojo.declare("classes.village.ui.FestivalButtonController", classes.village.ui.VillageButtonController, {
 	fetchModel: function(options) {
 		var model = this.inherited(arguments);
@@ -4904,18 +5020,14 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		var controlsTd = dojo.create("td", {}, tr);
 		var manpowerCost = 100 - this.game.getEffect("huntCatpowerDiscount");
 		//hunt
-		var huntBtn = new com.nuclearunicorn.game.ui.ButtonModern({
+		var huntBtn = new classes.village.ui.HuntBtn({
 				name: $I("village.btn.hunters"),
 				description: $I("village.btn.hunters.desc"),
 				handler: dojo.hitch(this, function(){
 					this.sendHunterSquad();
 				}),
 				prices: [{ name : "manpower", val: manpowerCost }],
-				controller: new classes.village.ui.VillageButtonController(this.game, {
-					updateVisible: function (model) {
-						model.visible = this.game.science.get("archery").researched && (!this.game.challenges.isActive("pacifism"));
-					}
-				})
+				controller: new classes.village.ui.HuntButtonController(this.game)
 		}, this.game);
 		huntBtn.render(controlsTd);
 		this.huntBtn = huntBtn;

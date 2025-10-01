@@ -2168,7 +2168,7 @@ dojo.declare("classes.queue.manager", null,{
         return length;
     },
 
-    addToQueue: function(name, type, label, shiftKey /*add all*/){
+    addToQueue: function(name, type, label, event /*optional parameter*/){
         if (!name || !type){
             console.error("queueMgr#addToQueue: unable to add item:", name, type, label);
             return;
@@ -2178,20 +2178,31 @@ dojo.declare("classes.queue.manager", null,{
             return;
         }
 
+        //SHIFT is used throughout the game for "buy all"; CTRL is used for "buy one batch"
+        //The batch size is configurable in the game settings menu (10 by default)
+		if (!event) { event = {}; }
+        var batchSize = this.game.opts.batchSize || 10;
+        var amtToQueue = event.shiftKey ? Infinity : (event.ctrlKey || event.metaKey ? batchSize : 1);
+
+        //Don't ever queue a non-stackable item in bulk--there's no point!
+        if (this.queueNonStackable.includes(type)) {
+            amtToQueue = 1;
+        }
+
+        //Don't add more than can fit inside the queue cap:
+        amtToQueue = Math.min(this.cap - this.queueLength(), amtToQueue);
+        if (amtToQueue < 1) {
+            return; //Already finished queueing
+        }
+
         //TODO: too complex logic, can we streamline it somehow?
         var lastItem = this.queueItems[this.queueItems.length - 1];
         if (this.queueItems.length > 0 && lastItem && lastItem.name == name){
             if (this.queueNonStackable.includes(type)){
                 return;
             }
-            var valOfItem = (lastItem.value || 1) + 1;
+            var valOfItem = (lastItem.value || 1) + amtToQueue;
             lastItem.value = valOfItem;
-
-            if (shiftKey){
-                while (this.queueLength() < this.cap){
-                    this.addToQueue(name, type, label, false);
-                }
-            }
             return;
         }
         
@@ -2203,14 +2214,8 @@ dojo.declare("classes.queue.manager", null,{
             name: name,
             type: type,
             label: label,
-            value: 1    //always store size of the queue group, even if it is a single item
+            value: amtToQueue //always store size of the queue group, even if it is a single item
         });
-
-        if (shiftKey && !this.queueNonStackable.includes(type)){
-            while (this.queueLength() < this.cap){
-                this.addToQueue(name, type, label, false);
-            }
-        }
     },
 
     /**
@@ -2647,7 +2652,7 @@ dojo.declare("classes.queue.manager", null,{
             return;
         }
 
-        var result = controllerAndModel.controller.buyItem(controllerAndModel.model, null);
+        var result = controllerAndModel.controller.buyItem(controllerAndModel.model, { boughtByQueue: true });
         var wasItemBought = result.itemBought;
         var resultOfBuyingItem = {reason: result.reason};
 

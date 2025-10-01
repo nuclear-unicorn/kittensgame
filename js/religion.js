@@ -125,7 +125,14 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		this.loadMetadata(this.religionUpgrades, _data.ru);
 		this.loadMetadata(this.transcendenceUpgrades, _data.tu);
 		this.loadMetadata(this.pactsManager.pacts, _data.pact);
-
+	},
+	/**
+	 * This function is meant to be called while loading a savefile, AFTER everything has been initialized.
+	 * In here, we handle matters which require communication with other systems of the game.
+	 * For example: Properly unlock different game features based on permanent religion upgrades
+	 */
+	afterLoad: function() {
+		//Cryptotheology-based unlock conditions
 		for (var i = 0; i < this.transcendenceUpgrades.length; i++){
 			var tu = this.transcendenceUpgrades[i];
 			if (this.transcendenceTier >= tu.tier && (!tu.evaluateLocks || tu.evaluateLocks(this.game))) {
@@ -619,7 +626,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 						faithMax = 3000;
 					}
 				}
-				self.effects["faithMax"] = faithMax;
+				self.effects["faithMax"] = faithMax * 2 /*subject to balance changes*/;
 			}
 		},
 		unlocked: true,
@@ -1956,12 +1963,6 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 		var amt = Math.floor(this._canAfford(model) / divider);
 		if (amt < 1) {
 			callback(false /*itemBought*/, { reason: "cannot-afford" });
-			return;
-		}
-		if (!model.enabled) {
-			//As far as I can tell, this shouldn't ever happen because being
-			//unable to afford it is the only reason for it to be disabled.
-			callback(false /*itemBought*/, { reason: "not-enabled" });
 			return;
 		}
 		var didWeSucceed = this._transform(model, amt);

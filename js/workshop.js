@@ -2955,90 +2955,49 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 		var model = this.inherited(arguments);
 		var self = this;
 		if (this.game.science.get("mechanization").researched) {
-			if (!this.controllerOpts.compactStyle) {
-				model.unassignCraftLinks = [
-				  {
-						id: "unassign",
-						title: "[-]",
-						handler: function(){
-							self.unassignCraftJob(model, 1);
-						},
-					  	enabled: true
-				   },{
-						id: "unassign5",
-						title: "[-5]",
-						handler: function(){
-							self.unassignCraftJob(model, 5);
-						},
-						enabled: true
-				   },{
-						id: "unassign25",
-						title: "[-25]",
-						handler: function(){
-							self.unassignCraftJob(model, 25);
-						},
-						enabled: true
-				   }];
+			//We will generate links for assigning/unassigning this many engineers:
+			var LINK_AMOUNTS = [5, 25, 100];
 
-				model.assignCraftLinks = [
-					{
-						id: "assign",
-						title: "[+]",
-						handler: function(){
-							self.assignCraftJob(model, 1);
-						},
-						enabled: true
-				   },{
-						id: "assign5",
-						title: "[+5]",
-						handler: function(){
-							self.assignCraftJob(model, 5);
-						},
-						enabled: true
-				   },{
-						id: "assign25",
-						title: "[+25]",
-						handler: function(){
-							self.assignCraftJob(model, 25);
-						},
-						enabled: true
-				   }];
-			} else {
-				model.unassignCraftLinks = [
-				  {
-						id: "unassign",
-						title: "-",
-						handler: function(){
-							self.unassignCraftJob(model, 1);
-						},
-					  	enabled: true
-				   },{
-						id: "unassign25",
-						title: "-25",
-						handler: function(){
-							self.unassignCraftJob(model, 25);
-						},
-						enabled: true
-				   }];
-
-				model.assignCraftLinks = [
-					{
-						id: "assign",
-						title: "+",
-						handler: function(){
-							self.assignCraftJob(model, 1);
-						},
-						enabled: true
-				   },{
-						id: "assign25",
-						title: "+25",
-						handler: function(){
-							self.assignCraftJob(model, 25);
-						},
-						enabled: true
-				   }];
-			}
-
+			//Links for +/- 1
+			model.unassignCraftLinks = [{
+				id: "unassign",
+				title: "[-]",
+				handler: function(){
+					self.unassignCraftJob(model, 1);
+				},
+				enabled: true
+			}];
+			model.assignCraftLinks = [{
+				id: "assign",
+				title: "[+]",
+				handler: function(){
+					self.assignCraftJob(model, 1);
+				},
+				enabled: true
+			}];
+			//Links for +/- amt, where amt is specified in LINK_AMOUNTS
+			//(Generate only if we have at least as many engineers as amt.)
+			LINK_AMOUNTS.forEach(function(amt) {
+				if (this.game.village.getWorkerKittens("engineer") < amt) {
+					return; //Skip generating links for this amt
+				}
+				model.unassignCraftLinks.push({
+					id: "unassign" + amt,
+					title: "[-" + amt + "]",
+					handler: function() {
+						self.unassignCraftJob(model, amt);
+					},
+					enabled: true
+				});
+				model.assignCraftLinks.push({
+					id: "assign" + amt,
+					title: "[+" + amt + "]",
+					handler: function(){
+						self.assignCraftJob(model, amt);
+					},
+					enabled: true
+				});
+			});
 		} else {
 			model.assignCraftLinks = [];
 			model.unassignCraftLinks = [];
