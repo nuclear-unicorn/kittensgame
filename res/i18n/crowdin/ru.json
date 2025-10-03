@@ -1965,6 +1965,7 @@
     "workshop.lhc.desc": "Каждый ускоритель даст бонус к максимуму науки.",
     "workshop.logistics.label": "Логистика",
     "workshop.logistics.desc": "Умения котят эффективнее на 15%",
+    "workshop.longRangeSpaceships.desc": "Разблокировать Космический шаттл. Необходимо снабдить его командой из двух котят",
     "workshop.mWReactor.label": "Микроскачковый реактор",
     "workshop.mWReactor.desc": "Новые ускользаниевые реакторы для лунной шахты. Добыча недостания улучшена на 75%",
     "workshop.machineLearning.label": "Машинное обучение",
