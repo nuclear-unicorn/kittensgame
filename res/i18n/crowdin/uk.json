@@ -167,6 +167,7 @@
     "buildings.lumberMill.desc": "Покращує виробництво деревини на 10%",
     "buildings.lumberMill.flavor": "Найкращий деревообробний інструмент",
     "buildings.magneto.label": "Магнето",
+    "buildings.magneto.desc": "Покращує загальне виробництво ресурсів на 2%. Кожне парове обладнання збільшує цей ефект на 15%. Споживає нафту.",
     "buildings.mansion.label": "Особняк",
     "buildings.mansion.desc": "Простірний особняк (в кожному є місце для одного кошеня)",
     "buildings.mansion.flavor": "Найкращій вантажний контейнер із можливих",
