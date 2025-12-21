@@ -304,7 +304,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             numberEvents = this.applyRedshift(daysOffset);
         }
 
-        this.game.msg($I("time.redshift", [daysOffset]) + (numberEvents ? " " + $I("time.redshift.ext",[numberEvents]) : ""));
+        this.game.msg($I("time.redshift", [daysOffset]) + (numberEvents ? " " + $I("time.redshift.ext",[this.game.getDisplayValueExt(numberEvents)]) : ""));
     },
 
 	chronoforgeUpgrades: [{
@@ -1151,7 +1151,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         }
         return {
             visible: isVisible,
-            title: "x" + shatteredQuantity,
+            title: "x" + self.game.getDisplayValueExt(shatteredQuantity),
             handler: function(event) {
                 self.doShatterAmt(model, shatteredQuantity);
             }
@@ -1454,7 +1454,7 @@ dojo.declare("classes.ui.time.UseHeatBtnController", com.nuclearunicorn.game.ui.
 		}
 		return {
 			visible: isVisible,
-			title: "x" + shatteredQuantity,
+			title: "x" + self.game.getDisplayValueExt(shatteredQuantity),
 			handler: function(event) {
 				self.doShatterAmt(model, shatteredQuantity);
 			}

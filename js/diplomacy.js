@@ -627,7 +627,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			if (!output){
 				this.game.msg($I("trade.msg.trade.empty"), null, "trade", true);
 			}
-			this.game.msg($I("trade.msg.trade.caravan", [amtTrade]), null, "trade");
+			this.game.msg($I("trade.msg.trade.caravan", [this.game.getDisplayValueExt(amtTrade)]), null, "trade");
 		}
 	},
 
