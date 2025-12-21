@@ -1583,7 +1583,8 @@ dojo.declare("com.nuclearunicorn.game.ui.PraiseBtnController", com.nuclearunicor
 dojo.declare("com.nuclearunicorn.game.ui.ResetFaithBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	getName: function(model) {
 		var ttPlus1 = this.game.religion.transcendenceTier + 1;
-		return model.options.name + (this.game.religion.getRU("transcendence").on ? " [×" + (ttPlus1 * ttPlus1) + "]" : "");
+		return "<div class=\"label\"><span class=\"label-content\">" + model.options.name + "</span></div>" + 
+			(this.game.religion.getRU("transcendence").on ? "<div>[×" + (ttPlus1 * ttPlus1) + "]</div>" : "");
 	},
 
 	updateVisible: function (model) {

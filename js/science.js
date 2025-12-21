@@ -2349,7 +2349,8 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 	getName: function(model){
 		var meta = model.metadata;
 		if (meta.blocked){
-			return meta.label + " " + $I("btn.blocked.capital");
+			var label = "<div class=\"label\"><span class=\"label-content\">" + meta.label + "</span></div>";	
+			return label + "<div>" + $I("btn.blocked.capital") + "</div>";
 		}
 
 		return this.inherited(arguments);

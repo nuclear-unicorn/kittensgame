@@ -1293,8 +1293,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.spaceEngineers.label"),
 		description: $I("workshop.spaceEngineers.desc"),
 		effects: {
-			"t1CraftRatio": 2,
-			"t2CraftRatio": 2,
+			"t1CraftRatio": 10,
+			"t2CraftRatio": 5,
 			"t3CraftRatio": 2,
 			"t4CraftRatio": 2,
 			"queueCap": 2
@@ -1325,8 +1325,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.chronoEngineers.label"),
 		description: $I("workshop.chronoEngineers.desc"),
 		effects: {
-			"t1CraftRatio": 2,
-			"t2CraftRatio": 2,
+			"t1CraftRatio": 10,
+			"t2CraftRatio": 5,
 			"t3CraftRatio": 2,
 			"t4CraftRatio": 2,
 			"t5CraftRatio": 2,

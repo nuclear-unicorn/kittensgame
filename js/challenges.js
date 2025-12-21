@@ -843,16 +843,19 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 
 		var meta = model.metadata;
 		var name = meta.label;
+
+		var label = "<div class=\"label\"><span class=\"label-content\">" + meta.label + "</span></div>";
+
 		if (meta.active || meta.name == this.game.challenges.active) {
-			name = $I("challendge.btn.name.current", [meta.label]);
+			name = $I("challendge.btn.name.current", [label]);
 		} else if (meta.researched){
-			name = $I("challendge.btn.name.complete", [meta.label]);
+			name = $I("challendge.btn.name.complete", [label]);
 		} 
 		if (meta.pending){
-			name += " (" + $I("challendge.pending") + ")";
+			name += "<div>(" + $I("challendge.pending") + ")</div>";
 		}
 		if (meta.on) {
-			name += " (" + meta.on + ")";
+			name += "<div>(" + meta.on + ")</div>";
 		}
 		return name;
 	},

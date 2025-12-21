@@ -1419,10 +1419,10 @@ dojo.declare("classes.ui.space.FurthestRingPanel", [classes.ui.space.PlanetPanel
 	},
 
 	render: function(container){
-		var wrapper = new mixin.IReactAware(WChiral, this.game);
+		//var wrapper = new mixin.IReactAware(WChiral, this.game);
 
 		var content = this.inherited(arguments);
-		wrapper.render(content);
+		//wrapper.render(content);
 
 		return content;
 	}
