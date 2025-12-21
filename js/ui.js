@@ -168,7 +168,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
     isDisplayOver: false,
     isCenter: false,
 
-    defaultSchemes: ["default", "dark", "grassy", "sleek", "black", "minimalist", "factory"],
+    defaultSchemes: ["default"].concat(new classes.KGConfig().statics.defaultSchemes),
     allSchemes: ["default"].concat(new classes.KGConfig().statics.schemes),
 
     dirtyComponents: [],
