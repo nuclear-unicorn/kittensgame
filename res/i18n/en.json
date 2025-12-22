@@ -1867,7 +1867,7 @@
     "ui.option.notation": "Notation:",
     "ui.option.pollution": "Disable pollution effects",
 
-    "queue.alphabeticalToggle": "Sort queue items alphabetically",
+    "queue.alphabeticalToggle": "Sort queue A➛Z",
     "queue.add": "Add to queue",
 
     "left.resources": "resources",

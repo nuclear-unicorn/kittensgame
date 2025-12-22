@@ -1257,34 +1257,6 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	},
 		//Holy Memecide
 	],
-	necrocornDeficitPunishment: function(){
-		for(var kitten in this.game.village.sim.kittens){
-			var skills = this.game.village.sim.kittens[kitten].skills;
-			for(var job in skills){
-				skills[job] = 0;
-			}
-		}
-		this.game.religion.getPact("fractured").on = 1;
-		this.game.religion.getPact("fractured").val = 1;
-		this.game.upgrade(
-			{
-				transcendenceUpgrades:["mausoleum"],
-				policies:["radicalXenophobia"],
-				pacts:["fractured"]
-			}
-		);
-		//this.game.religion.getPact("fractured").calculateEffects(this.game.religion.getPact("fractured"), this.game);
-		this.game.religion.necrocornDeficit = 0;
-		this.game.msg($I("msg.pacts.fractured", [Math.round(100 * this.game.resPool.get("alicorn").value)/100]),"alert", "ai");
-		this.game.resPool.get("alicorn").value = 0;
-		var blackPyramid = this.game.religion.getZU("blackPyramid");
-		for (var i in blackPyramid.effectsPreDeficit){
-			blackPyramid.effectsPreDeficit[i] = 0;
-		}
-		this.game.religion.getZU("blackPyramid").updateEffects(this.game.religion.getZU("blackPyramid"), this.game);
-	},
-
-
 	effectsBase: {
 		"kittensKarmaPerMinneliaRatio" : 0.0001, //unspent pacts can make karma
 		"pactNecrocornConsumption" : -0.0005
@@ -2229,7 +2201,8 @@ dojo.declare("classes.religion.pactsManager", null, {
 		);
 		//this.game.religion.getPact("fractured").calculateEffects(this.game.religion.getPact("fractured"), this.game);
 		this.game.religion.pactsManager.necrocornDeficit = 0;
-		this.game.msg($I("msg.pacts.fractured", [Math.round(100 * this.game.resPool.get("alicorn").value)/100]),"alert", "ai");
+		var alicornsLost = Math.round(100 * this.game.resPool.get("alicorn").value) / 100;
+		this.game.msg($I("msg.pacts.fractured", [this.game.getDisplayValueExt(alicornsLost)]),"alert", "ai");
 		this.game.resPool.get("alicorn").value = 0;
 		var blackPyramid = this.game.religion.getZU("blackPyramid");
 		for (var i in blackPyramid.effectsPreDeficit){
