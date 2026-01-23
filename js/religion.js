@@ -1719,7 +1719,6 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 	},
 
 	//zigguratIvoryPriceRatio applies an additive modifier to the price ratio, but only for ivory
-	//zigguratIvoryCostIncrease applies a multiplicative modifier to the base price, but only for ivory
 	getPrices: function(model) {
 		var meta = model.metadata;
 		var ratio = meta.priceRatio || 1;
@@ -1732,9 +1731,6 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 			var resPriceDiscount = this.game.getEffect(meta.prices[i].name + "CostReduction");
 			resPriceDiscount = this.game.getLimitedDR(resPriceDiscount, 1);
 			var resPriceModifier = 1 - resPriceDiscount;
-			if (meta.prices[i].name == "ivory") {
-				resPriceModifier *= 1 + this.game.getEffect("zigguratIvoryCostIncrease");
-			}
 			var ratioToUse = meta.prices[i].name == "ivory" ? ivoryRatio : ratio;
 
 			prices.push({
