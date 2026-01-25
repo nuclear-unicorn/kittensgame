@@ -720,7 +720,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				"tearsMax": 0,
 				"alicornMax": 0
 			};
-			if (game.resPool.get("alicorn").value > 0) {
+			//Alicornmancy effect: Production starts instantly; no need to wait for first descent.
+			var hasAlicornmancy = game.prestige.getPerk("alicornmancy").researched;
+			if (hasAlicornmancy || game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.00002;
 			}
 			if (game.challenges.isActive("unicornTears")) {
@@ -766,7 +768,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				"tearsMax": 0,
 				"alicornMax": 0
 			};
-			if (game.resPool.get("alicorn").value > 0) {
+			//Alicornmancy effect: Production starts instantly; no need to wait for first descent.
+			var hasAlicornmancy = game.prestige.getPerk("alicornmancy").researched;
+			if (hasAlicornmancy || game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.000025;
 			}
 			if (game.challenges.isActive("unicornTears")) {
@@ -818,7 +822,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				"tearsMax": 0,
 				"alicornMax": 0
 			};
-			if (game.resPool.get("alicorn").value > 0) {
+			//Alicornmancy effect: Production starts instantly; no need to wait for first descent.
+			var hasAlicornmancy = game.prestige.getPerk("alicornmancy").researched;
+			if (hasAlicornmancy || game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.00005;
 			}
 			if (game.challenges.isActive("unicornTears")) {

@@ -213,7 +213,20 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		prices: [{ name: "paragon", val: 125 }],
 		unlocked: true,
 		defaultUnlocked: true,
-		researched: false
+		researched: false,
+		unlocks: {
+			"perks": ["alicornmancy"]
+		}
+	},{
+		name: "alicornmancy", //Exists to reduce reliance on RNG during the Unicorn Tears Challenge
+		label: $I("prestige.alicornmancy.label"),
+		description: $I("prestige.alicornmancy.desc"),
+		prices: [{ name: "paragon", val: 200 }],
+		unlocked: false,
+		researched: false,
+		upgrades: {
+			zigguratUpgrades: ["skyPalace", "unicornUtopia", "sunspire"]
+		}
 	},
 	{
 		name: "anachronomancy",

@@ -875,7 +875,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			this.game.challenges.getChallenge("pacifism").unlocked = true;
 		}
 
-		var unicorns = this.game.resPool.addResEvent("unicorns", this.game.math.binominalRandomInteger(squads, 0.05));
+		var unicorns = this.game.resPool.addResEvent("unicorns", this.game.math.binominalRandomInteger(squads, this.getHuntUnicornChance()));
 		if (unicorns > 0) {
 			var unicornMsg = unicorns == 1
 				? $I("village.new.one.unicorn")
@@ -927,6 +927,19 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 	getMaxHuntAmt: function() {
 		var huntCost = 100 - this.game.getEffect("huntCatpowerDiscount");
 		return Math.floor(this.game.resPool.get("manpower").value / huntCost);
+	},
+	/**
+	 * Calculates the chance to receive a unicorn from performing one hunt.
+	 * @return The probability as a number from 0 to 1
+	 */
+	getHuntUnicornChance: function() {
+		//Alicornmancy effect: Increased chance to find unicorns, provided the player has 0 Unicorn Pastures.
+		var hasAlicornmancy = this.game.prestige.getPerk("alicornmancy").researched;
+		if (hasAlicornmancy && this.game.bld.get("unicornPasture").val == 0) {
+			return 0.25;
+		}
+		//Else, Alicornmancy effect doesn't apply
+		return 0.05;
 	},
 
 	holdFestival: function(amt){

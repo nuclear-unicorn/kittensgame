@@ -961,6 +961,8 @@
     "prestige.panel.label": "Metaphysics",
     "prestige.adjustmentBureau.label": "Adjustment Bureau",
     "prestige.adjustmentBureau.desc": "Unlocks additional game challenges.",
+    "prestige.alicornmancy.label": "Alicornmancy",
+    "prestige.alicornmancy.desc": "Increases the chance to get your first unicorns from hunting.\nAlicorn production will start instantly once unlocked.",
     "prestige.anachronomancy.label": "Anachronomancy",
     "prestige.anachronomancy.desc": "Time crystals and chronophysics will be saved across resets.",
     "prestige.ascoh.label": "ASCOH",
