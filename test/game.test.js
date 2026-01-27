@@ -1066,3 +1066,27 @@ test("Refine Catnip ×100 should fail if there isn't enough catnip", () => {
     expect(game.resPool.get("catnip").value).toBe(0); //Should have consumed 10k catnip
     expect(game.resPool.get("wood").value).toBe(200); //Crafted 100 more wood
 });
+
+test("Metaphysics upgrade unlock tree must be sensible", () => {
+    //============
+    //If an upgrade is unlocked by another upgrade, it should NOT be unlocked by default.
+    //============
+    var perksMap = {}; //Map.  Key is name of upgrade, value is whether it's unlocked by default.
+    for (const perk of game.prestige.perks) {
+        perksMap[perk.name] = Boolean(perk.defaultUnlocked);
+    }
+    //Now that we have a lookup table to know if an upgrade is unlocked by default, let's see which upgrades unlock each other:
+    for (const perk of game.prestige.perks) {
+        if (perk.unlocks && perk.unlocks.perks) {
+            for (const unlock of perk.unlocks.perks) {
+                //We are looping through which upgrades are unlocked by perk
+                //If they're unlocked by something, then they should have a falsy defaultUnlocked!
+                if (perksMap[unlock] !== false) {
+                    //Seeing something like "Expected: false; Received: true" is unhelpful for the dev, so output a custom error message:
+                    console.error(perk.name + " unlocks " + unlock + ", which is pointless since " + unlock + " is unlocked by default anyways.");
+                }
+                expect(perksMap[unlock]).toBe(false);
+            }
+        }
+    }
+});
