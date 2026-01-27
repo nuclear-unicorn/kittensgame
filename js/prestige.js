@@ -211,8 +211,8 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		label: $I("prestige.unicornmancy.label"),
 		description: $I("prestige.unicornmancy.desc"),
 		prices: [{ name: "paragon", val: 125 }],
-		unlocked: true,
-		defaultUnlocked: true,
+		unlocked: false,
+		defaultUnlocked: false,
 		researched: false,
 		unlocks: {
 			"perks": ["alicornmancy"]
