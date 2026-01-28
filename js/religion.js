@@ -1999,6 +1999,9 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 
 		//Amount of the resource we failed to gain because we hit the cap:
 		var overcap = attemptedGainCount - actualGainCount;
+		if (!resToObj.maxValue) { //Having a falsy maxValue is the game engine's way of saying it's uncapped.
+			overcap = 0;
+		}
 		if (actualGainCount == 0 && attemptedGainCount > 0 &&
 			resToObj.value / attemptedGainCount > 1e15) {
 			//We are in territory where overcap will be triggered due to floating-point precision limits.
@@ -2010,9 +2013,10 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 		}
 
 		if (overcap > 0.001) { //Don't trigger from floating-point errors
-			if (resToName == "tears") {
+			var pollutionRate = this.game.getEffect("cathPollutionPerTearOvercapped");
+			if (pollutionRate && resToName == "tears") { //Avoid possible Infinity * 0 = NaN
 				//Tears evaporate into a smoky substance
-				this.game.bld.cathPollution += overcap * this.game.getEffect("cathPollutionPerTearOvercapped");
+				this.game.bld.cathPollution += overcap * pollutionRate;
 			}
 			//Optional parameter to display a message when we overcap:
 			if (typeof(this.controllerOpts.overcapMsgID) === "string") {

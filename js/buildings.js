@@ -2766,7 +2766,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		return this.game.getEffect("cathPollutionPerTickProd") * this.getPollutionRatio() * (1 + this.game.getEffect("cathPollutionRatio")) + this.game.getEffect("cathPollutionPerTickCon");
 	},
 	cacheCathPollutionPerTick: function(){
-		this.cathPollutionPerTick = this.getUndissipatedPollutionPerTick() - this.cathPollution * this.pollutionEffects["pollutionDissipationRatio"];
+		//Avoid NaN errors if cathPollution is infinite by setting dissipation to 0
+		var dissipation = isFinite(this.cathPollution) ? this.cathPollution * this.pollutionEffects["pollutionDissipationRatio"] : 0;
+		this.cathPollutionPerTick = this.getUndissipatedPollutionPerTick() - dissipation;
 	},
 	getEquilibriumPollution: function(){ //returns pollution value at which pollutionDissipationRatio will make pollutionPerTick equal to 0, or -1 if such value doesn't exits
 		if (this.pollutionEffects["pollutionDissipationRatio"]){
