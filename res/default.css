@@ -834,8 +834,8 @@ label:hover {
 
 #optionsDiv {
     overflow-y: scroll;
-    height: 400px;
-    margin-top:-170px;
+    height: 440px;
+    margin-top:-220px;
 }
 
 #optionsDiv input[type="checkbox"] {
