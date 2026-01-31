@@ -315,7 +315,7 @@ body.scheme_computer {
 	padding-right: 5px;
 }
 .scheme_computer #tooltip,
-.scheme_computer .tooltip-block > div {
+.scheme_computer .tooltip-content{
 	color: #f0a258; /* tooltip windows == left column : left text */
 	background-color: #2b2c2d;
 	border: 3px outset #1b1c1e;
@@ -323,7 +323,7 @@ body.scheme_computer {
 	box-shadow: inset 1px 1px 2px #424242, inset -1px -1px 1px #020202;
 	margin-left: 3px; /* for offset tooltip due to larger buttons .btn.modern */
 }
-.scheme_computer .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_computer .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_computer .button_tooltip {

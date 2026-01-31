@@ -291,7 +291,7 @@ body.scheme_school.with_background_image,
 	font-size: 13px; /* for center tooltip except title, effects and flavor */
 }
 .scheme_school #tooltip,
-.scheme_school .tooltip-block > div {
+.scheme_school .tooltip-content{
     background-image: url('img/theme-school_dark.jpg'); /* source : https://pngtree.com/freebackground/taobao-small-appliances-poster-tmall-kitchen-supplies-banner_1061754.html */
 	background-repeat: repeat;
 	background-attachment: fixed;
@@ -303,7 +303,7 @@ body.scheme_school.with_background_image,
 	border-radius: 0 0 5px 5px;
 	box-shadow: inset 0 1px 2px #000000, 2px 2px 3px #000000;
 }
-.scheme_school .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_school .tooltip-content{ /* tooltip on ? top right column */
 	font-size: 13px;
 	padding: 5px;
 }

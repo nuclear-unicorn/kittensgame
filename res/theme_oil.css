@@ -267,7 +267,7 @@ body.scheme_oil,
 /******************** TOOLTIP ********************/
 /*************************************************/
 .scheme_oil #tooltip,
-.scheme_oil .tooltip-block > div {
+.scheme_oil .tooltip-content{
 	background-color: #101010;
 	font-size: 14px;
 	color: #898989; /* tooltip windows == left column : left text */
@@ -279,7 +279,7 @@ body.scheme_oil,
 	box-shadow: inset 0 0 40px 12px #000000,
 	-1px -1px 2px #797979, 1px 1px 2px #191919;
 }
-.scheme_oil .tooltip-block > div {
+.scheme_oil .tooltip-content{
 	padding: 5px;
 }
 .scheme_oil .button_tooltip {

@@ -345,7 +345,7 @@ body.scheme_vintage {
 	/* font-size: 13px; /* for center tooltip except title, effects and flavor */
 /* } */
 .scheme_vintage #tooltip,
-.scheme_vintage .tooltip-block > div {
+.scheme_vintage .tooltip-content{
 	padding-left: 9px; /* default padding-left: 3px; */
 	padding-bottom: 5px;
 	background-color: #161619;
@@ -360,7 +360,7 @@ body.scheme_vintage {
 	box-shadow: 2px 5px 7px #000000, -2px -5px 7px #000000;
 	/* margin-left: 20px; /* for offset tooltip due to larger buttons .btn.modern */
 }
-.scheme_vintage .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_vintage .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_vintage .button_tooltip {

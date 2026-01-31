@@ -1779,7 +1779,7 @@
     "ui.filter.enabled": "Enabled",
     "ui.filter.togglable": "Togglable",
 
-    "ui.kgnet.login": "> Log in <",
+    "ui.kgnet.login": "Log in",
     "ui.kgnet.online": "Online",
     "ui.kgnet.save.current": "current",
     "ui.kgnet.save.save": "Save",

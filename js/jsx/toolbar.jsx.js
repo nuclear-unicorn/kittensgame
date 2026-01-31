@@ -654,15 +654,21 @@ WLogin = React.createClass({
                 },
                 [
                     $r("a", {
+                        className: "kgnet-login-link-container",
                         href:"#!",
                         onClick: this.toggleExpanded,
                     }, 
                         $r("span", {
                             className: "kgnet-login-link status-indicator-" + (game.server.userProfile ? "online" : "offline")
                             + (lastBackup >= 7 ? " freshMessage" : "")
-                        }, "* " + (game.server.userProfile ?
-                            $I("ui.kgnet.online") : $I("ui.kgnet.login")
-                        )),
+                        }, [
+                            $r("div", {
+                                className: "svg-icon user"
+                            }),  
+                            (game.server.userProfile ?
+                            $I("ui.kgnet.online") : $I("ui.kgnet.login"))
+                        ]
+                        ),
                     ),
                     this.state.isExpanded && $r("div", {
                         className: "login-popup button_tooltip tooltip-block"

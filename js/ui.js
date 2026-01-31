@@ -1121,10 +1121,12 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
     updateCenter: function(){
         if (this.isCenter) {
             $("#game").addClass("centered");
-            $("#toggleCenter").html("&lt;");
+            $("#toggleCenterIcon").removeClass("right");
+            $("#toggleCenterIcon").addClass("left");
         } else {
             $("#game").removeClass("centered");
-            $("#toggleCenter").html("&gt;");
+            $("#toggleCenterIcon").removeClass("left");
+            $("#toggleCenterIcon").addClass("right");
         }
 
     },

@@ -2000,23 +2000,22 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 
 		var label = "<div class=\"label\"><span class=\"label-content\">" + meta.label + "</span></div>";
 
+		var amtClass = "amt";
+		if (meta.val >= 10000){
+			amtClass = "amt small";
+		}
+
 		if (!meta.val) {
 			return label;
 		} else if (meta.noStackable){
 			return label + " " + $I("btn.complete");
 		} else if (meta.togglableOnOff){
-			return label + "<div>(" + meta.val + ")</div>";
-		} else if (meta.togglable) {
-			//it's not so important h
-			/*if (meta.val >= 1000){
-				return meta.label + " (" +
-					(meta.on < 10000 ? ((meta.on/1000).toFixed(1) + "K") : this.game.getDisplayValueExt(meta.on)) + "/" +
-					(meta.val < 10000 ? ((meta.val/1000).toFixed(1) + "K") : this.game.getDisplayValueExt(meta.val)) +
-				")";
-			}*/
-			return label + "<div>(" + meta.on + "/" + meta.val + ")</div>";
+			return label + "<div class=\"amt\">(" + meta.val + ")</div>";
+		} else if (meta.togglable && meta.on != meta.val) {
+			//do not display redundand 1000/1000 to save real estate
+			return label + "<div class=\"" + amtClass + "\">(" + meta.on + "/" + meta.val + ")</div>";
 		} else {
-			return label + "<div>(" + meta.on + ")</div>";
+			return label + "<div class=\"amt\">(" + meta.on + ")</div>";
 		}
 	},
 

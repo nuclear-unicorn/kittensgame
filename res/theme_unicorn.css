@@ -296,7 +296,7 @@ body.scheme_unicorn.with_background_image {
 /* ******************* TOOLTIP ******************* */
 /* *********************************************** */
 .scheme_unicorn #tooltip,
-.scheme_unicorn .tooltip-block > div {
+.scheme_unicorn .tooltip-content{
 	background-color: #223144;
 	color: #798797; /* tooltip windows == left column : left text */
 	border-style: groove;
@@ -306,7 +306,7 @@ body.scheme_unicorn.with_background_image {
 	box-shadow: 4px 4px 9px #111922;
 	margin-left: 5px; /* for offset tooltip due to larger buttons .btn.modern */
 }
-.scheme_unicorn .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_unicorn .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_unicorn .button_tooltip {

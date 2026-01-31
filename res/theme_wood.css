@@ -420,7 +420,7 @@ body.scheme_wood.with_background_image {
 	/* font-size: 13px; /* for center tooltip except title, effects and flavor */
 /* } */
 .scheme_wood #tooltip,
-.scheme_wood .tooltip-block > div {
+.scheme_wood .tooltip-content{
 	padding-left: 9px; /* default padding-left: 3px; */
 	padding-right: 9px;
 	padding-bottom: 5px;
@@ -438,7 +438,7 @@ body.scheme_wood.with_background_image {
 	box-shadow: 2px 2px 7px #000000, inset 1px 1px 5px #000000;
 	/* margin-left: 20px; /* for offset tooltip due to larger buttons .btn.modern */
 }
-.scheme_wood .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_wood .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_wood .button_tooltip {
