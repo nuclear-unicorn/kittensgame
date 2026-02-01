@@ -1885,14 +1885,11 @@ span.genericWarning {
     align-items: center;
 }
 
-.icons-container * {
-    display: inline-flex;
-}
-
 .kgnet-login-link-container {
     display: flex;
 }
 
 .kgnet-login-link {
     gap: 3px;
+    display: inline-flex;
 }
