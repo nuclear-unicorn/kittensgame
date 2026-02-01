@@ -8,6 +8,13 @@
 /* ******************* GAME ******************* */
 /* ******************************************** */
 
+.scheme_computer,
+.scheme_computer .help {
+	color-scheme: dark;
+	--page-background-color:#4b4c4e;
+	--text-color: #b0b0b0;
+}
+
 body.scheme_computer {
 	background-color: #4b4c4e;
 }

@@ -25,11 +25,13 @@
 /* ******************************************** */
 /* ******************* GAME ******************* */
 /* ******************************************** */
-
-body.scheme_wood {
-	background-color:#201916;
+.scheme_wood,
+.scheme_wood .help {
 	color-scheme: dark;
+	--page-background-color:#201916;
+	--text-color: #a89f93;
 }
+
 body.scheme_wood.with_background_image {
 	background:	repeat-x local top left url('img/theme_wood_border_01.png'), #201916;
 }

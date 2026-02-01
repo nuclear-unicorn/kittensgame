@@ -7,9 +7,12 @@
 /* ******************************************** */
 /* ******************* GAME ******************* */
 /* ******************************************** */
-body.scheme_unicorn {
-	background-color: #e8dbc7;
+.scheme_unicorn,
+.scheme_unicorn .help {
+	--page-background-color: #e8dbc7;
+	--text-color: #454e58;
 }
+
 body.scheme_unicorn.with_background_image {
 	background: no-repeat fixed bottom 3px right url('img/theme_unicorn_01.png'), #e8dbc7; /* source: https://pngtree.com/freepng/unicorn_3741926.html Volkeyrn: permanent premium member */
 }

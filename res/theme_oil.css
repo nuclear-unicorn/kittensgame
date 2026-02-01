@@ -9,6 +9,14 @@
 /**********************************************/
 /******************** GAME ********************/
 /**********************************************/
+
+.scheme_oil,
+.scheme_oil .help {
+	color-scheme: dark;
+	--page-background-color:#000000;
+	--text-color: #A9A9A9;
+}
+
 body.scheme_oil,
 .scheme_oil .help,
 .scheme_oil .dialog {

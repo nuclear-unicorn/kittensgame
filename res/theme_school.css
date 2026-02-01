@@ -7,6 +7,14 @@
 /**********************************************/
 /******************** GAME ********************/
 /**********************************************/
+/* ******************************************** */
+.scheme_school,
+.scheme_school .help {
+	color-scheme: dark;
+	--page-background-color:#292728;
+	--text-color: #81848C;
+}
+
 body.scheme_school,
 .scheme_school div.dialog {
 	background-color: #292728;

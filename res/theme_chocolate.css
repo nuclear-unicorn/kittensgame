@@ -7,9 +7,11 @@
 /**********************************************/
 /******************** GAME ********************/
 /**********************************************/
-body.scheme_chocolate {
+.scheme_chocolate,
+.scheme_chocolate .help {
 	background-color: #403022;
 	--page-background-color: #403022;
+	--text-color: #e0c8af;
 }
 body.scheme_chocolate.with_background_image {
 	background:	repeat-x local top left url('img/theme_chocolate_topbar_background.png'), #403022; /* source of images for graphic design : https://pngtree.com/freepng/set-of-cloud-collection-vector_3575869.html Volkeyrn: permanent premium member */

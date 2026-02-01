@@ -11,9 +11,11 @@
 /* ******************************************** */
 /* ******************* GAME ******************* */
 /* ******************************************** */
-body.scheme_tombstone {
-	background-color: #27282c;
+.scheme_tombstone,
+.scheme_tombstone .help {
 	color-scheme: dark;
+	--page-background-color:#27282c;
+	--text-color: #b7b7b9;
 }
 .scheme_tombstone #gamePageContainer,
 .scheme_tombstone select,

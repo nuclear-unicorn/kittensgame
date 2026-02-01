@@ -9,8 +9,11 @@
 /* ******************* GAME ******************* */
 /* ******************************************** */
 
-body.scheme_vintage {
-	background-color: #242329;
+.scheme_vintage,
+.scheme_vintage .help {
+	color-scheme: dark;
+	--page-background-color:#242329;
+	--text-color: #c0c0c0;
 }
 .scheme_vintage  #gamePageContainer,
 .scheme_vintage select,
