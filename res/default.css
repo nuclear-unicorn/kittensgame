@@ -1843,11 +1843,18 @@ span.genericWarning {
     width: 14px;
     height:14px;
     background-color: var(--text-color);
+    opacity: 0.8;
 }
 
 .svg-icon.gear {
     mask: url('img/gear.svg') no-repeat center / contain;
     -webkit-mask: url('img/gear.svg') no-repeat center / contain;
+}
+
+.svg-icon.gear:hover {
+    opacity: 1;
+    scale: 1.1;
+    transition: opacity 0.1s, scale 0.1s;
 }
 
 .svg-icon.down {

@@ -7,6 +7,14 @@
 /**********************************************/
 /******************** GAME ********************/
 /**********************************************/
+
+.scheme_fluid,
+.scheme_fluid .help {
+	color-scheme: dark;
+	--page-background-color:#292728;
+	--text-color: #81848C;
+}
+
 body.scheme_fluid,
 .scheme_fluid .help,
 .scheme_fluid .dialog {
