@@ -873,7 +873,7 @@ WLeftPanel = React.createClass({
                     ")"
                 )
             ),
-            $r("div", {id:"fastPraiseContainer sidebar-section", className:"pin-link", style:{visibility:"hidden"}},
+            $r("div", {id:"fastPraiseContainer", className:"pin-link sidebar-section", style:{visibility:"hidden"}},
                 $r("a", {href:"#", onClick: this.praiseAll},
                     $I("left.praise")
                 )
