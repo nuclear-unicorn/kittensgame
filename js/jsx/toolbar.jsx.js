@@ -725,7 +725,7 @@ WToolbar = React.createClass({
             $r(WToolbarHappiness, {game: this.state.game}),
             $r(WToolbarEnergy, {game: this.state.game}),
             $r(WBLS, {game: this.state.game}),
-            $r(WToolbarMOTD, {game: this.state.game}),
+            //$r(WToolbarMOTD, {game: this.state.game}),
             $r(WLogin, {game: this.state.game})
 
         );
