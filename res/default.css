@@ -104,6 +104,11 @@ img.loader {
 
     overflow-y: auto;
     overflow-x: hidden;
+
+    padding-top:20px;
+
+    height: calc(100% - 20px);
+    min-height: calc(100% - 20px);
 }
 
 #midColumn {
@@ -1831,7 +1836,7 @@ div.leet {
     text-decoration: underline;
 }
 
-#leftColumn, #toggleCenter {
+#toggleCenter {
     padding-top: 20px;
 }
 
