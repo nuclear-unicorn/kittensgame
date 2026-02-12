@@ -819,7 +819,7 @@ body.scheme_fluid,
 	background-position: left;
 	padding-left: 20px; /* default padding-left: 8px; */
 	top: 0; /* default top: 20px; */
-	margin-top: 16px; /* default margin-top: 4px; */
+	margin-top: 32px; /* default margin-top: 4px; */
 }
 .scheme_fluid #toggleCenter,
 .scheme_fluid span.toggleCenter {
