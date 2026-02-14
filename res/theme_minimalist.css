@@ -15,6 +15,10 @@
 	--text-color: #B0B0B0;
 }
 
+.scheme_minimalist .button_tooltip.login-popup {
+	background-color: var(--page-background-color);
+}
+
 body.scheme_minimalist {
 	background-color: #0C0D10;
 	color-scheme: dark;
