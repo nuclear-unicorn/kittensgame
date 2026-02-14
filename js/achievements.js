@@ -407,6 +407,15 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             title: "Better Safe Than Sorry",
             description: "Get Carbon Sequestration with no pollution.",
             difficulty: "E"
+        },{
+            name: "soLongAndThanksForAllTheHay", //Because horses eat hay
+            title: "So Long, and Thanks for All the Hay",
+            description: "Have exactly 42 alicorns.", //Subtle lie--accomodate floating-point error by ± 1 picoalicorn.
+            difficulty: "S",
+            condition: function() {
+                var epsilon = 1e-12;
+                return Math.abs(this.game.resPool.get("alicorn").value - 42) < epsilon;
+            }
         }
     ],
 

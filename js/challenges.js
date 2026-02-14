@@ -431,7 +431,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"thorium": 180000,
 			//---Other---//
 			"unicorns": -Infinity, //Used to prevent a building that already costs this resource from having its price modified
-			"alicorns": -Infinity,
+			"alicorn": -Infinity,
 			"tears": -Infinity,
 			"megalith": -Infinity,
 			"default": 10 //Used for any resource not explicitly specified
@@ -567,6 +567,11 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			chall.active = false;
 			chall.pending = false;
 			chall.unlocked = false;
+		}
+
+		//Unlock special challenge-specific Workshop upgrades
+		if (this.isActive("unicornTears") && !this.game.workshop.get("alicornStable").unlocked && this.game.resPool.get("alicorn").value >= 15) {
+			this.game.unlock({ upgrades: ["alicornStable"]});
 		}
 
 		//Iron Will has special rules.  Just make the UI more obvious when the game is in IW mode:

@@ -1595,6 +1595,29 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		]
 	},
 	{
+		//Special upgrade only unlockable during the Unicorn Tears Challenge
+		name: "alicornStable",
+		label: $I("workshop.alicornStable.label"),
+		description: $I("workshop.alicornStable.desc"),
+		effects: {
+			"alicornMax": 0
+		},
+		calculateEffects: function(self, game) {
+			if (game.challenges.isActive("unicornTears")) {
+				self.description = $I("workshop.alicornStable.desc");
+				self.effects["alicornMax"] = 0.2;
+			} else {
+				self.description = $I("workshop.alicornStable.desc.noChallenge");
+				self.effects["alicornMax"] = 0;
+			}
+		},
+		prices:[
+			{ name: "wood", val: 3000 },
+			{ name: "gold", val: 100 },
+			{ name: "alicorn", val: 20 }
+		]
+	},
+	{
 		name: "gmo",
 		label: $I("workshop.gmo.label"),
 		description: $I("workshop.gmo.desc"),
