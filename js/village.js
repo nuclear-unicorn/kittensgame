@@ -3363,13 +3363,15 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 	},
 
 	renameLoadout: function(){
-		var textToDisplay = prompt("", this.title);
-		if(!textToDisplay) {
-			return;
-		}
-		textToDisplay = textToDisplay.substring(0,25);
-		this.title = textToDisplay;
-		this.game.render();
+		var self = this;
+		this.game.ui.prompt("", this.title, function(textToDisplay) {
+			if(!textToDisplay) {
+				return;
+			}
+			textToDisplay = textToDisplay.substring(0,25);
+			self.title = textToDisplay;
+			self.game.render();
+		});
 	},
 
 	getLoadoutJobsSum: function(){

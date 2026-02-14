@@ -7,6 +7,14 @@
 /**********************************************/
 /******************** GAME ********************/
 /**********************************************/
+.scheme_minimalist,
+.scheme_minimalist .help
+.scheme_minimalist #viewport-container {
+	color-scheme: dark;
+	--page-background-color:#0C0D10;
+	--text-color: #B0B0B0;
+}
+
 body.scheme_minimalist {
 	background-color: #0C0D10;
 	color-scheme: dark;

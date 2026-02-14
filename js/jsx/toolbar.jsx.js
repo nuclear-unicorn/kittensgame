@@ -393,7 +393,7 @@ WLoginForm = React.createClass({
     login: function(){
         var self = this;
 
-        this.setState({isLoading: true});
+        self.setState({error: null, isLoading: true});
         $.ajax({
             cache: false,
             type: "POST",
@@ -410,10 +410,12 @@ WLoginForm = React.createClass({
 		}).done(function(resp){
             if (resp.id){
                 self.props.game.server.setUserProfile(resp);
+            } else {
+                self.setState({error: resp.error})
             }
 		}).fail(function(resp, status){
             console.error("something went wrong, resp:", resp, status)
-            self.setState({error: resp.responseText})
+            self.setState({error: resp.responseText || "There was a problem connecting the server"})
         }).always(function(){
             self.setState({isLoading: false});
         });

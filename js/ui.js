@@ -1064,8 +1064,13 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         if (window.confirm(msg)) {
             callbackOk.apply(window);
         } else if (callbackCancel != undefined) {
-        	callbackCancel.apply(window);
+            callbackCancel.apply(window);
         }
+    },
+
+    prompt: function(title, defaultValue, callbackOk) {
+        var result = window.prompt(title, defaultValue);
+        callbackOk.call(window, result);
     },
 
     //TODO: add dialog and close/bind events
