@@ -180,6 +180,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     updateQueue: function(){
         if(this.game.getFeatureFlag("QUEUE")){
             this.queue.update();
+
+            this.game.queueTab.update();
         }
     },
 
@@ -2625,4 +2627,19 @@ dojo.declare("classes.queue.manager", null,{
 });
 
 dojo.declare("classes.tab.QueueTab", com.nuclearunicorn.game.ui.tab, {
+    update: function(){
+        this.updateTab();
+    },
+
+    updateTab: function(){
+        this.tabName = $I("tab.name.queue");
+        var queueManager = this.game.time.queue;
+        
+        this.tabName += "(" + queueManager.queueLength() + ")";
+
+        if (this.domNode) {
+			this.domNode.innerHTML = this.tabName;
+		}
+        dojo.publish("ui/refreshTabNames", [this.game]);
+    }
 });
