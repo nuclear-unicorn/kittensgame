@@ -181,7 +181,10 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         if(this.game.getFeatureFlag("QUEUE")){
             this.queue.update();
 
-            this.game.queueTab.update();
+            //TODO: use dedicated flag for queue tab
+            if (this.game.isMobile()){
+                this.game.queueTab.update();
+            }
         }
     },
 
