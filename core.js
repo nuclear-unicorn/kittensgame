@@ -582,6 +582,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	fetchModel: function(options) {
 		var model = this.initModel(options);
 		model.name = this.getName(model);
+		model.type = this.getType(model);
 		model.description = this.getDescription(model);
 		model.prices = this.getPrices(model);
 		model.priceRatio = options.priceRatio;
@@ -618,6 +619,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		return  {
 			name: "",
 			description: "",
+			type: "",
 			visible: true,
 			enabled: true,
 			handler: null,
@@ -691,6 +693,9 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		return model.options.description;
 	},
 
+	getType: function(model){
+		return model.options.type;
+	},
 
 	/**
 	 * Deprecated method for price management (increases price property stored in button)
@@ -2008,7 +2013,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 		if (!meta.val) {
 			return label;
 		} else if (meta.noStackable){
-			return label + " " + $I("btn.complete");
+			return label + "<div>" + $I("btn.complete") + "</div>";
 		} else if (meta.togglableOnOff){
 			return label + "<div class=\"amt\">(" + meta.val + ")</div>";
 		} else if (meta.togglable && meta.on != meta.val) {
@@ -2279,10 +2284,11 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingNotStackableBtnController", com
 
 	getName: function(model){
 		var meta = model.metadata;
+		var label = "<div class=\"label\"><span class=\"label-content\">" + meta.label + "</span></div>";	
 		if (meta.researched){
-			return meta.label + " " + $I("btn.complete.capital");
+			return label + "<div>" + $I("btn.complete.capital") + "</div>";
 		} else {
-			return meta.label;
+			return label;
 		}
 	},
 
