@@ -36,7 +36,7 @@ dojo.declare("com.nuclearunicorn.i18n.Lang", null, {
 			"ja": "日本語",
 			"ko": "한국어",
 			"nl": "NL",
-			"no": "NO",
+			"no": "Norsk",
 			"pl": "Polski",
 			"ro": "RO",
 			"ru": "Русский",
