@@ -2736,6 +2736,10 @@ dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearun
 		return result;
 	},
 
+	getType: function(){
+		return "upgrades";
+	},
+
 	getMetadata: function(model){
         if (!model.metaCached){
             model.metaCached = this.game.workshop.get(model.options.id);
@@ -3089,6 +3093,10 @@ dojo.declare("com.nuclearunicorn.game.ui.ZebraUpgradeButtonController", com.nucl
         }
         return model.metaCached;
     },
+
+	getType: function(){
+		return "zebraUpgrades";
+	},
 
 	getPrices: function(model) {
         return this.game.village.getEffectLeader("scientist", this.inherited(arguments));

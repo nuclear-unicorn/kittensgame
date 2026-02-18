@@ -2581,6 +2581,10 @@ dojo.declare("com.nuclearunicorn.game.ui.TechButtonController", com.nuclearunico
 		return result;
 	},
 
+	getType: function(){
+		return "tech";
+	},
+
 	getMetadata: function(model){
         if (!model.metaCached){
             model.metaCached = this.game.science.get(model.options.id);

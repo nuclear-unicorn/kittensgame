@@ -1253,6 +1253,10 @@ dojo.declare("com.nuclearunicorn.game.ui.SpaceProgramBtnController", com.nuclear
         return model.metaCached;
     },
 
+	getType: function(){
+		return "spaceMission";
+	},
+
     getPrices: function(model) {
         var prices = dojo.clone(model.metadata.prices);
 
