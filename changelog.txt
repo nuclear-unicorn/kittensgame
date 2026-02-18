@@ -5,7 +5,7 @@ Unicorn Tears Challenge (Brent)
 New Foreign Relations Policies (Brent)
 
 Minor:
-Added Norwegian language to the list of available localizations
+Added Norwegian and Dutch languages to the list of available localizations
 Fixed error messages not being shown for login panel
 Minor ui tweaks for various color themes
 Removed crowdin translation widget
