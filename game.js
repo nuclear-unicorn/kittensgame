@@ -3982,6 +3982,24 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.religion.praise();
 	},
 
+	sacrificeAllUnicorns: function(event){
+		event.preventDefault();
+		//My goal here is to minimize code duplication
+		var controller = new classes.ui.religion.TransformBtnController(this, {
+			gainMultiplier: function() { return this.game.bld.get("ziggurat").on; },
+			gainedResource: "tears",
+			applyAtGain: function(priceCount) {
+				this.game.stats.getStat("unicornsSacrificed").val += priceCount;
+			},
+			overcapMsgID: "religion.sacrificeBtn.sacrifice.msg.overcap",
+			logTextID: "religion.sacrificeBtn.sacrifice.msg",
+			logfilterID: "unicornSacrifice"
+		});
+		var model = { prices: [{ name: "unicorns", val: 2500}]};
+
+		controller.transform(model, 1 /*all*/, event, function(){/*dummy callback function*/});
+	},
+
 	/**
 	 * Updates a perTickValue of resource for UI
 	 */

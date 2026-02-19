@@ -811,6 +811,10 @@ WLeftPanel = React.createClass({
             (!game.challenges.isActive("pacifism"));
         var showFastHunt = (catpower.value >= huntCost);
 
+        var sacCost = 2500;
+        var canSacrifice = game.religionTab.visible && game.bld.get("ziggurat").on > 0;
+        var showFastSacrifice = game.resPool.get("unicorns").value >= sacCost;
+
         //---------- advisor ---------
         var showAdvisor = false;
 
@@ -857,7 +861,16 @@ WLeftPanel = React.createClass({
                     $I("left.praise")
                 )
             ),             
-             
+            $r("div", {id:"fastSacrificeContainer", className:"pin-link", style: {
+                display: (canSacrifice ? "block" : "none"),
+                visibility: (showFastSacrifice ? "visible" : "hidden")
+            }},
+                $r("a", {href:"#", onClick: this.sacrificeAllUnicorns},
+                    $I("left.sacrifice") + " ",
+                    $r("span", {id:"fastSacrificeContainerCount"}, $I("left.sacrifice.all"))
+                )
+            ),
+
             $r(WPins, {game: game}),
             $r(WCraftTable, {resources: game.resPool.resources, reqRes: reqRes})
         ]);
@@ -869,6 +882,10 @@ WLeftPanel = React.createClass({
 
     praiseAll: function(event){
         this.state.game.praise(event);
+    },
+
+    sacrificeAllUnicorns: function(event){
+        this.state.game.sacrificeAllUnicorns(event);
     },
 
     componentDidMount: function(){

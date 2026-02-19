@@ -1924,6 +1924,8 @@
     "left.hunt.time": "time",
     "left.hunt.times": "times",
     "left.praise": "Praise the sun!",
+    "left.sacrifice": "Sacrifice unicorns",
+    "left.sacrifice.all": "(all)",
 
     "console.filter.astronomicalEvent": "Astronomical Events",
     "console.filter.hunt": "Hunts",
