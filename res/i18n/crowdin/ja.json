@@ -166,7 +166,7 @@
     "buildings.harbor.desc": "資材を保管する場所を提供します。",
     "buildings.harbor.flavor": "Ahoy, 陸者ども！",
     "buildings.hut.label": "小屋",
-    "buildings.hut.desc": "小屋を建てます (子猫が2匹やってきます)。子猫はキャットニップが足りないと死んでしまいます。<br>子猫1匹は1tick(1秒)ごとに約4つキャットニップを消費します。",
+    "buildings.hut.desc": "小屋を建てます (それぞれ子猫２匹分のスペース)。子猫はキャットニップが足りないと死んでしまいます。<br>子猫1匹は1tick(1秒)ごとに約4つキャットニップを消費します。",
     "buildings.hut.flavor": "二人だけの国",
     "buildings.hydroplant.label": "水力発電所",
     "buildings.hydroplant.desc": "近代的な発電方法。",
