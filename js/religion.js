@@ -316,7 +316,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 
 		var alicorns = this.game.resPool.get("alicorn");
 		if (alicorns.value > 0) {
-			this.corruption += this.getCorruptionPerTick();
+			this.corruption += (this.game.calendar.day >= 0)? this.getCorruptionPerTick(): this.getCorruptionPerTickProduction();
 		} else {
 			this.corruption = 0;
 		}
@@ -361,10 +361,11 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 		return alicornsToCorrupt;
 	},
-	necrocornsNaiveFastForward: function(daysOffset, times){
+	necrocornsNaiveFastForward: function(daysOffset, times, percentTimeInParadox){
 		var alicorns = this.game.resPool.get("alicorn");
 		if (alicorns.value > 0) {
-			var corruptionPerTick = this.getCorruptionPerTick();
+			//simplify the corruption per tick value by using the percentTimeInParadox calculation
+			var corruptionPerTick = this.getCorruptionPerTick() * (1 - percentTimeInParadox) + this.getCorruptionPerTickProduction() * percentTimeInParadox;
 			var ticksBeforeFirstNecrocorn = this.game.resPool.get("necrocorn").value == 0
 				// this.corruption is <= 1 at this point, no need to check if 1-this.corruption is negative
 				? Math.min(Math.ceil((1 - this.corruption) / corruptionPerTick), times)
@@ -398,13 +399,24 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		return 0;
 	},
 	necrocornFastForward: function(days, times){
+		//--------------------- paradox percent calculation ---------------------
+		// might be a bad idea, but at least no save scamming
+		var percentTimeInParadox = 0;
+		var temporalParadoxChance = this.game.getEffect("temporalParadoxChance");
+		if (temporalParadoxChance > 0)
+		{
+			//calculate amount of void earned on average per day, then multiply by days and percentage of time in paradox
+			var daysInParadox = 10 + this.game.getEffect("temporalParadoxDay");
+			var daysBetweenParadox = daysInParadox + 100 * Math.max( 1 , 1 / temporalParadoxChance );
+			percentTimeInParadox = Math.floor(days * (daysInParadox / daysBetweenParadox)) / days;
+		}
 		//------------------------- necrocorns pacts -------------------------
 		//deficit changing
 		var necrocornDeficitRepaymentModifier = 1;
 		if(this.pactsManager.necrocornDeficit > 0){
 			necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
 		}
-		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
+		var necrocornPerDay = this.game.getEffect("necrocornPerDay") * (1 - percentTimeInParadox);
 		var necrocornVal = this.game.resPool.get("necrocorn").value;
 		var corruptionWithExisting = this.game.religion.getCorruptionPerTickProduction(true);
 		var worstPerTickDelta = corruptionWithExisting * this.game.calendar.ticksPerDay + necrocornPerDay;
@@ -413,12 +425,12 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			(worstPerTickDelta >= 0)
 			||((worstPerTickDelta < 0 && necrocornVal + worstPerTickDelta * days > 0)&&
 			(this.game.resPool.get("alicorn").value - 1 + necrocornPerDay * days >= 0))){ //naive solution here
-			this.necrocornsNaiveFastForward(days, times);
+			this.necrocornsNaiveFastForward(days, times, percentTimeInParadox);
 			return;
 		}
 		//}
 		var corruptionWithoutExisting = this.game.religion.getCorruptionPerTickProduction(false);
-		//here we chech if the necrocorns will get into cycles of being produced and spent, which also works with syphening
+		//here we chech if the necrocorns will get into cycles of being produced and spent, which also works with siphoning
 		if(corruptionWithExisting * this.game.calendar.ticksPerDay + necrocornPerDay < 0 &&
 		corruptionWithoutExisting * this.game.calendar.ticksPerDay + necrocornPerDay > 0
 		){
@@ -462,7 +474,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		}
 		var compensatedNecrocorns = 0;
 		var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
-		if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
+		if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphoning is enough to pay for per day consumption
 			this.game.resPool.addResPerTick("alicorn",consumedAlicorns);
 		}
 		//var consumedAlicorns = Math.min(this.game.resPool.get("alicorn").value - 1, necrocornPerDay * days);
@@ -471,7 +483,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		compensatedNecrocorns = Math.max(consumedAlicorns, -siphenedNecrocorns);
 		this.game.resPool.addResPerTick("alicorn", compensatedNecrocorns);
 	
-		//if siphening is not enough to pay for per day consumption ALSO consume necrocorns;
+		//if siphoning is not enough to pay for per day consumption ALSO consume necrocorns;
 		if((this.game.resPool.get("necrocorn").value + necrocornPerDay * days * necrocornDeficitRepaymentModifier - compensatedNecrocorns) < 0){
 			this.necrocornDeficit += Math.max(-necrocornPerDay * days - this.game.resPool.get("necrocorn").value + compensatedNecrocorns, 0);
 			necrocornDeficitRepaymentModifier = 1;
@@ -2245,7 +2257,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 		}
 		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
 		if(this.game.science.getPolicy(["siphoning"]).researched){
-			if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay >= 1){ //check if siphening is enough to pay for per day consumption
+			if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay >= 1){ //check if siphoning is enough to pay for per day consumption
 				return 1;
 			}
 		}
@@ -2257,7 +2269,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 		}
 		return necrocornDeficitRepaymentModifier;
 	},
-	//how much corruption siphening spends in x days
+	//how much corruption siphoning spends in x days
 	getSiphonedCorruption: function(days){
 		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
 		if(this.game.science.getPolicy(["siphoning"]).researched){
@@ -2275,7 +2287,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 		var necrocornPerDay = this.game.getEffect("necrocornPerDay");
 		var compensatedNecrocorns = 0;
 		if(this.game.science.getPolicy(["siphoning"]).researched){
-			if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphening is enough to pay for per day consumption
+			if(this.game.religion.getCorruptionDeficitPerTick() == 0 && this.game.resPool.get("alicorn").value - necrocornPerDay * days >= 1){ //check if siphoning is enough to pay for per day consumption
 				this.game.resPool.addResPerTick("alicorn", necrocornPerDay * days);
 				return;
 			}
@@ -2284,7 +2296,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 			compensatedNecrocorns = Math.max(consumedAlicorns, -siphenedNecrocorns);
 			this.game.resPool.addResPerTick("alicorn", compensatedNecrocorns);
 		}
-		//if siphening is not enough to pay for per day consumption ALSO consume necrocorns;
+		//if siphoning is not enough to pay for per day consumption ALSO consume necrocorns;
 		if(this.necrocornDeficit > 0){
 			necrocornDeficitRepaymentModifier = 1 + 0.15 * (1 + this.game.getEffect("deficitRecoveryRatio")/2);
 		}
