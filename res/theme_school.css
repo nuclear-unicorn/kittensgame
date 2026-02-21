@@ -926,10 +926,15 @@ body.scheme_school.with_background_image,
 	color: #973B47;
 	padding-top: 6px; /* default padding-top: 10px; */
 }
-.scheme_school #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+.scheme_school #fastHuntContainer > a, /* Text left column : "Send hunters (xx times)" */
+.scheme_school #fastSacrificeContainer > a {
 	font-size: 100%;
 }
-.scheme_school #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_school #fastHuntContainer > a:hover,
+.scheme_school #fastSacrificeContainer > a:hover {
+	text-shadow: 1px 1px #000000;
+}
+.scheme_school div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #4A4A4A;
 	text-shadow: none !important;
 }
@@ -938,9 +943,6 @@ body.scheme_school.with_background_image,
 }
 .scheme_school #fastPraiseContainer > a:hover {
 	text-shadow: 0 0 7px rgba(255, 255, 255, 0.9);
-}
-.scheme_school #fastHuntContainer > a:hover {
-	text-shadow: 1px 1px #000000;
 }
 .scheme_school .res-cell.positive-weather { /* to change bonus cell according to the season */
 	font-size: 80% !important;

@@ -983,10 +983,11 @@ body.scheme_gold {
 	/* default max-width: 90px; */
 	color: #d9d9d9;
 }
-.scheme_gold #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+.scheme_gold #fastHuntContainer > a, /* Text left column : "Send hunters (xx times)" */
+.scheme_gold #fastSacrificeContainer > a {
     font-size: 110%;
 }
-.scheme_gold #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_gold div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #919084;
 }
 .scheme_gold #fastPraiseContainer > a { /* Text left column : "Praise the sun!" */
@@ -995,7 +996,8 @@ body.scheme_gold {
 .scheme_gold #fastPraiseContainer > a:hover {
     text-shadow: 1px 1px 1px #E7AF4F, 1px 1px 4px #DFCE99, -1px -1px 4px #DFCE99;
 }
-.scheme_gold #fastHuntContainer > a:hover {
+.scheme_gold #fastHuntContainer > a:hover,
+.scheme_gold #fastSacrificeContainer > a:hover {
 	color: #E7AF4F;
 	text-shadow: 1px 1px #404040;
 }

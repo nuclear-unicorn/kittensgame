@@ -1404,7 +1404,7 @@ body.scheme_wood.with_background_image {
 	/* default max-width: 90px; */
 	color: #a89f93;
 }
-.scheme_wood #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_wood div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #706464;
 	text-shadow: none !important;
 }

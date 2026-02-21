@@ -1122,7 +1122,7 @@ body.scheme_chocolate.with_background_image {
 	color: #cb000b;
 	padding-top: 6px;/* default padding-top: 10px; */
 }
-.scheme_chocolate #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_chocolate div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #b8b8b8;
 	font-size: smaller;
 }

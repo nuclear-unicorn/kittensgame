@@ -1034,7 +1034,7 @@ body.scheme_oil,
 	color: #a90909;
 	padding-top: 6px;/* default padding-top: 10px; */
 }
-.scheme_oil #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_oil div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #c9c9c9;
 	font-size: smaller;
 }

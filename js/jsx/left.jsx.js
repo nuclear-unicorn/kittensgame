@@ -844,7 +844,7 @@ WLeftPanel = React.createClass({
                 $r("a", {href:"#", onClick: this.huntAll},
                     $I("left.hunt") + " (",
                     $r("span", {
-                        id:"fastHuntContainerCount"
+                        id:"fastHuntContainerCount", className: "pin-link-quantity"
                     },
                         [
                             game.getDisplayValueExt(huntCount, false, false, 0),
@@ -861,7 +861,7 @@ WLeftPanel = React.createClass({
             }},
                 $r("a", {href:"#", onClick: this.sacrificeAllUnicorns},
                     $I("left.sacrifice") + " (",
-                    $r("span", {id:"fastSacrificeContainerCount"},
+                    $r("span", {id:"fastSacrificeContainerCount", className: "pin-link-quantity"},
                         game.getDisplayValueExt(maxAvailableSacrifices, false /*prefix*/, false /*usePerTickHack*/, 0 /*precision*/) +
                             " " + (maxAvailableSacrifices === 1 ? $I("left.hunt.time") : $I("left.hunt.times"))
                     ),

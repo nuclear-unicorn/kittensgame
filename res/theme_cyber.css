@@ -1303,7 +1303,7 @@ body.scheme_cyber {
 	/* default max-width: 90px; */
 	color: #b0b0b0;
 }
-.scheme_cyber #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_cyber div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #707070;
 }
 .scheme_cyber #fastPraiseContainer >a {

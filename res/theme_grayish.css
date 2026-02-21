@@ -1244,7 +1244,7 @@ body.scheme_grayish {
 	/* default max-width: 90px; */
 	color: #4c4c4c;
 }
-.scheme_grayish #fastHuntContainerCount { /* Text left column: "xx times" from Send hunters */
+.scheme_grayish div.pin-link span.pin-link-quantity { /* Text left column: "xx times" from Send hunters */
 	color: #707070;
 	text-shadow: none !important;
 }
