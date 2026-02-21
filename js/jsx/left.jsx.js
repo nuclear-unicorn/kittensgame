@@ -811,9 +811,8 @@ WLeftPanel = React.createClass({
             (!game.challenges.isActive("pacifism"));
         var showFastHunt = (catpower.value >= huntCost);
 
-        var sacCost = 2500;
-        var canSacrifice = game.religionTab.visible && game.bld.get("ziggurat").on > 0;
-        var showFastSacrifice = game.resPool.get("unicorns").value >= sacCost;
+        var canSacrifice = game.religion.getHasUnlockedUnicornSacrifice();
+        var maxAvailableSacrifices = game.religion.getAvailableUnicornSacrifices();
 
         //---------- advisor ---------
         var showAdvisor = false;
@@ -856,18 +855,22 @@ WLeftPanel = React.createClass({
                     ")"
                 )
             ),
+            $r("div", {id:"fastSacrificeContainer", className:"pin-link", style: {
+                display: (canSacrifice ? "block" : "none"),
+                visibility: (maxAvailableSacrifices >= 1 ? "visible" : "hidden")
+            }},
+                $r("a", {href:"#", onClick: this.sacrificeAllUnicorns},
+                    $I("left.sacrifice") + " (",
+                    $r("span", {id:"fastSacrificeContainerCount"},
+                        game.getDisplayValueExt(maxAvailableSacrifices, false /*prefix*/, false /*usePerTickHack*/, 0 /*precision*/) +
+                            " " + (maxAvailableSacrifices === 1 ? $I("left.hunt.time") : $I("left.hunt.times"))
+                    ),
+                    ")"
+                )
+            ),
             $r("div", {id:"fastPraiseContainer", className:"pin-link", style:{visibility:"hidden"}},
                 $r("a", {href:"#", onClick: this.praiseAll},
                     $I("left.praise")
-                )
-            ),             
-            $r("div", {id:"fastSacrificeContainer", className:"pin-link", style: {
-                display: (canSacrifice ? "block" : "none"),
-                visibility: (showFastSacrifice ? "visible" : "hidden")
-            }},
-                $r("a", {href:"#", onClick: this.sacrificeAllUnicorns},
-                    $I("left.sacrifice") + " ",
-                    $r("span", {id:"fastSacrificeContainerCount"}, $I("left.sacrifice.all"))
                 )
             ),
 

@@ -1379,26 +1379,8 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 			var baseAmt = amt / (1 + game.getResCraftRatio(res.name));
 			game.workshop.craft(res.name, baseAmt, false /*no undo*/, true /*force all*/);
 		}
-		if (res.name == "tears" && game.religionTab.visible) {
-			var numZiggurats = game.bld.get("ziggurat").on;
-			if (numZiggurats > 0) {
-				//My goal here is to minimize code duplication
-				var controller = new classes.ui.religion.TransformBtnController(game, {
-						gainMultiplier: function() { return numZiggurats; },
-						gainedResource: "tears",
-						applyAtGain: function(priceCount) {
-							this.game.stats.getStat("unicornsSacrificed").val += priceCount;
-						},
-						overcapMsgID: "religion.sacrificeBtn.sacrifice.msg.overcap",
-						logTextID: "religion.sacrificeBtn.sacrifice.msg",
-						logfilterID: "unicornSacrifice"
-					});
-				var model = { prices: [{ name: "unicorns", val: 2500}]};
-
-				//I feel weird calling internal functions like this, but it's simpler than fiddling with a divider.
-				var baseAmt = Math.min(Math.ceil( amt / numZiggurats ), controller._canAfford(model));
-				controller._transform(model, baseAmt);
-			}
+		if (res.name == "tears" && game.religion.getHasUnlockedUnicornSacrifice()) {
+			game.religion.sacrificeUnicornsToTarget(amt);
 		}
 	}
 });
