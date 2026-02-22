@@ -1362,6 +1362,12 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	},
 		//Holy Memecide
 	],
+
+	effectsBase: {
+		"kittensKarmaPerMinneliaRatio" : 0.0001, //unspent pacts can make karma
+		"pactNecrocornConsumption" : -0.0005
+	},
+
 	necrocornDeficitPunishment: function(){
 		for (var kitten in this.game.village.sim.kittens){
 			var skills = this.game.village.sim.kittens[kitten].skills;
@@ -1387,12 +1393,6 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			blackPyramid.effectsPreDeficit[i] = 0;
 		}
 		this.game.religion.getZU("blackPyramid").updateEffects(this.game.religion.getZU("blackPyramid"), this.game);
-	},
-
-
-	effectsBase: {
-		"kittensKarmaPerMinneliaRatio" : 0.0001, //unspent pacts can make karma
-		"pactNecrocornConsumption" : -0.0005
 	},
 
 	getZU: function(name){
@@ -1852,7 +1852,8 @@ dojo.declare("com.nuclearunicorn.game.ui.PraiseBtnController", com.nuclearunicor
 dojo.declare("com.nuclearunicorn.game.ui.ResetFaithBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	getName: function(model) {
 		var ttPlus1 = this.game.religion.transcendenceTier + 1;
-		return model.options.name + (this.game.religion.getRU("transcendence").on ? " [×" + (ttPlus1 * ttPlus1) + "]" : "");
+		return "<div class=\"label\"><span class=\"label-content\">" + model.options.name + "</span></div>" + 
+			(this.game.religion.getRU("transcendence").on ? "<div>[×" + (ttPlus1 * ttPlus1) + "]</div>" : "");
 	},
 
 	updateVisible: function (model) {
@@ -2556,7 +2557,8 @@ dojo.declare("classes.religion.pactsManager", null, {
 		);
 		//this.game.religion.getPact("fractured").calculateEffects(this.game.religion.getPact("fractured"), this.game);
 		this.game.religion.pactsManager.necrocornDeficit = 0;
-		this.game.msg($I("msg.pacts.fractured", [Math.round(100 * this.game.resPool.get("alicorn").value)/100]),"alert", "ai");
+		var alicornsLost = Math.round(100 * this.game.resPool.get("alicorn").value) / 100;
+		this.game.msg($I("msg.pacts.fractured", [this.game.getDisplayValueExt(alicornsLost)]),"alert", "ai");
 		this.game.resPool.get("alicorn").value = 0;
 		var blackPyramid = this.game.religion.getZU("blackPyramid");
 		for (var i in blackPyramid.effectsPreDeficit){

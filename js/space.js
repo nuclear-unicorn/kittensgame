@@ -171,8 +171,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 			{name: "thorium",   val: 35000}
 		],
 		unlocks: {
-			planet: ["charon"],
-			spaceMission: ["charonMission"]
+			planet: ["charon"]
 		}
 	},{
 		name: "centaurusSystemMission",
@@ -1288,6 +1287,10 @@ dojo.declare("com.nuclearunicorn.game.ui.SpaceProgramBtnController", com.nuclear
         return model.metaCached;
     },
 
+	getType: function(){
+		return "spaceMission";
+	},
+
     getPrices: function(model) {
         var prices = dojo.clone(model.metadata.prices);
 
@@ -1480,10 +1483,10 @@ dojo.declare("classes.ui.space.FurthestRingPanel", [classes.ui.space.PlanetPanel
 	},
 
 	render: function(container){
-		var wrapper = new mixin.IReactAware(WChiral, this.game);
+		//var wrapper = new mixin.IReactAware(WChiral, this.game);
 
 		var content = this.inherited(arguments);
-		wrapper.render(content);
+		//wrapper.render(content);
 
 		return content;
 	}

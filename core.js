@@ -587,6 +587,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	fetchModel: function(options) {
 		var model = this.initModel(options);
 		model.name = this.getName(model);
+		model.type = this.getType(model);
 		model.description = this.getDescription(model);
 		model.prices = this.getPrices(model);
 		model.priceRatio = options.priceRatio;
@@ -623,6 +624,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		return  {
 			name: "",
 			description: "",
+			type: "",
 			visible: true,
 			enabled: true,
 			handler: null,
@@ -696,6 +698,9 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		return model.options.description;
 	},
 
+	getType: function(model){
+		return model.options.type;
+	},
 
 	/**
 	 * Deprecated method for price management (increases price property stored in button)
@@ -2008,23 +2013,22 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 
 		var label = "<div class=\"label\"><span class=\"label-content\">" + meta.label + "</span></div>";
 
+		var amtClass = "amt";
+		if (meta.val >= 10000){
+			amtClass = "amt small";
+		}
+
 		if (!meta.val) {
 			return label;
 		} else if (meta.noStackable){
-			return label + " " + $I("btn.complete");
+			return label + "<div>" + $I("btn.complete") + "</div>";
 		} else if (meta.togglableOnOff){
-			return label + "<div>(" + meta.val + ")</div>";
-		} else if (meta.togglable) {
-			//it's not so important h
-			/*if (meta.val >= 1000){
-				return meta.label + " (" +
-					(meta.on < 10000 ? ((meta.on/1000).toFixed(1) + "K") : this.game.getDisplayValueExt(meta.on)) + "/" +
-					(meta.val < 10000 ? ((meta.val/1000).toFixed(1) + "K") : this.game.getDisplayValueExt(meta.val)) +
-				")";
-			}*/
-			return label + "<div>(" + meta.on + "/" + meta.val + ")</div>";
+			return label + "<div class=\"amt\">(" + meta.val + ")</div>";
+		} else if (meta.togglable && meta.on != meta.val) {
+			//do not display redundand 1000/1000 to save real estate
+			return label + "<div class=\"" + amtClass + "\">(" + meta.on + "/" + meta.val + ")</div>";
 		} else {
-			return label + "<div>(" + meta.on + ")</div>";
+			return label + "<div class=\"amt\">(" + meta.on + ")</div>";
 		}
 	},
 
@@ -2288,10 +2292,11 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingNotStackableBtnController", com
 
 	getName: function(model){
 		var meta = model.metadata;
+		var label = "<div class=\"label\"><span class=\"label-content\">" + meta.label + "</span></div>";	
 		if (meta.researched){
-			return meta.label + " " + $I("btn.complete.capital");
+			return label + "<div>" + $I("btn.complete.capital") + "</div>";
 		} else {
-			return meta.label;
+			return label;
 		}
 	},
 

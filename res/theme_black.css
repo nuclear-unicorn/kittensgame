@@ -8,8 +8,9 @@
 /* ******************* GAME ******************* */
 /* ******************************************** */
 body.scheme_black {
-	background-color: #000000;
 	color-scheme: dark;
+	--page-background-color:#000000;
+	--text-color: gray;
 }
 .scheme_black  #gamePageContainer,
 .scheme_black select,
@@ -20,7 +21,6 @@ body.scheme_black {
 	font-family: 'Asap', sans-serif;
 }
 .scheme_black .btn {
-	color: gray;
 	margin-bottom: 6px; /* default 10px */
 	background-color: transparent;
 	border: solid 1px transparent;
@@ -314,14 +314,14 @@ body.scheme_black {
 /* ******************* TOOLTIP ******************* */
 /* *********************************************** */
 .scheme_black #tooltip,
-.scheme_black .tooltip-block > div {
+.scheme_black .tooltip-content {
 	background-color: #000000;
 	color: #808080; /* tooltip windows == left column : left text */
 	border: 1px solid #404040;
 	border-radius: 3px;
 	box-shadow: 0 0 5px 1px #000000;
 }
-.scheme_black .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_black .tooltip-content { /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_black .button_tooltip {

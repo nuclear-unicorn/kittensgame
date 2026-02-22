@@ -180,6 +180,11 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     updateQueue: function(){
         if (this.game.getFeatureFlag("QUEUE")){
             this.queue.update();
+
+            //TODO: use dedicated flag for queue tab
+            if (this.game.isMobile()){
+                this.game.queueTab.update();
+            }
         }
     },
 
@@ -304,7 +309,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             numberEvents = this.applyRedshift(daysOffset);
         }
 
-        this.game.msg($I("time.redshift", [daysOffset]) + (numberEvents ? " " + $I("time.redshift.ext",[numberEvents]) : ""));
+        this.game.msg($I("time.redshift", [daysOffset]) + (numberEvents ? " " + $I("time.redshift.ext",[this.game.getDisplayValueExt(numberEvents)]) : ""));
     },
 
 	chronoforgeUpgrades: [{
@@ -1192,7 +1197,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         }
         return {
             visible: isVisible,
-            title: "x" + shatteredQuantity,
+            title: "x" + self.game.getDisplayValueExt(shatteredQuantity),
             handler: function(event) {
                 self.doShatterAmt(model, shatteredQuantity);
             }
@@ -1495,7 +1500,7 @@ dojo.declare("classes.ui.time.UseHeatBtnController", com.nuclearunicorn.game.ui.
 		}
 		return {
 			visible: isVisible,
-			title: "x" + shatteredQuantity,
+			title: "x" + self.game.getDisplayValueExt(shatteredQuantity),
 			handler: function(event) {
 				self.doShatterAmt(model, shatteredQuantity);
 			}
@@ -2723,4 +2728,19 @@ dojo.declare("classes.queue.manager", null,{
 });
 
 dojo.declare("classes.tab.QueueTab", com.nuclearunicorn.game.ui.tab, {
+    update: function(){
+        this.updateTab();
+    },
+
+    updateTab: function(){
+        this.tabName = $I("tab.name.queue");
+        var queueManager = this.game.time.queue;
+        
+        this.tabName += "(" + queueManager.queueLength() + ")";
+
+        if (this.domNode) {
+			this.domNode.innerHTML = this.tabName;
+		}
+        dojo.publish("ui/refreshTabNames", [this.game]);
+    }
 });

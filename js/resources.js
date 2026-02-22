@@ -470,7 +470,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
         title: $I("resources.kerosene.title"),
         type: "common",
         craftable: true,
-        color: "darkYellow",
+        color: "olive",
 		isNotRefundable: true,
 		tag: "chemist"
 	},{

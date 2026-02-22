@@ -2,6 +2,7 @@
 
     $r,
     WQueue: writable,
+    WQueueItem: writable,
     game
 */
 

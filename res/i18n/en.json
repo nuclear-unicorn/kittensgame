@@ -271,6 +271,7 @@
     "buildings.upgrade.confirmation.msg": "Do you want to upgrade this building?\n\nYou will lose all of those currently built.",
     "buildings.downgrade.confirmation.msg": "Do you want to downgrade this building?\n\nYou will lose all of those currently built.",
 
+    "calendar.hint.astronomy": "(Research Astronomy to unlock.)",
     "calendar.msg.alicorn": "An Alicorn has descended from the sky!",
     "calendar.msg.alicorn.departed": "{0} alicorns ascended back into the heavens.",
     "calendar.msg.event": "A rare astronomical event occurred in the sky",
@@ -354,8 +355,8 @@
     "challendge.btn.desc": "<br>Gain: {0}<br><br>Your game will be reset in order to enable this challenge. {1}",
     "challendge.btn.desc.new": "<br>Gain: {0}",
     "challendge.btn.log.message.on.complete": "Congratulations! You complete the challenge {0}.",
-    "challendge.btn.name.complete": "{0} (Complete)",
-    "challendge.btn.name.current": "{0} (Active)",
+    "challendge.btn.name.complete": "{0}<div>(✓)</div>",
+    "challendge.btn.name.current": "{0}<div>(Active)</div>",
     "challendge.reserves.cryochambers.label": "Cryochambers in reserve: {0}",
     "challendge.reserves.panel.label": "Reserves: Store Resources in a Safe Place",
     "challendge.reserves.panel.reclaim.instructions": "You can reclaim reserves when you are not in any challenge.",
@@ -1806,7 +1807,7 @@
     "ui.filter.enabled": "Enabled",
     "ui.filter.togglable": "Togglable",
 
-    "ui.kgnet.login": "> Log in <",
+    "ui.kgnet.login": "Log in",
     "ui.kgnet.online": "Online",
     "ui.kgnet.save.current": "current",
     "ui.kgnet.save.save": "Save",
@@ -1908,8 +1909,10 @@
     "ui.option.notation": "Notation:",
     "ui.option.pollution": "Disable pollution effects",
 
-    "queue.alphabeticalToggle": "Sort queue items alphabetically",
+    "queue.alphabeticalToggle": "Sort queue A➛Z",
     "queue.add": "Add to queue",
+    "queue.length.indicator": "Queue length: {0}/{1}",
+    "btn.enqueue": "⇶ ({0})",
 
     "left.resources": "resources",
     "left.resources.tip": "Ctrl+click resource to hide it, use gear icon for more settings.",
