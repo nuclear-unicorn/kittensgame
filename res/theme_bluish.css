@@ -1223,7 +1223,7 @@ body.scheme_bluish {
 	/* default max-width: 90px; */
 	color: #8f94ac;
 }
-.scheme_bluish #fastHuntContainerCount { /* Text left column: "xx times" from Send hunters */
+.scheme_bluish div.pin-link span.pin-link-quantity { /* Text left column: "xx times" from Send hunters */
 	color: #707070;
 	text-shadow: none !important;
 }

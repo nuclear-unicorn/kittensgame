@@ -1424,11 +1424,11 @@ body.scheme_factory {
 }
 /* .scheme_factory .pin-link { /* links pinned */
 /* } */
-.scheme_factory #fastHuntContainerCount { /* Text left column: "xx times" from Send hunters */
+.scheme_factory div.pin-link span.pin-link-quantity { /* Text left column: "xx times" from Send hunters */
 	color: #575657;
 	font-size: 15px;
 }
-.scheme_factory #fastHuntContainer > a:hover #fastHuntContainerCount {
+.scheme_factory div.pin-link > a:hover > span.pin-link-quantity {
 	color: #fed349;
 }
 .scheme_factory #fastPraiseContainer >a {

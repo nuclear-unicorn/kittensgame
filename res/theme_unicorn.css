@@ -1099,20 +1099,16 @@ body.scheme_unicorn.with_background_image {
 .scheme_unicorn .res-cell.resource-value {
 	color: #718090;
 }
-.scheme_unicorn #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+.scheme_unicorn div.pin-link > a { /* Pins such as fast hunt, fast praise, fast trade, etc. */
 	text-shadow: 1px 1px 2px #111922;
 	font-size: 100%;
 }
-.scheme_unicorn #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_unicorn div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #647180;
 	text-shadow: none !important;
 	font-size: smaller;
 }
-.scheme_unicorn #fastPraiseContainer > a { /* Text left column : "Praise the sun!" */
-	text-shadow: 1px 1px 2px #111922;
-	font-size: 100%;
-}
-.scheme_unicorn #fastPraiseContainer >a:hover {
+.scheme_unicorn #fastPraiseContainer >a:hover { /* Text left column : "Praise the sun!" */
 	color: #f8f5f0;
 	text-shadow: 0 0 4px #f8f5f0;
 }

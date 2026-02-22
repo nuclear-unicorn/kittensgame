@@ -1201,10 +1201,11 @@ body.scheme_dune {
 	color: #e70c25;
 	padding-top: 6px;/* default padding-top: 10px; */
 }
-.scheme_dune #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+.scheme_dune #fastHuntContainer > a, /* Text left column : "Send hunters (xx times)" */
+.scheme_dune #fastSacrificeContiner > a {
 	text-shadow: -1px -1px 2px #000000;
 }
-.scheme_dune #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_dune div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #bbbbbb;
 	text-shadow: none !important;
 	font-size: smaller;

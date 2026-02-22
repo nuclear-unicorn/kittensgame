@@ -1188,14 +1188,16 @@ body.scheme_vessel {
 	color: #991A22;
 	padding-top: 6px;/* default padding-top: 10px; */
 }
-.scheme_vessel #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+.scheme_vessel #fastHuntContainer > a, /* Text left column : "Send hunters (xx times)" */
+.scheme_vessel #fastSacrificeContainer > a {
 	font-size: 100%;
 	color: #007B3E;
 }
-.scheme_vessel #fastHuntContainer > a:hover {
+.scheme_vessel #fastHuntContainer > a:hover,
+.scheme_vessel #fastSacrificeContainer > a:hover {
 	color: #A0A0A0;
 }
-.scheme_vessel #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_vessel div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #747474;
 	text-shadow: none !important;
 }

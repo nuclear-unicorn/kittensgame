@@ -1750,10 +1750,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.zigguratIvoryPriceRatio.title"),
 				type: "ratio"
 			},
-			"zigguratIvoryCostIncrease": {
-				title: $I("effectsMgr.statics.zigguratIvoryCostIncrease.title"),
-				type: "ratio"
-			},
 			"cryochamberSupport":{
 				title: $I("effectsMgr.statics.cryochamberSupport.title"),
 			},
@@ -3984,6 +3980,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	praise: function(event){
 		event.preventDefault();
 		this.religion.praise();
+	},
+
+	sacrificeAllUnicorns: function(event){
+		event.preventDefault();
+		this.religion.sacrificeAllUnicorns();
 	},
 
 	/**

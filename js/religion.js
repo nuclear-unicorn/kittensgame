@@ -28,6 +28,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	//the amount of currently active HG buildings (typically refils during reset)
 	activeHolyGenocide: 0,
 
+	//Other game systems interact with unicorn sacrificing.
+	//Rather than creating & destroying a controller every tick, let's just keep around one controller.
+	unicornSacController: null,
+
 	constructor: function(game){
 		this.game = game;
 		this.registerMeta(/*"stackable"*/false, this.zigguratUpgrades, {
@@ -54,6 +58,21 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		this.pactsManager = new classes.religion.pactsManager(game);
 		this.registerMeta("stackable", this.pactsManager.pacts, null);
 		this.setEffectsCachedExisting();
+
+		//Other game systems will want to interact with unicorn sacrifice, so let's ensure that
+		// there is always a controller initialized for other systems to borrow when needed.
+		this.unicornSacController = new classes.ui.religion.TransformBtnController(game, {
+			gainMultiplier: function() {
+				return this.game.bld.get("ziggurat").on;
+			},
+			gainedResource: "tears",
+			applyAtGain: function(priceCount) {
+				this.game.stats.getStat("unicornsSacrificed").val += priceCount;
+			},
+			overcapMsgID: "religion.sacrificeBtn.sacrifice.msg.overcap",
+			logTextID: "religion.sacrificeBtn.sacrifice.msg",
+			logfilterID: "unicornSacrifice"
+		});
 	},
 
 	resetState: function(){
@@ -720,7 +739,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				"tearsMax": 0,
 				"alicornMax": 0
 			};
-			if (game.resPool.get("alicorn").value > 0) {
+			//Alicornmancy effect: Production starts instantly; no need to wait for first descent.
+			var hasAlicornmancy = game.prestige.getPerk("alicornmancy").researched;
+			if (hasAlicornmancy || game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.00002;
 			}
 			if (game.challenges.isActive("unicornTears")) {
@@ -766,7 +787,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				"tearsMax": 0,
 				"alicornMax": 0
 			};
-			if (game.resPool.get("alicorn").value > 0) {
+			//Alicornmancy effect: Production starts instantly; no need to wait for first descent.
+			var hasAlicornmancy = game.prestige.getPerk("alicornmancy").researched;
+			if (hasAlicornmancy || game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.000025;
 			}
 			if (game.challenges.isActive("unicornTears")) {
@@ -818,7 +841,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				"tearsMax": 0,
 				"alicornMax": 0
 			};
-			if (game.resPool.get("alicorn").value > 0) {
+			//Alicornmancy effect: Production starts instantly; no need to wait for first descent.
+			var hasAlicornmancy = game.prestige.getPerk("alicornmancy").researched;
+			if (hasAlicornmancy || game.resPool.get("alicorn").value > 0) {
 				effects["alicornPerTick"] = 0.00005;
 			}
 			if (game.challenges.isActive("unicornTears")) {
@@ -1409,6 +1434,21 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	getPact: function(name){
 		return this.getMeta(name, this.pactsManager.pacts);
 	},
+	/**
+	 * Checks if the player has unlocked the ability to sacrifice unicorns to gain unicorn tears.
+	 * @return boolean
+	 */
+	getHasUnlockedUnicornSacrifice: function() {
+		return this.game.religionTab.visible && this.game.bld.get("ziggurat").on > 0;
+	},
+	/**
+	 * Calculates how many batches of unicorn sacrifice the player can currently afford to do.
+	 * @return A nonnegative integer
+	 */
+	getAvailableUnicornSacrifices: function() {
+		var model = { prices: [{ name: "unicorns", val: 2500 }]};
+		return this.unicornSacController.getCanAfford(model);
+	},
 	getSolarRevolutionRatio: function() {
 		var uncappedBonus = this.getRU("solarRevolution").on ? this.game.getUnlimitedDR(this.faith, 1000) / 100 : 0;
 		return this.game.getLimitedDR(uncappedBonus, 10 + this.game.getEffect("solarRevolutionLimit") + (this.game.challenges.getChallenge("atheism").researched ? (this.game.religion.transcendenceTier) : 0)) * (1 + this.game.getEffect("faithSolarRevolutionBoost")/*(LDR specified in challenges.js)*/);
@@ -1430,6 +1470,26 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				(1 + this.game.getLimitedDR(this.game.getEffect("maxKittensRatio"), 1))
 			)
 		) *(1 + scalingRatio);
+	},
+
+	/**
+	 * Quick & easy way for other game systems to trigger a unicorn sacrifice
+	 */
+	sacrificeAllUnicorns: function() {
+		var model = { prices: [{ name: "unicorns", val: 2500 }]};
+		this.unicornSacController.transform(model, 1 /*all*/);
+	},
+	/**
+	 * Sacrifices as many unicorns as we need to generate the desired quantity of unicorn tears.
+	 * If we cannot afford them all, sacrifices the amount we can.
+	 * @param tearsToGenerate number
+	 */
+	sacrificeUnicornsToTarget: function(tearsToGenerate) {
+		var model = { prices: [{ name: "unicorns", val: 2500 }]};
+		var controller = this.unicornSacController;
+		var tearsPerSacrifice = controller.controllerOpts.gainMultiplier.call(this); //Accessing controllerOpts in this way feels a bit hacky
+		var numSacrifices = Math.min(Math.ceil(tearsToGenerate / tearsPerSacrifice), controller.getCanAfford(model));
+		controller.transformFixed(model, numSacrifices);
 	},
 
 	turnHGOff: function(){
@@ -1719,7 +1779,6 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 	},
 
 	//zigguratIvoryPriceRatio applies an additive modifier to the price ratio, but only for ivory
-	//zigguratIvoryCostIncrease applies a multiplicative modifier to the base price, but only for ivory
 	getPrices: function(model) {
 		var meta = model.metadata;
 		var ratio = meta.priceRatio || 1;
@@ -1732,9 +1791,6 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 			var resPriceDiscount = this.game.getEffect(meta.prices[i].name + "CostReduction");
 			resPriceDiscount = this.game.getLimitedDR(resPriceDiscount, 1);
 			var resPriceModifier = 1 - resPriceDiscount;
-			if (meta.prices[i].name == "ivory") {
-				resPriceModifier *= 1 + this.game.getEffect("zigguratIvoryCostIncrease");
-			}
 			var ratioToUse = meta.prices[i].name == "ivory" ? ivoryRatio : ratio;
 
 			prices.push({
@@ -1894,7 +1950,7 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 	},
 
 	_newLink: function(model, divider) {
-		var transformations = Math.floor(this._canAfford(model) / divider);
+		var transformations = Math.floor(this.getCanAfford(model) / divider);
 		var self = this;
 		return {
 			visible: this.game.opts.showNonApplicableButtons || transformations > 1,
@@ -1943,10 +1999,14 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 		}
 	},
 
-	//Calculates the max number of transformations the player can afford to do.
-	//If the resource has a storage cap (such as during a Unicorn Tears Challenge),
-	//it won't give the option to go farther than 1 transformation above that cap.
-	_canAfford: function(model) {
+	/**
+	 * Calculates the max number of transformations the player can afford to do.
+	 * If the resource has a storage cap (such as during a Unicorn Tears Challenge),
+	 * it won't give the option to go farther than 1 transformation above that cap.
+	 * @param model	object	The model object which specifies the price we're working with
+	 * @return A nonnegative integer
+	 */
+	getCanAfford: function(model) {
 		var spendRes = this.game.resPool.get(model.prices[0].name);
 		var gainRes = this.game.resPool.get(this.controllerOpts.gainedResource);
 		var amtWeCanAfford = Math.floor(spendRes.value / model.prices[0].val);
@@ -1960,21 +2020,49 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 		return amtWeCanAfford;
 	},
 
+	/**
+	 * Performs one or more transformations of one resource to another, as specified in the model, controllerOpts, etc.
+	 * The number of batches of resource that are transformed depends on how many we can afford right now.
+	 * @param model	The model object which this controller controls.
+	 * @param divider	number > 0	Determines what fraction of available transformations to perform.
+	 * 1 = ALL, 2 = one-half of the max we can afford, 5 = one-fifth of the max we can afford, etc.
+	 * @param event	object (optional)	Contains information about the event (i.e. user input)
+	 * @param callback	function (optional)	This is how we communicate the results to the calling code.
+	 * If specified, will be called with the results of what happened.  If not specified, the results are not communicated.
+	 */
 	transform: function(model, divider, event, callback) {
-		var amt = Math.floor(this._canAfford(model) / divider);
+		this.transformFixed(model, Math.floor(this.getCanAfford(model) / divider), event, callback);
+	},
+
+	/**
+	 * Performs one or more transformations of one resource to another, as specified in the model, controllerOpts, etc.
+	 * Unlike the regular transform function, in this one we specify exactly how many batches we want to transform.
+	 * @param model	The model object which this controller controls.
+	 * @param amt	number	How many batches to transform.  If less than 1, nothing happens.
+	 * Somewhat non-intuitively, the reason (if amt<1) is reported as "cannot-afford".
+	 * @param event	object (optional)	Contains information about the event (i.e. user input)
+	 * @param callback	function (optional)	This is how we communicate the results to the calling code.
+	 * If specified, will be called with the results of what happened.  If not specified, the results are not communicated.
+	 */
+	transformFixed: function(model, amt, event, callback) {
 		if (amt < 1) {
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
+			if (callback) {
+				callback(false /*itemBought*/, { reason: "cannot-afford" });
+			}
 			return;
 		}
 		var didWeSucceed = this._transform(model, amt);
-		if (didWeSucceed) {
-			callback(true /*itemBought*/, { reason: "paid-for" });
-		} else {
-			//_transform(model, amt) returns false if we can't afford it
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
+		if (callback) {
+			if (didWeSucceed) {
+				callback(true /*itemBought*/, { reason: "paid-for" });
+			} else {
+				callback(false /*itemBought*/, { reason: "cannot-afford" });
+			}
 		}
 	},
 
+	//This function actually performs the transformation, along with handling all side effects.
+	//Returns true if we succeed (& the game-state is affected), false otherwise (& no side effects happen)
 	_transform: function(model, amt) {
 		//Save references to values we'll use a lot:
 		// "res from" refers to the resource consumed by the transform action
@@ -1998,6 +2086,9 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 
 		//Amount of the resource we failed to gain because we hit the cap:
 		var overcap = attemptedGainCount - actualGainCount;
+		if (!resToObj.maxValue) { //Having a falsy maxValue is the game engine's way of saying it's uncapped.
+			overcap = 0;
+		}
 		if (actualGainCount == 0 && attemptedGainCount > 0 &&
 			resToObj.value / attemptedGainCount > 1e15) {
 			//We are in territory where overcap will be triggered due to floating-point precision limits.
@@ -2009,9 +2100,10 @@ dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.ga
 		}
 
 		if (overcap > 0.001) { //Don't trigger from floating-point errors
-			if (resToName == "tears") {
+			var pollutionRate = this.game.getEffect("cathPollutionPerTearOvercapped");
+			if (pollutionRate && resToName == "tears") { //Avoid possible Infinity * 0 = NaN
 				//Tears evaporate into a smoky substance
-				this.game.bld.cathPollution += overcap * this.game.getEffect("cathPollutionPerTearOvercapped");
+				this.game.bld.cathPollution += overcap * pollutionRate;
 			}
 			//Optional parameter to display a message when we overcap:
 			if (typeof(this.controllerOpts.overcapMsgID) === "string") {
@@ -2074,7 +2166,7 @@ dojo.declare("classes.ui.religion.RefineTearsBtnController", com.nuclearunicorn.
 		return {
 			visible: this.game.opts.showNonApplicableButtons
 				|| this.game.resPool.get("sorrow").value <= this.game.resPool.get("sorrow").maxValue - count
-				&& self._canAfford(model, count) >= count,
+				&& self.getCanAfford(model, count) >= count,
 			title: "x" + count,
 			handler: function (event) {
 				self.buyItem(model, null, count);
@@ -2083,7 +2175,7 @@ dojo.declare("classes.ui.religion.RefineTearsBtnController", com.nuclearunicorn.
 		};
 	},
 
-	_canAfford: function(model, count) {
+	getCanAfford: function(model, count) {
 		return Math.floor(this.game.resPool.get(model.prices[0].name).value / model.prices[0].val);
 	},
 
@@ -2803,18 +2895,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 				name: $I("religion.sacrificeBtn.label"),
 				description: $I("religion.sacrificeBtn.desc"),
 				prices: [{ name: "unicorns", val: 2500}],
-				controller: new classes.ui.religion.TransformBtnController(game, {
-					gainMultiplier: function() {
-						return this.game.bld.get("ziggurat").on;
-					},
-					gainedResource: "tears",
-					applyAtGain: function(priceCount) {
-						this.game.stats.getStat("unicornsSacrificed").val += priceCount;
-					},
-					overcapMsgID: "religion.sacrificeBtn.sacrifice.msg.overcap",
-					logTextID: "religion.sacrificeBtn.sacrifice.msg",
-					logfilterID: "unicornSacrifice"
-				})
+				controller: game.religion.unicornSacController,
 			}, game);
 			sacrificeBtn.render(content);
 			this.sacrificeBtn = sacrificeBtn;

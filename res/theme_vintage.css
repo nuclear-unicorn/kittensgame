@@ -1239,7 +1239,7 @@
 	/* default max-width: 90px; */
 	color: #b0b0b0;
 }
-.scheme_vintage #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_vintage div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #707070;
 	text-shadow: none !important;
 }

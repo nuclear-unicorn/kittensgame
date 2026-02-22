@@ -1335,6 +1335,15 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 	isPrecraftAvailable: function(model){
 		for (var i in model.prices){
 			var price = model.prices[i];
+			if (price.name == "wood") {
+				if (this.game.village.getKittens() == 0) {
+					//(We don't want any kittens starving to death.)
+					return true;
+				}
+				//Else, treat wood as non-craftable
+				continue;
+			}
+			if (price.name == "tears") { return true; }
 			var res = this.game.resPool.get(price.name);
 			if (res.craftable){
 				return true;
@@ -1358,13 +1367,25 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 			}
 		}
 
-		var res = this.game.resPool.get(price.name);
-		if (res.craftable && res.name != "wood" && this.game.workshop.getCraft(res.name).unlocked) {
-			var amt = price.val - res.value;
-			if (amt > 0) {
-				var baseAmt = amt / (1 + this.game.getResCraftRatio(res.name));
-				this.game.workshop.craft(res.name, baseAmt, false /*no undo*/, true /*force all*/);
-			}
+		var game = this.game;
+		if (game.resPool.isStorageLimited([ price ])) { //Do not precraft if we cannot afford it anyways
+			return;
+		}
+		var res = game.resPool.get(price.name);
+		var amt = price.val - res.value;
+		if (amt <= 0) {
+			return;
+		}
+		if (res.name == "wood" && game.village.getKittens() > 0) {
+			//Don't craft wood if we have kittens, as there's risk of causing starvation
+			return;
+		}
+		if (res.craftable && game.workshop.getCraft(res.name).unlocked) {
+			var baseAmt = amt / (1 + game.getResCraftRatio(res.name));
+			game.workshop.craft(res.name, baseAmt, false /*no undo*/, true /*force all*/);
+		}
+		if (res.name == "tears" && game.religion.getHasUnlockedUnicornSacrifice()) {
+			game.religion.sacrificeUnicornsToTarget(amt);
 		}
 	}
 });

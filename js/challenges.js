@@ -327,10 +327,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"unicornsMax": 0,
 			"tearsMax": 0,
 			"alicornMax": 0,
-			//Reward amounts are chosen such that building less than 20 buildings gets *more* expensive,
-			//	but building more than 20 buildings is less expensive than before.
-			"zigguratIvoryPriceRatio": -0.001,
-			"zigguratIvoryCostIncrease": 0.01
+			"zigguratIvoryPriceRatio": -0.003
 		},
 		calculateEffects: function(self, game) {
 			if (!game.getFeatureFlag("UNICORN_TEARS_CHALLENGE")) {
@@ -358,7 +355,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["alicornMax"] = 0.2;
 				//Disable the reward:
 				self.effects["zigguratIvoryPriceRatio"] = 0;
-				self.effects["zigguratIvoryCostIncrease"] = 0;
 			} else {
 				self.effects["bonfireTearsPriceRatioChallenge"] = 0;
 				self.effects["scienceTearsPricesChallenge"] = 0;
@@ -368,8 +364,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["tearsMax"] = 0;
 				self.effects["alicornMax"] = 0;
 				//Enable the reward:
-				self.effects["zigguratIvoryPriceRatio"] = -0.001;
-				self.effects["zigguratIvoryCostIncrease"] = 0.01;
+				self.effects["zigguratIvoryPriceRatio"] = -0.003;
 			}
 		},
 		stackOptions: {
@@ -380,8 +375,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"unicornsMax": { noStack: true },
 			"tearsMax": { noStack: true },
 			"alicornMax": { noStack: true },
-			"zigguratIvoryPriceRatio": { LDRLimit: 0.15 },
-			"zigguratIvoryCostIncrease": { LDRLimit: 1 }
+			"zigguratIvoryPriceRatio": { LDRLimit: 0.075 },
 		},
 		leviEnergyToUnlock: 25, //Used by the unlock condition logic
 		/**
@@ -437,7 +431,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			"thorium": 180000,
 			//---Other---//
 			"unicorns": -Infinity, //Used to prevent a building that already costs this resource from having its price modified
-			"alicorns": -Infinity,
+			"alicorn": -Infinity,
 			"tears": -Infinity,
 			"megalith": -Infinity,
 			"default": 10 //Used for any resource not explicitly specified
@@ -573,6 +567,11 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			chall.active = false;
 			chall.pending = false;
 			chall.unlocked = false;
+		}
+
+		//Unlock special challenge-specific Workshop upgrades
+		if (this.isActive("unicornTears") && !this.game.workshop.get("alicornStable").unlocked && this.game.resPool.get("alicorn").value >= 15) {
+			this.game.unlock({ upgrades: ["alicornStable"]});
 		}
 
 		//Iron Will has special rules.  Just make the UI more obvious when the game is in IW mode:
