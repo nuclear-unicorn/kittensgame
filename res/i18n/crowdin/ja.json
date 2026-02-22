@@ -185,7 +185,7 @@
     "buildings.magneto.desc": "全資源の生産力が2%向上します。蒸気機関は各々この効果を15%上昇させるでしょう。オイルを消費します。",
     "buildings.magneto.phantoms": "最大{0}の非稼働マグネトが生産ボーナスに貢献できます。",
     "buildings.mansion.label": "邸宅",
-    "buildings.mansion.desc": "夢のような豪邸(それぞれ子猫一匹分のスペース)。",
+    "buildings.mansion.desc": "夢のような豪邸(子猫が1匹やってきます)。",
     "buildings.mansion.flavor": "一番良い物件がありますよ。",
     "buildings.mine.label": "鉱坑",
     "buildings.mine.desc": "鉱夫の仕事をアンロックします。アップグレードごとに鉱物の生産量が20%増加します。",
