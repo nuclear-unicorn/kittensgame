@@ -168,7 +168,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
     isDisplayOver: false,
     isCenter: false,
 
-    defaultSchemes: ["default", "dark", "grassy", "sleek", "black", "wood", "bluish", "grayish", "greenish", "tombstone", "spooky"],
+    defaultSchemes: ["default"].concat(new classes.KGConfig().statics.defaultSchemes),
     allSchemes: ["default"].concat(new classes.KGConfig().statics.schemes),
 
     dirtyComponents: [],
@@ -1075,8 +1075,13 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         if (window.confirm(msg)) {
             callbackOk.apply(window);
         } else if (callbackCancel != undefined) {
-        	callbackCancel.apply(window);
+            callbackCancel.apply(window);
         }
+    },
+
+    prompt: function(title, defaultValue, callbackOk) {
+        var result = window.prompt(title, defaultValue);
+        callbackOk.call(window, result);
     },
 
     //TODO: add dialog and close/bind events
@@ -1132,10 +1137,12 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
     updateCenter: function(){
         if (this.isCenter) {
             $("#game").addClass("centered");
-            $("#toggleCenter").html("&lt;");
+            $("#toggleCenterIcon").removeClass("right");
+            $("#toggleCenterIcon").addClass("left");
         } else {
             $("#game").removeClass("centered");
-            $("#toggleCenter").html("&gt;");
+            $("#toggleCenterIcon").removeClass("left");
+            $("#toggleCenterIcon").addClass("right");
         }
 
     },

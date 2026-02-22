@@ -366,7 +366,7 @@ body.scheme_arctic.with_background_image {
 	/* font-size: 13px; /* for center tooltip except title, effects and flavor */
 /* } */
 .scheme_arctic #tooltip,
-.scheme_arctic .tooltip-block > div {
+.scheme_arctic .tooltip-content{
 	padding-left: 9px; /* default padding-left: 3px; */
 	padding-bottom: 5px;
 	background: padding-box linear-gradient(90deg, rgba(222, 235, 238, 0.2) 0%, rgba(222, 235, 238, 0.2) 100%),
@@ -381,7 +381,7 @@ body.scheme_arctic.with_background_image {
 	border-image-repeat: round;
 	/* margin-left: 20px; /* for offset tooltip due to larger buttons .btn.modern */
 }
-.scheme_arctic .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_arctic .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_arctic .button_tooltip {

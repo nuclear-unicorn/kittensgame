@@ -31,7 +31,10 @@ WCollapsiblePanel = React.createClass({
                             tabindex: 1,
                             title: this.props.title
                         },
-                        this.state.isCollapsed ? ">(" +  this.props.title + ")" : "v"
+                        this.state.isCollapsed ? ">(" +  this.props.title + ")" : 
+                        $r("div", {
+                            className: "svg-icon down"
+                        })
                     )
                 )
             ]),
@@ -598,7 +601,9 @@ WResourceTable = React.createClass({
                             tabindex: 1,
                             title: "Toggle resources",
                         },
-                        this.state.isCollapsed ? ">(" + $I("left.resources") + ")" : "v"
+                        this.state.isCollapsed ? ">(" + $I("left.resources") + ")" : $r("div", {
+                            className: "svg-icon down"
+                        })
                     )
                 ),
                 $r("div", {className:"res-toolbar right"}, 
@@ -608,9 +613,17 @@ WResourceTable = React.createClass({
                         onKeyDown: this.onKeyDown,
                         title:  "Resource settings",
                         tabIndex: 1
-                    }, "⚙"),
-                    $r(WTooltip, {body:"?", tabindex: 1}, 
-                        $I("left.resources.tip"))
+                    }, 
+                        $r("div", {
+                            className: "svg-icon gear"
+                        })
+                    ),
+                    $r(WTooltip, {body:
+                        $r("div", {
+                            className: "svg-icon question-mark"
+                        }), 
+                    tabindex: 1}, 
+                    $I("left.resources.tip"))
                 
                 )
             ]),
@@ -688,7 +701,7 @@ WCraftTable = React.createClass({
             return null;
         }
 
-        return $r("div", {ariaLabel:"Craftable resources"}, [
+        return $r("div", {className: "sidebar-section", ariaLabel:"Craftable resources"}, [
             $r("div", null,[
                 $r("div", {
                     className:"res-toolbar left",
@@ -699,7 +712,10 @@ WCraftTable = React.createClass({
                             tabindex: 1,
                             title: "Toggle craft",
                         },
-                        this.state.isCollapsed ? ">(" + $I("left.craft") + ")" : "v"
+                        this.state.isCollapsed ? ">(" + $I("left.craft") + ")" : $r("div", {
+                            className: "svg-icon down",
+                            src:"res/img/down.svg"
+                        })
                     )
                 ),
                 $r("div", {className:"res-toolbar right"}, 
@@ -708,7 +724,12 @@ WCraftTable = React.createClass({
                         onClick: this.toggleEdit,
                         onKeyDown: this.onKeyDown,
                         tabindex: 1
-                    }, "⚙")
+                    },              
+                        $r("div", {
+                            className: "svg-icon gear",
+                            src:"res/img/gear.svg"
+                        })
+                    )
                 )
             ]),
             this.state.isCollapsed ? null :
@@ -855,7 +876,7 @@ WLeftPanel = React.createClass({
                     ")"
                 )
             ),
-            $r("div", {id:"fastSacrificeContainer", className:"pin-link", style: {
+            $r("div", {id:"fastSacrificeContainer", className:"pin-link sidebar-section", style: {
                 display: (canSacrifice ? "block" : "none"),
                 visibility: (maxAvailableSacrifices >= 1 ? "visible" : "hidden")
             }},
@@ -868,7 +889,7 @@ WLeftPanel = React.createClass({
                     ")"
                 )
             ),
-            $r("div", {id:"fastPraiseContainer", className:"pin-link", style:{visibility:"hidden"}},
+            $r("div", {id:"fastPraiseContainer", className:"pin-link sidebar-section", style:{visibility:"hidden"}},
                 $r("a", {href:"#", onClick: this.praiseAll},
                     $I("left.praise")
                 )

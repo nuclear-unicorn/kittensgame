@@ -393,7 +393,7 @@ WLoginForm = React.createClass({
     login: function(){
         var self = this;
 
-        this.setState({isLoading: true});
+        self.setState({error: null, isLoading: true});
         $.ajax({
             cache: false,
             type: "POST",
@@ -410,10 +410,12 @@ WLoginForm = React.createClass({
 		}).done(function(resp){
             if (resp.id){
                 self.props.game.server.setUserProfile(resp);
+            } else {
+                self.setState({error: resp.error})
             }
 		}).fail(function(resp, status){
             console.error("something went wrong, resp:", resp, status)
-            self.setState({error: resp.responseText})
+            self.setState({error: resp.responseText || "There was a problem connecting the server"})
         }).always(function(){
             self.setState({isLoading: false});
         });
@@ -654,15 +656,21 @@ WLogin = React.createClass({
                 },
                 [
                     $r("a", {
+                        className: "kgnet-login-link-container",
                         href:"#!",
                         onClick: this.toggleExpanded,
                     }, 
                         $r("span", {
                             className: "kgnet-login-link status-indicator-" + (game.server.userProfile ? "online" : "offline")
                             + (lastBackup >= 7 ? " freshMessage" : "")
-                        }, "* " + (game.server.userProfile ?
-                            $I("ui.kgnet.online") : $I("ui.kgnet.login")
-                        )),
+                        }, [
+                            $r("div", {
+                                className: "svg-icon user"
+                            }),  
+                            (game.server.userProfile ?
+                            $I("ui.kgnet.online") : $I("ui.kgnet.login"))
+                        ]
+                        ),
                     ),
                     this.state.isExpanded && $r("div", {
                         className: "login-popup button_tooltip tooltip-block"
@@ -719,7 +727,7 @@ WToolbar = React.createClass({
             $r(WToolbarHappiness, {game: this.state.game}),
             $r(WToolbarEnergy, {game: this.state.game}),
             $r(WBLS, {game: this.state.game}),
-            $r(WToolbarMOTD, {game: this.state.game}),
+            //$r(WToolbarMOTD, {game: this.state.game}),
             $r(WLogin, {game: this.state.game})
 
         );

@@ -347,7 +347,7 @@ body.scheme_catnip {
 	/* font-size: 13px; /* for center tooltip except title, effects and flavor */
 /* } */
 .scheme_catnip #tooltip,
-.scheme_catnip .tooltip-block > div {
+.scheme_catnip .tooltip-content{
 	/* default padding-left: 3px; */
 	padding-bottom: 5px;
 	background: rgba(38, 40, 31, 0.9);
@@ -357,7 +357,7 @@ body.scheme_catnip {
 	box-shadow: 0 0 1px 1px rgba(0, 0 , 0, 0.5);
 	/* margin-left: 20px; /* for offset tooltip due to larger buttons .btn.modern */
 }
-.scheme_catnip .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_catnip .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_catnip .button_tooltip {

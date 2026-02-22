@@ -3,10 +3,19 @@ html, body {
     overflow-y: hidden;
 }
 
+:root {
+    /** Background color for body, page, panels and most elements **/
+    --page-background-color: #FFFFFF;
+    --button-border-color:#888;
+    /** General text color on the page (buttons, tooltips, etc) */
+    --text-color: black;
+}
+
 body {
     margin: 0;
     padding: 0;
-    background-color: #FFFFFF;
+    background-color: var(--page-background-color);
+    color: var(--text-color);
     height: 100vh;
 }
 
@@ -95,6 +104,11 @@ img.loader {
 
     overflow-y: auto;
     overflow-x: hidden;
+
+    padding-top:20px;
+
+    height: calc(100% - 20px);
+    min-height: calc(100% - 20px);
 }
 
 #midColumn {
@@ -118,6 +132,7 @@ img.loader {
     padding-top: 2px;
     position:absolute;
     top: 5px;
+    text-align: center;
 }
 
 div#gameLog {
@@ -206,6 +221,7 @@ select>option {
     width: 170px;
     text-align: center;
     margin-bottom:10px;
+    color: var(--text-color);
 }
 
 .btn:hover {
@@ -237,7 +253,7 @@ select>option {
     display: inline-block;
 }
 
-.btn .btnContent a.small {
+.btn .btnContent .small {
     font-size: 0.7em;
     line-height: 16px;
 }
@@ -258,6 +274,11 @@ select>option {
 
 .btn .noRes {
     color: #FF3030;
+}
+
+.btn .label-content {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
 }
 
 .rawRes {
@@ -285,7 +306,7 @@ select>option {
     left: 50%;
     top: 50%;
 
-    background-color: #FFF;
+    background-color: var(--page-background-color);
     padding: 20px;
     box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
 }
@@ -296,6 +317,8 @@ select>option {
 
     margin-top: -150px;
     margin-left: -300px;
+    background-color: var(--page-background-color);
+    color: var(--text-color);
 }
 
 .credits {
@@ -485,7 +508,7 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
     font-family: Helvetica;
     font-size: 14px;
     border-radius: 3px;
-    border: 1px solid #888;
+    border: 1px solid var(--button-border-color);
     padding: 0;
     width: 264px;
 }
@@ -559,10 +582,6 @@ table.craftTable tr:hover td {
 }
 
 #devPanel div {
-    display: inline-block;
-}
-
-.icons-container > div{
     display: inline-block;
 }
 
@@ -700,12 +719,9 @@ table.craftTable tr:hover td {
     display: inline-block;
 }
 
-.tooltip-block > div {
+.tooltip-block .tooltip-content {
     z-index: 9999;
     padding: 5px;
-}
-
-.tooltip-block > div {
     border: 1px solid lightgray;
 }
 
@@ -828,8 +844,8 @@ label:hover {
 
 #optionsDiv {
     overflow-y: scroll;
-    height: 400px;
-    margin-top:-170px;
+    height: 440px;
+    margin-top:-220px;
 }
 
 #optionsDiv input[type="checkbox"] {
@@ -978,20 +994,24 @@ a:hover {
 }
 
 @keyframes pulse {
-  0%,100% {color: #001F3F;}
-      50% {color: #FF4136;}
+  0% {color: #001F3F;}
+  50% {color: #FF4136;}
+  100% {color: #001F3F;}
 }
 @-webkit-keyframes pulse {
-  0%,100% {color: #001F3F;}
-      50% {color: #FF4136;}
+  0% {color: #001F3F;}
+  50% {color: #FF4136;}
+  100% {color: #001F3F;}
 }
 @-moz-keyframes pulse {
-  0%,100% {color: #001F3F;}
-      50% {color: #FF4136;}
+  0% {color: #001F3F;}
+  50% {color: #FF4136;}
+  100% {color: #001F3F;}
 }
 @-o-keyframes pulse {
-  0%,100% {color: #001F3F;}
-      50% {color: #FF4136;}
+  0% {color: #001F3F;}
+  50% {color: #FF4136;}
+  100% {color: #001F3F;}
 }
 
 .flavor {
@@ -1139,6 +1159,10 @@ a.link.collapse:hover {
     opacity: 0.9;
 }
 
+.sidebar-section {
+    margin-bottom: 5px;
+}
+
 .res-toolbar {
     display: inline-block;
     user-select: none;
@@ -1146,8 +1170,13 @@ a.link.collapse:hover {
 
 .res-toolbar.right {
     text-align: right;
-    margin-right:-18px;
+    margin-right:-13px;
     float: right;
+}
+
+
+.res-toolbar .link {
+    padding-right: 6px;
 }
 
 .res-toolbar .link.toggled {
@@ -1398,20 +1427,24 @@ a.link.collapse:hover {
 }
 
 @keyframes border-pulse {
-    0%,100% {border: 1px solid lightgray;}
-        50% {border: 1px solid red;}
+    0% {border: 1px solid lightgray;}
+    50% {border: 1px solid red;}
+    100% {border: 1px solid lightgray;}
 }
 @-webkit-keyframes border-pulse {
-    0%,100% {border: 1px solid lightgray;}
-        50% {border: 1px solid red;}
+    0% {border: 1px solid lightgray;}
+    50% {border: 1px solid red;}
+    100% {border: 1px solid lightgray;}
 }
 @-moz-keyframes border-pulse {
-    0%,100% {border: 1px solid lightgray;}
-        50% {border: 1px solid red;}
+    0% {border: 1px solid lightgray;}
+    50% {border: 1px solid red;}
+    100% {border: 1px solid lightgray;}
 }
 @-o-keyframes border-pulse {
-    0%,100% {border: 1px solid lightgray;}
-        50% {border: 1px solid red;}
+    0% {border: 1px solid lightgray;}
+    50% {border: 1px solid red;}
+    100% {border: 1px solid lightgray;}
 }
 
 .map-cell .coord {
@@ -1501,70 +1534,82 @@ div.leet {
 }
 
 @keyframes blaze-rainbow {
-    0%,100% {color: #F00;}
-        17% {color: #FF0;}
-        33% {color: #0F0;}
-        50% {color: #0FF;}
-        67% {color: #00F;}
-        83% {color: #F0F;}
+    0% {color: #F00;}
+    17% {color: #FF0;}
+    33% {color: #0F0;}
+    50% {color: #0FF;}
+    67% {color: #00F;}
+    83% {color: #F0F;}
+    100% {color: #F00;}
 }
 @-webkit-keyframes blaze-rainbow {
-    0%,100% {color: #F00;}
-        17% {color: #FF0;}
-        33% {color: #0F0;}
-        50% {color: #0FF;}
-        67% {color: #00F;}
-        83% {color: #F0F;}
+    0% {color: #F00;}
+    17% {color: #FF0;}
+    33% {color: #0F0;}
+    50% {color: #0FF;}
+    67% {color: #00F;}
+    83% {color: #F0F;}
+    100% {color: #F00;}
 }
 @-moz-keyframes blaze-rainbow {
-    0%,100% {color: #F00;}
-        17% {color: #FF0;}
-        33% {color: #0F0;}
-        50% {color: #0FF;}
-        67% {color: #00F;}
-        83% {color: #F0F;}
+    0% {color: #F00;}
+    17% {color: #FF0;}
+    33% {color: #0F0;}
+    50% {color: #0FF;}
+    67% {color: #00F;}
+    83% {color: #F0F;}
+    100% {color: #F00;}
 }
 @-o-keyframes blaze-rainbow {
-    0%,100% {color: #F00;}
-        17% {color: #FF0;}
-        33% {color: #0F0;}
-        50% {color: #0FF;}
-        67% {color: #00F;}
-        83% {color: #F0F;}
+    0% {color: #F00;}
+    17% {color: #FF0;}
+    33% {color: #0F0;}
+    50% {color: #0FF;}
+    67% {color: #00F;}
+    83% {color: #F0F;}
+    100% {color: #F00;}
 }
 
 @keyframes hail-rainbow {
-    0%,100% {color: red; text-shadow: 0 0 10px red;}
-        50% {color: black; text-shadow: none;}
+    0% {color: red; text-shadow: 0 0 10px red;}
+    50% {color: black; text-shadow: none;}
+    100% {color: red; text-shadow: 0 0 10px red;}
 }
 @-webkit-keyframes hail-rainbow {
-    0%,100% {color: red; text-shadow: 0 0 10px red;}
-        50% {color: black; text-shadow: none;}
+    0% {color: red; text-shadow: 0 0 10px red;}
+    50% {color: black; text-shadow: none;}
+    100% {color: red; text-shadow: 0 0 10px red;}
 }
 @-moz-keyframes hail-rainbow {
-    0%,100% {color: red; text-shadow: 0 0 10px red;}
-        50% {color: black; text-shadow: none;}
+    0% {color: red; text-shadow: 0 0 10px red;}
+    50% {color: black; text-shadow: none;}
+    100% {color: red; text-shadow: 0 0 10px red;}
 }
 @-o-keyframes hail-rainbow {
-    0%,100% {color: red; text-shadow: 0 0 10px red;}
-        50% {color: black; text-shadow: none;}
+    0% {color: red; text-shadow: 0 0 10px red;}
+    50% {color: black; text-shadow: none;}
+    100% {color: red; text-shadow: 0 0 10px red;}
 }
 
 @keyframes pray-rainbow {
-    0%,100% {color: gold; text-shadow: 0 0 10px gold;}
-        50% {color: silver; text-shadow: none;}
+    0% {color: gold; text-shadow: 0 0 10px gold;}
+    50% {color: silver; text-shadow: none;}
+    100% {color: gold; text-shadow: 0 0 10px gold;}
 }
 @-webkit-keyframes pray-rainbow {
-    0%,100% {color: gold; text-shadow: 0 0 10px gold;}
-        50% {color: silver; text-shadow: none;}
+    0% {color: gold; text-shadow: 0 0 10px gold;}
+    50% {color: silver; text-shadow: none;}
+    100% {color: gold; text-shadow: 0 0 10px gold;}
 }
 @-moz-keyframes pray-rainbow {
-    0%,100% {color: gold; text-shadow: 0 0 10px gold;}
-        50% {color: silver; text-shadow: none;}
+    0% {color: gold; text-shadow: 0 0 10px gold;}
+    50% {color: silver; text-shadow: none;}
+    100% {color: gold; text-shadow: 0 0 10px gold;}
 }
 @-o-keyframes pray-rainbow {
-    0%,100% {color: gold; text-shadow: 0 0 10px gold;}
-        50% {color: silver; text-shadow: none;}
+    0% {color: gold; text-shadow: 0 0 10px gold;}
+    50% {color: silver; text-shadow: none;}
+    100% {color: gold; text-shadow: 0 0 10px gold;}
 }
 
 @keyframes neon-purple {
@@ -1805,4 +1850,74 @@ div.leet {
 
 .queue-container .queue-label:hover {
     text-decoration: underline;
+}
+
+#toggleCenter {
+    padding-top: 20px;
+}
+
+span.genericWarning {
+    margin-left: 5px;
+}
+
+.svg-icon {
+    width: 14px;
+    height:14px;
+    background-color: var(--text-color);
+    opacity: 0.8;
+}
+
+.svg-icon.gear {
+    mask: url('img/gear.svg') no-repeat center / contain;
+    -webkit-mask: url('img/gear.svg') no-repeat center / contain;
+}
+
+.svg-icon.gear:hover {
+    opacity: 1;
+    scale: 1.1;
+    transition: opacity 0.1s, scale 0.1s;
+}
+
+.svg-icon.down {
+    mask: url('img/down.svg') no-repeat center / contain;
+    -webkit-mask: url('img/down.svg') no-repeat center / contain;
+}
+
+.svg-icon.question-mark {
+    mask: url('img/question.svg') no-repeat center / contain;
+    -webkit-mask: url('img/question.svg') no-repeat center / contain;
+}
+
+.svg-icon.user {
+    mask: url('img/user.svg') no-repeat center / contain;
+    -webkit-mask: url('img/user.svg') no-repeat center / contain;
+}
+
+.svg-icon.right {
+    mask: url('img/right.svg') no-repeat center / contain;
+    -webkit-mask: url('img/right.svg') no-repeat center / contain;
+}
+
+.svg-icon.left {
+    mask: url('img/left.svg') no-repeat center / contain;
+    -webkit-mask: url('img/left.svg') no-repeat center / contain;
+}
+
+#headerToolbar {
+    display: flex;
+    height: 100%;
+}
+
+.icons-container {
+    display: flex;
+    align-items: center;
+}
+
+.kgnet-login-link-container {
+    display: flex;
+}
+
+.kgnet-login-link {
+    gap: 3px;
+    display: inline-flex;
 }

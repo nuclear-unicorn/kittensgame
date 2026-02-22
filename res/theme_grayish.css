@@ -10,8 +10,11 @@
 /* ******************************************** */
 
 body.scheme_grayish {
-	background-color: #f2f2f2;
+	--page-background-color:#f2f2f2;
+	--text-color: #4c4c4c;
+	color-scheme: light;
 }
+
 .scheme_grayish #gamePageContainer,
 .scheme_grayish select,
 .scheme_grayish .btn,
@@ -342,7 +345,7 @@ body.scheme_grayish {
 	/* font-size: 13px; /* for center tooltip except title, effects and flavor */
 /* } */
 .scheme_grayish #tooltip,
-.scheme_grayish .tooltip-block > div {
+.scheme_grayish .tooltip-content{
 	/* default padding-left: 3px; */
 	padding-bottom: 5px;
 	background: linear-gradient(90deg, rgba(64, 64, 64, 0.1), rgba(64, 64, 64, 0.1)), #f2f2f2;
@@ -351,7 +354,7 @@ body.scheme_grayish {
 	border-radius: 7px;
 	/* margin-left: 20px; /* for offset tooltip due to larger buttons .btn.modern */
 }
-.scheme_grayish .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_grayish .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_grayish .button_tooltip {

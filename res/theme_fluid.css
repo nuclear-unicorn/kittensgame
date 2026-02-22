@@ -7,6 +7,14 @@
 /**********************************************/
 /******************** GAME ********************/
 /**********************************************/
+
+.scheme_fluid,
+.scheme_fluid .help {
+	color-scheme: dark;
+	--page-background-color:#292728;
+	--text-color: #81848C;
+}
+
 body.scheme_fluid,
 .scheme_fluid .help,
 .scheme_fluid .dialog {
@@ -291,7 +299,7 @@ body.scheme_fluid,
 /******************** TOOLTIP ********************/
 /*************************************************/
 .scheme_fluid #tooltip,
-.scheme_fluid .tooltip-block > div {
+.scheme_fluid .tooltip-content{
 	background-color: #111011;
 	color: #828790; /* tooltip windows == left column : left text */
 	border: 1px solid rgba(96, 96, 96, 0.5); /* color #606060 */
@@ -299,7 +307,7 @@ body.scheme_fluid,
                  0 -2px 0 #151415 !important;
 	border-radius: 11px !important;
 }
-.scheme_fluid .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_fluid .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_fluid .button_tooltip {
@@ -811,7 +819,7 @@ body.scheme_fluid,
 	background-position: left;
 	padding-left: 20px; /* default padding-left: 8px; */
 	top: 0; /* default top: 20px; */
-	margin-top: 16px; /* default margin-top: 4px; */
+	margin-top: 32px; /* default margin-top: 4px; */
 }
 .scheme_fluid #toggleCenter,
 .scheme_fluid span.toggleCenter {

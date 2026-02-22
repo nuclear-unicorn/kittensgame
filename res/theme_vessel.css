@@ -326,7 +326,7 @@ body.scheme_vessel {
 /* ******************* TOOLTIP ******************* */
 /* *********************************************** */
 .scheme_vessel #tooltip,
-.scheme_vessel .tooltip-block > div {
+.scheme_vessel .tooltip-content{
 	background-color: rgba(0, 0, 0, 0.8);
 	background-image: url('img/theme_vessel_glass.png'); /* source of images for graphic design : https://pngtree.com/ Volkeyrn: permanent premium member */
 	background-repeat: no-repeat;
@@ -338,7 +338,7 @@ body.scheme_vessel {
                  0 -2px 0 #161616 !important;
 	border-radius: 11px !important;
 }
-.scheme_vessel .tooltip-block > div { /* for tooltip on ? in left column */
+.scheme_vessel .tooltip-content{ /* for tooltip on ? in left column */
 	background-image: url('img/theme_vessel_glass_button_background.png'); /* source of images for graphic design : https://pngtree.com/ Volkeyrn: permanent premium member */
 	padding: 3px;
 }

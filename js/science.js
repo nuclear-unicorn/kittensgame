@@ -1452,26 +1452,22 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		}
 	}, {
 		name: "sharkRelationsMerchants",
-        label: $I("policy.sharkRelationsMerchants.label"),
-        description: $I("policy.sharkRelationsMerchants.desc"),
-        prices: [
-            {name : "culture", val: 2200}
-        ],
-        effects:{
-            "tradeRatio" : 0
-        },
-        unlocked: false,
-        blocked: false,
-		isRelation: true,
-        blocks:["sharkRelationsScribes", "sharkRelationsBotanists"],
-		calculateEffects: function(self, game) {
-			var trades = game.stats.getStatCurrent("totalTrades").val;
-			self.effects["tradeRatio"] = Math.min(Math.round((Math.log10(Math.max(trades, 100)) - 1) * 3) / 100, 0.3);			
+		label: $I("policy.sharkRelationsMerchants.label"),
+		description: $I("policy.sharkRelationsMerchants.desc"),
+		prices: [
+			{name : "culture", val: 2200}
+		],
+		effects: {
+			"tradeRatio" : 0
 		},
-		evaluateLocks: function(game){
+		unlocked: false,
+		blocked: false,
+		isRelation: true,
+		blocks: ["sharkRelationsScribes", "sharkRelationsBotanists"],
+		evaluateLocks: function(game) {
 			return game.science.checkRelation("sharks", 20);
 		}
-	},{
+	}, {
 		name: "sharkRelationsBotanists",
         label: $I("policy.sharkRelationsBotanists.label"),
         description: $I("policy.sharkRelationsBotanists.desc"),
@@ -2440,7 +2436,8 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 	getName: function(model){
 		var meta = model.metadata;
 		if (meta.blocked){
-			return meta.label + " " + $I("btn.blocked.capital");
+			var label = "<div class=\"label\"><span class=\"label-content\">" + meta.label + "</span></div>";	
+			return label + "<div>" + $I("btn.blocked.capital") + "</div>";
 		}
 
 		return this.inherited(arguments);
@@ -2686,6 +2683,10 @@ dojo.declare("com.nuclearunicorn.game.ui.TechButtonController", com.nuclearunico
 		result.tooltipName = true;
 		result.simplePrices = false;
 		return result;
+	},
+
+	getType: function(){
+		return "tech";
 	},
 
 	getMetadata: function(model){
