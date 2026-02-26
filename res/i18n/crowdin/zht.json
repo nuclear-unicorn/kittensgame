@@ -2351,7 +2351,7 @@
     "workshop.satelliteRadio.label": "衛星廣播",
     "workshop.satelliteRadio.desc": "每顆衛星將提高廣播塔 0.5%的的效果",
     "workshop.satnav.label": "衛星導航系統",
-    "workshop.satnav.desc": "每颗卫星将船舶的淀粉需求量减少1.25%。",
+    "workshop.satnav.desc": "每顆衛星將船隻的星圖需求量減少 1.25%",
     "workshop.seti.label": "搜尋地外文明計畫",
     "workshop.seti.desc": "大量電子望遠鏡。天文事件將自動化並且靜音。",
     "workshop.silos.label": "糧倉",
