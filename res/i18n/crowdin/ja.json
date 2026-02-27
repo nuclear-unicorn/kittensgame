@@ -85,7 +85,7 @@
     "bld.msg.automation.plates": "鉄 {0} 個を使って、鉄板を {1} 枚作った!",
     "bld.msg.automation.skip": "工房の自動化は止まっている...",
     "bld.msg.automation.slabs": "鉱物 {0} 個を使って、石板を {1} 枚作った!",
-    "btn.all": "全表示",
+    "btn.all": "全て",
     "btn.all.minor": "全て",
     "btn.all.assign": "[+全て]",
     "btn.all.unassign": "[-全て]",
