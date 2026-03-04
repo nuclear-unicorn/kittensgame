@@ -885,6 +885,8 @@
     "policy.tradition.desc": "文化志向の社会に適しています。原稿価格を下げ、その効果を高めます。これは将来どのような政策が利用できるかに影響します！",
     "policy.transkittenism.label": "超子猫主義",
     "policy.transkittenism.desc": "子猫の身体を捨てAIと統合します。AIコアは2倍の効率を発揮し、AIレベルに悪影響はありません。",
+    "policy.upfrontPayment.label": "前払い",
+    "policy.upfrontPayment.desc": "Pactsを再交渉し、維持コストを10％減らします。ただし、負債がある場合そのペナルティはより厳しくなります。<br>この政策を購入すると、現在結んでいるすべてのPactsの前払いコストを即座に支払わなければなりません。",
     "policy.zebraRelationsAppeasement.label": "シマウマ族関係：融和政策",
     "policy.zebraRelationsAppeasement.desc": "あなたを毛嫌いしているシマウマ族に対して、友好的な態度で応じます。\n交易条件がわずかに緩和しますが、ゴールド生産はわずかに減少します。",
     "policy.zebraRelationsBellicosity.label": "シマウマ族関係：敵意政策",
