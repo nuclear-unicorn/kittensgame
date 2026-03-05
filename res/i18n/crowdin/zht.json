@@ -302,7 +302,7 @@
     "challendge.pending": "選中",
     "challendge.reclaimReserves.label": "取回存儲資源",
     "challendge.reclaimReserves.desc": "從外部回收資源",
-    "challendge.applyPending.label": "应用选中的变更 ({0})",
+    "challendge.applyPending.label": "應用選中的變更 ({0})",
     "challendge.applyPending.desc": "立即重置時間線，開始選定的挑戰",
     "challendge.1000Years.label": "千禧年",
     "challendge.1000Years.desc": "重置遊戲，進入半衰期時間。目標：達到 1000 年。",
