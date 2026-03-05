@@ -811,7 +811,7 @@
     "policy.fascism.label": "ファシズム",
     "policy.fascism.desc": "レーベンスラウム！人口による幸福度へのペナルティは排除され、小屋のコストは半分になります。",
     "policy.feedingFrenzy.label": "狂乱の給餌",
-    "policy.feedingFrenzy.desc": "あなたが古の神々に日々提供する神聖なごちそうは、利用可能契約数に応じてより効果的になります。代わりにネクロコーンの腐敗効率に対する負の干渉を引き起こすでしょう。ネクロコーンが0か1頭の時、最高速で腐敗します。",
+    "policy.feedingFrenzy.desc": "あなたが古の神々に日々提供する神聖なごちそうは、利用可能契約数に応じてより効果的になります。加えて、ネクロコーンが1頭未満の時、0頭であるかのように素早く腐敗します。代わりに全体的な腐敗効率に対する負の干渉を引き起こすでしょう。",
     "policy.frugality.label": "質素倹約",
     "policy.frugality.desc": "禁欲主義の哲学者が造幣局を担当し、汚職を減らすことでより効果的になります。",
     "policy.fullIndustrialization.label": "完全工業化",
