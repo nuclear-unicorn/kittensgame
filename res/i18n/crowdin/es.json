@@ -761,6 +761,7 @@
     "opts.pollution": "Desactivar polución",
     "opts.pollution.desc": "Deshabilita los efectos de la polución",
     "msg.policy.aiNotMerges": "La IA no quiere fusionarse con gatitos.",
+    "msg.policy.cannotPayUpfront": "Esta política requiere {0} {1} adicional, que no puedes permitir.",
     "msg.policy.exclusivity": "Las políticas con el mismo costo numérico son mutuamente exclusivas",
     "msg.policy.kittenNotMadeLeader": "{0} sólo puede ser liderado por un {1}",
     "msg.policy.wrongLeaderJobDemoted": "{0} sólo puede ser dirigido por un {1}",
