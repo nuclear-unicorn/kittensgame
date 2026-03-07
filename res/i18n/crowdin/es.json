@@ -306,7 +306,7 @@
     "challendge.applyPending.label": "Aplicar cambios pendientes ({0})",
     "challendge.applyPending.desc": "Activar Desafíos/Condiciones marcadas como Pendientes inmediatamente",
     "challendge.1000Years.label": "1000 años",
-    "challendge.1000Years.desc": "Objetivo: llegar al año 1000.",
+    "challendge.1000Years.desc": "Reinicia el juego con un tiempo de vida medio.<br><br>Objetivo: Alcanza el año 1000.",
     "challendge.1000Years.effect.desc": "TBD",
     "challendge.anarchy.label": "Anarquía",
     "challendge.anarchy.desc": "Reinicia el juego con los gatitos actuando a su manera: los gatitos son flojos, siempre comen catnip extra y no pueden asignarse como líderes. Objetivo: A determinar:",
