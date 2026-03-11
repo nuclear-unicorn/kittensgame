@@ -1632,7 +1632,7 @@
     "time.cfu.blastFurnace.desc": "按計時表操作。將最大熱量限制提高100點。",
     "time.cfu.blastFurnace.desc2": "自動化每消耗100%燃料跳躍一年到未來。",
     "time.cfu.controlledDelay.label": "控制延遲",
-    "time.cfu.controlledDelay.desc": "每個會讓計時爐再次發射前等待0.2秒。",
+    "time.cfu.controlledDelay.desc": "每個控制延遲會讓計時爐再次發射前等待0.2秒。",
     "time.cfu.controlledDelay.desc2": "切換自動化不會產生遊戲影響。",
     "time.cfu.ressourceRetrieval.label": "資源恢復",
     "time.cfu.ressourceRetrieval.desc": "當你燃燒TC的時候恢復你的年度資源的一部分，",
