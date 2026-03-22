@@ -1185,6 +1185,25 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			religion: ["solarchant", "scholasticism", "goldenSpire", "sunAltar", "stainedGlass", "basilica", "templars"]
 		},
 		noStackable: true
+	},{
+		name: "frescoes",
+		label: $I("religion.ru.frescoes.label"),
+		description: $I("religion.ru.frescoes.desc"),
+		prices: [
+			{ name: "gold",  val: 5000 },
+			{ name: "faith", val: 4000 },
+			{ name: "spice", val: 1600 } //Not affected by philosopher trait discount
+		],
+		faith: 200000,
+		calculateEffects: function(self, game) {
+			self.noStackable = (game.religion.getRU("transcendence").on == 0);
+		},
+		noStackable: true,
+		priceRatio: 2.5,
+		flavor: $I("religion.ru.frescoes.flavor"),
+		upgrades: {
+			buildings: ["chapel"]
+		}
 	}],
 
 	transcendenceUpgrades: [

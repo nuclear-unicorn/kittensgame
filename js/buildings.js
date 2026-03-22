@@ -1841,20 +1841,23 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		effects: {
 			"culturePerTickBase" : 0,
 			"faithPerTickBase" : 0,
-			"cultureMax" : 0
+			"cultureMax" : 0,
+			"faithMax" : 0
 		},
 		calculateEffects: function(self, game) {
+			var effects = {
+				"culturePerTickBase" : 0.05,
+				"faithPerTickBase" : 0,
+				"cultureMax" : 200,
+				"faithMax" : 0
+			};
 			if (!game.challenges.isActive("atheism")) {
-				var effects = {
-					"culturePerTickBase" : 0.05,
-					"faithPerTickBase" : 0.005,
-					"cultureMax" : 200
-				};
-			} else {
-				var effects = {
-					"culturePerTickBase" : 0.05,
-					"cultureMax" : 200
-				};
+				effects["faithPerTickBase"] = 0.005;
+				var frescoes = game.religion.getRU("frescoes");
+				if (frescoes.on) {
+					//The stripe parameter can be tweaked as needed for the sake of balancing.
+					effects["faithMax"] = game.getUnlimitedDR( frescoes.on, 1.65 /*stripe*/ ) * game.resPool.get("karma").value;
+				}
 			}
 			self.effects = effects;
 		}
