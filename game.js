@@ -5190,10 +5190,21 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var stripe = 5;	//initial amount of kittens per stripe
 		var karma = this.getUnlimitedDR(this.karmaKittens, stripe);
 
-		this.resPool.get("karma").value = karma;
+		var karmaRes = this.resPool.get("karma");
+		var karmaPrev = karmaRes.value;
+		karmaRes.value = karma;
 
 		if (this.karmaZebras){
 			this.resPool.get("zebras").maxValue = this.karmaZebras + 1;
+		}
+
+		//Recalculate some effects if karma amount has changed:
+		if (karma != karmaPrev) {
+			//Do not call game.upgrade here.  It'll have weird knock-on effects if we do that.
+			//Instead, we'll just call calculateEffects & wait for another game system to call updateCaches.
+			//Worst-case scenario, that function gets called every 5 ticks anyways.
+			var bld = this.bld.get("chapel"); bld.calculateEffects(bld, this);
+			var ru = this.religion.getRU("frescoes"); ru.calculateEffects(ru, this);
 		}
 	},
 

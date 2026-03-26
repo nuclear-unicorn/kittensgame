@@ -1182,7 +1182,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//none
 		},
 		upgrades: {
-			religion: ["solarchant", "scholasticism", "goldenSpire", "sunAltar", "stainedGlass", "basilica", "templars"]
+			religion: ["solarchant", "scholasticism", "goldenSpire", "sunAltar", "stainedGlass", "basilica", "templars","frescoes"]
 		},
 		noStackable: true
 	},{
@@ -1192,11 +1192,19 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		prices: [
 			{ name: "gold",  val: 5000 },
 			{ name: "faith", val: 4000 },
-			{ name: "spice", val: 1600 } //Not affected by philosopher trait discount
+			{ name: "spice", val: 8000 } //Not affected by philosopher trait discount
 		],
 		faith: 200000,
 		calculateEffects: function(self, game) {
 			self.noStackable = (game.religion.getRU("transcendence").on == 0);
+			self.description = $I("religion.ru.frescoes.desc") + (self.noStackable ? "" : "<br>" + $I("religion.ru.frescoes.desc.stackable"));
+			var karma = game.resPool.get("karma").value;
+			if (karma < 10) {
+				//Add a hint telling the player how to gain some karma:
+				self.description += "<br><br><span class=\"genericWarning\">" +
+					(karma == 0 ? $I("religion.ru.frescoes.desc.noKarma") : $I("religion.ru.frescoes.desc.lowKarma")) +
+					"</span><br>" + $I("religion.ru.frescoes.desc.karmaHint");
+			}
 		},
 		noStackable: true,
 		priceRatio: 2.5,
