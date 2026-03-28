@@ -2283,6 +2283,9 @@ dojo.declare("classes.ui.CryptotheologyWGT", [mixin.IChildrenAware, mixin.IGameA
 
 	render: function(container){
 		var div = dojo.create("div", null, container);
+		dojo.create("span", {
+			id: "cryptotheologyInfo",
+			innerHTML: $I("religion.panel.cryptotheology.info")}, div);
 		var btnsContainer = dojo.create("div", null, div);
 		this.inherited(arguments, [btnsContainer]);
 	},

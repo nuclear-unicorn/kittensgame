@@ -1071,6 +1071,7 @@
     "religion.pact.payDebt.desc": "Get rid of Necrocorn Deficit by giving up enough necrocorns",
 	"religion.pact.fractured.label": "Fractured",
 	"religion.pact.fractured.desc": "You have broken the deal... now you will pay",
+    "religion.panel.cryptotheology.info": "Cryptotheologies persist across resets and remain active even before Cryptotheology (technology) is researched.",
     "religion.panel.cryptotheology.label": "Cryptotheology",
     "religion.panel.pacts.label": "Pacts",
     "religion.panel.orderOfTheSun.label": "Order of the Sun",
