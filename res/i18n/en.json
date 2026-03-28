@@ -158,6 +158,7 @@
     "buildings.calciner.desc.automation": "Automation converts {0}% of iron output into steel.",
     "buildings.chapel.label": "Chapel",
     "buildings.chapel.desc": "Produces a bit of culture and faith per tick. May be improved with religious upgrades",
+    "buildings.chapel.desc.atheism": "Produces a bit of culture.",
     "buildings.chronosphere.label": "Chronosphere",
     "buildings.chronosphere.desc": "Relocates small amount of resources through time. Can be upgraded further. Every Chronosphere increases the chance of Temporal Paradox.",
     "buildings.dataCenter.label": "Data Center",
@@ -236,7 +237,10 @@
     "buildings.brewery.flavor": "Sir! Want some nip' in ya milk?",
     "buildings.temple.label": "Temple",
     "buildings.temple.desc": "Temple of light. Produces culture. May be improved with Theology.",
+    "buildings.temple.desc.atheism": "Temple of light. Produces culture.",
     "buildings.temple.flavor": "All praise Ceiling Cat!",
+    "buildings.temple.flavor.atheism": "Whom are you praying to?",
+
     "buildings.tradepost.label": "Tradepost",
     "buildings.tradepost.desc": "The heart of your trading empire. Improves trade effectiveness by 1.5%, reduces rare resource consumption by 4%",
     "buildings.tradepost.flavor": "I hope they have yarn",

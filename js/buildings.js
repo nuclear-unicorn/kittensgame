@@ -1851,7 +1851,10 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				"cultureMax" : 200,
 				"faithMax" : 0
 			};
-			if (!game.challenges.isActive("atheism")) {
+			if (game.challenges.isActive("atheism")) {
+				self.description = $I("buildings.chapel.desc.atheism");
+			} else {
+				self.description = $I("buildings.chapel.desc");
 				effects["faithPerTickBase"] = 0.005;
 				var frescoes = game.religion.getRU("frescoes");
 				if (frescoes.on) {
@@ -1887,6 +1890,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game){
 			if (!game.challenges.isActive("atheism")) {
+				self.description = $I("buildings.temple.desc");
+				self.flavor = $I("buildings.temple.flavor");
 				if (self.val > 0){
                     game.time.queue.unlockQueueSource("religion");
                 }
@@ -1937,6 +1942,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					effects["manpowerMax"] = 50 + 25 * templars.on;
 				}
 			} else {
+				self.description = $I("buildings.temple.desc.atheism");
+				self.flavor = $I("buildings.temple.flavor.atheism");
 				var effects = {
 					"culturePerTickBase" : 0.1
 				};
