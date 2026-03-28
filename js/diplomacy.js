@@ -933,7 +933,10 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 		// Apply effects from sharkRelationsMerchants policy.
 		var trades = game.stats.getStatCurrent("totalTrades").val;
-		var sharkRelationsMerchantsBonus = this.game.science.getPolicy("sharkRelationsMerchants").researched ?  Math.min(Math.round((Math.log10(Math.max(trades, 100)) - 1) * 3) / 100, 0.3) : 0;
+		var merchantBonus = Math.min(Math.round((Math.log10(Math.max(trades, 100)) - 1) * 3) / 100, 0.3);
+		var merchantPolicy = game.science.getPolicy("sharkRelationsMerchants");
+		merchantPolicy.lastCalculatedBonus = merchantBonus;
+		var sharkRelationsMerchantsBonus = merchantPolicy.researched ? merchantBonus : 0;
 
 		return sharkRelationsMerchantsBonus + phantomTradeposts * tradepostsTradeRatio;
 	}

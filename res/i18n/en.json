@@ -911,6 +911,7 @@
     "policy.sharkRelationsScribes.desc" : "The shark scribes are keen on recording Cath's history and you can help each other in the form of a trade deal. If you give them more resources in trade, they are willing to share more of their recordings.",
     "policy.sharkRelationsMerchants.label" : "Shark Relations: Merchants",
     "policy.sharkRelationsMerchants.desc" : "The sharks are experts of traveling through water, but not so much on land. Work together with their merchants to discover and share trade routes through water and land.<br>The more you trade, the more effective it becomes",
+    "policy.sharkRelationsMerchants.currentBonus" : "Currently: {0}",
     "policy.siphoning.label" : "Siphoning",
     "policy.siphoning.desc" : "Pacts no longer continuously consume necrocorns. Instead, whenever a necrocorn is produced, it may be siphoned away to pay off debt. Small amounts of debt are harmless.",
     "policy.socialism.label" : "Socialism",

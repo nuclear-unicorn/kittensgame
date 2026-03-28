@@ -2174,9 +2174,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			this.updateCaches();
 		}), 5);		//once per 5 ticks
 
+		//Update descriptions of some policies where it's a pain to call game.upgrade every time something changes.
 		this.timer.addEvent(dojo.hitch(this, function() {
-			var policy = this.science.getPolicy("upfrontPayment");
-			policy.calculateEffects(policy, this); //Update description of policy
+			var policies = ["upfrontPayment", "sharkRelationsMerchants"];
+			for (var i = 0; i < policies.length; i++) {
+				var thePolicy = game.science.getPolicy(policies[i]);
+				thePolicy.calculateEffects(thePolicy, this);
+			}
 		}), 25);		//every 5 seconds
 
 		var ONE_MIN = this.ticksPerSecond * 60;
