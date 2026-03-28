@@ -2900,7 +2900,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 		wgt.setGame(this.game);
 		ctPanel.addChild(wgt);
 
-		var ptPanel = new classes.ui.PactsPanel("Pacts");
+		var ptPanel = new classes.ui.PactsPanel($I("religion.panel.pacts.label"));
 		ptPanel.game = this.game;
 		this.addChild(ptPanel);
 		this.ptPanel = ptPanel;
