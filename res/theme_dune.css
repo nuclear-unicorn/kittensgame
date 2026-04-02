@@ -336,7 +336,7 @@ body.scheme_dune {
 /* ******************* TOOLTIP ******************* */
 /* *********************************************** */
 .scheme_dune #tooltip,
-.scheme_dune .tooltip-block > div {
+.scheme_dune .tooltip-content{
 	background-color: rgba(46, 26, 53, 0.9);
 	font-size: 14px;
 	color: #bbbbbb; /* tooltip windows == left column : left text */
@@ -345,7 +345,7 @@ body.scheme_dune {
 	box-shadow: none;
 	margin-left: 20px; /* for offset tooltip due to larger buttons .btn.modern */
 }
-.scheme_dune .tooltip-block > div {
+.scheme_dune .tooltip-content{
 	padding: 5px;
 }
 .scheme_dune .button_tooltip {

@@ -364,14 +364,14 @@ body.scheme_space.with_background_image {
 /******************** TOOLTIP ********************/
 /*************************************************/
 .scheme_space #tooltip,
-.scheme_space .tooltip-block > div {
+.scheme_space .tooltip-content{
     color: #1a98bd; /* tooltip windows == left column : left text */
 	background-color: rgba(6, 19, 54, 0.8);
 	font-size: 95%;
 	border: 1px solid rgba(11, 74, 104, 0.8);
 	border-radius: 5px !important;
 }
-.scheme_space .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_space .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_space .button_tooltip {

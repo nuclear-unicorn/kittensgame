@@ -85,11 +85,11 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		value: 0,
 		unlocked: false,
 		calculateEffects: function (self, game) {
-			if(game.challenges.isActive("atheism")){
+			if (game.challenges.isActive("atheism")){
 				self.unlocked = false;
 				for (var i in game.village.sim.kittens){
 					var kitten = game.village.sim.kittens[i];
-					if(kitten.job == "priest"){
+					if (kitten.job == "priest"){
 						game.village.unassignJob(kitten);
 						console.warn("Kitten was unasigned from being a priest in atheism! " + kitten.name + " " + kitten.surname);
 					}
@@ -178,7 +178,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		if (this.game.science.getPolicy("monarchy").researched){
 			leaderRatio = 1.95;
 		}
-		if(this.leader) {
+		if (this.leader) {
 			var leaderTrait = this.leader.trait.name;
 			if (leaderTrait == trait) {
 				var burnedParagonRatio = 1 + this.game.prestige.getBurnedParagonRatio();
@@ -281,7 +281,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			if (job.name == "engineer") {
 				this.game.workshopTab.updateTab();
 			}
-			if(job.name == "hunter"){
+			if (job.name == "hunter"){
 				this.sim.hadKittenHunters = true;
 			}
 			this.game.villageTab.updateTab();
@@ -304,7 +304,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 	},
 	calculateSimMaxKittens: function(){
 		var maxKittensRatio = this.game.getEffect("maxKittensRatio");
-		if(!maxKittensRatio){
+		if (!maxKittensRatio){
 			return this.maxKittens;
 		}
 		var withRatioMaxKittens = Math.round(this.maxKittens * (1 + this.game.getLimitedDR(maxKittensRatio, 1)));
@@ -368,7 +368,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			} else {
 				this.sim.update(kittensPerTick);
 			}
-		} else{
+		} else {
 			this.sim.update(kittensPerTick);
 		}
 
@@ -516,9 +516,9 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 				var jobTitle = this.game.village.getJob(theocracy.requiredLeaderJob).title;
 				this.game.msg($I("msg.policy.wrongLeaderJobDemoted", [theocracy.label, jobTitle]), "important");
 			}
-			if(kitten.job) {
+			if (kitten.job) {
 				var job = this.getJob(kitten.job);
-				if(job) {
+				if (job) {
 					// Is there a shorter path to this function? I could go from gamePage but I'm trying to keep the style consistent.
 					//TODO: move to the village manager
 					var mod = this.game.village.getValueModifierPerSkill(kitten.skills[kitten.job] || 0);
@@ -540,7 +540,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 						if (!res[jobResMod]){
 							res[jobResMod] = diff;
-						}else{
+						} else {
 							res[jobResMod] += diff;
 						}
 					}
@@ -571,7 +571,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 						if (!res[jobResMod]){
 							res[jobResMod] = diff;
-						}else{
+						} else {
 							res[jobResMod] += diff;
 						}
 					}
@@ -615,7 +615,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		//Else, kitten will be our leader.
 
 		var theocracy = game.science.getPolicy("theocracy");
-		if((theocracy.researched) && (kitten.job != theocracy.requiredLeaderJob)){
+		if ((theocracy.researched) && (kitten.job != theocracy.requiredLeaderJob)){
 			//can't assign non-priest leaders if orderOfTheStars is researched
 			var jobTitle = this.getJob(theocracy.requiredLeaderJob).title;
 			this.game.msg($I("msg.policy.kittenNotMadeLeader", [theocracy.label, jobTitle]), "important");
@@ -741,7 +741,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			var loadouts = saveData.village.loadouts;
 			this.loadoutController.loadouts = [];
 
-			for(var i in loadouts){
+			for (var i in loadouts){
 				var loadout = loadouts[i];
 
 				var newLoadout = new com.nuclearunicorn.game.village.Loadout(this.game);
@@ -771,6 +771,26 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		return this.getKittens() - this.sim.maxKittens;
 	},
 
+	/**
+	 * Calculates the amount of happiness bonus that is granted by the player's current karma points.
+	 * @return A number, measured in percentage points.  Example: 10 means the bonus is +10% happiness
+	 */
+	getHappinessFromKarma: function() {
+		var game = this.game;
+
+		//+1% to the production per karma point
+		var karma = game.resPool.get("karma").value;
+
+		//Policy whose downside reduces karma effectiveness if you're in Pact debt
+		if (game.science.getPolicy("upfrontPayment").researched) {
+			var debtMultiplier = game.religion.pactsManager.getDebtPenaltyRatio();
+			debtMultiplier = Math.max(debtMultiplier, 0.1); //Capped at -90% reduction
+			karma *= debtMultiplier;
+		}
+
+		return karma;
+	},
+
 	/** Calculates a total happiness where result is a value of [0..1] **/
 	updateHappines: function(){
 		var happiness = 100;
@@ -792,10 +812,10 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		for (var i = resources.length - 1; i >= 0; i--) {
 			if (resources[i].type != "common" && resources[i].value > 0){
 				happiness += happinessPerLuxury;
-				if(resources[i].name == "elderBox" && this.game.resPool.get("wrappingPaper").value){
+				if (resources[i].name == "elderBox" && this.game.resPool.get("wrappingPaper").value){
 					happiness -= happinessPerLuxury; // Present Boxes and Wrapping Paper do not stack.
 				}
-				if(resources[i].type == "uncommon"){
+				if (resources[i].type == "uncommon"){
 					happiness += this.game.getEffect("consumableLuxuryHappiness");
 				}
 			}
@@ -805,8 +825,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			happiness += 30 * (1 + this.game.getEffect("festivalRatio"));
 		}
 
-		var karma = this.game.resPool.get("karma");
-		happiness += karma.value;	//+1% to the production per karma point
+		//+1% to the production per karma point
+		happiness += this.getHappinessFromKarma();
 
 		var overpopulation = this.getOverpopulation();
 		if (overpopulation > 0){
@@ -825,20 +845,36 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		this.gainHuntRes(1);
 	},
 
-	huntAll: function() {
+	huntFifth: function() { this.huntFraction(5); },
+	huntHalf: function() { this.huntFraction(2); },
+	huntAll: function() { this.huntFraction(1); },
+	/**
+	 * Hunts 1/divisor times as many as you can afford.
+	 * This incluldes spending the cost & gaining rewards.
+	 * i.e. If the divisor is 10, & we can afford to do 57 hunts currently, it does 5 hunts.
+	 * @param divisor	number
+	 */
+	huntFraction: function(divisor) {
 		var manpowerCost = 100 - this.game.getEffect("huntCatpowerDiscount");
-
 		var squads = Math.floor(this.game.resPool.get("manpower").value / manpowerCost);
+		squads = Math.floor(squads / divisor);
 		if (squads >= 1) {
 			this.game.resPool.addResEvent("manpower", -squads * manpowerCost);
 			this.gainHuntRes(squads);
 		}
-		if(squads >= 1000&&!this.game.challenges.getChallenge("pacifism").unlocked){
-			this.game.challenges.getChallenge("pacifism").unlocked = true;
-		}
 	},
 
+	/**
+	 * Gain resources from hunting: furs, ivory, unicorns, etc.
+	 * Also checks the unlock requirement for the Pacifism Challenge, since that cares about hunts.
+	 * This function does NOT spend any resources; that code is handled elsewhere.
+	 * @param squads	number	Essentially acts like a multiplier to resources gained.
+	 */
 	gainHuntRes: function (squads) {
+		if (squads >= 1000&&!this.game.challenges.getChallenge("pacifism").unlocked){
+			this.game.challenges.getChallenge("pacifism").unlocked = true;
+		}
+
 		var unicorns = this.game.resPool.addResEvent("unicorns", this.game.math.binominalRandomInteger(squads, 0.05));
 		if (unicorns > 0) {
 			var unicornMsg = unicorns == 1
@@ -883,6 +919,16 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		this.game.msg(msg, null, "hunt");
 	},
 
+	/**
+	 * Calculates how many squads of hunters the player can afford to send right now,
+	 * with their current amount of catpower.
+	 * @returns number
+	 */
+	getMaxHuntAmt: function() {
+		var huntCost = 100 - this.game.getEffect("huntCatpowerDiscount");
+		return Math.floor(this.game.resPool.get("manpower").value / huntCost);
+	},
+
 	holdFestival: function(amt){
 		var festivalWasInProgress = this.game.calendar.festivalDays > 0;
 
@@ -925,7 +971,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 			this.game.village.clearJobs(false);
 
-		if(this.game.village.leader && this.game.science.getPolicy("theocracy").researched){//hack for theocracy; so that it stop being soo annoying
+		if (this.game.village.leader && this.game.science.getPolicy("theocracy").researched){//hack for theocracy; so that it stop being soo annoying
 			this.game.village.leader.job = "priest";
 			situationJobs["priest"] = situationJobs["priest"] - 1;
 			this.game.village.getJob("priest").value += 1;
@@ -1007,7 +1053,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		var candidates = [];
 		for (var i = 0; i < this.sim.kittens.length; i++) {
 			var tier = -1;
-			if(this.sim.kittens[i].engineerSpeciality != null) {
+			if (this.sim.kittens[i].engineerSpeciality != null) {
 				tier = this.game.workshop.getCraft(this.sim.kittens[i].engineerSpeciality).tier;
 				if (this.sim.kittens[i].rank >= tier) {//if engineer already have required rank, it go to common pool
 					tier = -1;
@@ -1041,7 +1087,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 	},
 
 	getValueModifierPerSkill: function(value){
-		if(this.game.challenges.isActive("anarchy")) {
+		if (this.game.challenges.isActive("anarchy")) {
 			return 0;
 		}
 
@@ -1090,22 +1136,22 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 	},
 
 	getStyledName: function(kitten, isLeaderPanel){
-		if(!this.game.religion.getPact("fractured").val || !this.game.getFeatureFlag("MAUSOLEUM_PACTS")){
+		if (!this.game.religion.getPact("fractured").val || !this.game.getFeatureFlag("MAUSOLEUM_PACTS")){
 		return "<span class='name color-" +
 			((kitten.color && kitten.colors[kitten.color + 1]) ? kitten.colors[kitten.color + 1].color : "none") +
 			" variety-" + ((kitten.variety && kitten.varieties[kitten.variety + 1]) ? kitten.varieties[kitten.variety + 1].style : "none") +
 			"'>" + kitten.name + " " + kitten.surname +
 		"</span>";
 		}
-		else{
-			if(!kitten.randTimer){
+		else {
+			if (!kitten.randTimer){
 				var color_and_variety;
 				color_and_variety = this.game.createRandomVarietyAndColor(this.game.rand(76), this.game.rand(76));
 				kitten.fakeColor = color_and_variety[0];
 				kitten.fakeName = this.game.createRandomName() + this.game.createRandomName(1, "    -/_") + this.game.createRandomName();
 				kitten.fakeVariety = color_and_variety[1];
 				kitten.randTimer = 10 + this.game.rand(41);
-			}else{
+			} else {
 				kitten.randTimer += -1;
 			}
 			return "<span class='name color-" +
@@ -1461,14 +1507,29 @@ dojo.declare("classes.village.Map", null, {
 	// point on map currently being explored
 	currentBiome: null,
 
+	//current map id
+	activeMapId: "cath",
+
 	//level of expedition squad
 	explorersLevel: 0,
 
 	//level of your supply depo
 	hqLevel: 0,
 
-	//hp of a current squad
-	hp: 10,
+	//current explorer squad
+	squad: {
+		level: 1,
+		hp: 50,
+		prevHp: 50,
+		atk: 2,
+		def: 1,
+		agi: 1,
+		str: 1,
+		spd: 1
+	},
+
+	//Combat frame. Every tick frame is increased by X. There are 100 frames in a round, and every combatan can attack once per X fames adjusted for agi.
+	frame: 0,
 
 	//energy/stamina/supplies of your exploration squad
 	energy: 70,
@@ -1490,7 +1551,7 @@ dojo.declare("classes.village.Map", null, {
 	 *   | 												/
 	 *  plain       -\   ...    /->  coast -> stone ocean
 	 *   |
-	 *  village . . .  > hills  ->   mountain 	->
+	 *  village . . .  > hills  ->   mountain 	-> volcano
 	 *   |
 	 *  forest      _/	 ...	\->  swamps
 	 *   |											\
@@ -1507,6 +1568,20 @@ dojo.declare("classes.village.Map", null, {
 	 * level: current exploration level
 	 **/
 
+	//todo: aggregate biomes inline?
+	maps: [{
+			name: "cath",
+			title: "Cath",
+			description: "Cath map description",
+			biomes: ["village", "plains"]
+		},{
+			name: "space",
+			title: "Space",
+			description: "Outer space map description",
+			biomes: ["cath", "redmoon"]
+		},
+	],
+
 	//TODO: should we use TabManager wrapper or perhaps separate metadata handling logic to MetaTable?
 	biomes: [
 	{
@@ -1514,6 +1589,7 @@ dojo.declare("classes.village.Map", null, {
 		title: "Village",
 		desc: "Improves exploration rate of all biomes",
 		terrainPenalty: 1.0,
+		mobLevel: 1,
 		faunaPenalty: 0,
 		unlocked: true,
 	},
@@ -1522,6 +1598,7 @@ dojo.declare("classes.village.Map", null, {
 		title: "Plains",
 		desc: "Improves catnip generation by 1% per level",
 		terrainPenalty: 1.0,
+		mobLevel: 3,
 		unlocked: true,
 		unlocks: {
 			biomes: ["hills"]
@@ -1551,6 +1628,7 @@ dojo.declare("classes.village.Map", null, {
 		name: "hills",
 		title: "Hills",
 		desc: "TBD",
+		mobLevel: 3,
 		terrainPenalty: 1.2,
 		unlocked: false,
 		unlocks: {
@@ -1567,6 +1645,7 @@ dojo.declare("classes.village.Map", null, {
 		name: "forest",
 		title: "Forest",
 		desc: "Improves your wood production by 1% per level",
+		mobLevel: 5,
 		lore: {
 			5: "It smells really nice",
 			10: "The forest is rumored to be endless and covering half of the planet",
@@ -1586,6 +1665,7 @@ dojo.declare("classes.village.Map", null, {
 		name: "boneForest",
 		title: "Bone Forest",
 		terrainPenalty: 1.9,
+		mobLevel: 30,
 		unlocked: false,
 		evaluateLocks: function(game){
 			return game.village.getBiome("forest").level >= 25 && game.village.getBiome("rainForest").level >= 5;
@@ -1598,6 +1678,7 @@ dojo.declare("classes.village.Map", null, {
 		title: "Rain Forest",
 		description: "TBD",
 		terrainPenalty: 1.4,
+		mobLevel: 15,
 		unlocked: false,
 		5: "The trees are so tall you don't see where it ends. When the rain starts it can go for hundreds of years.",
 		10: "In the fog you can see the mountains. The mountains have eyes and sometimes change places."
@@ -1606,6 +1687,7 @@ dojo.declare("classes.village.Map", null, {
 		name: "mountain",
 		title: "Mountain",
 		description: "Improves mineral generation by 1% per level",
+		mobLevel: 35,
 		terrainPenalty: 1.2,
 		lore: {
 			5: "Remember to grab your mandatory 50 meters of rope. The ascend will take quite some time.",
@@ -1631,6 +1713,7 @@ dojo.declare("classes.village.Map", null, {
 		description: "TBD",
 		terrainPenalty: 3.5,
 		unlocked: false,
+		mobLevel: 50,
 		lore: {
 			5: "TBD"
 		},
@@ -1643,6 +1726,7 @@ dojo.declare("classes.village.Map", null, {
 		title: "Desert",
 		description: "Improves solar panel effectiveness by 1% per level",
 		terrainPenalty: 1.5,
+		mobLevel: 7,
 		unlocked: false,
 		lore: {
 			5: "An endless white desert with occasional red rock formations"
@@ -1657,6 +1741,7 @@ dojo.declare("classes.village.Map", null, {
 		name: "bloodDesert",
 		title: "Crimson Desert",
 		description: "",
+		mobLevel: 75,
 		terrainPenalty: 1.5,
 		lore: {
 			5: "There are tales of horrible monsters and lost cities and endless deserts of red sand",
@@ -1667,6 +1752,7 @@ dojo.declare("classes.village.Map", null, {
 	},{
 		name: "swamp",
 		title: "Swamp",
+		mobLevel: 25,
 		description : "Everything that is edible is poisonous and so are the trees and the grass and the air is also poisonous slightly",
 		terrainPenalty: 1.95,
 		lore: {
@@ -1675,7 +1761,27 @@ dojo.declare("classes.village.Map", null, {
 			15: "All you can see are the endless swamplands with lost ziggurats and rotten watchtowers"
 		},
 		unlocked: false
-	}],
+	},
+	//space
+	{
+		name: "cath",
+		title: "Cath",
+		description : "Little pale green dot",
+		terrainPenalty: 10,
+		lore: {
+		},
+		unlocked: true
+	},
+	{
+		name: "redmoon",
+		title: "Redmoon",
+		description : "Red moon description",
+		terrainPenalty: 20,
+		lore: {
+		},
+		unlocked: false
+	}
+	],
 
 	constructor: function(game){
 		this.game = game;
@@ -1693,6 +1799,44 @@ dojo.declare("classes.village.Map", null, {
 	//var toLevel = 100 * (1 + 1.1 * Math.pow((distance - 1), 2.8)) * Math.pow(data.level + 1, 1.18 + 0.1 * distance);
 	toLevel: function(biome){
 		return 100 * (1 + 1.1 * Math.pow(biome.level + 1, 1.18 + 0.1 * biome.terrainPenalty));
+	},
+
+	getMap: function(name){
+		for (var i in this.maps){
+			var map = this.maps[i];
+			if (map.name == name){
+				return map;
+			}
+		}
+		console.error("Could not find map data for '" + name + "'");
+	},
+
+	getBiomes: function(){
+		var mapId = this.activeMapId;
+		if (!mapId){
+			mapId = "cath";
+		}
+		var map = this.getMap(mapId);
+		if (!map){
+			console.error("invalid map id: " + mapId);
+			return [];
+		}
+		//var biomeIds = map.biomes;
+		if (!map.biomeCached){
+			var biomeCached = [];
+			for (var i in this.biomes){
+				var biome = this.biomes[i];
+				if (map.biomes.indexOf(biome.name) != -1){
+					biomeCached.push(biome);
+				}
+			}
+			map.biomeCached = biomeCached;
+		}
+		return map.biomeCached;
+	},
+
+	setMap: function(mapId){
+		this.activeMapId = mapId;
 	},
 
 	update: function(){
@@ -1714,33 +1858,48 @@ dojo.declare("classes.village.Map", null, {
 
 			//5% of chance to spawn enemy per tick
 			if (!biome.fauna || !biome.fauna.length){
-				var spawnChance = 10 * (biome.faunaPenalty || 1.0);
+				var spawnChance = 1000 * (biome.faunaPenalty || 1.0);
 				if (this.game.rand(10000) <= spawnChance){
+					var mobLevel = Math.round(biome.mobLevel * Math.pow(1.05, biome.level));	//adjust by +- 15%
+					
+					
+					var hp = Math.round((this.game.rand(10) + 5) * Math.pow(1.05, mobLevel));
 					biome.fauna = [{
 						title: faunaName,
-						hp: this.game.rand(10) + 5,
-						atk: 1,
-						def: 1
+						level: mobLevel,
+						prevHp: hp,
+						hp: hp,
+						atk: 2.5 * Math.pow(1.05, mobLevel),
+						def: (1 + mobLevel) * Math.pow(1.01, mobLevel),
+						str: (1 + mobLevel) * Math.pow(1.01, mobLevel),
+						agi: (1 + mobLevel) * Math.pow(1.01, mobLevel),
+						spd: (1 + mobLevel) * Math.pow(1.01, mobLevel)
 					}];
 				}
 			}
 		}
-		if(this.currentBiome){
+		//always regenerate HP slowly
+		if (this.squad.hp < this.getMaxHP()) {
+			this.squad.hp += 0.1;
+		}
+
+		//only regenerate stamina outside of the combat
+		if (this.currentBiome){
 			this.explore(this.currentBiome);
 		} else {
 			if (this.energy < this.getMaxEnergy()) {
 				this.energy += 0.5;
 			}
-			if (this.hp < this.getMaxHP()) {
-				this.hp += 0.01;
-			}
+			
 			//cap eneergy and hp
 			if (this.energy > this.getMaxEnergy()) {
 				this.energy = this.getMaxEnergy();
 			}
-			if (this.hp > this.getMaxHP()) {
-				this.hp = this.getMaxHP();
-			}
+			this.squad.hp += 0.1;	//TODO: scale the hp regeneration proportionally to the max HP
+		}
+
+		if (this.squad.hp > this.getMaxHP()) {
+			this.squad.hp = this.getMaxHP();
 		}
 	},
 
@@ -1749,7 +1908,7 @@ dojo.declare("classes.village.Map", null, {
 	},
 
 	getMaxHP: function(){
-		return (10 + this.explorersLevel * 0.1) * (1 + (0.01 * this.explorersLevel));
+		return (10 + this.explorersLevel * 0.2) * (2 + (0.02 * this.explorersLevel));
 	},
 
 	explore: function(biomeId){
@@ -1769,7 +1928,7 @@ dojo.declare("classes.village.Map", null, {
 			//todo: combat round timeout
 			this.combat();
 
-			if (this.hp <= 0){
+			if (this.squad.hp <= 0){
 				this.currentBiome = null;
 				this.game.msg("All contact with the expedition have been lost", "important", "explore");
 			}
@@ -1777,8 +1936,9 @@ dojo.declare("classes.village.Map", null, {
 		}
 
 		if (this.energy <= 0){
-			this.currentBiome = null;
-			this.game.msg("Your explorers have returned from expedition", "important", "explore");
+			this.energy = 0;
+			//this.currentBiome = null;
+			//this.game.msg("Your explorers have returned from expedition", "important", "explore");
 		}
 
 		//get biome level price based on the terrain difficulty and current explored level
@@ -1802,18 +1962,76 @@ dojo.declare("classes.village.Map", null, {
 
 	combat: function(){
 		var biome = this.game.village.getBiome(this.currentBiome);
+
+		this.frame++;
+		if (this.frame > 100){
+			this.frame = 0;
+		}
+
+		//TODO: handle individual attacker speed
+		if (this.frame % 8 != 0){
+			return;
+		}
+
 		for (var i in biome.fauna ){
 			var fauna = biome.fauna[i];
 
-			var combatSpeed = 0.1;
+			/*var combatSpeed = 0.1;
 			if (fauna.hp > 0){
 				this.hp = this.hp - fauna.atk * combatSpeed;
-				fauna.hp -= 2 /*this.atk */ * combatSpeed;
-			}
+				fauna.hp -= 2  * combatSpeed;
+			}*/
+			this.attack(this.squad, fauna);
+			this.attack(fauna, this.squad);
+
 		}
 		biome.fauna = biome.fauna.filter(function(fauna) {
 			return fauna.hp > 0;
 		});
+	},
+
+	getHitRate: function(src, tgt){
+		//formulas are courtesy of proto23
+		//return ((you.agl+agl_bonus/2)*you.efficiency())/((spd+global.current_m.agl+global.current_m.eva))*130+5;
+		var efficiency = src.efficiency ? src.efficiency : 1.0;
+		var hitRate = ((src.agi) * efficiency) / (( /*tgt.spd */ + tgt.agi /*+ tgt.evasion*/)) * 130 + 5;
+
+		if (hitRate > 100){
+			hitRate = 100;
+		}
+		return hitRate;
+	},
+
+	/**
+	 * Returns an EXP value that {src} will get for killing {tgt}
+	 * @param {*} src 
+	 * @param {*} tgt 
+	 * @returns 
+	 */
+	getExp: function(src, tgt){
+		/**
+		 * let df = 1; let ld = this.lvl-you.lvl; 
+		 * if(ld<0) df=Math.sqrt(Math.abs(ld))+Math.abs(ld)*.1*Math.abs(ld);
+    		giveExp(this.exp+(this.exp*this.lvl/10<<0)/df);
+		 */
+
+		var levelDiff = tgt.level - src.level;
+		var df = 1;
+		if (levelDiff < 0){
+			df = Math.sqrt(Math.abs(levelDiff)) + Math.abs(levelDiff) * .1 * Math.abs(levelDiff);
+		}
+		var exp = (src.exp * tgt.lvl / 10 << 0) / df;
+		return exp;
+	},
+
+	attack: function(src, tgt){
+		//hit change
+		var hitChance = this.getHitRate(src, tgt);
+
+		console.log(src, "attacks", tgt, "hit chance:", hitChance);
+		if (this.game.rand(100) <= hitChance) {
+			tgt.hp -= src.atk;
+		}
 	},
 
 	onLevelUp: function(biome){
@@ -1906,7 +2124,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 
 	clickHandler: function(model, event){
 		var map = this.game.village.map;
-		if (map.energy <= 0 || map.hp <= 0)
+		if (map.energy <= 0 || map.squad.hp <= 0)
 		{
 			//Not enough resources to explore
 			return;
@@ -1952,7 +2170,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 	},
 	updateEnabled: function(model) {
 		var map = this.game.village.map;
-		if (map.energy <= 0 || map.hp <= 0)
+		if (map.energy <= 0 || map.squad.hp <= 0)
 		{
 			//Not enough resources to explore
 			model.enabled = false;
@@ -1976,8 +2194,6 @@ dojo.declare("classes.ui.village.BiomeBtn", com.nuclearunicorn.game.ui.ButtonMod
 	getTooltipHTML: function(){
 		return function(controller, model){
 			controller.fetchExtendedModel(model);
-
-			console.log("biome model:", model);
 			var tooltip = dojo.create("div", { className: "tooltip-inner" }, null);
 
 			if (model.tooltipName) {
@@ -2143,8 +2359,9 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 	constructor: function(game){
 		this.setGame(game);
 
-		for (var i in game.village.map.biomes){
-			var biome = game.village.map.biomes[i];
+		var biomes = game.village.map.getBiomes();
+		for (var i in biomes){
+			var biome = biomes[i];
 
 			this.addChild(new classes.ui.village.BiomeBtn({
 				id: biome.name,
@@ -2177,6 +2394,7 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 	},
 
 	render: function(container){
+		var self = this;
 		var map = this.game.village.map;
 		var div = dojo.create("div", null, container);
 
@@ -2185,9 +2403,36 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		this.upgradeHQBtn.render(btnsContainer);
 		//----------------------
 
+		var _div = dojo.create("div", {innerHTML: "Maps", style: { paddingBottom: "10px"} }, div);
+		this.mapsDiv = dojo.create("div", null, _div);
+
+		var currentMap = map.getMap(map.activeMapId);
+		dojo.create("div", {innerHTML: "Current map: " + currentMap.name + "<br>" + currentMap.description }, this.mapsDiv);
+
+		//Map selector (map is an aggregation of biomes)
+		var mapSelect = dojo.create("select", {style: {float: "right"}}, this.mapsDiv);
+		var maps = map.maps;
+		for (var i = 0; i < maps.length; i++) {
+			var _map = maps[i];
+			dojo.create("option", {
+				value: _map.name, innerHTML: _map.title,
+				selected: _map.name == map.activeMapId
+			}, mapSelect);
+		}
+		dojo.connect(mapSelect, "onchange", this.game.village.map, function (event) {
+			var mapId = event.target.value;
+			self.game.village.map.setMap(mapId);
+			self.game.render();	//TODO: figure out proper update logic
+		});
+
 		dojo.create("div", {innerHTML: "Biomes", style: { paddingBottom: "10px"} }, div);
 		//this.villageDiv = dojo.create("div", null, div);
 		this.explorationDiv = dojo.create("div", null, div);
+		this.cancelExplorationLink = dojo.create("a", {
+			href: "#",
+			innerHTML: "[Cancel]"
+		}, div);
+		dojo.connect(this.cancelExplorationLink, "onclick", this, this.cancelExploration);
 
 		/*this.biomeDiv = dojo.create("div", {
 			innerHTML: "Biome: lv. 1, cp. 666/999, penalty: 1.1, etc"
@@ -2197,8 +2442,20 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 			innerHTML: "Explorers: Supplies []"
 		}, div);
 
+		UIUtils.attachTooltip(this.game, this.teamDiv, 0, 150, dojo.hitch(this, function(){
+			var biome = map.currentBiome ? self.game.village.getBiome(map.currentBiome) : null;
+			var tooltipContent = "You are currently not in combat";
+			if (biome && biome.fauna && biome.fauna.length){
+				var fauna =  biome.fauna[0];
+				var hitRate = map.getHitRate(map.squad, fauna);
+				var dodgeRate = 100 - map.getHitRate(fauna, map.squad);
+				var tooltipContent = "Hit chance: " + hitRate.toFixed(0) + "%<br>" + "Dodge chance: " + dodgeRate.toFixed(0) + "%";
+			}
+			return tooltipContent;
+		}));
+
 		this.explorerDiv = dojo.create("div", {
-			innerHTML: "Explorers: lvl 0, HP: " + map.hp.toFixed(1) + "/" + map.getMaxHP()
+			innerHTML: "Explorers: lvl 0, HP: " + map.squad.hp.toFixed(0) + "/" + map.getMaxHP()
 		}, div);
 
 		var btnsContainer = dojo.create("div", {style:{paddingTop:"20px"}}, div);
@@ -2207,9 +2464,13 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		this.inherited(arguments, [btnsContainer]);
 	},
 
+	cancelExploration: function(){
+		var map = this.game.village.map;
+		map.currentBiome = null;
+	},
+
 	update: function() {
 		var map = this.game.village.map;
-
 		var biome = map.currentBiome ? this.game.village.getBiome(map.currentBiome) : null;
 
 		if (biome){
@@ -2220,16 +2481,38 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 
 			this.explorationDiv.innerHTML = "Currently exploring: [" + biome.title + "], " +
 			(biome.cp / toLevel * 100).toFixed(0) +
-			"% [Cancel]";	//<-- link TBD
+			"%";	
+			
 		} else {
-			//this.biomeDiv.innerHTML = "Explorers awaiting at the base";
+			this.explorationDiv.innerHTML = "";
 		}
+		dojo.style(this.cancelExplorationLink, "display", biome ? "" : "none");
 
 		this.upgradeExplorersBtn.update();
 		this.upgradeHQBtn.update();
 
-		this.teamDiv.innerHTML = "Supplies [" + map.energy.toFixed(0) + " days]";
-		this.explorerDiv.innerHTML = "Explorers: HP: " + map.hp.toFixed(1) + "/" + map.getMaxHP().toFixed(1);
+		var hpInfo = "<span class='hp'>" + map.squad.hp.toFixed(0) + "</span>";
+		if (map.squad.prevHp > map.squad.hp){
+			hpInfo = "<span class='hp flash-red'>" + map.squad.hp.toFixed(0) + "</span>";
+			map.squad.prevHp = map.squad.hp;
+		}
+
+		var efficiency = map.energy / map.getMaxEnergy();
+		map.squad.efficiency = efficiency;
+
+		this.teamDiv.innerHTML = "Stamina: " + map.energy.toFixed(0) + " [" + (efficiency * 100).toFixed() + "%]";
+		this.explorerDiv.innerHTML = "Explorers: HP: " + hpInfo + "/" + map.getMaxHP().toFixed(0);
+		if (biome && biome.fauna && biome.fauna.length){
+			var fauna =  biome.fauna[0];
+			var hpInfo = "<span class='hp'>" + fauna.hp.toFixed(0) + "</span>";
+			if (fauna.hp != fauna.prevHp){
+				hpInfo = "<span class='hp flash-red'>" + fauna.hp.toFixed(0) + "</span>";
+				fauna.prevHp = fauna.hp;
+			}
+			this.explorerDiv.innerHTML += " | " + fauna.title + " lvl." + fauna.level + " HP: " + hpInfo;
+		}
+		
+		
 		this.inherited(arguments);
 	}
 });
@@ -2301,7 +2584,7 @@ dojo.declare("classes.village.KittenSim", null, {
 		}
 		//if times isn't 1, we are using fastforward, so frequency should be IGNORED
 		//----- WARNING END -----
-		if(times == 1){
+		if (times == 1){
 			times = frequency; //fastforward should ignore frequency. Non fastforward should take frequency into the account for skill!
 		}
 		var hgSkillModifier = (this.kittens.length <= this.maxKittens)? 1 /(1 + this.game.getLimitedDR(this.game.getEffect("maxKittensRatio"), 1)): 1; //overcrowding makes it not work
@@ -2436,7 +2719,7 @@ dojo.declare("classes.village.KittenSim", null, {
 	sortKittensByFavorite: function(){
 		this.sortKittensByExp();
 		this.kittens.sort(function(a,b) {
-			if(a.favorite == b.favorite){
+			if (a.favorite == b.favorite){
 				return 0;
 			} else {
 				return a.favorite? 1 : -1;
@@ -2447,11 +2730,11 @@ dojo.declare("classes.village.KittenSim", null, {
 	sortKittensByColor: function(){
 		this.sortKittensByExp();
 		this.kittens.sort(function(a,b) {
-			if(a.color && b.color){
+			if (a.color && b.color){
 				//Order it so that colored kittens are at the top
 				return b.color - a.color;
 			}
-			if(a.color || b.color){
+			if (a.color || b.color){
 				return a.color? 1 : -1;
 			}
 			return 0;
@@ -2461,10 +2744,10 @@ dojo.declare("classes.village.KittenSim", null, {
 	sortKittensByVariety: function(){
 		this.sortKittensByExp();
 		this.kittens.sort(function(a,b) {
-			if(a.variety && b.variety){
+			if (a.variety && b.variety){
 				return b.variety - a.variety;
 			}
-			if(a.variety || b.variety) {
+			if (a.variety || b.variety) {
 				return a.variety? 1 : -1;
 			}
 			return 0;
@@ -2591,7 +2874,7 @@ dojo.declare("classes.village.KittenSim", null, {
 					kitten = this.kittens[_workingKitten.id];
 
 				this.game.village.unassignJob(kitten);
-			}else{
+			} else {
 				console.error("failed to remove job", job);
 			}
 		}
@@ -3085,7 +3368,7 @@ dojo.declare("classes.village.LoadoutController", null, {
 
 		var showLoadout = true;
 
-		for(var i = this.loadouts.length - 1; i >= 0; i--){
+		for (var i = this.loadouts.length - 1; i >= 0; i--){
 			var loadout = this.loadouts[i];
 			if (loadout.isDefault){
 				showLoadout = false;
@@ -3093,11 +3376,11 @@ dojo.declare("classes.village.LoadoutController", null, {
 			}
 		}
 
-		if(showLoadout){
-			for(var i = this.defaultLoadouts.length - 1; i >= 0; i--){
+		if (showLoadout){
+			for (var i = this.defaultLoadouts.length - 1; i >= 0; i--){
 				var defaultLoadout = this.defaultLoadouts[i];
 				var newLoadout = new com.nuclearunicorn.game.village.Loadout(this.game, true);
-				for(var j in defaultLoadout){
+				for (var j in defaultLoadout){
 					var property = defaultLoadout[j];
 					newLoadout[j] = property;
 				}
@@ -3127,7 +3410,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 		this.jobs = [];
 		this.engineerJobs = [];
 
-		if(!isDefault){
+		if (!isDefault){
 			this.saveLoadout();
 		}
 		
@@ -3170,14 +3453,14 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 
 	saveLoadout: function(setDefault) {
 
-		if(setDefault){
+		if (setDefault){
 			this.isDefault = false;
 		}
 
 		this.jobs = [];
 		this.engineerJobs = [];
 
-		if(this.game.village.leader){
+		if (this.game.village.leader){
 			this.leaderTrait = this.game.village.leader.trait;
 			this.leaderJob = this.game.village.leader.job;
 		}
@@ -3189,10 +3472,10 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 			}
 		}	
 
-		if(this.jobs && !this.title){
+		if (this.jobs && !this.title){
 			var tempJobs = Object.create(this.jobs);
 			tempJobs = tempJobs.sort(function(a, b){return b.value - a.value;});
-			if(tempJobs[0].value > 0){
+			if (tempJobs[0].value > 0){
 				this.title = this.game.village.getJob(tempJobs[0].name).title;
 			} else {
 				this.title = $I("village.btn.loadout.empty");
@@ -3203,7 +3486,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 		if (this.game.village.getJob("engineer").unlocked) {
 			var crafts = this.game.workshop.crafts;
 			for (var i = crafts.length - 1; i >= 0; i--) {
-				if(crafts[i].value > 0) {
+				if (crafts[i].value > 0) {
 				this.engineerJobs.push({craft: crafts[i].name, value: crafts[i].value});
 				}
 			}
@@ -3219,7 +3502,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 		for (var i in this.jobs) {
 			var job = this.jobs[i];
 
-			if(this.game.village.getJob(job.name).unlocked && job.value > 0) {				
+			if (this.game.village.getJob(job.name).unlocked && job.value > 0) {				
 				loadoutJobsSum += job.value;
 				jobsFiltered.push({name : job.name, value : job.value});
 			}
@@ -3227,10 +3510,10 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 		var jobRatio = kittens.length / loadoutJobsSum;
 
 		var limitedJobs = 0;
-		for(i in jobsFiltered) {	//Check the filtered jobs if they are limited (engineers) and if the kittens assigned would be over the limit, assign the limit and remove the job from the filter
+		for (i in jobsFiltered) {	//Check the filtered jobs if they are limited (engineers) and if the kittens assigned would be over the limit, assign the limit and remove the job from the filter
 			job = jobsFiltered[i];
 			var jobLimit = this.game.village.getJobLimit(job.name);
-			if(jobLimit < job.value * jobRatio){
+			if (jobLimit < job.value * jobRatio){
 				this.game.village.assignJob(this.game.village.getJob(job.name), jobLimit);
 				loadoutJobsSum -= job.value;
 				jobsFiltered.splice(jobsFiltered.indexOf(job), 1);			
@@ -3253,14 +3536,14 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 			job = jobsFiltered[i];
 
 			var valueFiltered = Math.floor(jobRatio * (job.value)) - 1;
-			if(valueFiltered > 0){
+			if (valueFiltered > 0){
 				this.game.village.assignJob(this.game.village.getJob(job.name), valueFiltered);
 			}			
 		}
 
 		var freeKittens = this.game.village.getFreeKittens();
 		
-		if(freeKittens && jobsFiltered.length) { //Assign remaining kittens due to Math.floor being used
+		if (freeKittens && jobsFiltered.length) { //Assign remaining kittens due to Math.floor being used
 			for (var i in jobsFiltered) {
 				if (freeKittens > 0){
 					job = jobsFiltered[i];
@@ -3279,7 +3562,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 		for (var i in this.engineerJobs) {
 			var engineerJob = this.engineerJobs[i];
 
-			if(this.game.workshop.getCraft(engineerJob.craft).unlocked && engineerJob.value > 0) {
+			if (this.game.workshop.getCraft(engineerJob.craft).unlocked && engineerJob.value > 0) {
 				craftsSum += engineerJob.value;
 				craftsFiltered.push(engineerJob);
 			}
@@ -3297,14 +3580,14 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 			var craft = craftsFiltered[i];
 
 			var craftValueFiltered = Math.floor(engineerRatio * (craft.value)) - 1;
-			if(craftValueFiltered > 0){
+			if (craftValueFiltered > 0){
 				this.assignCraftJob(this.game.workshop.getCraft(craft.craft), craftValueFiltered);
 			}
 		}
 
 		var freeEngineers = this.game.village.getFreeEngineers();
 
-		if(freeEngineers && craftsFiltered.length) { //Assign remaining kittens due to Math.floor.	
+		if (freeEngineers && craftsFiltered.length) { //Assign remaining kittens due to Math.floor.	
 			for (var i in craftsFiltered) {
 				if (freeEngineers > 0){
 					this.assignCraftJob(this.game.workshop.getCraft(craftsFiltered[i].craft), 1);
@@ -3317,17 +3600,17 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 
 		//Assign leader
 
-		if(setLeader && this.leaderTrait && !this.game.challenges.isActive("anarchy")) {
+		if (setLeader && this.leaderTrait && !this.game.challenges.isActive("anarchy")) {
 			this.game.village.sim.sortKittensByExp();
 			var theocracy = this.game.science.getPolicy("theocracy");
 			var tempKitten = null;
-			for(var i = kittens.length - 1; i >= 0; i--) {
+			for (var i = kittens.length - 1; i >= 0; i--) {
 				if (kittens[i].trait.name == this.leaderTrait.name) {
-					if((theocracy.researched) && (kittens[i].job != theocracy.requiredLeaderJob)){
+					if ((theocracy.researched) && (kittens[i].job != theocracy.requiredLeaderJob)){
 						continue;
 					}
 
-					if(kittens[i].job == this.leaderJob){
+					if (kittens[i].job == this.leaderJob){
 						this.game.village.makeLeader(kittens[i]);
 						tempKitten = null;
 						break;
@@ -3337,7 +3620,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 					
 				}
 			}
-			if(tempKitten){ // If there is no kitten that has the saved job and trait together, assign the first kitten with the trait. 
+			if (tempKitten){ // If there is no kitten that has the saved job and trait together, assign the first kitten with the trait. 
 				this.game.village.makeLeader(tempKitten);
 			}
 		}
@@ -3363,13 +3646,15 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 	},
 
 	renameLoadout: function(){
-		var textToDisplay = prompt("", this.title);
-		if(!textToDisplay) {
-			return;
-		}
-		textToDisplay = textToDisplay.substring(0,25);
-		this.title = textToDisplay;
-		this.game.render();
+		var self = this;
+		this.game.ui.prompt("", this.title, function(textToDisplay) {
+			if (!textToDisplay) {
+				return;
+			}
+			textToDisplay = textToDisplay.substring(0,25);
+			self.title = textToDisplay;
+			self.game.render();
+		});
 	},
 
 	getLoadoutJobsSum: function(){
@@ -3409,10 +3694,10 @@ dojo.declare("com.nuclearunicorn.game.ui.LoadoutButtonController", com.nuclearun
 		var jobText = "";
 		var textToDisplay = "";
 
-		if(loadout.leaderTrait){
+		if (loadout.leaderTrait){
 			textToDisplay += $I("village.loadout.desc", [loadout.leaderTrait.title]) + "<br>";
 		}
-		if(loadout.leaderJob){
+		if (loadout.leaderJob){
 			textToDisplay += $I("village.loadout.desc2", [this.game.village.getJob(loadout.leaderJob).title]) + "<br>";
 		}
 
@@ -3426,7 +3711,7 @@ dojo.declare("com.nuclearunicorn.game.ui.LoadoutButtonController", com.nuclearun
 		textToDisplay += "<br>" + $I("village.loadout.desc3", [jobText]);
 
 		var engineerText = "";
-		for(var i in loadout.engineerJobs){
+		for (var i in loadout.engineerJobs){
 			var engineerJob = loadout.engineerJobs[i];
 			var engineerJobsSum = loadout.getLoadoutEngineerJobsSum();
 			if (engineerJob.value > 0){
@@ -3434,7 +3719,7 @@ dojo.declare("com.nuclearunicorn.game.ui.LoadoutButtonController", com.nuclearun
 			}
 		}
 		
-		if(engineerText) {
+		if (engineerText) {
 			textToDisplay += $I("village.loadout.desc4", [engineerText]);
 		}
 		
@@ -3596,61 +3881,65 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 	fetchModel: function(options){
 		var model = this.inherited(arguments);
 		var self = this;
-		model.unassignLinks = [
-		  {
-				id: "unassign",
-				title: "[&ndash;]",
-				alt: "minus",
-				handler: function(){
-					self.unassignJobs(model, 1);
-				}
-		   },{
-				id: "unassign5",
-				title: "[-5]",
-				handler: function(){
-					self.unassignJobs(model, 5);
-				}
-		   },{
-				id: "unassign25",
-				title: "[-25]",
-				handler: function(){
-					self.unassignJobs(model, 25);
-				}
-		   },{
-				id: "unassignAll",
-				title: $I("btn.all.unassign"),
-				handler: function(){
-					self.unassignAllJobs(model);
-				}
-		   }];
+		//We will generate links for assigning/unassigning this many kittens:
+		var LINK_AMOUNTS = [5, 25, 100];
 
-		model.assignLinks = [
-			{
-				id: "assign",
-				title: "[+]",
-				alt: "plus",
-				handler: function(){
-					self.assignJobs(model, 1);
+		//Links for +/- 1
+		model.unassignLinks = [{
+			id: "unassign",
+			title: "[&ndash;]",
+			alt: "minus",
+			handler: function() {
+				self.unassignJobs(model, 1);
+			}
+		}];
+		model.assignLinks = [{
+			id: "assign",
+			title: "[+]",
+			alt: "plus",
+			handler: function() {
+				self.assignJobs(model, 1);
+			}
+		}];
+		//Links for +/- amt, where amt is specified in LINK_AMOUNTS
+		//(Generate only if we have at least 2x as many kittens as amt.)
+		LINK_AMOUNTS.forEach(function(amt) {
+			if (this.game.village.getKittens() < amt * 2) {
+				return; //Skip generating links for this amt
+			}
+			if (this.game.village.getJobLimit(model.job.name) < amt) {
+				return; //Doesn't make sense to assign +/- N to a job if the max is less than that...
+			}
+			model.unassignLinks.push({
+				id: "unassign" + amt,
+				title: "[-" + amt + "]",
+				handler: function() {
+					self.unassignJobs(model, amt);
 				}
-		   },{
-				id: "assign5",
-				title: "[+5]",
+			});
+			model.assignLinks.push({
+				id: "assign" + amt,
+				title: "[+" + amt + "]",
 				handler: function(){
-					self.assignJobs(model, 5);
+					self.assignJobs(model, amt);
 				}
-		   },{
-				id: "assign25",
-				title: "[+25]",
-				handler: function(){
-					self.assignJobs(model, 25);
-				}
-		   },{
-				id: "assignall",
-				title: $I("btn.all.assign"),
-				handler: function(){
-					self.assignAllJobs(model);
-				}
-		   }];
+			});
+		});
+		//Links for +/- ALL
+		model.unassignLinks.push({
+			id: "unassignAll",
+			title: $I("btn.all.unassign"),
+			handler: function() {
+				self.unassignAllJobs(model);
+			}
+		});
+		model.assignLinks.push({
+			id: "assignall",
+			title: $I("btn.all.assign"),
+			handler: function() {
+				self.assignAllJobs(model);
+			}
+		});
 		return model;
 	},
 
@@ -3834,7 +4123,7 @@ dojo.declare("classes.ui.village.Census", null, {
 			this.render(this.container);
 		});
 
-		if(!this.statics.sortKittens){
+		if (!this.statics.sortKittens){
 			sim.sortKittensByExp(); //When switching to this tab, the default sorting is used.
 		}
 
@@ -3854,10 +4143,10 @@ dojo.declare("classes.ui.village.Census", null, {
 
 		//--------------- filtering -----------------
 		// Filters work differently from sorting as they skip kittens, because of this a workaround is used
-		if(this.statics.filterJob || this.statics.filterTrait){
+		if (this.statics.filterJob || this.statics.filterTrait){
 			//Count kittens that match the filters:
 			this.numKittensFiltered = 0;
-			for(var i in sim.kittens){
+			for (var i in sim.kittens){
 				var kitten = sim.kittens[i];
 				if (this._applyJobFilter(kitten, this.statics.filterJob) && this._applyTraitFilter(kitten, this.statics.filterTrait)) {
 					//If the kitten passes through both filters, we will display it.
@@ -4091,14 +4380,14 @@ dojo.declare("classes.ui.village.Census", null, {
 				bonus = bonus * 100;
 				bonus = bonus > 0 ? " +" + bonus.toFixed(0) + "%" : "";
 			}
-			if(kitten.job == "engineer" && j == 0){
+			if (kitten.job == "engineer" && j == 0){
 				craftInfo = $I("village.census.crafting") + " ";
 				if (kitten.engineerSpeciality){
 					craftInfo += this.game.workshop.getCraft(kitten.engineerSpeciality).label;
-				} else{
+				} else {
 					craftInfo += $I("village.census.crafting.nothing");
 				}
-			} else{
+			} else {
 				craftInfo = "";
 			}
 
@@ -4177,7 +4466,7 @@ dojo.declare("classes.ui.village.Census", null, {
 			event.preventDefault();
 			var game = census.game;
 
-			if(leader.job){
+			if (leader.job){
 				game.village.unassignJob(leader);
 				game.village.updateResourceProduction();
 				game.render();
@@ -4265,7 +4554,7 @@ dojo.declare("classes.ui.village.Census", null, {
 		}, pageSwitchDiv);
 
 		dojo.connect(nextHref, "onclick", this, dojo.partial(function(){
-			if(this.numKittensFiltered - 10 > this.statics.startKitten){
+			if (this.numKittensFiltered - 10 > this.statics.startKitten){
 				this.statics.startKitten += 10;
 			}
 			this.render(this.container);
@@ -4296,7 +4585,7 @@ dojo.declare("classes.ui.village.Census", null, {
 
 		dojo.connect(previousHref, "onclick", this, dojo.partial(function(){
 			this.statics.startKitten -= 10;
-			if(this.statics.startKitten < 0){
+			if (this.statics.startKitten < 0){
 				this.statics.startKitten = 0;
 			}
 			this.render(this.container);
@@ -4364,6 +4653,92 @@ dojo.declare("classes.village.ui.VillageButtonController", com.nuclearunicorn.ga
 		result.simplePrices = false;
 		result.hasResourceHover = true;
 		return result;
+	}
+});
+
+//Blatant copy of MultiLinkBtn logic from religion.js
+dojo.declare("classes.village.ui.HuntBtn", com.nuclearunicorn.game.ui.ButtonModern, {
+	huntFifthHref: null,
+	huntHalfHref: null,
+	huntAllHref: null,
+
+	renderLinks: function() {
+		this.huntAllHref = this.addLink(this.model.allLink);
+		this.huntHalfHref = this.addLink(this.model.halfLink);
+		this.huntFifthHref = this.addLink(this.model.fifthLink);
+	},
+	update: function() {
+		this.inherited(arguments);
+		this.updateLink(this.huntFifthHref, this.model.fifthLink);
+		this.updateLink(this.huntHalfHref, this.model.halfLink);
+		this.updateLink(this.huntAllHref, this.model.allLink);
+	}
+});
+
+dojo.declare("classes.village.ui.HuntButtonController", classes.village.ui.VillageButtonController, {
+	fetchModel: function(options) {
+		var model = this.inherited(arguments);
+		var village = this.game.village;
+		//We use bind(village) to ensure that the huntFraction functions work properly.
+		model.fifthLink = this._newLink(model, 5, village.huntFifth.bind(village));
+		model.halfLink = this._newLink(model, 2, village.huntHalf.bind(village));
+		model.allLink = this._newLink(model, 1, village.huntAll.bind(village));
+		return model;
+	},
+
+	_newLink: function(model, divider, handlerFunc) {
+		var squadsToSend = Math.floor(this.game.village.getMaxHuntAmt() / divider);
+		var self = this;
+		return {
+			visible: this.game.opts.showNonApplicableButtons || squadsToSend > 1,
+			title: divider == 1
+				? $I("btn.all.minor")
+				: this.game.opts.usePercentageConsumptionValues
+					? (100 / divider) + "%"
+					: "x" + this.game.getDisplayValueExt(squadsToSend, null, false, 0),
+			tooltip:  divider == 1 || this.game.opts.usePercentageConsumptionValues ? "x" + this.game.getDisplayValueExt(squadsToSend, null, false, 0) : (100 / divider) + "%",
+			handler: handlerFunc
+		};
+	},
+
+	updateVisible: function (model) {
+		model.visible = this.game.science.get("archery").researched && (!this.game.challenges.isActive("pacifism"));
+	},
+
+	//Works with CTRL/SHIFT
+	buyItem: function(model, event /*optional parameter*/) {
+		if (!event) { event = {}; }
+		var batchSize = this.game.opts.batchSize || 10;
+		var squadCount = event.shiftKey ? Infinity : (event.ctrlKey || event.metaKey ? batchSize : 1);
+		//Cap squadCount based on the resources the player ACTUALLY has right now.
+		squadCount = Math.min(this.game.village.getMaxHuntAmt(), squadCount);
+
+		if (squadCount < 1) {
+			return {
+				itemBought: false,
+				reason: "cannot-afford"
+			};
+		}
+
+		this.payPriceMultiple(model, squadCount);
+		this.game.village.gainHuntRes(squadCount);
+		return {
+			itemBought: true,
+			reason: "paid-for"
+		};
+	},
+
+	/**
+	 * Very similar to the payPrice function except we can specify how many times to pay it.
+	 * @param model	The model for the item whose price we will pay
+	 * @param multiplier	number	All price values will be multiplied by this amount.
+	 */
+	payPriceMultiple: function(model, multiplier) {
+		var multiPrices = [];
+		this.getPrices(model).forEach(function(price) { //Populate multiPrices based on model's prices
+			multiPrices.push({ name: price.name, val: price.val * multiplier });
+		});
+		this.game.resPool.payPrices(multiPrices);
 	}
 });
 
@@ -4524,7 +4899,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		var defaultOn = false;
 		for (var i = 0; i < this.game.village.loadoutController.loadouts.length; i++){
 			var loadout = this.game.village.loadoutController.loadouts[i];
-			if(loadout.isDefault){
+			if (loadout.isDefault){
 				defaultOn = true;
 			}
 
@@ -4554,7 +4929,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		});
 
 		var toggleText = $I("village.loadout.show.default");
-		if(defaultOn){
+		if (defaultOn){
 			toggleText = $I("village.loadout.remove.default");
 		}
 
@@ -4647,18 +5022,14 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		var controlsTd = dojo.create("td", {}, tr);
 		var manpowerCost = 100 - this.game.getEffect("huntCatpowerDiscount");
 		//hunt
-		var huntBtn = new com.nuclearunicorn.game.ui.ButtonModern({
+		var huntBtn = new classes.village.ui.HuntBtn({
 				name: $I("village.btn.hunters"),
 				description: $I("village.btn.hunters.desc"),
 				handler: dojo.hitch(this, function(){
 					this.sendHunterSquad();
 				}),
 				prices: [{ name : "manpower", val: manpowerCost }],
-				controller: new classes.village.ui.VillageButtonController(this.game, {
-					updateVisible: function (model) {
-						model.visible = this.game.science.get("archery").researched && (!this.game.challenges.isActive("pacifism"));
-					}
-				})
+				controller: new classes.village.ui.HuntButtonController(this.game)
 		}, this.game);
 		huntBtn.render(controlsTd);
 		this.huntBtn = huntBtn;

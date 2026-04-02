@@ -296,7 +296,7 @@ body.scheme_gold {
 /******************** TOOLTIP ********************/
 /*************************************************/
 .scheme_gold #tooltip,
-.scheme_gold .tooltip-block > div {
+.scheme_gold .tooltip-content{
     background-color: #383838;
     color: #9F9E94; /* tooltip windows == left column : left text */
     border-color:  rgba(223, 206, 153, 0.8); /* color #DFCE99 */
@@ -305,7 +305,7 @@ body.scheme_gold {
                  0 1px 2px rgba(200, 200, 200, 0.1);
     text-shadow: 0 1px 1px #181818;
 }
-.scheme_gold .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_gold .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_gold .button_tooltip {

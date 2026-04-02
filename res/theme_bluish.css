@@ -10,9 +10,11 @@
 /* ******************************************** */
 
 body.scheme_bluish {
-	background-color: #141936;
+	--page-background-color:#141936;
+	--text-color: #8f94ac;
 	color-scheme: dark;
 }
+
 .scheme_bluish #gamePageContainer,
 .scheme_bluish select,
 .scheme_bluish .btn,
@@ -343,7 +345,7 @@ body.scheme_bluish {
 	/* font-size: 13px; /* for center tooltip except title, effects and flavor */
 /* } */
 .scheme_bluish #tooltip,
-.scheme_bluish .tooltip-block > div {
+.scheme_bluish .tooltip-content{
 	/* default padding-left: 3px; */
 	padding-bottom: 5px;
 	background: linear-gradient(90deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), #141936;
@@ -352,7 +354,7 @@ body.scheme_bluish {
 	border-radius: 7px;
 	/* margin-left: 20px; /* for offset tooltip due to larger buttons .btn.modern */
 }
-.scheme_bluish .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_bluish .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_bluish .button_tooltip {

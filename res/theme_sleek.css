@@ -4,7 +4,11 @@
  *			Sleek 0.1 Beta Theme © Kida
  */
 
-
+.scheme_sleek,
+.scheme_sleek .help {
+	color-scheme: dark;
+	--text-color: #DCDCDC;
+}
 
 /*Theme-Dark Import*/
 .scheme_sleek #autosaveTooltip {

@@ -1242,6 +1242,40 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 			effect += effectMeta;
 		}
 		return effect;
+	},
+
+	undo: function(data) {
+		if (data.action === "build") {
+			var bld = this.getBuilding(data.metaId);
+			var props = {
+				id:            bld.name,
+				name:           bld.label,
+				description:    bld.description,
+				building:       bld.name
+			};
+			props.controller = new classes.ui.space.PlanetBuildingBtnController(this.game);
+			var model = props.controller.fetchModel(props);
+			model.refundPercentage = 1.0;	//full refund for undo
+			props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
+		} else if (data.action === "sell") {
+			var bld = this.getBuilding(data.metaId);
+			var props = {
+				id:            bld.name,
+				name:           bld.label,
+				description:    bld.description,
+				building:       bld.name
+			};
+			props.controller = new classes.ui.space.PlanetBuildingBtnController(this.game);
+			var model = props.controller.fetchModel(props);
+
+			//The meat of the function: un-sell the buildings.
+			//Since buildings are sold for a 50% refund, we need to un-refund everything
+			for (var i = 0; i < data.val; i += 1) {
+				props.controller.incrementValue(model);
+				props.controller.payPriceForUndoRefund(model);
+			}
+			this.game.render();
+		}
 	}
 });
 
@@ -1252,6 +1286,10 @@ dojo.declare("com.nuclearunicorn.game.ui.SpaceProgramBtnController", com.nuclear
         }
         return model.metaCached;
     },
+
+	getType: function(){
+		return "spaceMission";
+	},
 
     getPrices: function(model) {
         var prices = dojo.clone(model.metadata.prices);
@@ -1380,6 +1418,32 @@ dojo.declare("classes.ui.space.PlanetBuildingBtnController", com.nuclearunicorn.
 		}
 
 		return prices;
+	},
+
+	build: function(model, opts) {
+		var counter = this.inherited(arguments);
+		if (!counter) {
+			return; //Skip undo if nothing was built
+		}
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.game.space.id, {
+			action: "build",
+			metaId: model.metadata.name,
+			val: counter
+		}, $I("ui.undo.bld.build", [counter, model.metadata.label]));
+	},
+
+	sell: function(event, model){
+		var amtSold = this.inherited(arguments);
+
+		if (amtSold > 0) {
+			var undo = this.game.registerUndoChange();
+			undo.addEvent(this.game.space.id, {
+				action: "sell",
+				metaId: model.metadata.name,
+				val: amtSold
+			}, $I("ui.undo.bld.sell", [amtSold, model.metadata.label]));
+		}
 	}
 });
 
@@ -1419,10 +1483,10 @@ dojo.declare("classes.ui.space.FurthestRingPanel", [classes.ui.space.PlanetPanel
 	},
 
 	render: function(container){
-		var wrapper = new mixin.IReactAware(WChiral, this.game);
+		//var wrapper = new mixin.IReactAware(WChiral, this.game);
 
 		var content = this.inherited(arguments);
-		wrapper.render(content);
+		//wrapper.render(content);
 
 		return content;
 	}

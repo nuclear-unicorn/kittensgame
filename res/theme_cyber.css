@@ -24,9 +24,13 @@
 /* ******************* GAME ******************* */
 /* ******************************************** */
 
-body.scheme_cyber {
-	background-color: #000000;
+.scheme_cyber,
+.scheme_cyber .help {
+	color-scheme: dark;
+	--page-background-color: #000000;
+	--text-color: #606060;
 }
+
 .scheme_cyber #gamePageContainer,
 .scheme_cyber select,
 .scheme_cyber .btn,
@@ -385,7 +389,7 @@ body.scheme_cyber {
 	/* font-size: 13px; /* for center tooltip except title, effects and flavor */
 /* } */
 .scheme_cyber #tooltip,
-.scheme_cyber .tooltip-block > div {
+.scheme_cyber .tooltip-content{
 	padding-left: 9px; /* default padding-left: 3px; */
 	padding-bottom: 5px;
 	background: padding-box rgba(16, 17, 18, 0.85);
@@ -399,7 +403,7 @@ body.scheme_cyber {
 	border-image-repeat: round;
 	/* margin-left: 20px; /* for offset tooltip due to larger buttons .btn.modern */
 }
-.scheme_cyber .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_cyber .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_cyber .button_tooltip {

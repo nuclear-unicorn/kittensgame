@@ -451,7 +451,7 @@ body.scheme_spooky.with_background_image {
 /* ******************* TOOLTIP ******************* */
 /* *********************************************** */
 .scheme_spooky #tooltip,
-.scheme_spooky .tooltip-block > div {
+.scheme_spooky .tooltip-content{
 	/* default padding-left: 3px; */
 	padding-bottom: 5px;
 	background: transparent;
@@ -464,7 +464,7 @@ body.scheme_spooky.with_background_image {
 	border-image-outset: 0 1px 2px 1px;
 	border-image-repeat: stretch;
 }
-.scheme_spooky .tooltip-block > div { /* tooltip on "?" top right column */
+.scheme_spooky .tooltip-content{ /* tooltip on "?" top right column */
 	padding: 5px;
 }
 .scheme_spooky .button_tooltip {

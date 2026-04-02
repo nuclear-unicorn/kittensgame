@@ -5,18 +5,16 @@
 .scheme_dark,
 .scheme_dark .help {
 	color: #DCDCDC;
-	background-color: #201F1D;
 	color-scheme: dark;
+	--page-background-color:#201F1D;
+	--button-border-color: #b8753a;
+	--text-color: #DCDCDC;
 }
 
 .scheme_dark #autosaveTooltip {
 	color: #DCDCDC;
 }
 
-.scheme_dark .btn {
-	color: #DCDCDC;
-	border: solid 1px rgb(184, 117, 58);
-}
 
 .scheme_dark .btn.disabled {
 	color: #DCDCDC;

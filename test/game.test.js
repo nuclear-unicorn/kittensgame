@@ -570,7 +570,7 @@ test("Queue should correctly add and remove items", () => {
      */
 
     //test shift key option
-    queue.addToQueue("field", "buildings", "N/A", true /*all available*/);
+    queue.addToQueue("field", "buildings", "N/A", { shiftKey: true } /*all available*/);
     expect(queue.queueLength()).toBe(13);
     expect(queue.queueItems.length).toBe(2);
 

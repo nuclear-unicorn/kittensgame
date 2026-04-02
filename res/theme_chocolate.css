@@ -7,10 +7,11 @@
 /**********************************************/
 /******************** GAME ********************/
 /**********************************************/
-body.scheme_chocolate,
-.scheme_chocolate .help,
-.scheme_chocolate .dialog {
+.scheme_chocolate,
+.scheme_chocolate .help {
 	background-color: #403022;
+	--page-background-color: #403022;
+	--text-color: #e0c8af;
 }
 body.scheme_chocolate.with_background_image {
 	background:	repeat-x local top left url('img/theme_chocolate_topbar_background.png'), #403022; /* source of images for graphic design : https://pngtree.com/freepng/set-of-cloud-collection-vector_3575869.html Volkeyrn: permanent premium member */
@@ -321,7 +322,7 @@ body.scheme_chocolate.with_background_image {
 /******************** TOOLTIP ********************/
 /*************************************************/
 .scheme_chocolate #tooltip,
-.scheme_chocolate .tooltip-block > div {
+.scheme_chocolate .tooltip-content{
 	background-color: #42302d;
 	color: #a0a0a0; /* tooltip windows == left column : left text */
 	border-style: solid;
@@ -331,7 +332,7 @@ body.scheme_chocolate.with_background_image {
 	margin-left: 15px; /* for offset tooltip due to larger buttons .btn.modern */
 	box-shadow: -1px -1px 2px #584230, 1px 1px 2px #241b13;
 }
-.scheme_chocolate .tooltip-block > div {
+.scheme_chocolate .tooltip-content{
 	padding: 5px;
 }
 .scheme_chocolate .button_tooltip {

@@ -11,9 +11,11 @@
 /* ******************************************** */
 /* ******************* GAME ******************* */
 /* ******************************************** */
-body.scheme_tombstone {
-	background-color: #27282c;
+.scheme_tombstone,
+.scheme_tombstone .help {
 	color-scheme: dark;
+	--page-background-color:#27282c;
+	--text-color: #b7b7b9;
 }
 .scheme_tombstone #gamePageContainer,
 .scheme_tombstone select,
@@ -359,7 +361,7 @@ body.scheme_tombstone {
 	/* font-size: 13px; /* for center tooltip except title, effects and flavor */
 /* } */
 .scheme_tombstone #tooltip,
-.scheme_tombstone .tooltip-block > div {
+.scheme_tombstone .tooltip-content{
 	/* default padding-left: 3px; */
 	padding-bottom: 5px;
 	background: #232428;
@@ -367,7 +369,7 @@ body.scheme_tombstone {
 	border: 1px solid #5b5b5e;
 	border-radius: 5px;
 }
-.scheme_tombstone .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_tombstone .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_tombstone .button_tooltip {

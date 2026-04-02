@@ -7,9 +7,12 @@
 /* ******************************************** */
 /* ******************* GAME ******************* */
 /* ******************************************** */
-body.scheme_unicorn {
-	background-color: #e8dbc7;
+.scheme_unicorn,
+.scheme_unicorn .help {
+	--page-background-color: #e8dbc7;
+	--text-color: #454e58;
 }
+
 body.scheme_unicorn.with_background_image {
 	background: no-repeat fixed bottom 3px right url('img/theme_unicorn_01.png'), #e8dbc7; /* source: https://pngtree.com/freepng/unicorn_3741926.html Volkeyrn: permanent premium member */
 }
@@ -296,7 +299,7 @@ body.scheme_unicorn.with_background_image {
 /* ******************* TOOLTIP ******************* */
 /* *********************************************** */
 .scheme_unicorn #tooltip,
-.scheme_unicorn .tooltip-block > div {
+.scheme_unicorn .tooltip-content{
 	background-color: #223144;
 	color: #798797; /* tooltip windows == left column : left text */
 	border-style: groove;
@@ -306,7 +309,7 @@ body.scheme_unicorn.with_background_image {
 	box-shadow: 4px 4px 9px #111922;
 	margin-left: 5px; /* for offset tooltip due to larger buttons .btn.modern */
 }
-.scheme_unicorn .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_unicorn .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_unicorn .button_tooltip {
