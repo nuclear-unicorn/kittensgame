@@ -713,14 +713,14 @@ test("Unicorn Tears Challenge--Resource caps should be enforced, & unicorn sacri
     let callbackFunction = function() {};
 
     //The smart "sacrifice all unicorns" algorithm should have sacrificed 4 batches to give us 110 tears plus (34*3) pollution
-    expect(controller._canAfford(model)).toBe(4);
+    expect(controller.getCanAfford(model)).toBe(4);
     controller.transform(model, 1 /*divider, 1 means "all"*/, null /*event*/, callbackFunction);
     expect(unicornsSacrificed).toBe(10000); //4 batches' worth
     expect(tear.value == tear.maxValue).toBe(true);
     expect(game.bld.cathPollution).toBeCloseTo(1497.3 + 102); //Previous pollution plus what we just made
 
     //Even though we're at max tears, we should still be able to sacrifice 1 batch of unicorns for no gain:
-    expect(controller._canAfford(model)).toBe(1);
+    expect(controller.getCanAfford(model)).toBe(1);
     controller.transform(model, 1 /*divider, 1 means "all"*/, null /*event*/, callbackFunction);
     expect(unicornsSacrificed).toBe(12500); //+1 batch
     expect(tear.value == tear.maxValue).toBe(true);

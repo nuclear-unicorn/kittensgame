@@ -10,6 +10,9 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	baseGoldCost: 15,
 	baseManpowerCost: 50,
 
+	nonRandomTrades: 0, //Way to prevent using the undo feature to exploit RNG
+	nonRandomResetDays: 0, //nonRandomTrades will get reset to 0 after enough game-days have passed
+
 	races: [{
 		name: "lizards",
 		title: $I("trade.race.lizards"),
@@ -206,7 +209,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	},
 
 	get: function(raceName){
-		for( var i = 0; i < this.races.length; i++){
+		for ( var i = 0; i < this.races.length; i++){
 			if (this.races[i].name == raceName){
 				return this.races[i];
 			}
@@ -229,6 +232,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			race.energy = 0;
 			race.duration = 0;
 		}
+		this.nonRandomTrades = 0;
+		this.nonRandomResetDays = 0;
 	},
 
 	save: function(saveData){
@@ -247,6 +252,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			this.game.bld.loadMetadata(this.races, saveData.diplomacy.races);
 			this.get("leviathans").autoPinned = saveData.diplomacy.autoPinLeviathans || false;
 		}
+		this.nonRandomTrades = 0; //Don't preserve this in the save-state (has very little meaningful gameplay value)
+		this.nonRandomResetDays = 0;
 	},
 
 	hasUnlockedRaces: function(){
@@ -276,7 +283,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			if (!this.races[i].unlocked ){
 				if (!this.races[i].hidden){
 					unmetRaces.push(this.races[i]);
-				}else{
+				} else {
 					hasLockedHiddenRaces = true;
 				}
 			}
@@ -343,7 +350,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			this.game.msg($I("trade.msg.emissary", [race.title]), "notice");
 		}
 
-		 if(this.game.ironWill && this.game.challenges.isActive('blackSky')) {
+		 if (this.game.ironWill && this.game.challenges.isActive('blackSky')) {
 
 			// BSK+IW emissaries
 			var sharks = this.get("sharks");
@@ -369,7 +376,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 			// BSK+IW discount!
 			for (var i = 0; i < griffins.buys.length; i++) {
-				if(griffins.buys[i].name == "wood") {
+				if (griffins.buys[i].name == "wood") {
 					griffins.buys[i].val = 400;
 				}
 			}
@@ -377,7 +384,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			// sharks got science!
 			for (var i = 0; i < sharks.sells.length; i++) {
 			    var sellResource = sharks.sells[i];
-				if(sellResource["name"] == "catnip") {
+				if (sellResource["name"] == "catnip") {
 					sellResource.name = "science";
 					sellResource.value = 80;
 					sellResource.seasons = {
@@ -395,7 +402,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		var sharks = this.get("sharks");
 		var griffins = this.get("griffins");
 		for (var i = 0; i < griffins.buys.length; i++) {
-			if(griffins.buys[i].name == "wood") {
+			if (griffins.buys[i].name == "wood") {
 				griffins.buys[i].val = 500;
 			}
 		}
@@ -403,7 +410,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		this.baseManpowerCost = this.defaultManpowerCost;
 		for (var i = 0; i < sharks.sells.length; i++) {
 			var sellResource = sharks.sells[i];
-			if(sellResource["name"] == "science") {
+			if (sellResource["name"] == "science") {
 				sellResource.name = "catnip";
 				sellResource.value = 35000;
 				sellResource.seasons = {
@@ -423,14 +430,22 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
         elders.unlocked = true;
         // 5 years + 1 year per energy unit
-        elders.duration = this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear *  (5  + elders.energy);
+        elders.duration = this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear *  (5  + Math.floor(elders.energy));
 
-		if(elders.autoPinned){elders.pinned = true;}
+		if (elders.autoPinned){elders.pinned = true;}
 
         this.game.msg($I("trade.msg.elders"), "urgent", "elders");
     },
 
-    onNewDay: function(){
+	onNewDay: function() {
+		//nonRandomTrades is an anti-exploit mechanism
+		//But if enough time elapses, it's safe to assume the player is not trying to exploit it.
+		if (this.nonRandomResetDays > 0) {
+			this.nonRandomResetDays--;
+		} else {
+			this.nonRandomTrades = 0;
+		}
+
         var elders = this.get("leviathans");
         if (elders.duration <= 0  && elders.unlocked){
 			elders.unlocked = false;
@@ -446,27 +461,132 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
         }
 	},
 
+	undo: function(data) {
+		if (data.action == "buildEmbassy") {
+			var props = {
+				race: data.race,
+				prices: data.race.embassyPrices
+			};
+			props.controller = new classes.diplomacy.ui.EmbassyButtonController(this.game);
+			var model = props.controller.fetchModel(props);
+			model.refundPercentage = 1.0;	//full refund for undo
+			props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
+
+			this.triggerOnEmbassyCountChanged();
+		} else if (data.action == "trade") {
+			//The player can only undo the trade if they haven't spent any of the resources gained this way.
+			//If they cannot return the merchandise, they cannot get a refund.
+			var canUndo = true;
+			for (var resName in data.resGained) {
+				var required = data.resGained[resName];
+				var have = this.game.resPool.get(resName).value;
+				if (have < required) {
+					this.game.msg($I("trade.undo.missing", [this.game.resPool.get(resName).title]), "alert", "undo", true /*noBullet*/);
+					canUndo = false;
+				}
+			}
+			if (!canUndo) {
+				return;
+			}
+			//Else, we have determined that it is valid to undo this trade.
+			for (var resName in data.resGained) { //Un-gain trade resources
+				this.game.resPool.addResEvent(resName, -data.resGained[resName]);
+			}
+			for (var resName in data.resSpent) { //Un-spend the requirements
+				this.game.resPool.addResEvent(resName, data.resSpent[resName]);
+			}
+			this.nonRandomTrades += data.val; //Prevent exploiting RNG
+			this.nonRandomResetDays = 45; //After some real-life time (45 game-days = 90 IRL-sec) has passed, reset the anti-exploit mechanism
+		}
+	},
+
+	//Some unlocks require embassies.
+	//Some upgrades care about the number of embassies there are.
+	//Call this function to recalculate this, as needed:
+	triggerOnEmbassyCountChanged: function() {
+		this.game.upgrade({policies: ["lizardRelationsDiplomats", "nagaRelationsArchitects", "spiderRelationsGeologists"]});
+		this.game.science.unlockRelations();
+		this.game.ui.render();
+	},
+
+	/**
+	 * Call this function when performing a trade (one or multiple).
+	 * This function decides how many of those trades fall into these 3 categories:
+	 * 	* Failed (because the {race} hate you for no reason)
+	 * 	* Normal
+	 * 	* Bonus (because the {race} think your kittens are adorable :3)
+	 * This function has no side effects (the calling function is expected to handle those).
+	 * @param standing number	Encodes how much the {race} like you.
+	 *                       	If less than 0, trades have a chance to fail.  For example, -0.2 means 20% chance of failure.
+	 *                       	If exactly 0, trades are always normal.
+	 *                       	If greater than 0, trades have a chance to grant bonus resources.  For example, 0.15 means 15% chance of bonus resources.
+	 * @param numTrades number	The total number of trades we're going to do.  It's expected to be a nonnegative integer.
+	 * @param nonRandom number	The number of trades suffering from a "non-random" penalty.  (Usually 0, but sometimes positive.)
+	 *                        	These ones ignore randomness & always pick the worst option when given a choice.
+	 * @return an object with 3 numeric fields: failed, normal, bonus
+	 */
+	calculateFailedNormalBonusTrades: function(standing, numTrades, nonRandom) {
+		var tradeResults = { failed: 0, normal: 0, bonus: 0 };
+		//Validate inputs
+		if (typeof(standing) !== "number" || typeof(numTrades) !== "number" || typeof(nonRandom) !== "number") {
+			console.error("Error in calculateFailedNormalBonusTrades: Parameter was of wrong type (requires 3 numbers).");
+			return tradeResults;
+		}
+		if (numTrades < 0 || nonRandom < 0) {
+			console.error("Error in calculateFailedNormalBonusTrades: numTrades & nonRandom must be nonnegative.");
+			//Ideally, they should also be integers, but I'm too lazy to check that now.
+			return tradeResults;
+		}
+
+		if (standing < 0) { //We have a chance to fail some trades!
+			tradeResults.failed = Math.min(nonRandom, numTrades); //The first nonRandom are guaranteed to fail
+			var randomEligible = Math.max(numTrades - nonRandom, 0); //Use randomness for the remaining
+			tradeResults.failed += this.game.math.binominalRandomInteger(randomEligible, -standing); //Roll
+			tradeResults.normal = numTrades - tradeResults.failed; //If a trade didn't fail, then it was normal.
+		} else if (standing > 0) { //We have a chance to have some bonus trades!  :3 are cute, after all
+			if (standing >= 1) { //All trades are guaranteed to have bonuses
+				tradeResults.bonus = numTrades;
+			} else { //Use randomness
+				var randomEligible = Math.max(numTrades - nonRandom, 0); //Randomness is for non-nonRandom trades only
+				tradeResults.bonus = this.game.math.binominalRandomInteger(randomEligible, standing); //Roll
+				tradeResults.normal = numTrades - tradeResults.bonus; //If a trade isn't bonus, then it's normal
+			}
+		} else { //standing is exactly equal to 0
+			//Trades will not ever fail or have bonuses.  There is no need for randomness.
+			tradeResults.normal = numTrades;
+		}
+		//Verify that things add up:
+		if (tradeResults.failed + tradeResults.normal + tradeResults.bonus != numTrades) {
+			console.error("Error in calculateFailedNormalBonusTrades: Something didn't add up correctly!");
+		}
+		return tradeResults;
+	},
+
 	tradeImpl: function(race, totalTradeAmount) {
 
 		 // BSK early unlocks!
-		 if(this.game.ironWill && this.game.challenges.isActive('blackSky')) {
-			if(race.name == "griffins") {
+		 if (this.game.ironWill && this.game.challenges.isActive('blackSky')) {
+			if (race.name == "griffins") {
 				this.game.resPool.get('iron').unlocked = true;
 			}
-			if(race.name == "sharks") {
+			if (race.name == "sharks") {
 				this.game.resPool.get('science').unlocked = true;
 			}
 		 }
 
 
-		if(race.unlocks){
+		if (race.unlocks){
             this.game.unlock(race.unlocks);
 		}
 		var printMessages = totalTradeAmount == 1;
-		var standing = this.getFinalStanding(race);
 
-		var failedTradeAmount = standing < 0 ? this.game.math.binominalRandomInteger(totalTradeAmount, -standing) : 0;
-		var successfullTradeAmount = totalTradeAmount - failedTradeAmount;
+		//Decide how many of these trades fail (because they hate us) or give bonus resources (because we're adorable)
+		var tradeResults = this.calculateFailedNormalBonusTrades(this.getFinalStanding(race), totalTradeAmount, this.nonRandomTrades);
+		//If there are failures, they may have been caused by nonRandomTrades.
+		this.nonRandomTrades = Math.max(this.nonRandomTrades - tradeResults.failed, 0);
+		var normalTradeAmount = tradeResults.normal;
+		var bonusTradeAmount = tradeResults.bonus;
+		var successfullTradeAmount = normalTradeAmount + bonusTradeAmount;
 
 		if (successfullTradeAmount == 0) {
 			if (printMessages) {
@@ -476,10 +596,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 
 		// at most 1 year + 1 season per energy unit
-		race.duration = Math.min(race.duration, this.game.calendar.daysPerSeason * (this.game.calendar.seasonsPerYear + race.energy));
-
-		var bonusTradeAmount = standing > 0 ? this.game.math.binominalRandomInteger(totalTradeAmount, standing) : 0;
-		var normalTradeAmount = successfullTradeAmount - bonusTradeAmount;
+		race.duration = Math.min(race.duration, this.game.calendar.daysPerSeason * (this.game.calendar.seasonsPerYear + Math.floor(race.energy)));
 
 		if (bonusTradeAmount > 0) {
 			if (printMessages) {
@@ -488,7 +605,11 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 
 		var boughtResources = {};
-		var tradeRatio = 1 + this.game.diplomacy.getTradeRatio() + this.game.diplomacy.calculateTradeBonusFromPolicies(race.name, this.game) + this.game.challenges.getChallenge("pacifism").getTradeBonusEffect(this.game);
+		var tradeRatio = 
+			1
+			+ this.game.diplomacy.getTradeRatio()
+			+ this.game.diplomacy.calculateTradeBonusFromPolicies(race.name, this.game)
+			+ this.game.challenges.getChallenge("pacifism").getTradeBonusEffect(this.game);
 		var raceRatio = 1 + race.energy * 0.02;
 		var currentSeason = this.game.calendar.getCurSeason().name;
 
@@ -499,13 +620,26 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				continue;
 			}
 
-			var resourcePassedNormalTradeAmount = this.game.math.binominalRandomInteger(normalTradeAmount, tradeChance);
-			var resourcePassedBonusTradeAmount = this.game.math.binominalRandomInteger(bonusTradeAmount, tradeChance);
+			var eligibleForResNormal = normalTradeAmount;
+			var eligibleForResBonus = bonusTradeAmount;
+			//If a trade isn't guaranteed (i.e. if there's randomness), a non-random trade will NEVER get it.
+			//Non-random trades should take away from normal trades first, then bonus ones, in that order.
+			//Non-random trades will NEVER take away from something that's guaranteed
+			if (tradeChance < 1 && this.nonRandomTrades) {
+				eligibleForResNormal = Math.max(normalTradeAmount - this.nonRandomTrades, 0);
+				eligibleForResBonus = Math.max(bonusTradeAmount - Math.max(this.nonRandomTrades - normalTradeAmount, 0), 0);
+			}
+
+			//Roll the dice to see how many pass the tradeChance:
+			var resourcePassedNormalTradeAmount = this.game.math.binominalRandomInteger(eligibleForResNormal, tradeChance);
+			var resourcePassedBonusTradeAmount = this.game.math.binominalRandomInteger(eligibleForResBonus, tradeChance);
 
 			if (resourcePassedNormalTradeAmount + resourcePassedBonusTradeAmount == 0) {
 				continue;
 			}
 
+			//Theoretically, we could make non-random trades always give the lowest possible amount...
+			// ...but I don't care about that enough to program in the logic for that to happen.
 			var fuzzedNormalAmount = this._fuzzGainedAmount(resourcePassedNormalTradeAmount, sellResource.width);
 			var fuzzedBonusAmount = this._fuzzGainedAmount(resourcePassedBonusTradeAmount, sellResource.width);
 			var resourceSeasonTradeRatio = 1 + (sellResource.seasons ? sellResource.seasons[currentSeason] : 0);
@@ -515,8 +649,12 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 		//-------------------- 35% chance to get spice + 1% per embassy lvl ------------------
 		var spiceChance = this.getSpiceTradeChance(race);
+		var eligibleForSpice = successfullTradeAmount;
+		if (spiceChance < 1 && this.nonRandomTrades) { //Non-random trades won't give spice unless it's guaranteed
+			eligibleForSpice = Math.max(successfullTradeAmount - this.nonRandomTrades, 0);
+		}
 		var spiceTradeAmount = this.game.math.binominalRandomInteger(
-			successfullTradeAmount, spiceChance
+			eligibleForSpice, spiceChance
 		);
 		boughtResources["spice"] = 25 * spiceTradeAmount +
 			50 * tradeRatio * this.game.math.irwinHallRandom(spiceTradeAmount);
@@ -529,21 +667,43 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		if (race.name == "nagas") {
 			blueprintTradeChance += this.game.getEffect("nagaBlueprintTradeChance");
 		}
+		var eligibleForBlueprint = successfullTradeAmount;
+		if (blueprintTradeChance < 1 && this.nonRandomTrades) { //Non-random trades won't give blueprints unless it's guaranteed
+			eligibleForBlueprint = Math.max(successfullTradeAmount - this.nonRandomTrades, 0);
+		}
 		boughtResources["blueprint"] = Math.floor(
-			this.game.math.binominalRandomInteger(successfullTradeAmount, blueprintTradeChance)
+			this.game.math.binominalRandomInteger(eligibleForBlueprint, blueprintTradeChance)
 		);
 
 		//-------------- 15% + 0.35% chance per ship to get titanium ---------------
 		if (race.name == "zebras") {
 			var shipAmount = this.game.resPool.get("ship").value;
 			var zebraRelationModifierTitanium = this.game.getEffect("zebraRelationModifier") * this.game.bld.getBuildingExt("tradepost").meta.effects["tradeRatio"];
-			boughtResources["titanium"] = (1.5 + shipAmount * 0.03) * (1 + zebraRelationModifierTitanium) * this.game.math.binominalRandomInteger(successfullTradeAmount, 0.15 + shipAmount * 0.0035);
+			var titaniumTradeChance = 0.15 + shipAmount * 0.0035;
+			var eligibleForTitanium = successfullTradeAmount;
+			if (titaniumTradeChance < 1 && this.nonRandomTrades) { //Non-random trades won't give titanium unless it's guaranteed
+				eligibleForTitanium = Math.max(successfullTradeAmount - this.nonRandomTrades, 0);
+			}
+			boughtResources["titanium"] = (1.5 + shipAmount * 0.03) * (1 + zebraRelationModifierTitanium) * this.game.math.binominalRandomInteger(eligibleForTitanium, titaniumTradeChance);
 		}
 
 		//Update Trade Stats
 		this.game.stats.getStat("totalTrades").val = Math.min(this.game.stats.getStat("totalTrades").val + successfullTradeAmount, Number.MAX_VALUE);
 		this.game.stats.getStatCurrent("totalTrades").val += successfullTradeAmount;
-		this.game.upgrade({policies : ["sharkRelationsMerchants"]});
+
+		//Consume non-random trades:
+		this.nonRandomTrades = Math.max(this.nonRandomTrades - successfullTradeAmount, 0);
+
+		var undo = this.game.registerUndoChange();
+		var resSpent = { "manpower": this.getManpowerCost() * totalTradeAmount,
+			"gold": this.getGoldCost() * totalTradeAmount };
+		resSpent[race.buys[0].name] = race.buys[0].val * totalTradeAmount;
+		undo.addEvent(this.id, {
+			action: "trade",
+			val: totalTradeAmount,
+			resSpent: resSpent,
+			resGained: boughtResources
+		}, $I("ui.undo.diplomacy.trade", [this.game.getDisplayValueExt(totalTradeAmount), race.title]));
 
 		return boughtResources;
 	},
@@ -554,7 +714,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 	getManpowerCost: function() {
 		var manpowerCost = this.baseManpowerCost - this.game.getEffect("tradeCatpowerDiscount");
-		if(this.game.challenges.isActive("postApocalypse")) {
+		if (this.game.challenges.isActive("postApocalypse")) {
 			manpowerCost *= 1 + this.game.bld.getPollutionLevel();
 		}
 		return (manpowerCost < 0) ? 0 : manpowerCost;
@@ -562,7 +722,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 	getGoldCost: function() {
 		var goldCost = this.baseGoldCost - this.game.getEffect("tradeGoldDiscount");
-		if(this.game.challenges.isActive("postApocalypse")) {
+		if (this.game.challenges.isActive("postApocalypse")) {
 			goldCost *= 1 + this.game.bld.getPollutionLevel();
 		}
 		return (goldCost < 0) ? 0 : goldCost;
@@ -624,7 +784,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			if (!output){
 				this.game.msg($I("trade.msg.trade.empty"), null, "trade", true);
 			}
-			this.game.msg($I("trade.msg.trade.caravan", [amtTrade]), null, "trade");
+			this.game.msg($I("trade.msg.trade.caravan", [this.game.getDisplayValueExt(amtTrade)]), null, "trade");
 		}
 	},
 
@@ -704,8 +864,9 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		var elders = this.game.diplomacy.get("leviathans");
 		var cleanRequest = Math.max(amtRequested, 1) || 1;
 		var amt = Math.floor(Math.min(cleanRequest, ncorns.value));
-		if (amt >= 1){
-			elders.energy += amt;
+		if (amt > 0) {
+			var efficiency = 1 + this.game.getEffect("feedEldersEfficiencyRatio");
+			elders.energy += amt * efficiency;
 
 			var markerCap = this.game.diplomacy.getMarkerCap();
 
@@ -754,9 +915,9 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	calculatePhantomTradeposts: function(raceName, game){
 		var phantomTradeposts = 0;
         phantomTradeposts += game.getEffect("globalRelationsBonus");
-        if(raceName == "zebras"){
+        if (raceName == "zebras"){
 			phantomTradeposts += game.getEffect("zebraRelationModifier");
-        }else{
+        } else {
 			phantomTradeposts += game.getEffect("nonZebraRelationModifier");
         }
 		return phantomTradeposts;
@@ -769,7 +930,12 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	calculateTradeBonusFromPolicies: function(raceName, game){
 		var tradepostsTradeRatio = game.bld.getBuildingExt("tradepost").meta.effects["tradeRatio"];
 		var phantomTradeposts = game.diplomacy.calculatePhantomTradeposts(raceName, game);
-		return phantomTradeposts * tradepostsTradeRatio;
+
+		// Apply effects from sharkRelationsMerchants policy.
+		var trades = game.stats.getStatCurrent("totalTrades").val;
+		var sharkRelationsMerchantsBonus = this.game.science.getPolicy("sharkRelationsMerchants").researched ?  Math.min(Math.round((Math.log10(Math.max(trades, 100)) - 1) * 3) / 100, 0.3) : 0;
+
+		return sharkRelationsMerchantsBonus + phantomTradeposts * tradepostsTradeRatio;
 	}
 });
 
@@ -1077,19 +1243,14 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 		return prices;
 	},
 
-	buyItem: function(model, event) {
-		var result = this.inherited(arguments);
-		if (result.itemBought){
-			this.game.upgrade({policies: ["lizardRelationsDiplomats", "nagaRelationsArchitects", "spiderRelationsGeologists"]}); //Upgrade, since the policy is based on number of embassies.
-			this.game.science.unlockRelations(); //Check if we can unlock new relation policies based on number of embassies.
-			this.game.ui.render();
-		}
-		return result;
-	},
-
 	incrementValue: function(model) {
 		this.inherited(arguments);
-		model.options.race.embassyLevel++;		
+		model.options.race.embassyLevel++;
+	},
+
+	decrementValue: function(model) {
+		this.inherited(arguments);
+		model.options.race.embassyLevel--;
 	},
 
 	hasSellLink: function(model){
@@ -1098,7 +1259,27 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 
 	updateVisible: function(model){
 		model.visible = this.game.science.get("writing").researched;
-	}
+	},
+
+	build: function(model, opts) {
+		var counter = this.inherited(arguments);
+		if (!counter) {
+			return; //Skip triggers & undo if nothing was built
+		}
+
+		this.game.diplomacy.triggerOnEmbassyCountChanged();
+
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.game.diplomacy.id, {
+			action: "buildEmbassy",
+			race: model.options.race, //Reference to the race object
+			val: counter
+		}, (counter == 1 ?
+			$I("ui.undo.diplomacy.build.one.embassy", [model.options.race.title])
+			:
+			$I("ui.undo.diplomacy.build.many.embassies", [counter, model.options.race.title])
+		));
+	},
 });
 
 //Embassy Buttons have a custom tooltip:
@@ -1444,7 +1625,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 			dojo.addClass(rightColumn, "right");
 			dojo.addClass(clear, "clear");
 
-			if(racePanel.feedBtn){
+			if (racePanel.feedBtn){
 				var leviathansInfo = dojo.create("div", {
 					innerHTML: ""
 				}, leftColumn);
@@ -1512,7 +1693,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 				}, this.game);
 				racePanel.embassyButton = embassyButton;
 				embassyButton.render(rightColumn);
-			} else{
+			} else {
 				var autoPinnedButton = new classes.diplomacy.ui.autoPinnedButton({
 					name: $I("trade.autopinned.labelOff"),
 					description: $I("trade.autopinned.desc"),
@@ -1591,7 +1772,13 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 			//Energy:
 			if (leviathans.energy) {
 				var markerCap = this.game.diplomacy.getMarkerCap();
-				var leviathansInfoEnergy = leviathans.energy ? leviathans.energy + " / " + markerCap : "N/A";
+				//Display to 1 decimal place, but only if needed.
+				//Not triggered by machine-precision floating-point rounding errors.
+				//Can be triggered by effects like LDR on "feedEldersEfficiencyRatio" or similar.
+				//This is intentional.  (7.0 is NOT the same as 7 when it's actually 6.979166666666668.)
+				var isInteger = function(num) { return Math.abs(num - Math.round(num)) < 0.0001; };
+				var energyDisp = leviathans.energy.toFixed(isInteger(leviathans.energy) ? 0 : 1);
+				var leviathansInfoEnergy = leviathans.energy ? energyDisp + " / " + markerCap : "N/A";
 				this.leviathansInfo.innerHTML += $I("trade.leviathans.energy") + leviathansInfoEnergy + "<br />";
 			}
 			//Time to leave:

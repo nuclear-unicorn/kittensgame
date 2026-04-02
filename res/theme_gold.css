@@ -296,7 +296,7 @@ body.scheme_gold {
 /******************** TOOLTIP ********************/
 /*************************************************/
 .scheme_gold #tooltip,
-.scheme_gold .tooltip-block > div {
+.scheme_gold .tooltip-content{
     background-color: #383838;
     color: #9F9E94; /* tooltip windows == left column : left text */
     border-color:  rgba(223, 206, 153, 0.8); /* color #DFCE99 */
@@ -305,7 +305,7 @@ body.scheme_gold {
                  0 1px 2px rgba(200, 200, 200, 0.1);
     text-shadow: 0 1px 1px #181818;
 }
-.scheme_gold .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_gold .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_gold .button_tooltip {
@@ -983,10 +983,11 @@ body.scheme_gold {
 	/* default max-width: 90px; */
 	color: #d9d9d9;
 }
-.scheme_gold #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+.scheme_gold #fastHuntContainer > a, /* Text left column : "Send hunters (xx times)" */
+.scheme_gold #fastSacrificeContainer > a {
     font-size: 110%;
 }
-.scheme_gold #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_gold div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #919084;
 }
 .scheme_gold #fastPraiseContainer > a { /* Text left column : "Praise the sun!" */
@@ -995,7 +996,8 @@ body.scheme_gold {
 .scheme_gold #fastPraiseContainer > a:hover {
     text-shadow: 1px 1px 1px #E7AF4F, 1px 1px 4px #DFCE99, -1px -1px 4px #DFCE99;
 }
-.scheme_gold #fastHuntContainer > a:hover {
+.scheme_gold #fastHuntContainer > a:hover,
+.scheme_gold #fastSacrificeContainer > a:hover {
 	color: #E7AF4F;
 	text-shadow: 1px 1px #404040;
 }

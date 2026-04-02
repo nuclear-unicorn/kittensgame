@@ -178,8 +178,13 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
     },
 
     updateQueue: function(){
-        if(this.game.getFeatureFlag("QUEUE")){
+        if (this.game.getFeatureFlag("QUEUE")){
             this.queue.update();
+
+            //TODO: use dedicated flag for queue tab
+            if (this.game.isMobile()){
+                this.game.queueTab.update();
+            }
         }
     },
 
@@ -191,7 +196,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         var resourceLimits = this.game.resPool.fastforward(daysOffset);
 
         var numberEvents = 0;
-        if(!ignoreCalendar){
+        if (!ignoreCalendar){
             numberEvents = this.game.calendar.fastForward(daysOffset);
         }
         this.game.bld.fastforward(daysOffset);
@@ -217,7 +222,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 var amt = Math.floor(blastFurnace.heat / 100);
                 blastFurnace.heat -= 100 * amt;
                 //this.shatter(amt);
-                if(this.testShatter == 1) {this.shatterInGroupCycles(amt);}
+                if (this.testShatter == 1) {this.shatterInGroupCycles(amt);}
                 //else if(this.testShatter == 2) {this.shatterInCycles(amt);}
                 //shatterInCycles is deprecated
                 else {this.shatter(amt);}
@@ -252,7 +257,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         if (daysOffset > offset){
             daysOffset = offset;
         }
-        if(this.game.getFeatureFlag("QUEUE_REDSHIFT")){
+        if (this.game.getFeatureFlag("QUEUE_REDSHIFT")){
             //console.log( "Calculating queue redshift for the following queue:", this.queue.queueItems );
             var result = this.queue.getFirstItemEtaDay();
             var daysOffsetLeft = daysOffset;
@@ -292,7 +297,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     /*if (!redshiftQueueWorked){
                         console.warn("Redshift queue failed to build", this.queue.queueItems[0]);
                     }*/
-                }else{
+                } else {
                     this.applyRedshift(daysOffsetLeft, true);
                     daysOffsetLeft = 0;
                 }
@@ -300,11 +305,11 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             numberEvents = this.game.calendar.fastForward(daysOffset);
             //console.log( "Queue redshift calculations finished.  This is the new queue:", this.queue.queueItems );
         }
-        else{
+        else {
             numberEvents = this.applyRedshift(daysOffset);
         }
 
-        this.game.msg($I("time.redshift", [daysOffset]) + (numberEvents ? " " + $I("time.redshift.ext",[numberEvents]) : ""));
+        this.game.msg($I("time.redshift", [daysOffset]) + (numberEvents ? " " + $I("time.redshift.ext",[this.game.getDisplayValueExt(numberEvents)]) : ""));
     },
 
 	chronoforgeUpgrades: [{
@@ -375,7 +380,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 self.heat -= 100 * amt;
                 delay.delayTicks = delay.on; //Pause for a duration of 1 game-tick per active Controlled Delay
                 //game.time.shatter(amt);
-                if(test_shatter == 1) {game.time.shatterInGroupCycles(amt);}
+                if (test_shatter == 1) {game.time.shatterInGroupCycles(amt);}
                 //else if(game.time.testShatter == 2) {game.time.shatterInCycles(amt);}
                 //shatterInCycles is deprecated
                 else  {game.time.shatter(amt);}
@@ -450,7 +455,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             "timeRatio" : 0.05
         },
         calculateEffects: function(self, game) {
-            if(self.isAutomationEnabled === null){
+            if (self.isAutomationEnabled === null){
                 self.isAutomationEnabled = (game.time.testShatter == 1);
             }
             game.time.testShatter = (self.isAutomationEnabled)? 1 : 0;
@@ -767,7 +772,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             }
         }
 
-        while(maxYearsShattered > 0){
+        while (maxYearsShattered > 0){
             var remainingYearsInCurrentCycle = Math.min(cal.yearsPerCycle - cal.cycleYear, maxYearsShattered);
             var remainingDaysInCurrentCycle = (remainingYearsInCurrentCycle - 1) * daysPerYear + remainingDaysInFirstYear;
             var remainingTicksInCurrentCycle = remainingDaysInCurrentCycle * cal.ticksPerDay;
@@ -870,7 +875,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             for (j in remainingCyclesYears){
                 remainingCyclesYears[j] = maxYearsShattered/10;
             }
-        }else{
+        } else {
             var wholeCycleYears = maxYearsShattered - maxYearsShattered%50;
             for (j in remainingCyclesYears){
                 remainingCyclesYears[j] = wholeCycleYears/10;
@@ -895,7 +900,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
             // ShatterTC gain
             if (shatterTCGain > 0) {
-                if(yearsInCurrentCycle == 1){ //no need to do AI Apocalypse twice
+                if (yearsInCurrentCycle == 1){ //no need to do AI Apocalypse twice
                     aiApocalypseLevel = 0;
                 }
                 // XXX Partially duplicates resources#fastforward and #enforceLimits, some nice factorization is probably possible
@@ -926,14 +931,14 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                         //console.log(res.name);
                         var oldVal = res.value - delta[res.name];
                         delta[res.name]/= yearsInCurrentCycle||1;  
-                        if(resLimit == res.MaxValue && oldVal + delta[res.name] - (oldVal + delta[res.name]) * aiDestructionMod >= resLimit){
+                        if (resLimit == res.MaxValue && oldVal + delta[res.name] - (oldVal + delta[res.name]) * aiDestructionMod >= resLimit){
                             resLimit = Math.min(resLimit, res.value) * (1 + aiDestructionMod);
-                        }else if (!res.maxValue){
+                        } else if (!res.maxValue){
                             delta[res.name] = Math.max(delta[res.name], 0);
                             //using sum of geometrical progression:
                             var decreaseOfDelta = -delta[res.name] * (1 - Math.abs(Math.pow(aiDestructionMod, yearsInCurrentCycle)))/(Math.abs(1 - aiDestructionMod)||1);
                             game.resPool.addResEvent(res.name, decreaseOfDelta - oldVal * (1- Math.pow((1 + aiDestructionMod), yearsInCurrentCycle))); //this is no longer broken
-                        }else /*if (resLimit == res.value)*/{
+                        } else /*if (resLimit == res.value)*/{
                             resLimit = Math.min(resLimit, res.value) * Math.pow(1 + aiDestructionMod, yearsInCurrentCycle);
                         }
                     }
@@ -953,7 +958,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             maxYearsShattered -= Math.min(5, maxYearsShattered);
             remainingDaysInFirstYear = cal.daysPerSeason * cal.seasonsPerYear;
         }
-        if(maxYearsShattered < 0){console.error("max years shattered negative " + toString(maxYearsShattered));}
+        if (maxYearsShattered < 0){console.error("max years shattered negative " + toString(maxYearsShattered));}
         cal.year += maxYearsShattered;
         cal.onNewYears(endYear == cal.year, maxYearsShattered, false);
         cal.calculateMilleniumProduction(cal.getMilleniaChanged(startYear, cal.year));
@@ -963,7 +968,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             game.msg($I("time.tc.shatter",[amt]), "", "tcShatter");
         }
 
-		if(aiApocalypseLevel){
+		if (aiApocalypseLevel){
             this.game.msg($I("ai.apocalypse.msg", [aiApocalypseLevel]), "alert", "ai");
         }
         this.flux += amt - 1 + remainingDaysInFirstYearSaved / daysPerYear;
@@ -978,7 +983,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 		});
     },
     compareShatterTime: function(shatters, times, ignoreOldFunction, ignoreShatterInCycles, ignoreGroupCycles){
-        if(!ignoreOldFunction){
+        if (!ignoreOldFunction){
             var oldShatterD1 = new Date();
             for (var i = 0; i < times; i++){
                 this.shatter(shatters);
@@ -995,7 +1000,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             var newShatterD2 = new Date();
             console.log("Group shatter average = " + (newShatterD2.getTime() - newShatterD1.getTime())/times + " ms");
         }
-        if(!ignoreShatterInCycles){
+        if (!ignoreShatterInCycles){
             //shatterInCycles is currently deprecated
             var new1ShatterD1 = new Date();
             for (var i = 0; i < times; i++){
@@ -1005,11 +1010,11 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             console.log("Cycle shatter average = " + (new1ShatterD2.getTime() - new1ShatterD1.getTime())/times + " ms");
         }
 
-        if(!ignoreOldFunction && !ignoreGroupCycles){
+        if (!ignoreOldFunction && !ignoreGroupCycles){
              console.log("newEfficensy = " + (oldShatterD2.getTime() - oldShatterD1.getTime())/(newShatterD2.getTime() - newShatterD1.getTime()));
         }
 
-        if(!ignoreOldFunction && !ignoreShatterInCycles){
+        if (!ignoreOldFunction && !ignoreShatterInCycles){
             //shatterInCycles is currently deprecated
             console.log("new1Efficensy = " + (oldShatterD2.getTime() - oldShatterD1.getTime())/(new1ShatterD2.getTime() - new1ShatterD1.getTime()));
         }
@@ -1019,7 +1024,48 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             this.cfu[i].unlocked = true;
         }
         this.game.msg("All time upgrades are unlocked");
-    }
+	},
+
+	undo: function(data) {
+		if (data.action === "buildCFU") {
+			var bld = this.getCFU(data.metaId);
+			var props = {
+				id:            bld.name,
+				name:           bld.label,
+				description:    bld.description,
+				building:       bld.name
+			};
+			props.controller = new classes.ui.time.ChronoforgeBtnController(this.game);
+			var model = props.controller.fetchModel(props);
+			model.refundPercentage = 1.0;	//full refund for undo
+			props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
+		} else if (data.action === "buildVSU") {
+			var bld = this.getVSU(data.metaId);
+			var props = {
+				id:            bld.name,
+				name:           bld.label,
+				description:    bld.description,
+				building:       bld.name
+			};
+			props.controller = new classes.ui.time.VoidSpaceBtnController(this.game);
+			var model = props.controller.fetchModel(props);
+			model.refundPercentage = 1.0;	//full refund for undo
+			props.controller.sellInternal(model, model.metadata.val - data.val, false /*requireSellLink*/);
+		} else if (data.action === "fixCryochamber") {
+			//Update the building metadata:
+			var controller = new classes.ui.time.FixCryochamberBtnController(this.game);
+			var amtFixed = controller.undoFixCryochambers(data.val);
+
+			//Update resource amounts (full refund):
+			var prices = controller.getPrices({} /*model*/); //Due to how it's implemented, we can get away with using an empty object as our model
+			var resPool = this.game.resPool;
+			prices.forEach(function(priceLine) { //priceLine has the form {name: string, val: number}
+				var refundVal = resPool.addResEvent(priceLine.name, priceLine.val * amtFixed);
+				this.game.msg($I("workshop.undo.regain", [this.game.getDisplayValueExt(refundVal),
+					resPool.get(priceLine.name).title]), null, "undo", true /*noBullet*/);
+			});
+		}
+	}
 });
 
 dojo.declare("classes.ui.time.AccelerateTimeBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
@@ -1135,7 +1181,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         model.previousCycleLink = this._newLink(model, this.game.calendar.yearsPerCycle * (this.game.calendar.cyclesPerEra - 1));
         model.tenErasLink = this._newLink(model, 10 * this.game.calendar.yearsPerCycle * this.game.calendar.cyclesPerEra);
         var shatterYearBoost = this.game.getEffect("shatterYearBoost");
-        if(shatterYearBoost){
+        if (shatterYearBoost){
             model.customLink = this._newLink(model, shatterYearBoost); //Creates additional custom shatter link based on the effect
         }
         return model;
@@ -1151,7 +1197,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
         }
         return {
             visible: isVisible,
-            title: "x" + shatteredQuantity,
+            title: "x" + self.game.getDisplayValueExt(shatteredQuantity),
             handler: function(event) {
                 self.doShatterAmt(model, shatteredQuantity);
             }
@@ -1194,7 +1240,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
             timeCrystal: 0
         };
 		var prices_cloned = $.extend(true, [], model.options.prices);
-        if(this.game.getEffect("shatterVoidCost")){
+        if (this.game.getEffect("shatterVoidCost")){
             var shatterVoidCost = this.game.getEffect("shatterVoidCost");
             prices_cloned.push({
                 name: "void",
@@ -1322,7 +1368,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
             return;
         }
         var price = this.getPricesMultiple(model, amt);
-        if(price.void){
+        if (price.void){
             if (price.timeCrystal <= this.game.resPool.get("timeCrystal").value &&
             (price.void <= this.game.resPool.get("void").value)) {
                 this.game.resPool.addResEvent("timeCrystal", -price.timeCrystal);
@@ -1363,11 +1409,11 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
             timeManager.heat += amt * factor * (1 - heat_acutoconverted);
             var efficiency = 1 + this.game.getEffect("heatEfficiency");
             timeManager.getCFU("blastFurnace").heat += amt * factor * heat_acutoconverted * efficiency;
-        }else{
+        } else {
             timeManager.heat += amt * factor;
         }
         //timeManager.shatter(amt);
-        if(timeManager.testShatter == 1) {timeManager.shatterInGroupCycles(amt);}
+        if (timeManager.testShatter == 1) {timeManager.shatterInGroupCycles(amt);}
         //else if(timeManager.testShatter == 2) {timeManager.shatterInCycles(amt);}
         //shatterInCycles is deprecated
         else {timeManager.shatter(amt);}
@@ -1388,7 +1434,7 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
         this.tenEras = this.addLink(this.model.tenErasLink);
         this.previousCycle = this.addLink(this.model.previousCycleLink);
         this.nextCycle = this.addLink(this.model.nextCycleLink);
-        if(this.model.customLink){
+        if (this.model.customLink){
             this.custom = this.addLink(this.model.customLink);
         }
     },
@@ -1399,10 +1445,10 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
         dojo.style(this.previousCycle.link, "display", this.model.previousCycleLink.visible ? "" : "none");
         dojo.style(this.tenEras.link, "display", this.model.tenErasLink.visible ? "" : "none");
 
-        if(this.model.customLink && !this.custom) { //Create custom link if needed
+        if (this.model.customLink && !this.custom) { //Create custom link if needed
             this.custom = this.addLink(this.model.customLink);
         }
-        if(!this.model.customLink && this.custom) { //Destroy custom link if needed
+        if (!this.model.customLink && this.custom) { //Destroy custom link if needed
             dojo.destroy(this.custom.link);
             this.custom = undefined;
         }
@@ -1434,7 +1480,7 @@ dojo.declare("classes.ui.time.UseHeatBtnController", com.nuclearunicorn.game.ui.
 		var model = this.inherited(arguments);
 		model.useAllLink = this._newLink(model, "all");
 		var shatterYearBoost = this.game.getEffect("shatterYearBoost");
-		if(shatterYearBoost){
+		if (shatterYearBoost){
 			model.customLink = this._newLink(model, shatterYearBoost); //Creates additional custom shatter link based on the effect
 		}
 		return model;
@@ -1454,7 +1500,7 @@ dojo.declare("classes.ui.time.UseHeatBtnController", com.nuclearunicorn.game.ui.
 		}
 		return {
 			visible: isVisible,
-			title: "x" + shatteredQuantity,
+			title: "x" + self.game.getDisplayValueExt(shatteredQuantity),
 			handler: function(event) {
 				self.doShatterAmt(model, shatteredQuantity);
 			}
@@ -1510,7 +1556,7 @@ dojo.declare("classes.ui.time.UseHeatBtnController", com.nuclearunicorn.game.ui.
 		var game = this.game;
 		var timeManager = game.time;
 		//timeManager.shatter(amt);
-		if(timeManager.testShatter == 1) {timeManager.shatterInGroupCycles(amt);}
+		if (timeManager.testShatter == 1) {timeManager.shatterInGroupCycles(amt);}
 		//else if(timeManager.testShatter == 2) {timeManager.shatterInCycles(amt);}
 		//shatterInCycles is deprecated
 		else {timeManager.shatter(amt);}
@@ -1525,7 +1571,7 @@ dojo.declare("classes.ui.time.UseHeatBtn", com.nuclearunicorn.game.ui.ButtonMode
     renderLinks: function() {
         this.useAllLink = this.addLink(this.model.useAllLink);
         dojo.addClass(this.useAllLink.link,"rightestLink");
-        if(this.model.customLink){
+        if (this.model.customLink){
             this.custom = this.addLink(this.model.customLink);
         }
     },
@@ -1544,10 +1590,10 @@ dojo.declare("classes.ui.time.UseHeatBtn", com.nuclearunicorn.game.ui.ButtonMode
         }
         dojo.style(this.useAllLink.link, "display", this.model.useAllLink.visible ? "" : "none");
 
-        if(this.model.customLink && !this.custom) { //Create custom link if needed
+        if (this.model.customLink && !this.custom) { //Create custom link if needed
             this.custom = this.addLink(this.model.customLink);
         }
-        if(!this.model.customLink && this.custom) { //Destroy custom link if needed
+        if (!this.model.customLink && this.custom) { //Destroy custom link if needed
             dojo.destroy(this.custom.link);
             this.custom = undefined;
         }
@@ -1599,6 +1645,18 @@ dojo.declare("classes.ui.time.ChronoforgeBtnController", com.nuclearunicorn.game
 		var building = model.metadata;
 		building.isAutomationEnabled = !building.isAutomationEnabled;
 			this.game.upgrade({chronoforge: [building.name]});
+	},
+	build: function(model, opts) {
+		var counter = this.inherited(arguments);
+		if (!counter) {
+			return; //Skip undo if nothing was built
+		}
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.game.time.id, {
+			action: "buildCFU",
+			metaId: model.metadata.name,
+			val: counter
+		}, $I("ui.undo.bld.build", [counter, model.metadata.label]));
 	}
 });
 
@@ -1662,6 +1720,19 @@ dojo.declare("classes.ui.time.VoidSpaceBtnController", com.nuclearunicorn.game.u
 			}
 		}
 		return prices;
+	},
+
+	build: function(model, opts) {
+		var counter = this.inherited(arguments);
+		if (!counter) {
+			return; //Skip undo if nothing was built
+		}
+		var undo = this.game.registerUndoChange();
+		undo.addEvent(this.game.time.id, {
+			action: "buildVSU",
+			metaId: model.metadata.name,
+			val: counter
+		}, $I("ui.undo.bld.build", [counter, model.metadata.label]));
 	}
 });
 
@@ -1695,19 +1766,30 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
 
 		if (!event) { event = {}; /*event is an optional parameter*/ }
         var isBuyAll = (event && event.shiftKey) || buyType == "all";
-		var fixCount = isBuyAll
+		var fixCount = isBuyAll //Represents how many we *intend* to fix
 			? 1000
 			: event.ctrlKey || event.metaKey /*osx tears*/
 				? this.game.opts.batchSize || 10
 				: 1;
 		fixCount = Math.min(fixCount, this.game.time.getVSU("usedCryochambers").val);
 
-		var fixHappened = false;
-		for (var count = 0; count < fixCount && this.hasResources(model); ++count) {
+		var numFixed = 0; //Count the amount we actually fixed
+		for (var i = 0; i < fixCount && this.hasResources(model); ++i) {
 			this.payPrice(model);
-			fixHappened |= this.doFixCryochamber(model);
+			if (this.doFixCryochamber(model)) {
+				numFixed++;
+			}
 		}
-        if(fixHappened){
+
+		if (numFixed){
+			var undo = this.game.registerUndoChange();
+			undo.addEvent(this.game.time.id, {
+				action: "fixCryochamber",
+				metaId: "usedCryochambers", //Just in case a future dev wants to add multiple types of Cryochambers
+				val: numFixed
+			}, numFixed == 1 ?
+				$I("ui.undo.fix.one.cryochamber") :
+				$I("ui.undo.fix.many.cryochambers", [numFixed]));
             var cry = this.game.time.getVSU("cryochambers");
             cry.calculateEffects(cry, this.game);
             return {
@@ -1737,6 +1819,22 @@ dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.g
 		}
         return false;
     },
+
+	/**
+	 * @param amountToFix number How many Cryochambers to turn back into Used Cryochambers
+	 * @return number of Cryochambers actually fixed.
+	 */
+	undoFixCryochambers: function(amountToFix) {
+		var cry = this.game.time.getVSU("cryochambers");
+		var usedCry = this.game.time.getVSU("usedCryochambers");
+		amountToFix = Math.min(cry.val, amountToFix);
+		usedCry.val += amountToFix;
+		usedCry.on += amountToFix;
+		usedCry.unlocked = true;
+		cry.val -= amountToFix;
+		cry.on -= amountToFix;
+		return amountToFix;
+	},
 
 	updateVisible: function(model) {
 		model.visible = this.game.workshop.get("chronoforge").researched && this.game.time.getVSU("usedCryochambers").val != 0;
@@ -1982,7 +2080,7 @@ dojo.declare("classes.queue.manager", null,{
                     break;
                 }
             }
-            if(add_to_arr){
+            if (add_to_arr){
                 this.queueSourcesArr.push({name: i, label: this.queueLabels[i]});
             }
         }
@@ -2026,7 +2124,7 @@ dojo.declare("classes.queue.manager", null,{
         "tech", "upgrades", "policies", "zebraUpgrades", "spaceMission"
     ],
     unlockQueueSource: function(source){
-        if(this.queueSources[source] === false){
+        if (this.queueSources[source] === false){
             this.queueSources[source] = true;
             this.queueSourcesArr.push({name: source, label: this.queueLabels[source]});
         }
@@ -2067,7 +2165,7 @@ dojo.declare("classes.queue.manager", null,{
     queueLength: function(){
         var length = 0;
         dojo.forEach(this.queueItems, function(item) {
-            if(item) {
+            if (item) {
                 length += item.value || 1;
             }
             //Else, the item is null or invalid, so don't count it.
@@ -2075,34 +2173,45 @@ dojo.declare("classes.queue.manager", null,{
         return length;
     },
 
-    addToQueue: function(name, type, label, shiftKey /*add all*/){
+    addToQueue: function(name, type, label, event /*optional parameter*/){
         if (!name || !type){
             console.error("queueMgr#addToQueue: unable to add item:", name, type, label);
             return;
         }
 
-        if(this.queueLength() >= this.cap){
+        if (this.queueLength() >= this.cap){
             return;
+        }
+
+        //SHIFT is used throughout the game for "buy all"; CTRL is used for "buy one batch"
+        //The batch size is configurable in the game settings menu (10 by default)
+		if (!event) { event = {}; }
+        var batchSize = this.game.opts.batchSize || 10;
+        var amtToQueue = event.shiftKey ? Infinity : (event.ctrlKey || event.metaKey ? batchSize : 1);
+
+        //Don't ever queue a non-stackable item in bulk--there's no point!
+        if (this.queueNonStackable.includes(type)) {
+            amtToQueue = 1;
+        }
+
+        //Don't add more than can fit inside the queue cap:
+        amtToQueue = Math.min(this.cap - this.queueLength(), amtToQueue);
+        if (amtToQueue < 1) {
+            return; //Already finished queueing
         }
 
         //TODO: too complex logic, can we streamline it somehow?
         var lastItem = this.queueItems[this.queueItems.length - 1];
-        if(this.queueItems.length > 0 && lastItem && lastItem.name == name){
-            if(this.queueNonStackable.includes(type)){
+        if (this.queueItems.length > 0 && lastItem && lastItem.name == name){
+            if (this.queueNonStackable.includes(type)){
                 return;
             }
-            var valOfItem = (lastItem.value || 1) + 1;
+            var valOfItem = (lastItem.value || 1) + amtToQueue;
             lastItem.value = valOfItem;
-
-            if (shiftKey){
-                while(this.queueLength() < this.cap){
-                    this.addToQueue(name, type, label, false);
-                }
-            }
             return;
         }
         
-        if(!label){
+        if (!label){
             label = "$" + name + "$";
         }
 
@@ -2110,14 +2219,8 @@ dojo.declare("classes.queue.manager", null,{
             name: name,
             type: type,
             label: label,
-            value: 1    //always store size of the queue group, even if it is a single item
+            value: amtToQueue //always store size of the queue group, even if it is a single item
         });
-
-        if (shiftKey && !this.queueNonStackable.includes(type)){
-            while(this.queueLength() < this.cap){
-                this.addToQueue(name, type, label, false);
-            }
-        }
     },
 
     /**
@@ -2194,7 +2297,7 @@ dojo.declare("classes.queue.manager", null,{
     getQueueOptions: function(type){
         if (this.alphabeticalSort){
             return this.getQueueOptionsAlphabetical(type);
-        }else{
+        } else {
             return this.getQueueOptionsUnsorted(type);
         }
     },
@@ -2231,14 +2334,14 @@ dojo.declare("classes.queue.manager", null,{
                 for (var i in bld.buildingsData){
                     var building = bld.buildingsData[i];
 
-                    if(!building.unlocked){
+                    if (!building.unlocked){
                         continue;
                     }
 
                     var name = building.name;
                     var label = building.label;
-                    if(building.stages){
-                        if(building.stages){
+                    if (building.stages){
+                        if (building.stages){
                             label = building.stages[building.stage].label;
                         }
                     }
@@ -2254,7 +2357,7 @@ dojo.declare("classes.queue.manager", null,{
                 var spaceBuildMap = this.game.space.spaceBuildingsMap;
                 for (var i in spaceBuildMap){
                     var building = this.game.space.getBuilding(spaceBuildMap[i]);
-                    if(building.unlocked){
+                    if (building.unlocked){
                         options.push({
                             name: building.name,
                             label: building.label
@@ -2267,7 +2370,7 @@ dojo.declare("classes.queue.manager", null,{
                 var zigguratUpgrades = this.game.religion.zigguratUpgrades;
                 for (var i in zigguratUpgrades){
                     var building = this.game.religion.zigguratUpgrades[i];
-                    if(building.unlocked){
+                    if (building.unlocked){
                         options.push({
                             name: building.name,
                             label: building.label
@@ -2280,7 +2383,7 @@ dojo.declare("classes.queue.manager", null,{
                 var transcendenceUpgrades = this.game.religion.transcendenceUpgrades;
                 for (var i in transcendenceUpgrades){
                     var building = this.game.religion.transcendenceUpgrades[i];
-                    if(building.unlocked){
+                    if (building.unlocked){
                         options.push({
                             name: building.name,
                             label: building.label
@@ -2306,7 +2409,7 @@ dojo.declare("classes.queue.manager", null,{
                 var voidSpaceUpgrades = this.game.time.voidspaceUpgrades;
                 for (var i in voidSpaceUpgrades){
                     var building = voidSpaceUpgrades[i];
-                    if(building.name == "usedCryochambers"){
+                    if (building.name == "usedCryochambers"){
                         //ONLY allow queueing of Fix Cryochamber if we have unlocked that feature normally.
                         if (this.game.workshop.get("chronoforge").researched && building.val != 0)
                         {
@@ -2393,7 +2496,7 @@ dojo.declare("classes.queue.manager", null,{
 
             case "religion":
                 var religionUpgrades = this.game.religion.religionUpgrades;
-                if(this.game.challenges.getChallenge("atheism").active){
+                if (this.game.challenges.getChallenge("atheism").active){
                     return options; //just in case
                 }
                 for (var i in religionUpgrades){
@@ -2419,10 +2522,10 @@ dojo.declare("classes.queue.manager", null,{
     },
     dropLastItem: function(){
         var item = this.queueItems[0];
-        if(item.value && item.value > 1){
+        if (item.value && item.value > 1){
             item.value -= 1;
         }
-        else{
+        else {
             this.queueItems.shift();
             this.game._publish("ui/update", this.game);
         }
@@ -2492,7 +2595,7 @@ dojo.declare("classes.queue.manager", null,{
             case "voidSpace":
                 props.controller = new classes.ui.time.VoidSpaceBtnController(this.game);
                 var model = props.controller.fetchModel(props);
-                if(el.name == "usedCryochambers"){ //a bunch of model black magic
+                if (el.name == "usedCryochambers"){ //a bunch of model black magic
                     props.controller = new classes.ui.time.FixCryochamberBtnController(this.game);
                     itemMetaRaw = this.game.getUnlockByName("cryochambers", el.type);
                     model.prices = this.game.time.getVSU("usedCryochambers").fixPrices;
@@ -2535,7 +2638,7 @@ dojo.declare("classes.queue.manager", null,{
     },
     update: function(){
         this.cap = this.calculateCap();
-        if(!this.queueItems.length){
+        if (!this.queueItems.length){
             return;
         }
         var el = this.queueItems[0];
@@ -2547,14 +2650,14 @@ dojo.declare("classes.queue.manager", null,{
         }
 
         var controllerAndModel = this.getQueueElementControllerAndModel(el);
-        if(!controllerAndModel || !controllerAndModel.controller || !controllerAndModel.model){
+        if (!controllerAndModel || !controllerAndModel.controller || !controllerAndModel.model){
             console.error(el.name + " of " + el.type + " queing is not supported!");
             this.queueItems.shift();
             this.game._publish("ui/update", this.game);
             return;
         }
 
-        var result = controllerAndModel.controller.buyItem(controllerAndModel.model, null);
+        var result = controllerAndModel.controller.buyItem(controllerAndModel.model, { boughtByQueue: true });
         var wasItemBought = result.itemBought;
         var resultOfBuyingItem = {reason: result.reason};
 
@@ -2608,14 +2711,14 @@ dojo.declare("classes.queue.manager", null,{
     onDeltagrade: function(itemName) {
         var buildingsManager = this.game.bld;
         dojo.forEach(this.queueItems, function(item) {
-            if(!item || item.name !== itemName) {
+            if (!item || item.name !== itemName) {
                 return;
             }
             //Else, we have here a valid queue item matching the name of what was deltagraded.
-            if(item.type === "buildings") {
+            if (item.type === "buildings") {
                 var building = buildingsManager.getBuildingExt(itemName).meta;
                 var newLabel = building.label;
-                if(building.stages){
+                if (building.stages){
                     newLabel = building.stages[building.stage].label;
                 }
                 item.label = newLabel;
@@ -2625,4 +2728,19 @@ dojo.declare("classes.queue.manager", null,{
 });
 
 dojo.declare("classes.tab.QueueTab", com.nuclearunicorn.game.ui.tab, {
+    update: function(){
+        this.updateTab();
+    },
+
+    updateTab: function(){
+        this.tabName = $I("tab.name.queue");
+        var queueManager = this.game.time.queue;
+        
+        this.tabName += "(" + queueManager.queueLength() + ")";
+
+        if (this.domNode) {
+			this.domNode.innerHTML = this.tabName;
+		}
+        dojo.publish("ui/refreshTabNames", [this.game]);
+    }
 });

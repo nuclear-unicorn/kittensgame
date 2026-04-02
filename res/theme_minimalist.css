@@ -7,6 +7,18 @@
 /**********************************************/
 /******************** GAME ********************/
 /**********************************************/
+.scheme_minimalist,
+.scheme_minimalist .help
+.scheme_minimalist #viewport-container {
+	color-scheme: dark;
+	--page-background-color:#0C0D10;
+	--text-color: #B0B0B0;
+}
+
+.scheme_minimalist .button_tooltip.login-popup {
+	background-color: var(--page-background-color);
+}
+
 body.scheme_minimalist {
 	background-color: #0C0D10;
 	color-scheme: dark;
@@ -353,7 +365,7 @@ body.scheme_minimalist.with_background_image,
 /******************** TOOLTIP ********************/
 /*************************************************/
 .scheme_minimalist #tooltip,
-.scheme_minimalist .tooltip-block > div {
+.scheme_minimalist .tooltip-content{
 	background-color: #101115;
 	font-size: 14px;
 	color: #828790; /* tooltip windows == left column : left text */
@@ -364,7 +376,7 @@ body.scheme_minimalist.with_background_image,
 	box-shadow: 4px 4px 9px #0A0A0D;
 	margin-left: 20px; /* for offset tooltip due to larger buttons .btn.modern */
 }
-.scheme_minimalist .tooltip-block > div {
+.scheme_minimalist .tooltip-content{
 	padding: 5px;
 }
 .scheme_minimalist .button_tooltip {
@@ -1186,10 +1198,11 @@ body.scheme_minimalist.with_background_image,
 	color: #be4151;
 	padding-top: 6px;/* default padding-top: 10px; */
 }
-.scheme_minimalist #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+.scheme_minimalist #fastHuntContainer > a, /* Text left column : "Send hunters (xx times)" */
+.scheme_minimalist #fastSacrificeContainer > a {
 	text-shadow: -1px -1px 2px rgba(12, 13, 16, 0.9); /* color #0C0D10 */
 }
-.scheme_minimalist #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_minimalist div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #DD836C;
 	text-shadow: none !important;
 	font-size: smaller;

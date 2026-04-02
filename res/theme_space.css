@@ -359,26 +359,19 @@ body.scheme_space.with_background_image {
 	bottom: 6px;
 	color: #0A2450; /* a link separator : | on header and footer links */
 }
-.scheme_space #crowdjet-expand-container {
-	color: #89A4CD;
-	font-family: 'Oxanium', cursive;
-}
-.scheme_space #crowdjet-expand-container:hover {
-	color: #12E7D1;
-}
 
 /*************************************************/
 /******************** TOOLTIP ********************/
 /*************************************************/
 .scheme_space #tooltip,
-.scheme_space .tooltip-block > div {
+.scheme_space .tooltip-content{
     color: #1a98bd; /* tooltip windows == left column : left text */
 	background-color: rgba(6, 19, 54, 0.8);
 	font-size: 95%;
 	border: 1px solid rgba(11, 74, 104, 0.8);
 	border-radius: 5px !important;
 }
-.scheme_space .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_space .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_space .button_tooltip {
@@ -1082,10 +1075,15 @@ body.scheme_space.with_background_image {
 .scheme_unicor div#advisorsContainer {
 	color: #C23574;
 }
-.scheme_space #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+.scheme_space #fastHuntContainer > a, /* Text left column : "Send hunters (xx times)" */
+.scheme_space #fastSacrificeContainer > a {
 	font-size: 110%;
 }
-.scheme_space #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_space #fastHuntContainer > a:hover,
+.scheme_space #fastSacrificeContainer > a:hover {
+	text-shadow: 1px 1px #101010;
+}
+.scheme_space div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #F4691A;
 }
 .scheme_space #fastPraiseContainer > a { /* Text left column : "Praise the sun!" */
@@ -1094,9 +1092,6 @@ body.scheme_space.with_background_image {
 .scheme_space #fastPraiseContainer > a:hover {
 	color: #FFFFFF;
 	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9), 3px 1px 6px #C23574, -3px -1px 6px #C23574;
-}
-.scheme_space #fastHuntContainer > a:hover {
-	text-shadow: 1px 1px #101010;
 }
 .scheme_space .res-cell.positive-weather { /* to change the color for bonus cell according to the season */
 	font-size: 90% !important;

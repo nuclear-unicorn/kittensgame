@@ -423,7 +423,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "relic",     	val: 5 }
 		],
 		calculateEffects: function(self, game){
-			if(self.researched){
+			if (self.researched){
 				game.time.queue.unlockQueueSource("chronoforge");
 			}
 		}
@@ -1293,8 +1293,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.spaceEngineers.label"),
 		description: $I("workshop.spaceEngineers.desc"),
 		effects: {
-			"t1CraftRatio": 2,
-			"t2CraftRatio": 2,
+			"t1CraftRatio": 10,
+			"t2CraftRatio": 5,
 			"t3CraftRatio": 2,
 			"t4CraftRatio": 2,
 			"queueCap": 2
@@ -1325,8 +1325,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.chronoEngineers.label"),
 		description: $I("workshop.chronoEngineers.desc"),
 		effects: {
-			"t1CraftRatio": 2,
-			"t2CraftRatio": 2,
+			"t1CraftRatio": 10,
+			"t2CraftRatio": 5,
 			"t3CraftRatio": 2,
 			"t4CraftRatio": 2,
 			"t5CraftRatio": 2,
@@ -1592,6 +1592,29 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "titanium", val: 1500 },
 			{ name : "science",  val: 175000 }
+		]
+	},
+	{
+		//Special upgrade only unlockable during the Unicorn Tears Challenge
+		name: "alicornStable",
+		label: $I("workshop.alicornStable.label"),
+		description: $I("workshop.alicornStable.desc"),
+		effects: {
+			"alicornMax": 0
+		},
+		calculateEffects: function(self, game) {
+			if (game.challenges.isActive("unicornTears")) {
+				self.description = $I("workshop.alicornStable.desc");
+				self.effects["alicornMax"] = 0.2;
+			} else {
+				self.description = $I("workshop.alicornStable.desc.noChallenge");
+				self.effects["alicornMax"] = 0;
+			}
+		},
+		prices:[
+			{ name: "wood", val: 3000 },
+			{ name: "gold", val: 100 },
+			{ name: "alicorn", val: 20 }
 		]
 	},
 	{
@@ -2474,7 +2497,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 		if (bypassResourceCheck || this.game.resPool.hasRes(prices)) {
 			this.game.resPool.payPrices(prices);
-			this.game.resPool.addResEvent(res,craftAmt);
+			var actualAmtGained = this.game.resPool.addResEvent(res,craftAmt);
 			if (craft.upgrades){
 				this.game.upgrade(craft.upgrades);
 			}
@@ -2482,15 +2505,16 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			this.game.stats.getStat("totalCrafts").val++;
 			this.game.stats.getStatCurrent("totalCrafts").val++;
 
-            if (!suppressUndo) {
-                var undo = this.game.registerUndoChange();
-                undo.addEvent("workshop", /* TODO: use manager.id and pass it in proper way as manager constructor*/
-                    {
-						metaId:res,
-						val: amt
-					}
-				);
-            }
+			if (!suppressUndo) {
+				var undo = this.game.registerUndoChange();
+				undo.addEvent(this.id,
+				{
+					metaId: res, //Internal ID of the craft recipe & also of the resource that's the product
+					resGainedAmt: actualAmtGained,
+					resSpent: prices
+				}, $I("ui.undo.workshop.craft", [this.game.getDisplayValueExt(actualAmtGained), this.game.resPool.get(res).title]));
+				// (Note: We use res.title instead of craft.label because this way the English version makes consistent grammatical sense.)
+			}
 
             return true;
 		} else if (forceAll) {
@@ -2525,7 +2549,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				var price = craft.prices[priceInd];
 				if (!result[price.name]){
 					result[price.name] = -price.val * effectPerTick;
-				}else{
+				} else {
 					result[price.name] -= price.val * effectPerTick;
 				}
 			}
@@ -2551,16 +2575,38 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		return effectPerTick * (1 + (afterCraft ? this.game.getResCraftRatio(resName) : 0));
 	},
 
-    undo: function(data){
-		var metaId = data.metaId,
-			val = data.val;
-
-		if (this.craft(metaId, -val, true /*do not create cyclic undo*/)){
-			var res = this.game.resPool.get(metaId);
-			var craftRatio = this.game.getResCraftRatio(metaId);
-			this.game.msg( $I("workshop.undo.msg", [this.game.getDisplayValueExt(val * (1 + craftRatio)), (res.title || res.name)]));
+	/**
+	 * This function un-crafts something.  The idea is that the undo system will delegate any crafting-related
+	 * undo commands to this function here.
+	 * If the product of the craft cannot be returned (like, if it's been spent), the undo will fail & nothing will be refunded.
+	 * Otherwise, the player will get a full refund, regaining the resources that were actually spent.
+	 * If, in the intervening time (between crafting & getting a refund), the craft ratio changes,
+	 * 	the refund uses the value that the craft ratio had at the time the original craft was performed.
+	 * 	(No exploit by changing leaders!)
+	 * @param data		object	Contains all pertinent information needed to undo the craft.
+	 * 		metaId: string, name of the resource produced as a result of the craft
+	 * 		resGainedAmt: number, amount of the resource produced as a result of the craft
+	 * 		resSpent: array of objects, names & amounts of resources spent as a part of the craft
+	 * 			Objects have the structure { name: <string>, val: <number> }
+	 */
+	undo: function(data){
+		var resPool = this.game.resPool;
+		//Fail the un-craft if we cannot get the player a full refund:
+		if (resPool.get(data.metaId).value < data.resGainedAmt) {
+			this.game.msg($I("workshop.undo.failure", [resPool.get(data.metaId).title]), "alert", "undo", true /*noBullet*/);
+			return;
 		}
-    },
+		//Else, player is eligible for a full refund:
+		resPool.addResEvent(data.metaId, -data.resGainedAmt);
+		data.resSpent.forEach(function(priceLine) {
+			var amt = resPool.addResEvent(priceLine.name, priceLine.val);
+			if (amt) {
+				//amt could be 0 due to a rounding error.  In that case, don't show it.
+				this.game.msg($I("workshop.undo.regain", [this.game.getDisplayValueExt(amt), resPool.get(priceLine.name).title]),
+					null, "undo", true /*noBullet*/);
+			}
+		});
+	},
 
 	//returns a total number of resoruces possible to craft for this recipe
 	getCraftAllCount: function(craftName){
@@ -2734,6 +2780,10 @@ dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearun
 		result.tooltipName = true;
 		result.simplePrices = false;
 		return result;
+	},
+
+	getType: function(){
+		return "upgrades";
 	},
 
 	getMetadata: function(model){
@@ -2932,90 +2982,49 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 		var model = this.inherited(arguments);
 		var self = this;
 		if (this.game.science.get("mechanization").researched) {
-			if (!this.controllerOpts.compactStyle) {
-				model.unassignCraftLinks = [
-				  {
-						id: "unassign",
-						title: "[-]",
-						handler: function(){
-							self.unassignCraftJob(model, 1);
-						},
-					  	enabled: true
-				   },{
-						id: "unassign5",
-						title: "[-5]",
-						handler: function(){
-							self.unassignCraftJob(model, 5);
-						},
-						enabled: true
-				   },{
-						id: "unassign25",
-						title: "[-25]",
-						handler: function(){
-							self.unassignCraftJob(model, 25);
-						},
-						enabled: true
-				   }];
+			//We will generate links for assigning/unassigning this many engineers:
+			var LINK_AMOUNTS = [5, 25, 100];
 
-				model.assignCraftLinks = [
-					{
-						id: "assign",
-						title: "[+]",
-						handler: function(){
-							self.assignCraftJob(model, 1);
-						},
-						enabled: true
-				   },{
-						id: "assign5",
-						title: "[+5]",
-						handler: function(){
-							self.assignCraftJob(model, 5);
-						},
-						enabled: true
-				   },{
-						id: "assign25",
-						title: "[+25]",
-						handler: function(){
-							self.assignCraftJob(model, 25);
-						},
-						enabled: true
-				   }];
-			} else {
-				model.unassignCraftLinks = [
-				  {
-						id: "unassign",
-						title: "-",
-						handler: function(){
-							self.unassignCraftJob(model, 1);
-						},
-					  	enabled: true
-				   },{
-						id: "unassign25",
-						title: "-25",
-						handler: function(){
-							self.unassignCraftJob(model, 25);
-						},
-						enabled: true
-				   }];
-
-				model.assignCraftLinks = [
-					{
-						id: "assign",
-						title: "+",
-						handler: function(){
-							self.assignCraftJob(model, 1);
-						},
-						enabled: true
-				   },{
-						id: "assign25",
-						title: "+25",
-						handler: function(){
-							self.assignCraftJob(model, 25);
-						},
-						enabled: true
-				   }];
-			}
-
+			//Links for +/- 1
+			model.unassignCraftLinks = [{
+				id: "unassign",
+				title: "[-]",
+				handler: function(){
+					self.unassignCraftJob(model, 1);
+				},
+				enabled: true
+			}];
+			model.assignCraftLinks = [{
+				id: "assign",
+				title: "[+]",
+				handler: function(){
+					self.assignCraftJob(model, 1);
+				},
+				enabled: true
+			}];
+			//Links for +/- amt, where amt is specified in LINK_AMOUNTS
+			//(Generate only if we have at least as many engineers as amt.)
+			LINK_AMOUNTS.forEach(function(amt) {
+				if (this.game.village.getWorkerKittens("engineer") < amt) {
+					return; //Skip generating links for this amt
+				}
+				model.unassignCraftLinks.push({
+					id: "unassign" + amt,
+					title: "[-" + amt + "]",
+					handler: function() {
+						self.unassignCraftJob(model, amt);
+					},
+					enabled: true
+				});
+				model.assignCraftLinks.push({
+					id: "assign" + amt,
+					title: "[+" + amt + "]",
+					handler: function(){
+						self.assignCraftJob(model, amt);
+					},
+					enabled: true
+				});
+			});
 		} else {
 			model.assignCraftLinks = [];
 			model.unassignCraftLinks = [];
@@ -3090,6 +3099,10 @@ dojo.declare("com.nuclearunicorn.game.ui.ZebraUpgradeButtonController", com.nucl
         return model.metaCached;
     },
 
+	getType: function(){
+		return "zebraUpgrades";
+	},
+
 	getPrices: function(model) {
         return this.game.village.getEffectLeader("scientist", this.inherited(arguments));
     },
@@ -3098,7 +3111,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ZebraUpgradeButtonController", com.nucl
 		var upgrade = model.metadata;
 		if (!upgrade.unlocked){
 			model.visible = false;
-		}else{
+		} else {
 			model.visible = true;
 		}
 
@@ -3206,7 +3219,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Workshop", com.nuclearunicorn.game.
 	//---------------------------------------------------------------------
 
 	var zebraUpgradesPanel = new com.nuclearunicorn.game.ui.Panel($I("workshop.zebraUpgradesPanel.label"), this.game.workshop);
-	if(this.game.bld.getBuildingExt("zebraWorkshop").meta.val>0){
+	if (this.game.bld.getBuildingExt("zebraWorkshop").meta.val>0){
 		var content = zebraUpgradesPanel.render(tabContainer);
 
 		for (var i = 0; i < this.game.workshop.zebraUpgrades.length; i++){

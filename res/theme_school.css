@@ -7,6 +7,14 @@
 /**********************************************/
 /******************** GAME ********************/
 /**********************************************/
+/* ******************************************** */
+.scheme_school,
+.scheme_school .help {
+	color-scheme: dark;
+	--page-background-color:#292728;
+	--text-color: #81848C;
+}
+
 body.scheme_school,
 .scheme_school div.dialog {
 	background-color: #292728;
@@ -291,7 +299,7 @@ body.scheme_school.with_background_image,
 	font-size: 13px; /* for center tooltip except title, effects and flavor */
 }
 .scheme_school #tooltip,
-.scheme_school .tooltip-block > div {
+.scheme_school .tooltip-content{
     background-image: url('img/theme-school_dark.jpg'); /* source : https://pngtree.com/freebackground/taobao-small-appliances-poster-tmall-kitchen-supplies-banner_1061754.html */
 	background-repeat: repeat;
 	background-attachment: fixed;
@@ -303,7 +311,7 @@ body.scheme_school.with_background_image,
 	border-radius: 0 0 5px 5px;
 	box-shadow: inset 0 1px 2px #000000, 2px 2px 3px #000000;
 }
-.scheme_school .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_school .tooltip-content{ /* tooltip on ? top right column */
 	font-size: 13px;
 	padding: 5px;
 }
@@ -926,10 +934,15 @@ body.scheme_school.with_background_image,
 	color: #973B47;
 	padding-top: 6px; /* default padding-top: 10px; */
 }
-.scheme_school #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+.scheme_school #fastHuntContainer > a, /* Text left column : "Send hunters (xx times)" */
+.scheme_school #fastSacrificeContainer > a {
 	font-size: 100%;
 }
-.scheme_school #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_school #fastHuntContainer > a:hover,
+.scheme_school #fastSacrificeContainer > a:hover {
+	text-shadow: 1px 1px #000000;
+}
+.scheme_school div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #4A4A4A;
 	text-shadow: none !important;
 }
@@ -938,9 +951,6 @@ body.scheme_school.with_background_image,
 }
 .scheme_school #fastPraiseContainer > a:hover {
 	text-shadow: 0 0 7px rgba(255, 255, 255, 0.9);
-}
-.scheme_school #fastHuntContainer > a:hover {
-	text-shadow: 1px 1px #000000;
 }
 .scheme_school .res-cell.positive-weather { /* to change bonus cell according to the season */
 	font-size: 80% !important;

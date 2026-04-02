@@ -2,6 +2,7 @@
 
     $r,
     WQueue: writable,
+    WQueueItem: writable,
     game
 */
 
@@ -229,7 +230,7 @@ WQueue = React.createClass({
                             options[indexToUse].name,
                             self.state.typeId,
                             options[indexToUse].label,
-                            e.shiftKey
+                            e
                         );
                     }
 

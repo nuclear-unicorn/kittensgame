@@ -22,8 +22,7 @@ body.scheme_vessel {
 .scheme_vessel .btn,
 .scheme_vessel .modern,
 .scheme_vessel .btn.modern,
-.scheme_vessel input[type='button'],
-.scheme_vessel #crowdjet-expand-container {
+.scheme_vessel input[type='button'] {
 	 font-family: 'Play', sans-serif;
 }
 .scheme_vessel .btn.disabled,
@@ -322,18 +321,12 @@ body.scheme_vessel {
 	/* default right: 5px; */
 	color: rgba(90, 90, 90, 0.5); /* color #5A5A5A *//* a link separator : | on footer links */
 }
-.scheme_vessel #crowdjet-expand-container {
-	color: #dddddd;
-}
-.scheme_vessel #crowdjet-expand-container:hover {
-	color: #a0a0a0;
-}
 
 /* *********************************************** */
 /* ******************* TOOLTIP ******************* */
 /* *********************************************** */
 .scheme_vessel #tooltip,
-.scheme_vessel .tooltip-block > div {
+.scheme_vessel .tooltip-content{
 	background-color: rgba(0, 0, 0, 0.8);
 	background-image: url('img/theme_vessel_glass.png'); /* source of images for graphic design : https://pngtree.com/ Volkeyrn: permanent premium member */
 	background-repeat: no-repeat;
@@ -345,7 +338,7 @@ body.scheme_vessel {
                  0 -2px 0 #161616 !important;
 	border-radius: 11px !important;
 }
-.scheme_vessel .tooltip-block > div { /* for tooltip on ? in left column */
+.scheme_vessel .tooltip-content{ /* for tooltip on ? in left column */
 	background-image: url('img/theme_vessel_glass_button_background.png'); /* source of images for graphic design : https://pngtree.com/ Volkeyrn: permanent premium member */
 	padding: 3px;
 }
@@ -1195,14 +1188,16 @@ body.scheme_vessel {
 	color: #991A22;
 	padding-top: 6px;/* default padding-top: 10px; */
 }
-.scheme_vessel #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+.scheme_vessel #fastHuntContainer > a, /* Text left column : "Send hunters (xx times)" */
+.scheme_vessel #fastSacrificeContainer > a {
 	font-size: 100%;
 	color: #007B3E;
 }
-.scheme_vessel #fastHuntContainer > a:hover {
+.scheme_vessel #fastHuntContainer > a:hover,
+.scheme_vessel #fastSacrificeContainer > a:hover {
 	color: #A0A0A0;
 }
-.scheme_vessel #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_vessel div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #747474;
 	text-shadow: none !important;
 }

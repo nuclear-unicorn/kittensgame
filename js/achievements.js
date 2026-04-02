@@ -407,6 +407,15 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             title: "Better Safe Than Sorry",
             description: "Get Carbon Sequestration with no pollution.",
             difficulty: "E"
+        },{
+            name: "soLongAndThanksForAllTheHay", //Because horses eat hay
+            title: "So Long, and Thanks for All the Hay",
+            description: "Have exactly 42 alicorns.", //Subtle lie--accomodate floating-point error by ± 1 picoalicorn.
+            difficulty: "S",
+            condition: function() {
+                var epsilon = 1e-12;
+                return Math.abs(this.game.resPool.get("alicorn").value - 42) < epsilon;
+            }
         }
     ],
 
@@ -630,7 +639,7 @@ dojo.declare("classes.ui.AchievementsPanel", com.nuclearunicorn.game.ui.Panel, {
 		var desiredStarText = this.generateStarText(completedStars, uncompletedStars);
 		//The inner HTML has taken the &#; format & rendered it as Unicode; we must do something similar.
 		var starTextForCompare = String.fromCharCode.apply(null, desiredStarText.replaceAll("&#", "").split(";").slice(0, -1));
-		if(this.achievementsHeader.firstElementChild.innerHTML != starTextForCompare) {
+		if (this.achievementsHeader.firstElementChild.innerHTML != starTextForCompare) {
 			this.achievementsHeader.firstElementChild.innerHTML = desiredStarText;
 		}
 	},

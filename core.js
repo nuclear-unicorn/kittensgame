@@ -259,7 +259,7 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 			return;
 		}
 
-		for(var i = 0; i < saveMeta.length; i++){
+		for (var i = 0; i < saveMeta.length; i++){
 			var savedMetaElem = saveMeta[i];
 
 			if (savedMetaElem != null){
@@ -287,9 +287,17 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 		}
 	},
 
-	filterMetadata: function(meta, fields){
+	/**
+	 * 
+	 * @param {*} meta 
+	 * @param {*} fields 
+	 * @param {*} replacer - function(key, value)
+	 * If returns undefined, metadata field will not be serialized
+	 * @returns 
+	 */
+	filterMetadata: function(meta, fields, replacer){
 		var filtered = [];
-		for(var i = 0; i < meta.length; i++){
+		for (var i = 0; i < meta.length; i++){
 			var clone = {};
 
 			for (var j = 0; j < fields.length; j++){
@@ -297,7 +305,17 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 				/*if (!meta[i].hasOwnProperty(fld)){
 					console.warn("Can't find elem." + fld + " in", meta[i]);
 				}*/
-				clone[fld] = meta[i][fld];
+
+				var value = meta[i][fld];
+				if (replacer){
+					value = replacer(fld, meta[i][fld]);
+				} else {
+					value = meta[i][fld];
+				}
+
+				if (value !== undefined){
+					clone[fld] = value;
+				}
 			}
 			filtered.push(clone);
 		}
@@ -438,6 +456,11 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 				enabled: true,
 				unlocked: false
 			},
+			"undo": {
+				title: $I("console.filter.undo"),
+				enabled: true,
+				unlocked: false
+			}
 		}
 	},
 
@@ -564,6 +587,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	fetchModel: function(options) {
 		var model = this.initModel(options);
 		model.name = this.getName(model);
+		model.type = this.getType(model);
 		model.description = this.getDescription(model);
 		model.prices = this.getPrices(model);
 		model.priceRatio = options.priceRatio;
@@ -581,7 +605,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		var priceModels = [];
 
 		if (prices) {
-			for( var i = 0; i < prices.length; i++){
+			for ( var i = 0; i < prices.length; i++){
 				var price = prices[i];
 				priceModels.push(this.createPriceLineModel(model, price));
 
@@ -600,6 +624,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		return  {
 			name: "",
 			description: "",
+			type: "",
 			visible: true,
 			enabled: true,
 			handler: null,
@@ -673,6 +698,9 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		return model.options.description;
 	},
 
+	getType: function(model){
+		return model.options.type;
+	},
 
 	/**
 	 * Deprecated method for price management (increases price property stored in button)
@@ -680,7 +708,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	adjustPrice:function(model, ratio ){
 		var prices = this.getPrices(model);
 		if (prices.length){
-			for( var i = 0; i < prices.length; i++){
+			for ( var i = 0; i < prices.length; i++){
 				var price = prices[i];
 
 				price.val = price.val * ratio;
@@ -696,7 +724,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	rejustPrice: function(model, ratio){
 		var prices = model.prices;
 		if (prices.length){
-			for( var i = 0; i < prices.length; i++){
+			for ( var i = 0; i < prices.length; i++){
 				var price = prices[i];
 
 				price.val = price.val / ratio;
@@ -717,7 +745,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 			console.warn("unable pay prices for undo refund a building, no prices specified in metadata :O");
 			return;
 		}
-		for( var i = 0; i < model.prices.length; i++){
+		for ( var i = 0; i < model.prices.length; i++){
 			var price = model.prices[i];
 
 			var res = this.game.resPool.get(price.name);
@@ -800,7 +828,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 			console.warn("unable to refund building, no prices specified in metadata :O");
 			return;
 		}
-		for( var i = 0; i < model.prices.length; i++){
+		for ( var i = 0; i < model.prices.length; i++){
 			var price = model.prices[i];
 
 			var res = this.game.resPool.get(price.name);
@@ -1014,7 +1042,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 			var tooltipPricesNodes = [];
 
-			for( var i = 0; i < prices.length; i++){
+			for ( var i = 0; i < prices.length; i++){
 				var price = prices[i];
 
 				var priceItemNode = dojo.create("div", {
@@ -1307,6 +1335,15 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 	isPrecraftAvailable: function(model){
 		for (var i in model.prices){
 			var price = model.prices[i];
+			if (price.name == "wood") {
+				if (this.game.village.getKittens() == 0) {
+					//(We don't want any kittens starving to death.)
+					return true;
+				}
+				//Else, treat wood as non-craftable
+				continue;
+			}
+			if (price.name == "tears") { return true; }
 			var res = this.game.resPool.get(price.name);
 			if (res.craftable){
 				return true;
@@ -1330,13 +1367,25 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 			}
 		}
 
-		var res = this.game.resPool.get(price.name);
-		if (res.craftable && res.name != "wood" && this.game.workshop.getCraft(res.name).unlocked) {
-			var amt = price.val - res.value;
-			if (amt > 0) {
-				var baseAmt = amt / (1 + this.game.getResCraftRatio(res.name));
-				this.game.workshop.craft(res.name, baseAmt, false /*no undo*/, true /*force all*/);
-			}
+		var game = this.game;
+		if (game.resPool.isStorageLimited([ price ])) { //Do not precraft if we cannot afford it anyways
+			return;
+		}
+		var res = game.resPool.get(price.name);
+		var amt = price.val - res.value;
+		if (amt <= 0) {
+			return;
+		}
+		if (res.name == "wood" && game.village.getKittens() > 0) {
+			//Don't craft wood if we have kittens, as there's risk of causing starvation
+			return;
+		}
+		if (res.craftable && game.workshop.getCraft(res.name).unlocked) {
+			var baseAmt = amt / (1 + game.getResCraftRatio(res.name));
+			game.workshop.craft(res.name, baseAmt, false /*no undo*/, true /*force all*/);
+		}
+		if (res.name == "tears" && game.religion.getHasUnlockedUnicornSacrifice()) {
+			game.religion.sacrificeUnicornsToTarget(amt);
 		}
 	}
 });
@@ -1431,7 +1480,7 @@ ButtonModernHelper = {
 		if (!prices.length){
 			return;
 		}
-		for( var i = 0; i < prices.length; i++){
+		for ( var i = 0; i < prices.length; i++){
 			var price = prices[i];
 			var span = ButtonModernHelper._renderPriceLine(tooltip, price);
 		}
@@ -1676,7 +1725,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 
 		if (building.on >= amt){
 			building.on -= amt;
-			if(building.stages){
+			if (building.stages){
 				model.metaAccessor.meta.on -= amt; //stage hack
 			}
 			this.metadataHasChanged(model);
@@ -1688,7 +1737,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		var building = model.metadata;
 		if (building.on){
 			building.on = 0;
-			if(building.stages){
+			if (building.stages){
 				model.metaAccessor.meta.on = 0; //stage hack
 			}
 			this.metadataHasChanged(model);
@@ -1708,7 +1757,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 
 		if (building.on + amt <= building.val ){
 			building.on += amt;
-			if(building.stages){
+			if (building.stages){
 				model.metaAccessor.meta.on += amt; //stage hack
 			}
 			this.metadataHasChanged(model);
@@ -1720,7 +1769,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		var building = model.metadata;
 		if (building.on < building.val) {
 			building.on = building.val;
-			if(building.stages){
+			if (building.stages){
 				model.metaAccessor.meta.on = building.val; //stage hack
 			}
 			this.metadataHasChanged(model);
@@ -1737,7 +1786,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		// Allow buildings to override sell button with custom actions
 		// But, proceed with normal action as well if true returned.
 		if (building.canSell) {
-			if(!building.canSell(building, this.game)) {
+			if (!building.canSell(building, this.game)) {
 				return 0;
 			}
 		}
@@ -1753,8 +1802,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 				var self = this;
 				var amtSold = 0;
 				this.game.ui.confirm($("sell.all.confirmation.title"), $I("sell.all.confirmation.msg"), function() {
-					self.sellInternal(model, end, true /*requireSellLink*/);
-					amtSold = start;
+					amtSold = self.sellInternal(model, end, true /*requireSellLink*/);
 				});
 				return amtSold;
 			}
@@ -1775,6 +1823,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 	 * 						This feature exists so that Order of the Sun upgrades can have additional requirements
 	 * 						for when they can be sold, but also so that those requirements can be bypassed
 	 * 						for purposes such as the implementation of the undo feature.
+	 * @return The number of buildings actually sold.
 	 */
 	sellInternal: function(model, end, requireSellLink){
 		//Check input parameters for validity.
@@ -1783,9 +1832,11 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 			requireSellLink = false;
 		}
 
+		var counter = 0;
 		var building = model.metadata;
 		while (building.val > end) {
 			this.decrementValue(model);
+			counter += 1;
 
 			model.prices = this.getPrices(model);
 			this.refund(model);
@@ -1798,6 +1849,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		this.metadataHasChanged(model);
 		this.game.upgrade(building.upgrades);
 		this.game.render();
+		return counter;
 	},
 
 	decrementValue: function(model) {
@@ -1853,7 +1905,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 		}
 
 		//--------------- style -------------
-		if((building.val > 9 || building.name.length > 10) && this.model.hasSellLink) {
+		if ((building.val > 9 || building.name.length > 10) && this.model.hasSellLink) {
 			//Steamworks and accelerator specifically can be too large when sell button is on
 			//(tested to support max 99 bld count)
 			dojo.addClass(this.domNode, "small-text");
@@ -1944,7 +1996,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 			}
 
 			//--------------- style -------------
-			if(building.val > 9) {
+			if (building.val > 9) {
 				dojo.style(this.domNode,"font-size","90%");
 			}
 
@@ -1982,23 +2034,22 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 
 		var label = "<div class=\"label\"><span class=\"label-content\">" + meta.label + "</span></div>";
 
+		var amtClass = "amt";
+		if (meta.val >= 10000){
+			amtClass = "amt small";
+		}
+
 		if (!meta.val) {
 			return label;
 		} else if (meta.noStackable){
-			return label + " " + $I("btn.complete");
+			return label + "<div>" + $I("btn.complete") + "</div>";
 		} else if (meta.togglableOnOff){
-			return label + "<div>(" + meta.val + ")</div>";
-		} else if (meta.togglable) {
-			//it's not so important h
-			/*if (meta.val >= 1000){
-				return meta.label + " (" +
-					(meta.on < 10000 ? ((meta.on/1000).toFixed(1) + "K") : this.game.getDisplayValueExt(meta.on)) + "/" +
-					(meta.val < 10000 ? ((meta.val/1000).toFixed(1) + "K") : this.game.getDisplayValueExt(meta.val)) +
-				")";
-			}*/
-			return label + "<div>(" + meta.on + "/" + meta.val + ")</div>";
+			return label + "<div class=\"amt\">(" + meta.val + ")</div>";
+		} else if (meta.togglable && meta.on != meta.val) {
+			//do not display redundand 1000/1000 to save real estate
+			return label + "<div class=\"" + amtClass + "\">(" + meta.on + "/" + meta.val + ")</div>";
 		} else {
-			return label + "<div>(" + meta.on + ")</div>";
+			return label + "<div class=\"amt\">(" + meta.on + ")</div>";
 		}
 	},
 
@@ -2262,10 +2313,11 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingNotStackableBtnController", com
 
 	getName: function(model){
 		var meta = model.metadata;
+		var label = "<div class=\"label\"><span class=\"label-content\">" + meta.label + "</span></div>";	
 		if (meta.researched){
-			return meta.label + " " + $I("btn.complete.capital");
+			return label + "<div>" + $I("btn.complete.capital") + "</div>";
 		} else {
-			return meta.label;
+			return label;
 		}
 	},
 

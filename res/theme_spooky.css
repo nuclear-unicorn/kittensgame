@@ -443,20 +443,15 @@ body.scheme_spooky.with_background_image {
 .scheme_spooky #footerLinks a {
 	color: #d0d0d0;
 }
-.scheme_spooky #footerLinks a:hover,
-.scheme_spooky #crowdjet-expand-container:hover {
+.scheme_spooky #footerLinks a:hover{
 	color: #982ee4;
-}
-.scheme_spooky #crowdjet-expand-container {
-	color: #d0d0d0;
-	font-family: 'Delius', cursive;
 }
 
 /* *********************************************** */
 /* ******************* TOOLTIP ******************* */
 /* *********************************************** */
 .scheme_spooky #tooltip,
-.scheme_spooky .tooltip-block > div {
+.scheme_spooky .tooltip-content{
 	/* default padding-left: 3px; */
 	padding-bottom: 5px;
 	background: transparent;
@@ -469,7 +464,7 @@ body.scheme_spooky.with_background_image {
 	border-image-outset: 0 1px 2px 1px;
 	border-image-repeat: stretch;
 }
-.scheme_spooky .tooltip-block > div { /* tooltip on "?" top right column */
+.scheme_spooky .tooltip-content{ /* tooltip on "?" top right column */
 	padding: 5px;
 }
 .scheme_spooky .button_tooltip {
