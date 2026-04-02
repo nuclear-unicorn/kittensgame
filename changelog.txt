@@ -1,3 +1,13 @@
+v 1.5.0.1 (21 Feb 2026)
+Undo System Update:
+* Now supports more actions (trade, religion, space, time)
+Siphoning Update:
+* Siphoning policy reworked
+* It's part of a trio now
+Minor:
+* Add CTRL/SHIFT support for "Send hunters" and "Add to Queue" (Brent)
+* Various fixes and balance improvements (Brent)
+
 v 1.5.0.0 (16 Feb 2026)
 Major:
 
@@ -9,9 +19,6 @@ Added Norwegian and Dutch languages to the list of available localizations
 Fixed error messages not being shown for login panel
 Minor ui tweaks for various color themes
 Removed crowdin translation widget
-
-Add CTRL/SHIFT support for "Send hunters" and "Add to Queue" (Brent)
-Various fixes and balance improvements (Brent)
 
 v 1.4.9.4 (12 Dec 2024)
 Major:

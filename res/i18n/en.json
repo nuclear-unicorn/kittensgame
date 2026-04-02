@@ -1909,6 +1909,7 @@
     "ui.option.app.ios": "iOS",
     "ui.option.notation": "Notation:",
     "ui.option.pollution": "Disable pollution effects",
+    "ui.option.enableMobileUI": "Show additional mobile UI features",
 
     "queue.alphabeticalToggle": "Sort queue A➛Z",
     "queue.add": "Add to queue",
