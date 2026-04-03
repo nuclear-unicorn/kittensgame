@@ -934,14 +934,24 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"pyramidFaithRatio" : 0,
 			"deficitRecoveryRatio": 0,
 			"blackLibraryBonus": 0,
-			"pyramidSpaceCompendiumRatio": 0
+			"pyramidSpaceCompendiumRatio": 0,
+			"craftRatio": 0,
+			"UniversalKnowHow" : 0,
+			"pyramidPerYearRatio" : 0,
+			"timeRatio" : 0
 		},
-		simpleEffectNames:[
+		simpleEffectNames: [
 			"GlobalResourceRatio",
 			"RecoveryRatio",
 			"GlobalProductionRatio",
 			"FaithRatio",
-			"SpaceCompendiumRatio"
+			"SpaceCompendiumRatio",
+			"PerYearRatio"
+		],
+		prefixEffectNames: [
+			"craftRatio",
+			"UniversalKnowHow",
+			"timeRatio"
 		],
 		upgrades: {
 			spaceBuilding: ["spaceBeacon"]
@@ -966,6 +976,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			var self = game.religion.getZU("blackPyramid");
 			for (var counter in self.simpleEffectNames){
 				self.effectsPreDeficit["pyramid" + self.simpleEffectNames[counter]] = game.getEffect("pact" + self.simpleEffectNames[counter]) * transcendenceTierModifier;
+			}
+			for (var counter in self.prefixEffectNames){
+				self.effectsPreDeficit[self.prefixEffectNames[counter]] = game.getEffect("pact" + self.prefixEffectNames[counter]) * transcendenceTierModifier;
 			}
 			self.effectsPreDeficit["deficitRecoveryRatio"] = game.getEffect("pactDeficitRecoveryRatio");
 			var pactBlackLibraryBoost = game.getEffect("pactBlackLibraryBoost") * transcendenceTierModifier;
@@ -1337,7 +1350,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		},
 		unlocked: false,
 		unlocks: {
-			pacts: ["pactOfCleansing", "pactOfDestruction",  "pactOfExtermination", "pactOfPurity"],
+			pacts: ["pactOfCleansing", "pactOfDestruction",  "pactOfExtermination", "pactOfPurity", "pactOfArcane", "pactOfChronicler"],
 			policies: ["siphoning", "feedingFrenzy", "upfrontPayment"]
 		},
 		calculateEffects: function (self, game){
@@ -2559,6 +2572,54 @@ dojo.declare("classes.religion.pactsManager", null, {
 				self.effects["necrocornPerDay"] = game.getEffect("pactNecrocornConsumption");
 				game.religion.getZU("blackPyramid").jammed = false;
 			}
+		},{
+			name: "pactOfArcane",
+			label: $I("religion.pact.pactOfArcane.label"),
+			description: $I("religion.pact.pactOfArcane.desc"),
+
+			prices: [
+				{ name : "relic", val: 100},
+			],
+			effects: {
+				"pactsAvailable": -1,
+				"necrocornPerDay": 0,
+				"pactcraftRatio": 0.001,
+				"pactUniversalKnowHow": 0.1,
+			},
+			unlocked: false,
+			calculateEffects: function(self, game){
+				if (!game.getFeatureFlag("MAUSOLEUM_PACTS")){
+					return;
+				}
+				self.effects["necrocornPerDay"] = game.getEffect("pactNecrocornConsumption");
+				game.religion.getZU("blackPyramid").jammed = false;
+			}
+		},{
+			name: "pactOfChronicler",
+			label: $I("religion.pact.pactOfChronicler.label"),
+			description: $I("religion.pact.pactOfChronicler.desc"),
+
+			prices: [
+				{ name : "relic", val: 100},
+			],
+			effects: {
+				"pactsAvailable": -1,
+				"necrocornPerDay": 0,
+				"pactPerYearRatio" : 0.003,
+				"umbraBoostRatio": 0.1,
+				"pacttimeRatio": 0.1,
+			},
+			unlocked: false,
+			calculateEffects: function(self, game){
+				if (!game.getFeatureFlag("MAUSOLEUM_PACTS")){
+					return;
+				}
+				self.effects["necrocornPerDay"] = game.getEffect("pactNecrocornConsumption");
+				game.religion.getZU("blackPyramid").jammed = false;
+			},
+			upgrades: {
+				spaceBuilding: ["hrHarvester"]
+			},
 		},{
 			name: "payDebt",
 			label: $I("religion.pact.payDebt.label"),

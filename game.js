@@ -1810,6 +1810,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.pyramidSpaceCompendiumRatio.title"),
 				type: "ratio"
 			},
+			"pyramidPerYearRatio": {
+				title: $I("effectsMgr.statics.pyramidPerYearRatio.title"),
+				type: "ratio"
+			},
 			"pactBlackLibraryBoost":{
 				title: $I("effectsMgr.statics.pactBlackLibraryBoost.title"),
 				type: "ratio"
@@ -1818,8 +1822,28 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.pactDeficitRecoveryRatio.title"),
 				type: "ratio"
 			},
+			"UniversalKnowHow" :  {
+                title: $I("effectsMgr.statics.UniversalKnowHow.title"),
+                type: "fixed"
+            },
 			"pactSpaceCompendiumRatio":{
 				title: $I("effectsMgr.statics.pactSpaceCompendiumRatio.title"),
+				type: "ratio"
+			},
+			"pactcraftRatio": {
+				title: $I("effectsMgr.statics.pactcraftRatio.title"),
+				type: "ratio"
+			},
+			"pactPerYearRatio": {
+				title: $I("effectsMgr.statics.pactPerYearRatio.title"),
+				type: "ratio"
+			},
+			"pactUniversalKnowHow":{
+				title: $I("effectsMgr.statics.pactUniversalKnowHow.title"),
+				type: "fixed"
+			},
+			"pacttimeRatio":{
+				title: $I("effectsMgr.statics.pacttimeRatio.title"),
 				type: "ratio"
 			},
 			//pollution
@@ -3354,9 +3378,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			value: game.getEffect(resName + "PolicyRatio")
 		});
 		array.push({
-			name: $I("res.stack.destruction"),
+			name: $I("res.stack.chronicler"),
 			type: "ratio",
-			value: game.getEffect("pyramidGlobalProductionRatio")
+			value: game.getEffect("pyramidPerYearRatio")
 		});
 		return array;
 	},
@@ -3841,6 +3865,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			type: "ratio",
 			value: this.getEffect(res.name + "PolicyRatio")
 		});
+
+		stack.push({
+			name: $I("res.stack.chronicler"),
+			type: "ratio",
+			value: this.getEffect("pyramidPerYearRatio")
+		});
 		return stack;
 	},
 	getCMBRBonus: function() {
@@ -4024,7 +4054,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				return 0;
 			}
 		}
-		return this.getEffect(resName + "Production") * (1 + this.getEffect(resName + "PolicyRatio"));
+		return this.getEffect(resName + "Production") * (1 + this.getEffect(resName + "PolicyRatio")) * (1 + this.getEffect("pyramidPerYearRatio"));
 	},
 	getResourcePerTickConvertion: function(resName) {
 		return this.fixFloatPointNumber(this.getEffect(resName + "PerTickCon"));
