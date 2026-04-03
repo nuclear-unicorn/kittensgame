@@ -2492,7 +2492,7 @@ dojo.declare("classes.religion.pactsManager", null, {
 				"pactsAvailable": -1,
 				"necrocornPerDay": 0,
 				"pactcraftRatio": 0.001,
-				"pactUniversalKnowHow": 0.05,
+				"pactUniversalKnowHow": 0.1,
 			},
 			unlocked: false,
 			calculateEffects: function(self, game){
@@ -2513,9 +2513,9 @@ dojo.declare("classes.religion.pactsManager", null, {
 			effects: {
 				"pactsAvailable": -1,
 				"necrocornPerDay": 0,
-				"pactPerYearRatio" : 0.0005,
+				"pactPerYearRatio" : 0.003,
 				"umbraBoostRatio": 0.1,
-				"pacttimeRatio": 0.01,
+				"pacttimeRatio": 0.1,
 			},
 			unlocked: false,
 			calculateEffects: function(self, game){
