@@ -1554,6 +1554,8 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 
 	racePanels: null,
 	leviathansInfo: null,
+	tradeRatioSpan: null,
+	sharkMerchantsSpan: null,
 
 	constructor: function(tabName, game){
 		this.game = game;
@@ -1587,8 +1589,17 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 
 		var self = this;
 
+		//Display current trade bonus (tradeposts + Pacifism Challenge reward)
+		//Also display bonus from Shark Relations: Merchants
 		var div = dojo.create("div", { class: "expandAllBar", style: { float: "left"}}, tabContainer);
-		dojo.create("span", { innerHTML: $I("trade.effectiveness", [this.game.getDisplayValueExt((this.game.diplomacy.getTradeRatio() + this.game.challenges.getChallenge("pacifism").getTradeBonusEffect(this.game))* 100, false, false, 0)]) }, div);
+		this.tradeRatioSpan = dojo.create("span", { innerHTML: $I("trade.effectiveness", [this.game.getDisplayValueExt((this.game.diplomacy.getTradeRatio() + this.game.challenges.getChallenge("pacifism").getTradeBonusEffect(this.game))* 100, false, false, 0)]) }, div);
+		var sharkMerchantsPolicy = this.game.science.getPolicy("sharkRelationsMerchants");
+		if (sharkMerchantsPolicy.researched) {
+			dojo.create("br", {}, div);
+			this.sharkMerchantsSpan = dojo.create("span", { innerHTML: $I("trade.effectiveness.sharkRelationsMerchants", [this.game.toDisplayPercentage(sharkMerchantsPolicy.lastCalculatedBonus, 0, false)]) }, div);
+		} else {
+			this.sharkMerchantsSpan = null;
+		}
 
 		// expand all / collapse all panels
 
@@ -1760,6 +1771,16 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 
 	update: function(){
 		this.inherited(arguments);
+
+		//Update trade ratio & Shark Merchants displays:
+		//Woohoo, we now have code duplication, but this is the cleanest way I can think of right now.
+		if (this.tradeRatioSpan) {
+			this.tradeRatioSpan.textContent = $I("trade.effectiveness", [this.game.getDisplayValueExt((this.game.diplomacy.getTradeRatio() + this.game.challenges.getChallenge("pacifism").getTradeBonusEffect(this.game))* 100, false, false, 0)]);
+		}
+		if (this.sharkMerchantsSpan) {
+			var sharkMerchantsPolicy = this.game.science.getPolicy("sharkRelationsMerchants");
+			this.sharkMerchantsSpan.textContent = $I("trade.effectiveness.sharkRelationsMerchants", [this.game.toDisplayPercentage(sharkMerchantsPolicy.lastCalculatedBonus, 0, false)]);
+		}
 
 		for (var i = 0; i < this.racePanels.length; i++){
 			this.racePanels[i].update();

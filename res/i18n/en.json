@@ -1761,6 +1761,7 @@
     "trade.attitude.nowNeutral": "now neutral",
     "trade.cost": "Cost",
     "trade.effectiveness": "Trade effectiveness: +{0}%",
+    "trade.effectiveness.sharkRelationsMerchants": "Shark Relations: Merchants provides +{0}%",
     "trade.msg.elders": "Elder gods have arrived",
     "trade.msg.elders.departed": "Elder gods have departed",
     "trade.msg.elders.displeased": "Elder gods are displeased",
