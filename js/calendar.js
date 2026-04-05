@@ -355,6 +355,12 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		return effects;
 	},
 
+	//Returns a boolean
+	//Note that this can still return true in a Black Sky Challenge, even though astro events won't happen
+	getAreAstroEventsUnlocked: function() {
+		return this.game.bld.get("library").on > 0 || this.game.science.get("astronomy").researched;
+	},
+
 	//Returns a number in the interval [0,1]
 	getAstroEventAutoChance: function() {
 		var game = this.game;
@@ -490,7 +496,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			this.game.religion.pactsManager.necrocornDeficitPunishment();
 		}
 		//------------------------- astronomical events -------------------------
-		if (this.game.bld.get("library").on > 0) {
+		if (this.getAreAstroEventsUnlocked()) {
 			var eventChance = (0.0025 + this.game.getEffect("starEventChance")) * chanceRatio;
 			if (this.game.prestige.getPerk("astromancy").researched) {
 				eventChance *= 2;
@@ -697,7 +703,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 		// Auto observable events
         var numberEvents = 0, totalNumberOfEvents = 0;
-        if (this.game.bld.get("library").on > 0 && !this.game.challenges.isActive("blackSky")) { //blackSky should block rare astr. events
+        if (this.getAreAstroEventsUnlocked() && !this.game.challenges.isActive("blackSky")) { //blackSky should block rare astr. events
             var eventChance = (0.0025 + this.game.getEffect("starEventChance")) * chanceRatio;
             if (this.game.prestige.getPerk("astromancy").researched) {
                 eventChance *= 2;
