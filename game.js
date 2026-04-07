@@ -2198,9 +2198,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			this.updateCaches();
 		}), 5);		//once per 5 ticks
 
+		//Update descriptions of some policies where it's a pain to call game.upgrade every time something changes.
 		this.timer.addEvent(dojo.hitch(this, function() {
-			var policy = this.science.getPolicy("upfrontPayment");
-			policy.calculateEffects(policy, this); //Update description of policy
+			var policies = ["upfrontPayment", "sharkRelationsMerchants"];
+			for (var i = 0; i < policies.length; i++) {
+				var thePolicy = game.science.getPolicy(policies[i]);
+				thePolicy.calculateEffects(thePolicy, this);
+			}
 		}), 25);		//every 5 seconds
 
 		var ONE_MIN = this.ticksPerSecond * 60;
@@ -5220,10 +5224,21 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var stripe = 5;	//initial amount of kittens per stripe
 		var karma = this.getUnlimitedDR(this.karmaKittens, stripe);
 
-		this.resPool.get("karma").value = karma;
+		var karmaRes = this.resPool.get("karma");
+		var karmaPrev = karmaRes.value;
+		karmaRes.value = karma;
 
 		if (this.karmaZebras){
 			this.resPool.get("zebras").maxValue = this.karmaZebras + 1;
+		}
+
+		//Recalculate some effects if karma amount has changed:
+		if (karma != karmaPrev) {
+			//Do not call game.upgrade here.  It'll have weird knock-on effects if we do that.
+			//Instead, we'll just call calculateEffects & wait for another game system to call updateCaches.
+			//Worst-case scenario, that function gets called every 5 ticks anyways.
+			var bld = this.bld.get("chapel"); bld.calculateEffects(bld, this);
+			var ru = this.religion.getRU("frescoes"); ru.calculateEffects(ru, this);
 		}
 	},
 

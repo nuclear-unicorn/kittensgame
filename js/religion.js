@@ -1195,9 +1195,36 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//none
 		},
 		upgrades: {
-			religion: ["solarchant", "scholasticism", "goldenSpire", "sunAltar", "stainedGlass", "basilica", "templars"]
+			religion: ["solarchant", "scholasticism", "goldenSpire", "sunAltar", "stainedGlass", "basilica", "templars","frescoes"]
 		},
 		noStackable: true
+	},{
+		name: "frescoes",
+		label: $I("religion.ru.frescoes.label"),
+		description: $I("religion.ru.frescoes.desc"),
+		prices: [
+			{ name: "gold",  val: 5000 },
+			{ name: "faith", val: 4000 },
+			{ name: "spice", val: 8000 } //Not affected by philosopher trait discount
+		],
+		faith: 200000,
+		calculateEffects: function(self, game) {
+			self.noStackable = (game.religion.getRU("transcendence").on == 0);
+			self.description = $I("religion.ru.frescoes.desc") + (self.noStackable ? "" : "<br>" + $I("religion.ru.frescoes.desc.stackable"));
+			var karma = game.resPool.get("karma").value;
+			if (karma < 10) {
+				//Add a hint telling the player how to gain some karma:
+				self.description += "<br><br><span class=\"genericWarning\">" +
+					(karma == 0 ? $I("religion.ru.frescoes.desc.noKarma") : $I("religion.ru.frescoes.desc.lowKarma")) +
+					"</span><br>" + $I("religion.ru.frescoes.desc.karmaHint");
+			}
+		},
+		noStackable: true,
+		priceRatio: 2.5,
+		flavor: $I("religion.ru.frescoes.flavor"),
+		upgrades: {
+			buildings: ["chapel"]
+		}
 	}],
 
 	transcendenceUpgrades: [
@@ -2269,6 +2296,9 @@ dojo.declare("classes.ui.CryptotheologyWGT", [mixin.IChildrenAware, mixin.IGameA
 
 	render: function(container){
 		var div = dojo.create("div", null, container);
+		dojo.create("span", {
+			id: "cryptotheologyInfo",
+			innerHTML: $I("religion.panel.cryptotheology.info")}, div);
 		var btnsContainer = dojo.create("div", null, div);
 		this.inherited(arguments, [btnsContainer]);
 	},
@@ -2931,7 +2961,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 		wgt.setGame(this.game);
 		ctPanel.addChild(wgt);
 
-		var ptPanel = new classes.ui.PactsPanel("Pacts");
+		var ptPanel = new classes.ui.PactsPanel($I("religion.panel.pacts.label"));
 		ptPanel.game = this.game;
 		this.addChild(ptPanel);
 		this.ptPanel = ptPanel;
