@@ -9,6 +9,8 @@
 /**********************************************/
 body.scheme_gold {
 	background-color: #202020;
+    --page-background-color: #202020;
+    --text-color: #d9d9d9;
 }
 .scheme_gold  #gamePageContainer,
 .scheme_gold select,

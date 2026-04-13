@@ -7,9 +7,16 @@
 /* ******************************************** */
 /* ******************* GAME ******************* */
 /* ******************************************** */
+.scheme_vessel {
+	color-scheme: dark;
+	--page-background-color: #202020;
+    --text-color: #d9d9d9;
+}
+
 body.scheme_vessel {
 	background-color: #000000;
 }
+
 .scheme_vessel #game,
 .scheme_vessel #loadingContainer {
     top: 22px;
