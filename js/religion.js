@@ -1702,6 +1702,10 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 		return result;
 	},
 
+	getType: function () {
+		return "zigguratUpgrades";
+	},
+
     getMetadata: function(model){
         if (!model.metaCached){
             model.metaCached = this.game.religion.getZU(model.options.id);
@@ -1768,6 +1772,10 @@ dojo.declare("com.nuclearunicorn.game.ui.ReligionBtnController", com.nuclearunic
 		var result = this.inherited(arguments);
 		result.tooltipName = false;
 		return result;
+	},
+
+	getType: function () {
+		return "religion";
 	},
 
     getMetadata: function(model){

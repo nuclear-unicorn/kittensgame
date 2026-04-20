@@ -1385,6 +1385,10 @@ dojo.declare("classes.ui.space.PlanetBuildingBtnController", com.nuclearunicorn.
         return model.metaCached;
     },
 
+	getType: function () {
+		return "spaceBuilding";
+	},
+
     hasSellLink: function(model){
 		return !this.game.opts.hideSell;
 	},
