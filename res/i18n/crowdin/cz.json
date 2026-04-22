@@ -1800,6 +1800,7 @@
     "ui.option.do.import.button": "Importovat",
     "ui.option.cancel.button": "Zrušit",
     "ui.option.app.text": "Kitten Game byl vydán pro mobil! Klikněte na tento link pro další informaci:",
+    "ui.option.app.android": "Android",
     "ui.option.app.ios": "iOS",
     "ui.option.notation": "Poznámky:",
     "ui.option.pollution": "Zakázat efekty znečištění",
