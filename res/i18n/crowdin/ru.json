@@ -1756,6 +1756,7 @@
     "ui.pause.title": "Поставить/снять мяузу",
     "ui.undo": "отменено ({0}s)",
     "ui.undo.title": "Откатить изменения",
+    "ui.undo.fix.many.cryochambers": "Отменить починку {0}x криокамер",
     "ui.queue.link": "Очередь",
     "ui.close": "закрыть",
     "ui.option.language": "Язык:",
