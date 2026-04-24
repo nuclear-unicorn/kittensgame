@@ -327,7 +327,7 @@
     "challendge.anarchy.desc": "Restart the game with kittens acting their own way : kittens are lazy, always eat extra catnip and can't be assigned as leaders.<br><br>Goal: Construct AI Core",
     "challendge.anarchy.effect.desc": "Kittens count double for karma",
     "challendge.atheism.label": "Atheism",
-    "challendge.atheism.desc": "Restart the game without faith bonus.<br><br>Goal: Reset with at least one cryochamber.",
+    "challendge.atheism.desc": "Restart the game without faith bonus.<br><br>Goal: Reset with at least one cryochamber or stasis pod.",
     "challendge.atheism.effect.desc": "Increase your Solar Revolution bonus limit by 100 percentage points per transcendence tier (equivalent to 20 Black Obelisks).",
     "challendge.blackSky.label": "Black Sky",
     "challendge.blackSky.desc": "Restart the game with no astronomical events to observe.<br><br>Goal: Build one Space Beacon. (+1 Beacon per completion.)",
