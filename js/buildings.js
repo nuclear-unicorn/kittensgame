@@ -2051,7 +2051,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"energyConsumption" : 0
 		},
 		upgrades: {
-			voidSpace: ["cryochambers"]
+			voidSpace: ["cryochambers"],
+			buildings: ["stasisPod"]
 		},
 		calculateEffects: function(self, game) {
 			self.effects["energyConsumption"] = 20;
@@ -2190,7 +2191,24 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"manpowerMax": 50,
 			"tMythrilCraftRatio" : 0.01,
 		},
-	},{
+	},
+	{
+		name: "stasisPod",
+		label: $I("buildings.stasisPod.label"),
+		description: $I("buildings.stasisPod.desc"),
+		unlockRatio: 0.01,
+		 prices: [
+            { name : "tMythril", val: 1 },
+            { name : "timeCrystal", val: 2 },
+            { name : "void", val: 100 }
+        ],
+		priceRatio: 1.25,
+		zebraRequired: 1,
+		effects: {
+			"zebraMax": 1,
+		},
+	},
+	{
 		name: "ivoryTemple",
 		defaultUnlockable: true,
 		label: $I("buildings.ivoryTemple.label"),

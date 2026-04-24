@@ -177,7 +177,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			}
 		},
 		checkCompletionConditionOnReset: function(game){
-			return game.time.getVSU("cryochambers").on > 0;
+			return game.time.getVSU("cryochambers").on > 0 || game.bld.get("stasisPod").on > 0;
 		},
 		reserveDelay: true
 	},{

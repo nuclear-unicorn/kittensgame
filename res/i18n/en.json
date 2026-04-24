@@ -261,6 +261,8 @@
     "buildings.zebraWorkshop.desc": "Unlocks various zebra upgrades",
     "buildings.ziggurat.label": "Ziggurat",
     "buildings.ziggurat.desc": "The dark legacy of the lost race. Every Ziggurat will improve your culture limits by 8%.<br>May have special usage once Theology is researched.",
+    "buildings.stasisPod.label": "Stasis Pod",
+    "buildings.stasisPod.desc": "A large stasis pod suited for non-feline liveforms",
     "buildings.tabName": "Bonfire",
     "buildings.group.culture": "Culture",
     "buildings.group.food": "Food Production",
