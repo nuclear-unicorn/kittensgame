@@ -770,7 +770,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: 	"timeCrystal", val: 5}
 		],
 		unlocks: {
-			buildings: ["chronosphere"],
+			buildings: ["chronosphere", "stasisPod"],
 			tech: ["tachyonTheory"],
 			upgrades: ["stasisChambers", "fluxCondensator"]
 		}
