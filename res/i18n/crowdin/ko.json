@@ -787,6 +787,7 @@
     "policy.communism.label": "공산주의",
     "policy.communism.desc": "산업화를 위해 모든 것을 감수합니다. 석탄, 철, 티타늄의 생산량이 증가하고 공장의 비용이 감소합니다.",
     "policy.conservation.label": "보존",
+    "policy.conservation.desc": "적극적으로 환경을 보호합니다. 좋은 환경으로 인해 행복도가 상승합니다.",
     "policy.culturalExchange.label": "문화 교류",
     "policy.culturalExchange.desc": "시인들과 배우들이 외국 땅을 여행하게 되어, 문화력 생산이 약간 증가합니다.",
     "policy.diplomacy.label": "외교",

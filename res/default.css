@@ -669,6 +669,11 @@ table.craftTable tr:hover td {
     font-size: 15px;
 }
 
+
+.login-popup.button_tooltip {
+	background-color: var(--page-background-color) !important;
+}
+
 .login-popup .last-backup {
     margin-bottom: 10px;
     border-bottom: 1px solid gray;

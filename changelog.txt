@@ -1,3 +1,26 @@
+v 1.5.0.2 (24 Apr 2026)
+
+Major:
+Stasis Pod
+
+Changes by Brent and Ziggurat
+
+Frescoes (Brent)
+Unicorn Tears Challenge Reward Balancing (Brent)
+Alicornmancy (Brent)
+Pact of Arcane (Ziggurat)
+Pact of Chronicler (Ziggurat)
+
+Minor:
+New Basge (Brent)
+Various translation fixes and bug fixes 
+
+Display current effect of Shark Merchants
+Display Shark Merchants bonus in the Trade tab (if researched)
+Allow astro events to happen with 0 Libraries if Astronomy is researched
+
+
+
 v 1.5.0.1 (21 Feb 2026)
 Undo System Update:
 * Now supports more actions (trade, religion, space, time)

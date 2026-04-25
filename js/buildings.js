@@ -1841,20 +1841,26 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		effects: {
 			"culturePerTickBase" : 0,
 			"faithPerTickBase" : 0,
-			"cultureMax" : 0
+			"cultureMax" : 0,
+			"faithMax" : 0
 		},
 		calculateEffects: function(self, game) {
-			if (!game.challenges.isActive("atheism")) {
-				var effects = {
-					"culturePerTickBase" : 0.05,
-					"faithPerTickBase" : 0.005,
-					"cultureMax" : 200
-				};
+			var effects = {
+				"culturePerTickBase" : 0.05,
+				"faithPerTickBase" : 0,
+				"cultureMax" : 200,
+				"faithMax" : 0
+			};
+			if (game.challenges.isActive("atheism")) {
+				self.description = $I("buildings.chapel.desc.atheism");
 			} else {
-				var effects = {
-					"culturePerTickBase" : 0.05,
-					"cultureMax" : 200
-				};
+				self.description = $I("buildings.chapel.desc");
+				effects["faithPerTickBase"] = 0.005;
+				var frescoes = game.religion.getRU("frescoes");
+				if (frescoes.on) {
+					//The stripe parameter can be tweaked as needed for the sake of balancing.
+					effects["faithMax"] = game.getUnlimitedDR( frescoes.on, 1.65 /*stripe*/ ) * game.resPool.get("karma").value;
+				}
 			}
 			self.effects = effects;
 		}
@@ -1884,6 +1890,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game){
 			if (!game.challenges.isActive("atheism")) {
+				self.description = $I("buildings.temple.desc");
+				self.flavor = $I("buildings.temple.flavor");
 				if (self.val > 0){
                     game.time.queue.unlockQueueSource("religion");
                 }
@@ -1934,6 +1942,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					effects["manpowerMax"] = 50 + 25 * templars.on;
 				}
 			} else {
+				self.description = $I("buildings.temple.desc.atheism");
+				self.flavor = $I("buildings.temple.flavor.atheism");
 				var effects = {
 					"culturePerTickBase" : 0.1
 				};
@@ -2041,7 +2051,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"energyConsumption" : 0
 		},
 		upgrades: {
-			voidSpace: ["cryochambers"]
+			voidSpace: ["cryochambers"],
+			buildings: ["stasisPod"]
 		},
 		calculateEffects: function(self, game) {
 			self.effects["energyConsumption"] = 20;
@@ -2180,7 +2191,24 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"manpowerMax": 50,
 			"tMythrilCraftRatio" : 0.01,
 		},
-	},{
+	},
+	{
+		name: "stasisPod",
+		label: $I("buildings.stasisPod.label"),
+		description: $I("buildings.stasisPod.desc"),
+		unlockRatio: 0.01,
+		 prices: [
+            { name : "tMythril", val: 1 },
+            { name : "timeCrystal", val: 2 },
+            { name : "void", val: 100 }
+        ],
+		priceRatio: 1.25,
+		zebraRequired: 1,
+		effects: {
+			"zebraMax": 1,
+		},
+	},
+	{
 		name: "ivoryTemple",
 		defaultUnlockable: true,
 		label: $I("buildings.ivoryTemple.label"),
@@ -3429,6 +3457,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 						name: 			bld.label,
 						description: 	bld.description,
 						building: 		bld.name,
+						type:           "buildings",
 						twoRow:			this.twoRows,
 						controller: new classes.ui.btn.StagingBldBtnController(this.game)
 					}, this.game);
@@ -3437,6 +3466,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 						name: 			bld.label,
 						description: 	bld.description,
 						building: 		bld.name,
+						type:           "buildings",
 						twoRow:			this.twoRows,
 						controller: new classes.ui.btn.BuildingBtnModernController(this.game)
 					}, this.game);

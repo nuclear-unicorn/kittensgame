@@ -934,17 +934,28 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"pyramidFaithRatio" : 0,
 			"deficitRecoveryRatio": 0,
 			"blackLibraryBonus": 0,
-			"pyramidSpaceCompendiumRatio": 0
+			"pyramidSpaceCompendiumRatio": 0,
+			"craftRatio": 0,
+			"UniversalKnowHow" : 0,
+			"pyramidPerYearRatio" : 0,
+			"timeRatio" : 0
 		},
-		simpleEffectNames:[
+		simpleEffectNames: [
 			"GlobalResourceRatio",
 			"RecoveryRatio",
 			"GlobalProductionRatio",
 			"FaithRatio",
-			"SpaceCompendiumRatio"
+			"SpaceCompendiumRatio",
+			"PerYearRatio"
+		],
+		prefixEffectNames: [
+			"craftRatio",
+			"UniversalKnowHow",
+			"timeRatio"
 		],
 		upgrades: {
-			spaceBuilding: ["spaceBeacon"]
+			spaceBuilding: ["spaceBeacon"],
+			chronoforge: ["temporalImpedance"]
 		},
 		calculateEffects: function(self, game) {
 			self.togglable = false;
@@ -966,6 +977,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			var self = game.religion.getZU("blackPyramid");
 			for (var counter in self.simpleEffectNames){
 				self.effectsPreDeficit["pyramid" + self.simpleEffectNames[counter]] = game.getEffect("pact" + self.simpleEffectNames[counter]) * transcendenceTierModifier;
+			}
+			for (var counter in self.prefixEffectNames){
+				self.effectsPreDeficit[self.prefixEffectNames[counter]] = game.getEffect("pact" + self.prefixEffectNames[counter]) * transcendenceTierModifier;
 			}
 			self.effectsPreDeficit["deficitRecoveryRatio"] = game.getEffect("pactDeficitRecoveryRatio");
 			var pactBlackLibraryBoost = game.getEffect("pactBlackLibraryBoost") * transcendenceTierModifier;
@@ -1182,9 +1196,36 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			//none
 		},
 		upgrades: {
-			religion: ["solarchant", "scholasticism", "goldenSpire", "sunAltar", "stainedGlass", "basilica", "templars"]
+			religion: ["solarchant", "scholasticism", "goldenSpire", "sunAltar", "stainedGlass", "basilica", "templars","frescoes"]
 		},
 		noStackable: true
+	},{
+		name: "frescoes",
+		label: $I("religion.ru.frescoes.label"),
+		description: $I("religion.ru.frescoes.desc"),
+		prices: [
+			{ name: "gold",  val: 5000 },
+			{ name: "faith", val: 4000 },
+			{ name: "spice", val: 8000 } //Not affected by philosopher trait discount
+		],
+		faith: 200000,
+		calculateEffects: function(self, game) {
+			self.noStackable = (game.religion.getRU("transcendence").on == 0);
+			self.description = $I("religion.ru.frescoes.desc") + (self.noStackable ? "" : "<br>" + $I("religion.ru.frescoes.desc.stackable"));
+			var karma = game.resPool.get("karma").value;
+			if (karma < 10) {
+				//Add a hint telling the player how to gain some karma:
+				self.description += "<br><br><span class=\"genericWarning\">" +
+					(karma == 0 ? $I("religion.ru.frescoes.desc.noKarma") : $I("religion.ru.frescoes.desc.lowKarma")) +
+					"</span><br>" + $I("religion.ru.frescoes.desc.karmaHint");
+			}
+		},
+		noStackable: true,
+		priceRatio: 2.5,
+		flavor: $I("religion.ru.frescoes.flavor"),
+		upgrades: {
+			buildings: ["chapel"]
+		}
 	}],
 
 	transcendenceUpgrades: [
@@ -1337,7 +1378,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		},
 		unlocked: false,
 		unlocks: {
-			pacts: ["pactOfCleansing", "pactOfDestruction",  "pactOfExtermination", "pactOfPurity"],
+			pacts: ["pactOfCleansing", "pactOfDestruction",  "pactOfExtermination", "pactOfPurity", "pactOfArcane", "pactOfChronicler"],
 			policies: ["siphoning", "feedingFrenzy", "upfrontPayment"]
 		},
 		calculateEffects: function (self, game){
@@ -1762,6 +1803,10 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 		return result;
 	},
 
+	getType: function () {
+		return "zigguratUpgrades";
+	},
+
     getMetadata: function(model){
         if (!model.metaCached){
             model.metaCached = this.game.religion.getZU(model.options.id);
@@ -1824,6 +1869,10 @@ dojo.declare("com.nuclearunicorn.game.ui.ReligionBtnController", com.nuclearunic
 		var result = this.inherited(arguments);
 		result.tooltipName = false;
 		return result;
+	},
+
+	getType: function () {
+		return "religion";
 	},
 
     getMetadata: function(model){
@@ -2256,6 +2305,9 @@ dojo.declare("classes.ui.CryptotheologyWGT", [mixin.IChildrenAware, mixin.IGameA
 
 	render: function(container){
 		var div = dojo.create("div", null, container);
+		dojo.create("span", {
+			id: "cryptotheologyInfo",
+			innerHTML: $I("religion.panel.cryptotheology.info")}, div);
 		var btnsContainer = dojo.create("div", null, div);
 		this.inherited(arguments, [btnsContainer]);
 	},
@@ -2559,6 +2611,54 @@ dojo.declare("classes.religion.pactsManager", null, {
 				self.effects["necrocornPerDay"] = game.getEffect("pactNecrocornConsumption");
 				game.religion.getZU("blackPyramid").jammed = false;
 			}
+		},{
+			name: "pactOfArcane",
+			label: $I("religion.pact.pactOfArcane.label"),
+			description: $I("religion.pact.pactOfArcane.desc"),
+
+			prices: [
+				{ name : "relic", val: 100},
+			],
+			effects: {
+				"pactsAvailable": -1,
+				"necrocornPerDay": 0,
+				"pactcraftRatio": 0.001,
+				"pactUniversalKnowHow": 0.1,
+			},
+			unlocked: false,
+			calculateEffects: function(self, game){
+				if (!game.getFeatureFlag("MAUSOLEUM_PACTS")){
+					return;
+				}
+				self.effects["necrocornPerDay"] = game.getEffect("pactNecrocornConsumption");
+				game.religion.getZU("blackPyramid").jammed = false;
+			}
+		},{
+			name: "pactOfChronicler",
+			label: $I("religion.pact.pactOfChronicler.label"),
+			description: $I("religion.pact.pactOfChronicler.desc"),
+
+			prices: [
+				{ name : "relic", val: 100},
+			],
+			effects: {
+				"pactsAvailable": -1,
+				"necrocornPerDay": 0,
+				"pactPerYearRatio" : 0.003,
+				"umbraBoostRatio": 0.1,
+				"pacttimeRatio": 0.1,
+			},
+			unlocked: false,
+			calculateEffects: function(self, game){
+				if (!game.getFeatureFlag("MAUSOLEUM_PACTS")){
+					return;
+				}
+				self.effects["necrocornPerDay"] = game.getEffect("pactNecrocornConsumption");
+				game.religion.getZU("blackPyramid").jammed = false;
+			},
+			upgrades: {
+				spaceBuilding: ["hrHarvester"]
+			},
 		},{
 			name: "payDebt",
 			label: $I("religion.pact.payDebt.label"),
@@ -2870,7 +2970,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.ReligionTab", com.nuclearunicorn.ga
 		wgt.setGame(this.game);
 		ctPanel.addChild(wgt);
 
-		var ptPanel = new classes.ui.PactsPanel("Pacts");
+		var ptPanel = new classes.ui.PactsPanel($I("religion.panel.pacts.label"));
 		ptPanel.game = this.game;
 		this.addChild(ptPanel);
 		this.ptPanel = ptPanel;

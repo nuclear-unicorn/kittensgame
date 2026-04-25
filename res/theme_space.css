@@ -8,6 +8,13 @@
 /**********************************************/
 /******************** GAME ********************/
 /**********************************************/
+
+.scheme_space {
+	color-scheme: dark;
+	--page-background-color: rgb(2, 5, 14);
+	--text-color: #aaaaaa;
+}
+
 body.scheme_space {
 	 background-color: rgb(2, 5, 14);
 }
