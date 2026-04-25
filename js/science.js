@@ -770,7 +770,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: 	"timeCrystal", val: 5}
 		],
 		unlocks: {
-			buildings: ["chronosphere"],
+			buildings: ["chronosphere", "stasisPod"],
 			tech: ["tachyonTheory"],
 			upgrades: ["stasisChambers", "fluxCondensator"]
 		}
@@ -1457,13 +1457,18 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		prices: [
 			{name : "culture", val: 2200}
 		],
-		effects: {
-			"tradeRatio" : 0
-		},
+		//effects: {}, //See DiplomacyManager#calculateTradeBonusFromPolicies
+		lastCalculatedBonus: -1,
 		unlocked: false,
 		blocked: false,
 		isRelation: true,
 		blocks: ["sharkRelationsScribes", "sharkRelationsBotanists"],
+		calculateEffects: function(self, game) {
+			//The operation of recalculating the bonus isn't that heavy, so force-recalculate whenever we update the description.
+			game.diplomacy.calculateTradeBonusFromPolicies("sharks" /*this argument doesn't actually matter*/, game);
+			self.description = $I("policy.sharkRelationsMerchants.desc") + "<br>" +
+				$I("policy.sharkRelationsMerchants.currentBonus", ["+" + game.toDisplayPercentage(self.lastCalculatedBonus, 0, false) + "%"]);
+		},
 		evaluateLocks: function(game) {
 			return game.science.checkRelation("sharks", 20);
 		}

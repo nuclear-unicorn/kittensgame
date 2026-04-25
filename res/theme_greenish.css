@@ -1256,7 +1256,7 @@ body.scheme_greenish {
 	/* default max-width: 90px; */
 	color: #202020;
 }
-.scheme_greenish #fastHuntContainerCount { /* Text left column: "xx times" from Send hunters */
+.scheme_greenish div.pin-link span.pin-link-quantity { /* Text left column: "xx times" from Send hunters */
 	color: #606060;
 	text-shadow: none !important;
 }

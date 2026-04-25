@@ -1198,10 +1198,11 @@ body.scheme_minimalist.with_background_image,
 	color: #be4151;
 	padding-top: 6px;/* default padding-top: 10px; */
 }
-.scheme_minimalist #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+.scheme_minimalist #fastHuntContainer > a, /* Text left column : "Send hunters (xx times)" */
+.scheme_minimalist #fastSacrificeContainer > a {
 	text-shadow: -1px -1px 2px rgba(12, 13, 16, 0.9); /* color #0C0D10 */
 }
-.scheme_minimalist #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_minimalist div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #DD836C;
 	text-shadow: none !important;
 	font-size: smaller;

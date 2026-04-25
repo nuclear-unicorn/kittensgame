@@ -832,6 +832,9 @@ WLeftPanel = React.createClass({
             (!game.challenges.isActive("pacifism"));
         var showFastHunt = (catpower.value >= huntCost);
 
+        var canSacrifice = game.religion.getHasUnlockedUnicornSacrifice();
+        var maxAvailableSacrifices = game.religion.getAvailableUnicornSacrifices();
+
         //---------- advisor ---------
         var showAdvisor = false;
 
@@ -862,7 +865,7 @@ WLeftPanel = React.createClass({
                 $r("a", {href:"#", onClick: this.huntAll},
                     $I("left.hunt") + " (",
                     $r("span", {
-                        id:"fastHuntContainerCount"
+                        id:"fastHuntContainerCount", className: "pin-link-quantity"
                     },
                         [
                             game.getDisplayValueExt(huntCount, false, false, 0),
@@ -873,12 +876,25 @@ WLeftPanel = React.createClass({
                     ")"
                 )
             ),
+            $r("div", {id:"fastSacrificeContainer", className:"pin-link sidebar-section", style: {
+                display: (canSacrifice ? "block" : "none"),
+                visibility: (maxAvailableSacrifices >= 1 ? "visible" : "hidden")
+            }},
+                $r("a", {href:"#", onClick: this.sacrificeAllUnicorns},
+                    $I("left.sacrifice") + " (",
+                    $r("span", {id:"fastSacrificeContainerCount", className: "pin-link-quantity"},
+                        game.getDisplayValueExt(maxAvailableSacrifices, false /*prefix*/, false /*usePerTickHack*/, 0 /*precision*/) +
+                            " " + (maxAvailableSacrifices === 1 ? $I("left.hunt.time") : $I("left.hunt.times"))
+                    ),
+                    ")"
+                )
+            ),
             $r("div", {id:"fastPraiseContainer", className:"pin-link sidebar-section", style:{visibility:"hidden"}},
                 $r("a", {href:"#", onClick: this.praiseAll},
                     $I("left.praise")
                 )
-            ),             
-             
+            ),
+
             $r(WPins, {game: game}),
             $r(WCraftTable, {resources: game.resPool.resources, reqRes: reqRes})
         ]);
@@ -890,6 +906,10 @@ WLeftPanel = React.createClass({
 
     praiseAll: function(event){
         this.state.game.praise(event);
+    },
+
+    sacrificeAllUnicorns: function(event){
+        this.state.game.sacrificeAllUnicorns(event);
     },
 
     componentDidMount: function(){

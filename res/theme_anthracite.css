@@ -1115,13 +1115,15 @@ body.scheme_anthracite.with_background_image,
 .scheme_anthracite .res-cell.resource-value {
 	color: #a0a0a0;
 }
-.scheme_anthracite #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+.scheme_anthracite #fastHuntContainer > a, /* Text left column : "Send hunters (xx times)" */
+.scheme_anthracite #fastSacrificeContainer > a {
 	font-size: 110%;
 }
-.scheme_anthracite #fastHuntContainer > a:hover {
+.scheme_anthracite #fastHuntContainer > a:hover,
+.scheme_anthracite #fastSacrificeContainer > a:hover {
 	text-shadow: 2px 2px 2px #000000;
 }
-.scheme_anthracite #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_anthracite div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #606060;
 	text-shadow: none !important;
 	font-size: smaller;

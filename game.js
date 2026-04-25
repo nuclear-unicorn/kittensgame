@@ -1750,10 +1750,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.zigguratIvoryPriceRatio.title"),
 				type: "ratio"
 			},
-			"zigguratIvoryCostIncrease": {
-				title: $I("effectsMgr.statics.zigguratIvoryCostIncrease.title"),
-				type: "ratio"
-			},
 			"cryochamberSupport":{
 				title: $I("effectsMgr.statics.cryochamberSupport.title"),
 			},
@@ -1814,6 +1810,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.pyramidSpaceCompendiumRatio.title"),
 				type: "ratio"
 			},
+			"pyramidPerYearRatio": {
+				title: $I("effectsMgr.statics.pyramidPerYearRatio.title"),
+				type: "ratio"
+			},
 			"pactBlackLibraryBoost":{
 				title: $I("effectsMgr.statics.pactBlackLibraryBoost.title"),
 				type: "ratio"
@@ -1822,8 +1822,28 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.pactDeficitRecoveryRatio.title"),
 				type: "ratio"
 			},
+			"UniversalKnowHow" :  {
+                title: $I("effectsMgr.statics.UniversalKnowHow.title"),
+                type: "fixed"
+            },
 			"pactSpaceCompendiumRatio":{
 				title: $I("effectsMgr.statics.pactSpaceCompendiumRatio.title"),
+				type: "ratio"
+			},
+			"pactcraftRatio": {
+				title: $I("effectsMgr.statics.pactcraftRatio.title"),
+				type: "ratio"
+			},
+			"pactPerYearRatio": {
+				title: $I("effectsMgr.statics.pactPerYearRatio.title"),
+				type: "ratio"
+			},
+			"pactUniversalKnowHow":{
+				title: $I("effectsMgr.statics.pactUniversalKnowHow.title"),
+				type: "fixed"
+			},
+			"pacttimeRatio":{
+				title: $I("effectsMgr.statics.pacttimeRatio.title"),
 				type: "ratio"
 			},
 			//pollution
@@ -2178,9 +2198,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			this.updateCaches();
 		}), 5);		//once per 5 ticks
 
+		//Update descriptions of some policies where it's a pain to call game.upgrade every time something changes.
 		this.timer.addEvent(dojo.hitch(this, function() {
-			var policy = this.science.getPolicy("upfrontPayment");
-			policy.calculateEffects(policy, this); //Update description of policy
+			var policies = ["upfrontPayment", "sharkRelationsMerchants"];
+			for (var i = 0; i < policies.length; i++) {
+				var thePolicy = game.science.getPolicy(policies[i]);
+				thePolicy.calculateEffects(thePolicy, this);
+			}
 		}), 25);		//every 5 seconds
 
 		var ONE_MIN = this.ticksPerSecond * 60;
@@ -3358,9 +3382,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			value: game.getEffect(resName + "PolicyRatio")
 		});
 		array.push({
-			name: $I("res.stack.destruction"),
+			name: $I("res.stack.chronicler"),
 			type: "ratio",
-			value: game.getEffect("pyramidGlobalProductionRatio")
+			value: game.getEffect("pyramidPerYearRatio")
 		});
 		return array;
 	},
@@ -3845,6 +3869,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			type: "ratio",
 			value: this.getEffect(res.name + "PolicyRatio")
 		});
+
+		stack.push({
+			name: $I("res.stack.chronicler"),
+			type: "ratio",
+			value: this.getEffect("pyramidPerYearRatio")
+		});
 		return stack;
 	},
 	getCMBRBonus: function() {
@@ -3986,6 +4016,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.religion.praise();
 	},
 
+	sacrificeAllUnicorns: function(event){
+		event.preventDefault();
+		this.religion.sacrificeAllUnicorns();
+	},
+
 	/**
 	 * Updates a perTickValue of resource for UI
 	 */
@@ -4023,7 +4058,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				return 0;
 			}
 		}
-		return this.getEffect(resName + "Production") * (1 + this.getEffect(resName + "PolicyRatio"));
+		return this.getEffect(resName + "Production") * (1 + this.getEffect(resName + "PolicyRatio")) * (1 + this.getEffect("pyramidPerYearRatio"));
 	},
 	getResourcePerTickConvertion: function(resName) {
 		return this.fixFloatPointNumber(this.getEffect(resName + "PerTickCon"));
@@ -5189,10 +5224,21 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var stripe = 5;	//initial amount of kittens per stripe
 		var karma = this.getUnlimitedDR(this.karmaKittens, stripe);
 
-		this.resPool.get("karma").value = karma;
+		var karmaRes = this.resPool.get("karma");
+		var karmaPrev = karmaRes.value;
+		karmaRes.value = karma;
 
 		if (this.karmaZebras){
 			this.resPool.get("zebras").maxValue = this.karmaZebras + 1;
+		}
+
+		//Recalculate some effects if karma amount has changed:
+		if (karma != karmaPrev) {
+			//Do not call game.upgrade here.  It'll have weird knock-on effects if we do that.
+			//Instead, we'll just call calculateEffects & wait for another game system to call updateCaches.
+			//Worst-case scenario, that function gets called every 5 ticks anyways.
+			var bld = this.bld.get("chapel"); bld.calculateEffects(bld, this);
+			var ru = this.religion.getRU("frescoes"); ru.calculateEffects(ru, this);
 		}
 	},
 

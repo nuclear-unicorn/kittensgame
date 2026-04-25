@@ -1008,22 +1008,19 @@ body.scheme_fluid,
 .scheme_fluid .res-cell.resPerTick {
     cursor: default;
 }
-.scheme_fluid #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
-	font-size: 100%;
-	font-weight: bold;
-}
-.scheme_fluid #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
-	color: #404040;
-	text-shadow: none !important;
-}
+.scheme_fluid #fastHuntContainer > a, /* Text left column : "Send hunters (xx times)" */
+.scheme_fluid #fastSacrificeContainer > a,
 .scheme_fluid #fastPraiseContainer > a { /* Text left column : "Praise the sun!" */
 	font-size: 100%;
 	font-weight: bold;
 }
-.scheme_fluid #fastPraiseContainer > a:hover {
-	text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
+.scheme_fluid div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
+	color: #404040;
+	text-shadow: none !important;
 }
-.scheme_fluid #fastHuntContainer > a:hover {
+.scheme_fluid #fastHuntContainer > a:hover,
+.scheme_fluid #fastSacrificeContainer > a:hover,
+.scheme_fluid #fastPraiseContainer > a:hover {
 	text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
 }
 .scheme_fluid .res-cell.positive-weather { /* to change the color for bonus cell according to the season */

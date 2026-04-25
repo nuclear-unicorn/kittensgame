@@ -1276,10 +1276,10 @@ body.scheme_computer {
 	/* default max-width: 90px; */
 	color: #030303;
 }
-.scheme_computer #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_computer div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #909090;
 }
-.scheme_computer #fastHuntContainer >a:hover #fastHuntContainerCount {
+.scheme_computer div.pin-link > a:hover > span.pin-link-quantity {
 	color: #f0a258;
 }
 .scheme_computer #fastPraiseContainer >a {

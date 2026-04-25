@@ -1068,7 +1068,7 @@ body.scheme_black {
 .scheme_black .res-cell.resource-value {
 	color: #a0a0a0;
 }
-.scheme_black #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_black div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #505050;
 	text-shadow: none !important;
 	font-size: smaller;

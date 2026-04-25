@@ -1265,15 +1265,15 @@ body.scheme_catnip {
 }
 .scheme_catnip .pin-link > a {
 	border-radius: 5px;
-    padding: 3px 5px;
-    margin: 0 5px;
-    text-align: center;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+	padding: 3px 5px;
+	margin: 0 5px;
+	text-align: center;
+	border: 1px solid rgba(0, 0, 0, 0.1);
 	color: #3c4128;
-    background-color: rgba(158, 173, 105, 0.75);
+	background-color: rgba(158, 173, 105, 0.75);
 }
 .scheme_catnip .pin-link > a:hover {
-    background-color: rgba(0, 0, 0, 0.75);
+	background-color: rgba(0, 0, 0, 0.75);
 	color: #fafbf9;
 }
 .scheme_catnip .pin-link > a:active {
@@ -1282,18 +1282,17 @@ body.scheme_catnip {
 .scheme_catnip :not(:first-child) .pin-link {
 	margin-top: 3px;
 }
-.scheme_catnip #fastHuntContainer > a {
+.scheme_catnip #fastHuntContainer > a:not(:hover) {
 	background-color: rgba(131, 203, 59, 0.5);
 	color: #3c4128;
 }
-.scheme_catnip #fastPraiseContainer > a {
+.scheme_catnip #fastSacrificeContainer > a:not(:hover) {
+	background-color: rgba(0, 181, 191, 0.5);
 	color: #1e2114;
-    background-color: #fafbf9;
 }
-.scheme_catnip #fastHuntContainer > a:hover,
-.scheme_catnip #fastPraiseContainer > a:hover  {
-	background-color: rgba(0, 0, 0, 0.75);
-	color: #fafbf9;
+.scheme_catnip #fastPraiseContainer > a:not(:hover) {
+	background-color: #fafbf9;
+	color: #1e2114;
 }
 .scheme_catnip .res-cell.positive-weather { /* to change the color for bonus cell according to the season */
 	color: #005f05;

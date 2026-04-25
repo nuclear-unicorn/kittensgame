@@ -1311,7 +1311,7 @@ body.scheme_arctic.with_background_image {
 	/* default max-width: 90px; */
 	color: #101010;
 }
-.scheme_arctic #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_arctic div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #606060;
 	text-shadow: none !important;
 }
