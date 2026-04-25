@@ -929,7 +929,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"timeRatio"
 		],
 		upgrades: {
-			spaceBuilding: ["spaceBeacon"]
+			spaceBuilding: ["spaceBeacon"],
+			chronoforge: ["temporalImpedance"]
 		},
 		calculateEffects: function(self, game) {
 			self.togglable = false;
