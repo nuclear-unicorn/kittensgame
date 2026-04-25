@@ -1942,6 +1942,7 @@
     "queue.add": "Add to queue",
     "queue.length.indicator": "Queue length: {0}/{1}",
     "btn.enqueue": "⇶ ({0})",
+    "btn.enqueue.long": "Add to queue ({0})",
 
     "left.resources": "resources",
     "left.resources.tip": "Ctrl+click resource to hide it, use gear icon for more settings.",

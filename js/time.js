@@ -1623,6 +1623,10 @@ dojo.declare("classes.ui.time.ChronoforgeBtnController", com.nuclearunicorn.game
         return model.metaCached;
     },
 
+    getType: function () {
+        return "chronoforge";
+    },
+
     getName: function(model){
         var meta = model.metadata;
         var game = this.game;
@@ -1699,6 +1703,10 @@ dojo.declare("classes.ui.time.VoidSpaceBtnController", com.nuclearunicorn.game.u
             model.metaCached = this.game.time.getVSU(model.options.id);
         }
         return model.metaCached;
+    },
+
+    getType: function () {
+        return "voidSpace";
     },
 
 	getName: function(model){

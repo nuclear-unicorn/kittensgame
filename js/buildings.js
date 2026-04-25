@@ -3457,6 +3457,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 						name: 			bld.label,
 						description: 	bld.description,
 						building: 		bld.name,
+						type:           "buildings",
 						twoRow:			this.twoRows,
 						controller: new classes.ui.btn.StagingBldBtnController(this.game)
 					}, this.game);
@@ -3465,6 +3466,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 						name: 			bld.label,
 						description: 	bld.description,
 						building: 		bld.name,
+						type:           "buildings",
 						twoRow:			this.twoRows,
 						controller: new classes.ui.btn.BuildingBtnModernController(this.game)
 					}, this.game);
