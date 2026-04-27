@@ -585,7 +585,6 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		//Normally, the number of ticks per day is a well-defined constant--but this might not be the case in the future if redshift paradox handling gets changed.
 		var ticksPerDay = times / days;
 
-
 		//Set up a loop!
 		//All variables defined above this point are CONSTANT within the loop.
 		for (var daysRemaining = days, timesRemaining = times, i = 0; daysRemaining > 0 || timesRemaining > 0; i++ ) {
