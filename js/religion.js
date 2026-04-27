@@ -571,6 +571,18 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		//Normally, the number of ticks per day is a well-defined constant--but this might not be the case in the future if redshift paradox handling gets changed.
 		var ticksPerDay = times / days;
 
+		// calculate percentage of days in paradox by floor of which reduce days
+		// this is partially duplicating calendar.js fastForward which might need revisiting in the future
+		// TODO: test/necrocorns.test.js for necrocornFastForward
+		var temporalParadoxChance = this.game.getEffect("temporalParadoxChance");
+		if (temporalParadoxChance > 0)
+		{
+			var daysInParadox = 10 + this.game.getEffect("temporalParadoxDay");
+			var daysBetweenParadox = daysInParadox + 100 * Math.max( 1 , 1 / temporalParadoxChance );
+			var percentTimeInParadox = daysInParadox / daysBetweenParadox;
+			var daysInParadox = Math.floor(days * percentTimeInParadox);
+			days -= daysInParadox;
+		}
 		//Set up a loop!
 		//All variables defined above this point are CONSTANT within the loop.
 		for (var daysRemaining = days, timesRemaining = times, i = 0; daysRemaining > 0 || timesRemaining > 0; i++ ) {
