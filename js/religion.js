@@ -350,7 +350,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			var daysInParadox = 10 + this.game.getEffect("temporalParadoxDay");
 			var daysBetweenParadox = daysInParadox + 100 * Math.max( 1 , 1 / temporalParadoxChance );
 			var percentTimeInParadox = daysInParadox / daysBetweenParadox;
-			var daysInParadox = Math.floor(days * percentTimeInParadox);
+			var daysInParadox = Math.floor(daysOffset * percentTimeInParadox);
 			daysOffset -= daysInParadox;
 		}
 
