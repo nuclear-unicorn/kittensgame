@@ -1797,7 +1797,7 @@
     "ui.undo.religion.adore": "取消讚美群星。",
     "ui.undo.religion.pact": "撤銷 {0}次 {1}。",
     "ui.undo.religion.praise": "撤銷本次讚美太陽累積的 {0} 虔誠。",
-    "ui.undo.religion.refine": "撤銷將 {0}個 {1} 精煉成 {2}個 {3} 。",
+    "ui.undo.religion.refine": "撤銷將 {0} {1} 精煉成 {2} {3} 。",
     "ui.undo.workshop.craft": "撤銷製作 {0}個 {1}。",
     "ui.queue.link": "任務隊列",
     "ui.close": "關閉",
