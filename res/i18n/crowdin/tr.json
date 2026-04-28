@@ -307,7 +307,6 @@
     "challendge.anarchy.desc": "Oyunu kediler kedicikler kafasına göre davranacak şekilde yeniden başlat: Kedicikler tembeldir, sürekli fazladan kedi nanesi yerler ve lider olarak atanamazlar.<br><br>Hedef: Bir AI çekirdeği inşa et",
     "challendge.anarchy.effect.desc": "Kedicikler karma puanına iki kat etki eder",
     "challendge.atheism.label": "Ateizm",
-    "challendge.atheism.desc": "Oyunu inanç bonusu olmadan yeniden başlat.<br><br>Hedef: En az bir soğutma haznesiyle yeniden başlat.",
     "challendge.atheism.effect.desc": "Solar Devrim'in bonus limitini sahip olunan her kutsal yükseliş seviyesi için 100% arttır (20 Siyah Obeliske eşit).",
     "challendge.blackSky.label": "Siyah gökyüzü",
     "challendge.blackSky.desc": "Gözlemlenecek astronomik olaylar olmadan oyunu yeniden başlatın.<br><br>Hedef: Bir Uzay İşaret Feneri inşa edin. (Tamamlama başına +1 İşaret Feneri.)",
