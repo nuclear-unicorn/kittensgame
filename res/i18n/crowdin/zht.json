@@ -1750,7 +1750,7 @@
     "trade.leviathans.energy": "能量: ",
     "trade.leviathans.timeToLeave": "離開時間：",
     "trade.send.caravan": "派出商隊",
-    "trade.send.caravan.desc": "用你的一些物品交換所提供的資源。價格可能因季節而異。<br>你有低機率獲得稀有資源。",
+    "trade.send.caravan.desc": "用你的一些物品交易提供的資源。價格可能因季節而異。<br>你有低機率獲得稀有資源。",
     "trade.send.explorers": "派出探險者",
     "trade.send.explorers.desc": "發現新的文明",
     "trade.buys": "買入",
