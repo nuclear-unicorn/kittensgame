@@ -885,9 +885,20 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 		if (this.game.resPool.get("zebras").value >= 10) {
 			var bloodstoneRatio = 1 + this.game.getEffect("bloodstoneRatio");
-			var bloodstone = this.game.resPool.addResEvent("bloodstone", this.game.math.binominalRandomInteger(squads, (this.game.resPool.get("bloodstone").value == 0 ? 0.05 : 0.0005) * bloodstoneRatio));
-			if (bloodstone > 0 && this.game.resPool.get("bloodstone").value == 1) {
-				this.game.msg($I("village.new.bloodstone"), "important", "ironWill");
+			var bloodstoneSquads = squads;
+			if (this.game.resPool.get("bloodstone").value == 0) {
+				// the first bloodstone has a 5% chance, further ones are much rarer
+				var huntsUntilBloodstone = this.game.math.geometricRandom(0.05 * bloodstoneRatio);
+				if (huntsUntilBloodstone <= bloodstoneSquads) {
+					this.game.resPool.addResEvent("bloodstone", 1);
+					this.game.msg($I("village.new.bloodstone"), "important", "ironWill");
+				}
+				bloodstoneSquads -= huntsUntilBloodstone;
+				bloodstoneSquads = Math.max(0, bloodstoneSquads);
+			}
+			var bloodstone = this.game.resPool.addResEvent("bloodstone", this.game.math.binominalRandomInteger(bloodstoneSquads, 0.0005 * bloodstoneRatio));
+			if (bloodstone > 0) {
+				this.game.msg($I("village.msg.hunt.bloodstone", [this.game.getDisplayValueExt(bloodstone)]), "important", "ironWill", true);
 			}
 		}
 

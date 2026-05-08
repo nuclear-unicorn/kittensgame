@@ -85,5 +85,12 @@ dojo.declare("com.nuclearunicorn.game.Math", null, {
         	result += coefficients[i];
         }
         return result;
+    },
+
+    // the geometric distribution is how many attempts are needed until an event of probability p occurs
+    geometricRandom: function(p) {
+        var u = 0;
+        while (u === 0) {u = Math.random();} //Converting [0,1) to (0,1)
+        return Math.ceil(Math.log(u) / this.log1p(-p));
     }
 });
