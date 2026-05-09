@@ -673,10 +673,15 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.compositeBow.label"),
 		description: $I("workshop.compositeBow.desc"),
 		effects: {
-			"manpowerJobRatio" : 0.5
+			"manpowerJobRatio" : 0.5,
+			"manpowerMax": 0
 		},
 		calculateEffects: function(self, game){
 			self.effects["manpowerJobRatio"] = 0.5 * (1 + game.getEffect("weaponEfficency")); //weaponEfficency can't go beyond -1, see challenges.js for more info
+			// give a small amount of catpower storage in iron will.
+			// together with bolas and huntingArmor, this makes the base catpower
+			// max 1000 (when at 0 paragon), which is necessary for unlocking trading
+			self.effects["manpowerMax"] = game.ironWill ? 100 : 0;
 		},
 		prices:[
 			{ name : "wood", val: 200 },
@@ -718,7 +723,11 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.bolas.label"),
 		description: $I("workshop.bolas.desc"),
 		effects: {
-			"hunterRatio" : 1
+			"hunterRatio" : 1,
+			"manpowerMax": 0
+		},
+		calculateEffects: function(self, game){
+			self.effects["manpowerMax"] = game.ironWill ? 200 : 0;
 		},
 		prices:[
 			{ name : "wood", val: 50 },
@@ -731,7 +740,11 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.huntingArmor.label"),
 		description: $I("workshop.huntingArmor.desc"),
 		effects: {
-			"hunterRatio" : 2
+			"hunterRatio" : 2,
+			"manpowerMax": 0
+		},
+		calculateEffects: function(self, game){
+			self.effects["manpowerMax"] = game.ironWill ? 600 : 0;
 		},
 		prices:[
 			{ name : "iron", val: 750 },
