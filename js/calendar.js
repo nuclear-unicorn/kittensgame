@@ -873,8 +873,23 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			this.game.stats.getStat("totalParagon").val += paragon;
 		}
 		this.game.religion.pactsManager.pactsMilleniumKarmaKittens(paragon);
+		var oldYear = this.year;
 		this.year += yearsOffset;
 		this.game.stats.getStat("totalYears").val += yearsOffset;
+
+		// how many times did we cross a 2-year boundary?
+		var numTwoYears = Math.floor(this.year/2) - Math.floor(oldYear/2);
+		if (numTwoYears > 0) {
+			// trigger alicornmancy effect
+			var hasAlicornmancy = this.game.prestige.getPerk("alicornmancy").researched;
+			var hasPacifism = this.game.challenges.isActive("pacifism");
+			var hasAnimal = this.game.science.get("animal").researched;
+			var unicorns = this.game.resPool.get("unicorns");
+			if (hasAlicornmancy && hasPacifism && hasAnimal && unicorns.value < 2){
+				var delta = Math.min(2 - unicorns.value, numTwoYears);
+				this.game.resPool.addResEvent("unicorns", delta);
+			}
+		}
 		//------------------------------------------------------------------
 
         return totalNumberOfEvents;
@@ -1079,6 +1094,19 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 				if (res.aiCanDestroy) {
 					resPool.addResEvent(res.name, -res.value * 0.01 * aiApocalypseLevel);
 				}
+			}
+		}
+
+		if (this.year % 2 == 0) {
+			// alicornmancy effect: makes the pacifism random unicorn spawns less random.
+			// one unicorn per 2 years -> you can start doing unicorns in year 4 (at the latest).
+			var hasAlicornmancy = this.game.prestige.getPerk("alicornmancy").researched;
+			var hasPacifism = this.game.challenges.isActive("pacifism");
+			var hasAnimal = this.game.science.get("animal").researched;
+			var unicorns = this.game.resPool.get("unicorns");
+			if (hasAlicornmancy && hasPacifism && hasAnimal && unicorns.value < 2){
+				this.game.resPool.addResEvent("unicorns", 1);
+				this.game.msg($I("calendar.msg.unicorn"));
 			}
 		}
 
