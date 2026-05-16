@@ -1865,6 +1865,11 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 		if (!counter) {
 			return; //Skip undo if nothing was built
 		}
+		// markers unlock necrocorns, but only in UT challenge
+		// (so the necrocorn tooltip has a countdown to the end of the challenge)
+		if (model.metadata.name == "marker" && this.game.challenges.isActive("unicornTears")) {
+			game.resPool.get("necrocorn").unlocked = true;
+		}
 		var undo = this.game.registerUndoChange();
 		undo.addEvent(this.game.religion.id, {
 			action: "buildZU",
