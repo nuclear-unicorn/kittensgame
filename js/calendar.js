@@ -633,18 +633,24 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 		var riftChance = this.game.getEffect("riftChance");	//5 OPTK
 		if (this.game.rand(10000) < riftChance * 10000 * unicornChanceRatio){
+			//10% of ziggurat buildings bonus
 			var unicornBonus = 500 * (1 + this.game.getEffect("unicornsRatioReligion") * 0.1);
-			this.game.msg($I("calendar.msg.rift", [this.game.getDisplayValueExt(unicornBonus)]), "notice", "unicornRift");
+			var unicornsGain = this.game.resPool.addResEvent("unicorns", unicornBonus);
 
-			this.game.resPool.addResEvent("unicorns", unicornBonus);	//10% of ziggurat buildings bonus
+			if (unicornsGain > 0) {
+				this.game.msg($I("calendar.msg.rift", [this.game.getDisplayValueExt(unicornsGain)]), "notice", "unicornRift");
+			}
+
 		}
 		//----------------------------------------------
 		var aliChance = this.game.getEffect("alicornChance");	//0.2 OPTK
 		aliChance *= 1 + this.game.getLimitedDR(this.game.getEffect("alicornPerTickRatio"), 1.2);
 		if (this.game.rand(100000) < aliChance * 100000){
-			this.game.msg($I("calendar.msg.alicorn"), "important", "alicornRift");
+			var alicornsGain = this.game.resPool.addResEvent("alicorn", 1);
+			if (alicornsGain > 0) {
+				this.game.msg($I("calendar.msg.alicorn"), "important", "alicornRift");
+			}
 
-			this.game.resPool.addResEvent("alicorn", 1);
 			this.game.upgrade({
 				zigguratUpgrades: ["skyPalace", "unicornUtopia", "sunspire"]
 			});
