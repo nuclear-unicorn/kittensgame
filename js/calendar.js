@@ -384,6 +384,27 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		return Math.min(autoChance, 1);
 	},
 
+	/**
+	 * Handles one effect of Alicornmancy: if the other conditions for random
+	 * wandering unicorn arrivals are met, one unicorn will arrive every 2 years.
+	 * This means you can start doing unicorns in year 4 (at the latest).
+	 * @param numTwoYears how many increments of 2 years have passed.
+	 * @param message whether to show a log message for unicorn arrivals.
+	 */
+	giveAlicornmancyYearlyUnicorns: function(numTwoYears, message) {
+		var hasAlicornmancy = this.game.prestige.getPerk("alicornmancy").researched;
+		var hasPacifism = this.game.challenges.isActive("pacifism");
+		var hasAnimal = this.game.science.get("animal").researched;
+		var unicorns = this.game.resPool.get("unicorns");
+		if (hasAlicornmancy && hasPacifism && hasAnimal && unicorns.value < 2) {
+			var delta = Math.min(2 - unicorns.value, numTwoYears);
+			this.game.resPool.addResEvent("unicorns", delta);
+			if (message) {
+				this.game.msg($I("calendar.msg.unicorn"));
+			}
+		}
+	},
+
 	trueYear: function() {
 		return (this.day / this.daysPerSeason + this.season) / this.seasonsPerYear + this.year - this.game.time.flux;
 	},
@@ -880,15 +901,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		// how many times did we cross a 2-year boundary?
 		var numTwoYears = Math.floor(this.year/2) - Math.floor(oldYear/2);
 		if (numTwoYears > 0) {
-			// trigger alicornmancy effect
-			var hasAlicornmancy = this.game.prestige.getPerk("alicornmancy").researched;
-			var hasPacifism = this.game.challenges.isActive("pacifism");
-			var hasAnimal = this.game.science.get("animal").researched;
-			var unicorns = this.game.resPool.get("unicorns");
-			if (hasAlicornmancy && hasPacifism && hasAnimal && unicorns.value < 2){
-				var delta = Math.min(2 - unicorns.value, numTwoYears);
-				this.game.resPool.addResEvent("unicorns", delta);
-			}
+			this.giveAlicornmancyYearlyUnicorns(numTwoYears, false);
 		}
 		//------------------------------------------------------------------
 
@@ -1098,16 +1111,7 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 		}
 
 		if (this.year % 2 == 0) {
-			// alicornmancy effect: makes the pacifism random unicorn spawns less random.
-			// one unicorn per 2 years -> you can start doing unicorns in year 4 (at the latest).
-			var hasAlicornmancy = this.game.prestige.getPerk("alicornmancy").researched;
-			var hasPacifism = this.game.challenges.isActive("pacifism");
-			var hasAnimal = this.game.science.get("animal").researched;
-			var unicorns = this.game.resPool.get("unicorns");
-			if (hasAlicornmancy && hasPacifism && hasAnimal && unicorns.value < 2){
-				this.game.resPool.addResEvent("unicorns", 1);
-				this.game.msg($I("calendar.msg.unicorn"));
-			}
+			this.giveAlicornmancyYearlyUnicorns(1, true);
 		}
 
 		this.game.upgrade({policies: ["authocracy", "dragonRelationsAstrologers", "lizardRelationsEcologists"]});
