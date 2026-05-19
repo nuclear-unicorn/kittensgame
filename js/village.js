@@ -414,17 +414,21 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		this.sim.update(kittensPerTick, times);
 	},
 
+	getDiligentKittens: function() {
+		if (this.game.challenges.isActive("anarchy")) {
+			return Math.round(this.getKittens() * (1 - this.game.getEffect("kittenLaziness"))); //LDR specified in challenges.js
+		} else {
+			return this.getKittens();
+		}
+	},
+
 	getFreeKittens: function(){
 		var workingKittens = 0;
 		for (var i = this.jobs.length - 1; i >= 0; i--) {
 			workingKittens += this.jobs[i].value;
 		}
 
-		var diligentKittens = this.game.challenges.isActive("anarchy")
-			? Math.round(this.getKittens() * (1 - this.game.getEffect("kittenLaziness"))) //LDR specified in challenges.js
-			: this.getKittens();
-
-		return diligentKittens - workingKittens;
+		return this.getDiligentKittens() - workingKittens;
 	},
 
 	hasFreeKittens: function(amt){
@@ -3520,6 +3524,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 	setLoadout: function(setLeader) {
 		this.game.village.clearJobs(true);
 		var kittens = this.game.village.sim.kittens;
+		var workCapableKittens = this.game.village.getDiligentKittens();
 		var loadoutJobsSum = 0;
 		var jobsFiltered = [];
 
@@ -3531,7 +3536,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 				jobsFiltered.push({name : job.name, value : job.value});
 			}
 		}
-		var jobRatio = kittens.length / loadoutJobsSum;
+		var jobRatio = workCapableKittens / loadoutJobsSum;
 
 		var limitedJobs = 0;
 		for (i in jobsFiltered) {	//Check the filtered jobs if they are limited (engineers) and if the kittens assigned would be over the limit, assign the limit and remove the job from the filter
@@ -3547,7 +3552,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 
 		//Assign jobs
 
-		jobRatio = (kittens.length - limitedJobs) / loadoutJobsSum;
+		jobRatio = (workCapableKittens - limitedJobs) / loadoutJobsSum;
 
 		jobsFiltered.sort(function(a, b){return b.value - a.value;});	//Sort the jobs, so the job with the most weight gets the most priority
 
@@ -5150,7 +5155,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		this.inherited(arguments);
 
 		if (this.tdTop){
-			this.tdTop.innerHTML = $I("village.general.free.kittens.label") + ": " + this.game.village.getFreeKittens() + " / " + this.game.resPool.get("kittens").value;
+			this.tdTop.innerHTML = $I("village.general.free.kittens.label") + ": " + this.game.village.getFreeKittens() + " / " + this.game.village.getDiligentKittens();
 		}
 
 		if (this.happinessStats){
