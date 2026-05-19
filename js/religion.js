@@ -885,6 +885,12 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		},
 		calculateEffects: function(self, game) {
 			self.effects["corruptionRatio"] = 0.000001 * (1 + game.getEffect("corruptionBoostRatioChallenge")); //LDR specified in challenges.js
+
+			// markers immediately unlock necrocorns, but only in UT challenge
+			// (so that the necrocorn tooltip has a countdown to the end of the challenge).
+			if (self.val > 0 && game.challenges.isActive("unicornTears")) {
+				game.resPool.get("necrocorn").unlocked = true;
+			}
 		},
 		unlocked: false,
 		unlocks: {
