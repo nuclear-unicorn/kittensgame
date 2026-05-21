@@ -137,6 +137,7 @@
     bottom: 0px;
     right: 0px;
     min-width: 1180px;
+    max-width: unset;
     width: auto !important;
     overflow: hidden;
 }
