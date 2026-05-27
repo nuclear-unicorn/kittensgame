@@ -32,6 +32,27 @@ dojo.declare("classes.space.PlanetSim", null, {
 	constructor: function(ecosystem){
 		this.temperature = ecosystem.temperature;
 		this.atmosphere = ecosystem.atmosphere;
+	},
+
+	getPressure: function(){
+		var total = 0;
+		for (var gas in this.atmosphere){
+			total += this.atmosphere[gas];
+		}
+		return total;
+	},
+
+	getLabel: function(key, value){
+		var meta = this.metadata[key];
+		if (!meta){
+			return "";
+		}
+		for (var i = meta.thresholds.length - 1; i >= 0; i--){
+			if (value >= meta.thresholds[i]){
+				return meta.labels[i];
+			}
+		}
+		return meta.labels[0];
 	}
 });
 
@@ -1069,6 +1090,16 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 
 	save: function(saveData){
 
+		for (var i = 0; i < this.planets.length; i++){
+			var planet = this.planets[i];
+			if (planet.sim){
+				planet.ecosystem = {
+					temperature: planet.sim.temperature,
+					atmosphere: planet.sim.atmosphere
+				};
+			}
+		}
+
 		var planets = this.filterMetadata(this.planets, ["name", "buildings", "reached", "unlocked", "routeDays", "ecosystem"]);
 
 		for (var i = 0; i < planets.length; i++){
@@ -1532,6 +1563,40 @@ dojo.declare("classes.ui.space.FurthestRingPanel", [classes.ui.space.PlanetPanel
 	}
 });
 
+dojo.declare("classes.ui.space.YarnPanel", classes.ui.space.PlanetPanel, {
+
+	render: function(){
+		var content = this.inherited(arguments);
+
+		var sim = this.planet.sim;
+
+		this.tempEl = dojo.create("div", { className: "planetSim" }, content);
+		this.pressureEl = dojo.create("div", { className: "planetSim" }, content);
+		this.oxygenEl = dojo.create("div", { className: "planetSim" }, content);
+
+		this.updateEcosystem();
+
+		return content;
+	},
+
+	updateEcosystem: function(){
+		var sim = this.planet.sim;
+		if (!sim){
+			return;
+		}
+		var pressure = sim.getPressure();
+		var oxygen = sim.atmosphere.oxygen ? sim.atmosphere.oxygen : 0;
+		this.tempEl.innerHTML = "Temperature: " + Math.round(sim.temperature - 273.15) + "°C (" + sim.getLabel("temperature", sim.temperature) + ")";
+		this.pressureEl.innerHTML = "Pressure: " + pressure.toFixed(2) + " atm (" + sim.getLabel("pressure", pressure) + ")";
+		this.oxygenEl.innerHTML = "Oxygen: " + oxygen.toFixed(2) + " atm (" + sim.getLabel("oxygen", oxygen) + ")";
+	},
+
+	update: function(){
+		this.inherited(arguments);
+		this.updateEcosystem();
+	}
+});
+
 dojo.declare("com.nuclearunicorn.game.ui.tab.SpaceTab", com.nuclearunicorn.game.ui.tab, {
 
 	GCPanel: null,
@@ -1607,6 +1672,8 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.SpaceTab", com.nuclearunicorn.game.
 				var planetPanel = null;
 				if (planet.name == "furthestRing"){
 					planetPanel = new classes.ui.space.FurthestRingPanel(planetTitle, self.game.space, self.game);
+				} else if (planet.name == "yarn"){
+					planetPanel = new classes.ui.space.YarnPanel(planetTitle, self.game.space);
 				} else {
 					planetPanel = new classes.ui.space.PlanetPanel(planetTitle, self.game.space);
 				}
