@@ -5,6 +5,36 @@
 /**
  * Behold the bringer of light!
  */
+
+dojo.declare("classes.space.PlanetSim", null, {
+	temperature: 0,
+	atmosphere: {},
+
+	metadata:{
+		temperature: {
+			thresholds: [150, 220, 273, 310, 360],	//K on log scale (frozen co2, frozen water, body temp, hot temp)
+			labels: ['Frozen', 'Cold', 'Temperate', 'Warm', 'Hot']
+		},
+
+		pressure: {
+			unit: 'atm',
+			thresholds: [0.01, 0.06, 0.35, 1.0, 4.0],	//atm on log scale (vacuum, armstrong limit, lower breathable, cath baseline, X_X)
+			labels: ['Vacuum', 'Thin', 'Breathable', 'Dense', 'Crushing']
+		},
+
+		oxygen: {
+			unit: 'atm',
+			thresholds: [0.0, 0.07, 0.10, 0.16, 0.30],	//atm on log scale (hypoxia, lower breathable, cath baseline, 451F, toxic)
+			labels: ['None', 'Thin', 'Breathable', 'Rich', 'Toxic']
+		},
+	},
+
+	constructor: function(ecosystem){
+		this.temperature = ecosystem.temperature;
+		this.atmosphere = ecosystem.atmosphere;
+	}
+});
+
 dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager, {
 
 	/*
@@ -735,6 +765,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 		name: "yarn",
 		label: $I("space.planet.yarn.label"),
 		routeDays: 3800,
+		ecosystem: { temperature: 0, atmosphere: { oxygen: 78, methane: 21 } },
 		buildings:[
 			{
 				name: "terraformingStation",
@@ -1038,7 +1069,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 
 	save: function(saveData){
 
-		var planets = this.filterMetadata(this.planets, ["name", "buildings", "reached", "unlocked", "routeDays"]);
+		var planets = this.filterMetadata(this.planets, ["name", "buildings", "reached", "unlocked", "routeDays", "ecosystem"]);
 
 		for (var i = 0; i < planets.length; i++){
 			var planet = planets[i];
@@ -1062,6 +1093,11 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 		this.hideResearched = saveData.space.hideResearched || false;
 		this.loadMetadata(this.programs, saveData.space.programs);
 		this.loadMetadata(this.planets, saveData.space.planets);
+
+		var yarn = this.getPlanet("yarn");
+		if (yarn){
+			yarn.sim = new classes.space.PlanetSim(yarn.ecosystem);
+		}
 
 		//TODO: move to some common method?
 		for (var i = this.programs.length - 1; i >= 0; i--) {
