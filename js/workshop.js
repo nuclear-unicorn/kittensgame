@@ -1904,6 +1904,22 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		},
 		flavor: $I("workshop.longRangeSpaceships.flavor")
 	},
+	{
+		name: "subsurfaceMining",
+		label: $I("workshop.subsurfaceMining.label"),
+		description: $I("workshop.subsurfaceMining.desc"),
+		prices:[
+			{ name : "science",  val: 850000 },
+			{name: "antimatter", val: 100  },
+			{name: "kerosene", val: 25000  }
+		],
+		effects: {
+			"terraformOxygenRatio" : 0.1
+		},
+		upgrades:{
+            spaceBuilding: ["terraformingStation"]
+        },
+	},
 	//------------------- oil --------------------------
     {
 		name: "oilRefinery",

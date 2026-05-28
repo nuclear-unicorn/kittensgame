@@ -7,8 +7,25 @@
  */
 
 dojo.declare("classes.space.PlanetSim", null, {
+	game: null,
+
 	temperature: 0,
 	atmosphere: {},
+
+	//todo: use adjustable greenhouse gas multipliers per atmosphere
+	gasMeta: {
+        "methane": {
+			viscosity: 1.3,
+			greenhouse: 2.5
+		},
+		"oxygen": {
+			viscosity: 1.15,
+			greenhouse: 0.0
+		},
+    },
+
+	//CH4 + 2 O2 -> CO2 + 2 H2O
+    oxidationRatio: 0.02,
 
 	metadata:{
 		temperature: {
@@ -29,7 +46,9 @@ dojo.declare("classes.space.PlanetSim", null, {
 		},
 	},
 
-	constructor: function(ecosystem){
+	constructor: function(game, ecosystem){
+		this.game = game;
+
 		this.temperature = ecosystem.temperature;
 		this.atmosphere = ecosystem.atmosphere;
 	},
@@ -53,6 +72,33 @@ dojo.declare("classes.space.PlanetSim", null, {
 			}
 		}
 		return meta.labels[0];
+	},
+
+	calcSurfaceTemperature: function (baseTempK, totalPressureAtm, ghgPressureAtm, antiGhgPressureAtm) {
+		var greenhouseFactor = 1 + (totalPressureAtm / 10) + Math.min(ghgPressureAtm, 3.0);
+		var antiGreenhouseFactor = 1 + Math.min(antiGhgPressureAtm, 3.0);
+		return baseTempK * (greenhouseFactor / antiGreenhouseFactor);
+	},
+
+	update: function(){
+		for (var gas in this.atmosphere){
+			var gasPerTick = this.game.getEffect(gas + "PerTick") * 0.01;
+			this.atmosphere[gas] += gasPerTick;
+
+			var viscosity = this.gasMeta[gas].viscosity;
+
+			//quadratic escape sink (pressure dissipates at a ^2 - ^4 law)
+			var pressure = Math.max(this.atmosphere[gas], 0);
+
+			//todo: cap perTick instead of setting up pressure equilibrium?
+			this.atmosphere[gas] -= Math.pow(pressure, viscosity) * 0.01;
+
+			if (this.atmosphere[gas] < 0){
+				this.atmosphere[gas] = 0;
+			}
+
+		}
+		this.temperature = this.calcSurfaceTemperature(200, this.getPressure(), this.atmosphere["methane"], this.atmosphere["oxygen"]);
 	}
 });
 
@@ -786,7 +832,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 		name: "yarn",
 		label: $I("space.planet.yarn.label"),
 		routeDays: 3800,
-		ecosystem: { temperature: 0, atmosphere: { oxygen: 78, methane: 21 } },
+		ecosystem: { temperature: 0, atmosphere: { oxygen: 0, methane: 0 } },
 		buildings:[
 			{
 				name: "terraformingStation",
@@ -801,10 +847,13 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				],
 				requiredTech: ["terraformation"],
 				effects: {
-					"maxKittens": 1
+					"maxKittens": 1,
+					"methanePerTick": 0.01,
+					"oxygenPerTick": 0
 				},
 				updateEffects: function(self, game) {
 					self.effects["maxKittens"] = 1 + game.getEffect("terraformingMaxKittensRatio");
+					self.effects["oxygenPerTick"] = self.effects["methanePerTick"] * game.getEffect("terraformOxygenRatio");
 				},
 				action: function(self, game) {
 					self.updateEffects(self, game);
@@ -827,6 +876,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				requiredTech: ["hydroponics"],
 				effects: {
 					"catnipRatio": 0.025,
+					"oxygenPerTick": 0.01,
 					"catnipMaxRatio": 0.1,
 					"terraformingMaxKittensRatio": 0
 				},
@@ -846,6 +896,25 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				action: function(self, game) {
 					self.updateEffects(self, game);
 				}
+			},
+			{
+				name: "supercomputer",
+				label: $I("space.planet.yarn.supercomputer.label"),
+				description: $I("space.planet.yarn.supercomputer.desc"),
+				unlocked: true,
+				priceRatio: 1.15,
+				prices: [
+					{name: "antimatter", val: 5 },
+					{name: "kerosene", val: 750 }
+				],
+				requiredTech: ["hydroponics"],
+				effects: {
+					"scienceMax": 10000,
+				},
+				updateEffects: function(self, game) {
+					var temp = game.space.getPlanet("yarn").sim.temperature;
+					self.effects["scienceMax"] = 50000 * (1 + game.getEffect("spaceScienceRatio")) * Math.max(0, (1 - temp / 300));
+				},
 			}
 		]
 	},{
@@ -1127,7 +1196,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 
 		var yarn = this.getPlanet("yarn");
 		if (yarn){
-			yarn.sim = new classes.space.PlanetSim(yarn.ecosystem);
+			yarn.sim = new classes.space.PlanetSim(this.game, yarn.ecosystem);
 		}
 
 		//TODO: move to some common method?
@@ -1154,6 +1223,10 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 	update: function(){
 		for (var i in this.planets){
 			var planet = this.planets[i];
+
+			if (planet.sim){
+				planet.sim.update();
+			}
 
 			if (!planet.reached && planet.unlocked) {
 				if (planet.routeDays > 0) {
@@ -1576,6 +1649,15 @@ dojo.declare("classes.ui.space.YarnPanel", classes.ui.space.PlanetPanel, {
 
 		this.updateEcosystem();
 
+		UIUtils.attachTooltip(this.game, this.oxygenEl, 20, 0, dojo.hitch(this, function(){
+			var html = "<b>Atmosphere:</b><br/>";
+			var atmo = this.planet.sim.atmosphere;
+			for (var gas in atmo){
+				html += gas + ": " + atmo[gas].toFixed(2) + " atm<br/>";
+			}
+			return html;
+		}));
+
 		return content;
 	},
 
@@ -1586,7 +1668,7 @@ dojo.declare("classes.ui.space.YarnPanel", classes.ui.space.PlanetPanel, {
 		}
 		var pressure = sim.getPressure();
 		var oxygen = sim.atmosphere.oxygen ? sim.atmosphere.oxygen : 0;
-		this.tempEl.innerHTML = "Temperature: " + Math.round(sim.temperature - 273.15) + "°C (" + sim.getLabel("temperature", sim.temperature) + ")";
+		this.tempEl.innerHTML = "Temperature: " + Math.round(sim.temperature) + "°K (" + sim.getLabel("temperature", sim.temperature) + ")";
 		this.pressureEl.innerHTML = "Pressure: " + pressure.toFixed(2) + " atm (" + sim.getLabel("pressure", pressure) + ")";
 		this.oxygenEl.innerHTML = "Oxygen: " + oxygen.toFixed(2) + " atm (" + sim.getLabel("oxygen", oxygen) + ")";
 	},

@@ -698,7 +698,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name : "relic",   val: 5}
 		],
 		unlocks: {
-			tech: ["hydroponics"]
+			tech: ["hydroponics"],
+			upgrades: ["subsurfaceMining"]
 		}
 	}, {
 		name: "hydroponics",
