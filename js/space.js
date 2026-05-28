@@ -875,11 +875,13 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				requiredTech: ["terraformation"],
 				effects: {
 					"methanePerTick": -0.035,
-					"kerosenePerTick": 0.0001
+					"kerosenePerTick": 0.0001,
+					"thoriumPerTick": 0.0001
 				},
 				updateEffects: function(self, game) {
 					var temp = game.space.getPlanet("yarn").sim.temperature;
 					self.effects["kerosenePerTick"] = 0.0001 * Math.max(0, (1 - temp / 300));
+					self.effects["thoriumPerTick"] = 0.0001 * Math.max(0, temp / 300);
 				},
 			},
 			{
