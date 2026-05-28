@@ -864,6 +864,25 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				breakIronWill: true
 			},
 			{
+				name: "cryoCondenser",
+				label: $I("space.planet.yarn.cryoCondenser.label"),
+				description: $I("space.planet.yarn.cryoCondenser.desc"),
+				unlocked: false,
+				priceRatio: 1.25,
+				prices: [
+					{name: "uranium", val: 5000  },
+				],
+				requiredTech: ["terraformation"],
+				effects: {
+					"methanePerTick": -0.035,
+					"kerosenePerTick": 0.0001
+				},
+				updateEffects: function(self, game) {
+					var temp = game.space.getPlanet("yarn").sim.temperature;
+					self.effects["kerosenePerTick"] = 0.0001 * Math.max(0, (1 - temp / 300));
+				},
+			},
+			{
 				name: "hydroponics",
 				label: $I("space.planet.yarn.hydroponics.label"),
 				description: $I("space.planet.yarn.hydroponics.desc"),
@@ -915,7 +934,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					var temp = game.space.getPlanet("yarn").sim.temperature;
 					self.effects["scienceMax"] = 50000 * (1 + game.getEffect("spaceScienceRatio")) * Math.max(0, (1 - temp / 300));
 				},
-			}
+			},
 		]
 	},{
 		name: "umbra",

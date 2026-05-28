@@ -1660,6 +1660,8 @@
     "space.planet.yarn.terraformingStation.desc": "Explode a charge of antimatter to melt yarn ice and throw oxygen into the atmosphere",
     "space.planet.yarn.supercomputer.label": "Supercomputer Array",
     "space.planet.yarn.supercomputer.desc": "Supercomputer Array. Operates better at absolute zero temperature.",
+    "space.planet.yarn.cryoCondenser.label": "Cryo Condenser",
+    "space.planet.yarn.cryoCondenser.desc": "Operates at low temperatures at methane rich environments to condense gas to liquid fuel",
     "space.panel.rorshach.label": "Rorschach",
     "space.rorschachMission.desc": "Rorschach is the biggest comet near Helios.",
     "space.rorschachMission.label": "Rorschach",
