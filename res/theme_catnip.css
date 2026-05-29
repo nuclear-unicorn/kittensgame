@@ -1164,7 +1164,7 @@ body.scheme_catnip {
 	padding-bottom: 0; /* default padding-bottom: 50px; */
 }
 .scheme_catnip .res-cell.craft-link {
-	color: #b6bda2;
+	color: #3c4128; /* match regular table link/text color */
 	/* default width: 20px; */
 	/* default max-width: 60px; */
 }
@@ -1174,16 +1174,16 @@ body.scheme_catnip {
 .scheme_catnip .res-cell.craft-link.all { /* column craft all */
 	font-size: 95%; /* default font-size: 85%; */
 	opacity: 1; /* default opacity: 0.4; */
-	color: #a0a0a0;
+	color: #5a613c;
 }
 .scheme_catnip .res-cell.craft-link:hover,
 .scheme_catnip .res-cell.craft-link.all:hover { /* craft table left column */
-    color: #ebede5;
+    color: #00979f;
 	text-decoration: none;
 	opacity: 1;
 }
 .scheme_catnip .craftTable .res-cell.resource-name {
-	color: #e6ebe1;
+	color: #1e2114; /* match regular resource table */
 }
 .scheme_catnip .res-row {
 	padding-bottom: 2px; /* default padding-bottom: 4px; */
@@ -1216,7 +1216,7 @@ body.scheme_catnip {
 .scheme_catnip .resAmount,
 .scheme_catnip .resPerTick,
 .scheme_catnip .res-cell.resource-value,
-.scheme_catnip .craftTable {
+.scheme_catnip .res-cell.craft-link { /* numeric craft cells only, so craft names match regular names (Delius) */
 	font-family: 'Open Sans', sans-serif;
 }
 .scheme_catnip .resource_faith .resource-name,
@@ -1261,7 +1261,7 @@ body.scheme_catnip {
 .scheme_catnip .res-cell.resource-value {
 	/* default width: 75px; */
 	/* default max-width: 90px; */
-	color: #d6dacb;
+	color: #1e2114; /* match regular table .resAmount */
 }
 .scheme_catnip .pin-link > a {
 	border-radius: 5px;
