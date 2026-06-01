@@ -364,6 +364,9 @@ body.scheme_catnip {
 	background-color: transparent;
 	backdrop-filter: none; /* default : backdrop-filter: blur(2px); */
 }
+.scheme_catnip .button_tooltip.login-popup { /* save/login popup: default falls back to white --page-background-color */
+	background-color: rgba(38, 40, 31, 0.9) !important; /* match tooltip window; !important to beat default.css */
+}
 .scheme_catnip .button_tooltip div { /* tooltip window == left column: right text | center column:highlighting text */
 	color: #ebede5;
 }
@@ -836,6 +839,10 @@ body.scheme_catnip {
 .scheme_catnip .container .name.variety-spots { /* tacheté */
 	border: 1px dotted #c49474;
 	padding: 0 5px;
+}
+.scheme_catnip .container .currentLeader .name { /* leader panel sits on the light bg, not the dark census-block, so the light fur colors wash out; use the theme's standard dark text color and readable face instead */
+	font-family: 'Open Sans', sans-serif;
+	color: #3c4128;
 }
 .scheme_catnip .btn.modern.disabled a.auto-on {
 	color: #005f05;

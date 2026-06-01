@@ -4327,7 +4327,7 @@ dojo.declare("classes.ui.village.Census", null, {
 	//TODO: behavior if in anarchy challenge?
 	getGovernmentInfo: function() {
 		var retVal = {
-			leaderInfo: "%username%",
+			leaderInfo: $I("village.census.lbl.noLeader"),
 			expInfo: "",
 			jobBonusInfo: "",
 		};
