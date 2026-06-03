@@ -649,7 +649,17 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 			res.value = this.game.getUnlimitedDR(this.game.karmaKittens, 5);
 		}
 
-		return res.value - prevValue;
+		// return the amount the resource actually changed by.
+		if (res.value == prevValue + addedValue) {
+			// In this case, computing the return value as (res.value - prevValue) would yield the
+			// original addedValue, but with a double-rounding. This is usually minor, but it might
+			// make the return value be non-integer even though addedValue was an integer. So we
+			// return the original addedValue directly.
+			return addedValue;
+		} else {
+			// change was limited in some way; recompute the change amount.
+			return res.value - prevValue;
+		}
 	},
 
 	addResPerTick: function(name, value){

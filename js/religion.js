@@ -340,6 +340,20 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		if (isNaN(this.faith)){
 			this.faith = 0;
 		}
+		
+		// calculate percentage of days in paradox by floor of which reduce days
+		// this is partially duplicating calendar.js fastForward which might need revisiting in the future
+		// TODO: test/necrocorns.test.js for necrocornFastForward
+		var temporalParadoxChance = this.game.getEffect("temporalParadoxChance");
+		if (temporalParadoxChance > 0)
+		{
+			var daysInParadox = 10 + this.game.getEffect("temporalParadoxDay");
+			var daysBetweenParadox = daysInParadox + 100 * Math.max( 1 , 1 / temporalParadoxChance );
+			var percentTimeInParadox = daysInParadox / daysBetweenParadox;
+			var daysInParadox = Math.floor(daysOffset * percentTimeInParadox);
+			daysOffset -= daysInParadox;
+		}
+
 		this.necrocornFastForward(daysOffset, times);
 
 		this.triggerOrderOfTheVoid(times);
@@ -871,6 +885,12 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		},
 		calculateEffects: function(self, game) {
 			self.effects["corruptionRatio"] = 0.000001 * (1 + game.getEffect("corruptionBoostRatioChallenge")); //LDR specified in challenges.js
+
+			// markers immediately unlock necrocorns, but only in UT challenge
+			// (so that the necrocorn tooltip has a countdown to the end of the challenge).
+			if (self.val > 0 && game.challenges.isActive("unicornTears")) {
+				game.resPool.get("necrocorn").unlocked = true;
+			}
 		},
 		unlocked: false,
 		unlocks: {
@@ -954,7 +974,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"timeRatio"
 		],
 		upgrades: {
-			spaceBuilding: ["spaceBeacon"]
+			spaceBuilding: ["spaceBeacon"],
+			chronoforge: ["temporalImpedance"]
 		},
 		calculateEffects: function(self, game) {
 			self.togglable = false;

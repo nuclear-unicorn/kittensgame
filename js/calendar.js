@@ -384,6 +384,27 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		return Math.min(autoChance, 1);
 	},
 
+	/**
+	 * Handles one effect of Alicornmancy: if the other conditions for random
+	 * wandering unicorn arrivals are met, one unicorn will arrive every 2 years.
+	 * This means you can start doing unicorns in year 4 (at the latest).
+	 * @param numTwoYears how many increments of 2 years have passed.
+	 * @param message whether to show a log message for unicorn arrivals.
+	 */
+	giveAlicornmancyYearlyUnicorns: function(numTwoYears, message) {
+		var hasAlicornmancy = this.game.prestige.getPerk("alicornmancy").researched;
+		var hasPacifism = this.game.challenges.isActive("pacifism");
+		var hasAnimal = this.game.science.get("animal").researched;
+		var unicorns = this.game.resPool.get("unicorns");
+		if (hasAlicornmancy && hasPacifism && hasAnimal && unicorns.value < 2) {
+			var delta = Math.min(2 - unicorns.value, numTwoYears);
+			this.game.resPool.addResEvent("unicorns", delta);
+			if (message) {
+				this.game.msg($I("calendar.msg.unicorn"));
+			}
+		}
+	},
+
 	trueYear: function() {
 		return (this.day / this.daysPerSeason + this.season) / this.seasonsPerYear + this.year - this.game.time.flux;
 	},
@@ -633,18 +654,24 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 		var riftChance = this.game.getEffect("riftChance");	//5 OPTK
 		if (this.game.rand(10000) < riftChance * 10000 * unicornChanceRatio){
+			//10% of ziggurat buildings bonus
 			var unicornBonus = 500 * (1 + this.game.getEffect("unicornsRatioReligion") * 0.1);
-			this.game.msg($I("calendar.msg.rift", [this.game.getDisplayValueExt(unicornBonus)]), "notice", "unicornRift");
+			var unicornsGain = this.game.resPool.addResEvent("unicorns", unicornBonus);
 
-			this.game.resPool.addResEvent("unicorns", unicornBonus);	//10% of ziggurat buildings bonus
+			if (unicornsGain > 0) {
+				this.game.msg($I("calendar.msg.rift", [this.game.getDisplayValueExt(unicornsGain)]), "notice", "unicornRift");
+			}
+
 		}
 		//----------------------------------------------
 		var aliChance = this.game.getEffect("alicornChance");	//0.2 OPTK
 		aliChance *= 1 + this.game.getLimitedDR(this.game.getEffect("alicornPerTickRatio"), 1.2);
 		if (this.game.rand(100000) < aliChance * 100000){
-			this.game.msg($I("calendar.msg.alicorn"), "important", "alicornRift");
+			var alicornsGain = this.game.resPool.addResEvent("alicorn", 1);
+			if (alicornsGain > 0) {
+				this.game.msg($I("calendar.msg.alicorn"), "important", "alicornRift");
+			}
 
-			this.game.resPool.addResEvent("alicorn", 1);
 			this.game.upgrade({
 				zigguratUpgrades: ["skyPalace", "unicornUtopia", "sunspire"]
 			});
@@ -867,8 +894,15 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			this.game.stats.getStat("totalParagon").val += paragon;
 		}
 		this.game.religion.pactsManager.pactsMilleniumKarmaKittens(paragon);
+		var oldYear = this.year;
 		this.year += yearsOffset;
 		this.game.stats.getStat("totalYears").val += yearsOffset;
+
+		// how many times did we cross a 2-year boundary?
+		var numTwoYears = Math.floor(this.year/2) - Math.floor(oldYear/2);
+		if (numTwoYears > 0) {
+			this.giveAlicornmancyYearlyUnicorns(numTwoYears, false);
+		}
 		//------------------------------------------------------------------
 
         return totalNumberOfEvents;
@@ -1074,6 +1108,10 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 					resPool.addResEvent(res.name, -res.value * 0.01 * aiApocalypseLevel);
 				}
 			}
+		}
+
+		if (this.year % 2 == 0) {
+			this.giveAlicornmancyYearlyUnicorns(1, true);
 		}
 
 		this.game.upgrade({policies: ["authocracy", "dragonRelationsAstrologers", "lizardRelationsEcologists"]});
