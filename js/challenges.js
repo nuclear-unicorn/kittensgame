@@ -179,6 +179,11 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		checkCompletionConditionOnReset: function(game){
 			return game.time.getVSU("cryochambers").on > 0 || game.bld.get("stasisPod").on > 0;
 		},
+		actionOnCompletion: function(game){
+			if (game.ironWill) {
+				game.achievements.unlockBadge("ivoryTower");
+			}
+		},
 		reserveDelay: true
 	},{
 		name: "1000Years",
@@ -292,11 +297,17 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			self.effects["tradeKnowledgeRatio"] = self.getTradeBonusEffect(game);
 		},
 		checkCompletionConditionOnReset: function(game){
+			// hack: this code is here as a sort of general "code that runs on
+			// reset when pacifism is active" hook. it intentionally does not
+			// require the completion condition to actually be met. (otherwise
+			// it might be too difficult to get this basge if one already has
+			// a lot of pacifism completions.)
 			if (game.diplomacy.baseManpowerCost > 0) { // BSK+IW precaution
 				if (!game.village.sim.hadKittenHunters && game.stats.getStatCurrent("totalTrades").val > 0){
-					game.achievements.unlockBadge("cleanPaws"); //hack
+					game.achievements.unlockBadge("cleanPaws");
 				}
 			}
+
 			return game.science.getPolicy("outerSpaceTreaty").researched;
 		},
 		upgrades: {
