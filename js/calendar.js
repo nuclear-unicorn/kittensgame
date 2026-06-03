@@ -952,7 +952,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		return Math.max(0, (Math.floor(endYear / 1000) * 1000 - Math.floor(startYear / 1000) * 1000) / 1000);
 	},
 	calculateMilleniumProduction: function(milleniums){
-		var paragonRatio = (1 + this.game.getEffect("milleniumParagon"));
+		var paragonRatio = (1 + this.game.getEffect("milleninumParagon"));
 		this.game.resPool.addResEvent("paragon", milleniums * paragonRatio);
 		this.game.stats.getStat("totalParagon").val += milleniums * paragonRatio;
 		this.game.religion.pactsManager.pactsMilleniumKarmaKittens(milleniums);

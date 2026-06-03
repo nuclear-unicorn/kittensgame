@@ -1390,7 +1390,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		tier: 21,
 		priceRatio: 3,
 		effects: {
-			"milleniumParagon": 1
+			"milleninumParagon": 1
 		},
 		unlocked: false,
 		// flavor: $I("religion.tu.darkParacosm.flavor")
