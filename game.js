@@ -2378,6 +2378,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 
 		this.globalEffectsCached = {};
+
+		this.undoChange = null;
+		this._publish("server/undoStateChanged");
 	},
 
 	_publish: function(topic, arg){
