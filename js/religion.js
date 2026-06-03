@@ -1464,7 +1464,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		togglable: true,
 		flavor: $I("religion.tu.holyGenocide.flavor")
 	}
-	//Holy Memecide
+		//Holy Memecide
 	],
 
 	effectsBase: {
