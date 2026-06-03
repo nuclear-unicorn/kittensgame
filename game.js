@@ -1874,6 +1874,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "fixed",
 				calculation: "nonProportional"
 
+			},
+			"milleniumParagon":{
+				title: $I("effectsMgr.statics.milleniumParagon.title"),
+				type: "fixed",
 			}
 		}
 	}
