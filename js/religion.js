@@ -1377,24 +1377,6 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		unlocked: false,
 		flavor: $I("religion.tu.darkNova.flavor")
 	},
-			//I'm not sure if TT21 is good place yet
-	{
-		name: "darkParacosm",
-		label: $I("religion.tu.darkParacosm.label"),
-		description: $I("religion.tu.darkParacosm.desc"),
-		prices: [
-			{ name : "relic", val: 23000},
-			{ name : "void", val: 29000},
-			{ name : "paragon", val: 8000}
-		],
-		tier: 21,
-		priceRatio: 3,
-		effects: {
-			"milleninumParagon": 1
-		},
-		unlocked: false,
-		// flavor: $I("religion.tu.darkParacosm.flavor")
-	},
 		//pacts can go to the TT23
 	{
 		name: "mausoleum",
@@ -1465,6 +1447,24 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		flavor: $I("religion.tu.holyGenocide.flavor")
 	},
 		//Holy Memecide
+		//I'm not sure if TT27 is good place yet
+	{
+		name: "darkParacosm",
+		label: $I("religion.tu.darkParacosm.label"),
+		description: $I("religion.tu.darkParacosm.desc"),
+		prices: [
+			{ name : "relic", val: 230000},
+			{ name : "void", val: 29000},
+			{ name : "paragon", val: 8}
+		],
+		tier: 27,
+		priceRatio: 2,
+		effects: {
+			"milleninumParagon": 1
+		},
+		unlocked: false,
+		flavor: $I("religion.tu.darkParacosm.flavor")
+	},
 	],
 
 	effectsBase: {
