@@ -1527,17 +1527,23 @@ dojo.declare("classes.ui.time.UseHeatBtnController", com.nuclearunicorn.game.ui.
 		var price = this.getPricesMultiple(model, amt);
 		var furnace = this.game.time.getCFU("blastFurnace");
 		if (furnace.heat < price.heat) {
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
-			return true;
+            return {
+                itemBought: false,
+                reason: "cannot-afford"
+            };
 		}
 		if (!model.enabled) {
-			callback(false /*itemBought*/, { reason: "not-enabled" });
-			return true;
+            return {
+                itemBought: false,
+                reason: "not-enabled"
+            };
 		}
 		furnace.heat -= price.heat;
 		this.doShatter(model, amt);
-		callback(true /*itemBought*/, { reason: "paid-for" });
-		return true;
+		return {
+            itemBought: true /*itemBought*/,
+            reason: "paid-for"
+        };
 	},
 
 	doShatterAmt: function(model, amt) {
