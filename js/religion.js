@@ -1462,6 +1462,11 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		effects: {
 			"milleninumParagon": 1
 		},
+		calculateEffects: function(self, game){
+			if (!game.getFeatureFlag("DARK_PARACOSM")){
+				self.unlocked = false;
+			}
+		},
 		unlocked: false,
 		flavor: $I("religion.tu.darkParacosm.flavor")
 	},
