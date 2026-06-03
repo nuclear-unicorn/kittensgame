@@ -369,6 +369,8 @@ dojo.declare("classes.game.Server", null, {
 
 			self.game.load();
 			self.game.msg($I("save.import.msg"));
+
+			self.game.render();
 		});
 	},
 
