@@ -1874,6 +1874,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "fixed",
 				calculation: "nonProportional"
 
+			},
+			"milleninumParagon":{
+				title: $I("effectsMgr.statics.milleninumParagon.title"),
+				type: "fixed",
 			}
 		}
 	}
@@ -2032,6 +2036,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			beta: true,
 			main: true,
 			mobile: true
+		},
+		DARK_PARACOSM: {
+			beta: true,
+			main: false,
+			mobile: false
 		}
 	},
 
