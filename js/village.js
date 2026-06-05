@@ -1198,7 +1198,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 
 	statics: {
-		SAVE_PACKET_OFFSET: 100
+		SAVE_PACKET_OFFSET: 100,
+		SEED_MAX: 999999
 	},
 
 	// 100 names MAX!
@@ -1289,53 +1290,118 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 	isSenator: false,
 
 	favorite: false,
+	seed: null,
 
-	constructor: function(){
-		this.name = this.names[this.rand(this.names.length)];
-		this.surname = this.surnames[this.rand(this.surnames.length)];
-		this.trait = this.traits[this.rand(this.traits.length)];
-
-		//kittens tend to be on the younger side with some basic minimal age
-
-		this.age = 5 + this.rand(10);
-		if (this.rand(100) < 30){
-			this.age += this.rand(30);
-		}
-
-		//10% of chance to generate one of 6 primary colors (rare colors TBD)
-		if (this.rand(100) <= 10){
-			this.color = this.rand(6) + 1;
-
-			//10% of chance of colored cat to be one of 5 rare varieties (dual, tabby, torbie, calico, spots)
-			if (this.rand(100) <= 10){
-				this.variety = this.rand(4) + 1;
-			}
-		}
-		//5% of kitten to be rarity 1 or 2, and extra 10% on top of it to be extra rare
-		if (this.rand(100) <= 5){
-			this.rarity = this.rand(2) + 1;
-			if (this.rand(100) <= 10){
-				this.rarity += 1;
-			}
+	constructor: function(seed){
+		if (seed !== undefined && seed !== null) {
+			this.seed = this._normalizeSeed(seed);
+			this._generateAttributes(this._createSeededRand(this.seed));
+		} else {
+			this._generateAttributes(this.rand.bind(this));
 		}
 
 		this.exp = 0;
 		this.skills = {};
 	},
 
+	_generateAttributes: function(rand){
+		this.color = 0;
+		this.variety = 0;
+		this.rarity = 0;
+
+		this.name = this.names[rand(this.names.length)];
+		this.surname = this.surnames[rand(this.surnames.length)];
+		this.trait = this.traits[rand(this.traits.length)];
+
+		//kittens tend to be on the younger side with some basic minimal age
+
+		this.age = 5 + rand(10);
+		if (rand(100) < 30){
+			this.age += rand(30);
+		}
+
+		//10% of chance to generate one of 6 primary colors (rare colors TBD)
+		if (rand(100) <= 10){
+			this.color = rand(6) + 1;
+
+			//10% of chance of colored cat to be one of 5 rare varieties (dual, tabby, torbie, calico, spots)
+			if (rand(100) <= 10){
+				this.variety = rand(4) + 1;
+			}
+		}
+		//5% of kitten to be rarity 1 or 2, and extra 10% on top of it to be extra rare
+		if (rand(100) <= 5){
+			this.rarity = rand(2) + 1;
+			if (rand(100) <= 10){
+				this.rarity += 1;
+			}
+		}
+	},
+
 	rand: function(ratio){
 		return (Math.floor(Math.random() * ratio));
 	},
 
+	_createSeededRand: function(seed){
+		var state = (seed + 1) % 2147483647;
+		return function(ratio){
+			state = state * 16807 % 2147483647;
+			return Math.floor((state - 1) / 2147483646 * ratio);
+		};
+	},
+
+	_normalizeSeed: function(seed){
+		seed = Math.floor(Number(seed));
+		if (!isFinite(seed)) {
+			seed = 0;
+		}
+		return Math.max(0, Math.min(this.statics.SEED_MAX, seed));
+	},
+
 	load: function(data, jobNames) {
-		if (data.ssn != undefined) {
+		if (data.seed !== undefined) {
+			this.loadSeeded(data, jobNames);
+		} else if (data.ssn != undefined) {
 			this.loadCompressed(data, jobNames);
 		} else {
 			this.loadUncompressed(data);
 		}
 	},
 
+	loadSeeded: function(data, jobNames) {
+		this.seed = this._normalizeSeed(data.seed);
+		this._generateAttributes(this._createSeededRand(this.seed));
+
+		this.skills = {};
+		var dataSkills = data.skills || 0;
+		var compressedSkills = jobNames && (typeof(dataSkills) == "number" || dataSkills instanceof Array);
+		if (compressedSkills) {
+			var sameSkill = typeof(dataSkills) == "number";
+			for (var i = jobNames.length - 1; i >= 0; --i) {
+				var skill = sameSkill ? dataSkills : (dataSkills[i] || 0);
+				this.skills[jobNames[i]] = Math.min(skill, 20001);
+			}
+		} else {
+			this.skills = data.skills || {};
+			for (var job in this.skills) {
+				if (this.skills[job] > 20001) {
+					this.skills[job] = 20001;
+				}
+			}
+		}
+
+		this.exp = data.exp || 0;
+		this.job = typeof(data.job) == "number" ? jobNames[data.job] : (data.job || null);
+		this.engineerSpeciality = data.engineerSpeciality || null;
+		this.rank = data.rank || 0;
+		this.isLeader = data.isLeader || false;
+		this.isSenator = false;
+		this.isAdopted = data.isAdopted || false;
+		this.favorite = data.favorite || false;
+	},
+
 	loadUncompressed: function(data) {
+		this.seed = null;
 		this.name = 	data.name;
 		this.surname =  data.surname;
 		this.age = 		data.age;
@@ -1378,6 +1444,7 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 	},
 
 	loadCompressed: function(data, jobNames) {
+		this.seed = null;
 		var ssn = this._splitSSN(data.ssn, 7);
 		this.name = data.name || this.names[ssn[0]];
 		this.surname = data.surname || this.surnames[ssn[1]];
@@ -1437,17 +1504,9 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 				saveSkills[job] = this.precisionRound(this.skills[job], 1);
 			}
 		}
-		// don't serialize falsy values
-		return {
-			name: this.name,
-			surname: this.surname,
-			age: this.age,
-			color: this.color || undefined,
-			variety: this.variety || undefined,
-			rarity: this.rarity || undefined,
+		var save = {
 			skills: saveSkills,
 			exp: this.exp || undefined,
-			trait: {name: this.trait.name},
 			job: this.job || undefined,
 			engineerSpeciality: this.engineerSpeciality || undefined,
 			rank: this.rank || undefined,
@@ -1455,6 +1514,18 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 			isAdopted: this.isAdopted || undefined,
 			favorite: this.favorite || undefined
 		};
+		if (this.seed !== null && this.seed !== undefined) {
+			save.seed = this.seed;
+		} else {
+			save.name = this.name;
+			save.surname = this.surname;
+			save.age = this.age;
+			save.color = this.color || undefined;
+			save.variety = this.variety || undefined;
+			save.rarity = this.rarity || undefined;
+			save.trait = {name: this.trait.name};
+		}
+		return save;
 	},
 
 	saveCompressed: function(jobNames) {
@@ -1471,18 +1542,8 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 			skills = maxSkill;
 		}
 
-		var nameIndex = this.names.indexOf(this.name);
-		var surnameIndex = this.surnames.indexOf(this.surname);
 		// don't serialize falsy values
 		var compressedSave = {
-			ssn: this._mergeSSN([
-				nameIndex > -1 ? nameIndex : 0,
-				surnameIndex > -1 ? surnameIndex : 0,
-				this.age,
-				this._getTraitIndex(this.trait.name),
-				this.color,
-				this.variety,
-				this.rarity]),
 			skills: skills || undefined,
 			exp: this.precisionRound(this.exp, 1) || undefined,
 			job: this.job ? jobNames.indexOf(this.job) : undefined,
@@ -1492,10 +1553,24 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 			isAdopted: this.isAdopted || undefined,
 			favorite: this.favorite || undefined
 		};
-		// Custom sur/names
-		if (nameIndex <= 0 || surnameIndex <= 0) {
-			compressedSave.name = this.name;
-			compressedSave.surname = this.surname;
+		if (this.seed !== null && this.seed !== undefined) {
+			compressedSave.seed = this.seed;
+		} else {
+			var nameIndex = this.names.indexOf(this.name);
+			var surnameIndex = this.surnames.indexOf(this.surname);
+			compressedSave.ssn = this._mergeSSN([
+				nameIndex > -1 ? nameIndex : 0,
+				surnameIndex > -1 ? surnameIndex : 0,
+				this.age,
+				this._getTraitIndex(this.trait.name),
+				this.color,
+				this.variety,
+				this.rarity]);
+			// Custom sur/names
+			if (nameIndex <= 0 || surnameIndex <= 0) {
+				compressedSave.name = this.name;
+				compressedSave.surname = this.surname;
+			}
 		}
 		return compressedSave;
 	},
@@ -2685,7 +2760,7 @@ dojo.declare("classes.village.KittenSim", null, {
 	},
 
 	addKitten: function() {
-		var kitten = new com.nuclearunicorn.game.village.Kitten();
+		var kitten = new com.nuclearunicorn.game.village.Kitten(this.generateKittenSeed());
 		this.kittens.push(kitten);
 		if (this.game.village.traits.indexOf(kitten.trait) < 0) {
 			this.game.village.traits.unshift(kitten.trait);
@@ -2788,6 +2863,10 @@ dojo.declare("classes.village.KittenSim", null, {
 
 	rand: function(ratio){
 		return (Math.floor(Math.random() * ratio));
+	},
+
+	generateKittenSeed: function(){
+		return this.rand(com.nuclearunicorn.game.village.Kitten.prototype.statics.SEED_MAX + 1);
 	},
 
 	getSkillsSorted: function(skillsDict){
