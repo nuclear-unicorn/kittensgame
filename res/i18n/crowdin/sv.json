@@ -1720,8 +1720,6 @@
     "ui.kgnet.login": "Logga in",
     "ui.kgnet.online": "Online",
     "ui.kgnet.save.current": "aktuell",
-    "ui.kgnet.save.save": "Spara",
-    "ui.kgnet.save.load": "Ladda",
     "ui.kgnet.sync": "Synka molnsparningar",
     "ui.kgnet.instructional": "<- Klicka på denna länk för att starta. Efter att data laddats, klicka på 'Skapa sparfil'.",
     "ui.toggle.researched": "Växla utforskningar",
