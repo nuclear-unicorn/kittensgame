@@ -1752,8 +1752,6 @@
     "ui.kgnet.login": "Iniciar Sesión",
     "ui.kgnet.online": "Online",
     "ui.kgnet.save.current": "Activo",
-    "ui.kgnet.save.save": "Guardar",
-    "ui.kgnet.save.load": "Load",
     "ui.kgnet.sync": "Syncronizar saves con la nube",
     "ui.kgnet.instructional": "<- Presiona este link para comenzar. Luego de que la data cargue, presiona \"Crear save\".",
     "ui.toggle.researched": "Alternar investigado",
