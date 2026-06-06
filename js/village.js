@@ -3465,6 +3465,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 			jobs: saveJobs,
 			engineerJobs: saveEngineerJobs,
 			leaderTrait: this.leaderTrait,
+			leaderJob: this.leaderJob,
 			pinned: this.pinned,
 			isDefault: this.isDefault
 		};
@@ -3475,6 +3476,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 		this.jobs = 	data.jobs;
 		this.engineerJobs = data.engineerJobs;
 		this.leaderTrait = data.leaderTrait;
+		this.leaderJob = data.leaderJob
 		this.pinned = 	data.pinned;
 		this.isDefault = data.isDefault;
 	},
@@ -3521,12 +3523,40 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 		}
 	},
 
+	assignLoadoutLeader: function(kittens, leaderJob, setLeader){
+		if (setLeader && this.leaderTrait && !this.game.challenges.isActive("anarchy")) {
+			
+			for (var i = kittens.length - 1; i >= 0; i--) {
+				if (kittens[i].trait.name == this.leaderTrait.name) {
+					kittens[i].job = leaderJob
+					var temp = this.game.village.getJob(leaderJob)	
+					this.game.village.getJob(leaderJob).value++ //Have to increase the job value, else the getFreeKittens function works incorrectly. TODO: Maybe make a function to assign a kitten to a specific job
+					this.game.village.makeLeader(kittens[i]);
+					
+					break;
+				}
+			}
+			if (!this.game.village.leader) {
+				kittens[i].job = leaderJob
+				this.game.village.getJob(leaderJob).value++
+				this.game.village.makeLeader(kittens[0]);
+			}
+		}
+	},
+
 	setLoadout: function(setLeader) {
 		this.game.village.clearJobs(true);
+		if(this.game.village.leader){
+			this.game.village.leader.isLeader = false
+			this.game.village.leader = null
+		}
 		var kittens = this.game.village.sim.kittens;
 		var workCapableKittens = this.game.village.getDiligentKittens();
 		var loadoutJobsSum = 0;
 		var jobsFiltered = [];
+		var leaderJob = this.leaderJob;
+
+		this.game.village.sim.sortKittensByExp();
 
 		for (var i in this.jobs) {
 			var job = this.jobs[i];
@@ -3538,17 +3568,38 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 		}
 		var jobRatio = workCapableKittens / loadoutJobsSum;
 
+		var theocracy = this.game.science.getPolicy("theocracy"); //Check if Order of the stars is active. If it is, change the leader job to priest
+			if (theocracy.researched && theocracy.requiredLeaderJob != leaderJob){
+				leaderJob = this.game.village.getJob(theocracy.requiredLeaderJob).name;
+			}
+			
+
 		var limitedJobs = 0;
 		for (i in jobsFiltered) {	//Check the filtered jobs if they are limited (engineers) and if the kittens assigned would be over the limit, assign the limit and remove the job from the filter
 			job = jobsFiltered[i];
 			var jobLimit = this.game.village.getJobLimit(job.name);
-			if (jobLimit < job.value * jobRatio){
-				this.game.village.assignJob(this.game.village.getJob(job.name), jobLimit);
-				loadoutJobsSum -= job.value;
-				jobsFiltered.splice(jobsFiltered.indexOf(job), 1);			
-				limitedJobs += jobLimit;
+			if (jobLimit < job.value * jobRatio && jobLimit > 0){
+				if(leaderJob == job.name) {  //If the leader was assigned this job, remove one kitten.
+					jobLimit--
+				}
+				this.assignLoadoutLeader(kittens, leaderJob, setLeader)
+				if (jobLimit > 0) {
+					this.game.village.assignJob(this.game.village.getJob(job.name), jobLimit);
+					loadoutJobsSum -= job.value;
+					jobsFiltered.splice(jobsFiltered.indexOf(job), 1);			
+					limitedJobs += jobLimit;
+				}
+			} else if(leaderJob == job.name && jobsFiltered && jobLimit <= 0) {
+				leaderJob = jobsFiltered[0].name //If the job limit is 0 (No Factories built) set another job
 			}
 		}
+
+		//Assign leader
+
+		if(!this.game.village.leader) {
+			this.assignLoadoutLeader(kittens, leaderJob, setLeader)
+		}
+
 
 		//Assign jobs
 
@@ -3626,34 +3677,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 				}				
 			}
 		}
-
-		//Assign leader
-
-		if (setLeader && this.leaderTrait && !this.game.challenges.isActive("anarchy")) {
-			this.game.village.sim.sortKittensByExp();
-			var theocracy = this.game.science.getPolicy("theocracy");
-			var tempKitten = null;
-			for (var i = kittens.length - 1; i >= 0; i--) {
-				if (kittens[i].trait.name == this.leaderTrait.name) {
-					if ((theocracy.researched) && (kittens[i].job != theocracy.requiredLeaderJob)){
-						continue;
-					}
-
-					if (kittens[i].job == this.leaderJob){
-						this.game.village.makeLeader(kittens[i]);
-						tempKitten = null;
-						break;
-					} else if (!tempKitten){
-						tempKitten = kittens[i];
-					}		
-					
-				}
-			}
-			if (tempKitten){ // If there is no kitten that has the saved job and trait together, assign the first kitten with the trait. 
-				this.game.village.makeLeader(tempKitten);
-			}
-		}
-
+		//this.game.village.optimizeJobs();
 		this.game.render();
 	},
 
