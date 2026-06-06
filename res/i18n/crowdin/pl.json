@@ -1731,8 +1731,6 @@
     "ui.kgnet.login": "Zaloguj",
     "ui.kgnet.online": "Online",
     "ui.kgnet.save.current": "bieżący",
-    "ui.kgnet.save.save": "Zapisz",
-    "ui.kgnet.save.load": "Wczytaj",
     "ui.kgnet.sync": "Zsynchronizuj zapisy w chmurze",
     "ui.kgnet.instructional": "<- Kliknij ten link, aby rozpocząć. Po załadowaniu danych kliknij przycisk \"Utwórz zapis\".",
     "ui.toggle.researched": "Przełącz ponownie zbadane",
