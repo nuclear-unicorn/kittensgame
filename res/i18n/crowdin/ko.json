@@ -1722,8 +1722,6 @@
     "ui.kgnet.login": "로그인",
     "ui.kgnet.online": "온라인",
     "ui.kgnet.save.current": "현재",
-    "ui.kgnet.save.save": "저장",
-    "ui.kgnet.save.load": "불러오기",
     "ui.kgnet.sync": "클라우드 저장 동기화",
     "ui.kgnet.instructional": "<- 링크를 눌러 시작. 데이터를 불러온 후, '새 저장'을 누르세요.",
     "ui.toggle.researched": "완료 연구 표시 전환",
