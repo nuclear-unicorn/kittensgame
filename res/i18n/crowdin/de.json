@@ -1723,8 +1723,6 @@
     "ui.kgnet.login": "Anmelden",
     "ui.kgnet.online": "Online",
     "ui.kgnet.save.current": "aktuell",
-    "ui.kgnet.save.save": "Speichern",
-    "ui.kgnet.save.load": "Laden",
     "ui.kgnet.sync": "Cloud-Sicherungen synchronisieren",
     "ui.kgnet.instructional": "<- Klicken Sie zum Anfangen auf diesen Link. Nach die Daten geladen sind, klicken Sie auf 'Spielstand speichern'.",
     "ui.toggle.researched": "Erforschtes umschalten",
