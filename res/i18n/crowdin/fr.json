@@ -1726,8 +1726,6 @@
     "ui.kgnet.login": "Connexion",
     "ui.kgnet.online": "En ligne",
     "ui.kgnet.save.current": "actuel",
-    "ui.kgnet.save.save": "Sauvegarder",
-    "ui.kgnet.save.load": "Charger",
     "ui.kgnet.sync": "Synchronisation des sauvegardes cloud",
     "ui.kgnet.instructional": "<- Cliquez sur ce lien pour commencer. Après le chargement des données, cliquez sur 'Créer une sauvegarde'.",
     "ui.toggle.researched": "Capacité de basculer recherchée",
