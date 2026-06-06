@@ -1015,7 +1015,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 						delete situationJobs[job];
 					} else {
 						situationJobs[job] = situationJobs[job] - 1;
-					}
+					} 
 				}
 			}
 
@@ -3476,7 +3476,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 		this.jobs = 	data.jobs;
 		this.engineerJobs = data.engineerJobs;
 		this.leaderTrait = data.leaderTrait;
-		this.leaderJob = data.leaderJob
+		this.leaderJob = data.leaderJob;
 		this.pinned = 	data.pinned;
 		this.isDefault = data.isDefault;
 	},
@@ -3528,17 +3528,17 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 			
 			for (var i = kittens.length - 1; i >= 0; i--) {
 				if (kittens[i].trait.name == this.leaderTrait.name) {
-					kittens[i].job = leaderJob
-					var temp = this.game.village.getJob(leaderJob)	
-					this.game.village.getJob(leaderJob).value++ //Have to increase the job value, else the getFreeKittens function works incorrectly. TODO: Maybe make a function to assign a kitten to a specific job
+					kittens[i].job = leaderJob;
+					var temp = this.game.village.getJob(leaderJob);
+					this.game.village.getJob(leaderJob).value++; //Have to increase the job value, else the getFreeKittens function works incorrectly. TODO: Maybe make a function to assign a kitten to a specific job
 					this.game.village.makeLeader(kittens[i]);
 					
 					break;
 				}
 			}
 			if (!this.game.village.leader) {
-				kittens[i].job = leaderJob
-				this.game.village.getJob(leaderJob).value++
+				kittens[0].job = leaderJob;
+				this.game.village.getJob(leaderJob).value++;
 				this.game.village.makeLeader(kittens[0]);
 			}
 		}
@@ -3546,9 +3546,9 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 
 	setLoadout: function(setLeader) {
 		this.game.village.clearJobs(true);
-		if(this.game.village.leader){
-			this.game.village.leader.isLeader = false
-			this.game.village.leader = null
+		if (this.game.village.leader){
+			this.game.village.leader.isLeader = false;
+			this.game.village.leader = null;
 		}
 		var kittens = this.game.village.sim.kittens;
 		var workCapableKittens = this.game.village.getDiligentKittens();
@@ -3579,25 +3579,25 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 			job = jobsFiltered[i];
 			var jobLimit = this.game.village.getJobLimit(job.name);
 			if (jobLimit < job.value * jobRatio && jobLimit > 0){
-				if(leaderJob == job.name) {  //If the leader was assigned this job, remove one kitten.
-					jobLimit--
+				if (leaderJob == job.name) {  //If the leader was assigned this job, remove one kitten.
+					jobLimit--;
 				}
-				this.assignLoadoutLeader(kittens, leaderJob, setLeader)
+				this.assignLoadoutLeader(kittens, leaderJob, setLeader);
 				if (jobLimit > 0) {
 					this.game.village.assignJob(this.game.village.getJob(job.name), jobLimit);
 					loadoutJobsSum -= job.value;
 					jobsFiltered.splice(jobsFiltered.indexOf(job), 1);			
 					limitedJobs += jobLimit;
 				}
-			} else if(leaderJob == job.name && jobsFiltered && jobLimit <= 0) {
-				leaderJob = jobsFiltered[0].name //If the job limit is 0 (No Factories built) set another job
+			} else if (leaderJob == job.name && jobsFiltered && jobLimit <= 0) {
+				leaderJob = jobsFiltered[0].name; //If the job limit is 0 (No Factories built) set another job
 			}
 		}
 
 		//Assign leader
 
-		if(!this.game.village.leader) {
-			this.assignLoadoutLeader(kittens, leaderJob, setLeader)
+		if (!this.game.village.leader) {
+			this.assignLoadoutLeader(kittens, leaderJob, setLeader);
 		}
 
 
