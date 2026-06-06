@@ -1751,8 +1751,6 @@
     "ui.kgnet.login": "Logg inn",
     "ui.kgnet.online": "På nett",
     "ui.kgnet.save.current": "nåværende",
-    "ui.kgnet.save.save": "Lagra",
-    "ui.kgnet.save.load": "Last",
     "ui.kgnet.sync": "Synkroniser skylagringer",
     "ui.kgnet.instructional": "<- Klikk denne lenken for å starte. Etter at data er lastet, klikk på 'Opprett lagring'.",
     "ui.toggle.researched": "Slå forskning av og på",
