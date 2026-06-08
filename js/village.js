@@ -271,12 +271,15 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		}
 	},
 
-	assignJob: function(job, amt){
+	assignJob: function(job, amt, optimize){
+		if (optimize === undefined) {
+			optimize = true;
+		}
 		var jobRef = this.getJob(job.name); 	//probably will fix missing ref on loading
 		amt = Math.min(amt, this.getFreeKittens(), this.getJobLimit(job.name) - jobRef.value);
 
 		if (amt > 0) {
-			this.sim.assignJob(job.name, amt);
+			this.sim.assignJob(job.name, amt, optimize);
 			jobRef.value += amt;
 			if (job.name == "engineer") {
 				this.game.workshopTab.updateTab();
@@ -2816,9 +2819,9 @@ dojo.declare("classes.village.KittenSim", null, {
 	 * • With leader and register tech buy : a free kitten with Highest skill level in this job or any free if none
 	 * • Else : the first free kitten
 	 */
-	assignJob: function(job, amt){
+	assignJob: function(job, amt, optimize){
 		var freeKittens = [];
-		var optimizeJobs = this.game.workshop.get("register").researched && this.game.village.leader;
+		var optimizeJobs = this.game.workshop.get("register").researched && this.game.village.leader && optimize;
 
 		for (var i = this.kittens.length - 1; i >= 0; i--) {
 			var kitten = this.kittens[i];
@@ -3431,6 +3434,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 	engineerJobs: null,
 	pinned: false,
 	isDefault: false,
+	lastSelected: false,
 
 	constructor: function(game, isDefault){
 
@@ -3467,7 +3471,8 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 			leaderTrait: this.leaderTrait,
 			leaderJob: this.leaderJob,
 			pinned: this.pinned,
-			isDefault: this.isDefault
+			isDefault: this.isDefault,
+			lastSelected: this.lastSelected
 		};
 	},
 
@@ -3479,6 +3484,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 		this.leaderJob = data.leaderJob;
 		this.pinned = 	data.pinned;
 		this.isDefault = data.isDefault;
+		this.lastSelected = data.lastSelected;
 	},
 
 	saveLoadout: function(setDefault) {
@@ -3539,7 +3545,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 			}
 			if (!this.game.village.leader) {
 				if (leaderJob) {
-					kittens[kittens.length - 1].job = leaderJob
+					kittens[kittens.length - 1].job = leaderJob;
 					this.game.village.getJob(leaderJob).value++;
 				}
 				this.game.village.makeLeader(kittens[kittens.length - 1]);
@@ -3549,26 +3555,37 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 
 	setLoadout: function(setLeader) {
 		this.game.village.clearJobs(true);
-		if (this.game.village.leader){
+		if (this.game.village.leader) {
 			this.game.village.leader.isLeader = false;
 			this.game.village.leader = null;
 		}
+		var loadouts = this.game.village.loadoutController.loadouts;
+		for (var i in loadouts) {
+			loadouts[i].lastSelected = false;
+		}
+		this.lastSelected = true; //Used for highlighting the last picked loadout
+
 		var kittens = this.game.village.sim.kittens;
 		var workCapableKittens = this.game.village.getDiligentKittens();
 		var loadoutJobsSum = 0;
 		var jobsFiltered = [];
 		var leaderJob = this.leaderJob;
+		var jobs = this.jobs;
 
-		this.game.village.sim.sortKittensByExp();
-
-		for (var i in this.jobs) {
-			var job = this.jobs[i];
+		for (var i in jobs) {
+			var job = jobs[i];
 
 			if (this.game.village.getJob(job.name).unlocked && job.value > 0) { //Check if the job is unlocked
 				var jobLimit = this.game.village.getJobLimit(job.name);
 				if (jobLimit > 0) {  //If the job limit is 0 (No factories built for engineers), then don't add it
 					loadoutJobsSum += job.value;
-					jobsFiltered.push({name : job.name, value : job.value, jobLimit : this.game.village.getJobLimit(job.name)});
+					var filteredJob = {name : job.name, value : job.value, jobLimit : this.game.village.getJobLimit(job.name)};
+					if (filteredJob.name == "engineer") {
+						jobsFiltered.unshift(filteredJob);
+					} else {
+						jobsFiltered.push(filteredJob);
+					}
+					
 				} else if (job.name == leaderJob) {
 					leaderJob = null;
 				}
@@ -3588,6 +3605,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 			}
 		} 
 
+		this.game.village.sim.sortKittensByExp(); //Sort kittens so the leader is assigned the highest possible rank
 		this.assignLoadoutLeader(kittens, leaderJob);
 
 		var limitedJobs = 0;
@@ -3599,7 +3617,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 					jobLimit--;
 				}
 				if (jobLimit > 0) {
-					this.game.village.assignJob(this.game.village.getJob(job.name), jobLimit);
+					this.game.village.assignJob(this.game.village.getJob(job.name), jobLimit, false);
 					loadoutJobsSum -= job.value;
 					jobsFiltered.splice(jobsFiltered.indexOf(job), 1);			
 					limitedJobs += jobLimit;
@@ -3612,20 +3630,26 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 		//Assign jobs
 
 		jobRatio = (workCapableKittens - limitedJobs) / loadoutJobsSum;
-
-		jobsFiltered.sort(function(a, b){return b.value - a.value;});	//Sort the jobs, so the job with the most weight gets the most priority
-
-		for (var i in jobsFiltered){	//Assign 1 kitten to each job so at least one worker is assigned.
-			this.game.village.assignJob(this.game.village.getJob(jobsFiltered[i].name), 1);
+		for (var i in jobsFiltered) {
+			jobsFiltered[i].value *= jobRatio;
 		}
 
+		this.game.village.sim.kittens.reverse(); //Reverse kittens array, so the high rank kittens are not assigned here
+		for (var i in jobsFiltered){	//Assign 1 kitten to each job so at least one worker is assigned.
+			if (jobsFiltered[i].name != "engineer") {
+				this.game.village.assignJob(this.game.village.getJob(jobsFiltered[i].name), 1, false);
+			} else {
+				jobsFiltered[i].value++; //This Engineer will be added later so they get a high rank
+			}
+		}
+		this.game.village.sim.kittens.reverse(); //Reverse again to assign highest rank kittens first as engineers
 		
 		for (var i in jobsFiltered) {
 			job = jobsFiltered[i];
 
-			var valueFiltered = Math.floor(jobRatio * (job.value)) - 1;
+			var valueFiltered = Math.floor(job.value) - 1; //Already added at least 1 kitten to each job so add 1 less
 			if (valueFiltered > 0){
-				this.game.village.assignJob(this.game.village.getJob(job.name), valueFiltered);
+				this.game.village.assignJob(this.game.village.getJob(job.name), valueFiltered, false);
 			}			
 		}
 
@@ -3635,7 +3659,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 			for (var i in jobsFiltered) {
 				if (freeKittens > 0){
 					job = jobsFiltered[i];
-					this.game.village.assignJob(this.game.village.getJob(job.name), 1);
+					this.game.village.assignJob(this.game.village.getJob(job.name), 1, false);
 					freeKittens--;
 				} else {
 					break;
@@ -4895,8 +4919,12 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 	},
 
 	createLoadoutBtn: function(loadout, game) {
+		var btnName = loadout.title;
+		if (loadout.lastSelected) {
+			btnName = "> " + btnName + " <";
+		}
 		var btn = new com.nuclearunicorn.game.ui.LoadoutButton({
-			name : loadout.title,
+			name : btnName,
 			loadout : loadout,
 			controller: new com.nuclearunicorn.game.ui.LoadoutButtonController(game)
 		}, game);
@@ -4979,7 +5007,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 			style: {
 				float: "right"
 			},
-			title: "Delete all loadouts"
 		}, loadoutDiv);
 
 		dojo.connect(this.deleteAllLoadoutHref, "onclick", this,  function(){
@@ -4997,7 +5024,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		this.toggleDefaultLoadoutHref = dojo.create("a", { // Restore all default loadouts
 			href: "#", innerHTML: toggleText,
 			className: "loadoutHref",
-			title: "Default loadouts"
 		}, loadoutDiv);
 
 		dojo.connect(this.toggleDefaultLoadoutHref, "onclick", this,  function(){
@@ -5030,7 +5056,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 			style: {
 				float: "right"
 			},
-			title: "Create Loadout"
 		}, tdTop2);
 
 		dojo.connect(this.createLoadoutHref, "onclick", this,  function(){

@@ -776,6 +776,7 @@ WPins = React.createClass({
             if (loadout.pinned){
                 pins.push({
                     title: $I("left.loadout.do", [loadout.title]),
+                    highlight: loadout.lastSelected,
                     handler: function(loadout){ 
                         loadout.setLoadout(true);
                     }.bind(this, loadout)
@@ -789,6 +790,9 @@ WPins = React.createClass({
         var pinLinks = [];
         for (var i in pins){
             var pin = pins[i];
+            if (pin.highlight) {
+                pin.title = "> " + pin.title + " <";
+            }
             pinLinks.push(
                 $r("div", {className:"pin-link"},
                     $r("a", {href:"#", onClick: pin.handler},
