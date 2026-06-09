@@ -509,6 +509,7 @@ WCloudSaveRecord = React.createClass({
                     e.stopPropagation();
                     game.ui.confirm("[S]ave", "This will override [SERVER] save. Y/N", function(){
                         game.server.pushSave();
+                        self.props.closeMenu && self.props.closeMenu();
                     });
                 }}, $I("ui.kgnet.save.save")),
             $r("a", {
@@ -518,6 +519,7 @@ WCloudSaveRecord = React.createClass({
                     e.stopPropagation();
                     game.ui.confirm("[L]oad", "This will override [LOCAL] save. Y/N", function(){
                         game.server.loadSave(save.guid);
+                        self.props.closeMenu && self.props.closeMenu();
                     });
                 }}, $I("ui.kgnet.save.load")),
             $r("a", {
@@ -602,7 +604,7 @@ WCloudSaves = React.createClass({
             //body
             //TODO: externalize save record as component?
             saveData && saveData.map(function(save){
-                return $r(WCloudSaveRecord, {save: save, game: game});
+                return $r(WCloudSaveRecord, {save: save, game: game, closeMenu: self.props.closeMenu});
             })),
 
             $r("div", {className:"save-record-container"}, [
@@ -610,6 +612,7 @@ WCloudSaves = React.createClass({
                     $r("a", {onClick: function(e){
                         e.stopPropagation();
                         game.server.pushSave();
+                        self.props.closeMenu && self.props.closeMenu();
                     }}, "Create new save (" + game.telemetry.guid + ")")
                 ]),
                 $r("div", {className:"save-record"},[
@@ -682,7 +685,7 @@ WLogin = React.createClass({
                                 (lastBackup >= 7) && $r("span", {className: "hazard"})
                             ]),
                             $r(WLoginForm, {game: game}),
-                            $r(WCloudSaves, {game: game})
+                            $r(WCloudSaves, {game: game, closeMenu: this.closeMenu})
                         )
                     )
                 ]
@@ -693,6 +696,12 @@ WLogin = React.createClass({
     toggleExpanded: function(){
         this.setState({
             isExpanded: !this.state.isExpanded
+        })
+    },
+
+    closeMenu: function(){
+        this.setState({
+            isExpanded: false
         })
     },
 
