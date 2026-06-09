@@ -271,12 +271,15 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		}
 	},
 
-	assignJob: function(job, amt){
+	assignJob: function(job, amt, optimize){
+		if (optimize === undefined) {
+			optimize = true;
+		}
 		var jobRef = this.getJob(job.name); 	//probably will fix missing ref on loading
 		amt = Math.min(amt, this.getFreeKittens(), this.getJobLimit(job.name) - jobRef.value);
 
 		if (amt > 0) {
-			this.sim.assignJob(job.name, amt);
+			this.sim.assignJob(job.name, amt, optimize);
 			jobRef.value += amt;
 			if (job.name == "engineer") {
 				this.game.workshopTab.updateTab();
@@ -1015,7 +1018,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 						delete situationJobs[job];
 					} else {
 						situationJobs[job] = situationJobs[job] - 1;
-					}
+					} 
 				}
 			}
 
@@ -2816,9 +2819,12 @@ dojo.declare("classes.village.KittenSim", null, {
 	 * • With leader and register tech buy : a free kitten with Highest skill level in this job or any free if none
 	 * • Else : the first free kitten
 	 */
-	assignJob: function(job, amt){
+	assignJob: function(job, amt, optimize){
+		if (optimize === undefined) {
+			optimize = true;
+		}
 		var freeKittens = [];
-		var optimizeJobs = this.game.workshop.get("register").researched && this.game.village.leader;
+		var optimizeJobs = this.game.workshop.get("register").researched && this.game.village.leader && optimize;
 
 		for (var i = this.kittens.length - 1; i >= 0; i--) {
 			var kitten = this.kittens[i];
@@ -3431,6 +3437,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 	engineerJobs: null,
 	pinned: false,
 	isDefault: false,
+	lastSelected: false,
 
 	constructor: function(game, isDefault){
 
@@ -3465,8 +3472,10 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 			jobs: saveJobs,
 			engineerJobs: saveEngineerJobs,
 			leaderTrait: this.leaderTrait,
+			leaderJob: this.leaderJob,
 			pinned: this.pinned,
-			isDefault: this.isDefault
+			isDefault: this.isDefault,
+			lastSelected: this.lastSelected
 		};
 	},
 
@@ -3475,8 +3484,10 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 		this.jobs = 	data.jobs;
 		this.engineerJobs = data.engineerJobs;
 		this.leaderTrait = data.leaderTrait;
+		this.leaderJob = data.leaderJob;
 		this.pinned = 	data.pinned;
 		this.isDefault = data.isDefault;
+		this.lastSelected = data.lastSelected;
 	},
 
 	saveLoadout: function(setDefault) {
@@ -3521,53 +3532,128 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 		}
 	},
 
+	assignLoadoutLeader: function(kittens, leaderJob){
+		if (this.leaderTrait && !this.game.challenges.isActive("anarchy") && this.game.science.get("civil").researched) { //Check if anarchy is active and if Civil Service if researched
+			
+			for (var i = kittens.length - 1; i >= 0; i--) {
+				if (kittens[i].trait.name == this.leaderTrait.name) {
+					if (leaderJob) {
+						kittens[i].job = leaderJob;
+						this.game.village.getJob(leaderJob).value++; //Have to increase the job value, else the getFreeKittens function works incorrectly. TODO: Maybe make a function to assign a kitten to a specific job
+					}
+					this.game.village.makeLeader(kittens[i]);
+					
+					break;
+				}
+			}
+			if (!this.game.village.leader) {
+				if (leaderJob) {
+					kittens[kittens.length - 1].job = leaderJob;
+					this.game.village.getJob(leaderJob).value++;
+				}
+				this.game.village.makeLeader(kittens[kittens.length - 1]);
+			}
+		}
+	},
+
 	setLoadout: function(setLeader) {
 		this.game.village.clearJobs(true);
+		if (this.game.village.leader) {
+			this.game.village.leader.isLeader = false;
+			this.game.village.leader = null;
+		}
+		var loadouts = this.game.village.loadoutController.loadouts;
+		for (var i in loadouts) {
+			loadouts[i].lastSelected = false;
+		}
+		this.lastSelected = true; //Used for highlighting the last picked loadout
+
 		var kittens = this.game.village.sim.kittens;
 		var workCapableKittens = this.game.village.getDiligentKittens();
 		var loadoutJobsSum = 0;
 		var jobsFiltered = [];
+		var leaderJob = this.leaderJob;
+		var jobs = this.jobs;
 
-		for (var i in this.jobs) {
-			var job = this.jobs[i];
+		for (var i in jobs) {
+			var job = jobs[i];
 
-			if (this.game.village.getJob(job.name).unlocked && job.value > 0) {				
-				loadoutJobsSum += job.value;
-				jobsFiltered.push({name : job.name, value : job.value});
+			if (this.game.village.getJob(job.name).unlocked && job.value > 0) { //Check if the job is unlocked
+				var jobLimit = this.game.village.getJobLimit(job.name);
+				if (jobLimit > 0) {  //If the job limit is 0 (No factories built for engineers), then don't add it
+					loadoutJobsSum += job.value;
+					var filteredJob = {name : job.name, value : job.value, jobLimit : this.game.village.getJobLimit(job.name)};
+					if (filteredJob.name == "engineer") {
+						jobsFiltered.unshift(filteredJob);
+					} else {
+						jobsFiltered.push(filteredJob);
+					}
+					
+				} else if (job.name == leaderJob) {
+					leaderJob = null;
+				}
+			} else if (job.name == leaderJob) {
+				leaderJob = null;
 			}
 		}
 		var jobRatio = workCapableKittens / loadoutJobsSum;
 
+		var theocracy = this.game.science.getPolicy("theocracy"); //Check if Order of the stars is active. If it is, change the leader job to priest
+		if (theocracy.researched && theocracy.requiredLeaderJob != leaderJob){
+			leaderJob = this.game.village.getJob(theocracy.requiredLeaderJob).name;
+		}
+		if (!leaderJob) {
+			if (jobsFiltered.length) {
+				leaderJob = jobsFiltered[0].name; //If there was no leaderJob or it was filtered out, set the first job from the filtered list (usually woodcutter)
+			}
+		} 
+
+		this.game.village.sim.sortKittensByExp(); //Sort kittens so the leader is assigned the highest possible rank
+		this.assignLoadoutLeader(kittens, leaderJob);
+
 		var limitedJobs = 0;
-		for (i in jobsFiltered) {	//Check the filtered jobs if they are limited (engineers) and if the kittens assigned would be over the limit, assign the limit and remove the job from the filter
-			job = jobsFiltered[i];
-			var jobLimit = this.game.village.getJobLimit(job.name);
-			if (jobLimit < job.value * jobRatio){
-				this.game.village.assignJob(this.game.village.getJob(job.name), jobLimit);
-				loadoutJobsSum -= job.value;
-				jobsFiltered.splice(jobsFiltered.indexOf(job), 1);			
-				limitedJobs += jobLimit;
+		for (i in jobsFiltered) {	//Check the filtered jobs if they are limited (engineers due to factories). If the kittens assigned would be over the limit, assign the limit and remove the job from the filter
+			var job = jobsFiltered[i];
+			var jobLimit = job.jobLimit;
+			if (jobLimit < job.value * jobRatio && jobLimit > 0){
+				if (leaderJob == job.name && this.leaderTrait) {  //If the leader was assigned this job, we need to assign one less kitten. leaderTrait checks if a leader is saved in the loadout
+					jobLimit--;
+				}
+				if (jobLimit > 0) {
+					this.game.village.assignJob(this.game.village.getJob(job.name), jobLimit, false);
+					loadoutJobsSum -= job.value;
+					jobsFiltered.splice(jobsFiltered.indexOf(job), 1);			
+					limitedJobs += jobLimit;
+				}
+			} else if (leaderJob == job.name && jobsFiltered && jobLimit <= 0) {
+				leaderJob = jobsFiltered[0].name; //If the job limit is 0 (No Factories built) set another job
 			}
 		}
 
 		//Assign jobs
 
 		jobRatio = (workCapableKittens - limitedJobs) / loadoutJobsSum;
-
-		jobsFiltered.sort(function(a, b){return b.value - a.value;});	//Sort the jobs, so the job with the most weight gets the most priority
-
-		for (var i in jobsFiltered){	//Assign 1 kitten to each job so at least one worker is assigned.
-			this.game.village.assignJob(this.game.village.getJob(jobsFiltered[i].name), 1);
+		for (var i in jobsFiltered) {
+			jobsFiltered[i].value *= jobRatio;
 		}
 
-		
 		for (var i in jobsFiltered) {
+			var optimize = true;
 			job = jobsFiltered[i];
-
-			var valueFiltered = Math.floor(jobRatio * (job.value)) - 1;
+			var valueFiltered = Math.floor(job.value) - 1; //1 less, so all jobs are assigned to at least 1 kitten later
+			
+			if (job.name == "engineer") {
+				optimize = false;
+			}
 			if (valueFiltered > 0){
-				this.game.village.assignJob(this.game.village.getJob(job.name), valueFiltered);
+				this.game.village.assignJob(this.game.village.getJob(job.name), valueFiltered, optimize);
 			}			
+		}
+
+		for (var i in jobsFiltered){ //Assign at least 1 kitten to all jobs
+			if (jobsFiltered[i].name != "engineer") { //Engineers will only be assigned to the highest ranks
+				this.game.village.assignJob(this.game.village.getJob(jobsFiltered[i].name), 1);
+			}
 		}
 
 		var freeKittens = this.game.village.getFreeKittens();
@@ -3590,8 +3676,10 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 		var craftsSum = 0;
 		for (var i in this.engineerJobs) {
 			var engineerJob = this.engineerJobs[i];
+			var craft = this.game.workshop.getCraft(engineerJob.craft);
+			engineerJob.tier = craft.tier;
 
-			if (this.game.workshop.getCraft(engineerJob.craft).unlocked && engineerJob.value > 0) {
+			if (craft.unlocked && engineerJob.value > 0) {
 				craftsSum += engineerJob.value;
 				craftsFiltered.push(engineerJob);
 			}
@@ -3599,19 +3687,19 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 
 		var engineerRatio = this.game.village.getFreeEngineers() / craftsSum;
 
-		craftsFiltered.sort(function(a, b){return b.value - a.value;});
-
-		for (var i in craftsFiltered){
-			this.assignCraftJob(this.game.workshop.getCraft(craftsFiltered[i].craft), 1);
-		}
+		craftsFiltered.sort(function(a, b){return b.tier - a.tier;});
 
 		for (var i in craftsFiltered) {
 			var craft = craftsFiltered[i];
 
-			var craftValueFiltered = Math.floor(engineerRatio * (craft.value)) - 1;
+			var craftValueFiltered = Math.floor(engineerRatio * (craft.value)) - 1; //1 less, so all craft jobs are assigned at least 1 kitten later
 			if (craftValueFiltered > 0){
 				this.assignCraftJob(this.game.workshop.getCraft(craft.craft), craftValueFiltered);
 			}
+		}
+
+		for (var i in craftsFiltered){ //Assign at least 1 kitten to all craft jobs
+			this.assignCraftJob(this.game.workshop.getCraft(craftsFiltered[i].craft), 1);
 		}
 
 		var freeEngineers = this.game.village.getFreeEngineers();
@@ -3626,34 +3714,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 				}				
 			}
 		}
-
-		//Assign leader
-
-		if (setLeader && this.leaderTrait && !this.game.challenges.isActive("anarchy")) {
-			this.game.village.sim.sortKittensByExp();
-			var theocracy = this.game.science.getPolicy("theocracy");
-			var tempKitten = null;
-			for (var i = kittens.length - 1; i >= 0; i--) {
-				if (kittens[i].trait.name == this.leaderTrait.name) {
-					if ((theocracy.researched) && (kittens[i].job != theocracy.requiredLeaderJob)){
-						continue;
-					}
-
-					if (kittens[i].job == this.leaderJob){
-						this.game.village.makeLeader(kittens[i]);
-						tempKitten = null;
-						break;
-					} else if (!tempKitten){
-						tempKitten = kittens[i];
-					}		
-					
-				}
-			}
-			if (tempKitten){ // If there is no kitten that has the saved job and trait together, assign the first kitten with the trait. 
-				this.game.village.makeLeader(tempKitten);
-			}
-		}
-
+		//this.game.village.optimizeJobs();
 		this.game.render();
 	},
 
@@ -3715,7 +3776,7 @@ dojo.declare("com.nuclearunicorn.game.ui.LoadoutButtonController", com.nuclearun
 	},
 
 	clickHandler: function(model) {
-		model.options.loadout.setLoadout(true);
+		model.options.loadout.setLoadout();
 	},
 
 	getDescription: function(model) {
@@ -4863,8 +4924,12 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 	},
 
 	createLoadoutBtn: function(loadout, game) {
+		var btnName = loadout.title;
+		if (loadout.lastSelected) {
+			btnName = "> " + btnName + " <";
+		}
 		var btn = new com.nuclearunicorn.game.ui.LoadoutButton({
-			name : loadout.title,
+			name : btnName,
 			loadout : loadout,
 			controller: new com.nuclearunicorn.game.ui.LoadoutButtonController(game)
 		}, game);
@@ -4947,7 +5012,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 			style: {
 				float: "right"
 			},
-			title: "Delete all loadouts"
 		}, loadoutDiv);
 
 		dojo.connect(this.deleteAllLoadoutHref, "onclick", this,  function(){
@@ -4965,7 +5029,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		this.toggleDefaultLoadoutHref = dojo.create("a", { // Restore all default loadouts
 			href: "#", innerHTML: toggleText,
 			className: "loadoutHref",
-			title: "Default loadouts"
 		}, loadoutDiv);
 
 		dojo.connect(this.toggleDefaultLoadoutHref, "onclick", this,  function(){
@@ -4998,7 +5061,6 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 			style: {
 				float: "right"
 			},
-			title: "Create Loadout"
 		}, tdTop2);
 
 		dojo.connect(this.createLoadoutHref, "onclick", this,  function(){
