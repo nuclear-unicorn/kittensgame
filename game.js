@@ -3671,15 +3671,22 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				type: "ratio",
 				value: spaceRatio - 1
 			});
-			spaceParagonSubStack.push({
-				name: $I("res.stack.spaceParagon"),
-				type: "ratio",
-				value: paragonSpaceProductionRatio - 1
-			});
+			var transferBonus = this.getEffect("prodTransferBonus");
+			// if transferBonus == 0, then it won't show up in the tooltip, but
+			// spaceParagon would still show up, which would make the tooltip
+			// look very misleading. so we manually hide the paragon line in
+			// this case; it's not useful anyways when transferBonus == 0.
+			if (transferBonus != 0) {
+				spaceParagonSubStack.push({
+					name: $I("res.stack.spaceParagon"),
+					type: "ratio",
+					value: paragonSpaceProductionRatio - 1
+				});
+			}
 			spaceParagonSubStack.push({
 				name: $I("res.stack.bonusTransf"),
 				type: "multiplier",
-				value: this.getEffect("prodTransferBonus")
+				value: transferBonus
 			});
 			perTickAutoprodSpaceStack.push(spaceParagonSubStack);
 		//<----
