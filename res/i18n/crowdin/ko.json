@@ -150,6 +150,7 @@
     "buildings.calciner.desc.automation": "자동으로 {0}%의 철을 강철로 변환했습니다.",
     "buildings.chapel.label": "예배당",
     "buildings.chapel.desc": "틱마다 약간의 문화와 신앙을 만들어냅니다. 종교 업그레이드로 개선할 수 있습니다.",
+    "buildings.chapel.desc.atheism": "조금의 문화를 만들어낸다.",
     "buildings.chronosphere.label": "크로노스피어",
     "buildings.chronosphere.desc": "시간을 통과해 소량의 자원을 재배치합니다. 업그레이드할 수 있습니다. 크로노스피어 당 시간 역설의 발생 확률이 높아집니다.",
     "buildings.dataCenter.label": "데이터 센터",
