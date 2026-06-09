@@ -2820,6 +2820,9 @@ dojo.declare("classes.village.KittenSim", null, {
 	 * • Else : the first free kitten
 	 */
 	assignJob: function(job, amt, optimize){
+		if (optimize === undefined) {
+			optimize = true;
+		}
 		var freeKittens = [];
 		var optimizeJobs = this.game.workshop.get("register").researched && this.game.village.leader && optimize;
 
