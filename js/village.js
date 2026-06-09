@@ -3637,23 +3637,23 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 			jobsFiltered[i].value *= jobRatio;
 		}
 
-		this.game.village.sim.kittens.reverse(); //Reverse kittens array, so the high rank kittens are not assigned here
-		for (var i in jobsFiltered){	//Assign 1 kitten to each job so at least one worker is assigned.
-			if (jobsFiltered[i].name != "engineer") {
-				this.game.village.assignJob(this.game.village.getJob(jobsFiltered[i].name), 1, false);
-			} else {
-				jobsFiltered[i].value++; //This Engineer will be added later so they get a high rank
-			}
-		}
-		this.game.village.sim.kittens.reverse(); //Reverse again to assign highest rank kittens first as engineers
-		
 		for (var i in jobsFiltered) {
+			var optimize = true;
 			job = jobsFiltered[i];
-
-			var valueFiltered = Math.floor(job.value) - 1; //Already added at least 1 kitten to each job so add 1 less
+			var valueFiltered = Math.floor(job.value) - 1; //1 less, so all jobs are assigned to at least 1 kitten later
+			
+			if (job.name == "engineer") {
+				optimize = false;
+			}
 			if (valueFiltered > 0){
-				this.game.village.assignJob(this.game.village.getJob(job.name), valueFiltered, false);
+				this.game.village.assignJob(this.game.village.getJob(job.name), valueFiltered, optimize);
 			}			
+		}
+
+		for (var i in jobsFiltered){ //Assign at least 1 kitten to all jobs
+			if (jobsFiltered[i].name != "engineer") { //Engineers will only be assigned to the highest ranks
+				this.game.village.assignJob(this.game.village.getJob(jobsFiltered[i].name), 1);
+			}
 		}
 
 		var freeKittens = this.game.village.getFreeKittens();
@@ -3662,7 +3662,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 			for (var i in jobsFiltered) {
 				if (freeKittens > 0){
 					job = jobsFiltered[i];
-					this.game.village.assignJob(this.game.village.getJob(job.name), 1, false);
+					this.game.village.assignJob(this.game.village.getJob(job.name), 1);
 					freeKittens--;
 				} else {
 					break;
@@ -3676,8 +3676,10 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 		var craftsSum = 0;
 		for (var i in this.engineerJobs) {
 			var engineerJob = this.engineerJobs[i];
+			var craft = this.game.workshop.getCraft(engineerJob.craft);
+			engineerJob.tier = craft.tier;
 
-			if (this.game.workshop.getCraft(engineerJob.craft).unlocked && engineerJob.value > 0) {
+			if (craft.unlocked && engineerJob.value > 0) {
 				craftsSum += engineerJob.value;
 				craftsFiltered.push(engineerJob);
 			}
@@ -3685,19 +3687,19 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 
 		var engineerRatio = this.game.village.getFreeEngineers() / craftsSum;
 
-		craftsFiltered.sort(function(a, b){return b.value - a.value;});
-
-		for (var i in craftsFiltered){
-			this.assignCraftJob(this.game.workshop.getCraft(craftsFiltered[i].craft), 1);
-		}
+		craftsFiltered.sort(function(a, b){return b.tier - a.tier;});
 
 		for (var i in craftsFiltered) {
 			var craft = craftsFiltered[i];
 
-			var craftValueFiltered = Math.floor(engineerRatio * (craft.value)) - 1;
+			var craftValueFiltered = Math.floor(engineerRatio * (craft.value)) - 1; //1 less, so all craft jobs are assigned at least 1 kitten later
 			if (craftValueFiltered > 0){
 				this.assignCraftJob(this.game.workshop.getCraft(craft.craft), craftValueFiltered);
 			}
+		}
+
+		for (var i in craftsFiltered){ //Assign at least 1 kitten to all craft jobs
+			this.assignCraftJob(this.game.workshop.getCraft(craftsFiltered[i].craft), 1);
 		}
 
 		var freeEngineers = this.game.village.getFreeEngineers();
