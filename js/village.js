@@ -1653,6 +1653,24 @@ dojo.declare("classes.village.Map", null, {
 		spd: 1
 	},
 
+	leaderStatIds: {
+		atk: 0,
+		def: 1,
+		agi: 2,
+		str: 3,
+		spd: 4,
+		hp: 5
+	},
+
+	leaderStatConfigs: {
+		atk: { base: 0, growth: 2.5, bias: 0.8 },
+		def: { base: 0, growth: 1.25, bias: 0.8 },
+		agi: { base: 0, growth: 1.25, bias: 0.8 },
+		str: { base: 0, growth: 1.25, bias: 0.8 },
+		spd: { base: 0, growth: 1.25, bias: 0.8 },
+		hp:  { base: 20, growth: 33, bias: 1.0 }
+	},
+
 	//Combat frame. Every tick frame is increased by X. There are 100 frames in a round, and every combatan can attack once per X fames adjusted for agi.
 	frame: 0,
 
@@ -2035,6 +2053,11 @@ dojo.declare("classes.village.Map", null, {
 	},
 
 	getMaxHP: function(){
+		var leader = this.game.village.leader;
+		if (leader && leader.seed !== undefined && leader.seed !== null) {
+			var lvl = this.game.village.getCombatLevel(leader.combatExp);
+			return this.getStatAtLevel(leader.seed, lvl, this.leaderStatIds.hp, this.leaderStatConfigs.hp);
+		}
 		return (10 + this.explorersLevel * 0.2) * (2 + (0.02 * this.explorersLevel));
 	},
 
@@ -2218,6 +2241,41 @@ dojo.declare("classes.village.Map", null, {
 		var jitter = (this.rand(jitterSeed) - 0.5) * (cfg.growth * 0.5);
 
 		return Math.floor(curve + jitter);
+	},
+
+	getLeaderCombatStats: function(leader) {
+		if (!leader) {
+			return null;
+		}
+		if (!leader.seed){
+			leader.seed = leader._normalizeSeed();
+			leader._generateAttributes(leader._createSeededRand(leader.seed));
+		}
+		var lvl = this.game.village.getCombatLevel(leader.combatExp);
+		var stats = {};
+		for (var stat in this.leaderStatIds) {
+			var statID = this.leaderStatIds[stat];
+			var cfg = this.leaderStatConfigs[stat];
+			stats[stat] = this.getStatAtLevel(leader.seed, lvl, statID, cfg);
+		}
+		return stats;
+	},
+
+	updateSquadStats: function() {
+		var leader = this.game.village.leader;
+		var stats = leader ? this.getLeaderCombatStats(leader) : null;
+		console.log("leader stats:", stats, leader);
+		if (stats) {
+			this.squad.atk = stats.atk;
+			this.squad.def = stats.def;
+			this.squad.agi = stats.agi;
+			this.squad.str = stats.str;
+			this.squad.spd = stats.spd;
+			var maxHp = stats.hp;
+			if (this.squad.hp > maxHp) {
+				this.squad.hp = maxHp;
+			}
+		}
 	},
 
 	attack: function(src, tgt){
@@ -2637,7 +2695,8 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 				"<div style='width:100%;height:4px;background:#333;margin-top:2px;'>" +
 				"<div style='width:" + (explorerHpRatio * 100).toFixed(0) + "%;height:100%;background:#4a4;'></div></div>" +
 				"<br>Stamina: " + map.energy.toFixed(0) + "/" + map.getMaxEnergy().toFixed(0) + " [eff:100%]" +
-				"<br>ATK: " + map.squad.atk.toFixed(0) + " | DEF: " + map.squad.def.toFixed(0) + " | AGI: " + map.squad.agi.toFixed(0) + " | STR: " + map.squad.str.toFixed(0) + " | SPD: " + map.squad.spd.toFixed(0)
+				"<br>ATK: " + map.squad.atk.toFixed(0) + " | DEF: " + map.squad.def.toFixed(0) + " | AGI: " + map.squad.agi.toFixed(0) + " | STR: " + map.squad.str.toFixed(0)
+				// + " | SPD: " + map.squad.spd.toFixed(0)
 
 		}, this.explorerDiv);
 
@@ -2680,6 +2739,7 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 
 	update: function() {
 		var map = this.game.village.map;
+		map.updateSquadStats();
 		var biome = map.currentBiome ? this.game.village.getBiome(map.currentBiome) : null;
 
 		if (biome){
@@ -2721,7 +2781,8 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		this.explorerLeftDiv.innerHTML = "Explorers:<br>HP: " + hpInfo + "/" + map.getMaxHP().toFixed(0) +
 			"<div style='width:100%;height:4px;background:#333;margin-top:2px;'>" +
 			"<div style='width:" + (Math.max(0, Math.min(1, map.squad.hp / map.getMaxHP())) * 100).toFixed(0) + "%;height:100%;background:#4a4;'></div></div>" +
-			"<br>ATK: " + map.squad.atk.toFixed(0) + " | DEF: " + map.squad.def.toFixed(0) + " | AGI: " + map.squad.agi.toFixed(0) + " | STR: " + map.squad.str.toFixed(0) + " | SPD: " + map.squad.spd.toFixed(0) +
+			"<br>ATK: " + map.squad.atk.toFixed(0) + " | DEF: " + map.squad.def.toFixed(0) + " | AGI: " + map.squad.agi.toFixed(0) + " | STR: " + map.squad.str.toFixed(0) +
+			//" | SPD: " + map.squad.spd.toFixed(0) +
 			"<br>Stamina: " + map.energy.toFixed(0) + "/" + map.getMaxEnergy().toFixed(0) + " [eff:" + (efficiency * 100).toFixed() + "%]";
 		this.explorerRightDiv.innerHTML = "";
 		if (biome && biome.fauna && biome.fauna.length){
