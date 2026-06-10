@@ -646,6 +646,23 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		return bonus;
 	},
 
+	getCombatLevel: function(combatExp){
+		return Math.max(1, Math.floor(Math.pow(combatExp, 0.25)));
+	},
+
+	getCombatExpProgress: function(combatExp) {
+		var lvl = this.getCombatLevel(combatExp);
+		var currentThreshold = lvl <= 1 ? 0 : Math.pow(lvl, 4);
+		var nextThreshold = Math.pow(lvl + 1, 4);
+		var current = combatExp - currentThreshold;
+		var total = nextThreshold - currentThreshold;
+		return {
+			current: current,
+			total: total,
+			pct: Math.floor(100 * current / total)
+		};
+	},
+
 	/**
 	 * Same but with negative values
 	 */
@@ -1278,6 +1295,7 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 	skills: null,
 	exp: 0,
 	rank: 0,
+	combatExp: 0,
 
 	rarity: 0,	//a growth/skill potential, 0 if none
 	color: 0,	//kitten color, the higher the rarer, 0 if none
@@ -1345,6 +1363,7 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 		this.job = 		data.job;
 		this.engineerSpeciality = data.engineerSpeciality || null;
 		this.rank =		data.rank || 0;
+		this.combatExp = data.combatExp || 0;
 		this.isLeader = data.isLeader || false;
 		this.isSenator = false;
 		this.isAdopted = data.isAdopted || false;
@@ -1402,6 +1421,7 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 		this.job = data.job != undefined ? jobNames[data.job] : null;
 		this.engineerSpeciality = data.engineerSpeciality || null;
 		this.rank = data.rank || 0;
+		this.combatExp = data.combatExp || 0;
 		this.isLeader = data.isLeader || false;
 		this.isSenator = false;
 		this.isAdopted = data.isAdopted || false;
@@ -1451,6 +1471,7 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 			job: this.job || undefined,
 			engineerSpeciality: this.engineerSpeciality || undefined,
 			rank: this.rank || undefined,
+			combatExp: this.combatExp || undefined,
 			isLeader: this.isLeader || undefined,
 			isAdopted: this.isAdopted || undefined,
 			favorite: this.favorite || undefined
@@ -1488,6 +1509,7 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 			job: this.job ? jobNames.indexOf(this.job) : undefined,
 			engineerSpeciality: this.engineerSpeciality || undefined,
 			rank: this.rank || undefined,
+			combatExp: this.combatExp || undefined,
 			isLeader: this.isLeader || undefined,
 			isAdopted: this.isAdopted || undefined,
 			favorite: this.favorite || undefined
@@ -1895,6 +1917,7 @@ dojo.declare("classes.village.Map", null, {
 					biome.fauna = [{
 						title: faunaName,
 						level: mobLevel,
+						exp: Math.round(10 * Math.pow(1.1, mobLevel)),
 						prevHp: hp,
 						hp: hp,
 						atk: 2.5 * Math.pow(1.05, mobLevel),
@@ -2013,9 +2036,20 @@ dojo.declare("classes.village.Map", null, {
 			this.attack(fauna, this.squad);
 
 		}
+		var killedFauna = biome.fauna.filter(function(fauna) {
+			return fauna.hp <= 0;
+		});
 		biome.fauna = biome.fauna.filter(function(fauna) {
 			return fauna.hp > 0;
 		});
+		var leader = this.game.village.leader;
+		if (leader && killedFauna.length) {
+			for (var i in killedFauna) {
+				var fauna = killedFauna[i];
+				var playerLvl = this.game.village.getCombatLevel(leader.combatExp);
+				leader.combatExp += this.getKillExp(playerLvl, this.squad.efficiency || 1.0, fauna.exp, fauna.level);
+			}
+		}
 	},
 
 	getHitRate: function(src, tgt){
@@ -2050,6 +2084,14 @@ dojo.declare("classes.village.Map", null, {
 		}
 		var exp = (src.exp * tgt.lvl / 10 << 0) / df;
 		return exp;
+	},
+	/*
+		Simplified version of above method with additional penalty for efficiency and base exp multiplier
+		Courtesy of proto23
+	*/
+	getKillExp: function(playerLvl, efficiency, mobExp, mobLvl) {
+		//formulas are courtesy of proto23
+		return Math.max(1, Math.round(mobExp * (1 + mobLvl / 10) * (0.4 + efficiency * 0.6)) - (playerLvl - 1));
 	},
 
 	attack: function(src, tgt){
@@ -2486,6 +2528,8 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 			innerHTML: "Explorers: lvl 0, HP: " + map.squad.hp.toFixed(0) + "/" + map.getMaxHP()
 		}, div);
 
+		this.leaderDiv = dojo.create("div", null, div);
+
 		var btnsContainer = dojo.create("div", {style:{paddingTop:"20px"}}, div);
 
 
@@ -2528,7 +2572,15 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		var efficiency = map.energy / map.getMaxEnergy();
 		map.squad.efficiency = efficiency;
 
-		this.teamDiv.innerHTML = "Stamina: " + map.energy.toFixed(0) + " [" + (efficiency * 100).toFixed() + "%]";
+		this.teamDiv.innerHTML = "Stamina: " + map.energy.toFixed(0) + "/" + map.getMaxEnergy().toFixed(0) + " [eff:" + (efficiency * 100).toFixed() + "%]";
+		var leader = this.game.village.leader;
+		if (leader) {
+			var combatLvl = this.game.village.getCombatLevel(leader.combatExp);
+			var progress = this.game.village.getCombatExpProgress(leader.combatExp);
+			this.leaderDiv.innerHTML = "<span>" + $I("village.census.lbl.leader") + ":</span> " + this.game.village.getStyledName(leader, true) + ", <span>Lvl</span> " + combatLvl + ", Exp: " + progress.current.toFixed(0) + "/" + progress.total.toFixed(0) + "";
+		} else {
+			this.leaderDiv.innerHTML = "<span>" + $I("village.census.lbl.leader") + ":</span> " + $I("village.census.lbl.noLeader");
+		}
 		this.explorerDiv.innerHTML = "Explorers: HP: " + hpInfo + "/" + map.getMaxHP().toFixed(0);
 		if (biome && biome.fauna && biome.fauna.length){
 			var fauna =  biome.fauna[0];
@@ -2539,8 +2591,10 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 			}
 			this.explorerDiv.innerHTML += " | " + fauna.title + " lvl." + fauna.level + " HP: " + hpInfo;
 		}
+
 		
-		
+
+
 		this.inherited(arguments);
 	}
 });
