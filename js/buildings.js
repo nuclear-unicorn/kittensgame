@@ -715,6 +715,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			for (var i in self.effects) {
 				self.effectsCalculated[i] = self.effects[i];
 			}
+			self.effects["scienceMax"] *= (1 + game.getEffect("biolabBiofuelScienceMaxRatio") * self.on);
 
 		},
 		lackResConvert: false,
@@ -734,6 +735,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 
 				if (self.val) {
 					self.effects["scienceRatio"] = 0.35 * (1 + self.on / self.val);
+					self.effects["scienceMax"] = self.effectsCalculated["scienceMax"] * (1 + game.getEffect("biolabBiofuelScienceMaxRatio") * self.on);
 				}
 
 				return amt;
