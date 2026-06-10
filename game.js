@@ -1514,6 +1514,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.breweryPolicyManpowerRatio.title"),
 				type: "ratio"
 			},
+			"biolabBiofuelScienceMax": {
+				title: $I("effectsMgr.statics.biolabBiofuelScienceMax.title"),
+				type: "fixed"
+			},
 			"religionUpgradesDiscount":{
 				title: $I("effectsMgr.statics.religionUpgradesDiscount.title"),
 				type: "ratio"

@@ -715,6 +715,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			for (var i in self.effects) {
 				self.effectsCalculated[i] = self.effects[i];
 			}
+			self.effects["scienceMax"] += self.getBiofuelScienceMax(self, game);
 
 		},
 		lackResConvert: false,
@@ -734,11 +735,30 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 
 				if (self.val) {
 					self.effects["scienceRatio"] = 0.35 * (1 + self.on / self.val);
+					self.effects["scienceMax"] = self.effectsCalculated["scienceMax"] + self.getBiofuelScienceMax(self, game);
 				}
 
 				return amt;
 
 			}
+		},
+		getBiofuelScienceMax: function(self, game){
+			if (!game.workshop.get("biofuel").researched){
+				return 0;
+			}
+			var biofuelScience = game.getEffect("biolabBiofuelScienceMax");
+			if (!biofuelScience) {
+				return 0;
+			}
+			if (!self.on){
+				return 0;
+			}
+			biofuelScience *= self.on;
+			if (game.workshop.get("uplink").researched && game.bld.get("library").stage == 1){
+				var datacenterBonus = game.bld.get("library").val * game.getEffect("uplinkLabRatio");
+				biofuelScience *= (1 + datacenterBonus);
+			}
+			return biofuelScience;
 		},
 		flavor: $I("buildings.biolab.flavor")
 	},
