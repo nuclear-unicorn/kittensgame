@@ -1981,7 +1981,7 @@ dojo.declare("classes.village.Map", null, {
 
 			if (this.squad.hp <= 0){
 				this.currentBiome = null;
-				this.game.msg("All contact with the expedition have been lost", "important", "explore");
+				this.game.msg("Expedition group is unconcious", "important", "explore");
 			}
 			//return;	//do not explore further if obstacle encountered
 		}
@@ -2047,7 +2047,9 @@ dojo.declare("classes.village.Map", null, {
 			for (var i in killedFauna) {
 				var fauna = killedFauna[i];
 				var playerLvl = this.game.village.getCombatLevel(leader.combatExp);
-				leader.combatExp += this.getKillExp(playerLvl, this.squad.efficiency || 1.0, fauna.exp, fauna.level);
+				var newExp = this.getKillExp(playerLvl, this.squad.efficiency || 1.0, fauna.exp, fauna.level);
+				this.game.msg("You have killed " + fauna.title + ", +" + newExp + "xp", "important", "explore");
+				leader.combatExp += newExp;
 			}
 		}
 	},
