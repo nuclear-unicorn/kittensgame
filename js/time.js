@@ -1943,10 +1943,13 @@ dojo.declare("classes.ui.ResetWgt", [mixin.IChildrenAware, mixin.IGameAware], {
         var karmaPointsAfter = this.game.getUnlimitedDR(karmaKittens, stripe);
 		var karmaPoints = Math.floor((karmaPointsAfter - karmaPointsPresent) * 100) / 100;
 
+        var bonus = this.game.prestige.getResetBonusBreakdown(paragonPoints, karmaPoints);
 
-
-        msg += "<br>" + $I("time.reset.karma") + ": " + karmaPoints;
-        msg += "<br>" + $I("time.reset.paragon") + ": " + paragonPoints;
+        msg += "<br>" + $I("time.reset.karma") + ": " + karmaPoints
+            + " <span style='color:gray;'>(" + $I("time.reset.bonus.happiness", [this.game.getDisplayValueExt(bonus.happiness * 100)]) + ")</span>";
+        msg += "<br>" + $I("time.reset.paragon") + ": " + paragonPoints
+            + " <span style='color:gray;'>(" + $I("time.reset.bonus.storage", [this.game.getDisplayValueExt(bonus.storage * 100)])
+            + ", " + $I("time.reset.bonus.production", [this.game.getDisplayValueExt(bonus.production * 100)]) + ")</span>";
 
         if (this.game.ironWill){
             msg += "<br>" + $I("time.reset.zebra") + ": " + this.game._getBonusZebras();

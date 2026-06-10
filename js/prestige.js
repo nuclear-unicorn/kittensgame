@@ -544,6 +544,24 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		return storageRatio;
 	},
 
+	/**
+	 * Marginal bonuses (as fractions, e.g. 0.1 == +10%) that a reset's prestige points would add on top of the current totals.
+	 * Storage scales linearly with paragon, but production is diminishing, so the gain must be the delta of the curve.
+	 */
+	getResetBonusBreakdown: function(extraParagon, extraKarma){
+		var paragonRatio = this.getParagonRatio();
+		var paragon = this.game.resPool.get("paragon").value;
+
+		var prodCur = this.game.getLimitedDR((paragon * 0.010) * paragonRatio, 2 * paragonRatio);
+		var prodNew = this.game.getLimitedDR(((paragon + extraParagon) * 0.010) * paragonRatio, 2 * paragonRatio);
+
+		return {
+			happiness: extraKarma / 100, //+1% happiness per karma point
+			storage: (extraParagon / 1000) * paragonRatio,
+			production: prodNew - prodCur
+		};
+	},
+
 	unlockAll: function(){
 		for (var i in this.perks){
 			this.perks[i].unlocked = true;

@@ -998,7 +998,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		name: "smelter",
 		label: $I("buildings.smelter.label"),
 		description: $I("buildings.smelter.desc"),
-		unlockRatio: 0.3,
+		unlockRatio: 0.15,
 		prices: [
 			{ name : "minerals", val: 200 }
 		],
