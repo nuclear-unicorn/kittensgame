@@ -2171,6 +2171,54 @@ dojo.declare("classes.village.Map", null, {
 		return Math.max(1, Math.round(mobExp * (1 + mobLvl / 10) * (0.4 + efficiency * 0.6)) - (playerLvl - 1));
 	},
 
+
+
+	/**
+	 * A version of seeded rand that takes string as a seed (mainly used for multiple parameters)
+	 */
+	xmur3: function(str) {
+		var h = 1779033703 ^ str.length;
+		for (var i = 0; i < str.length; i++) {
+			h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+			h = h << 13 | h >>> 19;
+		}
+		return function() {
+			h = Math.imul(h ^ h >>> 16, 2246822507);
+			h = Math.imul(h ^ h >>> 13, 3266489909);
+			return (h ^= h >>> 16) >>> 0;
+		};
+	},
+
+	getSeededStatRoll: function(seed, level, statIndex) {
+		// xmur3 hash over a composite string key
+		var h = this.xmur3(seed + ":" + level + ":" + statIndex);
+		return (h() >>> 0) / 0xFFFFFFFF;
+	},
+
+	//TODO: just pick one seeded RNG method
+	rand: function(v) {
+		v = Math.imul(v ^ v >>> 16, 0x85ebca6b);
+		v = Math.imul(v ^ v >>> 13, 0xc2b2ae35);
+		return ((v ^ v >>> 16) >>> 0) / 4294967296;
+	},
+
+	getStatAtLevel: function(seed, lvl, statID, cfg) {
+		//bake the randomness based on the stat id to make them grow differently
+		var statSeed = (seed ^ (statID * 0xdeadbeef)) >>> 0;
+
+		//bake macro level luck based on the stat seed
+		var macroLuck = 0.9 + (this.rand(statSeed) * 0.2);
+
+		// stat = base + (level * growthPerLevel * classModifier * macroLuck)
+		var curve = cfg.base + (lvl * cfg.growth * cfg.bias * macroLuck);
+
+		// add a pseudo-random jitter based on the level
+		var jitterSeed = (statSeed ^ (lvl * 0x85ebca6b)) >>> 0;
+		var jitter = (this.rand(jitterSeed) - 0.5) * (cfg.growth * 0.5);
+
+		return Math.floor(curve + jitter);
+	},
+
 	attack: function(src, tgt){
 		//hit change
 		var hitChance = this.getHitRate(src, tgt);
