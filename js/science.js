@@ -1484,7 +1484,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			"biolabEnergyRatio" : -0.75,
 			"breweryPolicyManpowerRatio" : 0.01,
 			"woodRatio" : 0,
-			"biolabBiofuelScienceMax": 25
+			"biolabBiofuelScienceMaxRatio": 0.02
         },
         unlocked: false,
         blocked: false,

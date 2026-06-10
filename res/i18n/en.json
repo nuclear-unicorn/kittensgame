@@ -398,7 +398,7 @@
     "effectsMgr.statics.barnRatio.title": "Barn expansion",
     "effectsMgr.statics.baseMetalMaxRatio.title": "Maximum base metal bonus",
     "effectsMgr.statics.beaconRelicsPerDay.title": "Relic production",
-    "effectsMgr.statics.biolabBiofuelScienceMax.title": "Biolab biofuel max science",
+    "effectsMgr.statics.biolabBiofuelScienceMaxRatio.title": "Biolab biofuel max science",
     "effectsMgr.statics.biolabEnergyRatio.title": "Bio Lab energy reduction",
     "effectsMgr.statics.biofuelRatio.title": "Bio Fuel bonus",
     "effectsMgr.statics.blackLibraryBonus.title": "Black Library bonus",
