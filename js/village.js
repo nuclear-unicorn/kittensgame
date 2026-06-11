@@ -1746,6 +1746,7 @@ dojo.declare("classes.village.Map", null, {
 		desc: "Improves catnip generation by 1% per level",
 		terrainPenalty: 1.0,
 		mobLevel: 3,
+		faunaNames: ["grass snake", "raptor", "vole"],
 		unlocked: true,
 		unlocks: {
 			biomes: ["hills"]
@@ -1760,10 +1761,9 @@ dojo.declare("classes.village.Map", null, {
 		rewards: [{
 			name: "catnip", value: 100, chance: 1, width: 0.21, multiplier: 1.2
 		}],
-		/*
-			Set to true whenever the biome is fully explored, allows 
-		*/
-		upgradeUnlocked: false
+		lore: {
+			5: "Legends tell about the time when the whole world been covered with trees"
+		},
 	},
 	{
 		name: "hills",
@@ -1772,6 +1772,7 @@ dojo.declare("classes.village.Map", null, {
 		mobLevel: 3,
 		terrainPenalty: 1.2,
 		unlocked: false,
+		faunaNames: ["rock lizard", "centipede", "stone toad", "cave bat"],
 		unlocks: {
 			biomes: ["mountain"]
 		},
@@ -1807,6 +1808,7 @@ dojo.declare("classes.village.Map", null, {
 		title: "Bone Forest",
 		terrainPenalty: 1.9,
 		mobLevel: 30,
+		faunaNames: ["bone spider"],
 		unlocked: false,
 		evaluateLocks: function(game){
 			return game.village.getBiome("forest").level >= 25 && game.village.getBiome("rainForest").level >= 5;
@@ -1820,6 +1822,7 @@ dojo.declare("classes.village.Map", null, {
 		description: "TBD",
 		terrainPenalty: 1.4,
 		mobLevel: 15,
+		faunaNames: ["poison frog", "razor leech", "jaguar", "giant centipede"],
 		unlocked: false,
 		5: "The trees are so tall you don't see where it ends. When the rain starts it can go for hundreds of years.",
 		10: "In the fog you can see the mountains. The mountains have eyes and sometimes change places."
@@ -1830,6 +1833,7 @@ dojo.declare("classes.village.Map", null, {
 		description: "Improves mineral generation by 1% per level",
 		mobLevel: 35,
 		terrainPenalty: 1.2,
+		faunaNames: ["mountain goat", "rock worm", "yeti cub"],
 		lore: {
 			5: "Remember to grab your mandatory 50 meters of rope. The ascend will take quite some time.",
 			10: "A small and larger structures cut from a limestone are towering there. Griffins call this place The White Citadel.",
@@ -1853,6 +1857,7 @@ dojo.declare("classes.village.Map", null, {
 		title: "Volcano",
 		description: "TBD",
 		terrainPenalty: 3.5,
+		faunaNames: ["magma slug", "lava beetle"],
 		unlocked: false,
 		mobLevel: 50,
 		lore: {
@@ -1868,6 +1873,7 @@ dojo.declare("classes.village.Map", null, {
 		description: "Improves solar panel effectiveness by 1% per level",
 		terrainPenalty: 1.5,
 		mobLevel: 7,
+		faunaNames: ["sand viper", "scorpion", "dune beetle", "sand raptor"],
 		unlocked: false,
 		lore: {
 			5: "An endless white desert with occasional red rock formations"
@@ -1884,6 +1890,7 @@ dojo.declare("classes.village.Map", null, {
 		description: "",
 		mobLevel: 75,
 		terrainPenalty: 1.5,
+		faunaNames: ["blood scarab", "crimson basilisk"],
 		lore: {
 			5: "There are tales of horrible monsters and lost cities and endless deserts of red sand",
 			10: "You can travel further. But you don’t really want to see what’s there in the desert.",
@@ -1896,6 +1903,7 @@ dojo.declare("classes.village.Map", null, {
 		mobLevel: 25,
 		description : "Everything that is edible is poisonous and so are the trees and the grass and the air is also poisonous slightly",
 		terrainPenalty: 1.95,
+		faunaNames: ["bog toad", "swamp serpent", "poison spore"],
 		lore: {
 			5: "Everything here tries to kill you",
 			10: "All plants here are poisonous and so are the trees and the water and the air is also poisonous slightly",
@@ -1919,6 +1927,8 @@ dojo.declare("classes.village.Map", null, {
 		description : "Red moon description",
 		terrainPenalty: 20,
 		lore: {
+			5: "You know why this moon is red",
+			10: "Under the basins, mountains and craters and the endless oceans of red dust you can sense the shape of something giant and snake-like coiled into an impossible knot",
 		},
 		unlocked: false
 	}
