@@ -1742,10 +1742,18 @@ dojo.declare("classes.village.Map", null, {
 		name: "village",
 		title: "Village",
 		desc: "Improves exploration rate of all biomes",
-		terrainPenalty: 1.0,
+		terrainPenalty: 0.85,
 		mobLevel: 1,
 		faunaPenalty: 0,
 		unlocked: true,
+		rewards: [
+			{
+				name: "catnip", value: 20, chance: 1, width: 0.05, multiplier: 1.05,
+			},
+			{
+				name: "wood", value: 10, chance: 0.95, width: 0.15, multiplier: 1.05,
+			}
+		],
 	},
 	{
 		name: "plains",
@@ -1969,7 +1977,7 @@ dojo.declare("classes.village.Map", null, {
 	//TODO: account for a signifficant penalty for late game biomes
 	//var toLevel = 100 * (1 + 1.1 * Math.pow((distance - 1), 2.8)) * Math.pow(data.level + 1, 1.18 + 0.1 * distance);
 	toLevel: function(biome){
-		return 100 * (1 + 1.1 * Math.pow((biome.val || 0) + 1, 1.18 + 0.1 * biome.terrainPenalty));
+		return 100 * (1 + 1.1 * Math.pow((biome.val || 0) + 1, 1.18 + 0.1 * biome.terrainPenalty)) * biome.terrainPenalty;
 	},
 
 	getMap: function(name){
@@ -2099,6 +2107,30 @@ dojo.declare("classes.village.Map", null, {
 		return 0.1 * Math.pow(1.15, this.hqLevel);
 	},
 
+	getCPPerTick: function(biome){
+		var exploreCost = this.getExplorationCost();
+
+		var explorationMultiplier = 1;
+		var playerLvl = 1;
+
+		var leader = this.game.village.leader;
+		if (leader && biome.fauna && biome.fauna.length) {
+			playerLvl = this.game.village.getCombatLevel(leader.combatExp);
+		}
+
+		var maxFaunaLevel = biome.fauna[0].level;
+		for (var fi = 1; fi < biome.fauna.length; fi++) {
+			if (biome.fauna[fi].level > maxFaunaLevel) {
+				maxFaunaLevel = biome.fauna[fi].level;
+			}
+		}
+		var levelDiff = Math.max(0, maxFaunaLevel - playerLvl);
+		var drFactor = this.game.getUnlimitedDR(levelDiff, 8);
+		explorationMultiplier = Math.max(0, 1 - 0.25 - 0.75 * drFactor);
+
+		return exploreCost * explorationMultiplier;
+	},
+
 	explore: function(biomeId){
 		var biome = this.game.village.getBiome(biomeId);
 		if (!biome.val && biome.val !== 0){
@@ -2121,7 +2153,7 @@ dojo.declare("classes.village.Map", null, {
 
 			if (this.squad.hp <= 0){
 				this.currentBiome = null;
-				this.game.msg("Expedition group is KO'd", "important", "explore");
+				this.game.msg("Expedition squad have been knocked out", "important", "explore");
 			}
 			//return;	//do not explore further if obstacle encountered
 		}
@@ -2139,25 +2171,8 @@ dojo.declare("classes.village.Map", null, {
 		if (catpower.value >= exploreCost){
 			catpower.value -= exploreCost;
 
-			var explorationMultiplier = 1;
-			var playerLvl = 1;
-
-			var leader = this.game.village.leader;
-			if (leader && biome.fauna && biome.fauna.length) {
-				playerLvl = this.game.village.getCombatLevel(leader.combatExp);
-			}
-
-			var maxFaunaLevel = biome.fauna[0].level;
-			for (var fi = 1; fi < biome.fauna.length; fi++) {
-				if (biome.fauna[fi].level > maxFaunaLevel) {
-					maxFaunaLevel = biome.fauna[fi].level;
-				}
-			}
-			var levelDiff = Math.max(0, maxFaunaLevel - playerLvl);
-			var drFactor = this.game.getUnlimitedDR(levelDiff, 8);
-			explorationMultiplier = Math.max(0, 1 - 0.25 - 0.75 * drFactor);
-
-			biome.cp += exploreCost * explorationMultiplier;
+			var cpPerTick = this.getCPPerTick(biome);
+			biome.cp += cpPerTick;
 
 			if (biome.cp >= toLevel){
 				this.onLevelUp(biome);
@@ -2874,12 +2889,16 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		if (biome){
 			var toLevel = map.toLevel(biome);
 
-			/*this.biomeDiv.innerHTML = "Biome data: lv. " + biome.level +
-				", cp. " + biome.cp.toFixed(1) + "/???, difficulty: x" + biome.terrainPenalty; */
+			var cpRemaining = toLevel - biome.cp;
+			var etaText = "";
+
+			var cpPerTick = this.game.village.map.getCPPerTick(biome);
+			var etaSeconds = cpRemaining / (cpPerTick * this.game.getTicksPerSecondUI());
+			etaText = ", ETA: " + this.game.toDisplaySeconds(etaSeconds);
 
 			this.explorationDiv.innerHTML = "Currently exploring: [" + biome.title + "], " +
 			(biome.cp / toLevel * 100).toFixed(0) +
-			"%";	
+			"%" + etaText;	
 			
 		} else {
 			this.explorationDiv.innerHTML = "";
