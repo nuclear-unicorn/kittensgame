@@ -1731,7 +1731,8 @@ dojo.declare("classes.village.Map", null, {
 			name: "space",
 			title: "Space",
 			description: "Outer space map description",
-			biomes: ["cath", "redmoon"]
+			biomes: ["cath", "redmoon"],
+			unlocked: false
 		},
 	],
 
@@ -2050,6 +2051,12 @@ dojo.declare("classes.village.Map", null, {
 				}
 			}
 		}
+		for (var mi in this.maps){
+			var _map = this.maps[mi];
+			if (_map.name == "space"){
+				_map.unlocked = this.game.space.getProgram("orbitalLaunch").on;
+			}
+		}
 		//always regenerate HP slowly
 		if (this.squad.hp < this.getMaxHP()) {
 			this.squad.hp += 0.1;
@@ -2133,20 +2140,22 @@ dojo.declare("classes.village.Map", null, {
 			catpower.value -= exploreCost;
 
 			var explorationMultiplier = 1;
+			var playerLvl = 1;
 
 			var leader = this.game.village.leader;
 			if (leader && biome.fauna && biome.fauna.length) {
-				var playerLvl = this.game.village.getCombatLevel(leader.combatExp);
-				var maxFaunaLevel = biome.fauna[0].level;
-				for (var fi = 1; fi < biome.fauna.length; fi++) {
-					if (biome.fauna[fi].level > maxFaunaLevel) {
-						maxFaunaLevel = biome.fauna[fi].level;
-					}
-				}
-				var levelDiff = Math.max(0, maxFaunaLevel - playerLvl);
-				var drFactor = this.game.getUnlimitedDR(levelDiff, 8);
-				explorationMultiplier = Math.max(0, 1 - 0.25 - 0.75 * drFactor);
+				playerLvl = this.game.village.getCombatLevel(leader.combatExp);
 			}
+
+			var maxFaunaLevel = biome.fauna[0].level;
+			for (var fi = 1; fi < biome.fauna.length; fi++) {
+				if (biome.fauna[fi].level > maxFaunaLevel) {
+					maxFaunaLevel = biome.fauna[fi].level;
+				}
+			}
+			var levelDiff = Math.max(0, maxFaunaLevel - playerLvl);
+			var drFactor = this.game.getUnlimitedDR(levelDiff, 8);
+			explorationMultiplier = Math.max(0, 1 - 0.25 - 0.75 * drFactor);
 
 			biome.cp += exploreCost * explorationMultiplier;
 
@@ -2588,7 +2597,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 	},
 	updateEnabled: function(model) {
 		var map = this.game.village.map;
-		if (map.energy <= 0 || map.squad.hp <= 0)
+		if (map.energy <= 0 || map.squad.hp <= 0 || map.squad.hp < map.getMaxHP() * 0.2)
 		{
 			//Not enough resources to explore
 			model.enabled = false;
@@ -2764,6 +2773,15 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		this.upgradeHQBtn.render(btnsContainer);
 		//----------------------
 
+		var maps = map.maps;
+		var unlockedMapCount = 0;
+		for (var i = 0; i < maps.length; i++) {
+			if (maps[i].unlocked) {
+				unlockedMapCount++;
+			}
+		}
+
+		if (unlockedMapCount > 0) {
 		var _div = dojo.create("div", {innerHTML: "Maps", style: { paddingBottom: "10px"} }, div);
 		this.mapsDiv = dojo.create("div", null, _div);
 
@@ -2772,9 +2790,12 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 
 		//Map selector (map is an aggregation of biomes)
 		var mapSelect = dojo.create("select", {style: {float: "right"}}, this.mapsDiv);
-		var maps = map.maps;
+
 		for (var i = 0; i < maps.length; i++) {
 			var _map = maps[i];
+			if (!_map.unlocked) {
+				continue;
+			}
 			dojo.create("option", {
 				value: _map.name, innerHTML: _map.title,
 				selected: _map.name == map.activeMapId
@@ -2785,6 +2806,7 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 			self.game.village.map.setMap(mapId);
 			self.game.render();	//TODO: figure out proper update logic
 		});
+		}
 
 		dojo.create("div", {innerHTML: "Biomes", style: { paddingBottom: "10px"} }, div);
 
@@ -4156,7 +4178,7 @@ dojo.declare("com.nuclearunicorn.game.ui.LoadoutButtonController", com.nuclearun
 						this.game.ui.confirm("", $I("village.btn.loadout.delete.confirm", [model.options.loadout.title]), function() {
 						self.deleteLoadout(loadout);
 						});
-					}					
+		}
 				}
 			}];
 		model.pinLink = {
