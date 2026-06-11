@@ -1425,6 +1425,7 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 		this.isSenator = false;
 		this.isAdopted = data.isAdopted || false;
 		this.favorite = data.favorite || false;
+		this.combatExp = data.combatExp || 0;
 	},
 
 	loadUncompressed: function(data) {
