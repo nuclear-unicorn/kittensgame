@@ -315,6 +315,62 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			return (tradepost.effects["tradeRatio"] * Math.min(tradepostLimit, tradepost.val * tradepostRatioLimit));
 		}
 	},{
+		name: "islands",
+		label: $I("challendge.islands.label"),
+		description: $I("challendge.islands.desc"),
+		effectDesc: $I("challendge.islands.effect.desc"),
+
+		//islands: [],
+		//islandEffects: {},
+
+		stackOptions: {
+			"catnipChallengeReductionRatio": { noStack: true },
+			"woodChallengeReductionRatio": { noStack: true },
+			"mineralsChallengeReductionRatio": { noStack: true },
+			"manpowerChallengeReductionRatio": { noStack: true },
+			"goldChallengeReductionRatio": { noStack: true },
+			"coalChallengeReductionRatio": { noStack: true },
+			"oilChallengeReductionRatio": { noStack: true }
+		},
+
+		effects: {
+			"catnipChallengeReductionRatio": 0,
+			"woodChallengeReductionRatio": 0,
+			"mineralsChallengeReductionRatio": 0,
+			"manpowerChallengeReductionRatio": 0,
+			"goldChallengeReductionRatio": 0,
+			"coalChallengeReductionRatio": 0,
+			"oilChallengeReductionRatio": 0
+		},
+		
+		calculateEffects: function(self, game) {
+			if (self.active) {
+				self.effects["catnipChallengeReductionRatio"] = -0.8;
+				self.effects["woodChallengeReductionRatio"] = -0.8;
+				self.effects["mineralsChallengeReductionRatio"] = -0.8;
+				self.effects["manpowerChallengeReductionRatio"] = -0.8;
+				self.effects["goldChallengeReductionRatio"] = -0.8;
+				self.effects["coalChallengeReductionRatio"] = -0.8;
+				self.effects["oilChallengeReductionRatio"] = -0.8;
+            } else {
+				self.effects["catnipChallengeReductionRatio"] = 0;
+				self.effects["woodChallengeReductionRatio"] = 0;
+				self.effects["mineralsChallengeReductionRatio"] = 0;
+				self.effects["manpowerChallengeReductionRatio"] = 0;
+				self.effects["goldChallengeReductionRatio"] = 0;
+				self.effects["coalChallengeReductionRatio"] = 0;
+				self.effects["oilChallengeReductionRatio"] = 0;
+			}
+		},
+
+		createNewIsland: function(){
+
+		},
+
+		checkCompletionCondition: function(game) {
+			return game.resPool.get("ship").value >= 1;
+		}
+	},{
 		name: "unicornTears",
 		label: $I("challendge.unicornTears.label"),
 		description: $I("challendge.unicornTears.desc"),

@@ -917,6 +917,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 
 			self.effects = game.resPool.addBarnWarehouseRatio(effects);
 		},
+		unlocks: {
+			challenges: ["islands"]
+		},
 		flavor: $I("buildings.harbor.flavor")
 	},
 	//----------------------------------- Resource production ----------------------------------------

@@ -518,6 +518,12 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 					resName: resname,
 					type: "ratio"
 				};
+			case type == "ChallengeReductionRatio":
+				return {
+					title: $I("effectsMgr.type.resReductionRatio", [restitle]),
+					resName: resname,
+					type: "ratio"
+				};
 			case type == "DemandRatio":
 				return {
 					title: $I("effectsMgr.type.resDemandRatio", [restitle]),
@@ -3254,6 +3260,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		// +*RELIGION EFFECTS
 		perTick *= 1 + this.getEffect(res.name + "RatioReligion");
 
+		// +*CHALLENGE EFFECTS
+		perTick *= 1 + this.getEffect(res.name + "ChallengeReductionRatio");
+
 		// +*AFTER PRODUCTION BOOST (UPGRADE EFFECTS SUPER)
 		perTick *= 1 + this.getEffect(res.name + "SuperRatio");
 
@@ -3497,6 +3506,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			name: $I("res.stack.religion"),
 			type: "ratio",
 			value: this.getEffect(res.name + "RatioReligion")
+		});
+
+		stack.push({
+			name: $I("res.stack.challenge"),
+			type: "ratio",
+			value: this.getEffect(res.name + "ChallengeReductionRatio")
 		});
 
 		// +*AFTER PRODUCTION BOOST (UPGRADE EFFECTS SUPER)
