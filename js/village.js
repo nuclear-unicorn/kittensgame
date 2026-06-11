@@ -1720,7 +1720,7 @@ dojo.declare("classes.village.Map", null, {
 			name: "cath",
 			title: "Cath",
 			description: "Mystical lands of Cath are full of perils and wonders",
-			biomes: ["village", "plains"]
+			biomes: ["village", "plains", "forest", "hills", "boneForest", "rainForest", "mountain", "volcano", "desert", "bloodDesert", "swamp" ]
 		},{
 			name: "space",
 			title: "Space",
@@ -1758,13 +1758,7 @@ dojo.declare("classes.village.Map", null, {
 		 * We will follow the same notation and same seasonality where it makes sense
 		 */
 		rewards: [{
-			name: "catnip", value: 100, chance: 1, width: 0.21, multiplier: 1.2,
-			seasons:{
-				"spring": 0.25,
-				"summer": 0.05,
-				"autumn": -0.35,
-				"winter": -0.05
-			}
+			name: "catnip", value: 100, chance: 1, width: 0.21, multiplier: 1.2
 		}],
 		/*
 			Set to true whenever the biome is fully explored, allows 
@@ -2087,7 +2081,7 @@ dojo.declare("classes.village.Map", null, {
 
 			if (this.squad.hp <= 0){
 				this.currentBiome = null;
-				this.game.msg("Expedition group is unconcious", "important", "explore");
+				this.game.msg("Expedition group is KO'd", "important", "explore");
 			}
 			//return;	//do not explore further if obstacle encountered
 		}
@@ -2403,10 +2397,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		var name = model.options.name;
 
 		if (biome.val !== undefined && biome.val > 0){
-			name += ", lv." + biome.val;
-			if (biome.on !== undefined && biome.on !== biome.val){
-				name += " (" + (biome.on || 0) + "/" + biome.val + ")";
-			}
+			name += ", lv." + biome.on;
 		}
 
 		if (biome.cp){
@@ -2443,6 +2434,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		}
 		if ((biome.on || 0) + amt <= biome.val){
 			biome.on = (biome.on || 0) + amt;
+			biome.cp = 0;
 			this.metadataHasChanged(model);
 		}
 	},
@@ -2455,6 +2447,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		}
 		if ((biome.on || 0) >= amt){
 			biome.on -= amt;
+			biome.cp = 0;
 			this.metadataHasChanged(model);
 		}
 	},
@@ -2463,6 +2456,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		var biome = model.metadata;
 		if ((biome.on || 0) < biome.val){
 			biome.on = biome.val;
+			biome.cp = 0;
 			this.metadataHasChanged(model);
 		}
 	},
@@ -2471,6 +2465,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		var biome = model.metadata;
 		if (biome.on){
 			biome.on = 0;
+			biome.cp = 0;
 			this.metadataHasChanged(model);
 		}
 	},
@@ -2618,53 +2613,6 @@ dojo.declare("classes.ui.village.BiomeBtn", com.nuclearunicorn.game.ui.ButtonMod
 	}
 });
 
-dojo.declare("classes.village.ui.map.UpgradeExplorersController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
-	defaults: function() {
-		var result = this.inherited(arguments);
-		result.simplePrices = false;
-		return result;
-	},
-
-	getMetadata: function(model) {
-		var map = this.game.village.map;
-		if (!model.metaCached) {
-			model.metaCached = {
-				label: $I("village.btn.upgradeExplorers"),
-				description: $I("village.btn.upgradeExplorers.desc"),
-				val: map.explorersLevel,
-				on: map.explorersLevel
-			};
-		}
-		return model.metaCached;
-	},
-
-	getPrices: function(model) {
-		var prices = dojo.clone(model.options.prices);
-		for (var i = 0; i < prices.length; i++) {
-            prices[i].val *= Math.pow(1.25, this.game.village.map.explorersLevel);
-		}
-		return prices;
-	},
-
-	buyItem: function(model, event) {
-		this.game.ui.render();
-		return this.inherited(arguments);
-	},
-
-	incrementValue: function(model) {
-		this.inherited(arguments);
-		this.game.village.map.explorersLevel++;
-	},
-
-	hasSellLink: function(model){
-		return false;
-	},
-
-	updateVisible: function(model){
-		model.visible = true;
-	}
-});
-
 dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.IGameAware], {
 	constructor: function(game){
 		this.setGame(game);
@@ -2805,7 +2753,8 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		if (leader) {
 			var combatLvl = this.game.village.getCombatLevel(leader.combatExp);
 			var progress = this.game.village.getCombatExpProgress(leader.combatExp);
-			this.leaderDiv.innerHTML = "<span>" + $I("village.census.lbl.leader") + ":</span> " + this.game.village.getStyledName(leader, true) + ", <span>Lvl</span> " + combatLvl + ", Exp: " + progress.current.toFixed(0) + "/" + progress.total.toFixed(0) + "";
+			this.leaderDiv.innerHTML = "<span>" + $I("village.census.lbl.leader") + ":</span> " + this.game.village.getStyledName(leader, true) + ", <span>Lvl</span> " + combatLvl + 
+			", Exp: " + this.game.getDisplayValueExt(progress.current) + "/" + this.game.getDisplayValueExt(progress.total) + "";
 		} else {
 			this.leaderDiv.innerHTML = "<span>" + $I("village.census.lbl.leader") + ":</span> " + $I("village.census.lbl.noLeader");
 		}
