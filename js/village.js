@@ -2773,7 +2773,7 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 			handler: dojo.hitch(this, function(){
 				//this.game.village.map.hqLevel++;
 			}),
-			prices: [{ name : "manpower", val: 1000 }],
+			prices: [{ name : "manpower", val: 250 }],
 			controller: new classes.village.ui.map.UpgradeHQController(this.game)
 		}, this.game);
 	},
