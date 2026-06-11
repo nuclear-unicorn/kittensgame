@@ -1645,6 +1645,12 @@ dojo.declare("classes.village.Map", null, {
 	//current map id
 	activeMapId: "cath",
 
+	//level of expedition squad
+	explorersLevel: 0,
+
+	//level of your supply depo
+	hqLevel: 0,
+
 	//current explorer squad
 	squad: {
 		level: 1,
@@ -2069,6 +2075,10 @@ dojo.declare("classes.village.Map", null, {
 		return 20;
 	},
 
+	getExplorationCost: function(){
+		return 0.1 * Math.pow(1.15, this.hqLevel);
+	},
+
 	explore: function(biomeId){
 		var biome = this.game.village.getBiome(biomeId);
 		if (!biome.val && biome.val !== 0){
@@ -2081,7 +2091,7 @@ dojo.declare("classes.village.Map", null, {
 			biome.cp = 0;
 		}
 
-		var explorePrice = 0.1;
+		var exploreCost = this.getExplorationCost();
 		var catpower = this.game.resPool.get("manpower");
 
 		this.energy -= 0.1;	// 10 ticks per day
@@ -2106,10 +2116,10 @@ dojo.declare("classes.village.Map", null, {
 		//var toLevel = 100;
 		var toLevel = this.toLevel(biome);
 
-		if (catpower.value >= explorePrice){
-			catpower.value -= explorePrice;
+		if (catpower.value >= exploreCost){
+			catpower.value -= exploreCost;
 
-			biome.cp += explorePrice;
+			biome.cp += exploreCost;
 
 			if (biome.cp >= toLevel){
 				this.onLevelUp(biome);
@@ -2275,7 +2285,6 @@ dojo.declare("classes.village.Map", null, {
 	updateSquadStats: function() {
 		var leader = this.game.village.leader;
 		var stats = leader ? this.getLeaderCombatStats(leader) : null;
-		console.log("leader stats:", stats, leader);
 		if (stats) {
 			this.squad.atk = stats.atk;
 			this.squad.def = stats.def;
@@ -2293,7 +2302,7 @@ dojo.declare("classes.village.Map", null, {
 		//hit change
 		var hitChance = this.getHitRate(src, tgt);
 
-		console.log(src, "attacks", tgt, "hit chance:", hitChance);
+		//console.log(src, "attacks", tgt, "hit chance:", hitChance);
 		if (this.game.rand(100) <= hitChance) {
 			tgt.hp -= src.atk;
 		}
@@ -2315,7 +2324,20 @@ dojo.declare("classes.village.Map", null, {
 			return;
 		}
 		var rewards = this.getBiomeRewards(biome);
-		//this.game.msg("Your explorers have brought you", fuzzedNormalAmount, reward.name);
+		for (var res in rewards) {
+			var amt = this.game.resPool.addResEvent(res, rewards[res]);
+			if (amt > 0) {
+				var resPool = this.game.resPool.get(res);
+				var name = resPool.title || res;
+				var msg = "Your explorers have brought " + this.game.getDisplayValueExt(amt) + " " + name;
+				var type = null;
+				if (res == "titanium" || res == "blueprint" || res == "relic"){
+					msg += "!";
+					type = "notice";
+				}
+				this.game.msg(msg, type, "explore");
+			}
+		}
 	},
 
 	getBiomeRewards: function(biome){
@@ -2366,12 +2388,64 @@ dojo.declare("classes.village.Map", null, {
 
 	save: function(){
 		return {
-			energy: this.energy
+			hqLevel: this.hqLevel,
+			energy: this.energy,
+			explorersLevel: this.explorersLevel
 		};
 	},
 
 	load: function(data){
+		this.hqLevel = data.hqLevel || 0;
 		this.energy = data.energy || 100;
+		this.explorersLevel = data.explorersLevel || 0;
+	}
+});
+
+dojo.declare("classes.village.ui.map.UpgradeHQController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
+	defaults: function() {
+		var result = this.inherited(arguments);
+		result.simplePrices = false;
+		return result;
+	},
+
+	getMetadata: function(model) {
+		var map = this.game.village.map;
+		if (!model.metaCached) {
+			model.metaCached = {
+				label: $I("village.btn.upgradeHQ"),
+				description: $I("village.btn.upgradeHQ.desc"),
+				val: map.hqLevel,
+				on: map.hqLevel
+			};
+		}
+		return model.metaCached;
+	},
+
+	getPrices: function(model) {
+		var prices = dojo.clone(model.options.prices);
+		for (var i = 0; i < prices.length; i++) {
+            prices[i].val *= Math.pow(1.25, this.game.village.map.hqLevel);
+		}
+		return prices;
+	},
+
+	buyItem: function(model, event) {
+		this.game.ui.render();
+		return this.inherited(arguments);
+		
+	},
+
+	incrementValue: function(model) {
+		this.inherited(arguments);
+		this.game.village.map.hqLevel++;
+	},
+
+	hasSellLink: function(model){
+		return false;
+	},
+
+	updateVisible: function(model){
+		model.visible = true;
 	}
 });
 
@@ -2639,6 +2713,16 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 				controller: new classes.ui.village.BiomeBtnController(game)
 			}, game));
 		}
+
+		this.upgradeHQBtn = new com.nuclearunicorn.game.ui.ButtonModern({
+			name: $I("village.btn.upgradeHQ"),
+			description: $I("village.btn.upgradeHQ.desc"),
+			handler: dojo.hitch(this, function(){
+				//this.game.village.map.hqLevel++;
+			}),
+			prices: [{ name : "manpower", val: 1000 }],
+			controller: new classes.village.ui.map.UpgradeHQController(this.game)
+		}, this.game);
 	},
 
 	render: function(container){
@@ -2647,6 +2731,8 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		var div = dojo.create("div", null, container);
 
 		var btnsContainer = dojo.create("div", {style:{paddingTop:"20px"}}, div);
+		//this.upgradeExplorersBtn.render(btnsContainer);
+		this.upgradeHQBtn.render(btnsContainer);
 		//----------------------
 
 		var _div = dojo.create("div", {innerHTML: "Maps", style: { paddingBottom: "10px"} }, div);
@@ -2790,7 +2876,8 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 				"<br>ATK: " + fauna.atk.toFixed(0) + " | DEF: " + fauna.def.toFixed(0) + " | AGI: " + fauna.agi.toFixed(0) + " | STR: " + fauna.str.toFixed(0) + " | SPD: " + fauna.spd.toFixed(0);
 		}
 
-		
+		//this.upgradeExplorersBtn.update();
+		this.upgradeHQBtn.update();
 
 
 		this.inherited(arguments);

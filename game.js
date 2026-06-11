@@ -3758,6 +3758,18 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 		}
 
+		if (res.name == "manpower"){
+			var biome = this.village.getBiome(this.village.map.currentBiome);
+			if (biome){
+				var exploreCost = this.village.map.getExplorationCost();
+				stack.push({
+					name: $I("res.stack.exploration"),
+					type: "fixed",
+					value: -exploreCost
+				});
+			}
+		}
+
 		stack.push({
 			name: $I("res.stack.demand"),
 			type: "fixed",

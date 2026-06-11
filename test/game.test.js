@@ -561,7 +561,7 @@ test("Explored biomes should update effects", () => {
 
 test("Explored biome should produce rewards", () => {
     var plainsBiome = game.village.getBiome("plains");
-    plainsBiome.level = 1;
+    plainsBiome.val = 1;
     
     //check that obtained random reward is within base value +- width
     var rewardSpec = plainsBiome.rewards[0];
@@ -582,8 +582,8 @@ test("Explored biome should produce rewards", () => {
     expect(amt).toBeGreaterThanOrEqual(rewardSpec.value * (1 - rewardSpec.width ) * fuzzBuffer);
     expect(amt).toBeLessThanOrEqual(rewardSpec.value * (1 + rewardSpec.width ) * fuzzBuffer);
 
-    plainsBiome.level = 2;
-    var multiplier = Math.pow(plainsBiome.level, rewardSpec.multiplier);
+    plainsBiome.val = 2;
+    var multiplier = Math.pow(plainsBiome.val, rewardSpec.multiplier | 1.2);
 
     var rewards = game.village.map.getBiomeRewards(plainsBiome);
     var amt = rewards["catnip"];
