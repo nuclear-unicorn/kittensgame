@@ -1645,12 +1645,6 @@ dojo.declare("classes.village.Map", null, {
 	//current map id
 	activeMapId: "cath",
 
-	//level of expedition squad
-	explorersLevel: 0,
-
-	//level of your supply depo
-	hqLevel: 0,
-
 	//current explorer squad
 	squad: {
 		level: 1,
@@ -1725,7 +1719,7 @@ dojo.declare("classes.village.Map", null, {
 	maps: [{
 			name: "cath",
 			title: "Cath",
-			description: "Cath map description",
+			description: "Mystical lands of Cath are full of perils and wonders",
 			biomes: ["village", "plains"]
 		},{
 			name: "space",
@@ -2059,7 +2053,7 @@ dojo.declare("classes.village.Map", null, {
 	},
 
 	getMaxEnergy: function(){
-		return (70 + this.hqLevel * 5) * (1 + (0.01 * this.hqLevel));
+		return 70;
 	},
 
 	getMaxHP: function(){
@@ -2068,7 +2062,7 @@ dojo.declare("classes.village.Map", null, {
 			var lvl = this.game.village.getCombatLevel(leader.combatExp);
 			return this.getStatAtLevel(leader.seed, lvl, this.leaderStatIds.hp, this.leaderStatConfigs.hp);
 		}
-		return (10 + this.explorersLevel * 0.2) * (2 + (0.02 * this.explorersLevel));
+		return 20;
 	},
 
 	explore: function(biomeId){
@@ -2368,16 +2362,12 @@ dojo.declare("classes.village.Map", null, {
 
 	save: function(){
 		return {
-			hqLevel: this.hqLevel,
-			energy: this.energy,
-			explorersLevel: this.explorersLevel
+			energy: this.energy
 		};
 	},
 
 	load: function(data){
-		this.hqLevel = data.hqLevel || 0;
 		this.energy = data.energy || 100;
-		this.explorersLevel = data.explorersLevel || 0;
 	}
 });
 
@@ -2628,54 +2618,6 @@ dojo.declare("classes.ui.village.BiomeBtn", com.nuclearunicorn.game.ui.ButtonMod
 	}
 });
 
-dojo.declare("classes.village.ui.map.UpgradeHQController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
-	defaults: function() {
-		var result = this.inherited(arguments);
-		result.simplePrices = false;
-		return result;
-	},
-
-	getMetadata: function(model) {
-		var map = this.game.village.map;
-		if (!model.metaCached) {
-			model.metaCached = {
-				label: $I("village.btn.upgradeHQ"),
-				description: $I("village.btn.upgradeHQ.desc"),
-				val: map.hqLevel,
-				on: map.hqLevel
-			};
-		}
-		return model.metaCached;
-	},
-
-	getPrices: function(model) {
-		var prices = dojo.clone(model.options.prices);
-		for (var i = 0; i < prices.length; i++) {
-            prices[i].val *= Math.pow(1.25, this.game.village.map.hqLevel);
-		}
-		return prices;
-	},
-
-	buyItem: function(model, event) {
-		this.game.ui.render();
-		return this.inherited(arguments);
-		
-	},
-
-	incrementValue: function(model) {
-		this.inherited(arguments);
-		this.game.village.map.hqLevel++;
-	},
-
-	hasSellLink: function(model){
-		return false;
-	},
-
-	updateVisible: function(model){
-		model.visible = true;
-	}
-});
-
 dojo.declare("classes.village.ui.map.UpgradeExplorersController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
 	defaults: function() {
 		var result = this.inherited(arguments);
@@ -2739,26 +2681,6 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 				controller: new classes.ui.village.BiomeBtnController(game)
 			}, game));
 		}
-
-		this.upgradeExplorersBtn = new com.nuclearunicorn.game.ui.ButtonModern({
-			name: $I("village.btn.upgradeExplorers"),
-			description: $I("village.btn.upgradeExplorers.desc"),
-			handler: dojo.hitch(this, function(){
-				//this.sendHunterSquad();
-			}),
-			prices: [{ name : "manpower", val: 100 }],
-			controller: new classes.village.ui.map.UpgradeExplorersController(this.game)
-		}, this.game);
-
-		this.upgradeHQBtn = new com.nuclearunicorn.game.ui.ButtonModern({
-			name: $I("village.btn.upgradeHQ"),
-			description: $I("village.btn.upgradeHQ.desc"),
-			handler: dojo.hitch(this, function(){
-				//this.game.village.map.hqLevel++;
-			}),
-			prices: [{ name : "catnip", val: 1000 }],
-			controller: new classes.village.ui.map.UpgradeHQController(this.game)
-		}, this.game);
 	},
 
 	render: function(container){
@@ -2767,8 +2689,6 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		var div = dojo.create("div", null, container);
 
 		var btnsContainer = dojo.create("div", {style:{paddingTop:"20px"}}, div);
-		this.upgradeExplorersBtn.render(btnsContainer);
-		this.upgradeHQBtn.render(btnsContainer);
 		//----------------------
 
 		var _div = dojo.create("div", {innerHTML: "Maps", style: { paddingBottom: "10px"} }, div);
@@ -2870,9 +2790,6 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 			this.explorationDiv.innerHTML = "";
 		}
 		dojo.style(this.cancelExplorationLink, "display", biome ? "" : "none");
-
-		this.upgradeExplorersBtn.update();
-		this.upgradeHQBtn.update();
 
 		var hpInfo = "<span class='hp'>" + map.squad.hp.toFixed(0) + "</span>";
 		if (map.squad.prevHp > map.squad.hp){
