@@ -2007,10 +2007,10 @@ dojo.declare("classes.village.Map", null, {
 			if (!biome.fauna || !biome.fauna.length){
 				var spawnChance = 1000 * (biome.faunaPenalty || 1.0);
 				if (this.game.rand(10000) <= spawnChance){
-					var mobLevel = Math.round(biome.mobLevel * Math.pow(1.05, (biome.on || 0)));	//adjust by +- 15%
+					var mobLevel = Math.round((biome.mobLevel + biome.on) * (1 + biome.on * 0.12 ) * Math.pow(1.05, (biome.on || 0)));	//adjust by +- 15%
 					
 					
-					var hp = Math.round((this.game.rand(10) + 5) * Math.pow(1.05, mobLevel));
+					var hp = Math.round((this.game.rand(10) + 5) * Math.pow(1.12, mobLevel));
 					biome.fauna = [{
 						title: faunaName,
 						level: mobLevel,
