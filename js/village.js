@@ -1764,9 +1764,14 @@ dojo.declare("classes.village.Map", null, {
 		 * Reward for clearing explored biome.
 		 * We will follow the same notation and same seasonality where it makes sense
 		 */
-		rewards: [{
-			name: "catnip", value: 100, chance: 1, width: 0.21, multiplier: 1.2
-		}],
+		rewards: [
+			{
+				name: "catnip", value: 100, chance: 1, width: 0.21, multiplier: 1.2,
+			},
+			{
+				name: "wood", value: 25, chance: 0.75, width: 0.15, multiplier: 1.15,
+			}
+		],
 		lore: {
 			5: "Legends tell about the time when the whole world been covered with trees"
 		},
@@ -1807,7 +1812,15 @@ dojo.declare("classes.village.Map", null, {
 		},
 		effects: {
 			woodRatio: 0.01
-		}
+		},
+		rewards: [
+			{
+				name: "wood", value: 100, chance: 1, width: 0.35, multiplier: 1.2,
+			},
+			{
+				name: "catnip", value: 25, chance: 0.65, width: 0.15, multiplier: 1.15,
+			}
+		],
 	},
 	{
 		name: "boneForest",
@@ -2119,7 +2132,23 @@ dojo.declare("classes.village.Map", null, {
 		if (catpower.value >= exploreCost){
 			catpower.value -= exploreCost;
 
-			biome.cp += exploreCost;
+			var explorationMultiplier = 1;
+
+			var leader = this.game.village.leader;
+			if (leader && biome.fauna && biome.fauna.length) {
+				var playerLvl = this.game.village.getCombatLevel(leader.combatExp);
+				var maxFaunaLevel = biome.fauna[0].level;
+				for (var fi = 1; fi < biome.fauna.length; fi++) {
+					if (biome.fauna[fi].level > maxFaunaLevel) {
+						maxFaunaLevel = biome.fauna[fi].level;
+					}
+				}
+				var levelDiff = Math.max(0, maxFaunaLevel - playerLvl);
+				var drFactor = this.game.getUnlimitedDR(levelDiff, 8);
+				explorationMultiplier = Math.max(0, 1 - 0.25 - 0.75 * drFactor);
+			}
+
+			biome.cp += exploreCost * explorationMultiplier;
 
 			if (biome.cp >= toLevel){
 				this.onLevelUp(biome);
