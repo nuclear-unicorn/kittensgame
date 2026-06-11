@@ -541,14 +541,18 @@ test("Test NR calls", () => {
 //--------------------------------
 test("Explored biomes should update effects", () => {
 
-    game.village.getBiome("plains").level = 1;
+    var plainsBiome = game.village.getBiome("plains");
+    plainsBiome.val = 1;
+    plainsBiome.on = 1;
     game.updateCaches();
     //expect(game.globalEffectsCached["catnipRatio"]).toBe(0.01);
     expect(game.getEffect("catnipRatio")).toBe(0.01);
 
     //buildings effects and biomes should compound and not interfeer with each other
 
-    game.village.getBiome("forest").level = 10;
+    var forestBiome = game.village.getBiome("forest");
+    forestBiome.val = 10;
+    forestBiome.on = 10;
     _build("lumberMill", 10);
     game.updateCaches();
 
