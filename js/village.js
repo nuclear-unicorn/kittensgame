@@ -2049,10 +2049,10 @@ dojo.declare("classes.village.Map", null, {
 					//use power law instead of exp law to avoid broken levels on biomes 20+
 					var powerLawMultiplier = biome.biomePenalty || 1.0;
 
-					var offset = Math.round(biome.mobLevel * Math.pow(biome.on, 0.7 * powerLawMultiplier)); 
+					var offset = Math.round(biome.mobLevel * Math.pow(biome.on, 0.6 * powerLawMultiplier)); 
 					var mobLevel = Math.round(
 						biome.mobLevel / 3 + 
-						(1.8 * Math.pow(biome.on, 1.60 * powerLawMultiplier) + offset) * 
+						(1.8 * Math.pow(biome.on, 1.50 * powerLawMultiplier) + offset) * 
 						(1 + (Math.random() * 2 - 1) * 0.15)
 					);
 					if (mobLevel <= 0) {
@@ -2879,7 +2879,7 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		var explorerHpRatio = map.squad.hp / map.getMaxHP();
 		this.explorerLeftDiv = dojo.create("div", {
 			style:{width:"50%"},
-			innerHTML: "Explorers:<br>HP: " + map.squad.hp.toFixed(0) + "/" + explorerMaxHp +
+			innerHTML: "Explorers:<br>HP: " + this.game.getDisplayValueExt(map.squad.hp) + "/" + this.game.getDisplayValueExt(explorerMaxHp) +
 				"<div style='width:100%;height:4px;background:#333;margin-top:2px;'>" +
 				"<div style='width:" + (explorerHpRatio * 100).toFixed(0) + "%;height:100%;background:#4a4;'></div></div>" +
 				"<br>Stamina: " + map.energy.toFixed(0) + "/" + map.getMaxEnergy().toFixed(0) + " [eff:100%]" +
@@ -2977,14 +2977,14 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 		this.explorerRightDiv.innerHTML = "";
 		if (biome && biome.fauna && biome.fauna.length){
 			var fauna =  biome.fauna[0];
-			var hpInfo = "<span class='hp'>" + fauna.hp.toFixed(0) + "</span>";
+			var hpInfo = "<span class='hp'>" + this.game.getDisplayValueExt(fauna.hp) + "</span>";
 			if (fauna.hp != fauna.prevHp){
-				hpInfo = "<span class='hp flash-red'>" + fauna.hp.toFixed(0) + "</span>";
+				hpInfo = "<span class='hp flash-red'>" + this.game.getDisplayValueExt(fauna.hp.toFixed) + "</span>";
 				fauna.prevHp = fauna.hp;
 			}
 			var faunaMaxHp = fauna.maxHp || fauna.hp;
 			var faunaHpRatio = Math.max(0, Math.min(1, fauna.hp / faunaMaxHp));
-			this.explorerRightDiv.innerHTML = fauna.title + " lvl." + fauna.level + "<br>HP: " + hpInfo + "/" + faunaMaxHp.toFixed(0) +
+			this.explorerRightDiv.innerHTML = fauna.title + " lvl." + fauna.level + "<br>HP: " + hpInfo + "/" + this.game.getDisplayValueExt(faunaMaxHp) +
 				"<div style='width:100%;height:4px;background:#333;margin-top:2px;'>" +
 				"<div style='width:" + (faunaHpRatio * 100).toFixed(0) + "%;height:100%;background:#a44;'></div></div>" +
 				"<br>ATK: " + fauna.atk.toFixed(0) + " | DEF: " + fauna.def.toFixed(0) + " | AGI: " + fauna.agi.toFixed(0) + " | STR: " + fauna.str.toFixed(0) + " | SPD: " + fauna.spd.toFixed(0);
