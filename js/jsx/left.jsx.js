@@ -832,6 +832,9 @@ WLeftPanel = React.createClass({
             (!game.challenges.isActive("pacifism"));
         var showFastHunt = (catpower.value >= huntCost);
 
+        var map = game.village.map;
+        var canExplore = map.lastBiome && !map.currentBiome && map.squad.hp >= map.getMaxHP();
+
         var canSacrifice = game.religion.getHasUnlockedUnicornSacrifice();
         var maxAvailableSacrifices = game.religion.getAvailableUnicornSacrifices();
 
@@ -876,6 +879,13 @@ WLeftPanel = React.createClass({
                     ")"
                 )
             ),
+            $r("div", {id:"fastExploreContainer", className:"pin-link", style:{
+                display: (canExplore ? "block" : "none")
+            }},
+                $r("a", {href:"#", onClick: this.exploreLast},
+                    $I("left.explore")
+                )
+            ),
             $r("div", {id:"fastSacrificeContainer", className:"pin-link sidebar-section", style: {
                 display: (canSacrifice ? "block" : "none"),
                 visibility: (maxAvailableSacrifices >= 1 ? "visible" : "hidden")
@@ -902,6 +912,14 @@ WLeftPanel = React.createClass({
 
     huntAll: function(event){
         this.state.game.huntAll(event);
+    },
+
+    exploreLast: function(event){
+        event.preventDefault();
+        var map = this.state.game.village.map;
+        if (map.lastBiome && map.squad.hp >= map.getMaxHP()) {
+            map.currentBiome = map.lastBiome;
+        }
     },
 
     praiseAll: function(event){

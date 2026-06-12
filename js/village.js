@@ -712,6 +712,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			jobs: this.filterMetadata(this.jobs, ["name", "unlocked", "value"]),
 			biomes: this.filterMetadata(this.map.biomes, ["name", "unlocked", "val", "on", "cp"]),
 			currentBiome: this.map.currentBiome,
+			lastBiome: this.map.lastBiome,
 			hadKittenHunters: this.sim.hadKittenHunters,
 			nextKittenProgress: this.sim.nextKittenProgress,
 			map: this.map.save(),
@@ -752,6 +753,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			if (saveData.village.biomes){
 				this.loadMetadata(this.map.biomes, saveData.village.biomes);
 				this.map.currentBiome = saveData.village.currentBiome;
+				this.map.lastBiome = saveData.village.lastBiome;
 				//migrate old biome.level to biome.val / biome.on
 				for (var _bi in this.map.biomes){
 					var _biome = this.map.biomes[_bi];
@@ -1641,6 +1643,7 @@ dojo.declare("classes.village.Map", null, {
 
 	// point on map currently being explored
 	currentBiome: null,
+	lastBiome: null,
 
 	//current map id
 	activeMapId: "cath",
@@ -2104,7 +2107,7 @@ dojo.declare("classes.village.Map", null, {
 	},
 
 	getExplorationCost: function(){
-		return 0.1 * Math.pow(1.15, this.hqLevel);
+		return 0.15 * Math.pow(1.15, this.hqLevel);
 	},
 
 	getCPPerTick: function(biome){
@@ -2339,8 +2342,8 @@ dojo.declare("classes.village.Map", null, {
 		var leader = this.game.village.leader;
 		var stats = leader ? this.getLeaderCombatStats(leader) : null;
 		if (stats) {
-			this.squad.atk = stats.atk;
-			this.squad.def = stats.def;
+			this.squad.atk = stats.atk + this.game.getEffect("explorerAtk");
+			this.squad.def = stats.def + this.game.getEffect("explorerDef");
 			this.squad.agi = stats.agi;
 			this.squad.str = stats.str;
 			this.squad.spd = stats.spd;
@@ -2526,6 +2529,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		console.log("CURRENT BIOME:", biome);
 
 		map.currentBiome = biome.name;
+		map.lastBiome = biome.name;
 	},
 
 	getName: function(model){
