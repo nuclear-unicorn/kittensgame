@@ -833,6 +833,7 @@ WLeftPanel = React.createClass({
         var showFastHunt = (catpower.value >= huntCost);
 
         var map = game.village.map;
+        var lastBiomeName = map.lastBiome ? game.village.getBiome(map.lastBiome).title : "";
         var canExplore = map.lastBiome && !map.currentBiome && map.squad.hp >= map.getMaxHP();
 
         var canSacrifice = game.religion.getHasUnlockedUnicornSacrifice();
@@ -883,7 +884,7 @@ WLeftPanel = React.createClass({
                 display: (canExplore ? "block" : "none")
             }},
                 $r("a", {href:"#", onClick: this.exploreLast},
-                    $I("left.explore")
+                    $I("left.explore", [lastBiomeName])
                 )
             ),
             $r("div", {id:"fastSacrificeContainer", className:"pin-link sidebar-section", style: {

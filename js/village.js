@@ -1681,7 +1681,7 @@ dojo.declare("classes.village.Map", null, {
 		agi: { base: 0, growth: 1.25, bias: 0.8 },
 		str: { base: 0, growth: 1.25, bias: 0.8 },
 		spd: { base: 0, growth: 1.25, bias: 0.8 },
-		hp:  { base: 20, growth: 33, bias: 1.0 }
+		hp:  { base: 20, growth: 15, bias: 1.0 }
 	},
 
 	//Combat frame. Every tick frame is increased by X. There are 100 frames in a round, and every combatan can attack once per X fames adjusted for agi.

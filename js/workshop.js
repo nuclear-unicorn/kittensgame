@@ -675,7 +675,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		effects: {
 			"manpowerJobRatio" : 0.5,
 			"manpowerMax": 0,
-			"explorerAtk": 1
+			"explorerAtk": 5
 		},
 		calculateEffects: function(self, game){
 			self.effects["manpowerJobRatio"] = 0.5 * (1 + game.getEffect("weaponEfficency")); //weaponEfficency can't go beyond -1, see challenges.js for more info
@@ -695,7 +695,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		description: $I("workshop.crossbow.desc"),
 		effects: {
 			"manpowerJobRatio" : 0.25,
-			"explorerAtk": 2
+			"explorerAtk": 10
 		},
 		calculateEffects: function(self, game){
 			self.effects["manpowerJobRatio"] = 0.25 * (1 + game.getEffect("weaponEfficency")); //weaponEfficency can't go beyond -1, see challenges.js for more info
