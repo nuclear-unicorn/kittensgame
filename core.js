@@ -466,8 +466,8 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 				enabled: true,
 				unlocked: false
 			},
-			"exp": {
-				title: $I("console.filter.exp"),
+			"combat": {
+				title: $I("console.filter.combat"),
 				enabled: true,
 				unlocked: false
 			}
