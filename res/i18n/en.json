@@ -1963,6 +1963,7 @@
     "left.hunt": "Send hunters",
     "left.hunt.time": "time",
     "left.hunt.times": "times",
+    "left.explore": "Explore {0}",
     "left.praise": "Praise the sun!",
     "left.sacrifice": "Sacrifice unicorns",
 
@@ -2010,7 +2011,7 @@
     "village.btn.upgradeExplorers": "Upgrade Explorers",
     "village.btn.upgradeExplorers.desc": "Upgrading your explorers will improve squad HP, stamina and resource gain",
     "village.btn.upgradeHQ": "Upgrade HQ",
-    "village.btn.upgradeHQ.desc": "Upgrades the max limit of your expedition supplies by 5 days + 1%",
+    "village.btn.upgradeHQ.desc": "Upgrades the speed of exploration at the cost of extra catpower spent",
     "village.btn.unwrap": "Unwrap present box",
     "village.btn.unwrap.confirmation.msg": "Are you sure that you want to unwrap your present box right now? Maybe you can have a better gift by waiting a bit!",
     "village.btn.loadout.save": "Save",
