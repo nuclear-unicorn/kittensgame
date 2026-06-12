@@ -981,6 +981,7 @@
     "religion.undo.refine.complete": "אי‑הזיקוק הניב {0} {1}.",
     "religion.undo.praise.failure": "לא ניתן להחזיר את השבח שלך. שום דבר לא קורה.",
     "religion.undo.refine.incomplete": "הזיקוק יכול היה להתבטל רק חלקית. החזרת {0} {1}.",
+    "religion.undo.praise.nogain": "ההלל לשמש בוטל בהצלחה, אך לא ניתן היה להשיב אמונה.",
     "religion.zu.ivoryCitadel.desc": "משפר את ייצור חדי הקרן ב-25%, מזמן מטאורי שנהב",
     "religion.zu.ivoryTower.desc": "משפר את ייצור חדי הקרן ב-10%, מאפשר קרעי חדי קרן",
     "religion.zu.marker.desc": "מבנה מוזר עשוי מתכת לא ידועה ומשרת מטרה שאינה מזוהה.",
