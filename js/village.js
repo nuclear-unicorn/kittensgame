@@ -2591,7 +2591,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		if ((biome.on || 0) + amt <= biome.val){
 			biome.on = (biome.on || 0) + amt;
 			biome.cp = 0;
-			biome.fauna = null;
+			biome.fauna = [];
 			this.metadataHasChanged(model);
 		}
 	},
@@ -2605,7 +2605,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		if ((biome.on || 0) >= amt){
 			biome.on -= amt;
 			biome.cp = 0;
-			biome.fauna = null;
+			biome.fauna = [];
 			this.metadataHasChanged(model);
 		}
 	},
@@ -2615,7 +2615,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		if ((biome.on || 0) < biome.val){
 			biome.on = biome.val;
 			biome.cp = 0;
-			biome.fauna = null;
+			biome.fauna = [];
 			this.metadataHasChanged(model);
 		}
 	},
@@ -2625,7 +2625,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		if (biome.on){
 			biome.on = 0;
 			biome.cp = 0;
-			biome.fauna = null;
+			biome.fauna = [];
 			this.metadataHasChanged(model);
 		}
 	},
