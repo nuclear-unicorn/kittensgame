@@ -1749,6 +1749,7 @@ dojo.declare("classes.village.Map", null, {
 		title: "Village",
 		desc: "Improves exploration rate of all biomes",
 		terrainPenalty: 0.85,
+		biomePenalty: 0.85,
 		mobLevel: 1,
 		faunaPenalty: 0,
 		unlocked: true,
@@ -2045,19 +2046,30 @@ dojo.declare("classes.village.Map", null, {
 			if (!biome.fauna || !biome.fauna.length){
 				var spawnChance = 1000 * (biome.faunaPenalty || 1.0);
 				if (this.game.rand(10000) <= spawnChance){
-					var mobLevel = Math.round((biome.mobLevel + biome.on) * (1 + biome.on * 0.12 ) * Math.pow(1.05, (biome.on || 0)));	//adjust by +- 15%
+					//use power law instead of exp law to avoid broken levels on biomes 20+
+					var powerLawMultiplier = biome.biomePenalty || 1.0;
+
+					var offset = Math.round(biome.mobLevel * Math.pow(biome.on, 0.7 * powerLawMultiplier)); 
+					var mobLevel = Math.round(
+						biome.mobLevel / 3 + 
+						(1.8 * Math.pow(biome.on, 1.60 * powerLawMultiplier) + offset) * 
+						(1 + (Math.random() * 2 - 1) * 0.15)
+					);
+					if (mobLevel <= 0) {
+						mobLevel = 1;
+					}
 					
 					
-					var hp = Math.round((this.game.rand(10) + 5) * Math.pow(1.12, mobLevel));
+					var hp = Math.round((15 * Math.pow(mobLevel, 1.25)) * (1 + (Math.random() * 2 - 1) * 0.15));
 					biome.fauna = [{
 						title: faunaName,
 						level: mobLevel,
-						exp: Math.round(10 * Math.pow(1.1, mobLevel)),
+						exp: Math.round(8 * Math.pow(mobLevel, 1.50)),
 						prevHp: hp,
 						maxHp: hp,
 						hp: hp,
-						atk: 2.5 * Math.pow(1.05, mobLevel),
-						def: (1 + mobLevel) * Math.pow(1.01, mobLevel),
+						atk: Math.round(1.5 * Math.pow(mobLevel, 1.05)),
+						def: Math.round(1.5 * Math.pow(mobLevel, 1.1)),
 						str: (1 + mobLevel) * Math.pow(1.01, mobLevel),
 						agi: (1 + mobLevel) * Math.pow(1.01, mobLevel),
 						spd: (1 + mobLevel) * Math.pow(1.01, mobLevel)
@@ -2110,7 +2122,7 @@ dojo.declare("classes.village.Map", null, {
 	},
 
 	getExplorationCost: function(){
-		return 0.15 * Math.pow(1.15, this.hqLevel);
+		return 0.15 * Math.pow(this.hqLevel, 1.7);
 	},
 
 	getCPPerTick: function(biome){
@@ -2179,14 +2191,16 @@ dojo.declare("classes.village.Map", null, {
 
 			var cpPerTick = this.getCPPerTick(biome);
 			biome.cp += cpPerTick;
+			//biome.cp = Math.min(biome.cp, toLevel);
 
-			if (biome.cp >= toLevel && biome.on == biome.val){
-				this.onLevelUp(biome);
-
-				//unlock next biome if level cap reached
-				//this.currentBiome = null;
-				//this.game.msg("Your explorers have returned", "important", "explore");
-            }
+			if (biome.cp >= toLevel){
+				if (biome.on == biome.val){
+					this.onLevelUp(biome);
+				} else {
+					biome.cp = 0;
+					this.grantBiomeRewards(biome);
+				}
+			}
 		}
 	},
 
@@ -2376,21 +2390,14 @@ dojo.declare("classes.village.Map", null, {
 		//console.log(src, "attacks", tgt, "hit chance:", hitChance);
 		if (this.game.rand(100) <= hitChance) {
 			tgt.hp -= src.atk;
+
+			if (tgt.hp < 0){
+				tgt.hp = 0;
+			}
 		}
 	},
 
-	onLevelUp: function(biome){
-		biome.cp = 0;
-		if ((biome.on || 0) === (biome.val || 0)) {
-			biome.on = (biome.on || 0) + 1;
-		}
-		biome.val = (biome.val || 0) + 1;
-
-		if (biome.unlocks){
-			this.game.unlock(biome.unlocks);
-		}
-
-		//calculate reward for exploration
+	grantBiomeRewards: function(biome){
 		if (!biome.rewards){
 			return;
 		}
@@ -2409,6 +2416,20 @@ dojo.declare("classes.village.Map", null, {
 				this.game.msg(msg, type, "explore");
 			}
 		}
+	},
+
+	onLevelUp: function(biome){
+		biome.cp = 0;
+		if ((biome.on || 0) === (biome.val || 0)) {
+			biome.on = (biome.on || 0) + 1;
+		}
+		biome.val = (biome.val || 0) + 1;
+
+		if (biome.unlocks){
+			this.game.unlock(biome.unlocks);
+		}
+
+		this.grantBiomeRewards(biome);
 	},
 
 	getBiomeRewards: function(biome){
