@@ -2124,7 +2124,7 @@ dojo.declare("classes.village.Map", null, {
 			playerLvl = this.game.village.getCombatLevel(leader.combatExp);
 		}
 
-		var maxFaunaLevel = biome.fauna[0].level;
+		var maxFaunaLevel = biome.fauna[0] ? biome.fauna[0].level : 0;
 		for (var fi = 1; fi < biome.fauna.length; fi++) {
 			if (biome.fauna[fi].level > maxFaunaLevel) {
 				maxFaunaLevel = biome.fauna[fi].level;
