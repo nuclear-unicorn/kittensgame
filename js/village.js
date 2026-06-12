@@ -2180,7 +2180,7 @@ dojo.declare("classes.village.Map", null, {
 			var cpPerTick = this.getCPPerTick(biome);
 			biome.cp += cpPerTick;
 
-			if (biome.cp >= toLevel){
+			if (biome.cp >= toLevel && biome.on == biome.val){
 				this.onLevelUp(biome);
 
 				//unlock next biome if level cap reached
