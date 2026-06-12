@@ -362,6 +362,10 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             //Else, undoState doesn't exist currently:
             return "";
         });
+
+        UIUtils.attachTooltip(game, $("#schemeTip")[0], 0, 20, function() {
+            return "<div class='option-tooltip'>" + $I("ui.option.scheme.tip") + "</div>";
+        });
     },
 
     render: function(){
@@ -948,7 +952,6 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#optionNotation").text($I("ui.option.notation"));
         $("#optionScheme").text($I("ui.option.scheme"));
         $("#schemeRelock").text($I("ui.option.scheme.relock"));
-        $("#schemeTip").text($I("ui.option.scheme.tip"));
         $("#optionMore").text($I("ui.option.more"));
         $("#optionBatchSize").text($I("ui.option.batch.size"));
         $("#exportButton").attr("value", $I("ui.option.export.button"));
