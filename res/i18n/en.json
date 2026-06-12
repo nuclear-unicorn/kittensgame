@@ -2028,6 +2028,7 @@
     "village.census.exp.desc": "Kittens earn exp by working.",
     "village.census.exp.notready": "Not enough exp to do anything special.",
     "village.census.exp.ready": "You can spend some exp and gold to promote this kitten.",
+    "village.explore.levelup": "Leader reached combat level {0}!",
     "village.census.filter.all": "All jobs",
     "village.census.filter.unemployed": "Jobless",
     "village.census.lbl.festival.duration": "Festival duration",

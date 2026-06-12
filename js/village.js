@@ -767,8 +767,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 					}
 				}
 			}
-			this.sim.hadKittenHunters = (saveData.village.hadKittenHunters === undefined)? true: saveData.village.hadKittenHunters;
-			this.sim.nextKittenProgress = saveData.village.nextKittenProgress ||0;
+			this.sim.hadKittenHunters = (saveData.village.hadKittenHunters === undefined) ? true: saveData.village.hadKittenHunters;
+			this.sim.nextKittenProgress = saveData.village.nextKittenProgress || 0;
 			if (saveData.village.map){
 				this.map.load(saveData.village.map);
 			}
@@ -1736,7 +1736,7 @@ dojo.declare("classes.village.Map", null, {
 		},{
 			name: "space",
 			title: "Space",
-			description: "Outer space map description",
+			description: "Black stars and endless seas",
 			biomes: ["cath", "redmoon"],
 			unlocked: false
 		},
@@ -1983,7 +1983,7 @@ dojo.declare("classes.village.Map", null, {
 	//TODO: account for a signifficant penalty for late game biomes
 	//var toLevel = 100 * (1 + 1.1 * Math.pow((distance - 1), 2.8)) * Math.pow(data.level + 1, 1.18 + 0.1 * distance);
 	toLevel: function(biome){
-		return 100 * (1 + 1.1 * Math.pow((biome.val || 0) + 1, 1.18 + 0.1 * biome.terrainPenalty)) * biome.terrainPenalty;
+		return 100 * (1 + 1.1 * Math.pow((biome.on || 0) + 1, 1.18 + 0.1 * biome.terrainPenalty)) * biome.terrainPenalty;
 	},
 
 	getMap: function(name){
@@ -2124,7 +2124,7 @@ dojo.declare("classes.village.Map", null, {
 			playerLvl = this.game.village.getCombatLevel(leader.combatExp);
 		}
 
-		var maxFaunaLevel = biome.fauna[0] ? biome.fauna[0].level : 0;
+		var maxFaunaLevel = (biome.fauna && biome.fauna.length) ? biome.fauna[0].level : 0;
 		for (var fi = 1; fi < biome.fauna.length; fi++) {
 			if (biome.fauna[fi].level > maxFaunaLevel) {
 				maxFaunaLevel = biome.fauna[fi].level;
@@ -2229,6 +2229,10 @@ dojo.declare("classes.village.Map", null, {
 				var newExp = this.getKillExp(playerLvl, this.squad.efficiency || 1.0, fauna.exp, fauna.level);
 				this.game.msg("You have killed " + fauna.title + ", +" + newExp + "xp", "important", "explore");
 				leader.combatExp += newExp;
+				var newPlayerLvl = this.game.village.getCombatLevel(leader.combatExp);
+				if (newPlayerLvl > playerLvl) {
+					this.game.msg($I("village.explore.levelup", [newPlayerLvl]), "important", "explore");
+				}
 			}
 		}
 	},
@@ -2335,8 +2339,16 @@ dojo.declare("classes.village.Map", null, {
 		var stats = {};
 		for (var stat in this.leaderStatIds) {
 			var statID = this.leaderStatIds[stat];
-			var cfg = this.leaderStatConfigs[stat];
+			var cfg = dojo.clone(this.leaderStatConfigs[stat]);
+			if (!leader.trait){
+				cfg.bias += 0.05;
+			}
 			stats[stat] = this.getStatAtLevel(leader.seed, lvl, statID, cfg);
+
+			if (stats[stat] == 0) {
+				//safe switch to not gimp new leader
+				stats[stat] = 1;
+			}
 		}
 		return stats;
 	},
@@ -2579,6 +2591,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		if ((biome.on || 0) + amt <= biome.val){
 			biome.on = (biome.on || 0) + amt;
 			biome.cp = 0;
+			biome.fauna = null;
 			this.metadataHasChanged(model);
 		}
 	},
@@ -2592,6 +2605,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		if ((biome.on || 0) >= amt){
 			biome.on -= amt;
 			biome.cp = 0;
+			biome.fauna = null;
 			this.metadataHasChanged(model);
 		}
 	},
@@ -2601,6 +2615,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		if ((biome.on || 0) < biome.val){
 			biome.on = biome.val;
 			biome.cp = 0;
+			biome.fauna = null;
 			this.metadataHasChanged(model);
 		}
 	},
@@ -2610,6 +2625,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		if (biome.on){
 			biome.on = 0;
 			biome.cp = 0;
+			biome.fauna = null;
 			this.metadataHasChanged(model);
 		}
 	},
