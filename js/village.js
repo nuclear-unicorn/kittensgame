@@ -2227,7 +2227,7 @@ dojo.declare("classes.village.Map", null, {
 				var fauna = killedFauna[i];
 				var playerLvl = this.game.village.getCombatLevel(leader.combatExp);
 				var newExp = this.getKillExp(playerLvl, this.squad.efficiency || 1.0, fauna.exp, fauna.level);
-				this.game.msg("You have killed " + fauna.title + ", +" + newExp + "xp", "important", "explore");
+				this.game.msg("You have killed " + fauna.title + ", +" + newExp + "xp", null, "combat");
 				leader.combatExp += newExp;
 				var newPlayerLvl = this.game.village.getCombatLevel(leader.combatExp);
 				if (newPlayerLvl > playerLvl) {

@@ -1986,6 +1986,8 @@
     "console.filter.blackcoin": "Blackcoin Transactions",
     "console.filter.festival": "Festivals",
     "console.filter.undo": "Undo Action",
+    "console.filter.explore": "Exploration",
+    "console.filter.combat": "Combat Log",
 
     "village.bonus.desc.chemist": "Chemical crafting bonus",
     "village.bonus.desc.engineer": "Crafting bonus",
