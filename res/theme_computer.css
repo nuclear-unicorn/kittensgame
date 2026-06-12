@@ -196,11 +196,11 @@ body.scheme_computer {
 }
 .scheme_computer #optionsDiv input[type="checkbox"] + label:before {
 	content: "\25FE"; /* BLACK MEDIUM SMALL SQUARE */
-	font: 18px sans-serif;
+	font: 16px sans-serif;
 }
 .scheme_computer #optionsDiv input[type="checkbox"]:checked + label:before {
 	content: "\25FD"; /* WHITE MEDIUM SMALL SQUARE	*/
-	font: 18px sans-serif;
+	font: 16px sans-serif;
 }
 .scheme_computer .dialog input[type="button"] {
 	margin-left: 7px;
