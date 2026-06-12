@@ -320,7 +320,15 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		description: $I("challendge.islands.desc"),
 		effectDesc: $I("challendge.islands.effect.desc"),
 
-		//islands: [],
+		islands: [{
+			name: "lush",
+			label: "challendge.islands.lush.label",
+			description: "challendge.islands.lush.description",
+			effects: {
+				"catnipChallengeReductionRatio": 0.02,
+				"woodChallengeReductionRatio" : 0.02,
+			},
+		}],
 		//islandEffects: {},
 
 		stackOptions: {
@@ -345,8 +353,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		
 		calculateEffects: function(self, game) {
 			if (self.active) {
-				self.effects["catnipChallengeReductionRatio"] = -0.8;
-				self.effects["woodChallengeReductionRatio"] = -0.8;
+				self.effects["catnipChallengeReductionRatio"] = -0.25;
+				self.effects["woodChallengeReductionRatio"] = -0.6;
 				self.effects["mineralsChallengeReductionRatio"] = -0.8;
 				self.effects["manpowerChallengeReductionRatio"] = -0.8;
 				self.effects["goldChallengeReductionRatio"] = -0.8;
@@ -363,12 +371,12 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			}
 		},
 
-		createNewIsland: function(){
+		createNewIsland: function(type){
 
 		},
 
 		checkCompletionCondition: function(game) {
-			return game.resPool.get("ship").value >= 1;
+			return game.resPool.get("tanker").value >= 1;
 		}
 	},{
 		name: "unicornTears",
