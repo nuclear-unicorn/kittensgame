@@ -1722,8 +1722,6 @@
     "ui.kgnet.login": "Přihlásit se",
     "ui.kgnet.online": "Online",
     "ui.kgnet.save.current": "aktuální",
-    "ui.kgnet.save.save": "Uložit",
-    "ui.kgnet.save.load": "Načíst",
     "ui.kgnet.sync": "Synchronizovat cloudové uložené hry",
     "ui.kgnet.instructional": "<- Klikněte na tento odkaz pro začátek. Poté, co se data načtou, klikněte na 'Vytvořit uložení'.",
     "ui.toggle.researched": "Nezobrazovat vyzkoumané",
