@@ -628,6 +628,21 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             this.game.tooltipUpdateFunc();
         }
 
+		// clear tooltips/highlights if their owning element doesn't exist
+		// anymore. if an element disappears (i.e. is removed from the DOM),
+		// its onmouseout handler does not fire, so the highlights/tooltips
+		// would get stuck.
+		if (this.game.tooltipOwnerDomNode) {
+			if (!document.contains(this.game.tooltipOwnerDomNode)) {
+				UIUtils.hideTooltip(this.game);
+			}
+		}
+		if (this.game.selectedBuildingDomNode) {
+			if (!document.contains(this.game.selectedBuildingDomNode)) {
+				this.game.clearSelectedObject();
+			}
+		}
+
         //wat
         /*React.render($r(WLeftPanel, {
             game: this.game

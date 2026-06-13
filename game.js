@@ -1927,12 +1927,15 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	//current building selected in the Building tab by a mouse cursor, should affect resource table rendering
 	//TODO: move me to UI
 	selectedBuilding: null,
-	setSelectedObject: function(object) {
+	selectedBuildingDomNode: null,
+	setSelectedObject: function(object, domNode) {
 		this.selectedBuilding = object;
+		this.selectedBuildingDomNode = domNode;
 		this._publish("ui/update", this);
 	},
 	clearSelectedObject: function() {
 		this.selectedBuilding = null;
+		this.selectedBuildingDomNode = null;
 		this._publish("ui/update", this);
 	},
 
