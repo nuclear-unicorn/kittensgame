@@ -1748,8 +1748,6 @@
     "ui.kgnet.login": "ログイン",
     "ui.kgnet.online": "オンライン",
     "ui.kgnet.save.current": "使用中",
-    "ui.kgnet.save.save": "セーブ",
-    "ui.kgnet.save.load": "ロード",
     "ui.kgnet.sync": "クラウドセーブの同期",
     "ui.kgnet.instructional": "<- 開始するには、このリンクをクリックします。データがロードされたら、「セーブデータを作成」をクリックします。",
     "ui.toggle.researched": "研究済みと切り替える",

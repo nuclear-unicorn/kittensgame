@@ -906,7 +906,6 @@
     "trade.bcoin.sell.desc": "ขายเหรียญมืดของคุณและรับวัตถุโบราณกลับมา",
     "trade.bcoin.sell.msg": "คุณมีวัตถุโบราณ {0} ชิ้น",
     "ui.filter.all": "ทั้งหมด",
-    "ui.kgnet.save.save": "บันทึก",
     "ui.loading.msg.1": "การปรับเทียบซิกกูแรต",
     "ui.loading.msg.14": "การขุดเหรียญมืด",
     "ui.energy.tooltip": "พลังงาน",
