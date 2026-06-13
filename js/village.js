@@ -2345,9 +2345,10 @@ dojo.declare("classes.village.Map", null, {
 		if (!leader) {
 			return null;
 		}
-		if (!leader.seed){
-			leader.seed = leader._normalizeSeed();
-			leader._generateAttributes(leader._createSeededRand(leader.seed));
+		var seed = leader.seed;
+
+		if (!seed){
+			seed = this.xmur3(leader.name + ":" + leader.surname);
 		}
 		var lvl = this.game.village.getCombatLevel(leader.combatExp);
 		var stats = {};
@@ -2357,10 +2358,9 @@ dojo.declare("classes.village.Map", null, {
 			if (!leader.trait){
 				cfg.bias += 0.05;
 			}
-			stats[stat] = this.getStatAtLevel(leader.seed, lvl, statID, cfg);
+			stats[stat] = this.getStatAtLevel(seed, lvl, statID, cfg);
 
 			if (stats[stat] == 0) {
-				//safe switch to not gimp new leader
 				stats[stat] = 1;
 			}
 		}
