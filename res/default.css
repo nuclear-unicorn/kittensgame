@@ -1926,6 +1926,27 @@ span.genericWarning {
     -webkit-mask: url('img/left.svg') no-repeat center / contain;
 }
 
+.svg-icon.res-icon {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.trade-icons {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-right: 4px;
+    text-decoration: none;
+}
+
+.trade-arrow {
+    margin: 0 1px;
+    letter-spacing: 1px;
+    opacity: 0.4;
+    font-size: 0.85em;
+    vertical-align: middle;
+}
+
 #headerToolbar {
     display: flex;
     height: 100%;
