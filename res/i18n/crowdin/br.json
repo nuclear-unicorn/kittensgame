@@ -1760,7 +1760,6 @@
     "ui.option.scheme": "Esquema de Cores:",
     "ui.option.scheme.relock": "Rebloquear temas",
     "ui.option.scheme.tip": "Temas que você não pode selecionar ainda têm de ser permanentemente desbloqueados por ações específicas.",
-    "ui.option.workers": "Usar trabalhador web <i> (o jogo funciona corretamente na aba de fundo, pode causar problemas de performance) <br> Você precisa atualizar a página no navegador para surtir efeito.</i>",
     "ui.option.force.high.precision": "Usar precisão alta para valores dos recursos",
     "ui.option.use.per.second.values": "Use valores por segundo <i>(caso contrário, os valores serão por tique)</i>",
     "ui.option.use.percentage.resource.values": "Usar valores percentuais de produção de recursos",
