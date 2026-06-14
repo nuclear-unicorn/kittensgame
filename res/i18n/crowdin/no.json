@@ -1803,7 +1803,6 @@
     "ui.option.scheme": "Fargetema",
     "ui.option.scheme.relock": "Lås opp temaer",
     "ui.option.scheme.tip": "Temaer du ikke kan velge ennå kan låses opp permanent ved spesifikke handlinger.",
-    "ui.option.workers": "Bruk web worker <i>(spillet fungerer korrekt i bakgrunnsfane, kan gi ytelsesproblemer)</i><br>Du må oppdatere nettlesersiden for at denne innstillingen skal tre i kraft.",
     "ui.option.force.high.precision": "Bruk høy presisjon for ressursverdier",
     "ui.option.use.per.second.values": "Bruk per sekund-verdier <i>(ellers per tick)</i>",
     "ui.option.use.percentage.resource.values": "Bruk prosentverdier for ressursproduksjon",
