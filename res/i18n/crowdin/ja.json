@@ -1786,7 +1786,6 @@
     "ui.option.scheme": "カラーテーマ:",
     "ui.option.scheme.relock": "テーマを未開放状態にする",
     "ui.option.scheme.tip": "まだ選択できないテーマも、特定の行動を取ることで永久にアンロックできます。",
-    "ui.option.workers": "Web Workerを使用する\n<i>(バックグラウンドタブでも正しくゲームが動作するようになりますが、パフォーマンスの問題が発生するかもしれません)<br>この設定の変更後はページを再読み込みしてください。</i>",
     "ui.option.force.high.precision": "リソース値に高精度計算を使用する",
     "ui.option.use.per.second.values": "表示時に1秒あたりの値を表示します <i>（そうでない場合は1ティックあたり）</i>",
     "ui.option.use.percentage.resource.values": "資源生産量をパーセンテージ値で表示する",
