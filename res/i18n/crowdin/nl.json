@@ -1790,7 +1790,6 @@
     "ui.option.scheme": "Kleurenthema:",
     "ui.option.scheme.relock": "Vergrendel thema's opnieuw",
     "ui.option.scheme.tip": "Thema's die je nog niet kunt selecteren kunnen permanent ontgrendeld worden door specifieke acties.",
-    "ui.option.workers": "Gebruik web worker\n<i>(spel werkt correct in achtergrond tab, kan prestatieproblemen veroorzaken)<br>Je moet de browserpagina verversen om deze instelling effect te laten hebben.</i>",
     "ui.option.force.high.precision": "Gebruik hoge precizie voor materiaalwaarden",
     "ui.option.use.per.second.values": "Gebruik waarden per seconde <i>(anders per tick)</i>",
     "ui.option.use.percentage.resource.values": "Gebruik percentage grondstofproductiewaarden",
