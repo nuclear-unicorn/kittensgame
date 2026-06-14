@@ -1772,7 +1772,6 @@
     "ui.option.scheme": "Motyw graficzny:",
     "ui.option.scheme.relock": "Odblokuj motywy",
     "ui.option.scheme.tip": "Motywy, których nie możesz jeszcze wybrać, mogą być trwale odblokowane przez konkretne działania.",
-    "ui.option.workers": "Uruchamiaj silnik gry w osobnym wątku (web worker)\n<i>(gra działa poprawnie w karcie w tle, ale może powodować problemy z wydajnością)<br>Musisz odświeżyć stronę w przeglądarce, aby to ustawienie zaczęło obowiązywać.</i>",
     "ui.option.force.high.precision": "Użyj wysokiej dokładności dla wartości zasobów",
     "ui.option.use.per.second.values": "Użyj wartości na sekundę <i>(inaczej co tick)</i>",
     "ui.option.use.percentage.resource.values": "Użyj wyrażenia wartości procentowych dla surowców",
