@@ -2979,7 +2979,7 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 			var fauna =  biome.fauna[0];
 			var hpInfo = "<span class='hp'>" + this.game.getDisplayValueExt(fauna.hp) + "</span>";
 			if (fauna.hp != fauna.prevHp){
-				hpInfo = "<span class='hp flash-red'>" + this.game.getDisplayValueExt(fauna.hp.toFixed) + "</span>";
+				hpInfo = "<span class='hp flash-red'>" + this.game.getDisplayValueExt(fauna.hp) + "</span>";
 				fauna.prevHp = fauna.hp;
 			}
 			var faunaMaxHp = fauna.maxHp || fauna.hp;
