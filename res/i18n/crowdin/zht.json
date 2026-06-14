@@ -1837,7 +1837,6 @@
     "ui.option.scheme": "佈景主題:",
     "ui.option.scheme.relock": "重新鎖定主題",
     "ui.option.scheme.tip": "特定行動可永久解鎖目前無法選擇的主題",
-    "ui.option.workers": "啟用 web worker\n<i>(遊戲可以在背景執行，可這能會影響效能)<br>您需要刷新頁面使該設置生效</i>",
     "ui.option.force.high.precision": "使用高精度資源值",
     "ui.option.use.per.second.values": "啟用顯示每秒資源變化 <i>(預設每tick顯示資源變化)</i>",
     "ui.option.use.percentage.resource.values": "以百分比顯示資源變化",
