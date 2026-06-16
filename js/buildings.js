@@ -2646,13 +2646,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				if (key == "unlocked" || key == "jammed" /*isAutomationEnabled is true by default*/){
 					return value === false ? undefined: value;
 				}
-
-				if (key == "name"){
-					console.log("name:", value);
-				}
-				if (key == "isAutomationEnabled"){
-					console.log(value);
-				}
 				return value;
 			}
 		);
