@@ -778,6 +778,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	},
 	{
 		name: "warehouse",
+		isAutomationEnabled: null,
 		stages: [
 			{
 				label: $I("buildings.warehouse.label"),
@@ -816,10 +817,12 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					"moonBaseStorageBonus": 0,
 					"planetCrackerStorageBonus": 0,
 					"cryostationStorageBonus": 0,
-					"energyConsumption": 0
+					"energyConsumption": 0,
+					"tradeVolume": 0
 				},
 				stageUnlocked: true,
-				togglable: true
+				togglable: true,
+				// isAutomationEnabled: null
 			}
 		],
 		calculateEffects: function(self, game){
@@ -845,7 +848,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					"moonBaseStorageBonus": 0.0085,
 					"planetCrackerStorageBonus": 0.0085,
 					"cryostationStorageBonus": 0.0085,
-					"energyConsumption": 5
+					"energyConsumption": 5,
+					"tradeVolume": 0
 			};
 			if (self.on >= 10) {
 				//The first 10 Spaceports each cost 5Wt to run.
@@ -853,6 +857,17 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				//The 12th Spaceport costs 7Wt to run.
 				//etc.
 				effects[ "energyConsumption" ] = 0.5 * (self.on - 9) + 45 / self.on;
+			}
+			if (game.workshop.get("transportSuperposition").researched && self.isAutomationEnabled === null){
+				self.isAutomationEnabled = true;
+				stageMeta.isAutomationEnabled = true;
+			} else if (!game.workshop.get("transportSuperposition").researched && self.isAutomationEnabled !== null) {
+				self.isAutomationEnabled = null;
+			}
+			if (self.isAutomationEnabled){
+				effects["tradeVolume"] = 0.5;
+			} else {
+				effects["tradeVolume"] = 0;
 			}
                 stageMeta.effects = effects;
             }
@@ -2627,6 +2642,13 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				}
 				if (key == "unlocked" || key == "jammed" /*isAutomationEnabled is true by default*/){
 					return value === false ? undefined: value;
+				}
+
+				if (key == "name"){
+					console.log("name:", value);
+				}
+				if (key == "isAutomationEnabled"){
+					console.log(value);
 				}
 				return value;
 			}

@@ -800,6 +800,24 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		},
 		flavor: $I("workshop.caravanserai.flavor")
 	},
+	{
+		name: "transportSuperposition",
+		label: $I("workshop.transportSuperposition.label"),
+		description: $I("workshop.transportSuperposition.desc"),
+		effects: {
+		},
+		prices:[
+			{ name : "ship", val: 2500},
+			{ name : "relic", val: 25000 },
+			{ name : "spice", val: 10000 }
+		],
+		upgrades: {
+			buildings: ["warehouse"],
+			stages: [{bld:"warehouse", stage:1}],
+		},
+		flavor: $I("workshop.transportSuperposition.flavor")
+	
+	},
 	//--------------------- stuff ----------------------
 	{
 		name: "advancedRefinement",

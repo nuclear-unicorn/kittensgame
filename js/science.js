@@ -745,7 +745,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name : "science", val: 235000}
 		],
 		unlocks: {
-			upgrades: ["energyRifts", "lhc"]
+			upgrades: ["energyRifts", "lhc", "transportSuperposition"]
 			// tech: ["artificialGravity"] -- see SPACE_EXPL feature flag
 		}
 	}, {
