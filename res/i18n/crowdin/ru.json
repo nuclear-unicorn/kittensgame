@@ -1743,8 +1743,6 @@
     "ui.kgnet.login": "Войти",
     "ui.kgnet.online": "Онлайн",
     "ui.kgnet.save.current": "текущий",
-    "ui.kgnet.save.save": "Сохранить",
-    "ui.kgnet.save.load": "Загрузить",
     "ui.kgnet.sync": "Синхронизация облачных сохранений",
     "ui.kgnet.instructional": "<- Нажмите на эту ссылку, чтобы начать. После загрузки данных нажмите на кнопку \"Создать сохранение\".",
     "ui.toggle.researched": "Спрятать изученное",

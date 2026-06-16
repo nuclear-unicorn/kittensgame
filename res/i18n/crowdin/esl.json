@@ -1722,8 +1722,6 @@
     "ui.kgnet.login": "Iniciar Sesión",
     "ui.kgnet.online": "En línea",
     "ui.kgnet.save.current": "actual",
-    "ui.kgnet.save.save": "Guardar",
-    "ui.kgnet.save.load": "Cargar",
     "ui.kgnet.sync": "Sincronizar guardado en la nube",
     "ui.kgnet.instructional": "← Haz clic en este enlace para comenzar. Una vez que carguen los datos, haz clic en \"Crear datos de guardado\".",
     "ui.toggle.researched": "Accionar investigado",

@@ -762,9 +762,11 @@ WPins = React.createClass({
 
             if (race.pinned){
                 pins.push({
-                    title: $I("left.trade.do", [race.title]),
-                    handler: function(race){ 
-                        this.props.game.diplomacy.tradeAll(race); 
+                    race: race,
+                    buy: race.buys[0].name,
+                    sell: race.sells[0].name,
+                    handler: function(race){
+                        this.props.game.diplomacy.tradeAll(race);
                     }.bind(this, race)
                 });
             }
@@ -785,20 +787,44 @@ WPins = React.createClass({
         }
         return pins;
     },
+    //Maps a traded resource to its svg icon; slab/scaffold reuse minerals/wood as proxies.
+    tradeIcons: {minerals: "minerals", iron: "iron", wood: "wood", catnip: "catnip",
+                 titanium: "titanium", coal: "coal", uranium: "uranium", ivory: "ivory",
+                 slab: "minerals", scaffold: "wood"},
+
+    //Returns the masked icon for a resource, or null when no icon is mapped (e.g. leviathan trades).
+    renderResource: function(name){
+        var icon = this.tradeIcons[name];
+        if (!icon){ return null; }
+        return $r("div", {
+            className: "svg-icon res-icon",
+            style: {WebkitMask: "url('res/img/resources/" + icon + ".svg') no-repeat center / contain",
+                    mask: "url('res/img/resources/" + icon + ".svg') no-repeat center / contain"}
+        });
+    },
+
     render: function(){
         var pins = this.getPins();
         var pinLinks = [];
         for (var i in pins){
             var pin = pins[i];
-            if (pin.highlight) {
-                pin.title = "> " + pin.title + " <";
+            var content;
+            if (pin.race){
+                var buy = this.renderResource(pin.buy);
+                var sell = this.renderResource(pin.sell);
+                //Arrow only makes sense between two icons; skip it otherwise.
+                var arrow = buy && sell ? $r("span", {className: "trade-arrow"}, "··") : null;
+                content = [
+                    $r("span", {className: "trade-icons"}, [buy, arrow, sell]),
+                    $r("span", null, $I("left.trade") + " " + pin.race.title)
+                ];
+            } else {
+                content = pin.title;
             }
             pinLinks.push(
                 $r("div", {className:"pin-link"},
-                    $r("a", {href:"#", onClick: pin.handler},
-                        pin.title
-                    )
-                )   
+                    $r("a", {href:"#", onClick: pin.handler}, content)
+                )
             );
         }
         return (
