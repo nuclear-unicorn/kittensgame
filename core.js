@@ -1878,9 +1878,6 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 	handleToggleAutomationLinkClick: function(model) {
 		var building = model.metadata;
 		building.isAutomationEnabled = !building.isAutomationEnabled;
-		if (building.stages){
-			model.metaAccessor.meta.isAutomationEnabled = building.isAutomationEnabled; //stage hack
-		}
 		this.game.upgrade({buildings: [building.name]});
 	}
 });

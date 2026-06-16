@@ -858,6 +858,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				//etc.
 				effects[ "energyConsumption" ] = 0.5 * (self.on - 9) + 45 / self.on;
 			}
+			if (game.workshop.get("transportSuperposition").researched){
+				stageMeta.description = $I("buildings.spaceport.desc") + "<br>" + $I("buildings.spaceport.desc.automation");
+			}
 			if (game.workshop.get("transportSuperposition").researched && self.isAutomationEnabled === null){
 				self.isAutomationEnabled = true;
 				stageMeta.isAutomationEnabled = true;
@@ -3236,6 +3239,25 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 
 		return stageLinks;
 	},
+
+	getDescription: function(model){
+		if (model.metadata.stages){
+			description = model.metaAccessor.meta.stages[model.metaAccessor.meta.stage].description;
+			return typeof(description) != "undefined" ? description : "";
+		}
+		var description = model.metadata.description;
+		return typeof(description) != "undefined" ? description : "";
+	},
+
+	handleToggleAutomationLinkClick: function(model) {
+		var building = model.metadata;
+		building.isAutomationEnabled = !building.isAutomationEnabled;
+		if (building.stages){
+			model.metaAccessor.meta.isAutomationEnabled = building.isAutomationEnabled; //stage hack
+		}
+		this.game.upgrade({buildings: [building.name]});
+	},
+
 
 	downgrade: function(model) {
 		if (this.game.opts.noConfirm) {
