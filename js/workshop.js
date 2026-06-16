@@ -801,6 +801,27 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		flavor: $I("workshop.caravanserai.flavor")
 	},
 	{
+		name: "freightfulExchange",
+		label: $I("workshop.freightfulExchange.label"),
+		description: $I("workshop.freightfulExchange.desc"),
+		effects: {
+		},
+		prices:[
+			{ name : "ship", val: 2500},
+			{ name : "relic", val: 25000 },
+			{ name : "spice", val: 10000 }
+		],
+		upgrades: {
+			buildings: ["warehouse"],
+			stages: [{bld:"warehouse", stage:1}],
+		},
+		unlocks:{
+			upgrades: ["transportSuperposition"]
+		}
+		// flavor: $I("workshop.transportSuperposition.flavor")
+	
+	},
+	{
 		name: "transportSuperposition",
 		label: $I("workshop.transportSuperposition.label"),
 		description: $I("workshop.transportSuperposition.desc"),
@@ -815,8 +836,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			buildings: ["warehouse"],
 			stages: [{bld:"warehouse", stage:1}],
 		},
-		flavor: $I("workshop.transportSuperposition.flavor")
-	
+		flavor: $I("workshop.transportSuperposition.flavor"),
+		evaluateLocks: function(game){
+			return game.workshop.get("freightfulExchange").researched && game.science.get("dimensionalPhysics").researched;
+		}
 	},
 	//--------------------- stuff ----------------------
 	{

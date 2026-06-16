@@ -858,17 +858,17 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				//etc.
 				effects[ "energyConsumption" ] = 0.5 * (self.on - 9) + 45 / self.on;
 			}
-			if (game.workshop.get("transportSuperposition").researched){
+			if (game.workshop.get("freightfulExchange").researched){
 				stageMeta.description = $I("buildings.spaceport.desc") + "<br>" + $I("buildings.spaceport.desc.automation");
 			}
-			if (game.workshop.get("transportSuperposition").researched && self.isAutomationEnabled === null){
+			if (game.workshop.get("freightfulExchange").researched && self.isAutomationEnabled === null){
 				self.isAutomationEnabled = true;
 				stageMeta.isAutomationEnabled = true;
-			} else if (!game.workshop.get("transportSuperposition").researched && self.isAutomationEnabled !== null) {
+			} else if (!game.workshop.get("freightfulExchange").researched && self.isAutomationEnabled !== null) {
 				self.isAutomationEnabled = null;
 			}
 			if (self.isAutomationEnabled){
-				effects["tradeVolume"] = 0.5;
+				effects["tradeVolume"] = 0.5 + (game.workshop.get("transportSuperposition").researched? 0.5 : 0);
 			} else {
 				effects["tradeVolume"] = 0;
 			}
@@ -877,6 +877,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		upgrades: {
 			spaceBuilding: ["moonBase", "planetCracker", "cryostation"]
+		},
+		unlocks: {
+			upgrades: ["transportSuperposition"]
 		},
 		flavor: $I("buildings.warehouse.flavor"),
 		unlockScheme: {
