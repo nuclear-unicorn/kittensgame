@@ -362,6 +362,10 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             //Else, undoState doesn't exist currently:
             return "";
         });
+
+        UIUtils.attachTooltip(game, $("#schemeTip")[0], 0, 20, function() {
+            return "<div class='option-tooltip'>" + $I("ui.option.scheme.tip") + "</div>";
+        });
     },
 
     render: function(){
@@ -623,6 +627,21 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         if (this.game.ticks % 5 == 0 && this.game.tooltipUpdateFunc) {
             this.game.tooltipUpdateFunc();
         }
+
+		// clear tooltips/highlights if their owning element doesn't exist
+		// anymore. if an element disappears (i.e. is removed from the DOM),
+		// its onmouseout handler does not fire, so the highlights/tooltips
+		// would get stuck.
+		if (this.game.tooltipOwnerDomNode) {
+			if (!document.contains(this.game.tooltipOwnerDomNode)) {
+				UIUtils.hideTooltip(this.game);
+			}
+		}
+		if (this.game.selectedBuildingDomNode) {
+			if (!document.contains(this.game.selectedBuildingDomNode)) {
+				this.game.clearSelectedObject();
+			}
+		}
 
         //wat
         /*React.render($r(WLeftPanel, {
@@ -948,7 +967,6 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#optionNotation").text($I("ui.option.notation"));
         $("#optionScheme").text($I("ui.option.scheme"));
         $("#schemeRelock").text($I("ui.option.scheme.relock"));
-        $("#schemeTip").text($I("ui.option.scheme.tip"));
         $("#optionMore").text($I("ui.option.more"));
         $("#optionBatchSize").text($I("ui.option.batch.size"));
         $("#exportButton").attr("value", $I("ui.option.export.button"));

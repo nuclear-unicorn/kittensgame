@@ -529,26 +529,27 @@
 			<div id="optionsDiv" style="display: none;" class="dialog help">
 				<a id="dialogClose" href="#" class="close" onclick="gamePage.closeOptions()" style="position: absolute; top: 10px; right: 15px;">close</a>
 
-				<label id="optionLanguage" for="languageSelector">Language:</label>
-				<select id="languageSelector" onchange="gamePage.ui.updateLanguage()">
-				</select>
-				&nbsp;<a id="addTranslationLink" target="_blank" href="https://crowdin.com/project/kittensgame" style="font-size:14px;">Translation portal</a>
-				<a id="languageApplyLink" href="#" onclick="gamePage.ui.applyLanguage()" style="display: none; padding-left: 15px;">Apply changes</a>
-				<br>
-				<br>
+				<div style="display: flex; gap: 25px; flex-wrap: nowrap; align-items: flex-start;">
+					<div>
+						<label id="optionLanguage" for="languageSelector">Language:</label><br>
+						<select id="languageSelector" onchange="gamePage.ui.updateLanguage()" style="margin-top: 2px;">
+						</select>
+						<br>
+						<a id="languageApplyLink" href="#" onclick="gamePage.ui.applyLanguage()" style="display: none; font-size:14px;">Apply changes</a>
+					</div>
 
-				<label id="optionNotation" for="notationSelector">Notation:</label>
-				<select id="notationSelector" onchange="gamePage.ui.updateNotation()">
-				</select>
-				<br>
-				<br>
+					<div>
+						<label id="optionNotation" for="notationSelector">Notation:</label><br>
+						<select id="notationSelector" onchange="gamePage.ui.updateNotation()" style="margin-top: 2px;">
+						</select>
+					</div>
 
-				<label id="optionScheme" for="schemeToggle">Color scheme:</label>
-				<select id="schemeToggle" onchange="gamePage.toggleScheme($('#schemeToggle').val())">
-				</select>
-				&nbsp;<a id="schemeRelock" href="#" onclick="gamePage.ui.relockSchemes()" style="font-size:14px;">Relock schemes</a>
-				<br><i><span id="schemeTip" style="font-size: 70%;">Schemes that you cannot select yet can be permanently unlocked by specific actions.</span></i>
-				<br>
+					<div>
+						<label id="optionScheme" for="schemeToggle">Color scheme:</label><span id="schemeTip" style="cursor: help; padding-left: 4px;">(?)</span><br>
+						<select id="schemeToggle" onchange="gamePage.toggleScheme($('#schemeToggle').val())" style="margin-top: 2px;">
+						</select>
+					</div>
+				</div>
 				<br>
 
 				<!-- ===================================== NOTE: FOR FULL I18N SUPPORT ===================================== -->
@@ -562,6 +563,10 @@
 					<div id="booleanOptionsExtra"></div>
 					<input id="batchSize" type="number" min="1" max="9999" size="4" oninput="$('#batchSize')[0].value = gamePage.opts.batchSize = Math.max(1, Math.min(9999, $('#batchSize')[0].value));">
 					<label id="optionBatchSize" for="batchSize">Batch size of Ctrl-click</label>
+					<br>
+					<a id="addTranslationLink" target="_blank" href="https://crowdin.com/project/kittensgame">Translation portal</a>
+					<br>
+					<a id="schemeRelock" href="#" onclick="gamePage.ui.relockSchemes()">Relock schemes</a>
 				</div>
 
 				<br>
