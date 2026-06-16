@@ -685,7 +685,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			if (titaniumTradeChance < 1 && this.nonRandomTrades) { //Non-random trades won't give titanium unless it's guaranteed
 				eligibleForTitanium = Math.max(successfullTradeAmount - this.nonRandomTrades, 0);
 			}
-			boughtResources["titanium"] = (1.5 + shipAmount * 0.03) * (1 + zebraRelationModifierTitanium) * this.game.math.binominalRandomInteger(eligibleForTitanium, titaniumTradeChance);
+			boughtResources["titanium"] = (1.5 + shipAmount * 0.03) * (1 + zebraRelationModifierTitanium) * tradeVolume * this.game.math.binominalRandomInteger(eligibleForTitanium, titaniumTradeChance);
 		}
 
 		//Update Trade Stats
