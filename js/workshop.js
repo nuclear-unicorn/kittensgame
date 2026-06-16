@@ -867,6 +867,14 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		},
 		flavor: $I("workshop.advancedRefinement.flavor")
 	},{
+		name: "prospecting",
+		label: $I("workshop.prospecting.label"),
+		description: $I("workshop.prospecting.desc"),
+		prices:[
+			{ name : "minerals", val: 1000 },
+			{ name : "science",  val: 1000 }
+		],
+	},{
 		name: "goldOre",
 		label: $I("workshop.goldOre.label"),
 		description: $I("workshop.goldOre.desc"),

@@ -2499,6 +2499,8 @@
     "workshop.pneumaticPress.desc": "Workshop automation will also convert iron to plates",
     "workshop.printingPress.label": "Printing Press",
     "workshop.printingPress.desc": "Steamworks automatically print manuscripts",
+    "workshop.prospecting.label": "Prospecting",
+    "workshop.prospecting.desc": "A small amount of iron can now be directly extracted from meteors",
     "workshop.pumpjack.label": "Pumpjack",
     "workshop.pumpjack.desc": "Improves effectiveness of Oil Wells by 45%. Every Oil Well will consume 1Wt/t.",
     "workshop.pyrolysis.label": "Pyrolysis",

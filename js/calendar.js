@@ -583,12 +583,19 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 				sciBonus *= 1 + minerologyBonus;
 				sciGain = this.game.resPool.addResEvent("science", sciBonus);
 			}
+			var ironGain = 0;
+			if (this.game.workshop.get("prospecting").researched) {
+				ironGain = this.game.resPool.addResEvent("iron", 5);
+			}
 
-			if (mineralsGain > 0 || sciGain > 0){
+			if (mineralsGain > 0 || sciGain > 0 || ironGain > 0){
 				var meteorMsg = $I("calendar.msg.meteor");
 
 				if (mineralsGain > 0){
 					meteorMsg += ", +" + this.game.getDisplayValueExt(mineralsGain) + " " + $I("resources.minerals.title");
+				}
+				if (ironGain > 0) {
+					meteorMsg += ", +" + this.game.getDisplayValueExt(ironGain) + " " + $I("resources.iron.title");
 				}
 				if (sciGain > 0) {
 					meteorMsg += ", +" + this.game.getDisplayValueExt(sciGain) + " " + $I("resources.science.title");
