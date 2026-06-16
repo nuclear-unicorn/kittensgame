@@ -1656,7 +1656,9 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 			var buys = race.buys[0];
 			var res = this.game.resPool.get(buys.name);
 			dojo.create("div", {
-				innerHTML: "<span class='buys'>" + $I("trade.buys") + ": </span>" + (res.title || res.name) + " <span class='tradeAmount'>" + buys.val + "</span>"
+				innerHTML: "<span class='buys'>" + $I("trade.buys") + ": </span>" + (res.title || res.name) + " <span class='tradeAmount'>" + 
+				this.game.getDisplayValueExt(buys.val * tradeVolume, false, false, 0) +
+				 "</span>"
 			}, leftColumn);
 
 			for (var j = 0; j < race.sells.length; j++) {
