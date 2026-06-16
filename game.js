@@ -5256,10 +5256,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var karmaPrev = karmaRes.value;
 		karmaRes.value = karma;
 
-		if (this.karmaZebras){
-			this.resPool.get("zebras").maxValue = this.karmaZebras + 1;
-		}
-
 		//Recalculate some effects if karma amount has changed:
 		if (karma != karmaPrev) {
 			//Do not call game.upgrade here.  It'll have weird knock-on effects if we do that.

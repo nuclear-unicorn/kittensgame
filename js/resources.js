@@ -784,6 +784,10 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 		var maxValue = game.getEffect(res.name + "Max") || 0;
 
+		if (res.name == "zebras") {
+			maxValue += (game.karmaZebras || 0) + 1;
+		}
+
 		maxValue = Math.min(this.addResMaxRatios(res, maxValue), Number.MAX_VALUE);
 		
 		var challengeEffect = this.game.getEffect(res.name + "MaxChallenge");
@@ -901,7 +905,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	 * Called in tooltips for more accurate per-building resMax increases
 	 */
 	addResMaxRatios: function(res, maxValue) {
-		if (res.name == "temporalFlux") {
+		if (res.name == "temporalFlux" || res.name == "zebras") {
 			return maxValue;
 		}
 

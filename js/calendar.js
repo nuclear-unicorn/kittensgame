@@ -630,7 +630,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			if (!zebras.value && archery.researched){
 				this.game.resPool.addResEvent("zebras", 1);
 				this.game.msg($I("calendar.msg.zebra.hunter"));
-			} else if ( zebras.value > 0 && zebras.value <= this.game.karmaZebras && this.game.karmaZebras > 0){
+			} else if ( zebras.value > 0 && zebras.value < zebras.maxValue){
 				var chanceModifier = (this.game.workshop.getZebraUpgrade("darkBrew").researched && this.festivalDays)?
 				2 + this.game.getEffect("festivalArrivalRatio") : 1; //bigger chance for zebras to arive after darkBrew is researched
 				if (this.game.rand(100000) <= 500 * chanceModifier){
@@ -642,10 +642,10 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		} else {
 			var zTreshold = 0;
 			if (this.game.prestige.getPerk("zebraDiplomacy").researched){
-				zTreshold = Math.floor(0.10 * (this.game.karmaZebras + 1));   //5 - 10% of hunters will stay
+				zTreshold = Math.floor(0.10 * zebras.maxValue);   //5 - 10% of hunters will stay
 			}
 			if (this.game.prestige.getPerk("zebraCovenant").researched){
-				zTreshold = Math.floor(0.50 * (this.game.karmaZebras + 1));   //5 - 50% of hunters will stay
+				zTreshold = Math.floor(0.50 * zebras.maxValue);   //5 - 50% of hunters will stay
 			}
 			if (zebras.value > zTreshold ){
 				this.game.msg( zebras.value > 1 ?
@@ -810,7 +810,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 				totalNumberOfEvents += numberEvents;
 			}
 
-			if ( zebras.value > 0 && zebras.value <= this.game.karmaZebras && this.game.karmaZebras > 0){
+			if ( zebras.value > 0 && zebras.value < zebras.maxValue){
 				numberEvents = Math.round(daysOffset * 500 / 100000);
 				this.game.resPool.addResEvent("zebras", numberEvents);
 				totalNumberOfEvents += numberEvents;
