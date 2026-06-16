@@ -807,13 +807,14 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		effects: {
 		},
 		prices:[
-			{ name : "ship", val: 2500},
-			{ name : "relic", val: 25000 },
-			{ name : "spice", val: 10000 }
+			{ name : "science", val: 450000},
+			{ name : "eludium", val: 100 },
+			{ name : "titanium", val: 1000 },
+			{ name : "tanker", val: 5000 }
 		],
 		upgrades: {
 			buildings: ["warehouse"],
-			stages: [{bld:"warehouse", stage:1}],
+			// stages: [{bld:"warehouse", stage:1}],
 		},
 		unlocks:{
 			upgrades: ["transportSuperposition"]
@@ -828,9 +829,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		effects: {
 		},
 		prices:[
-			{ name : "ship", val: 2500},
-			{ name : "relic", val: 25000 },
-			{ name : "spice", val: 10000 }
+			{ name : "science", val: 500000},
+			{ name : "eludium", val: 1500 },
+			{ name : "thorium", val: 25000 },
+			{ name : "tanker", val: 500000 },
 		],
 		upgrades: {
 			buildings: ["warehouse"],
