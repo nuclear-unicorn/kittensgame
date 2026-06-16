@@ -803,7 +803,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			Math.floor(this.game.resPool.get("manpower").value / Math.max(
 				manpowerCost, 1)
 			),
-			Math.floor(this.game.resPool.get(race.buys[0].name).value / race.buys[0].val * tradeVolume)
+			Math.floor(this.game.resPool.get(race.buys[0].name).value / (race.buys[0].val * tradeVolume))
 		];
 
 		amt[0] += (goldCost > 0) ? 0 : Number.MAX_VALUE;
@@ -1678,7 +1678,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 			if (race.name == "zebras") {
 				var zebraRelationModifierTitanium = this.game.getEffect("zebraRelationModifier") * this.game.bld.getBuildingExt("tradepost").meta.effects["tradeRatio"];
 				var titanium = this.game.resPool.get("titanium");
-				var displayedVal = this.game.getDisplayValueExt((1.5 + this.game.resPool.get("ship").value * 0.03) * (1 + zebraRelationModifierTitanium), false, false, 0);
+				var displayedVal = this.game.getDisplayValueExt((1.5 + this.game.resPool.get("ship").value * 0.03) * (1 + zebraRelationModifierTitanium) * tradeVolume, false, false, 0);
 				dojo.create("div", {
 						innerHTML: "<span class='sells'></span>" + (titanium.title || titanium.name) + " <span class='tradeAmount'>" + displayedVal + " - " + displayedVal + "</span>"
 					}, leftColumn);
@@ -1687,9 +1687,13 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 			var tradePrices = [{ name: "manpower", val: this.game.diplomacy.getManpowerCost()}, { name: "gold", val: this.game.diplomacy.getGoldCost()}];
 			var buys = race.buys;
 			for (var boughtItem in buys){
-				buys[boughtItem].val *= tradeVolume;
+				tradePrices.push({
+					name: race.buys[boughtItem].name, val: race.buys[boughtItem].val * tradeVolume,
+				});
+				// tradePrices = tradePrices.concat(buys);
+				// buys[boughtItem].val *= tradeVolume;
 			}
-			tradePrices = tradePrices.concat(buys);
+			// tradePrices = tradePrices.concat(buys);
 			// tradePrices = tradePrices.concat(race.buys);
 
 
