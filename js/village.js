@@ -2046,34 +2046,7 @@ dojo.declare("classes.village.Map", null, {
 			if (!biome.fauna || !biome.fauna.length){
 				var spawnChance = 1000 * (biome.faunaPenalty || 1.0);
 				if (this.game.rand(10000) <= spawnChance){
-					//use power law instead of exp law to avoid broken levels on biomes 20+
-					var powerLawMultiplier = biome.biomePenalty || 1.0;
-
-					var offset = Math.round(biome.mobLevel * Math.pow(biome.on, 0.6 * powerLawMultiplier)); 
-					var mobLevel = Math.round(
-						biome.mobLevel / 3 + 
-						(1.8 * Math.pow(biome.on, 1.50 * powerLawMultiplier) + offset) * 
-						(1 + (Math.random() * 2 - 1) * 0.15)
-					);
-					if (mobLevel <= 0) {
-						mobLevel = 1;
-					}
-					
-					
-					var hp = Math.round((15 * Math.pow(mobLevel, 1.25)) * (1 + (Math.random() * 2 - 1) * 0.15));
-					biome.fauna = [{
-						title: faunaName,
-						level: mobLevel,
-						exp: Math.round(8 * Math.pow(mobLevel, 1.50)),
-						prevHp: hp,
-						maxHp: hp,
-						hp: hp,
-						atk: Math.round(1.5 * Math.pow(mobLevel, 1.05)),
-						def: Math.round(1.5 * Math.pow(mobLevel, 1.1)),
-						str: (1 + mobLevel) * Math.pow(1.01, mobLevel),
-						agi: (1 + mobLevel) * Math.pow(1.01, mobLevel),
-						spd: (1 + mobLevel) * Math.pow(1.01, mobLevel)
-					}];
+					biome.fauna = [this.createFauna(biome, faunaName)];
 				}
 			}
 		}
@@ -2106,6 +2079,43 @@ dojo.declare("classes.village.Map", null, {
 		if (this.squad.hp > this.getMaxHP()) {
 			this.squad.hp = this.getMaxHP();
 		}
+	},
+
+	/**
+	 * Roll a single fauna mob for a biome at its current exploration level (biome.on).
+	 * HP and mob level carry a +/-15% spawn jitter; pass deterministic=true to get the
+	 * un-jittered baseline (used by the balance simulator to read average stats).
+	 */
+	createFauna: function(biome, faunaName, deterministic){
+		//use power law instead of exp law to avoid broken levels on biomes 20+
+		var powerLawMultiplier = biome.biomePenalty || 1.0;
+		var levelJitter = deterministic ? 1 : (1 + (Math.random() * 2 - 1) * 0.15);
+		var hpJitter = deterministic ? 1 : (1 + (Math.random() * 2 - 1) * 0.15);
+
+		var offset = Math.round(biome.mobLevel * Math.pow(biome.on, 0.6 * powerLawMultiplier));
+		var mobLevel = Math.round(
+			biome.mobLevel / 3 +
+			(1.8 * Math.pow(biome.on, 1.50 * powerLawMultiplier) + offset) *
+			levelJitter
+		);
+		if (mobLevel <= 0) {
+			mobLevel = 1;
+		}
+
+		var hp = Math.round((15 * Math.pow(mobLevel, 1.25)) * hpJitter);
+		return {
+			title: faunaName,
+			level: mobLevel,
+			exp: Math.round(8 * Math.pow(mobLevel, 1.50)),
+			prevHp: hp,
+			maxHp: hp,
+			hp: hp,
+			atk: Math.round(1.5 * Math.pow(mobLevel, 1.05)),
+			def: Math.round(1.5 * Math.pow(mobLevel, 1.1)),
+			str: Math.round(1.5 * Math.pow(mobLevel, 1.05)),
+			agi: Math.round(1.5 * Math.pow(mobLevel, 1.05)),
+			spd: Math.round(1.5 * Math.pow(mobLevel, 1.05))
+		};
 	},
 
 	getMaxEnergy: function(){
@@ -2341,6 +2351,27 @@ dojo.declare("classes.village.Map", null, {
 		return Math.floor(curve + jitter);
 	},
 
+	/**
+	 * Combat stats for a given seed/level. Traitless kittens get a small bias bonus.
+	 * Pulled out of getLeaderCombatStats so it can be evaluated without a full leader.
+	 */
+	getCombatStatsAt: function(seed, lvl, hasTrait) {
+		var stats = {};
+		for (var stat in this.leaderStatIds) {
+			var statID = this.leaderStatIds[stat];
+			var cfg = dojo.clone(this.leaderStatConfigs[stat]);
+			if (!hasTrait){
+				cfg.bias += 0.05;
+			}
+			stats[stat] = this.getStatAtLevel(seed, lvl, statID, cfg);
+
+			if (stats[stat] == 0) {
+				stats[stat] = 1;
+			}
+		}
+		return stats;
+	},
+
 	getLeaderCombatStats: function(leader) {
 		if (!leader) {
 			return null;
@@ -2351,20 +2382,7 @@ dojo.declare("classes.village.Map", null, {
 			seed = this.xmur3(leader.name + ":" + leader.surname);
 		}
 		var lvl = this.game.village.getCombatLevel(leader.combatExp);
-		var stats = {};
-		for (var stat in this.leaderStatIds) {
-			var statID = this.leaderStatIds[stat];
-			var cfg = dojo.clone(this.leaderStatConfigs[stat]);
-			if (!leader.trait){
-				cfg.bias += 0.05;
-			}
-			stats[stat] = this.getStatAtLevel(seed, lvl, statID, cfg);
-
-			if (stats[stat] == 0) {
-				stats[stat] = 1;
-			}
-		}
-		return stats;
+		return this.getCombatStatsAt(seed, lvl, leader.trait);
 	},
 
 	updateSquadStats: function() {
