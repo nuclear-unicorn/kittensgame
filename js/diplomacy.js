@@ -1692,11 +1692,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 				tradePrices.push({
 					name: race.buys[boughtItem].name, val: race.buys[boughtItem].val * tradeVolume,
 				});
-				// tradePrices = tradePrices.concat(buys);
-				// buys[boughtItem].val *= tradeVolume;
 			}
-			// tradePrices = tradePrices.concat(buys);
-			// tradePrices = tradePrices.concat(race.buys);
 
 
 			var tradeBtn = new com.nuclearunicorn.game.ui.TradeButton({
