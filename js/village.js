@@ -931,7 +931,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 				bloodstoneSquads -= huntsUntilBloodstone;
 				bloodstoneSquads = Math.max(0, bloodstoneSquads);
 			}
-			var bloodstone = this.game.resPool.addResEvent("bloodstone", this.game.math.binominalRandomInteger(bloodstoneSquads, 0.0005 * bloodstoneRatio));
+			var bloodstone = this.game.resPool.addResEvent("bloodstone", this.game.math.binominalRandomInteger(bloodstoneSquads, 0.005 * bloodstoneRatio));
 			if (bloodstone > 0) {
 				this.game.msg($I("village.msg.hunt.bloodstone", [this.game.getDisplayValueExt(bloodstone)]), "important", "ironWill", true);
 			}

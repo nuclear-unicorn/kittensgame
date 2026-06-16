@@ -170,7 +170,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		console.log("pactsAdjustment");
 		if (!this.getPact("fractured").researched && this.getZU("blackPyramid").val > 0 && (this.game.religion.getTU("mausoleum").val > 0 || this.game.science.getPolicy("radicalXenophobia").researched)){
 			this.game.unlock({
-				pacts: ["pactOfCleansing", "pactOfDestruction",  "pactOfExtermination", "pactOfPurity"]
+				pacts: ["pactOfCleansing", "pactOfDestruction",  "pactOfExtermination", "pactOfPurity", "pactOfArcane", "pactOfChronicler"]
 			});
 		}
 	},
@@ -304,7 +304,13 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	},
 	update: function(){
 		if (this.game.resPool.get("faith").value > 0 || this.game.challenges.isActive("atheism") && this.game.bld.get("ziggurat").val > 0){
-			this.game.religionTab.visible = true;
+			//Re-render when the tab first becomes visible (e.g. right after the first priest
+			// produces faith) so it appears immediately instead of on the player's next action.
+			//Guarded so we only render on the hidden->visible transition, not every tick.
+			if (!this.game.religionTab.visible){
+				this.game.religionTab.visible = true;
+				this.game.render();
+			}
 		}
 
 		//safe switch for a certain type of pesky bugs with conversion

@@ -28,6 +28,7 @@ dojo.declare("classes.managers.SettingsManager", com.nuclearunicorn.core.TabMana
 	 * 	label - i18n string shown as the name/description for this option in the web version of the game
 	 * 		If an option doesn't have a label, it won't be available in the web version.
 	 * 		So, if you want to make an option mobile-only, don't give it a label.
+	 * 	tooltip - i18n string (may contain HTML) shown in a "(?)" hover tooltip next to the option's label on web
 	 * 	mobileTitle - i18n string shown as the name for this option in the mobile version of the game
 	 * 	mobileDesc - i18n string shown as the description for this option in the mobile version of the game
 	 * 		Maybe the mobile UI system can be set up so that it only shows an option if it has mobileTitle defined...
@@ -44,7 +45,8 @@ dojo.declare("classes.managers.SettingsManager", com.nuclearunicorn.core.TabMana
 		name: "useWorkers",
 		defaultValue: true,
 		//This one has a label but no mobileTitle or mobileDesc, so it shows up on web but not on mobile
-		label: $I("ui.option.workers")
+		label: $I("ui.option.workers"),
+		tooltip: $I("ui.option.workers.tip") //Shown as a "(?)" hover tooltip next to the label
 	}, {
 		name: "forceHighPrecision",
 		defaultValue: false,
@@ -345,6 +347,17 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.SettingsTab", com.nuclearunicorn.ga
 		}, container);
 		if (setting.devModeOnly) {
 			dojo.attr(label, "title", $I("ui.option.dev.mode.only"));
+		}
+		//Render a "(?)" hint with a game tooltip next to the label, if the setting defines tooltip HTML.
+		if (setting.tooltip) {
+			var hint = dojo.create("span", {
+				innerHTML: " (?)",
+				style: "cursor: help;"
+			}, container);
+			var tooltipHTML = setting.tooltip;
+			UIUtils.attachTooltip(this.game, hint, 0, 20, function() {
+				return "<div class='option-tooltip'>" + tooltipHTML + "</div>";
+			});
 		}
 		dojo.create("br", {}, container); //Put each option on a separate line.
 

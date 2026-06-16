@@ -1575,7 +1575,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 		if (this.model.hasResourceHover) {
 			dojo.connect(this.domNode, "onmouseover", this,
 				dojo.hitch( this, function(){
-					this.game.setSelectedObject(this.getSelectedObject());
+					this.game.setSelectedObject(this.getSelectedObject(), this.domNode);
 				}));
 			dojo.connect(this.domNode, "onmouseout", this,
 				dojo.hitch( this, function(){
@@ -2660,6 +2660,8 @@ UIUtils = {
 			};
 			game.tooltipUpdateFunc();
 
+			game.tooltipOwnerDomNode = container;
+
 			var pos = $(container).offset();
 
 			// Compensate tooltip position for game container offset.
@@ -2690,8 +2692,7 @@ UIUtils = {
 		dojo.connect(container, "onmouseover", this, showTooltip);
 
 		dojo.connect(container, "onmouseout", this, function(){
-			game.tooltipUpdateFunc = null;
-			dojo.style(tooltip, "display", "none");
+			UIUtils.hideTooltip(game);
 		});
 		
 		dojo.connect(container, "onkeydown", this, function(e){
@@ -2705,5 +2706,10 @@ UIUtils = {
 		});
 
 		return htmlProvider;
+	},
+	hideTooltip: function(game){
+		game.tooltipUpdateFunc = null;
+		game.tooltipOwnerDomNode = null;
+		dojo.style(dojo.byId("tooltip"), "display", "none");
 	}
 };

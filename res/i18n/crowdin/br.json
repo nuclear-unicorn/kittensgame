@@ -1722,8 +1722,6 @@
     "ui.kgnet.login": "Iniciar sessão",
     "ui.kgnet.online": "Conectado",
     "ui.kgnet.save.current": "atual",
-    "ui.kgnet.save.save": "Salvar",
-    "ui.kgnet.save.load": "Carregar",
     "ui.kgnet.sync": "Sincronizar salvamentos na nuvem",
     "ui.kgnet.instructional": "<- Clique neste link para começar. Depois do carregamento de dados, clique em 'Criar Save'.",
     "ui.toggle.researched": "Alternar pesquisados",

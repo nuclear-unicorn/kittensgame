@@ -1558,8 +1558,6 @@
     "ui.filter.togglable": "Можа быць уключана",
     "ui.kgnet.online": "Анлайн",
     "ui.kgnet.save.current": "бягучы",
-    "ui.kgnet.save.save": "Захаваць",
-    "ui.kgnet.save.load": "Загрузіць",
     "ui.kgnet.sync": "Сінхранізацыя захаванняў у воблаку",
     "ui.kgnet.instructional": "<- Націсні на гэтую спасылку, каб пачаць. Пасля загрузкі даных націсні кнопку «Стварыць захаванне».",
     "ui.toggle.researched": "Пераключыць Даследаванае",
