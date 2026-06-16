@@ -635,6 +635,7 @@
     "effectsMgr.statics.tradeGoldDiscount.title" : "Gold trade discount",
     "effectsMgr.statics.tradeKnowledge.title": "Trade Knowledge",
     "effectsMgr.statics.tradeRatio.title": "Trade ratio",
+    "effectsMgr.statics.tradeVolume.title": "Trade volume",
     "effectsMgr.statics.tradeKnowledgeRatio.title": "Current trade ratio",
     "effectsMgr.statics.umbraBoostRatio.title": "HR Harvester bonus",
     "effectsMgr.statics.unhappinessRatio.title": "Unhappiness reduction",
