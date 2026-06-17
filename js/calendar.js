@@ -773,16 +773,22 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			numberEvents = Math.round(daysOffset * (baseChance + iwChance) / 10000);
 
 			var mineralsAmt = 50 + 25 * this.game.getEffect("mineralsRatio");
+			var minerologyBonus = this.game.getEffect("academyMeteorBonus");
 
 			if (this.game.ironWill){
 				mineralsAmt += mineralsAmt * 0.1;	//+10% of minerals for iron will
+				mineralsAmt *= 1 + this.game.getEffect("mineralsPolicyRatio") / 3;
 			}
-
+			mineralsAmt *= 1 + minerologyBonus;
 			this.game.resPool.addResEvent("minerals", numberEvents * mineralsAmt);
 
 			if (this.game.workshop.get("celestialMechanics").researched) {
 				var sciBonus = 15 * (1 + this.game.getEffect("scienceRatio"));
 				this.game.resPool.addResEvent("science", numberEvents * sciBonus);
+			}
+
+			if (this.game.workshop.get("prospecting").researched) {
+				this.game.resPool.addResEvent("iron", numberEvents * 5);
 			}
 
 			//TODO: make meteors give titanium on higher levels
