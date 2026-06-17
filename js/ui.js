@@ -732,7 +732,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             }
 
             calendarDiv.innerHTML = $I("calendar.year.full", [year.toLocaleString(), seasonTitle + mod, Math.floor(calendar.day)]);
-            document.title = $I("navbar.title") + " - " + $I("calendar.year.full", [calendar.year, seasonTitle, Math.floor(calendar.day)]);
+            document.title = $I("navbar.title") + " - " + $I("calendar.year.full", [this.game.getDisplayValueExt(calendar.year), seasonTitle, Math.floor(calendar.day)]);
 
             if (this.game.ironWill && calendar.observeBtn) {
                 document.title = "[EVENT!]" + document.title;
