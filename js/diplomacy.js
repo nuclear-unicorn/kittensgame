@@ -605,6 +605,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 
 		var boughtResources = {};
+		var tradeVolume = 1 + this.game.getEffect("tradeVolume");
 		var tradeRatio = 
 			1
 			+ this.game.diplomacy.getTradeRatio()
@@ -644,7 +645,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			var fuzzedBonusAmount = this._fuzzGainedAmount(resourcePassedBonusTradeAmount, sellResource.width);
 			var resourceSeasonTradeRatio = 1 + (sellResource.seasons ? sellResource.seasons[currentSeason] : 0);
 			boughtResources[sellResource.name] = (fuzzedNormalAmount + fuzzedBonusAmount * 1.25)
-				* sellResource.value * tradeRatio * raceRatio * resourceSeasonTradeRatio;
+				* sellResource.value * tradeRatio * raceRatio * resourceSeasonTradeRatio * tradeVolume;
 		}
 
 		//-------------------- 35% chance to get spice + 1% per embassy lvl ------------------
@@ -684,7 +685,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			if (titaniumTradeChance < 1 && this.nonRandomTrades) { //Non-random trades won't give titanium unless it's guaranteed
 				eligibleForTitanium = Math.max(successfullTradeAmount - this.nonRandomTrades, 0);
 			}
-			boughtResources["titanium"] = (1.5 + shipAmount * 0.03) * (1 + zebraRelationModifierTitanium) * this.game.math.binominalRandomInteger(eligibleForTitanium, titaniumTradeChance);
+			boughtResources["titanium"] = (1.5 + shipAmount * 0.03) * (1 + zebraRelationModifierTitanium) * tradeVolume * this.game.math.binominalRandomInteger(eligibleForTitanium, titaniumTradeChance);
 		}
 
 		//Update Trade Stats
@@ -697,7 +698,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		var undo = this.game.registerUndoChange();
 		var resSpent = { "manpower": this.getManpowerCost() * totalTradeAmount,
 			"gold": this.getGoldCost() * totalTradeAmount };
-		resSpent[race.buys[0].name] = race.buys[0].val * totalTradeAmount;
+		resSpent[race.buys[0].name] = race.buys[0].val * totalTradeAmount * tradeVolume;
 		undo.addEvent(this.id, {
 			action: "trade",
 			val: totalTradeAmount,
@@ -737,22 +738,24 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		if (!this.hasMultipleResources(race, amt)) {
 			return;
 		}
+		var tradeVolume = 1 + this.game.getEffect("tradeVolume");
 
 		//-------------- pay prices ------------------
 		var manpowerCost = this.getManpowerCost();
 		var goldCost = this.getGoldCost();
 		this.game.resPool.addResEvent("manpower", -manpowerCost * amt);
 		this.game.resPool.addResEvent("gold", -goldCost * amt);
-		this.game.resPool.addResEvent(race.buys[0].name, -race.buys[0].val * amt);
+		this.game.resPool.addResEvent(race.buys[0].name, -race.buys[0].val * amt * tradeVolume);
 
 		//---------- calculate yield -----------------
 		this.gainTradeRes(this.tradeImpl(race, amt), amt);
  	},
 
 	hasMultipleResources: function(race, amt){
+		var tradeVolume = 1 + this.game.getEffect("tradeVolume");
 		return (this.game.resPool.get("gold").value >= this.getGoldCost() * amt &&
 			this.game.resPool.get("manpower").value >= this.getManpowerCost() * amt &&
-			this.game.resPool.get(race.buys[0].name).value >= race.buys[0].val * amt);
+			this.game.resPool.get(race.buys[0].name).value >= race.buys[0].val * amt * tradeVolume);
 	},
 
 	tradeAll: function(race){
@@ -791,6 +794,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	getMaxTradeAmt: function(race){
 		var manpowerCost = this.getManpowerCost();
 		var goldCost = this.getGoldCost();
+		var tradeVolume = 1 + this.game.getEffect("tradeVolume");
 
 		var amt = [
 			Math.floor(this.game.resPool.get("gold").value /
@@ -799,7 +803,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			Math.floor(this.game.resPool.get("manpower").value / Math.max(
 				manpowerCost, 1)
 			),
-			Math.floor(this.game.resPool.get(race.buys[0].name).value / race.buys[0].val)
+			Math.floor(this.game.resPool.get(race.buys[0].name).value / (race.buys[0].val * tradeVolume))
 		];
 
 		amt[0] += (goldCost > 0) ? 0 : Number.MAX_VALUE;
@@ -1614,6 +1618,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 		dojo.create("div", { class: "clear"}, tabContainer);
 
 		var baseTradeRatio = 1 + this.game.diplomacy.getTradeRatio();
+		var tradeVolume = 1 + this.game.getEffect("tradeVolume");
 		var currentSeason = this.game.calendar.getCurSeason().name;
 		for (var i = 0; i < races.length; i++) {
 			var race = races[i];
@@ -1651,7 +1656,9 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 			var buys = race.buys[0];
 			var res = this.game.resPool.get(buys.name);
 			dojo.create("div", {
-				innerHTML: "<span class='buys'>" + $I("trade.buys") + ": </span>" + (res.title || res.name) + " <span class='tradeAmount'>" + buys.val + "</span>"
+				innerHTML: "<span class='buys'>" + $I("trade.buys") + ": </span>" + (res.title || res.name) + " <span class='tradeAmount'>" + 
+				this.game.getDisplayValueExt(buys.val * tradeVolume, false, false, 0) +
+				 "</span>"
 			}, leftColumn);
 
 			for (var j = 0; j < race.sells.length; j++) {
@@ -1661,7 +1668,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 				}
 
 				var res = this.game.resPool.get(s.name);
-				var average = s.value * tradeRatio * (1 + race.energy * 0.02) * (1 + (s.seasons ? s.seasons[currentSeason] : 0));
+				var average = s.value * tradeRatio * tradeVolume * (1 + race.energy * 0.02) * (1 + (s.seasons ? s.seasons[currentSeason] : 0));
 
 				var prefix = j == 0 ? "<span class='sells'>" + $I("trade.sells") + ": </span>" : "<span class='sells'></span>";
 				dojo.create("div", {
@@ -1673,14 +1680,20 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 			if (race.name == "zebras") {
 				var zebraRelationModifierTitanium = this.game.getEffect("zebraRelationModifier") * this.game.bld.getBuildingExt("tradepost").meta.effects["tradeRatio"];
 				var titanium = this.game.resPool.get("titanium");
-				var displayedVal = this.game.getDisplayValueExt((1.5 + this.game.resPool.get("ship").value * 0.03) * (1 + zebraRelationModifierTitanium), false, false, 0);
+				var displayedVal = this.game.getDisplayValueExt((1.5 + this.game.resPool.get("ship").value * 0.03) * (1 + zebraRelationModifierTitanium) * tradeVolume, false, false, 0);
 				dojo.create("div", {
 						innerHTML: "<span class='sells'></span>" + (titanium.title || titanium.name) + " <span class='tradeAmount'>" + displayedVal + " - " + displayedVal + "</span>"
 					}, leftColumn);
 			}
 
 			var tradePrices = [{ name: "manpower", val: this.game.diplomacy.getManpowerCost()}, { name: "gold", val: this.game.diplomacy.getGoldCost()}];
-			tradePrices = tradePrices.concat(race.buys);
+			var buys = race.buys;
+			for (var boughtItem in buys){
+				tradePrices.push({
+					name: race.buys[boughtItem].name, val: race.buys[boughtItem].val * tradeVolume,
+				});
+			}
+
 
 			var tradeBtn = new com.nuclearunicorn.game.ui.TradeButton({
 				name: $I("trade.send.caravan"),

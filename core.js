@@ -1647,7 +1647,9 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 				}
 			};
 		}
-		if (typeof(model.metadata.isAutomationEnabled) == "boolean") {
+		if (typeof(model.metadata.isAutomationEnabled) == "boolean" || 
+			(model.metadata.stages && typeof(model.metaAccessor.meta.isAutomationEnabled) == "boolean") //stage hack
+		) {
 			model.toggleAutomationLink = {
 				title: model.metadata.isAutomationEnabled ? "A" : "*",
 				tooltip: model.metadata.isAutomationEnabled ? $I("btn.aon.tooltip") : $I("btn.aoff.tooltip"),

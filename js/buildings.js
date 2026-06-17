@@ -780,6 +780,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	},
 	{
 		name: "warehouse",
+		isAutomationEnabled: null,
 		stages: [
 			{
 				label: $I("buildings.warehouse.label"),
@@ -818,10 +819,12 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					"moonBaseStorageBonus": 0,
 					"planetCrackerStorageBonus": 0,
 					"cryostationStorageBonus": 0,
-					"energyConsumption": 0
+					"energyConsumption": 0,
+					"tradeVolume": 0
 				},
 				stageUnlocked: true,
-				togglable: true
+				togglable: true,
+				// isAutomationEnabled: null
 			}
 		],
 		calculateEffects: function(self, game){
@@ -847,7 +850,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					"moonBaseStorageBonus": 0.0085,
 					"planetCrackerStorageBonus": 0.0085,
 					"cryostationStorageBonus": 0.0085,
-					"energyConsumption": 5
+					"energyConsumption": 5,
+					"tradeVolume": 0
 			};
 			if (self.on >= 10) {
 				//The first 10 Spaceports each cost 5Wt to run.
@@ -856,11 +860,28 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				//etc.
 				effects[ "energyConsumption" ] = 0.5 * (self.on - 9) + 45 / self.on;
 			}
+			if (game.workshop.get("freightfulExchange").researched){
+				stageMeta.description = $I("buildings.spaceport.desc") + "<br>" + $I("buildings.spaceport.desc.automation");
+			}
+			if (game.workshop.get("freightfulExchange").researched && self.isAutomationEnabled === null){
+				self.isAutomationEnabled = true;
+				stageMeta.isAutomationEnabled = true;
+			} else if (!game.workshop.get("freightfulExchange").researched && self.isAutomationEnabled !== null) {
+				self.isAutomationEnabled = null;
+			}
+			if (self.isAutomationEnabled){
+				effects["tradeVolume"] = 0.5 + (game.workshop.get("transportSuperposition").researched? 0.5 : 0);
+			} else {
+				effects["tradeVolume"] = 0;
+			}
                 stageMeta.effects = effects;
             }
 		},
 		upgrades: {
 			spaceBuilding: ["moonBase", "planetCracker", "cryostation"]
+		},
+		unlocks: {
+			upgrades: ["transportSuperposition"]
 		},
 		flavor: $I("buildings.warehouse.flavor"),
 		unlockScheme: {
@@ -3216,6 +3237,25 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 
 		return stageLinks;
 	},
+
+	getDescription: function(model){
+		if (model.metadata.stages){
+			description = model.metaAccessor.meta.stages[model.metaAccessor.meta.stage].description;
+			return typeof(description) != "undefined" ? description : "";
+		}
+		var description = model.metadata.description;
+		return typeof(description) != "undefined" ? description : "";
+	},
+
+	handleToggleAutomationLinkClick: function(model) {
+		var building = model.metadata;
+		building.isAutomationEnabled = !building.isAutomationEnabled;
+		if (building.stages){
+			model.metaAccessor.meta.isAutomationEnabled = building.isAutomationEnabled; //stage hack
+		}
+		this.game.upgrade({buildings: [building.name]});
+	},
+
 
 	downgrade: function(model) {
 		if (this.game.opts.noConfirm) {

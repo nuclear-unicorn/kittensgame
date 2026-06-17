@@ -734,7 +734,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			buildings: ["accelerator"],
 			tech: ["chronophysics", "dimensionalPhysics"],
-			upgrades: ["enrichedUranium", "railgun"]
+			upgrades: ["enrichedUranium", "railgun", "transportSuperposition"]
 		}
 	}, {
 		name: "dimensionalPhysics",
@@ -745,7 +745,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name : "science", val: 235000}
 		],
 		unlocks: {
-			upgrades: ["energyRifts", "lhc"]
+			upgrades: ["energyRifts", "lhc", "freightfulExchange"]
 			// tech: ["artificialGravity"] -- see SPACE_EXPL feature flag
 		}
 	}, {

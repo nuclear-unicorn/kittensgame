@@ -683,7 +683,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.tradeRatio.title"),
 				type: "ratio"
 			},
-
+			"tradeVolume": {
+				title: $I("effectsMgr.statics.tradeVolume.title"),
+				type: "ratio"
+			},
 			"standingRatio": {
 				title: $I("effectsMgr.statics.standingRatio.title"),
 				type: "ratio"
