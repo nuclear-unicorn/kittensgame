@@ -2110,9 +2110,9 @@ dojo.declare("classes.village.Map", null, {
 			prevHp: hp,
 			maxHp: hp,
 			hp: hp,
-			atk: Math.round(1.5 * Math.pow(mobLevel, 1.05)),
-			def: Math.round(1.5 * Math.pow(mobLevel, 1.1)),
-			str: Math.round(1.5 * Math.pow(mobLevel, 1.05)),
+			atk: Math.round(1.2 * Math.pow(mobLevel, 1.02)),
+			def: Math.round(0.6 * Math.pow(mobLevel, 1.01)),
+			str: Math.round(0.6 * Math.pow(mobLevel, 1.02)),
 			agi: Math.round(1.5 * Math.pow(mobLevel, 1.05)),
 			spd: Math.round(1.5 * Math.pow(mobLevel, 1.05))
 		};
@@ -2405,9 +2405,16 @@ dojo.declare("classes.village.Map", null, {
 		//hit change
 		var hitChance = this.getHitRate(src, tgt);
 
+		var efficiency = src.efficiency ? src.efficiency : 1;
+		var damage = Math.floor((src.str * efficiency + src.atk) - (tgt.str + tgt.def) * (0.9 + Math.random() * 0.2));	//+-10% damage variation
+
+		if (damage < 1){
+			damage = 1;
+		}
+
 		//console.log(src, "attacks", tgt, "hit chance:", hitChance);
 		if (this.game.rand(100) <= hitChance) {
-			tgt.hp -= src.atk;
+			tgt.hp -= damage;
 
 			if (tgt.hp < 0){
 				tgt.hp = 0;

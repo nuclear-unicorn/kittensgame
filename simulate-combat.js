@@ -26,6 +26,10 @@ const DUEL_MAX_ROUNDS     = 4000;  // stalemate guard (treated as a loss)
 const WIN_THRESHOLD       = 0.5;   // win-rate that counts as "can kill"
 const HAS_TRAIT           = true;  // leaders normally carry a trait (no bias bonus)
 
+
+const PLAYER_ATK = 1;	//current player atk bonus from upgrades
+const PLAYER_DEF = 1;	//current player def bonus from upgrades
+
 // Player levels and biome exploration levels to report (0..10 then by 10s).
 const LEVELS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
@@ -117,8 +121,8 @@ function averageFaunaStats(map, biome, on) {
 // per round (both combatants swing simultaneously, deaths resolved after).
 // ----------------------------------------------------------------------------
 function duel(map, squad, fauna) {
-	const s = { agi: squad.agi, atk: squad.atk, hp: squad.hp, efficiency: squad.efficiency };
-	const m = { agi: fauna.agi, atk: fauna.atk, hp: fauna.hp };
+	const s = { str: squad.str, agi: squad.agi, atk: squad.atk + PLAYER_ATK, def: squad.def + PLAYER_DEF, hp: squad.hp, efficiency: squad.efficiency };
+	const m = { str: fauna.str, agi: fauna.agi, atk: fauna.atk, def: fauna.def, hp: fauna.hp };
 	let rounds = 0;
 	while (s.hp > 0 && m.hp > 0 && rounds < DUEL_MAX_ROUNDS) {
 		map.attack(s, m);  // squad -> fauna (squad always swings first, like combat())
@@ -144,7 +148,7 @@ function requiredPlayerLevel(map, biome, on) {
 		let wins = 0;
 		for (let t = 0; t < REQ_TRIALS; t++) {
 			const stats = map.getCombatStatsAt(randSeed(), level, HAS_TRAIT);
-			const squad = { agi: stats.agi, atk: stats.atk, hp: stats.hp, efficiency: 1.0 };
+			const squad = { ...stats, efficiency: 1.0 };
 			const fauna = map.createFauna(biome, "mob");
 			if (duel(map, squad, fauna)) { wins++; }
 		}
@@ -169,7 +173,7 @@ function fmt(n, d) {
 function isCombatBiome(biome) {
 	// Skip the home village (faunaPenalty 0 -> never spawns) and any biome with
 	// no mob definition (e.g. the space-map placeholders).
-	return biome.mobLevel > 0 && biome.faunaPenalty !== 0;
+	return true;
 }
 
 function buildPlayerSection(map) {
