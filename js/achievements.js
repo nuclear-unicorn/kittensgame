@@ -431,11 +431,33 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
         return this.getMeta(name, this.badges);
     },
 
-    unlockBadge: function(name){
-        var badge = this.getBadge(name);
+	_unlockBadge: function(badge) {
         badge.unlocked = true;
         this.game.achievements.badgesUnlocked = true;
+	},
+	_unlockAchievement: function(ach) {
+		if (!ach.unlocked) {
+			ach.unlocked = true;
+			this.game.msg($I("achievements.msg.unlock", [ach.title]));
+			this.game.achievementTab.visible = true;
+		}
+	},
+	_unlockStarAchievement: function(ach) {
+		if (!ach.starUnlocked) {
+			ach.starUnlocked = true;
+			this.game.msg($I("achievements.msg.starUnlock", [ach.title]));
+			this.game.achievementTab.visible = true;
+		}
+	},
+    unlockBadge: function(name){
+		this._unlockBadge(this.getBadge(name));
     },
+	unlockAchievement: function(name){
+		this._unlockAchievement(this.get(name));
+	},
+	unlockStarAchievement: function(name){
+		this._unlockStarAchievement(this.get(name));
+	},
 
     hasUnlocked: function () {
         for (var i = 0; i < this.achievements.length; i++) {
@@ -450,24 +472,17 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
         for (var i in this.achievements) {
             var ach = this.achievements[i];
             if (!ach.unlocked && ach.condition && ach.condition.call(this)) {
-                ach.unlocked = true;
-                this.game.msg($I("achievements.msg.unlock", [ach.title]));
-                this.game.achievementTab.visible = true;
-
+				this._unlockAchievement(ach);
             }
             if (!ach.starUnlocked && ach.starCondition && ach.starCondition.call(this)) {
-                ach.starUnlocked = true;
-                this.game.msg($I("achievements.msg.starUnlock", [ach.title]));
-                this.game.achievementTab.visible = true;
-
+				this._unlockStarAchievement(ach);
             }
         }
 
         for (var i in this.badges) {
             var badge = this.badges[i];
             if (!badge.unlocked && badge.condition && badge.condition.call(this)) {
-                badge.unlocked = true;
-                this.badgesUnlocked = true;
+				this._unlockBadge(badge);
             }
         }
 
@@ -743,6 +758,9 @@ dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
 		this.badgesMap = {}; //Associates each badge in the game with a UI element representing it
 		for (var i in this.game.achievements.badges){
 			var badge = this.game.achievements.badges[i];
+			if (badge.fullyHidden) {
+				continue;
+			}
             totalBadges++;
             if (badge.unlocked) { completedBadges++; }
 
@@ -760,6 +778,9 @@ dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
 		var completedBadges = 0;
 		for (var i in this.game.achievements.badges){
 			var badge = this.game.achievements.badges[i];
+			if (badge.fullyHidden) {
+				continue;
+			}
 			var span = this.badgesMap[badge.name];
 			//Recount every tick
 			totalBadges++;
