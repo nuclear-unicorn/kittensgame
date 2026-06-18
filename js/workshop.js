@@ -2931,7 +2931,10 @@ dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearun
 
 	onPurchase: function(model) {
 		if (model.metadata.name == "carbonSequestration" && this.game.bld.cathPollution == 0) {
-			this.game.achievements.unlockBadge("betterSafeThanSorry");
+			this.game.achievements.unlockAchievement("betterSafeThanSorry");
+			if (this.game.startedWithoutChronospheres) {
+				this.game.achievements.unlockStarAchievement("betterSafeThanSorry");
+			}
 		}
 		this.inherited(arguments);
 	}

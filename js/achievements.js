@@ -255,6 +255,20 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             starCondition: function() {
                 return this.game.challenges.getCountCompletions() >= 100;
             }
+        }, {
+			name: "betterSafeThanSorry",
+			title: $I("achievements.betterSafeThanSorry.title"),
+			description: $I("achievements.betterSafeThanSorry.desc"),
+			starDescription: $I("achievements.betterSafeThanSorry.starDesc"),
+			condition: function() {
+				// grant the achievement to saves that had the old basge
+				return this.game.achievements.getBadge("betterSafeThanSorry").unlocked;
+			},
+			starCondition: function() {
+				// this is awarded manually, but we need starCondition to be
+				// defined for the star to show up in UI
+				return false;
+			}
         }
     ],
 
@@ -404,9 +418,10 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             }
         },{
             name: "betterSafeThanSorry",
-            title: "Better Safe Than Sorry",
+            title: "Better Safe Than Sorry (old)",
             description: "Get Carbon Sequestration with no pollution.",
-            difficulty: "E"
+            difficulty: "E",
+			fullyHidden: true
         },{
             name: "soLongAndThanksForAllTheHay", //Because horses eat hay
             title: "So Long, and Thanks for All the Hay",
