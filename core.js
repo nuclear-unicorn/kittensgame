@@ -1352,18 +1352,20 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 		return false;
 	},
 
-	precraft: function(model){
+	//craftWood: also convert catnip into the wood shortfall (long-press precraft). Off by default
+	//since crafting wood while kittens are present risks catnip starvation.
+	precraft: function(model, craftWood){
 		this.fetchExtendedModel(model);
 		for (var i in model.priceModels){
 			var price = model.priceModels[i];
-			this._precraftRes(price);
+			this._precraftRes(price, craftWood);
 		}
 	},
 
-	_precraftRes: function(price) {
+	_precraftRes: function(price, craftWood) {
 		if (price.children) {
 			for (var i in price.children) {
-				this._precraftRes(price.children[i]);
+				this._precraftRes(price.children[i], craftWood);
 			}
 		}
 
@@ -1376,7 +1378,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 		if (amt <= 0) {
 			return;
 		}
-		if (res.name == "wood" && game.village.getKittens() > 0) {
+		if (res.name == "wood" && game.village.getKittens() > 0 && !craftWood) {
 			//Don't craft wood if we have kittens, as there's risk of causing starvation
 			return;
 		}
