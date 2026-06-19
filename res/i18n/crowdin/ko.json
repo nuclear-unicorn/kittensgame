@@ -1761,7 +1761,6 @@
     "ui.option.scheme": "색상 테마:",
     "ui.option.scheme.relock": "테마 잠그기",
     "ui.option.scheme.tip": "아직 선택할 수 없는 테마. 특정 행동으로 영구 해금할 수 있습니다.",
-    "ui.option.workers": "웹 워커 사용\n<i>(게임이 백그라운드 탭에서도 정상적으로 작동합니다. 성능 문제가 생길 수 있습니다)<br>설정을 적용하려면 페이지를 새로고침 해야합니다.</i>",
     "ui.option.force.high.precision": "고정밀 자원값 사용",
     "ui.option.use.per.second.values": "초당 단위 값 사용 <i>(아닌 경우 틱당 단위 값)</i>",
     "ui.option.use.percentage.resource.values": "퍼센티지 기반 자원 생산값 사용",

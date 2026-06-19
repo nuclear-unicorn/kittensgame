@@ -1760,7 +1760,6 @@
     "ui.option.scheme": "Tema:",
     "ui.option.scheme.relock": "Rebloquear temas",
     "ui.option.scheme.tip": "Puedes desbloquear temas cumpliendo con ciertas acciones.",
-    "ui.option.workers": "Usar un trabajador web\n<i>(el juego funcionará correctamente en una pestaña en segundo plano, pero puede causar problemas de desempeño)<br>Necesitarás actualizar la página del explorador para aplicar este cambio.</i>",
     "ui.option.force.high.precision": "Usar alta preción para los valores de los recursos",
     "ui.option.use.per.second.values": "Usar valores por segundo <i>(alt.: valores por tick)</i>",
     "ui.option.use.percentage.resource.values": "Usar valores de producción de recursos en porcentajes",

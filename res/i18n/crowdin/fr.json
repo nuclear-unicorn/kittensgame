@@ -1777,7 +1777,6 @@
     "ui.option.scheme": "Thème de couleurs :",
     "ui.option.scheme.relock": "Revérouiller les thèmes",
     "ui.option.scheme.tip": "Les thèmes indisponibles peuvent être débloqués par des actions spécifiques.",
-    "ui.option.workers": "Utiliser le travailleur web\n<i>(le jeu fonctionne correctement en arrière-plan, pouvant causer des problèmes de performance)<br>Vous devez actualiser la page pour que ce paramètre prenne effet.</i>",
     "ui.option.force.high.precision": "Utiliser une haute précision pour les valeurs des ressources",
     "ui.option.use.per.second.values": "Utiliser des valeurs par secondes <i>(sinon par tick)</i>",
     "ui.option.use.percentage.resource.values": "Afficher la production en pourcentage",
