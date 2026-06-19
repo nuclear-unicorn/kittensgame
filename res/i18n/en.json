@@ -546,6 +546,7 @@
     "effectsMgr.statics.productionRatio.title": "Production bonus",
     "effectsMgr.statics.quarrySlabCraftBonus.title": "Quarry slab craft bonus",
     "effectsMgr.statics.queueCap": "Queue cap",
+    "effectsMgr.statics.queueCapRatio": "Queue cap bonus",
     "effectsMgr.statics.rankLeaderBonusConversion.title": "Conversion production per leader rank",
     "effectsMgr.statics.rationalityBonus.title" :"Rationality bonus",
     "effectsMgr.statics.reactorEnergyRatio.title": "Reactor energy bonus",

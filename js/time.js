@@ -2146,11 +2146,12 @@ dojo.declare("classes.queue.manager", null,{
     },
 
     /**
-     * Get maximum amount if individual (not grouped) items in the queue (see #queueLength)
+     * Get maximum amount of individual (not grouped) items in the queue (see #queueLength)
      */
     calculateCap: function(){
         var aiCore = this.game.bld.getBuildingExt("aiCore");
-        return aiCore.meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap + this.game.getEffect("queueCap");
+        var capBeforeMultipliers = aiCore.meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap + this.game.getEffect("queueCap");
+        return Math.floor(capBeforeMultipliers * (1 + this.game.getEffect("queueCapRatio")));
     },
 
     /**

@@ -1100,8 +1100,12 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 type: "fixed"
             },
 			"queueCap": {
-                title: $I("effectsMgr.statics.queueCap"),
-                type: "fixed"
+				title: $I("effectsMgr.statics.queueCap"),
+				type: "fixed"
+			},
+			"queueCapRatio": {
+				title: $I("effectsMgr.statics.queueCapRatio"),
+				type: "ratio"
 			},
 			//Spaceports
 			"moonBaseStorageBonus": {
