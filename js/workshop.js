@@ -814,7 +814,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			buildings: ["warehouse"],
-			// stages: [{bld:"warehouse", stage:1}],
+			stages: [{bld:"warehouse", stage:1}],
 		},
 		unlocks:{
 			upgrades: ["transportSuperposition"]
