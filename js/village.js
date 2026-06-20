@@ -229,6 +229,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 	},
 
 	updateEffectCached: function(){
+		this.updateHappines();
+		this.updateResourceProduction();
 		this.map.updateEffectCached();
 	},
 
