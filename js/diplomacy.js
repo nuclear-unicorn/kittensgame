@@ -1085,7 +1085,22 @@ dojo.declare("classes.diplomacy.ui.EldersPanel", classes.diplomacy.ui.RacePanel,
 				description: $I("trade.bcoin.crash.desc"),
 				controller: new com.nuclearunicorn.game.ui.CrashBcoinButtonController(this.game),
 				handler: function () {
-					self.game.calendar.correctCryptoPrice();
+					if (self.game.opts.noConfirm) {
+						self.game.calendar.correctCryptoPrice();
+					} else {
+						//Ask the player for confirmation.
+						//The confirmation pop-up should change based on the game-state so that it always shows relevant info.
+						var numBcoins = self.game.resPool.get("blackcoin").value;
+						var confirmMsg = numBcoins > 0 ? $I("trade.bcoin.crash.confirmation.msg", [ self.game.getDisplayValueExt(numBcoins)]) : $I("trade.bcoin.crash.confirmation.msg.alt");
+						var tcPrice = self.crashBcoin.model.prices[0].val;
+						if (tcPrice >= 0.01 * self.game.resPool.get("timeCrystal").value) {
+							//Price is greater than 1% of player's TC stash
+							confirmMsg += "\n" + $I("trade.bcoin.crash.confirmation.tcCost");
+						}
+						self.game.ui.confirm($I("trade.bcoin.crash.confirmation.title"), confirmMsg, function() {
+							self.game.calendar.correctCryptoPrice();
+						});
+					}
 				}
 			}, this.game);
 			this.crashBcoin.render(content);
@@ -1144,7 +1159,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CrashBcoinButtonController", com.nuclea
 		var tcPerTick = Math.max(tcPerTick_phase0, tcPerTick_phase1, tcPerTick_phase2);
 		// 10 ticks/day / (1.2499270834635280e-6 logInc/day), see calendar.js
 		var ticksUntilNextNaturalCrash = 8000466.693057134 * Math.log(1100 / this.game.calendar.cryptoPrice);
-		var tcBasePrice = Math.max(256, tcPerTick * ticksUntilNextNaturalCrash);
+		var tcBasePrice = Math.max(256, tcPerTick * ticksUntilNextNaturalCrash) / 8;
 		var tcPrice = Math.pow(2, Math.ceil(Math.log(tcBasePrice) * Math.LOG2E));
 		return [{name: "timeCrystal", val: tcPrice}];
 	}
