@@ -733,6 +733,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 		game.upgrade({
 			buildings: ["pasture"]
 		});
+        this.updateQueue();
     },
     /* shatterInCycles does this:
     1) indepenently calculates space travel
@@ -823,6 +824,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 		this.game.upgrade({
 			buildings: ["pasture"]
 		});
+        this.updateQueue();
     },
     /*
     shatterInGroupCycles does this:
@@ -981,6 +983,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 		this.game.upgrade({
 			buildings: ["pasture"]
 		});
+        this.updateQueue();
     },
     compareShatterTime: function(shatters, times, ignoreOldFunction, ignoreShatterInCycles, ignoreGroupCycles){
         if (!ignoreOldFunction){
