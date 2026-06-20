@@ -2421,7 +2421,7 @@
     "workshop.factoryRobotics.label": "Factory Robotics",
     "workshop.factoryRobotics.desc": "Improves Engineer's effectiveness",
     "workshop.freightfulExchange.label": "Freightful Exchange",
-    "workshop.freightfulExchange.desc": "Spaceports automation allows their usage for increased volumes of trade.",
+    "workshop.freightfulExchange.desc": "Spaceports automation allows their usage for increased volumes of trade. The volume increases by +50% per each",
     "workshop.fluidizedReactors.label": "Fluidized Reactors",
     "workshop.fluidizedReactors.desc": "Calciners are twice as effective",
     "workshop.fluxCondensator.label": "Flux Condensator",
