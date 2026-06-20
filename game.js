@@ -1105,8 +1105,12 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 type: "fixed"
             },
 			"queueCap": {
-                title: $I("effectsMgr.statics.queueCap"),
-                type: "fixed"
+				title: $I("effectsMgr.statics.queueCap"),
+				type: "fixed"
+			},
+			"queueCapRatio": {
+				title: $I("effectsMgr.statics.queueCapRatio"),
+				type: "ratio"
 			},
 			//Spaceports
 			"moonBaseStorageBonus": {
@@ -1487,14 +1491,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.magnetoBoostBonusPolicy.title"),
 				type: "ratio"
 			},
-			"parchmentTradeChanceIncrease":{
-				title: $I("effectsMgr.statics.parchmentTradeChanceIncrease.title"),
-                type: "ratio" 
-			},
-			"manuscriptTradeChanceIncrease":{
-				title: $I("effectsMgr.statics.manuscriptTradeChanceIncrease.title"),
-                type: "ratio" 
-			},
 			"faithFromManuscripts":{
 				title: $I("effectsMgr.statics.faithFromManuscripts.title"),
                 type: "ratio" 
@@ -1525,10 +1521,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			},
 			"religionUpgradesDiscount":{
 				title: $I("effectsMgr.statics.religionUpgradesDiscount.title"),
-				type: "ratio"
-			},
-			"ironBuyRatioIncrease":{
-				title: $I("effectsMgr.statics.ironBuyRatioIncrease.title"),
 				type: "ratio"
 			},
 			"nagaBlueprintTradeChance":{

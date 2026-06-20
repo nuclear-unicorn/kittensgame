@@ -733,6 +733,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 		game.upgrade({
 			buildings: ["pasture"]
 		});
+        this.updateQueue();
     },
     /* shatterInCycles does this:
     1) indepenently calculates space travel
@@ -823,6 +824,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 		this.game.upgrade({
 			buildings: ["pasture"]
 		});
+        this.updateQueue();
     },
     /*
     shatterInGroupCycles does this:
@@ -981,6 +983,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 		this.game.upgrade({
 			buildings: ["pasture"]
 		});
+        this.updateQueue();
     },
     compareShatterTime: function(shatters, times, ignoreOldFunction, ignoreShatterInCycles, ignoreGroupCycles){
         if (!ignoreOldFunction){
@@ -2163,11 +2166,12 @@ dojo.declare("classes.queue.manager", null,{
     },
 
     /**
-     * Get maximum amount if individual (not grouped) items in the queue (see #queueLength)
+     * Get maximum amount of individual (not grouped) items in the queue (see #queueLength)
      */
     calculateCap: function(){
         var aiCore = this.game.bld.getBuildingExt("aiCore");
-        return aiCore.meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap + this.game.getEffect("queueCap");
+        var capBeforeMultipliers = aiCore.meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap + this.game.getEffect("queueCap");
+        return Math.floor(capBeforeMultipliers * (1 + this.game.getEffect("queueCapRatio")));
     },
 
     /**

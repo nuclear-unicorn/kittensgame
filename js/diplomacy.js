@@ -330,6 +330,61 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		return null;
 	},
 
+	//Update chance & amount for certain writing-themed resources based on time elapsed in current run.
+	updateSharkScribes: function() {
+		var hasPolicy = this.game.science.getPolicy("sharkRelationsScribes").researched;
+		var sellParchmentParams = this.get("sharks").sells[1]; //I don't like hard-coding these things.  Can we change this eventually?
+		var sellManuscriptParams = this.get("sharks").sells[2];
+		var buyIronParams = this.get("sharks").buys[0];
+		if (!hasPolicy) {
+			//Set things back to their original values.
+			sellParchmentParams.value = 5;
+			sellParchmentParams.chance = 0.25;
+			sellManuscriptParams.value = 3;
+			sellManuscriptParams.chance = 0.15;
+			buyIronParams.val = 100;
+			return;
+		}
+		//Else, Shark Relations Scribes is researched, so we scale trade amounts based on time elapsed.
+		//Note: calendar.year is always an integer, calendar.trueYear counts fractional years
+		var calendar = this.game.calendar;
+		var timeElapsed = calendar.year + calendar.trueYear();
+		if (!this.game.startedWithoutChronospheres) {
+			//Having Chronosphere'd your way into this run counts as having existed for 2000 more years.  Number subject to balancing.
+			//Exists because by now, the trades need to be more lucrative in order to be worth doing at all.
+			timeElapsed += 4000;
+		}
+		if (timeElapsed < 0) { /*sanity check*/ timeElapsed = 0; }
+
+		sellParchmentParams.chance = Math.min(0.40 + timeElapsed / 33333, 1); //Reach 100% chance around year 10k-ish with 0 embassies
+		sellParchmentParams.value = 5 + Math.pow(timeElapsed, 1.25) / 1000;
+		sellManuscriptParams.chance = Math.min(0.20 + timeElapsed / 100000, 1); //Reach 100% chance around year 40k-ish with 0 embassies
+		sellManuscriptParams.value = 3.3 + timeElapsed / 545;
+
+		//Scale with Black Libraries so we can be more generous to lategame players:
+		var libraryRatio = 1 + 0.03 * this.game.religion.getTU("blackLibrary").on;
+		sellParchmentParams.value *= libraryRatio;
+		sellManuscriptParams.value *= libraryRatio;
+
+		//Iron cost should increase over time to keep cost efficiency balanced.
+		//But we also want it to always be a round number.
+		var rawValue = timeElapsed / 8 /*I think 8 is good here, but it's subject to balancing*/;
+		if (rawValue < 301) { //<minimum>, 150, 200, 250, 300
+			rawValue = 50 * Math.floor(rawValue/50);
+		} else if (rawValue < 501) { //300, 400, 500
+			rawValue = 100 * Math.floor(rawValue/100);
+		} else if (rawValue < 1501) { //500, 750, 1000, 1250, 1500
+			rawValue = 250 * Math.floor(rawValue/250);
+		} else if (rawValue < 2501) { //1500, 2000, 2500
+			rawValue = 500 * Math.floor(rawValue/500);
+		} else if (rawValue < 10001) { //2500, 3750, 5000, 6250, 7500, 8750, 10k
+			rawValue = 1250 * Math.floor(rawValue/1250);
+		} else {
+			rawValue = 11111; //Maximum iron cost of 11k
+		}
+		buyIronParams.val = Math.max(125, rawValue); //Minimum iron cost of 125
+	},
+
 	update: function() {
 		if (!this.hasUnlockedRaces()) {
 
@@ -445,6 +500,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		} else {
 			this.nonRandomTrades = 0;
 		}
+
+		this.updateSharkScribes();
 
         var elders = this.get("leviathans");
         if (elders.duration <= 0  && elders.unlocked){
@@ -1035,7 +1092,22 @@ dojo.declare("classes.diplomacy.ui.EldersPanel", classes.diplomacy.ui.RacePanel,
 				description: $I("trade.bcoin.crash.desc"),
 				controller: new com.nuclearunicorn.game.ui.CrashBcoinButtonController(this.game),
 				handler: function () {
-					self.game.calendar.correctCryptoPrice();
+					if (self.game.opts.noConfirm) {
+						self.game.calendar.correctCryptoPrice();
+					} else {
+						//Ask the player for confirmation.
+						//The confirmation pop-up should change based on the game-state so that it always shows relevant info.
+						var numBcoins = self.game.resPool.get("blackcoin").value;
+						var confirmMsg = numBcoins > 0 ? $I("trade.bcoin.crash.confirmation.msg", [ self.game.getDisplayValueExt(numBcoins)]) : $I("trade.bcoin.crash.confirmation.msg.alt");
+						var tcPrice = self.crashBcoin.model.prices[0].val;
+						if (tcPrice >= 0.01 * self.game.resPool.get("timeCrystal").value) {
+							//Price is greater than 1% of player's TC stash
+							confirmMsg += "\n" + $I("trade.bcoin.crash.confirmation.tcCost");
+						}
+						self.game.ui.confirm($I("trade.bcoin.crash.confirmation.title"), confirmMsg, function() {
+							self.game.calendar.correctCryptoPrice();
+						});
+					}
 				}
 			}, this.game);
 			this.crashBcoin.render(content);
@@ -1094,7 +1166,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CrashBcoinButtonController", com.nuclea
 		var tcPerTick = Math.max(tcPerTick_phase0, tcPerTick_phase1, tcPerTick_phase2);
 		// 10 ticks/day / (1.2499270834635280e-6 logInc/day), see calendar.js
 		var ticksUntilNextNaturalCrash = 8000466.693057134 * Math.log(1100 / this.game.calendar.cryptoPrice);
-		var tcBasePrice = Math.max(256, tcPerTick * ticksUntilNextNaturalCrash);
+		var tcBasePrice = Math.max(256, tcPerTick * ticksUntilNextNaturalCrash) / 8;
 		var tcPrice = Math.pow(2, Math.ceil(Math.log(tcBasePrice) * Math.LOG2E));
 		return [{name: "timeCrystal", val: tcPrice}];
 	}
