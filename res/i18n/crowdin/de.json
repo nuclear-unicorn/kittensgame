@@ -1761,7 +1761,6 @@
     "ui.option.scheme": "Farbschema:",
     "ui.option.scheme.relock": "Themes neu laden",
     "ui.option.scheme.tip": "Designs, die du noch nicht auswählen kannst, können dauerhaft durch bestimmte Aktionen freigeschaltet werden.",
-    "ui.option.workers": "Webworker verwenden\n<i>(Spiel funktioniert korrekt im Hintergrund-Tab, kann zu Performance-Problemen führen)<br>Du musst die Browser-Seite aktualisieren, damit diese Einstellung wirksam wird.</i>",
     "ui.option.force.high.precision": "Verwende hohe Genauigkeit für Ressourcenwerte",
     "ui.option.use.per.second.values": "Nutzwert pro Sekunde <i> (sonst pro Tick) </i>",
     "ui.option.use.percentage.resource.values": "Prozentuale Ressourcenproduktionswerte verwenden",

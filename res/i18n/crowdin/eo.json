@@ -1595,7 +1595,6 @@
     "ui.option.scheme": "Kolortemo:",
     "ui.option.scheme.relock": "Reŝlosi temojn",
     "ui.option.scheme.tip": "Temojn, kiujn vi ankoraŭ ne povas elekti, oni povas permanente malŝlosi per specifaj agoj.",
-    "ui.option.workers": "Uzu retlaborilon <i>(la ludo funkcias ĝuste en langeto kun fono, povas kaŭzi problemojn pri rendimento)<br> Vi devas refreŝigi la retumilan paĝon por ke ĉi tiu agordo ekvalidu.</i>",
     "ui.option.force.high.precision": "Uzu altan precizecon por rimedaj valoroj",
     "ui.option.use.per.second.values": "Ĉu uzi tempa notacio por ĉiu sekundo <i>(ĉiu tempero alie)</i>",
     "ui.option.use.percentage.resource.values": "Uzu procentajn valorojn de rimedo-produktado",

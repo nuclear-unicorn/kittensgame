@@ -1758,7 +1758,6 @@
     "ui.option.scheme": "Färgtema:",
     "ui.option.scheme.relock": "Återlås teman",
     "ui.option.scheme.tip": "Teman som du inte kan välja än kan permanent låsas upp genom specifika handlingar.",
-    "ui.option.workers": "Använd web worker\n<i>(spelet fungerar korrekt i bakgrundsflik, kan orsaka prestandaproblem)<br>Du behöver uppdatera webbläsarsidan för att denna inställning ska träda i kraft.</i>",
     "ui.option.force.high.precision": "Använd hög precision för resursvärden",
     "ui.option.use.per.second.values": "Använd per sekund-värden <i>(per tick annars)</i>",
     "ui.option.use.percentage.resource.values": "Använd procentuella resursproduktionsvärden",
