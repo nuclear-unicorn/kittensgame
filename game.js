@@ -2285,6 +2285,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.space.updateEffectCached();
 		this.time.updateEffectCached();
 		this.village.updateEffectCached();
+		this.village.updateHappines();
+		this.village.updateResourceProduction();
         this.science.updateEffectCached();
 		
 		this.bld.cacheCathPollutionPerTick();
