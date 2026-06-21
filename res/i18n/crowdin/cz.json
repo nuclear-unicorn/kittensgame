@@ -1760,7 +1760,6 @@
     "ui.option.scheme": "Barevný motiv:",
     "ui.option.scheme.relock": "Znova uzamknout skiny",
     "ui.option.scheme.tip": "Témata, která ještě nemůžete vybrat, lze trvale odemknout specifickými akcemi.",
-    "ui.option.workers": "Použít web worker\n<i>(hra funguje správně v záložce na pozadí, může způsobit problémy s výkonem)<br>Pro aktivaci tohoto nastavení je potřeba obnovit stránku prohlížeče.</i>",
     "ui.option.force.high.precision": "Použít vysokou přesnost pro hodnoty zdrojů",
     "ui.option.use.per.second.values": "Použít hodnoty za sekundu <i>(jinak za tik)</i>",
     "ui.option.use.percentage.resource.values": "Použití procentuálních hodnot produkce zdrojů",
