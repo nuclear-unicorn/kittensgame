@@ -354,7 +354,7 @@
     "challendge.ironWill.effect.desc": "Nothing",
     "challendge.islands.label": "Islands",
     "challendge.islands.desc": "Restart the game on an archipelago with limited resources available. Discover nearby islands to find resources",
-    "challendge.islands.effect.desc": "Keep policies unlocked this run",
+    "challendge.islands.effect.desc": "Keep challange specific upgrades after challenge completion",
     "challendge.pacifism.label": "Pacifism",
     "challendge.pacifism.desc": "Restart the game without ability to hunt. Some policies are unavailable.<br><br>Goal: Research Space Treaty policy and reset.",
     "challendge.pacifism.effect.desc": "You gain improved trade based on trade posts.",

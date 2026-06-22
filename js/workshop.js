@@ -44,7 +44,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		calculateEffects: function(self, game) {
 			if (game.challenges.isActive("islands")) {
-				self.effects["manpowerChallengeMitigation"] = 0.1 * (1 + game.getEffect("islandsMitigationEffectiveness"));
+				self.effects["manpowerChallengeMitigation"] = 0.1 * (1 - game.getEffect("islandsMitigationEffectiveness"));
 			} else {
 				self.effects["manpowerChallengeMitigation"] = 0;
 			}
@@ -618,7 +618,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		calculateEffects: function(self, game) {
 			if (game.challenges.isActive("islands")) {
-				self.effects["manpowerChallengeMitigation"] = 0.1 * (1 + game.getEffect("islandsMitigationEffectiveness"));;
+				self.effects["manpowerChallengeMitigation"] = 0.1 * (1 - game.getEffect("islandsMitigationEffectiveness"));
 			} else {
 				self.effects["manpowerChallengeMitigation"] = 0;
 			}
@@ -635,7 +635,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		calculateEffects: function(self, game) {
 			if (game.challenges.isActive("islands")) {
-				self.effects["islandAutomationBonus"] = 0.5
+				self.effects["islandAutomationBonus"] = 0.5;
 			} else {
 				self.effects["islandAutomationBonus"] = 0;
 			}
@@ -1686,7 +1686,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		description: $I("workshop.offShoreDrilling.desc"),
 		effects: {
 			"oilRatio" : 0.1,
-			"oilChallengeMitigation" : 0.2
+			"oilChallengeMitigation" : 0.1
 		},
 		prices:[
 			{ name : "titanium", val: 500 },
@@ -1695,7 +1695,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		calculateEffects: function(self, game) {
 			if (game.challenges.isActive("islands")) {
-				self.effects["oilChallengeMitigation"] = 0.2 * (1 + game.getEffect("islandsMitigationEffectiveness"));;
+				self.effects["oilChallengeMitigation"] = 0.1 * (1 - game.getEffect("islandsMitigationEffectiveness"));
 			} else {
 				self.effects["oilChallengeMitigation"] = 0;
 			}
@@ -1948,7 +1948,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "science",  val: 200000 },
 			{ name : "alloy", 	 val: 750 }
-		]
+		],
+		unlocks: {
+			challenges: ["islands"]
+		}
 	},{
         name: "satelliteRadio",
         label: $I("workshop.satelliteRadio.label"),

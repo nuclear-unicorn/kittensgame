@@ -921,9 +921,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 
 			self.effects = game.resPool.addBarnWarehouseRatio(effects);
 		},
-		unlocks: {
-			challenges: ["islands"]
-		},
 		flavor: $I("buildings.harbor.flavor")
 	},
 	//----------------------------------- Resource production ----------------------------------------
@@ -2365,8 +2362,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		],
 		priceRatio: 1.5,
 		effects: {
-			"goldChallengeMitigation": 0.01,
-			"coalChallengeMitigation": 0.001,
+			"goldChallengeMitigation": 0.04,
+			"coalChallengeMitigation": 0.002,
 			"oilChallengeMitigation": 0.001,
 		},
 		calculateEffects: function(self, game){

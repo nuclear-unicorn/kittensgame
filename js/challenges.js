@@ -355,12 +355,12 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["islandsMitigationEffectiveness"] = game.getLimitedDR(mitigationEffect, 1);
 
 				self.effects["catnipChallengeReductionRatio"] = -0.25;
-				self.effects["woodChallengeReductionRatio"] = increasingChallenge
-				self.effects["mineralsChallengeReductionRatio"] = increasingChallenge
-				self.effects["manpowerChallengeReductionRatio"] = increasingChallenge
-				self.effects["goldChallengeReductionRatio"] = increasingChallenge
-				self.effects["coalChallengeReductionRatio"] = increasingChallenge
-				self.effects["oilChallengeReductionRatio"] = increasingChallenge
+				self.effects["woodChallengeReductionRatio"] = increasingChallenge;
+				self.effects["mineralsChallengeReductionRatio"] = increasingChallenge;
+				self.effects["manpowerChallengeReductionRatio"] = increasingChallenge;
+				self.effects["goldChallengeReductionRatio"] = increasingChallenge;
+				self.effects["coalChallengeReductionRatio"] = increasingChallenge;
+				self.effects["oilChallengeReductionRatio"] = increasingChallenge;
 
 
 
@@ -401,9 +401,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["oilChallengeReductionRatio"] = 0;
 			}
 		},
-
-		checkCompletionCondition: function(game) {
-			return game.workshop.get("satnav").researched;
+		checkCompletionCondition: function(game){
+			return game.space.getPlanet("piscine").reached;
 		},
 		actionOnCompletion: function(game){
 			var buildings = game.bld.getBuildingGroup("islands");
@@ -416,7 +415,9 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		},
 		upgrades: {
 			buildings: ["lushIsland", "plainIsland", "rockyIsland",
-			"cavernousIsland", "glitteringIsland", "oilDeposit"]
+			"cavernousIsland", "glitteringIsland", "oilDeposit"],
+			upgrades: ["fishingNets", "improvedBoats", "islandManagement",
+			"fleetCoordination", "offShoreDrilling", "suspensionBridges"]
 		}
 	},{
 		name: "unicornTears",
