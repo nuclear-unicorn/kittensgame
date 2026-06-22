@@ -45,6 +45,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			buildings: ["zebraOutpost", "zebraWorkshop", "zebraForge"],
 			jobs: ["hunter"],
 			tech: ["animal"]
+		},	
+		upgrades: {
+			challenges: ["islands"]
 		},
 		flavor: $I("science.archery.flavor")
 	}, {
@@ -137,6 +140,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			buildings: ["aqueduct"],
 			tech: ["writing"],
             policies: ["stripMining", "clearCutting", "environmentalism"],
+		},		
+		upgrades: {
+			challenges: ["islands"]
 		}
 	}, {
 		name: "currency",
@@ -243,6 +249,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["caravanserai", "cargoShips", "astrolabe",
 						"titaniumMirrors", "titaniumAxe"],
 			crafts: ["ship"]
+		},		
+		upgrades: {
+			challenges: ["islands"]
 		}
 	}, {
 		name: "architecture",

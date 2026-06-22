@@ -244,6 +244,10 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		name: "zebraBuildings",
 		title: $I("buildings.group.zebraBuildings"),
 		buildings: ["zebraOutpost", "zebraWorkshop", "zebraForge", "ivoryTemple", "stasisPod"]
+	},{
+		name: "islands",
+		title: $I("buildings.group.islands"),
+		buildings: ["lushIsland", "plainIsland", "rockyIsland", "cavernousIsland", "glitteringIsland", "oilDeposit"]
 	}
 	],
 
@@ -2270,6 +2274,127 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			self.effects["alicornPerTickCon"] *= amt;
 			self.effects["tMythrilPerTick"] *= amt;
 		}
+	},{
+		name: "lushIsland",
+		label: $I("buildings.lushIsland.label"),
+		description: $I("buildings.lushIsland.desc"),
+		unlockRatio: 0.3,
+		prices: [
+			{ name : "wood", val: 20 },
+		],
+		priceRatio: 1.5,
+		effects: {
+			"catnipChallengeMitigation": 0.01,
+			"woodChallengeMitigation": 0.01
+		},
+		calculateEffects: function(self, game){
+			self.effects["catnipChallengeMitigation"] = 0.01;
+			self.effects["woodChallengeMitigation"] = 0.01;
+
+			game.bld.islandAutomation(self);
+		},
+		isAutomationEnabled: null
+	},{
+		name: "plainIsland",
+		label: $I("buildings.plainIsland.label"),
+		description: $I("buildings.plainIsland.desc"),
+		unlockRatio: 0.3,
+		prices: [
+			{ name : "wood", val: 20 },
+		],
+		priceRatio: 1.5,
+		effects: {
+			"catnipChallengeMitigation": 0.01,
+			"manpowerChallengeMitigation": 0.01
+		},
+		calculateEffects: function(self, game){
+			self.effects["catnipChallengeMitigation"] = 0.01;
+			self.effects["manpowerChallengeMitigation"] = 0.01;
+
+			game.bld.islandAutomation(self);
+		},
+		isAutomationEnabled: null
+	},{
+		name: "rockyIsland",
+		label: $I("buildings.rockyIsland.label"),
+		description: $I("buildings.rockyIsland.desc"),
+		unlockRatio: 0.6,
+		prices: [
+			{ name : "wood", val: 20 },
+		],
+		priceRatio: 1.5,
+		effects: {
+			"mineralsChallengeMitigation": 0.01,
+			"coalChallengeMitigation": 0.002
+		},
+		calculateEffects: function(self, game){
+			self.effects["mineralsChallengeMitigation"] = 0.01;
+			self.effects["coalChallengeMitigation"] = 0.002;
+			
+			game.bld.islandAutomation(self);
+		},
+		isAutomationEnabled: null
+	},{
+		name: "cavernousIsland",
+		label: $I("buildings.cavernousIsland.label"),
+		description: $I("buildings.cavernousIsland.desc"),
+		unlockRatio: 0.3,
+		prices: [
+			{ name : "wood", val: 100 },
+			{ name : "iron", val: 15 }
+		],
+		priceRatio: 1.5,
+		effects: {
+			"coalChallengeMitigation": 0.01,
+			"mineralsChallengeMitigation": 0.003
+		},
+		calculateEffects: function(self, game){
+			self.effects["coalChallengeMitigation"] = 0.01;
+			self.effects["mineralsChallengeMitigation"] = 0.003;
+			
+			game.bld.islandAutomation(self);
+		},
+		isAutomationEnabled: null
+	},{
+		name: "glitteringIsland",
+		label: $I("buildings.glitteringIsland.label"),
+		description: $I("buildings.glitteringIsland.desc"),
+		unlockRatio: 0.3,
+		prices: [
+			{ name : "ship", val: 1 },
+		],
+		priceRatio: 1.5,
+		effects: {
+			"goldChallengeMitigation": 0.01,
+			"coalChallengeMitigation": 0.001,
+			"oilChallengeMitigation": 0.001,
+		},
+		calculateEffects: function(self, game){
+			self.effects["goldChallengeMitigation"] = 0.01;
+			self.effects["coalChallengeMitigation"] = 0.001;
+			self.effects["oilChallengeMitigation"] = 0.001;
+			
+			game.bld.islandAutomation(self);
+		},
+		isAutomationEnabled: null
+	},{
+		name: "oilDeposit",
+		label: $I("buildings.oilDeposit.label"),
+		description: $I("buildings.oilDeposit.desc"),
+		unlockRatio: 0.3,
+		prices: [
+			{ name : "tanker", val: 1 },
+		],
+		priceRatio: 1.4,
+		effects: {
+			"oilChallengeMitigation": 0.05,
+		},
+		calculateEffects: function(self, game){
+			self.effects["oilChallengeMitigation"] = 0.05;
+			
+			game.bld.islandAutomation(self);
+		},
+		isAutomationEnabled: null
 	}
 	],
 
@@ -2470,6 +2595,23 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				//Else, if the weight is under 100, we don't add anything to the price.
 			}
 		}
+
+		if (this.game.challenges.isActive("islands")) {
+			if (bldName == "lushIsland" || bldName == "plainIsland" || bldName == "rockyIsland" || bldName == "cavernousIsland") {
+				if (bldVal > 25 && !this.game.challenges.isActive("blackSky")){
+					for (var i = prices.length - 1; i >= 0; i--) {
+						if (prices[i].name == "wood" || prices[i].name == "iron"){
+							prices.splice(i, 1);
+						}
+			}
+					prices.push({
+						name: "ship",
+						val: bldVal - 25
+					});
+				}
+			}
+		}
+
 		/**
 		 * Spaceport will use a much steper price ratio for starcharts to be a dedicated starchart sinker
 		 */
@@ -2776,6 +2918,44 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			resGainedAmt: actualAmtGained,
 			resSpent: [ { name : "catnip", val: (isEnriched ? 50 : 100) }]
 		}, $I("ui.undo.workshop.craft", [this.game.getDisplayValueExt(actualAmtGained), this.game.resPool.get("wood").title]));
+	},
+
+	getBuildingGroup: function(groupName) {
+		var buildings = [];
+		for (var i in this.buildingGroups) {
+			var buildingGroup = this.buildingGroups[i];
+			if (buildingGroup.name == groupName) {
+				for (var j in buildingGroup.buildings) {
+					buildings.push(this.getBuildingExt(buildingGroup.buildings[j]).meta);
+				}
+				
+			}
+		}
+		return buildings;
+	},
+
+	islandAutomation: function(island) {
+		if (this.game.workshop.get("fleetCoordination").researched) {
+			//self.description = $I("buildings.reactor.desc") + "<br>" + $I("buildings.reactor.desc.automation");
+			if (island.isAutomationEnabled === null ) {
+				island.isAutomationEnabled = false; //force non-null value
+			}
+		} else {
+			//self.description = $I("buildings.reactor.desc");
+			island.isAutomationEnabled = null;
+		}
+
+		if (island.isAutomationEnabled == true) {
+			var buildings = this.game.bld.getBuildingGroup("islands");
+			for (var i in buildings) {
+				buildings[i].isAutomationEnabled = false;
+				this.game.upgrade({buildings: [buildings[i].name]});
+			}
+			island.isAutomationEnabled = true;
+			for (var i in island.effects) {
+				island.effects[i] *= 1 + this.game.getEffect("challengePenaltyMitigation");
+			}
+		}
 	},
 
 	getUndissipatedPollutionPerTick: function(){

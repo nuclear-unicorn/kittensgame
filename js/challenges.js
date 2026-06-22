@@ -320,17 +320,6 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		description: $I("challendge.islands.desc"),
 		effectDesc: $I("challendge.islands.effect.desc"),
 
-		islands: [{
-			name: "lush",
-			label: "challendge.islands.lush.label",
-			description: "challendge.islands.lush.description",
-			effects: {
-				"catnipChallengeReductionRatio": 0.02,
-				"woodChallengeReductionRatio" : 0.02,
-			},
-		}],
-		//islandEffects: {},
-
 		stackOptions: {
 			"catnipChallengeReductionRatio": { noStack: true },
 			"woodChallengeReductionRatio": { noStack: true },
@@ -342,6 +331,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		},
 
 		effects: {
+			"islandsIncreasingChallenge": 0,
 			"catnipChallengeReductionRatio": 0,
 			"woodChallengeReductionRatio": 0,
 			"mineralsChallengeReductionRatio": 0,
@@ -352,14 +342,39 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		},
 		
 		calculateEffects: function(self, game) {
+			
 			if (self.active) {
+				self.effects["islandsIncreasingChallenge"] = 0.1 * self.on;
+				var increasingChallenge = 1 + self.effects["islandsIncreasingChallenge"];
 				self.effects["catnipChallengeReductionRatio"] = -0.25;
-				self.effects["woodChallengeReductionRatio"] = -0.6;
-				self.effects["mineralsChallengeReductionRatio"] = -0.8;
-				self.effects["manpowerChallengeReductionRatio"] = -0.8;
-				self.effects["goldChallengeReductionRatio"] = -0.8;
-				self.effects["coalChallengeReductionRatio"] = -0.8;
-				self.effects["oilChallengeReductionRatio"] = -0.8;
+				self.effects["woodChallengeReductionRatio"] = -game.getLimitedDR(0.6 * increasingChallenge, 0.95);
+				self.effects["mineralsChallengeReductionRatio"] = -game.getLimitedDR(0.7 * increasingChallenge, 0.99);
+				self.effects["manpowerChallengeReductionRatio"] = -game.getLimitedDR(0.7 * increasingChallenge, 0.99);
+				self.effects["goldChallengeReductionRatio"] = -game.getLimitedDR(0.7 * increasingChallenge, 0.99);
+				self.effects["coalChallengeReductionRatio"] = -game.getLimitedDR(0.7 * increasingChallenge, 0.99);
+				self.effects["oilChallengeReductionRatio"] = -game.getLimitedDR(0.7 * increasingChallenge, 0.99);
+
+				if (game.science.get("archery").researched && !game.workshop.get("fishingNets").unlocked) {
+					game.unlock({ upgrades: ["fishingNets"]});
+				}
+				if (game.science.get("engineering").researched && !game.workshop.get("fishingShips").unlocked) {
+					game.unlock({ upgrades: ["fishingShips"]});
+				}
+				if (game.science.get("navigation").researched && !game.workshop.get("fleetCoordination").unlocked) {
+					game.unlock({buildings: ["glitteringIsland"]});
+					game.unlock({ upgrades: ["fleetCoordination"]});
+				}
+				if (game.workshop.get("pumpjack").researched && !game.workshop.get("offShoreDrilling").unlocked) {
+					game.unlock({ upgrades: ["offShoreDrilling"]});
+				}
+				if (game.science.get("mechanization").researched && !game.workshop.get("suspensionBridges").unlocked) {
+					game.unlock({ upgrades: ["suspensionBridges"]});
+				}
+				if (game.workshop.get("offShoreDrilling").researched) {
+					game.unlock({buildings: ["glitteringIsland"]});
+				}
+
+				game.unlock	({buildings: ["lushIsland", "plainIsland", "rockyIsland", "cavernousIsland"]});
             } else {
 				self.effects["catnipChallengeReductionRatio"] = 0;
 				self.effects["woodChallengeReductionRatio"] = 0;
@@ -371,12 +386,17 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			}
 		},
 
-		createNewIsland: function(type){
-
-		},
-
 		checkCompletionCondition: function(game) {
-			return game.resPool.get("tanker").value >= 1;
+			return game.workshop.get("satnav").researched;
+		},
+		actionOnCompletion: function(game){
+			var buildings = game.bld.getBuildingGroup("islands");
+			for (var i in buildings) {
+				buildings[i].unlocked = false;
+				buildings[i].unlockable = false;
+				buildings[i].val = 0;
+				buildings[i].on = 0;
+			}
 		}
 	},{
 		name: "unicornTears",

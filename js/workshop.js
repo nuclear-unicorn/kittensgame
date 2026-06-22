@@ -31,6 +31,24 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "iron", val: 25 },
 			{ name : "science", val: 200 }
 		],
+	},{
+		name: "fishingNets",
+		label: $I("workshop.fishingNets.label"),
+		description: $I("workshop.fishingNets.desc"),
+		effects: {
+			"catnipDemandRatio": -0.25,
+			"manpowerChallengeMitigation": 0.1 
+		},
+		prices:[
+			{ name : "catnip", val: 2500 }
+		],
+		calculateEffects: function(self, game) {
+			if (game.challenges.isActive("islands")) {
+				self.effects["manpowerChallengeMitigation"] = 0.1;
+			} else {
+				self.effects["manpowerChallengeMitigation"] = 0;
+			}
+		},
 	},
 	//--------------------- wood upgrades ----------------------
 	{
@@ -556,6 +574,27 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		},
 		flavor: $I("workshop.cargoShips.flavor")
 	},{
+		name: "fleetCoordination",
+		label: $I("workshop.fleetCoordination.label"),
+		description: $I("workshop.fleetCoordination.desc"),
+		effects: {
+			"challengePenaltyMitigation" : 0.25
+		},
+		prices:[
+			{ name : "science", val: 60000 },
+		],
+		calculateEffects: function(self, game) {
+			if (game.challenges.isActive("islands")) {
+				self.effects["challengePenaltyMitigation"] = 0.25;
+			} else {
+				self.effects["challengePenaltyMitigation"] = 0;
+			}
+		},	
+		upgrades: {
+			buildings: ["lushIsland", "plainIsland", "rockyIsland",
+			"cavernousIsland", "glitteringIsland", "oilDeposit"]
+		}
+	},{
 		name: "barges",
 		label: $I("workshop.barges.label"),
 		description: $I("workshop.barges.desc"),
@@ -585,6 +624,26 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		upgrades: {
 			buildings: ["harbor"]
 		},
+	},{
+		name: "suspensionBridges",
+		label: $I("workshop.suspensionBridges.label"),
+		description: $I("workshop.suspensionBridges.desc"),
+		effects: {
+			"manpowerRatio": 0.1,
+			"challengePenaltyMitigation" : 0.25
+		},
+		calculateEffects: function(self, game) {
+			if (game.challenges.isActive("islands")) {
+				self.effects["challengePenaltyMitigation"] = 0.25;
+			} else {
+				self.effects["challengePenaltyMitigation"] = 0;
+			}
+		},
+		prices:[
+			{ name : "concrate", val: 100 },
+			{ name : "science", val: 100000 },
+			{ name : "blueprint", val: 35 }
+		]
 	},{
 		name: "ironwood",
 		label: $I("workshop.ironwood.label"),
@@ -799,6 +858,26 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			buildings: ["tradepost"]
 		},
 		flavor: $I("workshop.caravanserai.flavor")
+	},{
+		name: "fishingShips",
+		label: $I("workshop.fishingShips.label"),
+		description: $I("workshop.fishingShips.desc"),
+		effects: {
+			"hunterRatio": 0.25,
+			"manpowerChallengeMitigation": 0.2
+		},
+		prices:[
+			{ name : "wood", val: 1000 },
+			{ name : "iron", val: 100 },
+			{ name : "science", val: 1000 }
+		],
+		calculateEffects: function(self, game) {
+			if (game.challenges.isActive("islands")) {
+				self.effects["manpowerChallengeMitigation"] = 0.2;
+			} else {
+				self.effects["manpowerChallengeMitigation"] = 0;
+			}
+		},
 	},
 	//--------------------- stuff ----------------------
 	{
@@ -1575,6 +1654,30 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			buildings: ["oilWell"]
+		}
+	},
+	{
+		name: "offShoreDrilling",
+		label: $I("workshop.offShoreDrilling.label"),
+		description: $I("workshop.offShoreDrilling.desc"),
+		effects: {
+			"oilRatio" : 0.1,
+			"oilChallengeMitigation" : 0.2
+		},
+		prices:[
+			{ name : "titanium", val: 500 },
+			{ name : "science",  val: 110000 },
+			{ name : "gear", 	 val: 200 }
+		],
+		calculateEffects: function(self, game) {
+			if (game.challenges.isActive("islands")) {
+				self.effects["oilChallengeMitigation"] = 0.2;
+			} else {
+				self.effects["oilChallengeMitigation"] = 0;
+			}
+		},	
+		upgrades: {
+			challenges: ["islands"]
 		}
 	},{
 		name: "biofuel",
