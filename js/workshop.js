@@ -44,7 +44,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		calculateEffects: function(self, game) {
 			if (game.challenges.isActive("islands")) {
-				self.effects["manpowerChallengeMitigation"] = 0.1;
+				self.effects["manpowerChallengeMitigation"] = 0.1 * (1 + game.getEffect("islandsMitigationEffectiveness"));
 			} else {
 				self.effects["manpowerChallengeMitigation"] = 0;
 			}
@@ -574,27 +574,6 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		},
 		flavor: $I("workshop.cargoShips.flavor")
 	},{
-		name: "fleetCoordination",
-		label: $I("workshop.fleetCoordination.label"),
-		description: $I("workshop.fleetCoordination.desc"),
-		effects: {
-			"challengePenaltyMitigation" : 0.25
-		},
-		prices:[
-			{ name : "science", val: 60000 },
-		],
-		calculateEffects: function(self, game) {
-			if (game.challenges.isActive("islands")) {
-				self.effects["challengePenaltyMitigation"] = 0.25;
-			} else {
-				self.effects["challengePenaltyMitigation"] = 0;
-			}
-		},	
-		upgrades: {
-			buildings: ["lushIsland", "plainIsland", "rockyIsland",
-			"cavernousIsland", "glitteringIsland", "oilDeposit"]
-		}
-	},{
 		name: "barges",
 		label: $I("workshop.barges.label"),
 		description: $I("workshop.barges.desc"),
@@ -624,6 +603,71 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		upgrades: {
 			buildings: ["harbor"]
 		},
+	},{
+		name: "improvedBoats",
+		label: $I("workshop.improvedBoats.label"),
+		description: $I("workshop.improvedBoats.desc"),
+		effects: {
+			"hunterRatio": 0.25,
+			"manpowerChallengeMitigation": 0.1
+		},
+		prices:[
+			{ name : "wood", val: 1000 },
+			{ name : "iron", val: 100 },
+			{ name : "science", val: 1000 }
+		],
+		calculateEffects: function(self, game) {
+			if (game.challenges.isActive("islands")) {
+				self.effects["manpowerChallengeMitigation"] = 0.1 * (1 + game.getEffect("islandsMitigationEffectiveness"));;
+			} else {
+				self.effects["manpowerChallengeMitigation"] = 0;
+			}
+		},
+	},{
+		name: "islandManagement",
+		label: $I("workshop.islandManagement.label"),
+		description: $I("workshop.islandManagement.desc"),
+		effects: {
+			"islandAutomationBonus" : 0.5
+		},
+		prices:[
+			{ name : "science", val: 4500 },
+		],
+		calculateEffects: function(self, game) {
+			if (game.challenges.isActive("islands")) {
+				self.effects["islandAutomationBonus"] = 0.5
+			} else {
+				self.effects["islandAutomationBonus"] = 0;
+			}
+		},	
+		upgrades: {
+			buildings: ["lushIsland", "plainIsland", "rockyIsland",
+			"cavernousIsland", "glitteringIsland", "oilDeposit"]
+		}
+	},{
+		name: "fleetCoordination",
+		label: $I("workshop.fleetCoordination.label"),
+		description: $I("workshop.fleetCoordination.desc"),
+		effects: {
+			"challengePenaltyMitigation" : 0.25,
+			"islandAutomationBonus" : 0.5
+		},
+		prices:[
+			{ name : "science", val: 35000 },
+		],
+		calculateEffects: function(self, game) {
+			if (game.challenges.isActive("islands")) {
+				self.effects["challengePenaltyMitigation"] = 0.25;
+				self.effects["islandAutomationBonus"] = 0.5;
+			} else {
+				self.effects["challengePenaltyMitigation"] = 0;
+				self.effects["islandAutomationBonus"] = 0;
+			}
+		},	
+		upgrades: {
+			buildings: ["lushIsland", "plainIsland", "rockyIsland",
+			"cavernousIsland", "glitteringIsland", "oilDeposit"]
+		}
 	},{
 		name: "suspensionBridges",
 		label: $I("workshop.suspensionBridges.label"),
@@ -858,26 +902,6 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			buildings: ["tradepost"]
 		},
 		flavor: $I("workshop.caravanserai.flavor")
-	},{
-		name: "fishingShips",
-		label: $I("workshop.fishingShips.label"),
-		description: $I("workshop.fishingShips.desc"),
-		effects: {
-			"hunterRatio": 0.25,
-			"manpowerChallengeMitigation": 0.2
-		},
-		prices:[
-			{ name : "wood", val: 1000 },
-			{ name : "iron", val: 100 },
-			{ name : "science", val: 1000 }
-		],
-		calculateEffects: function(self, game) {
-			if (game.challenges.isActive("islands")) {
-				self.effects["manpowerChallengeMitigation"] = 0.2;
-			} else {
-				self.effects["manpowerChallengeMitigation"] = 0;
-			}
-		},
 	},
 	//--------------------- stuff ----------------------
 	{
@@ -1671,7 +1695,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		calculateEffects: function(self, game) {
 			if (game.challenges.isActive("islands")) {
-				self.effects["oilChallengeMitigation"] = 0.2;
+				self.effects["oilChallengeMitigation"] = 0.2 * (1 + game.getEffect("islandsMitigationEffectiveness"));;
 			} else {
 				self.effects["oilChallengeMitigation"] = 0;
 			}

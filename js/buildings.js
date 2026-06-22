@@ -2278,7 +2278,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		name: "lushIsland",
 		label: $I("buildings.lushIsland.label"),
 		description: $I("buildings.lushIsland.desc"),
-		unlockRatio: 0.3,
+		unlockRatio: 0.5,
 		prices: [
 			{ name : "wood", val: 20 },
 		],
@@ -2288,17 +2288,17 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"woodChallengeMitigation": 0.01
 		},
 		calculateEffects: function(self, game){
+
 			self.effects["catnipChallengeMitigation"] = 0.01;
 			self.effects["woodChallengeMitigation"] = 0.01;
-
-			game.bld.islandAutomation(self);
+			game.bld.setIslandEffects(self);
 		},
 		isAutomationEnabled: null
 	},{
 		name: "plainIsland",
 		label: $I("buildings.plainIsland.label"),
 		description: $I("buildings.plainIsland.desc"),
-		unlockRatio: 0.3,
+		unlockRatio: 0.5,
 		prices: [
 			{ name : "wood", val: 20 },
 		],
@@ -2311,7 +2311,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			self.effects["catnipChallengeMitigation"] = 0.01;
 			self.effects["manpowerChallengeMitigation"] = 0.01;
 
-			game.bld.islandAutomation(self);
+			game.bld.setIslandEffects(self);
 		},
 		isAutomationEnabled: null
 	},{
@@ -2331,7 +2331,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			self.effects["mineralsChallengeMitigation"] = 0.01;
 			self.effects["coalChallengeMitigation"] = 0.002;
 			
-			game.bld.islandAutomation(self);
+			game.bld.setIslandEffects(self);
 		},
 		isAutomationEnabled: null
 	},{
@@ -2352,7 +2352,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			self.effects["coalChallengeMitigation"] = 0.01;
 			self.effects["mineralsChallengeMitigation"] = 0.003;
 			
-			game.bld.islandAutomation(self);
+			game.bld.setIslandEffects(self);
 		},
 		isAutomationEnabled: null
 	},{
@@ -2374,7 +2374,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			self.effects["coalChallengeMitigation"] = 0.001;
 			self.effects["oilChallengeMitigation"] = 0.001;
 			
-			game.bld.islandAutomation(self);
+			game.bld.setIslandEffects(self);
 		},
 		isAutomationEnabled: null
 	},{
@@ -2392,7 +2392,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		calculateEffects: function(self, game){
 			self.effects["oilChallengeMitigation"] = 0.05;
 			
-			game.bld.islandAutomation(self);
+			game.bld.setIslandEffects(self);
 		},
 		isAutomationEnabled: null
 	}
@@ -2934,14 +2934,21 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		return buildings;
 	},
 
+	setIslandEffects: function(island) {
+		
+		var mitigationEffect = this.game.getEffect("islandsMitigationEffectiveness");
+			for (var i in island.effects) {
+				island.effects[i] *= 1 - mitigationEffect;
+		}
+		this.islandAutomation(island);
+	},
+
 	islandAutomation: function(island) {
-		if (this.game.workshop.get("fleetCoordination").researched) {
-			//self.description = $I("buildings.reactor.desc") + "<br>" + $I("buildings.reactor.desc.automation");
+		if (this.game.workshop.get("islandManagement").researched) {
 			if (island.isAutomationEnabled === null ) {
 				island.isAutomationEnabled = false; //force non-null value
 			}
 		} else {
-			//self.description = $I("buildings.reactor.desc");
 			island.isAutomationEnabled = null;
 		}
 
@@ -2953,7 +2960,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}
 			island.isAutomationEnabled = true;
 			for (var i in island.effects) {
-				island.effects[i] *= 1 + this.game.getEffect("challengePenaltyMitigation");
+				island.effects[i] *= 1 + this.game.getEffect("islandAutomationBonus");
 			}
 		}
 	},

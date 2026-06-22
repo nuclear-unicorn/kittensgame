@@ -1745,10 +1745,20 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.weaponEfficency.title"),
 				type: "ratio"
 			},
-			"islandsIncreasingChallenge": {
-				title: $I("effectsMgr.statics.islandsIncreasingChallenge.title"),
+			"islandsIncreasingPenalty": {
+				title: $I("effectsMgr.statics.islandsIncreasingPenalty.title"),
 				type: "ratio"
 			},
+			"islandsMitigationEffectiveness": {
+				title: $I("effectsMgr.statics.islandsMitigationEffectiveness.title"),
+				type: "ratio"
+			},
+			
+			"islandAutomationBonus": {
+				title: $I("effectsMgr.statics.islandAutomationBonus.title"),
+				type: "ratio"
+			},
+			
 			"challengePenaltyMitigation": {
 				title: $I("effectsMgr.statics.challengePenaltyMitigation.title"),
 				type: "ratio"

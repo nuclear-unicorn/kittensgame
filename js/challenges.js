@@ -321,6 +321,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		effectDesc: $I("challendge.islands.effect.desc"),
 
 		stackOptions: {
+			"islandsIncreasingPenalty": { noStack: true },
+			"islandsMitigationEffectiveness": { noStack: true },
 			"catnipChallengeReductionRatio": { noStack: true },
 			"woodChallengeReductionRatio": { noStack: true },
 			"mineralsChallengeReductionRatio": { noStack: true },
@@ -331,7 +333,8 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		},
 
 		effects: {
-			"islandsIncreasingChallenge": 0,
+			"islandsIncreasingPenalty": 0,
+			"islandsMitigationEffectiveness": 0,
 			"catnipChallengeReductionRatio": 0,
 			"woodChallengeReductionRatio": 0,
 			"mineralsChallengeReductionRatio": 0,
@@ -344,21 +347,31 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		calculateEffects: function(self, game) {
 			
 			if (self.active) {
-				self.effects["islandsIncreasingChallenge"] = 0.1 * self.on;
-				var increasingChallenge = 1 + self.effects["islandsIncreasingChallenge"];
+				var increasingChallenge = 0.1 * self.on;				
+				self.effects["islandsIncreasingPenalty"] = Math.min(0.999, increasingChallenge);
+				increasingChallenge = -Math.min(0.999, game.getLimitedDR(0.7 * (1 + increasingChallenge), 1.09)); //Reach maximum reduction at 10 completions
+
+				var mitigationEffect = Math.max(0, 0.1 * (self.on - 10)); //After 10 completions, decrease the effectivness of mitigation effects
+				self.effects["islandsMitigationEffectiveness"] = game.getLimitedDR(mitigationEffect, 1);
+
 				self.effects["catnipChallengeReductionRatio"] = -0.25;
-				self.effects["woodChallengeReductionRatio"] = -game.getLimitedDR(0.6 * increasingChallenge, 0.95);
-				self.effects["mineralsChallengeReductionRatio"] = -game.getLimitedDR(0.7 * increasingChallenge, 0.99);
-				self.effects["manpowerChallengeReductionRatio"] = -game.getLimitedDR(0.7 * increasingChallenge, 0.99);
-				self.effects["goldChallengeReductionRatio"] = -game.getLimitedDR(0.7 * increasingChallenge, 0.99);
-				self.effects["coalChallengeReductionRatio"] = -game.getLimitedDR(0.7 * increasingChallenge, 0.99);
-				self.effects["oilChallengeReductionRatio"] = -game.getLimitedDR(0.7 * increasingChallenge, 0.99);
+				self.effects["woodChallengeReductionRatio"] = increasingChallenge
+				self.effects["mineralsChallengeReductionRatio"] = increasingChallenge
+				self.effects["manpowerChallengeReductionRatio"] = increasingChallenge
+				self.effects["goldChallengeReductionRatio"] = increasingChallenge
+				self.effects["coalChallengeReductionRatio"] = increasingChallenge
+				self.effects["oilChallengeReductionRatio"] = increasingChallenge
+
+
 
 				if (game.science.get("archery").researched && !game.workshop.get("fishingNets").unlocked) {
 					game.unlock({ upgrades: ["fishingNets"]});
 				}
-				if (game.science.get("engineering").researched && !game.workshop.get("fishingShips").unlocked) {
-					game.unlock({ upgrades: ["fishingShips"]});
+				if (game.science.get("engineering").researched && !game.workshop.get("improvedBoats").unlocked) {
+					game.unlock({ upgrades: ["improvedBoats"]});
+				}
+				if (game.science.get("writing").researched && !game.workshop.get("islandManagement").unlocked) {
+					game.unlock({ upgrades: ["islandManagement"]});
 				}
 				if (game.science.get("navigation").researched && !game.workshop.get("fleetCoordination").unlocked) {
 					game.unlock({buildings: ["glitteringIsland"]});
@@ -371,11 +384,14 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 					game.unlock({ upgrades: ["suspensionBridges"]});
 				}
 				if (game.workshop.get("offShoreDrilling").researched) {
-					game.unlock({buildings: ["glitteringIsland"]});
+					game.unlock({buildings: ["oilDeposit"]});
 				}
 
 				game.unlock	({buildings: ["lushIsland", "plainIsland", "rockyIsland", "cavernousIsland"]});
+				game.upgrade(self.upgrades);
             } else {
+				self.effects["islandsIncreasingPenalty"] = 0;
+				self.effects["islandsMitigationEffectiveness"] = 0;
 				self.effects["catnipChallengeReductionRatio"] = 0;
 				self.effects["woodChallengeReductionRatio"] = 0;
 				self.effects["mineralsChallengeReductionRatio"] = 0;
@@ -397,6 +413,10 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				buildings[i].val = 0;
 				buildings[i].on = 0;
 			}
+		},
+		upgrades: {
+			buildings: ["lushIsland", "plainIsland", "rockyIsland",
+			"cavernousIsland", "glitteringIsland", "oilDeposit"]
 		}
 	},{
 		name: "unicornTears",
