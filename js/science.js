@@ -644,7 +644,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: 	"blueprint", val: 350}
 		],
 		unlocks: {
-			upgrades: ["eludiumCracker", "eludiumReflectors", "eludiumHuts", "mWReactor" /*, "eludiumDrill"*/],
+			upgrades: ["eludiumCracker", "eludiumReflectors", "eludiumHuts", "mWReactor", "freightfulExchange" /*, "eludiumDrill"*/],
 			crafts: ["eludium"],
 			stages: [{bld:"warehouse", stage:1}],
 		}
@@ -734,7 +734,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			buildings: ["accelerator"],
 			tech: ["chronophysics", "dimensionalPhysics"],
-			upgrades: ["enrichedUranium", "railgun", "transportSuperposition"]
+			upgrades: ["enrichedUranium", "railgun"]
 		}
 	}, {
 		name: "dimensionalPhysics",
@@ -745,7 +745,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name : "science", val: 235000}
 		],
 		unlocks: {
-			upgrades: ["energyRifts", "lhc", "freightfulExchange"]
+			upgrades: ["energyRifts", "lhc", "transportSuperposition"]
 			// tech: ["artificialGravity"] -- see SPACE_EXPL feature flag
 		}
 	}, {
