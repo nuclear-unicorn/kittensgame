@@ -1340,6 +1340,26 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 		model.visible = this.game.science.get("writing").researched;
 	},
 
+	buyItem: function(model, event) {
+		//Fail if the race in question isn't unlocked yet:
+		if (!model.options.race.unlocked) {
+			return {
+				itemBought: false,
+				reason: "not-unlocked"
+			};
+		}
+		//Fail if the prerequisite tech isn't researched:
+		if (!this.game.science.get("writing").researched) {
+			console.log("Failed to buy embassy because embassies aren't unlocked yet.");
+			return {
+				itemBought: false,
+				reason: "not-unlocked"
+			};
+		}
+		//Else, this embassy is unlocked, so proceed:
+		return this.inherited(arguments);
+	},
+
 	build: function(model, opts) {
 		var counter = this.inherited(arguments);
 		if (!counter) {
