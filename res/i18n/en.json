@@ -2003,11 +2003,11 @@
     "console.filter.explore": "Exploration",
     "console.filter.combat": "Combat Log",
 
-    "village.artifact.artForm.book.title": "Book",
-    "village.artifact.artForm.painting.title": "Painting",
-    "village.artifact.artForm.music.title": "Music",
-    "village.artifact.artForm.sculpture.title": "Sculpture",
-    "village.artifact.artForm.tapestry.title": "Tapestry",
+    "village.artifact.artifactType.book.title": "Book",
+    "village.artifact.artifactType.painting.title": "Painting",
+    "village.artifact.artifactType.music.title": "Music",
+    "village.artifact.artifactType.sculpture.title": "Sculpture",
+    "village.artifact.artifactType.tapestry.title": "Tapestry",
     "village.artifact.creator": "Creator",
 
     "village.artifact.description.book.technology": "Book holding all kitten knowledge about {0}.",
