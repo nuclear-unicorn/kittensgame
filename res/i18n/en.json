@@ -1838,6 +1838,9 @@
     "trade.embassy.pinned": "Pinned",
     "trade.embassy.unpinned": "Unpinned",
     "trade.embassy.open": "Open",
+    "trade.embassy.queue.cheapest": "Cheapest embassy",
+    "trade.embassy.queue.item": "Embassy ({0})",
+    "trade.embassy.queue.source": "Embassies",
     "trade.undo.missing": "Cannot undo the trade because {0} is missing.",
 
     "turnHGOff.confirmation.msg": "Are you sure you want to turn off Holy Genocide for this and future runs?",

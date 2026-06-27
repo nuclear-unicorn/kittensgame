@@ -2106,15 +2106,12 @@ dojo.declare("classes.queue.manager", null,{
         }
         self.queueSourcesArr;
     },
-    /*queueSources : ["policies", "tech", "buildings", "spaceMission",
-                    "spaceBuilding","chronoforge", "voidSpace", "zigguratUpgrades",  
-                    "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],*/
-    //queueSources: ["buildings", "spaceBuilding", "zigguratUpgrades", "transcendenceUpgrades"],
     queueLabels: {
         "buildings" : $I("buildings.tabName"),
         "tech" : $I("techs.panel.label"),
         "upgrades" : $I("workshop.upgradePanel.label"),
         "policies" : $I("policy.panel.label"),
+        "embassies" : $I("trade.embassy.queue.source"),
         "religion" : $I("religion.panel.orderOfTheSun.label"),
         "zebraUpgrades" : $I("workshop.zebraUpgradesPanel.label"),
         "spaceMission" : $I("space.ground.control.label"),
@@ -2130,6 +2127,7 @@ dojo.declare("classes.queue.manager", null,{
         "tech": false,
         "upgrades": false,
         "policies": false,
+        "embassies": false,
         "religion": false,
         "zebraUpgrades": false,
         "spaceMission": false,
@@ -2537,6 +2535,20 @@ dojo.declare("classes.queue.manager", null,{
                 }
                 return options;
 
+            case "embassies":
+                //TODO: how about we only unlock the embassy queue source if at least 1 race is unlocked?
+                //Maybe restrict it so that it has to be at least 1 race THAT HAS EMBASSIES, so Leviathans don't count
+
+                //TODO: cheapest embassy functionality
+                //options.push({ name: "cheapest", label: $I("trade.embassy.queue.cheapest") });
+                this.game.diplomacy.races.forEach( function(race) {
+                    if (race.unlocked &&
+                        race.embassyPrices /*is truthy iff the race *has* embassies at all*/) {
+                        options.push({ name: race.name, label: $I("trade.embassy.queue.item", [race.title]) });
+                    }
+                });
+                return options;
+
             default:
                 return options;
         }
@@ -2652,6 +2664,15 @@ dojo.declare("classes.queue.manager", null,{
 
             case "zebraUpgrades":
                 props.controller = new com.nuclearunicorn.game.ui.ZebraUpgradeButtonController(this.game);
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "embassies":
+                props = {
+                    race: itemMetaRaw,
+                    prices: itemMetaRaw.embassyPrices
+                };
+                props.controller = new classes.diplomacy.ui.EmbassyButtonController(this.game);
                 var model = props.controller.fetchModel(props);
                 break;
         }

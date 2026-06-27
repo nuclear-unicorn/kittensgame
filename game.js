@@ -5369,6 +5369,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				return unlockId;
 			case "biomes":
 				return this.village.getBiome(unlockId);
+			case "embassies":
+				var raceObj = this.diplomacy.get(unlockId);
+				if (raceObj.embassyPrices) {
+					return raceObj;
+				}
+				//Else, this race has no embassies
+				return undefined;
 		}
 	},
 
