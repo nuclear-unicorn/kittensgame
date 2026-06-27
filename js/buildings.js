@@ -235,7 +235,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	},{
 		name: "other",
 		title: $I("buildings.group.other"),
-		buildings: ["workshop", "tradepost", "mint", "unicornPasture", "brewery"]
+		buildings: ["workshop", "tradepost", "mint", "unicornPasture", "brewery", "museum"]
 	},{
 		name: "megastructures",
 		title: $I("buildings.group.megastructures"),
@@ -1790,7 +1790,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		effects: {
 			"unhappinessRatio" : 0,
 			"culturePerTickBase" : 0,
-			"cultureMax" : 0
+			"cultureMax" : 0,
+			"artifactXP": 0,
 		},
 		stages: [
 			{
@@ -1805,7 +1806,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				effects: {
 					"unhappinessRatio" : -0.048,
 					"culturePerTickBase" : 0.005,
-					"cultureMax" : 50
+					"cultureMax" : 50,
+					"artifactXP": 0.002,
 				},
 				stageUnlocked : true,
 				flavor: $I("buildings.amphitheatre.flavor")
@@ -1821,7 +1823,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				effects: {
 					"unhappinessRatio" : -0.75,
 					"culturePerTickBase" : 1,
-					"cultureMax" : 300
+					"cultureMax" : 300,
+					"artifactXP": 0.004,
 				},
 				stageUnlocked : false
 			}
@@ -1850,6 +1853,21 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				btower.effects["cultureMax"] *= ( 1 + totalRatio);
 			}
         }
+	},
+	{
+		name: "museum",
+		label: $I("buildings.museum.label"),
+		description: $I("buildings.museum.desc"),
+		unlockRatio: 0.5,
+		prices: [
+			{ name : "slab", val: 1000 },
+			{ name : "culture",  val: 1500 },
+			{ name : "manuscript", val: 100 }
+		],
+		priceRatio: 1.6,
+		effects: {
+			"maxArtifacts": 1
+		},
 	},
 	{
 		name: "chapel",
