@@ -36,6 +36,8 @@
 body.scheme_spooky {
 	background-color: #0b0c23;
 	color-scheme: dark;
+	--page-background-color: #0b0c23;
+	--text-color: #b2afbe;
 }
 body.scheme_spooky.with_background_image {
 	background: no-repeat local top left url('img/theme_spooky_tree_spider_web.png'),
@@ -120,10 +122,10 @@ body.scheme_spooky.with_background_image {
 	color: #9632e3;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_spooky div {
+.scheme_spooky > div {
 	color: #b0b0b0;
 }
-.scheme_spooky .disabled div { /* color text for disabled */
+.scheme_spooky .disabled > div { /* color text for disabled */
 	color: #808080;
 }
 .scheme_spooky h1 {
@@ -443,20 +445,15 @@ body.scheme_spooky.with_background_image {
 .scheme_spooky #footerLinks a {
 	color: #d0d0d0;
 }
-.scheme_spooky #footerLinks a:hover,
-.scheme_spooky #crowdjet-expand-container:hover {
+.scheme_spooky #footerLinks a:hover{
 	color: #982ee4;
-}
-.scheme_spooky #crowdjet-expand-container {
-	color: #d0d0d0;
-	font-family: 'Delius', cursive;
 }
 
 /* *********************************************** */
 /* ******************* TOOLTIP ******************* */
 /* *********************************************** */
 .scheme_spooky #tooltip,
-.scheme_spooky .tooltip-block > div {
+.scheme_spooky .tooltip-content{
 	/* default padding-left: 3px; */
 	padding-bottom: 5px;
 	background: transparent;
@@ -469,7 +466,7 @@ body.scheme_spooky.with_background_image {
 	border-image-outset: 0 1px 2px 1px;
 	border-image-repeat: stretch;
 }
-.scheme_spooky .tooltip-block > div { /* tooltip on "?" top right column */
+.scheme_spooky .tooltip-content{ /* tooltip on "?" top right column */
 	padding: 5px;
 }
 .scheme_spooky .button_tooltip {
@@ -929,13 +926,24 @@ body.scheme_spooky.with_background_image {
 .scheme_spooky .census-block:hover {
 	outline-color: #6c6c6c;
 }
+.scheme_spooky .census-block .links-container span {
+	border-radius: 50% 50% 1px 1px;
+	max-width: 2ch;
+	background: transparent !important;
+	outline-width: 1px !important;
+}
 .scheme_spooky .census-block.simLeader {
 	outline-color: #8e29d4;
 }
 .scheme_spooky .census-block.simLeader:hover {
 	outline-color: #e57333;
 }
-.scheme_spooky .census-block.simLeader a.leaderHref {
+.scheme_spooky .census-block.simLeader .leaderHref {
+	border: none;
+	outline: none;
+}
+.scheme_spooky .census-block.simLeader .leaderHref,
+.scheme_spooky .census-block.simFavorite .favoriteHref {
 	color: #53a8e0;
 }
 .scheme_spooky .census-block .info { /* info of kitten */
@@ -1078,7 +1086,7 @@ body.scheme_spooky.with_background_image {
 	outline: 2px inset #060713;
 	border-radius: 5px;
 }
-.scheme_spooky .achievement:not(.unethical).unlocked {
+.scheme_spooky .achievement:not(.unethical, .name).unlocked {
 	color: #d0d0d0;
 }
 .scheme_spooky .achievement:not(.unethical).unlocked:hover {
@@ -1195,9 +1203,6 @@ body.scheme_spooky.with_background_image {
 	border-image-slice: 30 0 0 0;
 	border-image-outset: 10px 0 0 0;
 	border-image-repeat: stretch;
-}
-.scheme_spooky #rightTabChat {
-	margin-top: 10px;
 }
 .scheme_spooky div.console-intro { /* Text on right column: "You are a kitten in a catnip forest." */
 	color: #1f5dba;

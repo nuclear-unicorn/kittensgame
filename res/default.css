@@ -3,10 +3,20 @@ html, body {
     overflow-y: hidden;
 }
 
+:root {
+    /** Background color for body, page, panels and most elements **/
+    --page-background-color: #FFFFFF;
+    --button-border-color:#888;
+    /** General text color on the page (buttons, tooltips, etc) */
+    --text-color: black;
+}
+
 body {
     margin: 0;
     padding: 0;
-    background-color: #FFFFFF;
+    background-color: var(--page-background-color);
+    color: var(--text-color);
+    height: 100vh;
 }
 
 img.loader {
@@ -94,6 +104,11 @@ img.loader {
 
     overflow-y: auto;
     overflow-x: hidden;
+
+    padding-top:20px;
+
+    height: calc(100% - 20px);
+    min-height: calc(100% - 20px);
 }
 
 #midColumn {
@@ -117,6 +132,7 @@ img.loader {
     padding-top: 2px;
     position:absolute;
     top: 5px;
+    text-align: center;
 }
 
 div#gameLog {
@@ -136,6 +152,7 @@ div#gameLog {
 .bldTopContainer {
     padding-bottom: 5px;
 	margin-bottom: 15px;
+    height: 100%;
 }
 
 .bldTopContainer > a, .bldTopContainer > span {
@@ -143,12 +160,12 @@ div#gameLog {
     text-decoration: none;
 }
 
-.activeTab {
+.scheme_default .tabsContainer a.tab {
     color: black;
 }
 
-.bldTopContainer > a.activeTab {
-    color: #444444;
+.scheme_default .tabsContainer a.tab.activeTab {
+    color: #500000;
 }
 
 .resourceRow {
@@ -204,6 +221,7 @@ select>option {
     width: 170px;
     text-align: center;
     margin-bottom:10px;
+    color: var(--text-color);
 }
 
 .btn:hover {
@@ -235,14 +253,15 @@ select>option {
     display: inline-block;
 }
 
-.btn .btnContent a.small {
+.btn .btnContent .small {
     font-size: 0.7em;
     line-height: 16px;
 }
 
-/*.btn .btnContent .btnTitle {
-
-}*/
+.btn .btnContent .btnTitle {
+    display: inline-flex;
+    gap: 4px;
+}
 
 .btn.small-text span {
     font-size: 90%;
@@ -257,12 +276,18 @@ select>option {
     color: #FF3030;
 }
 
+.btn .label-content {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}
+
 .rawRes {
     color: gray;
 }
 
 .dropdown-link {
     cursor: pointer;
+    white-space: nowrap !important;
 }
 
 .spacer {
@@ -281,7 +306,7 @@ select>option {
     left: 50%;
     top: 50%;
 
-    background-color: #FFF;
+    background-color: var(--page-background-color);
     padding: 20px;
     box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
 }
@@ -292,6 +317,8 @@ select>option {
 
     margin-top: -150px;
     margin-left: -300px;
+    background-color: var(--page-background-color);
+    color: var(--text-color);
 }
 
 .credits {
@@ -364,14 +391,17 @@ select > option:disabled {
 
 .achievement.badge {
     display: inline-block;
-    width: 45%;
+    width: 90%;
 }
 
-.achievement.badge:nth-child(2n+1) { /* select even elements */
-    margin-left: 10px;
-    float: right;
+.badges-container { /* display children in 2 equally-sized columns */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
 }
 
+.badges-container .achievement-header { /* header occupies both columns */
+    grid-column: span 2;
+}
 
 .achievement.unethical {
     border-color: red;
@@ -382,6 +412,8 @@ select > option:disabled {
     content: ' ' attr(title);
     transition: opacity 0.25s;
     opacity: 0;
+    text-overflow: inherit;
+    overflow: inherit;
   }
   .achievement[title]:hover::after{
     opacity: 0.6;
@@ -402,6 +434,12 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
     border: 1px solid gray;
     padding: 5px;
     pointer-events: none;
+}
+
+/* Wrapper for plain-text option tooltips (e.g. the "(?)" hints in the options
+   window), so long text wraps onto multiple lines instead of running off-screen. */
+.option-tooltip {
+    max-width: 250px;
 }
 
 #tooltip.tooltip-in-right-column {
@@ -461,17 +499,22 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
     padding: 0px;
 }
 
+#pactsTextKarmaPunishment span:hover {
+    color: orange;
+}
+
 .bldGroupContainer {
     padding-top: 15px;
     border-top: 1px solid gray;
     margin-top: 10px;
+    height: 100%;
 }
 
 .btn.modern {
     font-family: Helvetica;
     font-size: 14px;
     border-radius: 3px;
-    border: 1px solid #888;
+    border: 1px solid var(--button-border-color);
     padding: 0;
     width: 264px;
 }
@@ -523,6 +566,7 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
 	margin-bottom: 20px;
     padding: 15px;
     border: 1px solid #B0B0B0;
+    min-height: calc(100vh - 100px);
 }
 
 #toggleCenter {
@@ -544,10 +588,6 @@ table.craftTable tr:hover td {
 }
 
 #devPanel div {
-    display: inline-block;
-}
-
-.icons-container > div{
     display: inline-block;
 }
 
@@ -635,6 +675,11 @@ table.craftTable tr:hover td {
     font-size: 15px;
 }
 
+
+.login-popup.button_tooltip {
+	background-color: var(--page-background-color) !important;
+}
+
 .login-popup .last-backup {
     margin-bottom: 10px;
     border-bottom: 1px solid gray;
@@ -685,12 +730,9 @@ table.craftTable tr:hover td {
     display: inline-block;
 }
 
-.tooltip-block > div {
+.tooltip-block .tooltip-content {
     z-index: 9999;
     padding: 5px;
-}
-
-.tooltip-block > div {
     border: 1px solid lightgray;
 }
 
@@ -760,13 +802,13 @@ span.genericWarning,
 
 .trade-race .buys {
     color: #01A9DB;
-    width: 40px;
+    min-width: 40px;
     display: inline-block;
 }
 
 .trade-race .sells {
     color: green;
-    width: 40px;
+    min-width: 40px;
     display: inline-block;
 }
 
@@ -812,9 +854,15 @@ label:hover {
 -----------------------------------*/
 
 #optionsDiv {
-    overflow-y: scroll;
-    height: 400px;
-    margin-top:-170px;
+    /* Size to the content instead of a fixed height, but cap it & scroll if the
+       content (e.g. dev mode with many options) would overflow the screen. */
+    height: auto;
+    max-height: 440px;
+    overflow-y: auto;
+    /* The dialog is positioned with top:50%; translate up by half its own (now
+       variable) height to stay vertically centered regardless of content height. */
+    margin-top: 0;
+    transform: translateY(-50%);
 }
 
 #optionsDiv input[type="checkbox"] {
@@ -824,6 +872,12 @@ label:hover {
 #optionsDiv input[type="checkbox"] + label:before {
     content: "·";
 	display: inline-block;
+	/* Fixed width + centering so the indicator occupies the same horizontal space
+	   regardless of glyph or font-size (which vary by checked state & by theme),
+	   keeping every option's label text aligned in a column. */
+	width: 18px;
+	text-align: center;
+	box-sizing: border-box;
 	font: 16px sans-serif;
 	margin: 0px 6px 0px 2px;
 }
@@ -963,20 +1017,24 @@ a:hover {
 }
 
 @keyframes pulse {
-  0%,100% {color: #001F3F;}
-      50% {color: #FF4136;}
+  0% {color: #001F3F;}
+  50% {color: #FF4136;}
+  100% {color: #001F3F;}
 }
 @-webkit-keyframes pulse {
-  0%,100% {color: #001F3F;}
-      50% {color: #FF4136;}
+  0% {color: #001F3F;}
+  50% {color: #FF4136;}
+  100% {color: #001F3F;}
 }
 @-moz-keyframes pulse {
-  0%,100% {color: #001F3F;}
-      50% {color: #FF4136;}
+  0% {color: #001F3F;}
+  50% {color: #FF4136;}
+  100% {color: #001F3F;}
 }
 @-o-keyframes pulse {
-  0%,100% {color: #001F3F;}
-      50% {color: #FF4136;}
+  0% {color: #001F3F;}
+  50% {color: #FF4136;}
+  100% {color: #001F3F;}
 }
 
 .flavor {
@@ -1124,6 +1182,10 @@ a.link.collapse:hover {
     opacity: 0.9;
 }
 
+.sidebar-section {
+    margin-bottom: 5px;
+}
+
 .res-toolbar {
     display: inline-block;
     user-select: none;
@@ -1131,8 +1193,13 @@ a.link.collapse:hover {
 
 .res-toolbar.right {
     text-align: right;
-    margin-right:-18px;
+    margin-right:-13px;
     float: right;
+}
+
+
+.res-toolbar .link {
+    padding-right: 6px;
 }
 
 .res-toolbar .link.toggled {
@@ -1252,7 +1319,7 @@ a.link.collapse:hover {
 }
 .currentLeader .name {
 	background: no-repeat top -5px left url("data:image/svg+xml,%3Csvg width='24px' height='24px' viewBox='0 0 24 24' fill='%23000000' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18.53 19.24H5.4C5.24283 19.2414 5.0893 19.1927 4.96164 19.101C4.83399 19.0094 4.73885 18.8794 4.69 18.73L1.5 9C1.45113 8.86009 1.446 8.70861 1.4853 8.56571C1.52459 8.42281 1.60646 8.29525 1.72 8.2C1.83214 8.10161 1.97141 8.03941 2.11953 8.02157C2.26764 8.00372 2.4177 8.03106 2.55 8.1L8.37 11L11.37 5.18C11.4392 5.06398 11.5373 4.9679 11.6547 4.90118C11.7722 4.83446 11.9049 4.79938 12.04 4.79938C12.1751 4.79938 12.3078 4.83446 12.4253 4.90118C12.5427 4.9679 12.6408 5.06398 12.71 5.18L15.71 11.01L21.54 8.11C21.6708 8.0419 21.8191 8.01501 21.9655 8.03286C22.1119 8.05071 22.2494 8.11247 22.36 8.21C22.4557 8.31491 22.5197 8.44486 22.5445 8.58471C22.5693 8.72456 22.5539 8.86858 22.5 9L19.24 18.72C19.1929 18.8713 19.0985 19.0034 18.9707 19.097C18.8429 19.1906 18.6884 19.2407 18.53 19.24ZM6 17.74H18L20.51 10.25L15.64 12.67C15.5528 12.7146 15.4576 12.7415 15.3599 12.749C15.2623 12.7566 15.1641 12.7446 15.071 12.7139C14.978 12.6832 14.892 12.6344 14.818 12.5702C14.744 12.506 14.6835 12.4278 14.64 12.34L12 7.16L9.37 12.34C9.32648 12.4278 9.26596 12.506 9.19197 12.5702C9.11798 12.6344 9.03197 12.6832 8.93895 12.7139C8.84593 12.7446 8.74774 12.7566 8.65007 12.749C8.5524 12.7415 8.45721 12.7146 8.37 12.67L3.48 10.22L6 17.74Z' /%3E%3C/svg%3E");
-	padding-left: 28px;
+	padding-left: 28px !important;
 	font-weight: bold;
 }
 .census-block {
@@ -1269,6 +1336,29 @@ a.link.collapse:hover {
 
 .census-block .skill{
     font-size: 0.8em;
+}
+
+.census-block .links-container {
+    float: right;
+    display: block grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+}
+
+.census-block .links-container span {
+    width: initial !important;
+}
+
+.census-block .links-container span:hover {
+    background-color: #EEEEEE;
+}
+
+.census-block .links-container span:active {
+    text-shadow: 0 0 0.1em currentColor; /*shadow is the same color as the text*/
+}
+
+.census-block .links-container a {
+    grid-column: span 3; /* <a> element should occupy all 3 columns */
 }
 
 .name.color-brown {
@@ -1379,20 +1469,24 @@ a.link.collapse:hover {
 }
 
 @keyframes border-pulse {
-    0%,100% {border: 1px solid lightgray;}
-        50% {border: 1px solid red;}
+    0% {border: 1px solid lightgray;}
+    50% {border: 1px solid red;}
+    100% {border: 1px solid lightgray;}
 }
 @-webkit-keyframes border-pulse {
-    0%,100% {border: 1px solid lightgray;}
-        50% {border: 1px solid red;}
+    0% {border: 1px solid lightgray;}
+    50% {border: 1px solid red;}
+    100% {border: 1px solid lightgray;}
 }
 @-moz-keyframes border-pulse {
-    0%,100% {border: 1px solid lightgray;}
-        50% {border: 1px solid red;}
+    0% {border: 1px solid lightgray;}
+    50% {border: 1px solid red;}
+    100% {border: 1px solid lightgray;}
 }
 @-o-keyframes border-pulse {
-    0%,100% {border: 1px solid lightgray;}
-        50% {border: 1px solid red;}
+    0% {border: 1px solid lightgray;}
+    50% {border: 1px solid red;}
+    100% {border: 1px solid lightgray;}
 }
 
 .map-cell .coord {
@@ -1441,6 +1535,17 @@ a.link.collapse:hover {
     width: 120px;
 }
 
+.hp {
+    animation-timing-function: ease;
+    animation-name: color;
+    animation-duration: 0.3s;
+    animation-direction: alternate-reverse;
+}
+
+.flash-red {
+    color: #ff4444 !important;
+}
+
 
 div.blaze {
             animation: blaze-rainbow 3s linear infinite;
@@ -1471,70 +1576,82 @@ div.leet {
 }
 
 @keyframes blaze-rainbow {
-    0%,100% {color: #F00;}
-        17% {color: #FF0;}
-        33% {color: #0F0;}
-        50% {color: #0FF;}
-        67% {color: #00F;}
-        83% {color: #F0F;}
+    0% {color: #F00;}
+    17% {color: #FF0;}
+    33% {color: #0F0;}
+    50% {color: #0FF;}
+    67% {color: #00F;}
+    83% {color: #F0F;}
+    100% {color: #F00;}
 }
 @-webkit-keyframes blaze-rainbow {
-    0%,100% {color: #F00;}
-        17% {color: #FF0;}
-        33% {color: #0F0;}
-        50% {color: #0FF;}
-        67% {color: #00F;}
-        83% {color: #F0F;}
+    0% {color: #F00;}
+    17% {color: #FF0;}
+    33% {color: #0F0;}
+    50% {color: #0FF;}
+    67% {color: #00F;}
+    83% {color: #F0F;}
+    100% {color: #F00;}
 }
 @-moz-keyframes blaze-rainbow {
-    0%,100% {color: #F00;}
-        17% {color: #FF0;}
-        33% {color: #0F0;}
-        50% {color: #0FF;}
-        67% {color: #00F;}
-        83% {color: #F0F;}
+    0% {color: #F00;}
+    17% {color: #FF0;}
+    33% {color: #0F0;}
+    50% {color: #0FF;}
+    67% {color: #00F;}
+    83% {color: #F0F;}
+    100% {color: #F00;}
 }
 @-o-keyframes blaze-rainbow {
-    0%,100% {color: #F00;}
-        17% {color: #FF0;}
-        33% {color: #0F0;}
-        50% {color: #0FF;}
-        67% {color: #00F;}
-        83% {color: #F0F;}
+    0% {color: #F00;}
+    17% {color: #FF0;}
+    33% {color: #0F0;}
+    50% {color: #0FF;}
+    67% {color: #00F;}
+    83% {color: #F0F;}
+    100% {color: #F00;}
 }
 
 @keyframes hail-rainbow {
-    0%,100% {color: red; text-shadow: 0 0 10px red;}
-        50% {color: black; text-shadow: none;}
+    0% {color: red; text-shadow: 0 0 10px red;}
+    50% {color: black; text-shadow: none;}
+    100% {color: red; text-shadow: 0 0 10px red;}
 }
 @-webkit-keyframes hail-rainbow {
-    0%,100% {color: red; text-shadow: 0 0 10px red;}
-        50% {color: black; text-shadow: none;}
+    0% {color: red; text-shadow: 0 0 10px red;}
+    50% {color: black; text-shadow: none;}
+    100% {color: red; text-shadow: 0 0 10px red;}
 }
 @-moz-keyframes hail-rainbow {
-    0%,100% {color: red; text-shadow: 0 0 10px red;}
-        50% {color: black; text-shadow: none;}
+    0% {color: red; text-shadow: 0 0 10px red;}
+    50% {color: black; text-shadow: none;}
+    100% {color: red; text-shadow: 0 0 10px red;}
 }
 @-o-keyframes hail-rainbow {
-    0%,100% {color: red; text-shadow: 0 0 10px red;}
-        50% {color: black; text-shadow: none;}
+    0% {color: red; text-shadow: 0 0 10px red;}
+    50% {color: black; text-shadow: none;}
+    100% {color: red; text-shadow: 0 0 10px red;}
 }
 
 @keyframes pray-rainbow {
-    0%,100% {color: gold; text-shadow: 0 0 10px gold;}
-        50% {color: silver; text-shadow: none;}
+    0% {color: gold; text-shadow: 0 0 10px gold;}
+    50% {color: silver; text-shadow: none;}
+    100% {color: gold; text-shadow: 0 0 10px gold;}
 }
 @-webkit-keyframes pray-rainbow {
-    0%,100% {color: gold; text-shadow: 0 0 10px gold;}
-        50% {color: silver; text-shadow: none;}
+    0% {color: gold; text-shadow: 0 0 10px gold;}
+    50% {color: silver; text-shadow: none;}
+    100% {color: gold; text-shadow: 0 0 10px gold;}
 }
 @-moz-keyframes pray-rainbow {
-    0%,100% {color: gold; text-shadow: 0 0 10px gold;}
-        50% {color: silver; text-shadow: none;}
+    0% {color: gold; text-shadow: 0 0 10px gold;}
+    50% {color: silver; text-shadow: none;}
+    100% {color: gold; text-shadow: 0 0 10px gold;}
 }
 @-o-keyframes pray-rainbow {
-    0%,100% {color: gold; text-shadow: 0 0 10px gold;}
-        50% {color: silver; text-shadow: none;}
+    0% {color: gold; text-shadow: 0 0 10px gold;}
+    50% {color: silver; text-shadow: none;}
+    100% {color: gold; text-shadow: 0 0 10px gold;}
 }
 
 @keyframes neon-purple {
@@ -1769,22 +1886,101 @@ div.leet {
     padding-left: 5px;
 }
 
-#crowdjet-expand-container{
-    bottom: 40px;
-    right: 20px;
-    width: 60px !important;
-    height: 15px !important;
-    cursor: pointer;
-}
-
-#crowdjet-expand-container iframe {
-    display: none;
-}
-
 .queue-container .queue-label {
     cursor: pointer;
 }
 
 .queue-container .queue-label:hover {
     text-decoration: underline;
+}
+
+#toggleCenter {
+    padding-top: 20px;
+}
+
+span.genericWarning {
+    margin-left: 5px;
+}
+
+.svg-icon {
+    width: 14px;
+    height:14px;
+    background-color: var(--text-color);
+    opacity: 0.8;
+}
+
+.svg-icon.gear {
+    mask: url('img/gear.svg') no-repeat center / contain;
+    -webkit-mask: url('img/gear.svg') no-repeat center / contain;
+}
+
+.svg-icon.gear:hover {
+    opacity: 1;
+    scale: 1.1;
+    transition: opacity 0.1s, scale 0.1s;
+}
+
+.svg-icon.down {
+    mask: url('img/down.svg') no-repeat center / contain;
+    -webkit-mask: url('img/down.svg') no-repeat center / contain;
+}
+
+.svg-icon.question-mark {
+    mask: url('img/question.svg') no-repeat center / contain;
+    -webkit-mask: url('img/question.svg') no-repeat center / contain;
+}
+
+.svg-icon.user {
+    mask: url('img/user.svg') no-repeat center / contain;
+    -webkit-mask: url('img/user.svg') no-repeat center / contain;
+}
+
+.svg-icon.right {
+    mask: url('img/right.svg') no-repeat center / contain;
+    -webkit-mask: url('img/right.svg') no-repeat center / contain;
+}
+
+.svg-icon.left {
+    mask: url('img/left.svg') no-repeat center / contain;
+    -webkit-mask: url('img/left.svg') no-repeat center / contain;
+}
+
+.svg-icon.res-icon {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.trade-icons {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-right: 4px;
+    text-decoration: none;
+}
+
+.trade-arrow {
+    margin: 0 1px;
+    letter-spacing: 1px;
+    opacity: 0.4;
+    font-size: 0.85em;
+    vertical-align: middle;
+}
+
+#headerToolbar {
+    display: flex;
+    height: 100%;
+}
+
+.icons-container {
+    display: flex;
+    align-items: center;
+}
+
+.kgnet-login-link-container {
+    display: flex;
+}
+
+.kgnet-login-link {
+    gap: 3px;
+    display: inline-flex;
 }

@@ -8,6 +8,13 @@
 /* ******************* GAME ******************* */
 /* ******************************************** */
 
+.scheme_computer,
+.scheme_computer .help {
+	color-scheme: dark;
+	--page-background-color:#4b4c4e;
+	--text-color: #b0b0b0;
+}
+
 body.scheme_computer {
 	background-color: #4b4c4e;
 }
@@ -70,9 +77,11 @@ body.scheme_computer {
 .scheme_computer .btn.modern:not(.disabled):hover a {
 	color: #b8b8b8;
 }
+.scheme_computer .census-block > .links-container > span.btn.modern,
 .scheme_computer .btn.modern:not(.disabled) span.btnTitle { /* to change only the properties of the button name for buttons enabled */
 	color: #fcffff;
 }
+.scheme_computer .census-block > .links-container > span.btn.modern:hover,
 .scheme_computer .btn.modern:not(.disabled):hover span.btnTitle {
 	color: #e8e8e8;
 }
@@ -90,10 +99,10 @@ body.scheme_computer {
 	color: #f0f0f0;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_computer div {
+.scheme_computer > div {
 	color:#c0c0c0;
 }
-.scheme_computer .disabled div { /* color text for disabled */
+.scheme_computer .disabled > div { /* color text for disabled */
 	color: #606060;
 }
 .scheme_computer h1 {
@@ -187,11 +196,11 @@ body.scheme_computer {
 }
 .scheme_computer #optionsDiv input[type="checkbox"] + label:before {
 	content: "\25FE"; /* BLACK MEDIUM SMALL SQUARE */
-	font: 18px sans-serif;
+	font: 16px sans-serif;
 }
 .scheme_computer #optionsDiv input[type="checkbox"]:checked + label:before {
 	content: "\25FD"; /* WHITE MEDIUM SMALL SQUARE	*/
-	font: 18px sans-serif;
+	font: 16px sans-serif;
 }
 .scheme_computer .dialog input[type="button"] {
 	margin-left: 7px;
@@ -313,7 +322,7 @@ body.scheme_computer {
 	padding-right: 5px;
 }
 .scheme_computer #tooltip,
-.scheme_computer .tooltip-block > div {
+.scheme_computer .tooltip-content{
 	color: #f0a258; /* tooltip windows == left column : left text */
 	background-color: #2b2c2d;
 	border: 3px outset #1b1c1e;
@@ -321,7 +330,7 @@ body.scheme_computer {
 	box-shadow: inset 1px 1px 2px #424242, inset -1px -1px 1px #020202;
 	margin-left: 3px; /* for offset tooltip due to larger buttons .btn.modern */
 }
-.scheme_computer .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_computer .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_computer .button_tooltip {
@@ -721,8 +730,9 @@ body.scheme_computer {
 .scheme_computer .census-block.simLeader a:hover {
 	color: #000000;
 }
-.scheme_computer .census-block.simLeader a.leaderHref {
-	color: #0053a0;
+.scheme_computer .census-block.simLeader .leaderHref,
+.scheme_computer .census-block.simFavorite .favoriteHref {
+	color: #0053a0 !important;
 }
 .scheme_computer .census-block .info { /* info of kitten */
 	font-size: 0.9em;
@@ -910,6 +920,9 @@ body.scheme_computer {
 	color: #030303;
 	letter-spacing: 1px;
 	border-bottom: 1px solid #777777;
+	white-space: nowrap !important;
+	text-overflow: clip;
+	overflow: hidden;
 }
 .scheme_computer .achievement.unethical {
 	color: #b00005;
@@ -973,7 +986,7 @@ body.scheme_computer {
 .scheme_computer #calendarSign:hover {
    cursor: default;
 }
-.scheme_computer .right-tab-header { /* Log | Chat link on right column */
+.scheme_computer .right-tab-header { /* Log | Queue link on right column */
 	/* default margin-top: 10px; */
 	font-size: 80%;
 }
@@ -993,9 +1006,6 @@ body.scheme_computer {
 .scheme_computer div#observeButton {
 	margin-top: 5px; /* default margin-top: 15px */
 	height: 40px; /* default height: 30px; */
-}
-.scheme_computer #rightTabChat {
-	margin-top: 10px;
 }
 .scheme_computer div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #f0a258;
@@ -1266,10 +1276,10 @@ body.scheme_computer {
 	/* default max-width: 90px; */
 	color: #030303;
 }
-.scheme_computer #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_computer div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #909090;
 }
-.scheme_computer #fastHuntContainer >a:hover #fastHuntContainerCount {
+.scheme_computer div.pin-link > a:hover > span.pin-link-quantity {
 	color: #f0a258;
 }
 .scheme_computer #fastPraiseContainer >a {

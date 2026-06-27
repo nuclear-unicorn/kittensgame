@@ -7,6 +7,14 @@
 /**********************************************/
 /******************** GAME ********************/
 /**********************************************/
+/* ******************************************** */
+.scheme_school,
+.scheme_school .help {
+	color-scheme: dark;
+	--page-background-color:#292728;
+	--text-color: #81848C;
+}
+
 body.scheme_school,
 .scheme_school div.dialog {
 	background-color: #292728;
@@ -76,10 +84,10 @@ body.scheme_school.with_background_image,
 	color: #B5BAC4;
 	opacity: 1.0;
 }
-.scheme_school div {
+.scheme_school > div {
 	color: #ABAEB7;
 }
-.scheme_school .disabled div { /* color text for disabled */
+.scheme_school .disabled > div { /* color text for disabled */
 	color: #81848C;
 }
 .scheme_school h1 {
@@ -291,7 +299,7 @@ body.scheme_school.with_background_image,
 	font-size: 13px; /* for center tooltip except title, effects and flavor */
 }
 .scheme_school #tooltip,
-.scheme_school .tooltip-block > div {
+.scheme_school .tooltip-content{
     background-image: url('img/theme-school_dark.jpg'); /* source : https://pngtree.com/freebackground/taobao-small-appliances-poster-tmall-kitchen-supplies-banner_1061754.html */
 	background-repeat: repeat;
 	background-attachment: fixed;
@@ -303,7 +311,7 @@ body.scheme_school.with_background_image,
 	border-radius: 0 0 5px 5px;
 	box-shadow: inset 0 1px 2px #000000, 2px 2px 3px #000000;
 }
-.scheme_school .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_school .tooltip-content{ /* tooltip on ? top right column */
 	font-size: 13px;
 	padding: 5px;
 }
@@ -595,7 +603,9 @@ body.scheme_school.with_background_image,
 	background-color : rgba(17, 138, 194, 0.05); /* color #4895b9; */
 	border-color: rgba(187, 192, 202, 0.3); /* color #BBC0CA */
 }
-.scheme_school .census-block.simLeader a.leaderHref {
+.scheme_school .census-block.simLeader .leaderHref,
+.scheme_school .census-block.simFavorite .favoriteHref {
+	background-color: rgba(64, 64, 64, 0.4);
 	color: #4895b9;
 	text-shadow: 0 0 3px #4895b9;
 }
@@ -686,13 +696,18 @@ body.scheme_school.with_background_image,
     margin: 10px;
     height: 40px;
     background-color: rgba(187, 192, 202, 0.1); /* color #BBC0CA */
-    color: #D2D2D2;
     text-shadow: rgba(187, 192, 202, 1) 2px 0 10px; /* color #BBC0CA */
     text-transform: capitalize;
     letter-spacing: 1px;
     cursor: default !important;
-	border-color : rgba(165, 107, 91, 0.4); /* color #A56B5B; */
 	border-radius: 3px 3px 9px 9px;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+.scheme_school .achievement:not(.name) {
+	color: #D2D2D2;
+	border-color : rgba(165, 107, 91, 0.4); /* color #A56B5B; */
 }
 .scheme_school .achievement:hover {
     background-color: rgba(181, 133, 120, 0.3); /* color #b58578 */
@@ -774,7 +789,7 @@ body.scheme_school.with_background_image,
 .scheme_school #calendarSign:hover {
    cursor: default;
 }
-.scheme_school .right-tab-header { /* Log | Chat link on right column */
+.scheme_school .right-tab-header { /* Log | Queue link on right column */
 	color: rgba(86, 89, 92, 0.5); /* color #56595C */ /* for separator tab | */
 	font-size: 80%;
  }
@@ -782,9 +797,6 @@ body.scheme_school.with_background_image,
     text-decoration: underline rgba(187, 192, 202, 0.4); /* color #BBC0CA */;
 	color: #B5BAC4;
 	border-top: none;
-}
-.scheme_school #rightTabChat {
-	margin-top: 20px;
 }
 .scheme_school div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #4A4A4A;
@@ -922,10 +934,15 @@ body.scheme_school.with_background_image,
 	color: #973B47;
 	padding-top: 6px; /* default padding-top: 10px; */
 }
-.scheme_school #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+.scheme_school #fastHuntContainer > a, /* Text left column : "Send hunters (xx times)" */
+.scheme_school #fastSacrificeContainer > a {
 	font-size: 100%;
 }
-.scheme_school #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_school #fastHuntContainer > a:hover,
+.scheme_school #fastSacrificeContainer > a:hover {
+	text-shadow: 1px 1px #000000;
+}
+.scheme_school div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #4A4A4A;
 	text-shadow: none !important;
 }
@@ -934,9 +951,6 @@ body.scheme_school.with_background_image,
 }
 .scheme_school #fastPraiseContainer > a:hover {
 	text-shadow: 0 0 7px rgba(255, 255, 255, 0.9);
-}
-.scheme_school #fastHuntContainer > a:hover {
-	text-shadow: 1px 1px #000000;
 }
 .scheme_school .res-cell.positive-weather { /* to change bonus cell according to the season */
 	font-size: 80% !important;

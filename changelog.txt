@@ -1,3 +1,65 @@
+v 1.5.0.2 (24 Apr 2026)
+
+Major:
+Stasis Pod
+
+Changes by Brent and Ziggurat
+
+Frescoes (Brent)
+Unicorn Tears Challenge Reward Balancing (Brent)
+Alicornmancy (Brent)
+Pact of Arcane (Ziggurat)
+Pact of Chronicler (Ziggurat)
+
+Minor:
+New Basge (Brent)
+Various translation fixes and bug fixes 
+
+Display current effect of Shark Merchants
+Display Shark Merchants bonus in the Trade tab (if researched)
+Allow astro events to happen with 0 Libraries if Astronomy is researched
+
+
+
+v 1.5.0.1 (21 Feb 2026)
+Undo System Update:
+* Now supports more actions (trade, religion, space, time)
+Siphoning Update:
+* Siphoning policy reworked
+* It's part of a trio now
+Minor:
+* Add CTRL/SHIFT support for "Send hunters" and "Add to Queue" (Brent)
+* Various fixes and balance improvements (Brent)
+
+v 1.5.0.0 (16 Feb 2026)
+Major:
+
+Unicorn Tears Challenge (Brent)
+New Foreign Relations Policies (Brent)
+
+Minor:
+Added Norwegian and Dutch languages to the list of available localizations
+Fixed error messages not being shown for login panel
+Minor ui tweaks for various color themes
+Removed crowdin translation widget
+
+v 1.4.9.4 (12 Dec 2024)
+Major:
+* Loadout system
+* New Foreign Relations Policies
+* New Achievements & Basges
+* Census sorting, favorites, promotion
+
+Minor:
+* Temporal Paradoxes now have more intuitive behavior
+* Performance optimization related to bulk TC shattering
+* UI improvements
+* Clicking buttons no longer generates extra game ticks
+* Fix bugs related to Temporal Press
+* Fix bugs related to importing a save
+* Fix math errors related to Holy Genocide
+* Offline gflops should work correctly now.
+
 v 1.4.9.3
 Major:
 * Spaceport

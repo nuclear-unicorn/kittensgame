@@ -50,9 +50,10 @@ WToolbarHappiness = React.createClass({
         this.game = this.props.game;    //hack
 
         var base = this.game.getEffect("happiness");
-		//var population = this.game.village.getKittens() *  2;
-		var tooltip = $I("village.happiness.base") + ": 100%<br>" +
-			   $I("village.happiness.buildings") + ": +" + (Math.floor(base)) + "%<br>";
+		var challengeHappiness = this.game.getEffect("challengeHappiness");
+		// "base" is usually 100%, but it gets reduced in certain Challenges
+		var tooltip = $I("village.happiness.base") + ": " + this.game.getDisplayValueExt(100 + challengeHappiness, false, false, 0) + "%<br>";
+		tooltip += $I("village.happiness.buildings") + ": +" + (Math.floor(base)) + "%<br>";
 
 		//----------------------
 		var resHappiness = 0;
@@ -73,9 +74,9 @@ WToolbarHappiness = React.createClass({
 		}
 		tooltip += $I("village.happiness.rare.resources") + ": +" + this.game.getDisplayValueExt(resHappiness, false, false, 0) + "%<br>";
 		//---------------------
-		var karma = this.game.resPool.get("karma");
-		if (karma.value > 0){
-			tooltip += $I("village.happiness.karma") + ": +" + this.game.getDisplayValueExt(karma.value, false, false, 0) + "%<br>";
+		var karma = this.game.village.getHappinessFromKarma();
+		if (karma > 0){
+			tooltip += $I("village.happiness.karma") + ": +" + this.game.getDisplayValueExt(karma, false, false, 0) + "%<br>";
 		}
 
 		if (this.game.calendar.festivalDays > 0){
@@ -341,14 +342,16 @@ WLoginForm = React.createClass({
             {onClick: function (e){ e.stopPropagation(); }},
             [
                 $r("div", {className: "row"}, [
-                    "Email:",
+                    $r("label", {for:"kgnet-email"}, "Email:"),
                         $r("input", {
+                            id:"kgnet-email",
                             type: "email",
                             onChange: this.setLogin,
                             value: this.state.login
                         } ),
-                    "Password:",
+                    $r("label", {for:"kgnet-password"}, "Password:"),
                         $r("input", {
+                            id:"kgnet-password",
                             type: "password",
                             onChange: this.setPassword,
                             value: this.state.password
@@ -390,7 +393,7 @@ WLoginForm = React.createClass({
     login: function(){
         var self = this;
 
-        this.setState({isLoading: true});
+        self.setState({error: null, isLoading: true});
         $.ajax({
             cache: false,
             type: "POST",
@@ -407,10 +410,12 @@ WLoginForm = React.createClass({
 		}).done(function(resp){
             if (resp.id){
                 self.props.game.server.setUserProfile(resp);
+            } else {
+                self.setState({error: resp.error})
             }
 		}).fail(function(resp, status){
             console.error("something went wrong, resp:", resp, status)
-            self.setState({error: resp.responseText})
+            self.setState({error: resp.responseText || "There was a problem connecting the server"})
         }).always(function(){
             self.setState({isLoading: false});
         });
@@ -504,6 +509,7 @@ WCloudSaveRecord = React.createClass({
                     e.stopPropagation();
                     game.ui.confirm("[S]ave", "This will override [SERVER] save. Y/N", function(){
                         game.server.pushSave();
+                        self.props.closeMenu && self.props.closeMenu();
                     });
                 }}, $I("ui.kgnet.save.save")),
             $r("a", {
@@ -513,6 +519,7 @@ WCloudSaveRecord = React.createClass({
                     e.stopPropagation();
                     game.ui.confirm("[L]oad", "This will override [LOCAL] save. Y/N", function(){
                         game.server.loadSave(save.guid);
+                        self.props.closeMenu && self.props.closeMenu();
                     });
                 }}, $I("ui.kgnet.save.load")),
             $r("a", {
@@ -597,7 +604,7 @@ WCloudSaves = React.createClass({
             //body
             //TODO: externalize save record as component?
             saveData && saveData.map(function(save){
-                return $r(WCloudSaveRecord, {save: save, game: game});
+                return $r(WCloudSaveRecord, {save: save, game: game, closeMenu: self.props.closeMenu});
             })),
 
             $r("div", {className:"save-record-container"}, [
@@ -605,6 +612,7 @@ WCloudSaves = React.createClass({
                     $r("a", {onClick: function(e){
                         e.stopPropagation();
                         game.server.pushSave();
+                        self.props.closeMenu && self.props.closeMenu();
                     }}, "Create new save (" + game.telemetry.guid + ")")
                 ]),
                 $r("div", {className:"save-record"},[
@@ -622,7 +630,7 @@ WCloudSaves = React.createClass({
                         (this.state.isLoading && "[loading..]"), 
                         $I("ui.kgnet.sync")
                     ),
-                    $r("span", {paddingTop:"10px"}, $I("ui.kgnet.instructional"))
+                    (!saveData || !saveData.length) && $r("span", {paddingTop:"10px"}, $I("ui.kgnet.instructional"))
                 ])
             ])
         ])
@@ -646,15 +654,27 @@ WLogin = React.createClass({
         },
             $r("div",
                 {
-                    onClick: this.toggleExpanded
+                    onClick: this.toggleExpanded,
+                    onKeyDown: this.onKeyDown
                 },
                 [
-                    $r("span", {
-                        className: "kgnet-login-link status-indicator-" + (game.server.userProfile ? "online" : "offline")
-                        + (lastBackup >= 7 ? " freshMessage" : "")
-                    }, "* " + (game.server.userProfile ?
-                        $I("ui.kgnet.online") : $I("ui.kgnet.login")
-                    )),
+                    $r("a", {
+                        className: "kgnet-login-link-container",
+                        href:"#!",
+                        onClick: this.toggleExpanded,
+                    }, 
+                        $r("span", {
+                            className: "kgnet-login-link status-indicator-" + (game.server.userProfile ? "online" : "offline")
+                            + (lastBackup >= 7 ? " freshMessage" : "")
+                        }, [
+                            $r("div", {
+                                className: "svg-icon user"
+                            }),  
+                            (game.server.userProfile ?
+                            $I("ui.kgnet.online") : $I("ui.kgnet.login"))
+                        ]
+                        ),
+                    ),
                     this.state.isExpanded && $r("div", {
                         className: "login-popup button_tooltip tooltip-block"
                     },
@@ -665,7 +685,7 @@ WLogin = React.createClass({
                                 (lastBackup >= 7) && $r("span", {className: "hazard"})
                             ]),
                             $r(WLoginForm, {game: game}),
-                            $r(WCloudSaves, {game: game})
+                            $r(WCloudSaves, {game: game, closeMenu: this.closeMenu})
                         )
                     )
                 ]
@@ -677,6 +697,18 @@ WLogin = React.createClass({
         this.setState({
             isExpanded: !this.state.isExpanded
         })
+    },
+
+    closeMenu: function(){
+        this.setState({
+            isExpanded: false
+        })
+    },
+
+    onKeyDown: function(e){
+        if(e.key === "Escape") {
+            this.toggleExpanded()
+        }
     }
 });
 
@@ -704,7 +736,7 @@ WToolbar = React.createClass({
             $r(WToolbarHappiness, {game: this.state.game}),
             $r(WToolbarEnergy, {game: this.state.game}),
             $r(WBLS, {game: this.state.game}),
-            $r(WToolbarMOTD, {game: this.state.game}),
+            //$r(WToolbarMOTD, {game: this.state.game}),
             $r(WLogin, {game: this.state.game})
 
         );

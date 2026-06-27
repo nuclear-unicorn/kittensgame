@@ -8,8 +8,9 @@
 /* ******************* GAME ******************* */
 /* ******************************************** */
 body.scheme_black {
-	background-color: #000000;
 	color-scheme: dark;
+	--page-background-color:#000000;
+	--text-color: gray;
 }
 .scheme_black  #gamePageContainer,
 .scheme_black select,
@@ -20,7 +21,6 @@ body.scheme_black {
 	font-family: 'Asap', sans-serif;
 }
 .scheme_black .btn {
-	color: gray;
 	margin-bottom: 6px; /* default 10px */
 	background-color: transparent;
 	border: solid 1px transparent;
@@ -61,10 +61,10 @@ body.scheme_black {
 	color: #d0d0d0;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_black div {
+.scheme_black > div {
 	color:#b0b0b0;
 }
-.scheme_black .disabled div { /* color text for disabled */
+.scheme_black .disabled > div { /* color text for disabled */
 	color: #505050;
 }
 .scheme_black h1 {
@@ -314,14 +314,14 @@ body.scheme_black {
 /* ******************* TOOLTIP ******************* */
 /* *********************************************** */
 .scheme_black #tooltip,
-.scheme_black .tooltip-block > div {
+.scheme_black .tooltip-content {
 	background-color: #000000;
 	color: #808080; /* tooltip windows == left column : left text */
 	border: 1px solid #404040;
 	border-radius: 3px;
 	box-shadow: 0 0 5px 1px #000000;
 }
-.scheme_black .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_black .tooltip-content { /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_black .button_tooltip {
@@ -681,6 +681,10 @@ body.scheme_black {
 .scheme_black .census-block:hover {
 	border-color: #606060;
 }
+.scheme_black .census-block > .links-container > span.btn.modern:not(.simLeader .leaderHref):hover {
+	/*don't apply this to the "make-leader" button if this already is the leader*/
+	background-color: #222222 !important;
+}
 .scheme_black .census-block.simLeader {
     background: rgba(0, 0, 0, 0.2);
 	border: solid 1px #1e0080;
@@ -688,7 +692,12 @@ body.scheme_black {
 .scheme_black .census-block.simLeader:hover {
 	border-color: #6e42ff;
 }
-.scheme_black .census-block.simLeader a.leaderHref {
+.scheme_black .census-block.simLeader > .links-container > span.btn.modern.leaderHref {
+	background: transparent;
+	border: none;
+}
+.scheme_black .census-block.simLeader .leaderHref,
+.scheme_black .census-block.simFavorite .favoriteHref {
 	color: #6e42ff;
 }
 .scheme_black .census-block .info { /* info of kitten */
@@ -805,6 +814,9 @@ body.scheme_black {
 	letter-spacing: 1px;
 	border: 2px solid rgba(110, 66, 255, 0.3); /* color #6e42ff */
 	border-radius: 3px;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_black .achievement:hover {
 	color: #ffffff;
@@ -887,7 +899,7 @@ body.scheme_black {
 .scheme_black #calendarSign:hover {
    cursor: default;
 }
-.scheme_black .right-tab-header { /* Log | Chat link on right column */
+.scheme_black .right-tab-header { /* Log | Queue link on right column */
 	color: #202020; /* for separator tab | */
 	font-size: 80%;
  }
@@ -903,9 +915,6 @@ body.scheme_black {
 }
 .scheme_black div#observeButton {
 	height: 36px; /* default height: 30px; */
-}
-.scheme_black #rightTabChat {
-	margin-top: 14px;
 }
 .scheme_black div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #646464;
@@ -1059,7 +1068,7 @@ body.scheme_black {
 .scheme_black .res-cell.resource-value {
 	color: #a0a0a0;
 }
-.scheme_black #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_black div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #505050;
 	text-shadow: none !important;
 	font-size: smaller;

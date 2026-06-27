@@ -7,10 +7,11 @@
 /**********************************************/
 /******************** GAME ********************/
 /**********************************************/
-body.scheme_chocolate,
-.scheme_chocolate .help,
-.scheme_chocolate .dialog {
+.scheme_chocolate,
+.scheme_chocolate .help {
 	background-color: #403022;
+	--page-background-color: #403022;
+	--text-color: #e0c8af;
 }
 body.scheme_chocolate.with_background_image {
 	background:	repeat-x local top left url('img/theme_chocolate_topbar_background.png'), #403022; /* source of images for graphic design : https://pngtree.com/freepng/set-of-cloud-collection-vector_3575869.html Volkeyrn: permanent premium member */
@@ -91,10 +92,10 @@ body.scheme_chocolate.with_background_image {
 	color: #e8969f;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_chocolate div {
+.scheme_chocolate > div {
 	color: #dccebd;
 }
-.scheme_chocolate .disabled div { /* color text for disabled */
+.scheme_chocolate .disabled > div { /* color text for disabled */
 	color: #857160;
 }
 .scheme_chocolate h1 {
@@ -321,7 +322,7 @@ body.scheme_chocolate.with_background_image {
 /******************** TOOLTIP ********************/
 /*************************************************/
 .scheme_chocolate #tooltip,
-.scheme_chocolate .tooltip-block > div {
+.scheme_chocolate .tooltip-content{
 	background-color: #42302d;
 	color: #a0a0a0; /* tooltip windows == left column : left text */
 	border-style: solid;
@@ -331,7 +332,7 @@ body.scheme_chocolate.with_background_image {
 	margin-left: 15px; /* for offset tooltip due to larger buttons .btn.modern */
 	box-shadow: -1px -1px 2px #584230, 1px 1px 2px #241b13;
 }
-.scheme_chocolate .tooltip-block > div {
+.scheme_chocolate .tooltip-content{
 	padding: 5px;
 }
 .scheme_chocolate .button_tooltip {
@@ -685,7 +686,13 @@ body.scheme_chocolate.with_background_image {
 .scheme_chocolate .census-block.simLeader:hover {
 	border-color: #eddcc7;
 }
-.scheme_chocolate .census-block.simLeader a.leaderHref {
+.scheme_chocolate .census-block .links-container span {
+	border-radius: 1px;
+	border: none !important;
+	color: #c0a787;
+}
+.scheme_chocolate .census-block.simLeader .leaderHref,
+.scheme_chocolate .census-block.simFavorite .favoriteHref {
 	color: #96e8df;
 }
 .scheme_chocolate .census-block .info { /* info of kitten */
@@ -806,6 +813,13 @@ body.scheme_chocolate.with_background_image {
 	padding: 10px 20px; /* default padding-top: 20px; */
 	color: #120f0c;
 }
+.scheme_chocolate .tabInner.Challenges td.craftStuffPanel + td.craftStuffPanel > table { /* list of kittens in reserve */
+	background-color: rgba(36, 27, 19, 0.25); /* copied from census-block because inside we have a list of kitten names*/
+	border: 1px solid;
+	border-radius: 9px;
+	font-size: 0.9em;
+	color: #c0a787;
+}
 
 /**********************************************************/
 /******************** ACHIEVEMENTS TAB ********************/
@@ -831,6 +845,9 @@ body.scheme_chocolate.with_background_image {
 	border-bottom-color: rgba(217, 190, 163, 0.8);
 	box-shadow: inset 1px 1px 3px rgba(255, 255, 255, 0.4), inset -2px -2px 3px #202020,
 				1px 1px 3px #101010;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .scheme_chocolate .achievement:hover {
 	color: #eddcc7;
@@ -920,7 +937,7 @@ body.scheme_chocolate.with_background_image {
 .scheme_chocolate #calendarSign:hover {
 	cursor: default;
 }
-.scheme_chocolate .right-tab-header { /* Log | Chat link on right column */
+.scheme_chocolate .right-tab-header { /* Log | Queue link on right column */
 	color: #70543d; /* for separator tab | */
 	font-size: 80%;
 }
@@ -936,9 +953,6 @@ body.scheme_chocolate.with_background_image {
 }
 .scheme_chocolate div#observeButton {
 	height: 40px; /* default height 30px */
-}
-.scheme_chocolate #rightTabChat {
-	margin-top: 20px;
 }
 .scheme_chocolate div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #876f57;
@@ -1109,7 +1123,7 @@ body.scheme_chocolate.with_background_image {
 	color: #cb000b;
 	padding-top: 6px;/* default padding-top: 10px; */
 }
-.scheme_chocolate #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_chocolate div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #b8b8b8;
 	font-size: smaller;
 }

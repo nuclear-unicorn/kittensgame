@@ -8,9 +8,13 @@
 /* ******************* GAME ******************* */
 /* ******************************************** */
 
-body.scheme_anthracite {
-	background-color: #181818;
+.scheme_anthracite,
+.scheme_anthracite .help {
+	color-scheme: dark;
+	--page-background-color: #181818;
+	--text-color: #808080;
 }
+
 body.scheme_anthracite.with_background_image,
 .scheme_anthracite .dialog {
 	background: repeat local top left -230px url('img/theme_anthracite_texture_brushed_background.jpg'), #181818; /* source: https://pngtree.com/freebackground/black-metal-texture-texture-background-banner_1141447.html Volkeyrn: permanent premium member */
@@ -38,7 +42,8 @@ body.scheme_anthracite.with_background_image,
 	border-radius: 5px; /* default border-radius: 3px; */
 	width: 280px; /* +10px gained from left column +15px gained from padding default width: 264px; */
 }
-.scheme_anthracite .btn.modern.disabled {
+.scheme_anthracite .btn.modern.disabled,
+.scheme_anthracite .census-block.simLeader > .links-container > .btn.modern.leaderHref {
 	background-color: #202020;
 	border: inset 1px #181818;
 	background-image: url('img/theme_anthracite_button_disabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
@@ -46,7 +51,8 @@ body.scheme_anthracite.with_background_image,
 	background-attachment: local;
 	background-position: top left;
 }
-.scheme_anthracite .btn.modern.disabled:hover {
+.scheme_anthracite .btn.modern.disabled:hover,
+.scheme_anthracite .census-block.simLeader > .links-container > .btn.modern.leaderHref:hover {
 	background-color: #202020;
 	background-image: url('img/theme_anthracite_button_disabled_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
 	background-repeat: no-repeat;
@@ -96,10 +102,10 @@ body.scheme_anthracite.with_background_image,
 	color: #d0d0d0;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_anthracite div {
+.scheme_anthracite > div {
 	color:#b0b0b0;
 }
-.scheme_anthracite .disabled div { /* color text for disabled */
+.scheme_anthracite .disabled > div { /* color text for disabled */
 	color: #808080;
 }
 .scheme_anthracite h1 {
@@ -291,7 +297,7 @@ body.scheme_anthracite.with_background_image,
 /* ******************* TOOLTIP ******************* */
 /* *********************************************** */
 .scheme_anthracite #tooltip,
-.scheme_anthracite .tooltip-block > div {
+.scheme_anthracite .tooltip-content{
 	background-color: #282828;
 	background-image: url('img/theme_anthracite_tooltip_background.png'); /* source of images for graphic design : https://pngtree.com/freepng/metal-brushed-texture-background-hd-picture_4364018.html Volkeyrn: permanent premium member */
 	background-repeat: repeat;
@@ -302,7 +308,7 @@ body.scheme_anthracite.with_background_image,
 	border-radius: 5px;
 	box-shadow: 2px 2px 3px #000000;
 }
-.scheme_anthracite .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_anthracite .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_anthracite .button_tooltip {
@@ -676,7 +682,8 @@ body.scheme_anthracite.with_background_image,
 .scheme_anthracite .census-block.simLeader:hover {
 	border-color: #585858;
 }
-.scheme_anthracite .census-block.simLeader a.leaderHref {
+.scheme_anthracite .census-block.simLeader .leaderHref,
+.scheme_anthracite .census-block.simFavorite .favoriteHref {
 	color: #19b0ff;
 }
 .scheme_anthracite .census-block .info { /* info of kitten */
@@ -807,8 +814,6 @@ body.scheme_anthracite.with_background_image,
 .scheme_anthracite .achievement {
 	display: block;
 	font-size: 15px;
-	margin-right: 120px;
-	margin-left: 120px;
 	height: 34px;
 	background-color: transparent;
 	color: #a0a0a0;
@@ -820,6 +825,13 @@ body.scheme_anthracite.with_background_image,
 	background-repeat: no-repeat;
 	background-attachment: local;
 	background-position: top left;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+.scheme_anthracite .achievement:not(.badge) {
+	margin-right: 120px;
+	margin-left: 120px;
 }
 .scheme_anthracite .achievement:hover {
 	color: #f0f0f0;
@@ -907,7 +919,7 @@ body.scheme_anthracite.with_background_image,
 .scheme_anthracite #calendarSign:hover {
    cursor: default;
 }
-.scheme_anthracite .right-tab-header { /* Log | Chat link on right column */
+.scheme_anthracite .right-tab-header { /* Log | Queue link on right column */
 	color: transparent; /* for separator tab | */
 	font-size: 80%;
  }
@@ -936,9 +948,6 @@ body.scheme_anthracite.with_background_image,
 }
 .scheme_anthracite div#observeButton {
 	height: 35px; /* default height: 30px; */
-}
-.scheme_anthracite #rightTabChat {
-	margin-top: 14px;
 }
 .scheme_anthracite div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #646464;
@@ -1106,13 +1115,15 @@ body.scheme_anthracite.with_background_image,
 .scheme_anthracite .res-cell.resource-value {
 	color: #a0a0a0;
 }
-.scheme_anthracite #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+.scheme_anthracite #fastHuntContainer > a, /* Text left column : "Send hunters (xx times)" */
+.scheme_anthracite #fastSacrificeContainer > a {
 	font-size: 110%;
 }
-.scheme_anthracite #fastHuntContainer > a:hover {
+.scheme_anthracite #fastHuntContainer > a:hover,
+.scheme_anthracite #fastSacrificeContainer > a:hover {
 	text-shadow: 2px 2px 2px #000000;
 }
-.scheme_anthracite #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_anthracite div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #606060;
 	text-shadow: none !important;
 	font-size: smaller;

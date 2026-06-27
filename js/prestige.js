@@ -98,7 +98,8 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			"perks": ["divineProportion"]
 		},
 		effects:{
-			"priceRatio" : -(1 + Math.sqrt(5)) / 200	//Calculates the Golden Ratio
+			"priceRatio" : -(1 + Math.sqrt(5)) / 200,	//Calculates the Golden Ratio
+			"queueCap": 1
 		}
 	},{
 		name: "divineProportion",
@@ -111,7 +112,8 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			"perks": ["vitruvianFeline"]
 		},
 		effects:{
-			"priceRatio" : -16 / 900
+			"priceRatio" : -16 / 900,
+			"queueCap": 2
 		}
 	},{
 		name: "vitruvianFeline",
@@ -134,7 +136,8 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		unlocked: false,
 		researched: false,
 		effects:{
-			"priceRatio" : -0.0225
+			"priceRatio" : -0.0225,
+			"queueCap": 2
 		}
 	},{
 		name: "diplomacy",
@@ -146,6 +149,12 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		researched: false,
 		effects:{
 			"standingRatio" : 0.1
+		},
+		handler: function(game) { //Called when this is purchased
+			game.science.unlockRelations();
+		},
+		upgrades:{
+			policies: ["lizardRelationsEcologists"]
 		},
 		unlocks: {
 			"perks": ["zebraDiplomacy"]
@@ -202,9 +211,22 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		label: $I("prestige.unicornmancy.label"),
 		description: $I("prestige.unicornmancy.desc"),
 		prices: [{ name: "paragon", val: 125 }],
-		unlocked: true,
-		defaultUnlocked: true,
-		researched: false
+		unlocked: false,
+		defaultUnlocked: false,
+		researched: false,
+		unlocks: {
+			"perks": ["alicornmancy"]
+		}
+	},{
+		name: "alicornmancy", //Exists to reduce reliance on RNG during the Unicorn Tears Challenge
+		label: $I("prestige.alicornmancy.label"),
+		description: $I("prestige.alicornmancy.desc"),
+		prices: [{ name: "paragon", val: 200 }],
+		unlocked: false,
+		researched: false,
+		upgrades: {
+			zigguratUpgrades: ["skyPalace", "unicornUtopia", "sunspire"]
+		}
 	},
 	{
 		name: "anachronomancy",
@@ -522,6 +544,24 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		return storageRatio;
 	},
 
+	/**
+	 * Marginal bonuses (as fractions, e.g. 0.1 == +10%) that a reset's prestige points would add on top of the current totals.
+	 * Storage scales linearly with paragon, but production is diminishing, so the gain must be the delta of the curve.
+	 */
+	getResetBonusBreakdown: function(extraParagon, extraKarma){
+		var paragonRatio = this.getParagonRatio();
+		var paragon = this.game.resPool.get("paragon").value;
+
+		var prodCur = this.game.getLimitedDR((paragon * 0.010) * paragonRatio, 2 * paragonRatio);
+		var prodNew = this.game.getLimitedDR(((paragon + extraParagon) * 0.010) * paragonRatio, 2 * paragonRatio);
+
+		return {
+			happiness: extraKarma / 100, //+1% happiness per karma point
+			storage: (extraParagon / 1000) * paragonRatio,
+			production: prodNew - prodCur
+		};
+	},
+
 	unlockAll: function(){
 		for (var i in this.perks){
 			this.perks[i].unlocked = true;
@@ -539,11 +579,14 @@ dojo.declare("classes.ui.PrestigeBtnController", com.nuclearunicorn.game.ui.Buil
         return model.metaCached;
     },
 
-   	buyItem: function(model, event, callback) {
+   	buyItem: function(model, event) {
 		if (this.game.science.get("metaphysics").researched) {
-			this.inherited(arguments);
+			return this.inherited(arguments);
 		} else {
-			callback(false /*itemBought*/, { reason: "not-unlocked" });
+			return {
+				itemBought: false,
+				reason: "not-unlocked"
+			};
 		}
 	},
 

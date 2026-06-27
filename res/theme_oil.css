@@ -9,6 +9,14 @@
 /**********************************************/
 /******************** GAME ********************/
 /**********************************************/
+
+.scheme_oil,
+.scheme_oil .help {
+	color-scheme: dark;
+	--page-background-color:#000000;
+	--text-color: #A9A9A9;
+}
+
 body.scheme_oil,
 .scheme_oil .help,
 .scheme_oil .dialog {
@@ -83,10 +91,10 @@ body.scheme_oil,
 	color: #ffc900;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_oil div {
+.scheme_oil > div {
 	color: #A9A9A9;
 }
-.scheme_oil .disabled div { /* color text for disabled */
+.scheme_oil .disabled > div { /* color text for disabled */
 	color: #494949;
 }
 .scheme_oil h1 {
@@ -267,7 +275,7 @@ body.scheme_oil,
 /******************** TOOLTIP ********************/
 /*************************************************/
 .scheme_oil #tooltip,
-.scheme_oil .tooltip-block > div {
+.scheme_oil .tooltip-content{
 	background-color: #101010;
 	font-size: 14px;
 	color: #898989; /* tooltip windows == left column : left text */
@@ -279,7 +287,7 @@ body.scheme_oil,
 	box-shadow: inset 0 0 40px 12px #000000,
 	-1px -1px 2px #797979, 1px 1px 2px #191919;
 }
-.scheme_oil .tooltip-block > div {
+.scheme_oil .tooltip-content{
 	padding: 5px;
 }
 .scheme_oil .button_tooltip {
@@ -624,8 +632,13 @@ body.scheme_oil,
 .scheme_oil .census-block.simLeader {
 	background-color : rgba(160, 160, 160, 0.2); /* color #A0A0A0; */
 }
-.scheme_oil .census-block.simLeader a.leaderHref {
-	color: #118AC2;
+.scheme_oil .census-block.simLeader .leaderHref {
+	background: transparent !important;
+	border: none !important;
+}
+.scheme_oil .census-block.simLeader .leaderHref,
+.scheme_oil .census-block.simFavorite .favoriteHref {
+	color: #ffc900;
 }
 .scheme_oil .census-block .info { /* info of kitten */
 	font-size: 0.9em;
@@ -750,11 +763,16 @@ body.scheme_oil,
 	margin: 10px; /* default margin-bottom: 10px; */
     height: 40px;
     background-color: #000000;
-    color: #909090;
     text-shadow: rgba(192, 192, 192) 2px 0 10px; /* color #BBC0CA */
     letter-spacing: 1px;
-	border-color : rgba(255, 201, 0, 0.3); /* color #FFC900; */
 	border-radius: 19px;
+	white-space: nowrap !important;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+.scheme_oil .achievement:not(.name) {
+	color: #909090;
+	border-color : rgba(255, 201, 0, 0.3); /* color #FFC900; */
 }
 .scheme_oil .achievement:hover {
 	color: #E0E0E0;
@@ -841,7 +859,7 @@ body.scheme_oil,
 .scheme_oil #calendarSign:hover {
    cursor: default;
 }
-.scheme_oil .right-tab-header { /* Log and Chat link on right column */
+.scheme_oil .right-tab-header { /* Log and Queue link on right column */
 	/* default margin-top: 10px; */
 	font-size: 80%;
 	border-bottom: 1px solid #191919;
@@ -860,9 +878,6 @@ body.scheme_oil,
 .scheme_oil .right-tab-header a:not(.active) {
 	text-decoration: none;
 	border-top: none;
-}
-.scheme_oil #rightTabChat {
-	margin-top: 20px;
 }
 .scheme_oil div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #494949;
@@ -1027,7 +1042,7 @@ body.scheme_oil,
 	color: #a90909;
 	padding-top: 6px;/* default padding-top: 10px; */
 }
-.scheme_oil #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_oil div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #c9c9c9;
 	font-size: smaller;
 }

@@ -13,9 +13,15 @@
           "parserOptions": {
             "ecmaVersion": 6
           }
+        },
+        {
+          "files": ["*.es6.js"],
+          "parserOptions": {
+            "ecmaVersion": 6
+          }
         }
     ],
-    "ignorePatterns": ["lib/**/*", "node_modules/**/*"],
+    "ignorePatterns": ["lib/**/*", "node_modules/**/*", "simulate-combat.js"],
     "rules": {
         "quotes": [
             "warn",
@@ -25,6 +31,7 @@
             "error",
             "always"
         ],
+        "keyword-spacing": ["error"],
         "no-mixed-spaces-and-tabs": [
             "warn", "smart-tabs"
         ],

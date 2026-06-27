@@ -10,9 +10,11 @@
 /* ******************************************** */
 
 body.scheme_bluish {
-	background-color: #141936;
+	--page-background-color:#141936;
+	--text-color: #8f94ac;
 	color-scheme: dark;
 }
+
 .scheme_bluish #gamePageContainer,
 .scheme_bluish select,
 .scheme_bluish .btn,
@@ -73,10 +75,10 @@ body.scheme_bluish {
 	color: #915dfa;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_bluish div {
+.scheme_bluish > div {
 	color: #a6acc7;
 }
-.scheme_bluish .disabled div { /* color text for disabled */
+.scheme_bluish .disabled > div { /* color text for disabled */
 	color: #4b5373;
 }
 .scheme_bluish h1 {
@@ -343,7 +345,7 @@ body.scheme_bluish {
 	/* font-size: 13px; /* for center tooltip except title, effects and flavor */
 /* } */
 .scheme_bluish #tooltip,
-.scheme_bluish .tooltip-block > div {
+.scheme_bluish .tooltip-content{
 	/* default padding-left: 3px; */
 	padding-bottom: 5px;
 	background: linear-gradient(90deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), #141936;
@@ -352,7 +354,7 @@ body.scheme_bluish {
 	border-radius: 7px;
 	/* margin-left: 20px; /* for offset tooltip due to larger buttons .btn.modern */
 }
-.scheme_bluish .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_bluish .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_bluish .button_tooltip {
@@ -778,7 +780,15 @@ body.scheme_bluish {
 .scheme_bluish .census-block.simLeader {
 	background-color: #20294c;
 }
-.scheme_bluish .census-block.simLeader a.leaderHref {
+.scheme_bluish .census-block .links-container span {
+	border-radius: 50%; /*make it a circle!*/
+}
+.scheme_bluish .census-block.simLeader .leaderHref {
+	background: transparent;
+	border: none;
+}
+.scheme_bluish .census-block.simLeader .leaderHref,
+.scheme_bluish .census-block.simFavorite .favoriteHref {
 	color: #6c91f8;
 }
 .scheme_bluish .census-block .info { /* info of kitten */
@@ -975,7 +985,7 @@ body.scheme_bluish {
 .scheme_bluish #calendarSign:hover {
    cursor: default;
 }
-.scheme_bluish .right-tab-header { /* Log | Chat link on right column */
+.scheme_bluish .right-tab-header { /* Log | Queue link on right column */
 	/* default margin-top: 10px; */
 	font-size: 80%;
  }
@@ -994,9 +1004,6 @@ body.scheme_bluish {
 	margin-top: 5px; /* default margin-top: 15px */
 	height: 35px; /* default height: 30px; */
 	margin-bottom: 3px;
-}
-.scheme_bluish #rightTabChat {
-	margin-top: 10px;
 }
 .scheme_bluish div.console-intro { /* Text on right column: "You are a kitten in a catnip forest." */
 	color: #f6aa5c;
@@ -1216,7 +1223,7 @@ body.scheme_bluish {
 	/* default max-width: 90px; */
 	color: #8f94ac;
 }
-.scheme_bluish #fastHuntContainerCount { /* Text left column: "xx times" from Send hunters */
+.scheme_bluish div.pin-link span.pin-link-quantity { /* Text left column: "xx times" from Send hunters */
 	color: #707070;
 	text-shadow: none !important;
 }

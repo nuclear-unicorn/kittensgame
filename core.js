@@ -44,6 +44,9 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 	 * >>
 	 * >>  constructor: function() { this.arrayField = []; }
 	 */
+
+	//effectsCachedExisting is a table of the names of every possible effect on each item in this game tab.
+	//If an effect somehow isn't in here, the TabManager doesn't know it exists.
 	effectsCachedExisting: null,
 	meta: null,
 	panelData: null,
@@ -125,16 +128,21 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 			effectsBase = this.game.resPool.addBarnWarehouseRatio(effectsBase);
 		}
 
+		//Initialize effectsCachedExisting to effectsBase
+		for (var name in this.effectsCachedExisting) {
+			this.effectsCachedExisting[name] = (effectsBase && effectsBase[name]) ? effectsBase[name] : 0;
+		}
+
 		for (var i = 0; i < this.meta.length; i++){
+			//This will collect all meta effects into effectsCachedExisting
+			//We're just using it as a temporary holding area
 			this.updateMetaEffectCached(this.meta[i]);
 		}
 
+		var globalEffects = this.game.globalEffectsCached;
 		for (var name in this.effectsCachedExisting) {
-			// Add effect from meta
-			var effect = 0;
-			for (var i = 0; i < this.meta.length; i++){
-				effect += this.getMetaEffect(name, this.meta[i]);
-			}
+			var effect = this.effectsCachedExisting[name];
+			this.effectsCachedExisting[name] = 0; //zero it out after using it
 
 			// Previously, catnip demand (or other buildings that both affect the same resource)
 			// could have theoretically had more than 100% reduction because they diminished separately,
@@ -143,20 +151,20 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 				effect = this.game.getLimitedDR(effect, 1);
 			}
 
-			// Add effect from effectsBase
-			if (effectsBase && effectsBase[name]) {
-				effect += effectsBase[name];
-			}
-
 			// Add effect in globalEffectsCached, in addition of other managers
-			this.game.globalEffectsCached[name] = typeof(this.game.globalEffectsCached[name]) == "number" ? this.game.globalEffectsCached[name] + effect : effect;
+			globalEffects[name] = typeof(globalEffects[name]) == "number" ? globalEffects[name] + effect : effect;
 		}
 	},
 
 	updateMetaEffectCached: function (metadata) {
+		//The object named "metadata" is a group of items from a panel in a tab in the game.
+		//For example, all Bonfire buildings, or all Order of the Sun upgrades, or all policies.
 		for (var i = 0; i < metadata.meta.length; i++){
 			var meta = metadata.meta[i];
 			meta.totalEffectsCached = {};
+			//The object named "meta" is an individual item in the game.
+
+			//Populate totalEffectsCached by looping through all types of effects we know about
 			for (var effectName in this.effectsCachedExisting){
 				var effect;
 				if (metadata.provider){
@@ -164,7 +172,12 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 				} else {
 					effect = meta.effects[effectName] || 0;
 				}
-				meta.totalEffectsCached[effectName] = effect;
+				if (effect != 0) { //ONLY create the entry if it matters
+					meta.totalEffectsCached[effectName] = effect;
+					//Hack to reduce number of nested loops:
+					// temporarily collect the values in effectsCachedExisting.
+					this.effectsCachedExisting[effectName] += effect;
+				}
 			}
 		}
 	},
@@ -246,7 +259,7 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 			return;
 		}
 
-		for(var i = 0; i < saveMeta.length; i++){
+		for (var i = 0; i < saveMeta.length; i++){
 			var savedMetaElem = saveMeta[i];
 
 			if (savedMetaElem != null){
@@ -274,9 +287,17 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 		}
 	},
 
-	filterMetadata: function(meta, fields){
+	/**
+	 * 
+	 * @param {*} meta 
+	 * @param {*} fields 
+	 * @param {*} replacer - function(key, value)
+	 * If returns undefined, metadata field will not be serialized
+	 * @returns 
+	 */
+	filterMetadata: function(meta, fields, replacer){
 		var filtered = [];
-		for(var i = 0; i < meta.length; i++){
+		for (var i = 0; i < meta.length; i++){
 			var clone = {};
 
 			for (var j = 0; j < fields.length; j++){
@@ -284,7 +305,17 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 				/*if (!meta[i].hasOwnProperty(fld)){
 					console.warn("Can't find elem." + fld + " in", meta[i]);
 				}*/
-				clone[fld] = meta[i][fld];
+
+				var value = meta[i][fld];
+				if (replacer){
+					value = replacer(fld, meta[i][fld]);
+				} else {
+					value = meta[i][fld];
+				}
+
+				if (value !== undefined){
+					clone[fld] = value;
+				}
 			}
 			filtered.push(clone);
 		}
@@ -419,6 +450,26 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 				title: $I("console.filter.blackcoin"),
 				enabled: true,
 				unlocked: false
+			},
+			"festival": {
+				title: $I("console.filter.festival"),
+				enabled: true,
+				unlocked: false
+			},
+			"undo": {
+				title: $I("console.filter.undo"),
+				enabled: true,
+				unlocked: false
+			},
+			"explore": {
+				title: $I("console.filter.explore"),
+				enabled: true,
+				unlocked: false
+			},
+			"combat": {
+				title: $I("console.filter.combat"),
+				enabled: true,
+				unlocked: false
 			}
 		}
 	},
@@ -483,7 +534,16 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 		this.ui.renderConsoleLog();
 	},
 
-
+	//Sets a single filter to be not unlocked anymore
+	lockFilter: function(filterName) {
+		var filter = this.filters[filterName];
+		if (filter) {
+			filter.unlocked = false;
+			this.ui.renderFilters();
+		} else {
+			console.error("Error: Invalid filter name passed to lockFilter.");
+		}
+	},
 
 	resetState: function (){
 		for (var fId in this.filters){
@@ -537,6 +597,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	fetchModel: function(options) {
 		var model = this.initModel(options);
 		model.name = this.getName(model);
+		model.type = this.getType(model);
 		model.description = this.getDescription(model);
 		model.prices = this.getPrices(model);
 		model.priceRatio = options.priceRatio;
@@ -554,7 +615,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		var priceModels = [];
 
 		if (prices) {
-			for( var i = 0; i < prices.length; i++){
+			for ( var i = 0; i < prices.length; i++){
 				var price = prices[i];
 				priceModels.push(this.createPriceLineModel(model, price));
 
@@ -573,6 +634,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		return  {
 			name: "",
 			description: "",
+			type: "",
 			visible: true,
 			enabled: true,
 			handler: null,
@@ -646,6 +708,9 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		return model.options.description;
 	},
 
+	getType: function(model){
+		return model.options.type;
+	},
 
 	/**
 	 * Deprecated method for price management (increases price property stored in button)
@@ -653,7 +718,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	adjustPrice:function(model, ratio ){
 		var prices = this.getPrices(model);
 		if (prices.length){
-			for( var i = 0; i < prices.length; i++){
+			for ( var i = 0; i < prices.length; i++){
 				var price = prices[i];
 
 				price.val = price.val * ratio;
@@ -669,7 +734,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	rejustPrice: function(model, ratio){
 		var prices = model.prices;
 		if (prices.length){
-			for( var i = 0; i < prices.length; i++){
+			for ( var i = 0; i < prices.length; i++){
 				var price = prices[i];
 
 				price.val = price.val / ratio;
@@ -690,7 +755,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 			console.warn("unable pay prices for undo refund a building, no prices specified in metadata :O");
 			return;
 		}
-		for( var i = 0; i < model.prices.length; i++){
+		for ( var i = 0; i < model.prices.length; i++){
 			var price = model.prices[i];
 
 			var res = this.game.resPool.get(price.name);
@@ -737,16 +802,20 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	 * 									"cannot-afford"	The player can't afford the price of this item right now.
 	 * 									"not-enabled"		For some unspecified reason, this item is not available.
 	 * 				If the callback function returns anything, the return value from that function is ignored.
-	 * @return		No return value.  We communicate with the rest of the program using the callback function.
+	 * @returns BuyItemResult
 	 */
-	buyItem: function(model, event, callback){
+	buyItem: function(model, event){
 		if (!this.hasResources(model)) {
-			callback(false /*itemBought*/, {reason: "cannot-afford" });
-			return;
+			return {
+				itemBought: false,
+				reason: "cannot-afford"
+			};
 		}
 		if (!model.enabled) {
-			callback(false /*itemBought*/, {reason: "not-enabled" });
-			return;
+			return {
+				itemBought: false,
+				reason: "not-enabled"
+			};
 		}
 		//Else, we meet all requirements to buy this item:
 		if (!event) { event = {}; /*event is an optional parameter*/ }
@@ -758,7 +827,10 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 		}
 
 		//A lot of normal UI buttons that don't involve building things use this method, so check if things are free:
-		callback(true /*itemBought*/, {reason: ((model.prices && model.prices.length) ? "paid-for" : "item-is-free") });
+		return {
+			itemBought: true,
+			reason: ((model.prices && model.prices.length) ? "paid-for" : "item-is-free")
+		};
 	},
 
 	refund: function(model){
@@ -766,7 +838,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 			console.warn("unable to refund building, no prices specified in metadata :O");
 			return;
 		}
-		for( var i = 0; i < model.prices.length; i++){
+		for ( var i = 0; i < model.prices.length; i++){
 			var price = model.prices[i];
 
 			var res = this.game.resPool.get(price.name);
@@ -872,6 +944,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		this.updateEnabled();
 		this.updateVisible();
 
+		//can be potentially dangerous given that we now have markup in the model titles
 		if (this.buttonTitle && this.buttonTitle.innerHTML != this.model.name){
 			this.buttonTitle.innerHTML = this.model.name;
 		}
@@ -891,6 +964,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 				position: "relative",
 				display: this.model.visible ? "block" : "none"
 			},
+			"aria-description": this.model.description,
 			tabIndex: 0
 		}, btnContainer);
 
@@ -917,11 +991,10 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		}
 
 		this.updateVisible();
+		this.afterRender();
 
 		dojo.connect(this.domNode, "onclick", this, "onClick");
 		dojo.connect(this.domNode, "onkeypress", this, "onKeyPress");
-
-		this.afterRender();
 	},
 
 	animate: function(){
@@ -939,26 +1012,19 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 	onClick: function(event){
 		this.animate();
 		var self = this;
-		this.controller.buyItem(this.model, event, function(itemBought, extendedInfo) {
-			if (typeof(itemBought) !== "boolean" || typeof(extendedInfo) !== "object") {
-				console.error("Invalid arguments passed to callback function.");
-				return;
-			}
-			if (itemBought) {
-				self.update();
-			}
-		});
-
+		var result = this.controller.buyItem(this.model, event);
+		if (result.itemBought){
+			self.update();
+		}
 	},
 
-	onKeyPress: function(event){
-		if (event.key == "Enter"){
-			this.onClick(event);
+	onKeyPress: function(e){
+		if (e.key == "Enter"){
+			this.onClick(e);
 		}
 	},
 
 	afterRender: function(){
-
 		var prices = this.model.prices;
 		if (prices.length && !this.tooltip){
 
@@ -986,7 +1052,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 			var tooltipPricesNodes = [];
 
-			for( var i = 0; i < prices.length; i++){
+			for ( var i = 0; i < prices.length; i++){
 				var price = prices[i];
 
 				var priceItemNode = dojo.create("div", {
@@ -1004,8 +1070,11 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			dojo.connect(this.domNode, "onmouseover", this, dojo.partial(function(tooltip){ dojo.style(tooltip, "display", ""); }, tooltip));
 			dojo.connect(this.domNode, "onmouseout", this,  dojo.partial(function(tooltip){ dojo.style(tooltip, "display", "none"); }, tooltip));
 
+
 			this.tooltip = tooltip;
 			this.tooltipPricesNodes = tooltipPricesNodes;
+
+			console.log("this after render", this);
 		}
 	},
 
@@ -1175,6 +1244,9 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 		var hasRes = res.value >= price.val;
 
 		var hasLimitIssue = res.maxValue && ((price.val > res.maxValue && !indent) || price.baseVal > res.maxValue);
+		if (price.val == Infinity && !indent) {
+			hasLimitIssue = true; //The player can't have infinite of any resource.
+		}
 		var asterisk = hasLimitIssue ? "*" : "";	//mark limit issues with asterisk
 
 		var displayValue = hasRes || simplePrices
@@ -1204,24 +1276,22 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 			hasLimitIssue: hasLimitIssue
 		};
 
-
 		//unroll prices to the raw resources
 		if (!hasRes && res.craftable && !simplePrices && res.name != "wood") {
 			var craft = this.game.workshop.getCraft(res.name);
-			if (craft.unlocked) {
+			var diff = price.val - res.value;
+			//Only unroll if we've unlocked the craft; don't unroll infinite prices
+			if (craft.unlocked && isFinite(diff)) {
 				var craftRatio = this.game.getResCraftRatio(res.name);
 				result.title = "+ " + result.title;
 				result.children = [];
 
 				var components = this.game.workshop.getCraftPrice(craft);
 				for (var j in components) {
-
-					var diff = price.val - res.value;
-
 					// Round up to the nearest craftable amount
 					var val = Math.ceil(components[j].val * diff / (1 + craftRatio));
 					var remainder = val % components[j].val;
-					if (remainder != 0) {
+					if (remainder != 0 && isFinite(remainder)) {
 						val += components[j].val - remainder;
 					}
 
@@ -1275,6 +1345,15 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 	isPrecraftAvailable: function(model){
 		for (var i in model.prices){
 			var price = model.prices[i];
+			if (price.name == "wood") {
+				if (this.game.village.getKittens() == 0) {
+					//(We don't want any kittens starving to death.)
+					return true;
+				}
+				//Else, treat wood as non-craftable
+				continue;
+			}
+			if (price.name == "tears") { return true; }
 			var res = this.game.resPool.get(price.name);
 			if (res.craftable){
 				return true;
@@ -1298,13 +1377,25 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 			}
 		}
 
-		var res = this.game.resPool.get(price.name);
-		if (res.craftable && res.name != "wood" && this.game.workshop.getCraft(res.name).unlocked) {
-			var amt = price.val - res.value;
-			if (amt > 0) {
-				var baseAmt = amt / (1 + this.game.getResCraftRatio(res.name));
-				this.game.workshop.craft(res.name, baseAmt, false /*no undo*/, true /*force all*/);
-			}
+		var game = this.game;
+		if (game.resPool.isStorageLimited([ price ])) { //Do not precraft if we cannot afford it anyways
+			return;
+		}
+		var res = game.resPool.get(price.name);
+		var amt = price.val - res.value;
+		if (amt <= 0) {
+			return;
+		}
+		if (res.name == "wood" && game.village.getKittens() > 0) {
+			//Don't craft wood if we have kittens, as there's risk of causing starvation
+			return;
+		}
+		if (res.craftable && game.workshop.getCraft(res.name).unlocked) {
+			var baseAmt = amt / (1 + game.getResCraftRatio(res.name));
+			game.workshop.craft(res.name, baseAmt, false /*no undo*/, true /*force all*/);
+		}
+		if (res.name == "tears" && game.religion.getHasUnlockedUnicornSacrifice()) {
+			game.religion.sacrificeUnicornsToTarget(amt);
 		}
 	}
 });
@@ -1399,7 +1490,7 @@ ButtonModernHelper = {
 		if (!prices.length){
 			return;
 		}
-		for( var i = 0; i < prices.length; i++){
+		for ( var i = 0; i < prices.length; i++){
 			var price = prices[i];
 			var span = ButtonModernHelper._renderPriceLine(tooltip, price);
 		}
@@ -1484,7 +1575,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 		if (this.model.hasResourceHover) {
 			dojo.connect(this.domNode, "onmouseover", this,
 				dojo.hitch( this, function(){
-					this.game.setSelectedObject(this.getSelectedObject());
+					this.game.setSelectedObject(this.getSelectedObject(), this.domNode);
 				}));
 			dojo.connect(this.domNode, "onmouseout", this,
 				dojo.hitch( this, function(){
@@ -1549,17 +1640,21 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 				tooltip: model.metadata.on ? $I("btn.on.tooltip") : $I("btn.off.tooltip"),
 				cssClass: model.metadata.on ? "bld-on" : "bld-off",
 				//reserved for mobile
+				//if you remove it one more time I will find where you live
 				enabled: model.metadata.val > 0,
 				handler: function(btn){
 					self.handleTogglableOnOffClick(model);
 				}
 			};
 		}
-		if (typeof(model.metadata.isAutomationEnabled) == "boolean") {
+		if (typeof(model.metadata.isAutomationEnabled) == "boolean" || 
+			(model.metadata.stages && typeof(model.metaAccessor.meta.isAutomationEnabled) == "boolean") //stage hack
+		) {
 			model.toggleAutomationLink = {
 				title: model.metadata.isAutomationEnabled ? "A" : "*",
 				tooltip: model.metadata.isAutomationEnabled ? $I("btn.aon.tooltip") : $I("btn.aoff.tooltip"),
 				//reserved for mobile
+				//if you remove it one more time I will find where you live
 				enabled: model.metadata.val > 0,
 				cssClass: model.metadata.isAutomationEnabled ? "auto-on" : "auto-off",
 				handler: function(btn){
@@ -1642,7 +1737,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 
 		if (building.on >= amt){
 			building.on -= amt;
-			if(building.stages){
+			if (building.stages){
 				model.metaAccessor.meta.on -= amt; //stage hack
 			}
 			this.metadataHasChanged(model);
@@ -1654,7 +1749,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		var building = model.metadata;
 		if (building.on){
 			building.on = 0;
-			if(building.stages){
+			if (building.stages){
 				model.metaAccessor.meta.on = 0; //stage hack
 			}
 			this.metadataHasChanged(model);
@@ -1674,7 +1769,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 
 		if (building.on + amt <= building.val ){
 			building.on += amt;
-			if(building.stages){
+			if (building.stages){
 				model.metaAccessor.meta.on += amt; //stage hack
 			}
 			this.metadataHasChanged(model);
@@ -1686,7 +1781,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		var building = model.metadata;
 		if (building.on < building.val) {
 			building.on = building.val;
-			if(building.stages){
+			if (building.stages){
 				model.metaAccessor.meta.on = building.val; //stage hack
 			}
 			this.metadataHasChanged(model);
@@ -1703,7 +1798,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 		// Allow buildings to override sell button with custom actions
 		// But, proceed with normal action as well if true returned.
 		if (building.canSell) {
-			if(!building.canSell(building, this.game)) {
+			if (!building.canSell(building, this.game)) {
 				return 0;
 			}
 		}
@@ -1719,8 +1814,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 				var self = this;
 				var amtSold = 0;
 				this.game.ui.confirm($("sell.all.confirmation.title"), $I("sell.all.confirmation.msg"), function() {
-					self.sellInternal(model, end, true /*requireSellLink*/);
-					amtSold = start;
+					amtSold = self.sellInternal(model, end, true /*requireSellLink*/);
 				});
 				return amtSold;
 			}
@@ -1741,6 +1835,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 	 * 						This feature exists so that Order of the Sun upgrades can have additional requirements
 	 * 						for when they can be sold, but also so that those requirements can be bypassed
 	 * 						for purposes such as the implementation of the undo feature.
+	 * @return The number of buildings actually sold.
 	 */
 	sellInternal: function(model, end, requireSellLink){
 		//Check input parameters for validity.
@@ -1749,9 +1844,11 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 			requireSellLink = false;
 		}
 
+		var counter = 0;
 		var building = model.metadata;
 		while (building.val > end) {
 			this.decrementValue(model);
+			counter += 1;
 
 			model.prices = this.getPrices(model);
 			this.refund(model);
@@ -1761,8 +1858,10 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 			}
 		}
 
+		this.metadataHasChanged(model);
 		this.game.upgrade(building.upgrades);
 		this.game.render();
+		return counter;
 	},
 
 	decrementValue: function(model) {
@@ -1818,7 +1917,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 		}
 
 		//--------------- style -------------
-		if((building.val > 9 || building.name.length > 10) && this.model.hasSellLink) {
+		if ((building.val > 9 || building.name.length > 10) && this.model.hasSellLink) {
 			//Steamworks and accelerator specifically can be too large when sell button is on
 			//(tested to support max 99 bld count)
 			dojo.addClass(this.domNode, "small-text");
@@ -1909,7 +2008,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 			}
 
 			//--------------- style -------------
-			if(building.val > 9) {
+			if (building.val > 9) {
 				dojo.style(this.domNode,"font-size","90%");
 			}
 
@@ -1945,23 +2044,24 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 	getName: function(model){
 		var meta = model.metadata;
 
+		var label = "<div class=\"label\"><span class=\"label-content\">" + meta.label + "</span></div>";
+
+		var amtClass = "amt";
+		if (meta.val >= 10000){
+			amtClass = "amt small";
+		}
+
 		if (!meta.val) {
-			return meta.label;
+			return label;
 		} else if (meta.noStackable){
-			return meta.label + " " + $I("btn.complete");
+			return label + "<div>" + $I("btn.complete") + "</div>";
 		} else if (meta.togglableOnOff){
-			return meta.label + " (" + meta.val + ")";
-		} else if (meta.togglable) {
-			//it's not so important h
-			/*if (meta.val >= 1000){
-				return meta.label + " (" +
-					(meta.on < 10000 ? ((meta.on/1000).toFixed(1) + "K") : this.game.getDisplayValueExt(meta.on)) + "/" +
-					(meta.val < 10000 ? ((meta.val/1000).toFixed(1) + "K") : this.game.getDisplayValueExt(meta.val)) +
-				")";
-			}*/
-			return meta.label + " (" + meta.on + "/" + meta.val + ")";
+			return label + "<div class=\"amt\">(" + meta.val + ")</div>";
+		} else if (meta.togglable && meta.on != meta.val) {
+			//do not display redundand 1000/1000 to save real estate
+			return label + "<div class=\"" + amtClass + "\">(" + meta.on + "/" + meta.val + ")</div>";
 		} else {
-			return meta.label + " (" + meta.on + ")";
+			return label + "<div class=\"amt\">(" + meta.on + ")</div>";
 		}
 	},
 
@@ -2001,11 +2101,30 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 
 	},
 
-	buyItem: function(model, event, callback) {
+	/**
+	 * @returns BuyResultOperation
+	 * 
+	 * where BuyResultOperation is {
+	 * 	itemBought: boolean
+	 *  reason: string
+	 *  def?: Thenable<BuyResultOperation>
+	 * }
+	 * 
+	 * buyItem will return {reason: "require-confirmation"} and a deferred object that will be resolved when user confirms the choice
+	 * def objects can chain
+	 */
+	
+	buyItem: function(model, event, buyType) {
+		if (event && event.shiftKey){
+			buyType = "all";
+		}
+
 		var isInDevMode = this.game.devMode;
 		if (!this.hasResources(model) && !isInDevMode) {
-			callback(false /*itemBought*/, {reason: "cannot-afford" });
-			return;
+			return {
+				itemBought: false,
+				reason: "cannot-afford"
+			};
 		}
 		if (!model.enabled && !isInDevMode) {
 			//Give a more detailed reason of why we can't buy it at this time:
@@ -2016,51 +2135,88 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 			} else if (meta.on && meta.noStackable){
 				whyArentWeEnabled = "already-bought";
 			}
-
-			callback(false /*itemBought*/, {reason: whyArentWeEnabled });
-			return;
+			return {
+				itemBought: false,
+				reason: whyArentWeEnabled
+			};
 		}
 		//Else, we meet all the requirements for being able to buy this item:
 		var meta = model.metadata;
 		if (this.game.ironWill && meta.effects && meta.effects["maxKittens"] > 0 && this.game.science.get("archery").researched) {
 			//Show a confirmation message if we're building something that would break Iron Will mode.
+			var def = new dojo.Deferred();
 			var self = this;
 			this.game.ui.confirm("", $I("iron.will.break.confirmation.msg"), function() {
-				self._buyItem_step2(model, event, callback);
+				var _defResult = self._buyItem_step2(model, event);
+				def.callback(_defResult);
 			}, function() {
-				callback(false /*itemBought*/, {reason: "player-denied" /*The player decided not to buy this after all.*/ });
+				def.callback({
+					itemBought: false,
+					reason: "player-denied"
+				});
 			});
+			return {
+				itemBought: false,
+				reason: "require-confirmation",
+				def: def
+			};
 		} else {
-			this._buyItem_step2(model, event, callback);
+			return this._buyItem_step2(model, event, buyType);
 		}
 	},
+	
 
-	_buyItem_step2: function(model, event, callback) {
+	buyItemAll: function(model, event, callback){
+		return this.buyItem(model, event, "all" /*isBuyAll*/);
+	},
+
+	_buyItem_step2: function(model, event, buyType) {
 		if (!event) { event = {}; /*event is an optional parameter*/ }
 		//This is what we pass to the callback function if we succeed:
-		var resultIfBuySuccessful = { reason: (this.game.devMode ? "dev-mode" : "paid-for") };
+		var resultIfBuySuccessful = this.game.devMode ? "dev-mode" : "paid-for";
 
 		var meta = model.metadata;
-		if (!meta.noStackable && event.shiftKey) {
+		if (!meta.noStackable && buyType == "all") {
 			var maxBld = 10000;
 			if (this.game.opts.noConfirm) {
 				this.build(model, maxBld);
-				callback(true /*itemBought*/, resultIfBuySuccessful);
+				return {
+					itemBought: true,
+					reason: resultIfBuySuccessful
+				};
 			} else {
 				var self = this;
+				var def = new dojo.Deferred();
 				this.game.ui.confirm($I("construct.all.confirmation.title"), $I("construct.all.confirmation.msg"), function() {
 					self.build(model, maxBld);
-					callback(true /*itemBought*/, resultIfBuySuccessful);
+					def.callback({
+						itemBought: true,
+						reason: resultIfBuySuccessful
+					});
 				}, function() {
-					callback(false /*itemBought*/, {reason: "player-denied" /*The player decided not to buy this after all.*/});
+					def.callback({
+						itemBought: false,
+						reason: "player-denied"
+					});
 				});
+				return {
+					itemBought: false,
+					reason: "require-confirmation",
+					def: def
+				};
 			}
 		} else if (!meta.noStackable && (event.ctrlKey || event.metaKey /*osx tears*/)) {
 			this.build(model, this.game.opts.batchSize || 10);
-			callback(true /*itemBought*/, resultIfBuySuccessful);
+			return {
+				itemBought: true,
+				reason: resultIfBuySuccessful
+			};
 		} else {
             this.build(model, 1);
-		  callback(true /*itemBought*/, resultIfBuySuccessful);
+			return {
+				itemBought: true,
+				reason: resultIfBuySuccessful
+			};
         }
 	},
 
@@ -2105,6 +2261,10 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 			var zebraOutpostMeta = this.game.bld.getBuildingExt("zebraOutpost").meta;
 			zebraOutpostMeta.calculateEffects(zebraOutpostMeta, this.game);
 			zebraOutpostMeta.jammed = false;
+			this.game.upgrade({
+				policies: ["sharkRelationsBotanists"],
+				upgrades: ["huntingArmor", "bolas", "compositeBow"]
+			});
 			this.game.diplomacy.onLeavingIW();
 		}
 
@@ -2168,10 +2328,11 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingNotStackableBtnController", com
 
 	getName: function(model){
 		var meta = model.metadata;
+		var label = "<div class=\"label\"><span class=\"label-content\">" + meta.label + "</span></div>";	
 		if (meta.researched){
-			return meta.label + " " + $I("btn.complete.capital");
+			return label + "<div>" + $I("btn.complete.capital") + "</div>";
 		} else {
-			return meta.label;
+			return label;
 		}
 	},
 
@@ -2189,20 +2350,26 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingNotStackableBtnController", com
 	buyItem: function(model, event, callback) {
 		var isInDevMode = this.game.devMode;
 		if (model.metadata.researched && !isInDevMode) {
-			callback(false /*itemBought*/, {reason: "already-bought" });
-			return;
+			return {
+				itemBought: false,
+				reason: "already-bought"
+			};
 		}
 		if (!this.hasResources(model) && !isInDevMode) {
-			callback(false /*itemBought*/, {reason: "cannot-afford" });
-			return;
+			return {
+				itemBought: false,
+				reason: "cannot-afford"
+			};
 		}
 		//Else, we can buy it:
 		this.payPrice(model);
 		this.onPurchase(model);
 		
-		callback(true /*itemBought*/, {reason: (isInDevMode ? "dev-mode" : "paid-for") });
 		this.game.render();
-		return;
+		return {
+			itemBought: true,
+			reason: (isInDevMode ? "dev-mode" : "paid-for")
+		};
 	},
 
 	onPurchase: function(model){
@@ -2489,11 +2656,13 @@ UIUtils = {
 		var gameNode = dojo.byId("game");
 		var tooltip = dojo.byId("tooltip");
 
-		dojo.connect(container, "onmouseover", this, function() {
+		var showTooltip = function () {
 			game.tooltipUpdateFunc = function(){
 				tooltip.innerHTML = dojo.hitch(game, htmlProvider)();
 			};
 			game.tooltipUpdateFunc();
+
+			game.tooltipOwnerDomNode = container;
 
 			var pos = $(container).offset();
 
@@ -2520,13 +2689,29 @@ UIUtils = {
 			if (tooltip.innerHTML) {
 				dojo.style(tooltip, "display", "");
 			}
-		});
+		};
+
+		dojo.connect(container, "onmouseover", this, showTooltip);
 
 		dojo.connect(container, "onmouseout", this, function(){
-			game.tooltipUpdateFunc = null;
-			dojo.style(tooltip, "display", "none");
+			UIUtils.hideTooltip(game);
+		});
+		
+		dojo.connect(container, "onkeydown", this, function(e){
+			if (e.code == "Space"){
+				e.stopPropagation();
+				e.preventDefault();
+
+				showTooltip();
+				tooltip.focus();
+			}
 		});
 
 		return htmlProvider;
+	},
+	hideTooltip: function(game){
+		game.tooltipUpdateFunc = null;
+		game.tooltipOwnerDomNode = null;
+		dojo.style(dojo.byId("tooltip"), "display", "none");
 	}
 };

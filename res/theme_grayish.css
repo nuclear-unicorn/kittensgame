@@ -10,8 +10,11 @@
 /* ******************************************** */
 
 body.scheme_grayish {
-	background-color: #f2f2f2;
+	--page-background-color:#f2f2f2;
+	--text-color: #4c4c4c;
+	color-scheme: light;
 }
+
 .scheme_grayish #gamePageContainer,
 .scheme_grayish select,
 .scheme_grayish .btn,
@@ -72,10 +75,10 @@ body.scheme_grayish {
 	color: #343434;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_grayish div {
+.scheme_grayish > div {
 	color: #2c2c2c;
 }
-.scheme_grayish .disabled div { /* color text for disabled */
+.scheme_grayish .disabled > div { /* color text for disabled */
 	color: #4b5373;
 }
 .scheme_grayish h1 {
@@ -342,7 +345,7 @@ body.scheme_grayish {
 	/* font-size: 13px; /* for center tooltip except title, effects and flavor */
 /* } */
 .scheme_grayish #tooltip,
-.scheme_grayish .tooltip-block > div {
+.scheme_grayish .tooltip-content{
 	/* default padding-left: 3px; */
 	padding-bottom: 5px;
 	background: linear-gradient(90deg, rgba(64, 64, 64, 0.1), rgba(64, 64, 64, 0.1)), #f2f2f2;
@@ -351,7 +354,7 @@ body.scheme_grayish {
 	border-radius: 7px;
 	/* margin-left: 20px; /* for offset tooltip due to larger buttons .btn.modern */
 }
-.scheme_grayish .tooltip-block > div { /* tooltip on ? top right column */
+.scheme_grayish .tooltip-content{ /* tooltip on ? top right column */
 	padding: 5px;
 }
 .scheme_grayish .button_tooltip {
@@ -771,7 +774,15 @@ body.scheme_grayish {
 .scheme_grayish .census-block.simLeader {
 	background-color: #ebebeb;
 }
-.scheme_grayish .census-block.simLeader a.leaderHref {
+.scheme_grayish .census-block .links-container span {
+	border-radius: 50%; /*make it a circle!*/
+}
+.scheme_grayish .census-block.simLeader .leaderHref {
+	background: transparent;
+	border: none;
+}
+.scheme_grayish .census-block.simLeader .leaderHref,
+.scheme_grayish .census-block.simFavorite .favoriteHref {
 	color: #1867c8;
 }
 .scheme_grayish .census-block .info { /* info of kitten */
@@ -978,7 +989,7 @@ body.scheme_grayish {
 .scheme_grayish #calendarSign:hover {
    cursor: default;
 }
-.scheme_grayish .right-tab-header { /* Log | Chat link on right column */
+.scheme_grayish .right-tab-header { /* Log | Queue link on right column */
 	/* default margin-top: 10px; */
 	font-size: 80%;
  }
@@ -997,9 +1008,6 @@ body.scheme_grayish {
 	margin-top: 5px; /* default margin-top: 15px */
 	height: 35px; /* default height: 30px; */
 	margin-bottom: 3px;
-}
-.scheme_grayish #rightTabChat {
-	margin-top: 10px;
 }
 .scheme_grayish div.console-intro { /* Text on right column: "You are a kitten in a catnip forest." */
 	color: #b5b5b5;
@@ -1239,7 +1247,7 @@ body.scheme_grayish {
 	/* default max-width: 90px; */
 	color: #4c4c4c;
 }
-.scheme_grayish #fastHuntContainerCount { /* Text left column: "xx times" from Send hunters */
+.scheme_grayish div.pin-link span.pin-link-quantity { /* Text left column: "xx times" from Send hunters */
 	color: #707070;
 	text-shadow: none !important;
 }

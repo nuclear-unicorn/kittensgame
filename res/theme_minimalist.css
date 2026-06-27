@@ -7,6 +7,18 @@
 /**********************************************/
 /******************** GAME ********************/
 /**********************************************/
+.scheme_minimalist,
+.scheme_minimalist .help
+.scheme_minimalist #viewport-container {
+	color-scheme: dark;
+	--page-background-color:#0C0D10;
+	--text-color: #B0B0B0;
+}
+
+.scheme_minimalist .button_tooltip.login-popup {
+	background-color: var(--page-background-color);
+}
+
 body.scheme_minimalist {
 	background-color: #0C0D10;
 	color-scheme: dark;
@@ -92,10 +104,10 @@ body.scheme_minimalist.with_background_image,
 	color: #acafbc;
 	opacity: 1.0; /* default opacity: 0.6 */
 }
-.scheme_minimalist div {
+.scheme_minimalist > div {
 	color: #A6A4B0;
 }
-.scheme_minimalist .disabled div { /* color text for disabled */
+.scheme_minimalist .disabled > div { /* color text for disabled */
 	color: #888888;
 }
 .scheme_minimalist h1 {
@@ -353,7 +365,7 @@ body.scheme_minimalist.with_background_image,
 /******************** TOOLTIP ********************/
 /*************************************************/
 .scheme_minimalist #tooltip,
-.scheme_minimalist .tooltip-block > div {
+.scheme_minimalist .tooltip-content{
 	background-color: #101115;
 	font-size: 14px;
 	color: #828790; /* tooltip windows == left column : left text */
@@ -364,7 +376,7 @@ body.scheme_minimalist.with_background_image,
 	box-shadow: 4px 4px 9px #0A0A0D;
 	margin-left: 20px; /* for offset tooltip due to larger buttons .btn.modern */
 }
-.scheme_minimalist .tooltip-block > div {
+.scheme_minimalist .tooltip-content{
 	padding: 5px;
 }
 .scheme_minimalist .button_tooltip {
@@ -786,7 +798,8 @@ body.scheme_minimalist.with_background_image,
 .scheme_minimalist .census-block.simLeader:hover {
 	border-color: #5D56A9;
 }
-.scheme_minimalist .census-block.simLeader a.leaderHref {
+.scheme_minimalist .census-block.simLeader .leaderHref,
+.scheme_minimalist .census-block.simFavorite .favoriteHref {
 	color: #5D56A9;
 }
 .scheme_minimalist .census-block .info { /* info of kitten */
@@ -898,11 +911,13 @@ body.scheme_minimalist.with_background_image,
 	font-size: 15px;
     margin: 3px 5px;
     background-color: rgba(93, 86, 169, 0.1); /* color #5D56A9; */
-    color: #D8D8D8;
     text-shadow: rgba(187, 192, 202) 2px 0 10px; /* color #BBC0CA */
     letter-spacing: 1px;
-	border-color : rgba(93, 86, 169, 0.3); /* color #5D56A9; */
 	border-radius: 5px;
+}
+.scheme_minimalist .achievement:not(.name) {
+	color: #D8D8D8;
+	border-color : rgba(93, 86, 169, 0.3); /* color #5D56A9; */
 }
 .scheme_minimalist .achievement:hover {
     background-color: rgba(93, 86, 169, 0.3); /* color #5D56A9; */
@@ -986,16 +1001,13 @@ body.scheme_minimalist.with_background_image,
 .scheme_minimalist #calendarSign:hover {
 	cursor: default;
 }
-.scheme_minimalist .right-tab-header { /* Log | Chat link on right column */
+.scheme_minimalist .right-tab-header { /* Log | Queue link on right column */
 	color: #333342; /* for separator tab | */
 	font-size: 80%;
 }
 .scheme_minimalist .right-tab-header a.active {
     color: #B5BAC4;
 	font-weight: bold !important;
-}
-.scheme_minimalist #rightTabChat {
-	margin-top: 20px;
 }
 .scheme_minimalist div.console-intro { /* Text on right column : "You are a kitten in a catnip forest." */
 	color: #3b3b4c;
@@ -1186,10 +1198,11 @@ body.scheme_minimalist.with_background_image,
 	color: #be4151;
 	padding-top: 6px;/* default padding-top: 10px; */
 }
-.scheme_minimalist #fastHuntContainer > a { /* Text left column : "Send hunters (xx times)" */
+.scheme_minimalist #fastHuntContainer > a, /* Text left column : "Send hunters (xx times)" */
+.scheme_minimalist #fastSacrificeContainer > a {
 	text-shadow: -1px -1px 2px rgba(12, 13, 16, 0.9); /* color #0C0D10 */
 }
-.scheme_minimalist #fastHuntContainerCount { /* Text left column : "xx times" from Send hunters */
+.scheme_minimalist div.pin-link span.pin-link-quantity { /* Text left column : "xx times" from Send hunters */
 	color: #DD836C;
 	text-shadow: none !important;
 	font-size: smaller;
