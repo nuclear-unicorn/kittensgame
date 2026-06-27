@@ -404,6 +404,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 			this.game.msg($I("trade.msg.emissary", [race.title]), "notice");
 		}
+		this.checkQueueEmbassyUnlockCondition();
 
 		 if (this.game.ironWill && this.game.challenges.isActive('blackSky')) {
 
@@ -451,6 +452,33 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			}
 		}
 
+	},
+
+	/**
+	 * Evaluates the unlock condition for whether or not the player can queue embassies.
+	 * Calls the unlockQueueSource function if the player has met the requirements.
+	 * Has no return value.
+	 */
+	checkQueueEmbassyUnlockCondition: function() {
+		var queueManager = this.game.time.queue;
+		if (queueManager.queueSources["embassies"] === true) {
+			//Queuing embassies is already unlocked!
+			return;
+		}
+		if (!this.game.science.get("writing").researched) {
+			//Embassies are not unlocked yet.
+			return;
+		}
+		if (this.game.prestige.getPerk("ambassadors").researched || this.game.science.getPolicy("bigStickPolicy").researched) {
+			//One of these two items is required in order to queue embassies.
+			var unlockedEmbassies = 0;
+			this.races.forEach( function(race) {
+				if (race.unlocked && race.embassyPrices) { unlockedEmbassies += 1; }
+			});
+			if (unlockedEmbassies > 0) {
+				queueManager.unlockQueueSource("embassies");
+			}
+		}
 	},
 
 	onLeavingIW: function(){

@@ -157,7 +157,7 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			policies: ["lizardRelationsEcologists"]
 		},
 		unlocks: {
-			"perks": ["zebraDiplomacy"]
+			"perks": ["zebraDiplomacy", "ambassadors"]
 		}
 	},{
 		name: "zebraDiplomacy",
@@ -186,6 +186,31 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		prices: [{ name: "paragon", val: 300 }],
 		unlocked: false,
 		researched: false
+	},{
+		name: "ambassadors",
+		label: $I("prestige.ambassadors.label"),
+		description: $I("prestige.ambassadors.desc"),
+		prices: [
+			{ name: "karma", val: 5 },
+			{ name: "paragon", val: 100 }
+		],
+		unlocked: false,
+		researched: false,
+		unlocks: {
+			"perks": ["treaties"]
+		}
+		//TODO: increases cap of embassy effects
+	},{
+		name: "treaties",
+		label: $I("prestige.treaties.label"),
+		description: $I("prestige.treaties.desc"),
+		prices: [
+			{ name: "karma", val: 25 },
+			{ name: "paragon", val: 500 },
+		],
+		unlocked: false,
+		researched: false
+		//TODO: increases cap of embassy effects
 	},{
 		name: "chronomancy",
 		label: $I("prestige.chronomancy.label"),
