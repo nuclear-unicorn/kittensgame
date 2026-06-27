@@ -5325,36 +5325,43 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	getUnlockByName: function(unlockId, type){
 		switch (type) {
+			case "tabs":
+				return this.getTab(unlockId);
+			case "schemes":
+				return unlockId;
+			//--- Bonfire tab
+			case "buildings":
+				return this.bld.get(unlockId);
+			case "stages":
+				return this.bld.get(unlockId.bld);
+			//--- Village tab
+			case "jobs":
+				return this.village.getJob(unlockId);
+			case "biomes":
+				return this.village.getBiome(unlockId);
+			//--- Science tab
 			case "tech":
 				return this.science.get(unlockId);
 			case "policies":
 				return this.science.getPolicy(unlockId);
 			case "perks":
 				return this.prestige.getPerk(unlockId);
-			case "jobs":
-				return this.village.getJob(unlockId);
-			case "crafts":
-				return this.workshop.getCraft(unlockId);
+			//--- Workshop tab
 			case "upgrades":
 				return this.workshop.get(unlockId);
+			case "crafts":
+				return this.workshop.getCraft(unlockId);
 			case "zebraUpgrades":
 				return this.workshop.getZebraUpgrade(unlockId);
-			case "tabs":
-				return this.getTab(unlockId);
-			case "buildings":
-				return this.bld.get(unlockId);
-			case "spaceMission":
-				return this.space.getProgram(unlockId);
-			case "spaceBuilding":
-				return this.space.getBuilding(unlockId);
-			case "planet":
-				return this.space.getPlanet(unlockId);
-			case "chronoforge":
-				return this.time.getCFU(unlockId);
-			case "voidSpace":
-				return this.time.getVSU(unlockId);
-			case "stages":
-				return this.bld.get(unlockId.bld);
+			//--- Trade tab
+			case "embassies":
+				var raceObj = this.diplomacy.get(unlockId);
+				if (raceObj.embassyPrices) {
+					return raceObj;
+				}
+				//Else, this race has no embassies
+				return undefined;
+			//--- Religion tab
 			case "zigguratUpgrades":
 				return this.religion.getZU(unlockId);
 			case "religion":
@@ -5363,19 +5370,21 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				return this.religion.getTU(unlockId);
 			case "pacts":
 				return this.religion.getPact(unlockId);
+			//--- Space tab
+			case "spaceMission":
+				return this.space.getProgram(unlockId);
+			case "planet":
+				return this.space.getPlanet(unlockId);
+			case "spaceBuilding":
+				return this.space.getBuilding(unlockId);
+			//--- Time tab
+			case "chronoforge":
+				return this.time.getCFU(unlockId);
+			case "voidSpace":
+				return this.time.getVSU(unlockId);
+			//--- Challenges tab
 			case "challenges":
 				return this.challenges.getChallenge(unlockId);
-			case "schemes":
-				return unlockId;
-			case "biomes":
-				return this.village.getBiome(unlockId);
-			case "embassies":
-				var raceObj = this.diplomacy.get(unlockId);
-				if (raceObj.embassyPrices) {
-					return raceObj;
-				}
-				//Else, this race has no embassies
-				return undefined;
 		}
 	},
 
