@@ -218,6 +218,30 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		return null;
 	},
 
+	/**
+	 * Calculates which race (out of all the unlocked races) has the least expensive embassy.
+	 * If no race is unlocked, returns null.
+	 * @return string | null	The internal name of the race chosen
+	 */
+	getCheapestEmbassy: function() {
+		var priceCoeficient = 1 - this.game.getEffect("embassyCostReduction");
+		var fakeEmbassies = this.game.getEffect("embassyFakeBought");
+
+		var raceArr = [];
+		this.races.forEach( function(race) {
+			if (race.unlocked && race.embassyPrices) {
+				//Duplicate of EmbassyButtonController#getPrices logic
+				raceArr.push({ name: race.name, price: race.embassyPrices[0].val * priceCoeficient * Math.pow(1.15, race.embassyLevel + fakeEmbassies) });
+			}
+		});
+		//raceArr now holds information on each unlocked race & the price of its embassy
+		if (raceArr.length < 1) {
+			return null;
+		}
+		raceArr.sort( function( a, b ) { return a.price - b.price; });
+		return raceArr[0].name;
+	},
+
 	getTradeRatio: function() {
 		return this.game.getEffect("tradeRatio") + this.game.village.getEffectLeader("merchant", 0);
 	},

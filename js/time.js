@@ -2536,11 +2536,7 @@ dojo.declare("classes.queue.manager", null,{
                 return options;
 
             case "embassies":
-                //TODO: how about we only unlock the embassy queue source if at least 1 race is unlocked?
-                //Maybe restrict it so that it has to be at least 1 race THAT HAS EMBASSIES, so Leviathans don't count
-
-                //TODO: cheapest embassy functionality
-                //options.push({ name: "cheapest", label: $I("trade.embassy.queue.cheapest") });
+                options.push({ name: "cheapest", label: $I("trade.embassy.queue.cheapest") });
                 this.game.diplomacy.races.forEach( function(race) {
                     if (race.unlocked &&
                         race.embassyPrices /*is truthy iff the race *has* embassies at all*/) {

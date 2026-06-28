@@ -5355,6 +5355,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				return this.workshop.getZebraUpgrade(unlockId);
 			//--- Trade tab
 			case "embassies":
+				if (unlockId === "cheapest") {
+					unlockId = this.diplomacy.getCheapestEmbassy();
+				}
 				var raceObj = this.diplomacy.get(unlockId);
 				if (raceObj.embassyPrices) {
 					return raceObj;

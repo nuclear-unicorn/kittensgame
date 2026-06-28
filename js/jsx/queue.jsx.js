@@ -93,10 +93,11 @@ WQueueItem = React.createClass({
         var controller = controllerAndModel.controller;
         var model = controllerAndModel.model;
         if (item.type === "embassies") {
+            var raceName = item.name === "cheapest" ? game.diplomacy.getCheapestEmbassy() : item.name;
             //All embassy models have the same name, which is unhelpful in the context of the queue.
             //It's safe to change the model object because of how initModel is implemented in core.js.
             model.tooltipName = true; //Show name in tooltips
-            model.name = $I("trade.embassy.queue.item", [game.diplomacy.get(item.name).title]);
+            model.name = $I("trade.embassy.queue.item", [game.diplomacy.get(raceName).title]);
         }
 
         //Create tooltip
