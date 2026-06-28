@@ -2578,7 +2578,8 @@ dojo.declare("classes.queue.manager", null,{
         }
 
         var props = {
-            id: itemMetaRaw.name
+            id: itemMetaRaw.name,
+            isInQueue: true
         };
         switch (el.type){
             case "policies":
@@ -2596,7 +2597,8 @@ dojo.declare("classes.queue.manager", null,{
                     key:            bld.name,
                     name:           bld.label,
                     description:    bld.description,
-                    building:       bld.name
+                    building:       bld.name,
+                    isInQueue:      true
                 };
                 if (typeof(bld.stages) == "object"){
                     props.controller = new classes.ui.btn.StagingBldBtnController(this.game);
@@ -2666,7 +2668,9 @@ dojo.declare("classes.queue.manager", null,{
             case "embassies":
                 props = {
                     race: itemMetaRaw,
-                    prices: itemMetaRaw.embassyPrices
+                    prices: itemMetaRaw.embassyPrices,
+                    isInQueue: true,
+                    recalculateCheapestRace: el.name === "cheapest"
                 };
                 props.controller = new classes.diplomacy.ui.EmbassyButtonController(this.game);
                 var model = props.controller.fetchModel(props);

@@ -627,6 +627,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	initModel: function(options) {
 		var mdl = this.defaults();
 		mdl.options = options;
+		mdl.isInQueue = Boolean(options.isInQueue);
 		return mdl;
 	},
 
@@ -645,8 +646,8 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 			// ---
 			highlightUnavailable: false,
 			resourceIsLimited: "",
-			multiplyEffects: false
-
+			multiplyEffects: false,
+			isInQueue: false //Used for tooltip rendering (queued embassies)
 		};
 	},
 

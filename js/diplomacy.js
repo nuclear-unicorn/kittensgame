@@ -1338,6 +1338,15 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 		return result;
 	},
 
+	//Since all embassies have the same name by default, that'd make the "cheapest embassy"
+	// queued item really confusing to use.  So, we use use custom behavior to change the
+	// displayed name of the embassy, but only for the tooltip of an item in the queue.
+	initModel: function(options) {
+		var model = this.inherited(arguments);
+		model.tooltipName = Boolean(options.isInQueue);
+		return model;
+	},
+
 	getEffects: function(model) {
 		var race = model.options.race;
 		var nagaArchitects = this.game.science.getPolicy("nagaRelationsArchitects");
@@ -1356,7 +1365,7 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 		if (!model.metaCached) {
 			var race = model.options.race;
 			model.metaCached = {
-				label: $I("trade.embassy.label"),
+				label: model.isInQueue ? $I("trade.embassy.queue.item", [race.title]) : $I("trade.embassy.label"),
 				description: $I("trade.embassy.desc"),
 				val: race.embassyLevel,
 				on: race.embassyLevel
@@ -1437,8 +1446,14 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 var EmbassyButtonHelper = {
 	//This is a modified version of ButtonModernHelper.getTooltipHTML from core.js.
 	getTooltipHTML: function(controller, model) {
+		if (model.options.recalculateCheapestRace) { //Used for "cheapest embassy" queue option
+			var diplomacyManager = controller.game.diplomacy;
+			model.options.race = diplomacyManager.get(diplomacyManager.getCheapestEmbassy());
+			model.options.prices = model.options.race.embassyPrices;
+		}
+		//Some aspects of the metadata may have changed, so fetch the latest version of the model:
+		model = controller.fetchModel(model.options);
 		controller.fetchExtendedModel(model);
-		//throw "ButtonModern::getTooltipHTML must be implemented";
 
 		var tooltip = dojo.create("div", { className: "tooltip-inner" }, null);
 
