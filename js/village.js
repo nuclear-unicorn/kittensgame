@@ -759,6 +759,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 			this.sim.kittens = [];
 			this.game.village.traits = [];
+			this.artifactSim.artifacts = []
 
 			for (var i = kittens.length - 1; i >= 0; i--) {
 				var kitten = kittens[i];
@@ -3058,16 +3059,6 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 
 //=================	MAP END =====================
 
-dojo.declare("classes.village.ui.artifacts.CherishButton", com.nuclearunicorn.game.ui.ButtonModern, {
-	renderLinks: function() {
-		this.remove = this.addLink(this.model.remove);
-	},
-
-	update: function() {
-		this.inherited(arguments);
-		this.updateLink(this.remove, this.model.remove);
-	}
-});
 
 dojo.declare("classes.village.ui.artifacts.CherishController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
 	artifact : null,
@@ -3120,32 +3111,15 @@ dojo.declare("classes.village.ui.artifacts.CherishController", com.nuclearunicor
 		return prices;
 	},
 
-	buyItem: function(model, event, callback) {
-		/*if (event){
-			if (event.ctrlKey == true || event.shiftKey == true) {
-				this.buyItem(model, null, callback);
-				return;
-			}
-		}
-		/*var expNeeded = 100 * this.artifact.level;
-		if (this.artifact.exp < expNeeded) {			
-			this.game.msg($I("village.btn.cherishbutton.notEnoughXP") + Math.trunc(expNeeded - this.artifact.exp) + "XP");
-			return;
-		}*/		
-		this.inherited(arguments);
-		this.game.ui.render();		
-	},
-
 	incrementValue: function(model) {
 		this.inherited(arguments);
 		this.artifact.level++;
-		var expNeeded = 100 * this.artifact.level;
-		this.artifact.exp -= expNeeded;
+		this.game.render();
 	},
 
 	updateVisible: function(model){
 		model.visible = true;
-	}
+	},
 
 	/*hasSellLink: function(model){
 		return true;
@@ -3303,6 +3277,7 @@ dojo.declare("classes.village.Artifact", null, {
 		}
 
 		this.run = game.stats.getStat("totalResets").val + 1;
+		this.level = 1;
 		/*var tempDescription = tempArtifactType.description[this.rand(tempArtifactType.description.length)];
 		var randomItem = [this.getRandomItem(tempDescription.pool, self.game)];
 		if (tempDescription.pool2) {
@@ -3472,14 +3447,11 @@ dojo.declare("classes.village.Artifact", null, {
 
 dojo.declare("classes.village.ArtifactSim", null, {
 
+	game: null,
 	artifacts: null,
 
-	game: null,
-
 	maxArtifacts: 0,
-
 	nextArtifactProgress : 0,
-
 	artifactsPerTick: 0.2,
 
 	//artifactTypes: null,
@@ -3520,7 +3492,7 @@ dojo.declare("classes.village.ArtifactSim", null, {
 		}*/
 	},
 	addArtifact: function(type, pool, rank, effectCount) {
-		var artifact = new classes.village.Artifact(this.game, type, pool, rank, effectCount);
+		var artifact = new classes.village.Artifact(this.game, type, pool, rank, effectCount); //
 		this.artifacts.push(artifact);
 		this.game.msg($I("village.msg.artifact.created", "important"));
 
@@ -3568,63 +3540,58 @@ dojo.declare("classes.village.ArtifactSim", null, {
 	},
 });
 
-dojo.declare("com.nuclearunicorn.game.ui.ArtifactPanel", com.nuclearunicorn.game.ui.Panel, {
+dojo.declare("com.nuclearunicorn.game.ui.MuseumPanel", com.nuclearunicorn.game.ui.Panel, {
 
 	constructor: function(name, village, game){
-		this.artifactTypePanels = [];
 		this.tabManager = village;
 		this.game = game;
+		this.artifactList = new classes.ui.village.ArtifactList(game, game.village.artifactSim.artifacts);
 	},
 
 	render: function(container){
 		var panelContainer = this.inherited(arguments);
-		var tempArtifactTypePanels = [];
-
-		for (var i in game.village.artifactTypes) {
-			tempArtifactTypePanels.push(new com.nuclearunicorn.game.ui.ArtifactTypePanel(game.village.artifactTypes[i], this.tabManager, this.game));
-			tempArtifactTypePanels[i].render(panelContainer);
-		}
-
-		this.artifactTypePanels = tempArtifactTypePanels;
+		this.artifactList.render(panelContainer)
 	},
 
 	update: function(){
-		this.artifactTypePanels.render();
+		this.artifactList.update()
 	}
+
 });
 
-dojo.declare("com.nuclearunicorn.game.ui.ArtifactTypePanel", com.nuclearunicorn.game.ui.Panel, {
-	artifactRecords: null,
-	constructor: function(artifactType, village, game) {
-		this.name = artifactType.title;
-		this.artifactTypeID = artifactType.name;
+dojo.declare("classes.ui.village.ArtifactList", null, {
+
+	game: null,
+	container: null,
+	artifacts: null,
+
+	constructor: function(game, artifacts){
 		this.game = game;
-		this.artifactType = artifactType;
+		this.artifacts = artifacts;
 	},
 
-	render: function(container) {
-		this.artifactRecords = [];
-		var artifactFiltered = [];
+	glossaryDiv: null,
+	cherishButtons: null,
 
-		var artifacts = this.game.village.artifactSim.artifacts;
-		for(var i = 0; artifacts.length > i; i++) {
-			if(artifacts[i].name == this.artifactTypeID) {
-				artifactFiltered.push(artifacts[i]);
-			}
-		}
-		var panelContainer = this.inherited(arguments);
-		var glossaryDiv = dojo.create("div", { className: "censusFilters"}, panelContainer);
+	render: function(container){
+	
+		this.container = container;
+		dojo.empty(container);
 		
+		var glossaryDiv = dojo.create("div", { className: "censusFilters"}, container);
+		this.glossaryDiv = glossaryDiv;
+		this.cherishButtons = [],
+
 		this.effectBar = dojo.create("div", {
 			className: "effects"
 		}, glossaryDiv);
 		var effects = {};
-		for (i = 0; artifactFiltered.length > i; i++) {
-			for (var effect in artifactFiltered[i].effects) {
-				if (!effects[effect]) {
-					effects[effect] = 0;
-				}
-				effects[effect] += this.game.village.artifactSim.getArtifactEffectTotal(artifactFiltered[i].effects[effect], artifactFiltered[i].level);
+		for (i = 0; this.artifacts.length > i; i++) {
+			for (var effect in this.artifacts[i].effects) {
+				/*if (!effects[effect]) {
+					effects[effect] w= 0;
+				}*/
+				effects[effect] = this.game.village.artifactSim.getArtifactEffectTotal(this.artifacts[i].effects[effect], this.artifacts[i].level);
 
 			}
 		}
@@ -3637,11 +3604,9 @@ dojo.declare("com.nuclearunicorn.game.ui.ArtifactTypePanel", com.nuclearunicorn.
 			var textToDisplay = displayParams.displayEffectName + ": " + displayParams.displayEffectValue;
 			this.effectBar.innerHTML += "<br>" + textToDisplay;
 		}
-
-		this.collapse(this.artifactType.collapsed);
 		
-		for (i = 0; artifactFiltered.length > i; i++) {
-			var artifact = artifactFiltered[i];
+		for (i = 0; this.artifacts.length > i; i++) {
+			var artifact = this.artifacts[i];
 			
 			var textToDisplay = "";
 
@@ -3663,7 +3628,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ArtifactTypePanel", com.nuclearunicorn.
 				}
 			}, div);
 
-			var cherishButton = new classes.village.ui.artifacts.CherishButton({
+			var cherishButton = new com.nuclearunicorn.game.ui.ButtonModern({
 				name: $I("village.btn.cherish"),
 				description: $I("village.btn.cherish.desc"),				
 				prices: [{ name : "culture", val: 2000 }],
@@ -3679,23 +3644,20 @@ dojo.declare("com.nuclearunicorn.game.ui.ArtifactTypePanel", com.nuclearunicorn.
 				if (!displayParams) {
 					continue;
 				}
-				var textToDisplay = /*artifact.description + "<br>" + */displayParams.displayEffectName + ": " + displayParams.displayEffectValue
+				var textToDisplay = artifact.title + "<br>" +/*artifact.description + "<br>" + */displayParams.displayEffectName + ": " + displayParams.displayEffectValue
 				+ "<br>"/* + $I("village.artifact.creator") + ": " + artifact.creator*/
 				/*+ "<br>" + Math.trunc(artifact.exp) + "/" +  artifact.level * 100 + "XP"*/;
 				content.innerHTML += textToDisplay;
-			}			
+			}
+			this.cherishButtons.push(cherishButton);
 		}
-	},
 
-	onToggle: function(isToggled){
-		this.artifactType.collapsed = isToggled;
 	},
-
 	update: function(){
+		for (var i in this.cherishButtons)
+		this.cherishButtons[i].update();
 	}
-});
-
-
+}),
 
 /**
  * Detailed kitten simulation
@@ -5204,7 +5166,7 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButton", com.nuclearunicorn.game.ui.
 	}
 });
 
-dojo.declare("classes.ui.village.Census", null, {
+dojo.declare("classes.ui.village.Census", null, {//
 
 	game: null,
 	records: null,
@@ -6362,10 +6324,10 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		}
 		this.censusPanelContainer = this.censusPanel.render(tabContainer);
 		//--------------- artifacts ------------------
-		this.artifactPanel = new com.nuclearunicorn.game.ui.ArtifactPanel($I("village.panel.artifacts"), this.game.village, this.game);
-		var artifactPanelConatiner = this.artifactPanel.render(tabContainer);
+		this.museumPanel = new com.nuclearunicorn.game.ui.MuseumPanel($I("village.panel.artifacts"), this.game.village, this.game);
+		var museumPanelConatiner = this.museumPanel.render(tabContainer);
 		if (!this.game.science.get("drama").researched) {
-			this.artifactPanel.setVisible(false);
+			this.museumPanel.setVisible(false);
 		}
 		
 		this.update();
@@ -6415,9 +6377,10 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		var jobsHidden = (this.game.ironWill && !this.game.village.getKittens());
 		this.jobsPanel.setVisible(!jobsHidden);
 
-		if (this.artifactPanel) {
+		if (this.museumPanel) {
 			var hasDrama = this.game.science.get("drama").researched;
-			this.artifactPanel.setVisible(hasDrama);
+			this.museumPanel.setVisible(hasDrama);
+			this.museumPanel.update();
 		}
 
 
