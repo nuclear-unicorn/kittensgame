@@ -2600,8 +2600,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 					console.log("game#load - Processing", this.managers[i].id, "...");
 					this.managers[i].load(saveData);
 				}
-				//Ensure Cryptotheology-based unlock conditions for various things work properly:
-				this.religion.afterLoad(); //Kind of unelegant, but it works
+				//Do a second pass for features which require communication between game systems.
+				this.managers.forEach( function(manager) {
+					if (typeof(manager.afterLoad) === "function") {
+						console.log("game#load - Processing (afterLoad) " + manager.id + " ...");
+						manager.afterLoad();
+					}
+				});
 				
 				this._publish("server/load", saveData);
 			}
