@@ -1483,6 +1483,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.neutralRaceEmbassyStanding.title"),
 				type: "ratio"
 			},
+			"raceSpecificStanding": { //Used only in tooltips to communicate with the player (has no gameplay effect)
+				title: $I("effectsMgr.statics.raceSpecificStanding.title"),
+				type: "ratio"
+			},
 			"calcinerSteelRatioBonus":{
 				title: $I("effectsMgr.statics.calcinerSteelRatioBonus.title"),
 				type: "ratio"

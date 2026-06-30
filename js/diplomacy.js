@@ -1348,13 +1348,24 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 	},
 
 	getEffects: function(model) {
+		var scienceManager = this.game.science;
 		var race = model.options.race;
-		var nagaArchitects = this.game.science.getPolicy("nagaRelationsArchitects");
-		if (race.name == "nagas" && nagaArchitects.researched) {
-			return nagaArchitects.effects;
+		var lizardDiplomats = scienceManager.getPolicy("lizardRelationsDiplomats");
+		var nagaArchitects = scienceManager.getPolicy("nagaRelationsArchitects");
+		var spiderGeologists = scienceManager.getPolicy("spiderRelationsGeologists");
+
+		//Build a table to hold total effects of all embassies from this race:
+		var retVal = {};
+		if (race.standing == 0 && lizardDiplomats.researched) {
+			$.extend( true, retVal, { "raceSpecificStanding": race.embassyLevel * this.game.getEffect("neutralRaceEmbassyStanding")});
 		}
-		//Else,there are no effects associated with this embassy.
-		return undefined;
+		if (race.name == "nagas" && nagaArchitects.researched) {
+			$.extend( true, retVal, nagaArchitects.effects );
+		}
+		if (race.name == "spiders" && spiderGeologists.researched) {
+			$.extend( true, retVal, spiderGeologists.effects );
+		}
+		return retVal;
 	},
 	getTotalEffects: function(model) {
 		//Force this to return a falsy value so the game uses normal getEffects() instead
