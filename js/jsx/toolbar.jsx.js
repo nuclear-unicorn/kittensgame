@@ -225,7 +225,7 @@ WToolbarPollution = React.createClass({
         if (warnLvl >= 1 && warnLvl <= 4 && warnLvl > polLvlShow && warnLvl <= eqPolLvl) {
             message += "<br/>" + $I("pollution.level" + warnLvl + ".warning");
         }
-        if (pollution * 1.5 <= eqPol || eqPolLvl > polLvl){
+        if (pollution * 1.5 < eqPol || eqPolLvl > polLvl){
             message += "<br/>" + $I("pollution.increasing");
         }
         else if (pollution >= 0 && game.bld.cathPollutionPerTick <= 0 && eqPolLvl < polLvl){

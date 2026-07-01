@@ -67,7 +67,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		prices: [{name : "science", val: 900}],
 		unlocks: {
 			buildings: ["smelter"],
-			upgrades: ["huntingArmor"]
+			upgrades: ["huntingArmor", "prospecting"]
 		}
 	},
 	{
