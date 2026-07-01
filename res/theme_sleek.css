@@ -167,7 +167,6 @@
     max-height: initial;
     min-width: initial;
     /*max-width: initial;*/
-    overflow: hidden;
     max-width: 1800px !important;
     margin: auto !important;
 }
