@@ -33,7 +33,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		craftable: true,
 		visible: true,
 		calculatePerTick: true,
-		aiCanDestroy: true
+		aiCanDestroy: true,
 	},{
 		name : "minerals",
 		title: $I("resources.minerals.title"),
@@ -46,6 +46,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		title: $I("resources.coal.title"),
 		type : "common",
 		visible: true,
+		color: "gray",
 		calculatePerTick: true,
 		aiCanDestroy: true
 	},{
@@ -397,7 +398,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		name : "beam",
 		title: $I("resources.beam.title"),
 		type : "common",
-		craftable: true
+		craftable: true,
+		color: "#df9000"
 	},{
 		name : "slab",
 		title: $I("resources.slab.title"),
@@ -472,6 +474,13 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
         craftable: true,
         color: "olive",
 		isNotRefundable: true,
+		tag: "chemist"
+	},{
+        name: "plastic",
+        title: $I("resources.plastic.title"),
+        type: "common",
+        craftable: true,
+        color: "#9B9A5A",
 		tag: "chemist"
 	},{
 		name : "parchment",

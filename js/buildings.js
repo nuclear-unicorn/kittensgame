@@ -678,6 +678,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		prices: [
 			{ name : "science", val: 1500 },
 			{ name : "slab", val: 100 },
+			{ name: "plastic", val: 15 },
 			{ name : "alloy", val: 25 }
 		],
 		priceRatio: 1.10,
@@ -687,7 +688,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"scienceMax": 0,
 			"catnipPerTickCon": 0,
 			"oilPerTickProd": 0,
-			"energyConsumption": 0
+			"energyConsumption": 0,
+			"compediumCraftRatio": 0,
+			"compediumGlobalCraftRatio": 0
 		},
 		upgrades: {
 			buildings: ["library"]
@@ -704,6 +707,11 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				self.effects["catnipPerTickCon"] = 0;
 				self.effects["oilPerTickProd"] = 0;
 				self.effects["energyConsumption"] = 0;
+			}
+
+			if (game.workshop.get("petri").researched){
+				self.effects["compediumCraftRatio"] = 0.01;
+				self.effects["compediumGlobalCraftRatio"] = 0.001;
 			}
 
 			self.effects["scienceMax"] = 1500;

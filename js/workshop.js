@@ -1635,7 +1635,22 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		upgrades: {
 			buildings: ["oilWell"]
 		}
-	},{
+	},
+	{
+		name: "petri",
+		label: $I("workshop.petri.label"),
+		description: $I("workshop.petri.desc"),
+		effects: {
+		},
+		prices:[
+			{ name : "plastic", val: 250 },
+			{ name : "science",  val: 65000 }
+		],
+		upgrades: {
+			buildings: ["biolab"]
+		}
+	},
+	{
 		name: "biofuel",
 		label: $I("workshop.biofuel.label"),
 		description: $I("workshop.biofuel.desc"),
@@ -2219,6 +2234,15 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		progressHandicap: 5,
 		tier: 2
     },{
+        name: "plastic",
+        label: $I("workshop.crafts.plastic.label"),
+        description: $I("workshop.crafts.plastic.desc"),
+        prices:[
+            { name: "oil", val: 1000 }
+        ],
+		progressHandicap: 5,
+		tier: 2
+    },{
 		name: "parchment",
 		label: $I("workshop.crafts.parchment.label"),
 		description: $I("workshop.crafts.parchment.desc"),
@@ -2242,8 +2266,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.crafts.compedium.label"),
 		description: $I("workshop.crafts.compedium.desc"),
 		prices:[
-			{name: "science", val: 10000},
-			{name: "manuscript", val: 50}
+			{name: "science", val: 9000},
+			{name: "manuscript", val: 55}
 		],
 		progressHandicap: 5,
 		tier: 3

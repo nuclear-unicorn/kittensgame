@@ -362,6 +362,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		],
 		unlocks: {
 			buildings: ["biolab"],
+			crafts: ["plastic"],
+			upgrades: ["petri"],
 			tech: ["biochemistry"]
 		},
 		flavor: $I("science.biology.flavor")
