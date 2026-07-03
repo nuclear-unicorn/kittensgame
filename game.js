@@ -1999,6 +1999,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	devMode: false,
 	mobileSaveOnPause: true,
 
+	// whether loading the save from localstorage failed.
+	// used to prevent overwriting the potentially-broken save data in
+	// localstorage with definitely-broken data from a partial save load.
+	currentSaveIsBroken: false,
+
 	//should this go to the res pool?
 	winterCatnipPerTick: 0,
 
@@ -2413,6 +2418,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	save: function(){
+		if (this.currentSaveIsBroken) {
+			// if the save is broken, we return the original save that we tried to import.
+			// (unfortunately we need to parse it a little bit, since callers of save() expect the unserialized data...)
+			return this._parseLSSaveData(LCstorage["com.nuclearunicorn.kittengame.savedata"]);
+		}
+
 		this.ticksBeforeSave = this.autosaveFrequency;
 
 		var saveData = {
@@ -2560,6 +2571,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	load: function(){
 		var data = LCstorage["com.nuclearunicorn.kittengame.savedata"];
 		this.resetState();
+		this.currentSaveIsBroken = false;
 		if (!data){
 			this.calculateAllEffects();
 			this.updateOptionsUI();
@@ -2607,6 +2619,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 			this.msg("Unable to load save data. Contact the devs and provide the faulty save file.", "important");
 			success = false;
+			this.currentSaveIsBroken = true;
 		}
 
 
