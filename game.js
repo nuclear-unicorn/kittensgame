@@ -611,6 +611,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio"
 			},
 
+			"embassiesPerAmbassadorSlot": {
+				type: "hidden"
+			},
+
 			//kittens
 
 			"maxKittens" : {

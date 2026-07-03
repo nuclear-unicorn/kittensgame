@@ -144,6 +144,15 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		},
 		value: 0,
 		unlocked: false
+	}, {
+		name: "ambassador",
+		title: $I("village.job.ambassador"),
+		description: $I("village.job.ambassador.desc"),
+		modifiers: {
+			//TODO: Give ambassadors some interesting effects in exchange for consuming resources
+		},
+		value: 0,
+		unlocked: false
 	}],
 	jobNames: null,
 

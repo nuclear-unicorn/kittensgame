@@ -2536,7 +2536,10 @@ dojo.declare("classes.queue.manager", null,{
                 return options;
 
             case "embassies":
-                options.push({ name: "cheapest", label: $I("trade.embassy.queue.cheapest") });
+                if (this.game.prestige.getPerk("treaties").researched) {
+                    //"Cheapest embassy" quality-of-life feature is unlocked by a Metaphysics upgrade
+                    options.push({ name: "cheapest", label: $I("trade.embassy.queue.cheapest") });
+                }
                 this.game.diplomacy.races.forEach( function(race) {
                     if (race.unlocked &&
                         race.embassyPrices /*is truthy iff the race *has* embassies at all*/) {

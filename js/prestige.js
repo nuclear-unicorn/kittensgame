@@ -190,27 +190,28 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		name: "ambassadors",
 		label: $I("prestige.ambassadors.label"),
 		description: $I("prestige.ambassadors.desc"),
-		prices: [
-			{ name: "karma", val: 5 },
-			{ name: "paragon", val: 100 }
-		],
+		prices: [{ name: "paragon", val: 100 }],
 		unlocked: false,
 		researched: false,
 		unlocks: {
+			"jobs": ["ambassador"],
 			"perks": ["treaties"]
 		}
-		//TODO: increases cap of embassy effects
 	},{
 		name: "treaties",
 		label: $I("prestige.treaties.label"),
-		description: $I("prestige.treaties.desc"),
-		prices: [
-			{ name: "karma", val: 25 },
-			{ name: "paragon", val: 500 },
-		],
+		description: "",
+		prices: [{ name: "paragon", val: 500 }],
 		unlocked: false,
-		researched: false
-		//TODO: increases cap of embassy effects
+		researched: false,
+		effects: {
+			"embassiesPerAmbassadorSlot": 30
+		},
+		calculateEffects: function(self, game) {
+			self.description = $I("prestige.treaties.desc", [
+				game.getDisplayValueExt(self.effects["embassiesPerAmbassadorSlot"])
+			]);
+		}
 	},{
 		name: "chronomancy",
 		label: $I("prestige.chronomancy.label"),
