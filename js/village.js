@@ -1592,22 +1592,26 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 		};
 		if (this.seed !== null && this.seed !== undefined) {
 			compressedSave.seed = this.seed;
-		} else {
-			var nameIndex = this.names.indexOf(this.name);
-			var surnameIndex = this.surnames.indexOf(this.surname);
-			compressedSave.ssn = this._mergeSSN([
-				nameIndex > -1 ? nameIndex : 0,
-				surnameIndex > -1 ? surnameIndex : 0,
-				this.age,
-				this._getTraitIndex(this.trait.name),
-				this.color,
-				this.variety,
-				this.rarity]);
-			// Custom sur/names
-			if (nameIndex <= 0 || surnameIndex <= 0) {
-				compressedSave.name = this.name;
-				compressedSave.surname = this.surname;
-			}
+		}
+		// If this.seed is defined, then this data is redundant, since all the
+		// information can be derived from the seed. However, old versions of
+		// the game will fail to load saves that only have the seed. Thus we
+		// keep writing the redundant info until all supported versions of the
+		// game can load from seed.
+		var nameIndex = this.names.indexOf(this.name);
+		var surnameIndex = this.surnames.indexOf(this.surname);
+		compressedSave.ssn = this._mergeSSN([
+			nameIndex > -1 ? nameIndex : 0,
+			surnameIndex > -1 ? surnameIndex : 0,
+			this.age,
+			this._getTraitIndex(this.trait.name),
+			this.color,
+			this.variety,
+			this.rarity]);
+		// Custom sur/names
+		if (nameIndex <= 0 || surnameIndex <= 0) {
+			compressedSave.name = this.name;
+			compressedSave.surname = this.surname;
 		}
 		return compressedSave;
 	},
