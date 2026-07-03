@@ -88,7 +88,9 @@ test("New kittens save seed-generated attributes by seed", () => {
     let saveData = kitten.save(true, game.village.jobNames);
 
     expect(saveData.seed).toBe(kitten.seed);
-    expect(saveData.ssn).toBeUndefined();
+	// this is currently still present for backwards compatibility
+    expect(saveData.ssn).toBeDefined();
+
     expect(saveData.name).toBeUndefined();
     expect(saveData.surname).toBeUndefined();
 
