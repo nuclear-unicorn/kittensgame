@@ -1871,6 +1871,15 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"maxArtifacts":{
 				title: $I("effectsMgr.statics.maxArtifacts.title"),
 			},
+
+			"maxArtifactsMuseum":{
+				title: $I("effectsMgr.statics.maxArtifactsMuseum.title"),
+				type: "hidden"
+			},
+
+			"maxArtifactsPreserved":{
+				title: $I("effectsMgr.statics.maxArtifactsPreserved.title"),
+			},
 			
 			"pactcraftRatio": {
 				title: $I("effectsMgr.statics.pactcraftRatio.title"),
@@ -4064,7 +4073,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		//for example, here kitten resources are calculated per effect, this logic could be unified
 		this.village.maxKittens = Math.floor(this.getEffect("maxKittens"));
-		this.village.maxArtifacts = Math.floor(this.getEffect("maxArtifacts"));
 
 		this.village.update();
 		this.workshop.update();
@@ -4091,7 +4099,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		kittens.maxValue = this.village.sim.maxKittens; //for HG
 
 		var artifacts = this.resPool.get("artifact");
-		artifacts.value = this.village.artifactSim.artifacts.length;
+		artifacts.value = this.village.artifactSim.activeArtifacts;
 		artifacts.maxValue = this.village.artifactSim.maxArtifacts;
 
 		this.timer.update();
@@ -4528,12 +4536,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * 			displayEffectName = the localized title;
 	 * 			displayEffectValue = the value of the effect, formatted & localized properly
 	 */
-	getEffectDisplayParams: function(effectName, effectValue, showIfZero) {
+	getEffectDisplayParams: function(effectName, effectValue, showIfZero, showIfLocked) {
 		var effectMeta = this.getEffectMeta(effectName);
 		if (effectMeta.type === "hidden") {
 			return null;	//Don't display because it's a hidden effect.
 		}
-		if (effectMeta.resName && !this.resPool.get(effectMeta.resName).unlocked) {
+		if (effectMeta.resName && !this.resPool.get(effectMeta.resName).unlocked && !showIfLocked) {
 			return null;	//hide resource-related effects if we did not unlocked this effect yet
 		}
 		if (!effectValue && !showIfZero) {

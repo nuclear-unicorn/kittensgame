@@ -1866,7 +1866,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		],
 		priceRatio: 1.6,
 		effects: {
-			"maxArtifacts": 1
+			"maxArtifactsMuseum": 1,
+			"cultureMax": 100
 		},
 	},
 	{

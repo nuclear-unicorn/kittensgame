@@ -290,6 +290,57 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			"perks": ["malkuth"]
 		}
 	},
+	//---------------------------------------------------
+
+	{
+        name: "treasury",
+        label: $I("prestige.treasury.label"),
+        description: $I("prestige.treasury.desc"),
+        prices: [{ name: "paragon", val: 5 }],
+        unlocked: true,
+		defaultUnlocked: true,
+        researched: false,
+        effects:{
+            "maxArtifacts" : 3,
+			"maxArtifactsPreserved": 3
+        },
+		unlocks: {
+			"perks": ["vault"]
+		}
+    },
+
+		{
+        name: "vault",
+        label: $I("prestige.vault.label"),
+        description: $I("prestige.vault.desc"),
+        prices: [{ name: "paragon", val: 25 }],
+        unlocked: false,
+        researched: false,
+        effects:{
+            "maxArtifacts" : 2,
+			"maxArtifactsPreserved": 2
+        },
+		unlocks: {
+			"perks": ["hoard"]
+		}
+    },
+
+		{
+        name: "hoard",
+        label: $I("prestige.hoard.label"),
+        description: $I("prestige.hoard.desc"),
+        prices: [{ name: "paragon", val: 50 }],
+        unlocked: false,
+        researched: false,
+        effects:{
+            "maxArtifacts" : 1,
+			"maxArtifactsPreserved": 1
+        },
+		unlocks: {
+			"perks": ["hoard"]
+		}
+    },
+
     //---------------------------------------------------
     {
         name: "malkuth",

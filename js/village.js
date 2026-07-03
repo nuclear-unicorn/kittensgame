@@ -335,12 +335,16 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		}
 		return kittensPerTick;
 	},
+	calculateSimMaxArtifact: function(){
+		var maxArtifacts = this.game.getEffect("maxArtifacts") + Math.min(10, this.game.getEffect("maxArtifactsMuseum"));
+		return maxArtifacts;
+	},
 	update: function(){
 		//calculate kittens
 		var kittensPerTick = this.calculateKittensPerTick();
 
 		this.sim.maxKittens = this.calculateSimMaxKittens();
-		this.artifactSim.maxArtifacts = this.game.getEffect("maxArtifacts");
+		this.artifactSim.maxArtifacts = this.calculateSimMaxArtifact();
 		//this.sim.maxKittens = Math.round(this.maxKittens * (1 + this.game.getLimitedDR(maxKittensRatio, 1)));
 		//todo: consider discarding extra population, but DO account for disabled buildings like space stations
 		//likely the best way to do it is once, upon HG upgrade
@@ -419,6 +423,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		//calculate kittens
 		var kittensPerTick = this.calculateKittensPerTick();
 		this.sim.maxKittens = this.calculateSimMaxKittens();
+		this.artifactSim.maxArtifacts = this.calculateSimMaxArtifact();
 		this.sim.update(kittensPerTick, times);
 		this.artifactSim.update(times);
 	},
@@ -729,7 +734,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			lastBiome: this.map.lastBiome,
 			hadKittenHunters: this.sim.hadKittenHunters,
 			nextKittenProgress: this.sim.nextKittenProgress,
-			nextArtifactProgress: this.artifactSim.nextArtifactProgress,
+			huntArtifactProgress: this.artifactSim.huntArtifactProgress,
 			map: this.map.save(),
 			loadouts: loadouts
 		};
@@ -785,7 +790,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			}
 			this.sim.hadKittenHunters = (saveData.village.hadKittenHunters === undefined) ? true: saveData.village.hadKittenHunters;
 			this.sim.nextKittenProgress = saveData.village.nextKittenProgress || 0;
-			this.artifactSim.nextArtifactProgress = saveData.village.nextArtifactProgress || 0;
+			this.artifactSim.huntArtifactProgress = saveData.village.huntArtifactProgress || 0;
 			if (saveData.village.map){
 				this.map.load(saveData.village.map);
 			}
@@ -926,6 +931,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		if (squads >= 1000&&!this.game.challenges.getChallenge("pacifism").unlocked){
 			this.game.challenges.getChallenge("pacifism").unlocked = true;
 		}
+
+		this.game.village.artifactSim.addHuntArtifact()//Discover artifact if enough time passed in artifactSim
 
 		var unicorns = this.game.resPool.addResEvent("unicorns", this.game.math.binominalRandomInteger(squads, this.getHuntUnicornChance()));
 		if (unicorns > 0) {
@@ -3081,34 +3088,39 @@ dojo.declare("classes.village.ui.artifacts.CherishController", com.nuclearunicor
 
 	fetchModel: function(options){
 		var model = this.inherited(arguments);
-		var self = this;
+		var artifactSim = this.game.village.artifactSim;
+		var artifact = this.artifact;
 		model.discardLink = {
 			id: "discard",
-			title: "Discard",
+			title: $I("village.artifactList.btn.discard"),
+			tooltip: $I("village.artifactList.btn.discard.tooltip"),
 			handler: function(){
-				this.game.village.artifactSim.removeArtifact(this.controller.artifact);
+				artifactSim.removeArtifact(artifact);
 			}
 		};
 		model.forgetLink = {
 			id: "forget",
-			title: "Forget",
+			title: $I("village.artifactList.btn.forget"),
+			tooltip: $I("village.artifactList.btn.forget.tooltip"),	
 			handler: function(){
-				this.game.village.artifactSim.removeArtifact(this.controller.artifact);
+				artifactSim.removeArtifact(artifact);
 			}
 		};
 		model.rememberLink = {
 			id: "remember",
-			title: "Remember",
+			title: $I("village.artifactList.btn.remember"),
+			tooltip: $I("village.artifactList.btn.remember.tooltip"),	
 			handler: function(){
-					this.controller.artifact.on = this.controller.artifact.val;
-					this.game.villageTab.requestMuseumRefresh();
+					artifactSim.rememberArtifact(artifact);
 				}
 		};
 		model.storeLink = {
 			id: "store",
-			title: "Store",
+			title: $I("village.artifactList.btn.store"),
+			tooltip: $I("village.artifactList.btn.store.tooltip"),	
 			handler: function(){
-				this.controller.artifact.on = 0;
+				artifactSim.storeArtifact(artifact);
+				artifact.on = 0;
 				this.game.villageTab.requestMuseumRefresh();
 			}
 		};
@@ -3133,7 +3145,7 @@ dojo.declare("classes.village.ui.artifacts.CherishController", com.nuclearunicor
 	getPrices: function(model) {
 		var prices = dojo.clone(model.options.prices);
 		for (var i = 0; i < prices.length; i++) {
-            prices[i].val *= Math.pow(2.5, this.artifact.val);
+            prices[i].val *= Math.pow(2, this.artifact.val);
 		}
 		return prices;
 	},
@@ -3480,10 +3492,15 @@ dojo.declare("classes.village.ArtifactSim", null, {
 	game: null,
 	artifacts: null,
 
+	huntArtifactsPerTick: 0.2,
+	hunterRatioArtifact: 5, //Will decide if an extra effect is given when discovering artifact through hunting
+
 	maxArtifacts: 0,
-	nextArtifactProgress : 0,
-	artifactsPerTick: 0.2,
-	maxPreserve: 10,
+	huntArtifactProgress : 0,
+	maxPreserved: 0,
+
+	activeArtifacts: 0,
+	preservedArtifacts: 0,
 
 	constructor: function(game){
 		this.artifacts = [];
@@ -3491,52 +3508,95 @@ dojo.declare("classes.village.ArtifactSim", null, {
 	},
 
 	update: function(times){
+		
 		var game = this.game;
 		if (!times) {
 			times = 1;
 		}
-		this.maxPreserve = game.getEffect("artifactsPreservedMax");
-		
-		if (this.artifacts.length < this.maxArtifacts) {
-			//var temp = this.game.getLimitedDR(this.game.village.getFreeKittens(), 100) * 0.1;
-			this.nextArtifactProgress += times * this.artifactsPerTick * (1 + this.game.getLimitedDR(this.game.village.getFreeKittens(), 100) * 0.05);
-			if (this.nextArtifactProgress >= 1) {
-				var artifactsToAdd = Math.floor(this.nextArtifactProgress);
-				this.nextArtifactProgress -= artifactsToAdd;
+		this.maxPreserved = game.getEffect("maxArtifactsPreserved");
 
-				for (var i = 0; i < artifactsToAdd; i++) {
-					if (this.artifacts.length < this.maxArtifacts) {
-						this.addArtifact(null, "village", 2);
-					}
-				}
-
-				if (this.artifacts.length >= this.maxArtifacts) {
-					this.nextArtifactProgress = 0;
-				}
-			}
+		if (this.huntArtifactProgress < 1) {
+			this.huntArtifactProgress += times * this.huntArtifactsPerTick;
+			this.huntArtifactProgress = Math.min(1, this.huntArtifactProgress)
 		}
 
 	},
-	addArtifact: function(type, pool, effectCount) {
+
+	addArtifact: function(type, pool, effectCount, msg) {
+		if (!this.game.science.get("drama").researched) {
+			return false;
+		}
 		var artifact = new classes.village.Artifact(this.game, type, pool, effectCount); //
-		this.artifacts.push(artifact);
-		this.game.msg($I("village.msg.artifact.created", "important"));
+		this.artifacts.unshift(artifact);
+		this.refreshArtifactGroups();
+		this.game.msg(msg, "important");
 		this.game.villageTab.requestMuseumRefresh();
+		return true;
 	},
+
 	removeArtifact: function(artifact){
 		this.artifacts.splice(this.artifacts.indexOf(artifact), 1);
-		
-		this.game.villageTab.updateTab();
-		this.game.ui.render();
+		this.refreshArtifactGroups();
+		this.game.villageTab.requestMuseumRefresh();
 	},
 
-	discardArtifact: function(artifact){
-		if (artifact.preserve) {
-			artifact.preserve = !artifact.preserve;
-			artifact.on = 0;
+	rememberArtifact: function(artifact){
+		if (this.activeArtifacts < this.maxArtifacts) {
+			artifact.on = artifact.val;
+			this.refreshArtifactGroups();
+			this.game.villageTab.requestMuseumRefresh();
 		} else {
-			this.removeArtifact();
+			this.game.msg("There is not enough space to remember this artifact TMP")
 		}
+
+	},
+
+	storeArtifact: function(artifact){
+		artifact.on = 0;
+		this.refreshArtifactGroups();
+		this.game.villageTab.requestMuseumRefresh();
+	},
+
+	togglePreserveArtifact: function(artifact){
+		if (!artifact.preserve) {
+			if (this.preservedArtifacts < this.maxPreserved) {
+				artifact.preserve = true;
+				this.refreshArtifactGroups();
+				this.game.villageTab.requestMuseumRefresh();
+			} else {
+				this.game.msg("There is not enough space to preserve this artifact TMP")
+			}
+		} else {
+			artifact.preserve = false;
+			this.refreshArtifactGroups();
+			this.game.villageTab.requestMuseumRefresh();
+		}
+	},
+
+	addHuntArtifact: function (){
+		if (this.huntArtifactProgress >= 1 && this.getFreeArtifactSlot()) {
+			var hunterRatio = this.game.getEffect("hunterRatio");
+			var effectCount = 1;
+			for (var i = 2; i > 0; i--) { //Can give up to 2 extra effects based on Hunting effectiveness
+				var hunterRatioArtifact = Math.random() * this.hunterRatioArtifact
+				if (hunterRatio > hunterRatioArtifact) {
+					effectCount++
+				}
+			} 
+			if (this.addArtifact(null,null,effectCount, $I("village.msg.artifact.hunt"))) {
+				this.huntArtifactProgress = 0;
+				return true;
+			}
+
+		}
+		return false;
+	},
+
+	getFreeArtifactSlot: function(){
+		if (this.activeArtifacts >= this.maxArtifacts) {
+			return false;
+		}
+		return true;
 	},
 
 	getArtifactEffectTotal: function(effectVal, val){
@@ -3555,25 +3615,55 @@ dojo.declare("classes.village.ArtifactSim", null, {
 				if(!globalEffectsCached[effect]){
 					globalEffectsCached[effect] = 0;
 				}
-				globalEffectsCached[effect] += (effectVal * artifact.val);
+				globalEffectsCached[effect] += (effectVal * artifact.on);
 			}
 		}
 	},
+
+	getActiveArtifacts: function() {
+		var activeArtifacts = [];
+		for (var i in this.artifacts) {
+			var artifact = this.artifacts[i];
+			if (artifact.on > 0) {
+				activeArtifacts.push(artifact);
+			}
+		}
+		return activeArtifacts;
+	},
+
+	getPreservedArtifacts: function() {
+		var preservedArtifacts = [];
+		for (var i in this.artifacts) {
+			var artifact = this.artifacts[i];
+			if (artifact.preserve) {
+				preservedArtifacts.push(artifact);
+			} else if (artifact.on == 0) {
+				artifact.on = artifact.val;
+			}
+		}
+		return preservedArtifacts;
+	},
+
+	refreshArtifactGroups: function() {
+		this.activeArtifacts = this.getActiveArtifacts().length;
+		this.preservedArtifacts = this.getPreservedArtifacts().length;
+	}
 });
 
 dojo.declare("com.nuclearunicorn.game.ui.MuseumPanel", com.nuclearunicorn.game.ui.Panel, {
 
 	activeArtifactList: null,
 	preservedArtifactList: null,
+
 	constructor: function(name, village, game){
 		this.tabManager = village;
 		this.game = game;
 		
 
 		//This panel only shows artifacts that are active
-		this.activeArtifactList = new classes.ui.village.ArtifactList("Active Artifacts TMP", this.tabManager, game); 
+		this.activeArtifactList = new classes.ui.village.ArtifactList($I("village.artifactList.active.title"), this.tabManager, game, "active"); 
 		//This shows artifacts that are preserved
-		this.preservedArtifactList = new classes.ui.village.ArtifactList("Preserved Artifacts TMP", this.tabManager, game);
+		this.preservedArtifactList = new classes.ui.village.ArtifactList($I("village.artifactList.preserved.title"), this.tabManager, game, "preserved");
 		this.sortArtifacts();
 	},
 
@@ -3582,8 +3672,6 @@ dojo.declare("com.nuclearunicorn.game.ui.MuseumPanel", com.nuclearunicorn.game.u
 		this.inherited(arguments);
 		this.activeArtifactList.render(this.contentDiv)
 		this.preservedArtifactList.render(this.contentDiv)
-		
-		
 	},
 
 	refresh: function(){
@@ -3595,25 +3683,19 @@ dojo.declare("com.nuclearunicorn.game.ui.MuseumPanel", com.nuclearunicorn.game.u
 	},
 
 	sortArtifacts: function(){
-		var artifacts = game.village.artifactSim.artifacts;
-		this.activeArtifacts = []; 
-		this.preservedArtifacts = [];
-		for (var i in artifacts) {
-			var artifact = artifacts[i];
-			if (artifact.on > 0) {
-				this.activeArtifacts.push(artifact);
-			}
-			if (artifact.preserve) {
-				this.preservedArtifacts.push(artifact);
-			} else if (artifact.on == 0) {
-				artifact.on = artifact.val;
-			}
-		}
+		this.activeArtifacts = this.game.village.artifactSim.getActiveArtifacts(); 
+		this.preservedArtifacts = this.game.village.artifactSim.getPreservedArtifacts();
+
 		if (this.activeArtifactList && this.preservedArtifactList) {
 			this.activeArtifactList.artifacts = this.activeArtifacts;
 			this.preservedArtifactList.artifacts = this.preservedArtifacts;
 		}
 	},
+
+	update: function(){
+		this.activeArtifactList.update();
+		this.preservedArtifactList.update();
+	}
 
 });
 
@@ -3622,6 +3704,10 @@ dojo.declare("classes.ui.village.ArtifactList", com.nuclearunicorn.game.ui.Panel
 	game: null,
 	artifacts: null,
 	container: null,
+	groupType: null,
+
+	glossaryDiv: null,
+	cherishButtons: null,
 	
 	statics: { /*make configuration options static so they persist between tab switching*/
 		hideActiveEffects: true,
@@ -3630,24 +3716,44 @@ dojo.declare("classes.ui.village.ArtifactList", com.nuclearunicorn.game.ui.Panel
 
 	constructor: function(name, tabManager, game, groupType){
 		this.game = game;
-
+		this.groupType = groupType;
+		this.panelTitle = name
+		this.artifacts = [];
+		this.cherishButtons = []
 	},
 
-	glossaryDiv: null,
-	cherishButtons: null,
 
 	render: function(container){
-		
+		if (this.groupType == "active") {
+			this.name = this.panelTitle + " (" + this.game.village.artifactSim.activeArtifacts + "/" + this.game.village.artifactSim.maxArtifacts + ")";
+		} else if (this.groupType == "preserved") {
+			this.name = this.panelTitle + " (" + this.game.village.artifactSim.preservedArtifacts + "/" + this.game.village.artifactSim.maxPreserved + ")";
+		}
 		var panelContainer = this.inherited(arguments);
 
 		var glossaryDiv = dojo.create("div", { className: "censusFilters"}, panelContainer);
 		this.glossaryDiv = glossaryDiv;
+		var hide = this.manageVisibleEffects(this.groupType, false);
+
+		//var result = this.controller.buyItem(this.model, event);
+
+		//Button that levels up all artifacts
+
+		this.cherishAllHref = dojo.create("a", { 
+			href: "#", innerHTML: $I("village.artifactList.cherish.all"),
+			className: "cherisAllHref",
+			style: {
+				float: "right"
+			}
+		}, glossaryDiv);
 
 		//Button to show or hide total effects
 
-		var toggleText = $I("village.artifacts.effects,show");
-		if (this.hide){
-			toggleText = $I("village.artifacts.effects.hide");
+		var toggleText = $I("village.artifactList.effects.hide");
+		var effectBarDisplay = "block"
+		if (hide){
+			toggleText = $I("village.artifactList.effects.show");
+			var effectBarDisplay = "none"
 		}
 
 		this.showEffectsHref = dojo.create("a", { 
@@ -3662,7 +3768,7 @@ dojo.declare("classes.ui.village.ArtifactList", com.nuclearunicorn.game.ui.Panel
 		this.effectBar = dojo.create("div", {
 			className: "effects",
 			style: {
-				display: "none"
+				display: effectBarDisplay
 			}
 		}, glossaryDiv);
 		var effects = {};
@@ -3675,9 +3781,9 @@ dojo.declare("classes.ui.village.ArtifactList", com.nuclearunicorn.game.ui.Panel
 
 			}
 		}
-		this.effectBar.innerHTML = "TMP Total Effects: ";
+		this.effectBar.innerHTML = $I("village.artifactList.effects.title");
 		for (var effect in effects) {
-			var displayParams = this.game.getEffectDisplayParams(effect, effects[effect], false);
+			var displayParams = this.game.getEffectDisplayParams(effect, effects[effect], false, true /*showIfLocked*/);
 			if (!displayParams) {
 				continue;
 			}
@@ -3685,11 +3791,13 @@ dojo.declare("classes.ui.village.ArtifactList", com.nuclearunicorn.game.ui.Panel
 			this.effectBar.innerHTML += "<br>" + textToDisplay;
 		}
 
-		dojo.connect(this.showEffectsHref, "onclick", this, dojo.partial(function(effectBar){
-			if (effectBar.style.display == "block") {
+		dojo.connect(this.showEffectsHref, "onclick", this, dojo.partial(function(effectBar){ //Used to hide Total effects
+			if (this.manageVisibleEffects(this.groupType, true)) {
 				effectBar.style.display = "none";
+				this.showEffectsHref.innerHTML = $I("village.artifactList.effects.show");
 			} else {
 				effectBar.style.display = "block";
+				this.showEffectsHref.innerHTML = $I("village.artifactList.effects.hide");
 			}
 		}, this.effectBar));
 
@@ -3739,19 +3847,19 @@ dojo.declare("classes.ui.village.ArtifactList", com.nuclearunicorn.game.ui.Panel
 			preserveHref.innerHTML = artifact.preserve ? "&#9733;" : "&#9734;",
 
 			dojo.connect(preserveHref, "onclick", this, dojo.partial(function(game, artifact){
-				artifact.preserve = !artifact.preserve
-				game.render();
+				game.village.artifactSim.togglePreserveArtifact(artifact);
 			}, this.game, artifact));
-			if (game.getEffect("artifactsPreservedMax") <= 0) {
+			if (game.getEffect("maxArtifactsPreserved") <= 0 || artifact.on == 0) {
 				preserveHref.style.visibility = "hidden";
-			} else {
+			} else { //Hide preserve button if artifact is preserved and inactive, or if preserve is not unlocked
 				preserveHref.style.visibility = "visible";
 			}
 
 			var effects = artifact.effects;
 			content.innerHTML = artifact.title + "<br>";
+			
 			for (var effect in effects) {
-				var displayParams = this.game.getEffectDisplayParams(effect, effects[effect] * artifact.val, false);
+				var displayParams = this.game.getEffectDisplayParams(effect, effects[effect] * artifact.val, true, true /*showIfLocked*/);
 				if (!displayParams) {
 					textToDisplay += $I("village.museum.artifact.discovered") // Display if affected resource is not yet unlocked
 				} else {
@@ -3765,8 +3873,36 @@ dojo.declare("classes.ui.village.ArtifactList", com.nuclearunicorn.game.ui.Panel
 			}
 			this.cherishButtons.push(cherishButton);
 		}
-
+		dojo.connect(this.cherishAllHref, "onclick", this, dojo.partial(function(cherishButtons){ //Used to hide Total effects
+			for(var i in cherishButtons) {
+				var controller = cherishButtons[i].controller
+				controller.buyItem(cherishButtons[i].model, event);
+			}
+			this.game.villageTab.requestMuseumRefresh();
+		}, this.cherishButtons));
+		this.update();
 	},
+
+	manageVisibleEffects: function(groupType, toggle){
+		switch (groupType) {
+			case "active":
+				if (toggle) {
+					this.statics.hideActiveEffects = !this.statics.hideActiveEffects;
+				}
+				
+				return this.statics.hideActiveEffects;
+			case "preserved":
+				if (toggle) {
+					this.statics.hidePreservedEffects = !this.statics.hidePreservedEffects;					
+				}
+				return this.statics.hidePreservedEffects;
+			default:
+				break;
+		}
+	},
+
+		hideActiveEffects: true,
+		hidePreservedEffects: true,
 
 	update: function(){
 		for (var i in this.cherishButtons)
@@ -6441,7 +6577,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		//--------------- artifacts ------------------
 		this.museumPanel = new com.nuclearunicorn.game.ui.MuseumPanel($I("village.panel.artifacts"), this.game.village, this.game);
 		var museumPanelConatiner = this.museumPanel.render(tabContainer);
-		if (!this.game.science.get("drama").researched) {
+		if (!this.game.science.get("drama").researched){
 			this.museumPanel.setVisible(false);
 		}
 		
@@ -6493,9 +6629,10 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		this.jobsPanel.setVisible(!jobsHidden);
 
 		if (this.museumPanel) {
-			var hasDrama = this.game.science.get("drama").researched;
-			this.museumPanel.setVisible(hasDrama);
-			this.museumPanel.update();
+			if (this.game.village.artifactSim.artifacts.length || this.game.science.get("drama").researched) {
+				this.museumPanel.setVisible(true);
+				this.museumPanel.update();
+			}
 		}
 
 

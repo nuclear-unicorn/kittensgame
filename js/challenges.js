@@ -1199,7 +1199,7 @@ dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Pane
 		var childNodes = this.listElement.childNodes;
 		var i = 0;
 		for (var effectName in challengeData.effects) {
-			var displayParams = this.game.getEffectDisplayParams(effectName, challengeData.totalEffectsCached[effectName], false /*showIfZero*/);
+			var displayParams = this.game.getEffectDisplayParams(effectName, challengeData.totalEffectsCached[effectName], false /*showIfZero*/, false /*showIfLocked*/);
 			//displayParams could be null if this is the sort of effect that's supposed to be hidden.
 			if (!displayParams) {
 				continue;
