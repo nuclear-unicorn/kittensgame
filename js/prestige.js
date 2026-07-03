@@ -211,6 +211,9 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			self.description = $I("prestige.treaties.desc", [
 				game.getDisplayValueExt(self.effects["embassiesPerAmbassadorSlot"])
 			]);
+		},
+		upgrades: {
+			jobs: ["ambassador"]
 		}
 	},{
 		name: "chronomancy",

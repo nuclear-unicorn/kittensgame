@@ -290,6 +290,18 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	},
 
 	/**
+	 * Counts the TOTAL number of embassies built across all races in the current run.
+	 * @return A nonnegative integer
+	 */
+	getSumEmbassyLevels: function() {
+		var retVal = 0;
+		this.races.forEach( function(race) {
+			retVal += race.embassyLevel;
+		});
+		return retVal;
+	},
+
+	/**
 	 * Returns true if particular resource can be traded to you by a race
 	 */
 	isValidTrade: function(sell, race){
@@ -613,7 +625,10 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	//Some upgrades care about the number of embassies there are.
 	//Call this function to recalculate this, as needed:
 	triggerOnEmbassyCountChanged: function() {
-		this.game.upgrade({policies: ["lizardRelationsDiplomats", "nagaRelationsArchitects", "spiderRelationsGeologists"]});
+		this.game.upgrade({
+			jobs: ["ambassador"],
+			policies: ["lizardRelationsDiplomats", "nagaRelationsArchitects", "spiderRelationsGeologists"]
+		});
 		this.game.science.unlockRelations();
 		this.game.ui.render();
 	},

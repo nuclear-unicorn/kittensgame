@@ -151,6 +151,17 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		modifiers: {
 			//TODO: Give ambassadors some interesting effects in exchange for consuming resources
 		},
+		calculateEffects: function(self, game) { //Mostly just updating the description, honestly
+			var scalesBasedOnEmbassies = game.getEffect("embassiesPerAmbassadorSlot") > 0; //Boolean variable
+			var baseDescription = $I("village.job.ambassador.desc");
+			var limitDescription = $I("village.job.ambassador.limit.per.race");
+
+			if (scalesBasedOnEmbassies) {
+				var computedLimit = game.village.getJobLimit(self.name);
+				limitDescription = $I("village.job.ambassador.limit.calculated", [computedLimit]);
+			}
+			self.description = baseDescription + "<br>" + limitDescription;
+		},
 		value: 0,
 		unlocked: false
 	}],
@@ -273,6 +284,28 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 	getJobLimit: function(jobName) {
 		if (jobName == "engineer"){
 			return this.game.bld.get("factory").val;
+		} else if (jobName == "ambassador") {
+			//Check the unlock condition for this job in the first place:
+			if (!this.game.prestige.getPerk("ambassadors").researched) {
+				return 0;
+			}
+			//Limit is 1 per unlocked race, so compute that number:
+			var unlockedRaces = 0;
+			this.game.diplomacy.races.forEach( function(race) {
+				if (race.name == "leviathans") {
+					//Leviathans come & go as they please.  To handle this, we count them as unlocked iff we've fed them.
+					unlockedRaces += race.energy > 0 ? 1 : 0;
+				} else {
+					unlockedRaces += race.unlocked;
+				}
+			});
+			//Effect of Treaties (Metaphysics upgrade) increases job limit based on embassies:
+			var embassyDivisor = this.game.getEffect("embassiesPerAmbassadorSlot"); //Every N embassies adds +1 slot
+			var fromEmbassies = 0;
+			if (embassyDivisor > 0) {
+				fromEmbassies = Math.floor(this.game.diplomacy.getSumEmbassyLevels() / embassyDivisor);
+			}
+			return unlockedRaces + fromEmbassies;
 		} else if (jobName == "priest" && this.game.challenges.isActive("atheism")){
 			return 0;
 		} else {
