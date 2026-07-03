@@ -1008,11 +1008,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				self.effectsPreDeficit[self.prefixEffectNames[counter]] = game.getEffect("pact" + self.prefixEffectNames[counter]) * transcendenceTierModifier;
 			}
 			self.effectsPreDeficit["deficitRecoveryRatio"] = game.getEffect("pactDeficitRecoveryRatio");
+
 			var pactBlackLibraryBoost = game.getEffect("pactBlackLibraryBoost") * transcendenceTierModifier;
-			if (pactBlackLibraryBoost) {
-				var unicornGraveyard = game.religion.getZU("unicornGraveyard");
-				self.effectsPreDeficit["blackLibraryBonus"] = pactBlackLibraryBoost * unicornGraveyard.effects["blackLibraryBonus"] * (1 + unicornGraveyard.on);
-			}
+			var unicornGraveyard = game.religion.getZU("unicornGraveyard");
+			self.effectsPreDeficit["blackLibraryBonus"] = pactBlackLibraryBoost * unicornGraveyard.effects["blackLibraryBonus"] * (1 + unicornGraveyard.on);
 		},
 		updateEffects: function(self, game){
 			if (!self.jammed){
