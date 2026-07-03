@@ -556,6 +556,18 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 					resName: resname,
 					type: "ratio"
 				};
+			case type == "ArtifactRatio":
+				return {
+					title: $I("effectsMgr.type.resArtifactRatio", [restitle]),
+					resName: resname,
+					type: "ratio"
+				};
+			case type == "ArtifactMaxRatio":
+				return {
+					title: $I("effectsMgr.type.resArtifactMaxRatio", [restitle]),
+					resName: resname,
+					type: "ratio"
+				};
 			default:
 				return 0;
 		}
@@ -674,11 +686,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "perTick"
 			},
 
-			"artifactXPRatio" : {
-				title: $I("effectsMgr.statics.artifactXPRatio.title"),
-				type: "ratio"
-			},
-
 			"faithMaxRatio" : {
 				title: $I("effectsMgr.statics.faithMaxRatio.title"),
 				type: "ratio"
@@ -743,6 +750,11 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 
 			"festivalArrivalRatio":{
 				title: $I("effectsMgr.statics.festivalArrivalRatio.title"),
+				type: "ratio"
+			},
+
+			"artifactsPreservedMax":{
+				title: $I("effectsMgr.statics.artifactsPreservedMax.title"),
 				type: "ratio"
 			},
 
@@ -3287,6 +3299,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		// +*BUILDINGS AND SPACE PRODUCTION
 		perTick *= 1 + this.getEffect(res.name + "Ratio");
 
+		// +*ARTIFACT EFFECTS
+		perTick *= 1 + this.getEffect(res.name + "ArtifactRatio");
+
 		// +*RELIGION EFFECTS
 		perTick *= 1 + this.getEffect(res.name + "RatioReligion");
 
@@ -3519,6 +3534,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			name: $I("res.stack.upgrades"),
 			type: "ratio",
 			value: this.getEffect(res.name + "GlobalRatio")
+		});
+
+		// +*ARTIFACT EFFECTS
+		stack.push({
+			name: $I("res.stack.artifacts"),
+			type: "ratio",
+			value: this.getEffect(res.name + "ArtifactRatio")
 		});
 
 		// +*BUILDINGS AND SPACE PRODUCTION
@@ -5188,6 +5210,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			var _loadout = this.village.loadoutController.loadouts[i].save();
 			loadouts.push(_loadout);
 		}
+
+		var artifacts = []
 
 		var saveData = {
 			saveVersion: this.saveVersion,

@@ -921,6 +921,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 		//Stuff for Refrigiration and (potentially) similar effects
 		maxValue *= 1 + this.game.getEffect(res.name + "MaxRatio");
+		maxValue *= 1 + this.game.getEffect(res.name + "ArtifactMaxRatio");
+
 
 		if (!this.isNormalCraftableResource(res) && !res.transient) {
 			maxValue *= 1 + this.game.getEffect("globalResourceRatio");
