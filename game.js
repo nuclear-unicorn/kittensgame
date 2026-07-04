@@ -753,11 +753,6 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio"
 			},
 
-			"artifactsPreservedMax":{
-				title: $I("effectsMgr.statics.artifactsPreservedMax.title"),
-				type: "ratio"
-			},
-
 			// energy
 
 			"energyProduction": {
@@ -3308,9 +3303,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		// +*BUILDINGS AND SPACE PRODUCTION
 		perTick *= 1 + this.getEffect(res.name + "Ratio");
 
-		// +*ARTIFACT EFFECTS
-		perTick *= 1 + this.getEffect(res.name + "ArtifactRatio");
-
 		// +*RELIGION EFFECTS
 		perTick *= 1 + this.getEffect(res.name + "RatioReligion");
 
@@ -3370,6 +3362,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		// +*FAITH BONUS
 		perTick *= 1 + this.religion.getSolarRevolutionRatio() * (1 + ((res.name == "wood" || res.name == "catnip")? this.bld.pollutionEffects["solarRevolutionPollution"] : 0));
+
+		// +*ARTIFACT EFFECTS
+		perTick *= 1 + this.getEffect(res.name + "ArtifactRatio");
 		
 		//+COSMIC RADIATION
 		if (!this.opts.disableCMBR && res.name != "coal") {
@@ -3545,13 +3540,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			value: this.getEffect(res.name + "GlobalRatio")
 		});
 
-		// +*ARTIFACT EFFECTS
-		stack.push({
-			name: $I("res.stack.artifacts"),
-			type: "ratio",
-			value: this.getEffect(res.name + "ArtifactRatio")
-		});
-
 		// +*BUILDINGS AND SPACE PRODUCTION
 		stack.push({
 			name: $I("res.stack.buildings"),
@@ -3680,6 +3668,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				value: this.getCMBRBonus()
 			});
 		}
+
+		// +*ARTIFACT EFFECTS
+		stack.push({
+			name: $I("res.stack.artifacts"),
+			type: "ratio",
+			value: this.getEffect(res.name + "ArtifactRatio")
+		});
 
 		//ParagonSpaceProductionRatio definition 4/4
 		paragonSpaceProductionRatio *= 1 + this.religion.getSolarRevolutionRatio();
@@ -5218,8 +5213,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			var _loadout = this.village.loadoutController.loadouts[i].save();
 			loadouts.push(_loadout);
 		}
+		var newArtifacts = this.village.artifactSim.getPreservedArtifacts();
 
-		var artifacts = [];
 
 		var saveData = {
 			saveVersion: this.saveVersion,
@@ -5276,6 +5271,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				jobs: [],
 				traits: [],
 				hadKittenHunters: false,
+				artifacts: newArtifacts,
 				loadouts: loadouts
 			},
 			workshop: {

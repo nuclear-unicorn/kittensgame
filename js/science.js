@@ -255,7 +255,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		],
 		unlocks: {
 			buildings: ["mansion", "mint"],
-			tech: ["acoustics"]
+			tech: ["acoustics", "archeologyArtifact"]
 		},
 		flavor: $I("science.architecture.flavor")
 	}, {
@@ -309,6 +309,19 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["drama"]
 		}
 	}, {
+		name: "archeologyArtifact",
+		label: $I("science.archeologyArtifact.label"),
+		description: $I("science.archeologyArtifact.desc"),
+		effectDesc: $I("science.archeologyArtifact.effectDesc"),
+		prices: [
+			{name : "science", val: 60000},
+			{name: 	"manuscript", val: 500}
+		],
+		unlocks: {
+			buildings: ["museum"],
+			perks: ["remembrance"]
+		}
+	}, {
 		name: "drama",
 		label: $I("science.drama.label"),
 		description: $I("science.drama.desc"),
@@ -318,7 +331,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: 	"parchment", val: 5000}
 		],
 		unlocks: {
-			buildings: ["brewery", "museum"]
+			buildings: ["brewery"]
 		}
 	},{
 		name: "archeology",

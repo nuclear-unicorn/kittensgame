@@ -713,10 +713,6 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			var _kitten = this.sim.kittens[i].save(true /*this.game.opts.compressSaveFile*/, this.jobNames);
 			kittens.push(_kitten);
 		}
-		/*var artifacts = [];
-		for (var i in this.artifactSim.artifacts){			
-			artifacts.push(_artifact)
-		}*/
 
 		var loadouts = [];
 		for (var i in this.loadoutController.loadouts){
@@ -736,6 +732,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			nextKittenProgress: this.sim.nextKittenProgress,
 			huntArtifactProgress: this.artifactSim.huntArtifactProgress,
 			tradeArtifactProgress: this.artifactSim.tradeArtifactProgress,
+			mapArtifactProgress: this.artifactSim.mapArtifactProgress,
 			map: this.map.save(),
 			loadouts: loadouts
 		};
@@ -793,6 +790,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			this.sim.nextKittenProgress = saveData.village.nextKittenProgress || 0;
 			this.artifactSim.huntArtifactProgress = saveData.village.huntArtifactProgress || 0;
 			this.artifactSim.tradeArtifactProgress = saveData.village.tradeArtifactProgress || 0;
+			this.artifactSim.mapArtifactProgress = saveData.village.mapArtifactProgress || 0;
 			if (saveData.village.map){
 				this.map.load(saveData.village.map);
 			}
@@ -808,7 +806,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 				this.loadoutController.loadouts.push(newLoadout);
 			}
 		}
-
+		this.artifactSim.refreshArtifactGroups();
 		this.updateResourceProduction();
 	},
 
@@ -2285,6 +2283,9 @@ dojo.declare("classes.village.Map", null, {
 				}
 			}
 		}
+		if (killedFauna.length) {
+			this.game.village.artifactSim.addMapArtifact(biome);
+		}
 	},
 
 	getHitRate: function(src, tgt){
@@ -3178,8 +3179,6 @@ dojo.declare("classes.village.Artifact", null, {
 	title: null,
 	preserve: false,
 
-	//exp: 0,
-
 	effects: {},
 
 	//creator: "",
@@ -3187,8 +3186,9 @@ dojo.declare("classes.village.Artifact", null, {
 	description: "",
 
 	artifactTypes: [{
+		//Village and Trading
 		name: "book",
-		dropPools: ["village"],
+		dropPools: ["village", "trade"],
 		title: $I("village.artifact.artifactType.book.title"),
 		effects: {"scienceArtifactMaxRatio" : 0.005, "scienceArtifactRatio" : 0.01, "skillMultiplier" : 0.005},
 		description: [{
@@ -3202,9 +3202,9 @@ dojo.declare("classes.village.Artifact", null, {
 				text: "village.artifact.description.book.program"
 			}
 		]
-	}, {
+	},{
 		name: "painting",
-		dropPools: ["village"],
+		dropPools: ["village", "trade"],
 		title: $I("village.artifact.artifactType.painting.title"),
 		effects: {"cultureArtifactMaxRatio": 0.005, "cultureArtifactRatio": 0.01, "tradeRatio": 0.01},
 		description: [{
@@ -3218,9 +3218,9 @@ dojo.declare("classes.village.Artifact", null, {
 				text: "village.artifact.description.painting.planet"
 			}
 		]
-	}, {
+	},{
 		name: "music",
-		dropPools: ["village"],
+		dropPools: ["village", "trade"],
 		title: $I("village.artifact.artifactType.music.title"),
 		effects: {"faithArtifactRatio": 0.01, "happiness": 1, "festivalRatio": 0.001},
 		description: [{
@@ -3234,9 +3234,9 @@ dojo.declare("classes.village.Artifact", null, {
 			text: "village.artifact.description.music.governmentPolicy"
 		}
 	]
-	}, {
+	},{
 		name: "sculpture",
-		dropPools: ["village"],
+		dropPools: ["village", "trade"],
 		title: $I("village.artifact.artifactType.sculpture.title"),
 		effects: {"faithArtifactMaxRatio": 0.005, "craftRatio": 0.01, "embassyCostReduction": 0.005},
 		description: [{
@@ -3253,9 +3253,9 @@ dojo.declare("classes.village.Artifact", null, {
 				text: "village.artifact.description.sculpture.trait"
 			}
 		]
-	}, {
+	},{
 		name: "tapestry",
-		dropPools: ["village"],
+		dropPools: ["village", "trade"],
 		title: $I("village.artifact.artifactType.tapestry.title"),
 		effects: {"manpowerArtifactMaxRatio": 0.005, "manpowerArtifactRatio": 0.01, "tradeRatio": 0.005},
 		description: [{
@@ -3270,9 +3270,86 @@ dojo.declare("classes.village.Artifact", null, {
 				text: "village.artifact.description.tapestry.religion"
 			}
 		]
+	},
+	//-----------Hunting-----------
+	{
+		name: "fossil",
+		dropPools: ["hunt", "plains"],
+		title: $I("village.artifact.artifactType.fossil.title"),
+		effects: {"unicornsArtifactRatio": 0.01, "manpowerArtifactMaxRatio": 0.005, "coalArtifactRatio": 0.01},
+	},{
+		name: "fossilPrimeval",
+		dropPools: ["hunt", "plains", "spiders"],
+		title: $I("village.artifact.artifactType.fossilPrimeval.title"),
+		effects: {"oilArtifactRatio": 0.01, "manpowerArtifactRatio": 0.01, "mintIvoryRatio": 0.01},
+	},
+	//-----------Tools-----------
+	{
+		name: "toolsHunterAncient",
+		dropPools: ["hunt", "plains", "griffins", "zebras"],
+		title: $I("village.artifact.artifactType.toolsHunterAncient.title"),
+		effects: {"hunterRatio": 0.01, "manpowerArtifactRatio": 0.006, "manpowerArtifactMaxRatio": 0.005},
+	},{ 
+		name: "toolsPrehistoric",
+		dropPools: ["hunt", "plains", "forest"],
+		title: $I("village.artifact.artifactType.toolsPrehistoric.title"),
+		effects: {"catnipArtifactRatio": 0.01, "woodArtifactRatio": 0.005, "mineralsArtifactRatio": 0.01},
+	},{
+		name: "toolsAncinet",
+		dropPools: ["hunt", "hills", "mountain"],
+		title: $I("village.artifact.artifactType.toolsAncinet.title"),
+		effects: {"coalArtifactRatio": 0.01, "ironArtifactRatio": 0.005, "craftRatio": 0.015},
+	},{
+		name: "toolsWoodworking",
+		dropPools: ["forest", "lizards"],
+		title: $I("village.artifact.artifactType.toolsWoodworking.title"),
+		effects: {"woodArtifactRatio": 0.01, "beamCraftRatio": 0.08, "scaffoldCraftRatio": 0.07},
+	},{
+		name: "toolsWriting",
+		dropPools: ["plains", "sharks"],
+		title: $I("village.artifact.artifactType.toolsWriting.title"),
+		effects: {"cultureArtifactRatio": 0.01, "parchmentCraftRatio": 0.1, "manuscriptCraftRatio": 0.05},
+	},{
+		name: "toolsIronCasting",
+		dropPools: ["hills", "griffins", "mountain"],
+		title: $I("village.artifact.artifactType.toolsIronCasting.title"),
+		effects: {"ironArtifactRatio": 0.01, "plateCraftRatio": 0.06, "steelCraftRatio": 0.05},
+	},{
+		name: "toolsCultist",
+		dropPools: ["mountain", "nagas"],
+		title: $I("village.artifact.artifactType.toolsCultist.title"),
+		effects: {"faithRatio": 0.01, "faithArtifactMaxRatio": 0.005, "cultureArtifactMaxRatio": 0.005},
+	},{
+		name: "toolsMasonry",
+		dropPools: ["hills", "mountain", "nagas"],
+		title: $I("village.artifact.artifactType.toolsMasonry.title"),
+		effects: {"slabCraftRatio": 0.1, "megalithCraftRatio": 0.08, "concrateCraftRatio": 0.07},
+	},{
+		name: "toolsPaleontology",
+		dropPools: ["hills", "mountain", "spiders"],
+		title: $I("village.artifact.artifactType.toolsPaleontology.title"),
+		effects: {"mintIvoryRatio": 0.015, "oilArtifactRatio": 0.015, "coalArtifactRatio": 0.015},
+	},{
+		name: "toolsAstrology",
+		dropPools: ["mountain", "dragons"],
+		title: $I("village.artifact.artifactType.toolsAstrology.title"),
+		effects: {"starEventChance": 0.001, "starAutoSuccessChance": 0.002, "scienceArtifactRatio": 0.01},
+	},
+	//-----------Techniques-----------
+	{
+		name: "techniqueSmelting",
+		dropPools: ["hills", "mountain", "griffins"],
+		title: $I("village.artifact.artifactType.techniqueSmelting.title"),
+		effects: {"smelterRatio": 0.012, "goldRatio": 0.008, "steelCraftRatio": 0.06},
+	},{
+		name: "techniqueSmeltingAdvanced",
+		dropPools: ["mountain", "boneForest", "zebras"],
+		title: $I("village.artifact.artifactType.techniqueSmeltingAdvanced.title"),
+		effects: {"calcinerRatio": 0.025, "alloyCraftRatio": 0.025, "titaniumArtifactMaxRatio": 0.005},
 	}],
 
-	constructor: function(game, type, pool, effectCount){ //Use type if a specific type is needed, or pool if we want to select a random one from given pool
+
+	constructor: function(game, type, pools, effectCount){ //Use type if a specific type is needed, or pool if we want to select a random one from given pools
 		var tempArtifactType = null;
 		this.effects = {};
 		this.preserve = false;
@@ -3289,18 +3366,26 @@ dojo.declare("classes.village.Artifact", null, {
 				}
 				
 			}
-		} else if (pool) {
+		} else if (pools) {
 			var typesFiltered = [];
 			for (var i in this.artifactTypes) {
 				var artifactType = this.artifactTypes[i];
-				if (artifactType.dropPools.includes(pool)) {
-					typesFiltered.push(artifactType);
-				}	
+				for (var i in pools) {
+					if (artifactType.dropPools.includes(pools[i])) {
+						typesFiltered.push(artifactType);
+						break;
+					}	
+				}
+
 			}
 			tempArtifactType = typesFiltered[this.rand(typesFiltered.length)];
 		} else {
-			var tempArtifactType = this.artifactTypes[this.rand(this.artifactTypes.length)];
-		}	
+			tempArtifactType = this.artifactTypes[this.rand(this.artifactTypes.length)];
+		}
+
+		if (!tempArtifactType) {
+			tempArtifactType = this.artifactTypes[this.rand(this.artifactTypes.length)];
+		}
 		
 		this.name = tempArtifactType.name;
 		this.title = tempArtifactType.title;
@@ -3342,7 +3427,7 @@ dojo.declare("classes.village.Artifact", null, {
 		}*/			
 	},
 
-	getRandomItem: function(pool, game) {
+	/*getRandomItem: function(pool, game) {
 		var tempPool = [];
 		for (var i = 0; pool.length > i; i++) {
 			switch (pool[0]) {
@@ -3482,7 +3567,7 @@ dojo.declare("classes.village.Artifact", null, {
 			
 			return tempPool[this.rand(tempPool.length)];
 		}
-	},
+	},*/
 
 	rand: function(ratio){
 		return (Math.floor(Math.random() * ratio));
@@ -3493,18 +3578,23 @@ dojo.declare("classes.village.ArtifactSim", null, {
 
 	game: null,
 	artifacts: null,
-
-	huntArtifactsPerTick: 0.05,
-	hunterRatioArtifact: 5, //Will decide if an extra effect is given when discovering artifact through hunting
-
-	tradeArtifactsPerTick: 0.05,
-	tradeArtifact: 100, //Will decide if an extra effect is given when discovering artifact through hunting
+	
+	
 
 	maxArtifacts: 0,
 	huntArtifactProgress : 0,
-	tradeArtifactProgress: 0,
-	maxPreserved: 0,
+	huntArtifactsPerTick: 0.002,
+	hunterRatioArtifact: 5, //Will decide if an extra effect is given when discovering artifact through hunting
 
+	tradeArtifactProgress: 0,
+	tradeArtifactsPerTick: 0.002,
+	tradeArtifact: 100, //Will decide if an extra effect is given when discovering artifact through trading
+
+	mapArtifactProgress: 0,
+	mapArtifactProgressMax: 10, //How many fauna need to be killed for an artifact, affected by terrain penalty and level
+	mapArtifactCondition: 1, //Will decide if an extra effect is given when gaining artifact through the map. affected by biome penalty and level
+
+	maxPreserved: 0,
 	activeArtifacts: 0,
 	preservedArtifacts: 0,
 
@@ -3534,9 +3624,6 @@ dojo.declare("classes.village.ArtifactSim", null, {
 	},
 
 	addArtifact: function(type, pool, effectCount, msg) {
-		if (!this.game.science.get("drama").researched) {
-			return false;
-		}
 		var artifact = new classes.village.Artifact(this.game, type, pool, effectCount); //
 		this.artifacts.unshift(artifact);
 		this.refreshArtifactGroups();
@@ -3594,7 +3681,7 @@ dojo.declare("classes.village.ArtifactSim", null, {
 					effectCount++;
 				}
 			} 
-			if (this.addArtifact(null,null,effectCount, $I("village.msg.artifact.hunt"))) {
+			if (this.addArtifact(null,["hunt"],effectCount, $I("village.msg.artifact.hunt"))) {
 				this.huntArtifactProgress = 0;
 				return true;
 			}
@@ -3613,11 +3700,41 @@ dojo.declare("classes.village.ArtifactSim", null, {
 					effectCount++;
 				}
 			}
-			if (this.addArtifact(null,null,effectCount, $I("village.msg.artifact.trade"))) {
+			 //60% Chance to get race specific artifact instead of generic trade artifact
+			var pool = null;
+			if (Math.random() > 0.6) {
+				pool = race.name;
+			} else {
+				pool = "trade";
+			}
+			if (this.addArtifact(null,[pool],effectCount, $I("village.msg.artifact.trade"))) {
 				this.tradeArtifactProgress = 0;
 				return true;
 			}
 		}
+		return false;
+	},
+
+	addMapArtifact: function(biome){
+		var progress = biome.terrainPenalty * (1 + biome.on/10); //Terrain penalty and level affect progress
+		this.mapArtifactProgress += progress;
+		
+		if (this.mapArtifactProgress >= this.mapArtifactProgressMax && this.getFreeArtifactSlot()) {
+			var effectChance = 0.1 + biome.on * 0.05; //Small chance increased by biome level
+			var effectCount = 1;
+			
+			for (var i = 2; i > 0; i--) { // Can give up to 2 extra effects based on biome level
+				var mapArtifactRandom = Math.random() * this.mapArtifactCondition;
+				if (effectChance > mapArtifactRandom) {
+					effectCount++;
+				}
+			}
+			if (this.addArtifact(null,[biome.name],effectCount, $I("village.msg.artifact.map", [biome.title]))) {
+				this.mapArtifactProgress = 0;
+				return true;
+			}
+		}
+		this.mapArtifactProgress = Math.min(this.mapArtifactProgressMax, this.mapArtifactProgress);
 		return false;
 	},
 
@@ -3712,8 +3829,7 @@ dojo.declare("com.nuclearunicorn.game.ui.MuseumPanel", com.nuclearunicorn.game.u
 		}, this.contentDiv);
 
 		this.renderProgressDiv(this.progressDiv);
-		this.activeArtifactList.render(this.artifactListsDiv);
-		this.preservedArtifactList.render(this.artifactListsDiv);
+		this.renderArtifactLists(this.artifactListsDiv);
 	},
 
 	refresh: function(){
@@ -3725,11 +3841,14 @@ dojo.declare("com.nuclearunicorn.game.ui.MuseumPanel", com.nuclearunicorn.game.u
 	renderArtifactLists: function(container){
 		dojo.empty(this.artifactListsDiv);
 		this.activeArtifactList.render(this.artifactListsDiv);
-		this.preservedArtifactList.render(this.artifactListsDiv);	
+		if (this.game.prestige.getPerk("remembrance").researched) {
+			this.preservedArtifactList.render(this.artifactListsDiv);	
+		}
 	},
 
 	renderProgressDiv: function(container) {		
 		dojo.empty(this.progressDiv);
+
 		var huntProgress = $I("village.museum.panel.hunt.progress") + ": [" + ( this.artifactSim.huntArtifactProgress * 100 ).toFixed()  + "%]";
 		var tradeProgress = $I("village.museum.panel.trade.progress") + ": [" + ( this.artifactSim.tradeArtifactProgress * 100 ).toFixed()  + "%]";
 
@@ -3924,11 +4043,11 @@ dojo.declare("classes.ui.village.ArtifactList", com.nuclearunicorn.game.ui.Panel
 
 			var effects = artifact.effects;
 			content.innerHTML = artifact.title + "<br>";
-			
+			var remembrance = this.game.prestige.getPerk("remembrance").researched;
 			for (var effect in effects) {
-				var displayParams = this.game.getEffectDisplayParams(effect, effects[effect] * artifact.val, true, true /*showIfLocked*/);
+				var displayParams = this.game.getEffectDisplayParams(effect, effects[effect] * artifact.val, true, remembrance /*showIfLocked*/);
 				if (!displayParams) {
-					textToDisplay += $I("village.museum.artifact.discovered"); // Display if affected resource is not yet unlocked
+					textToDisplay += $I("village.museum.artifact.discovered" + "<br>"); // Display if affected resource is not yet unlocked
 				} else {
 					textToDisplay += /*artifact.description + "<br>" + */displayParams.displayEffectName + ": " + displayParams.displayEffectValue
 					+ "<br>"/* + $I("village.artifact.creator") + ": " + artifact.creator*/
@@ -6645,7 +6764,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		//--------------- artifacts ------------------
 		this.museumPanel = new com.nuclearunicorn.game.ui.MuseumPanel($I("village.panel.artifacts"), this.game.village, this.game);
 		var museumPanelConatiner = this.museumPanel.render(tabContainer);
-		if (!this.game.science.get("drama").researched){
+		if (!this.game.science.get("archeologyArtifact").researched){
 			this.museumPanel.setVisible(false);
 		}
 		
@@ -6697,7 +6816,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		this.jobsPanel.setVisible(!jobsHidden);
 
 		if (this.museumPanel) {
-			if (this.game.village.artifactSim.artifacts.length || this.game.science.get("drama").researched) {
+			if (this.game.village.artifactSim.artifacts.length || this.game.science.get("archeologyArtifact").researched) {
 				this.museumPanel.setVisible(true);
 				this.museumPanel.update();
 			}

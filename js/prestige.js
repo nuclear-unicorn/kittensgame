@@ -293,27 +293,26 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 	//---------------------------------------------------
 
 	{
-        name: "treasury",
-        label: $I("prestige.treasury.label"),
-        description: $I("prestige.treasury.desc"),
+        name: "remembrance",
+        label: $I("prestige.remembrance.label"),
+        description: $I("prestige.remembrance.desc"),
         prices: [{ name: "paragon", val: 5 }],
         unlocked: true,
-		defaultUnlocked: true,
         researched: false,
         effects:{
             "maxArtifacts" : 3,
 			"maxArtifactsPreserved": 3
         },
 		unlocks: {
-			"perks": ["vault"]
+			"perks": ["treasury"]
 		}
     },
 
-		{
-        name: "vault",
-        label: $I("prestige.vault.label"),
-        description: $I("prestige.vault.desc"),
-        prices: [{ name: "paragon", val: 25 }],
+	{
+		name: "treasury",
+        label: $I("prestige.treasury.label"),
+        description: $I("prestige.treasury.desc"),
+		prices: [{ name: "paragon", val: 100 }],
         unlocked: false,
         researched: false,
         effects:{
@@ -321,15 +320,31 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			"maxArtifactsPreserved": 2
         },
 		unlocks: {
-			"perks": ["hoard"]
+			"perks": ["vault"]
 		}
     },
 
-		{
-        name: "hoard",
-        label: $I("prestige.hoard.label"),
-        description: $I("prestige.hoard.desc"),
-        prices: [{ name: "paragon", val: 50 }],
+	{
+        name: "vault",
+        label: $I("prestige.vault.label"),
+        description: $I("prestige.vault.desc"),
+        prices: [{ name: "paragon", val: 200 }],
+        unlocked: false,
+        researched: false,
+        effects:{
+            "maxArtifacts" : 1,
+			"maxArtifactsPreserved": 1
+        },
+		unlocks: {
+			"perks": ["reliquary"]
+		}
+    },
+
+	{
+        name: "reliquary",
+        label: $I("prestige.reliquary.label"),
+        description: $I("prestige.reliquary.desc"),
+        prices: [{ name: "paragon", val: 500 }],
         unlocked: false,
         researched: false,
         effects:{
@@ -338,6 +353,22 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
         },
 		unlocks: {
 			"perks": ["hoard"]
+		}
+    },
+
+	{
+        name: "hoard",
+        label: $I("prestige.hoard.label"),
+        description: $I("prestige.hoard.desc"),
+        prices: [{ name: "paragon", val: 1000}],
+        unlocked: false,
+        researched: false,
+        effects:{
+            "maxArtifacts" : 1,
+			"maxArtifactsPreserved": 1
+        },
+		unlocks: {
+			"perks": ["reliquary"]
 		}
     },
 
