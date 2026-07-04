@@ -3494,10 +3494,10 @@ dojo.declare("classes.village.ArtifactSim", null, {
 	game: null,
 	artifacts: null,
 
-	huntArtifactsPerTick: 0.2,
+	huntArtifactsPerTick: 0.05,
 	hunterRatioArtifact: 5, //Will decide if an extra effect is given when discovering artifact through hunting
 
-	tradeArtifactsPerTick: 0.2,
+	tradeArtifactsPerTick: 0.05,
 	tradeArtifact: 100, //Will decide if an extra effect is given when discovering artifact through hunting
 
 	maxArtifacts: 0,
@@ -3683,11 +3683,12 @@ dojo.declare("com.nuclearunicorn.game.ui.MuseumPanel", com.nuclearunicorn.game.u
 
 	activeArtifactList: null,
 	preservedArtifactList: null,
+	artifactSim: null,
 
 	constructor: function(name, village, game){
-		this.tabManager = village;
 		this.game = game;
-		
+		this.tabManager = village;
+		this.artifactSim = game.village.artifactSim;
 
 		//This panel only shows artifacts that are active
 		this.activeArtifactList = new classes.ui.village.ArtifactList($I("village.artifactList.active.title"), this.tabManager, game, "active"); 
@@ -3699,21 +3700,57 @@ dojo.declare("com.nuclearunicorn.game.ui.MuseumPanel", com.nuclearunicorn.game.u
 	render: function(container){
 		this.sortArtifacts();
 		this.inherited(arguments);
-		this.activeArtifactList.render(this.contentDiv);
-		this.preservedArtifactList.render(this.contentDiv);
+		this.progressDiv = dojo.create("div", {	
+			style : {
+				overflow: "hidden"
+			}
+		}, this.contentDiv);
+		this.artifactListsDiv = dojo.create("div", {	
+			style : {
+				overflow: "hidden"
+			}
+		}, this.contentDiv);
+
+		this.renderProgressDiv(this.progressDiv);
+		this.activeArtifactList.render(this.artifactListsDiv);
+		this.preservedArtifactList.render(this.artifactListsDiv);
 	},
 
 	refresh: function(){
-		dojo.empty(this.contentDiv);
 		this.sortArtifacts();
-		this.activeArtifactList.render(this.contentDiv);
-		this.preservedArtifactList.render(this.contentDiv);
-		
+		this.renderProgressDiv(this.progressDiv);
+		this.renderArtifactLists(this.contentDiv);
+	},
+
+	renderArtifactLists: function(container){
+		dojo.empty(this.artifactListsDiv);
+		this.activeArtifactList.render(this.artifactListsDiv);
+		this.preservedArtifactList.render(this.artifactListsDiv);	
+	},
+
+	renderProgressDiv: function(container) {		
+		dojo.empty(this.progressDiv);
+		var huntProgress = $I("village.museum.panel.hunt.progress") + ": [" + ( this.artifactSim.huntArtifactProgress * 100 ).toFixed()  + "%]";
+		var tradeProgress = $I("village.museum.panel.trade.progress") + ": [" + ( this.artifactSim.tradeArtifactProgress * 100 ).toFixed()  + "%]";
+
+		var huntProgressDiv = dojo.create("div", {
+			innerHTML: huntProgress,
+			style: {
+				float: "left"
+			}
+		}, container);
+
+		var tradeProgressDiv = dojo.create("div", {
+			innerHTML: tradeProgress,
+			style: {
+				float: "right"
+			}
+		}, container);
 	},
 
 	sortArtifacts: function(){
-		this.activeArtifacts = this.game.village.artifactSim.getActiveArtifacts(); 
-		this.preservedArtifacts = this.game.village.artifactSim.getPreservedArtifacts();
+		this.activeArtifacts = this.artifactSim.getActiveArtifacts(); 
+		this.preservedArtifacts = this.artifactSim.getPreservedArtifacts();
 
 		if (this.activeArtifactList && this.preservedArtifactList) {
 			this.activeArtifactList.artifacts = this.activeArtifacts;
@@ -3724,6 +3761,7 @@ dojo.declare("com.nuclearunicorn.game.ui.MuseumPanel", com.nuclearunicorn.game.u
 	update: function(){
 		this.activeArtifactList.update();
 		this.preservedArtifactList.update();
+		this.renderProgressDiv(this.progressDiv);
 	}
 
 });

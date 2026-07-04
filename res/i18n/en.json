@@ -2190,6 +2190,8 @@
     "village.msg.starved": "starved to death.",
     "village.museum.btn.preserve": "Preserve Artifact",
     "village.museum.artifact.discovered": "Effect not discovered",
+    "village.museum.panel.hunt.progress": "Hunter Artifact Progress",
+    "village.museum.panel.trade.progress": "Trade Artifact Progress",
     "village.new.bloodstone": "Your hunters have brought you a strange gift",
     "village.new.one.unicorn": "You got a unicorn!",
     "village.new.many.unicorns": "You got {0} unicorns!",
