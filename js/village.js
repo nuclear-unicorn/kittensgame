@@ -735,6 +735,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			hadKittenHunters: this.sim.hadKittenHunters,
 			nextKittenProgress: this.sim.nextKittenProgress,
 			huntArtifactProgress: this.artifactSim.huntArtifactProgress,
+			tradeArtifactProgress: this.artifactSim.tradeArtifactProgress,
 			map: this.map.save(),
 			loadouts: loadouts
 		};
@@ -750,7 +751,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 			this.sim.kittens = [];
 			this.game.village.traits = [];
-			this.artifactSim.artifacts = []
+			this.artifactSim.artifacts = [];
 
 			for (var i = kittens.length - 1; i >= 0; i--) {
 				var kitten = kittens[i];
@@ -767,7 +768,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 				}
 				this.sim.kittens.unshift(newKitten);
 			}
-			if(saveData.village.artifacts) {
+			if (saveData.village.artifacts) {
 				this.artifactSim.artifacts = saveData.village.artifacts;
 			}
 
@@ -791,6 +792,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			this.sim.hadKittenHunters = (saveData.village.hadKittenHunters === undefined) ? true: saveData.village.hadKittenHunters;
 			this.sim.nextKittenProgress = saveData.village.nextKittenProgress || 0;
 			this.artifactSim.huntArtifactProgress = saveData.village.huntArtifactProgress || 0;
+			this.artifactSim.tradeArtifactProgress = saveData.village.tradeArtifactProgress || 0;
 			if (saveData.village.map){
 				this.map.load(saveData.village.map);
 			}
@@ -932,7 +934,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			this.game.challenges.getChallenge("pacifism").unlocked = true;
 		}
 
-		this.game.village.artifactSim.addHuntArtifact()//Discover artifact if enough time passed in artifactSim
+		this.game.village.artifactSim.addHuntArtifact(); //Discover artifact if enough time passed in artifactSim
 
 		var unicorns = this.game.resPool.addResEvent("unicorns", this.game.math.binominalRandomInteger(squads, this.getHuntUnicornChance()));
 		if (unicorns > 0) {
@@ -3057,7 +3059,7 @@ dojo.declare("classes.village.ui.artifacts.CherishBtn", com.nuclearunicorn.game.
 		if (artifact.preserve) {
 			if (artifact.on == 0) {
 				this.rememberLink = this.addLink(this.model.rememberLink);
-				this.forgetLink = this.addLink(this.model.forgetLink)
+				this.forgetLink = this.addLink(this.model.forgetLink);
 			} else if (artifact.on > 0) {
 				this.storeLink = this.addLink(this.model.storeLink);
 			}
@@ -3154,7 +3156,7 @@ dojo.declare("classes.village.ui.artifacts.CherishController", com.nuclearunicor
 		this.inherited(arguments);
 		this.artifact.val++;
 		if (this.artifact.on > 0) {
-			this.artifact.on = this.artifact.val
+			this.artifact.on = this.artifact.val;
 		}
 	},
 
@@ -3287,15 +3289,15 @@ dojo.declare("classes.village.Artifact", null, {
 				}
 				
 			}
-		}else if (pool) {
+		} else if (pool) {
 			var typesFiltered = [];
 			for (var i in this.artifactTypes) {
 				var artifactType = this.artifactTypes[i];
 				if (artifactType.dropPools.includes(pool)) {
-					typesFiltered.push(artifactType)
+					typesFiltered.push(artifactType);
 				}	
 			}
-			tempArtifactType = typesFiltered[this.rand(typesFiltered.length)]
+			tempArtifactType = typesFiltered[this.rand(typesFiltered.length)];
 		} else {
 			var tempArtifactType = this.artifactTypes[this.rand(this.artifactTypes.length)];
 		}	
@@ -3307,13 +3309,13 @@ dojo.declare("classes.village.Artifact", null, {
 		for (var i in tempArtifactType.effects) {
 			effects.push(i);
 		}
-		var effectCount = Math.min(effectCount, effects.length)
+		var effectCount = Math.min(effectCount, effects.length);
 		for (var i = 0; i < effectCount; i++) {
 
 			var randomEffect = this.rand(effects.length);
 			var key = effects[randomEffect];
 			this.effects[key] = tempArtifactType.effects[key];
-			effects.splice(randomEffect, 1)
+			effects.splice(randomEffect, 1);
 		}
 
 		this.run = game.stats.getStat("totalResets").val + 1;
@@ -3343,7 +3345,7 @@ dojo.declare("classes.village.Artifact", null, {
 	getRandomItem: function(pool, game) {
 		var tempPool = [];
 		for (var i = 0; pool.length > i; i++) {
-			switch(pool[0]){
+			switch (pool[0]) {
 				case "technology":
 					var technologies = game.science.techs;
 					for (var j in technologies){
@@ -3384,10 +3386,10 @@ dojo.declare("classes.village.Artifact", null, {
 					var bld = game.bld;
 					for (var j in bld.buildingsData){
 						var building = bld.buildingsData[j];
-						if(building.val){
+						if (building.val){
 							var label = building.label;
-							if(building.stages){
-								if(building.stages){
+							if (building.stages){
+								if (building.stages){
 									label = building.stages[building.stage].label;
 								}
 							}
@@ -3495,8 +3497,12 @@ dojo.declare("classes.village.ArtifactSim", null, {
 	huntArtifactsPerTick: 0.2,
 	hunterRatioArtifact: 5, //Will decide if an extra effect is given when discovering artifact through hunting
 
+	tradeArtifactsPerTick: 0.2,
+	tradeArtifact: 100, //Will decide if an extra effect is given when discovering artifact through hunting
+
 	maxArtifacts: 0,
 	huntArtifactProgress : 0,
+	tradeArtifactProgress: 0,
 	maxPreserved: 0,
 
 	activeArtifacts: 0,
@@ -3517,7 +3523,12 @@ dojo.declare("classes.village.ArtifactSim", null, {
 
 		if (this.huntArtifactProgress < 1) {
 			this.huntArtifactProgress += times * this.huntArtifactsPerTick;
-			this.huntArtifactProgress = Math.min(1, this.huntArtifactProgress)
+			this.huntArtifactProgress = Math.min(1, this.huntArtifactProgress);
+		}
+
+		if (this.tradeArtifactProgress < 1) {
+			this.tradeArtifactProgress += times * this.tradeArtifactsPerTick;
+			this.tradeArtifactProgress = Math.min(1, this.tradeArtifactProgress);
 		}
 
 	},
@@ -3546,7 +3557,7 @@ dojo.declare("classes.village.ArtifactSim", null, {
 			this.refreshArtifactGroups();
 			this.game.villageTab.requestMuseumRefresh();
 		} else {
-			this.game.msg("There is not enough space to remember this artifact TMP")
+			this.game.msg($I("village.msg.artifact.remember"));
 		}
 
 	},
@@ -3564,7 +3575,7 @@ dojo.declare("classes.village.ArtifactSim", null, {
 				this.refreshArtifactGroups();
 				this.game.villageTab.requestMuseumRefresh();
 			} else {
-				this.game.msg("There is not enough space to preserve this artifact TMP")
+				this.game.msg($I("village.msg.artifact.preserve"));
 			}
 		} else {
 			artifact.preserve = false;
@@ -3578,9 +3589,9 @@ dojo.declare("classes.village.ArtifactSim", null, {
 			var hunterRatio = this.game.getEffect("hunterRatio");
 			var effectCount = 1;
 			for (var i = 2; i > 0; i--) { //Can give up to 2 extra effects based on Hunting effectiveness
-				var hunterRatioArtifact = Math.random() * this.hunterRatioArtifact
+				var hunterRatioArtifact = Math.random() * this.hunterRatioArtifact;
 				if (hunterRatio > hunterRatioArtifact) {
-					effectCount++
+					effectCount++;
 				}
 			} 
 			if (this.addArtifact(null,null,effectCount, $I("village.msg.artifact.hunt"))) {
@@ -3588,6 +3599,24 @@ dojo.declare("classes.village.ArtifactSim", null, {
 				return true;
 			}
 
+		}
+		return false;
+	},
+
+	addTradeArtifact: function(race){
+		if (this.tradeArtifactProgress >= 1 && this.getFreeArtifactSlot()) {
+			var effectChance = race.embassyLevel + race.energy/10;
+			var effectCount = 1;
+			for (var i = 2; i > 0; i--) { // Can give up to 2 extra effects based on number of embassies or tenth of leviathan energy
+				var tradeArtifactRandom = Math.random() * this.tradeArtifact;
+				if (effectChance > tradeArtifactRandom) {
+					effectCount++;
+				}
+			}
+			if (this.addArtifact(null,null,effectCount, $I("village.msg.artifact.trade"))) {
+				this.tradeArtifactProgress = 0;
+				return true;
+			}
 		}
 		return false;
 	},
@@ -3612,7 +3641,7 @@ dojo.declare("classes.village.ArtifactSim", null, {
 			for (var effect in artifact.effects) {
 				var effectVal = artifact.effects[effect];
 				var globalEffectsCached = this.game.globalEffectsCached;
-				if(!globalEffectsCached[effect]){
+				if (!globalEffectsCached[effect]){
 					globalEffectsCached[effect] = 0;
 				}
 				globalEffectsCached[effect] += (effectVal * artifact.on);
@@ -3670,15 +3699,15 @@ dojo.declare("com.nuclearunicorn.game.ui.MuseumPanel", com.nuclearunicorn.game.u
 	render: function(container){
 		this.sortArtifacts();
 		this.inherited(arguments);
-		this.activeArtifactList.render(this.contentDiv)
-		this.preservedArtifactList.render(this.contentDiv)
+		this.activeArtifactList.render(this.contentDiv);
+		this.preservedArtifactList.render(this.contentDiv);
 	},
 
 	refresh: function(){
 		dojo.empty(this.contentDiv);
 		this.sortArtifacts();
-		this.activeArtifactList.render(this.contentDiv)
-		this.preservedArtifactList.render(this.contentDiv)
+		this.activeArtifactList.render(this.contentDiv);
+		this.preservedArtifactList.render(this.contentDiv);
 		
 	},
 
@@ -3717,9 +3746,9 @@ dojo.declare("classes.ui.village.ArtifactList", com.nuclearunicorn.game.ui.Panel
 	constructor: function(name, tabManager, game, groupType){
 		this.game = game;
 		this.groupType = groupType;
-		this.panelTitle = name
+		this.panelTitle = name;
 		this.artifacts = [];
-		this.cherishButtons = []
+		this.cherishButtons = [];
 	},
 
 
@@ -3750,10 +3779,10 @@ dojo.declare("classes.ui.village.ArtifactList", com.nuclearunicorn.game.ui.Panel
 		//Button to show or hide total effects
 
 		var toggleText = $I("village.artifactList.effects.hide");
-		var effectBarDisplay = "block"
+		var effectBarDisplay = "block";
 		if (hide){
 			toggleText = $I("village.artifactList.effects.show");
-			var effectBarDisplay = "none"
+			var effectBarDisplay = "none";
 		}
 
 		this.showEffectsHref = dojo.create("a", { 
@@ -3772,7 +3801,7 @@ dojo.declare("classes.ui.village.ArtifactList", com.nuclearunicorn.game.ui.Panel
 			}
 		}, glossaryDiv);
 		var effects = {};
-		for (i = 0; this.artifacts.length > i; i++) {
+		for (var i = 0; this.artifacts.length > i; i++) {
 			for (var effect in this.artifacts[i].effects) {
 				if (!effects[effect]) {
 					effects[effect] = 0;
@@ -3849,7 +3878,7 @@ dojo.declare("classes.ui.village.ArtifactList", com.nuclearunicorn.game.ui.Panel
 			dojo.connect(preserveHref, "onclick", this, dojo.partial(function(game, artifact){
 				game.village.artifactSim.togglePreserveArtifact(artifact);
 			}, this.game, artifact));
-			if (game.getEffect("maxArtifactsPreserved") <= 0 || artifact.on == 0) {
+			if (this.game.getEffect("maxArtifactsPreserved") <= 0 || artifact.on == 0) {
 				preserveHref.style.visibility = "hidden";
 			} else { //Hide preserve button if artifact is preserved and inactive, or if preserve is not unlocked
 				preserveHref.style.visibility = "visible";
@@ -3861,7 +3890,7 @@ dojo.declare("classes.ui.village.ArtifactList", com.nuclearunicorn.game.ui.Panel
 			for (var effect in effects) {
 				var displayParams = this.game.getEffectDisplayParams(effect, effects[effect] * artifact.val, true, true /*showIfLocked*/);
 				if (!displayParams) {
-					textToDisplay += $I("village.museum.artifact.discovered") // Display if affected resource is not yet unlocked
+					textToDisplay += $I("village.museum.artifact.discovered"); // Display if affected resource is not yet unlocked
 				} else {
 					textToDisplay += /*artifact.description + "<br>" + */displayParams.displayEffectName + ": " + displayParams.displayEffectValue
 					+ "<br>"/* + $I("village.artifact.creator") + ": " + artifact.creator*/
@@ -3874,8 +3903,8 @@ dojo.declare("classes.ui.village.ArtifactList", com.nuclearunicorn.game.ui.Panel
 			this.cherishButtons.push(cherishButton);
 		}
 		dojo.connect(this.cherishAllHref, "onclick", this, dojo.partial(function(cherishButtons){ //Used to hide Total effects
-			for(var i in cherishButtons) {
-				var controller = cherishButtons[i].controller
+			for (var i in cherishButtons) {
+				var controller = cherishButtons[i].controller;
 				controller.buyItem(cherishButtons[i].model, event);
 			}
 			this.game.villageTab.requestMuseumRefresh();
@@ -3905,8 +3934,9 @@ dojo.declare("classes.ui.village.ArtifactList", com.nuclearunicorn.game.ui.Panel
 		hidePreservedEffects: true,
 
 	update: function(){
-		for (var i in this.cherishButtons)
-		this.cherishButtons[i].update();
+		for (var i in this.cherishButtons) {
+			this.cherishButtons[i].update();
+		}
 	}
 }),
 

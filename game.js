@@ -5219,7 +5219,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			loadouts.push(_loadout);
 		}
 
-		var artifacts = []
+		var artifacts = [];
 
 		var saveData = {
 			saveVersion: this.saveVersion,
