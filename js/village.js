@@ -156,10 +156,10 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			"tradeBlueprintChance": 0.00015,
 			"tradeSpiceChance":     0.00006,
 			"tradeNormalResChance": 0.00009,
-			//TODO: lackResConvert logic?
 			"cultureConsumptionAmbassadors": 20,
 			"spiceConsumptionAmbassadors": 0.8
 		},
+		lackResConvert: false,
 		calculateEffects: function(self, game) { //Mostly just updating the description, honestly
 			var scalesBasedOnEmbassies = game.getEffect("embassiesPerAmbassadorSlot") > 0; //Boolean variable
 			var baseDescription = $I("village.job.ambassador.desc");
@@ -474,6 +474,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 				 {res: "spice", amt: spiceConsPerTick}],
 				times);
 		}
+		this.getJob("ambassador").lackResConvert = effectScaling < 1;
 
 		this.game.diplomacy.cachedAmbassadorEffects = {};
 		for (var effectName in this.getJob("ambassador").modifiers) {
@@ -4608,6 +4609,21 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButton", com.nuclearunicorn.game.ui.
 		this.unassignLinks = this.addLinkList(this.model.unassignLinks);
 
 		this.assignLinks = this.addLinkList(this.model.assignLinks);
+	},
+
+	update: function () {
+		this.inherited(arguments);
+		var job = this.model.job; //The job object associated with this button
+
+		if (typeof(job.lackResConvert) === "boolean") {
+			dojo.removeClass(this.domNode, "bldEnabled");
+			dojo.removeClass(this.domNode, "bldlackResConvert");
+			if (job.lackResConvert) {
+				dojo.toggleClass(this.domNode, "bldlackResConvert", job.value > 0);
+			} else {
+				dojo.toggleClass(this.domNode, "bldEnabled", job.value > 0);
+			}
+		}
 	}
 });
 
