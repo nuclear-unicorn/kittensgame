@@ -3765,6 +3765,17 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			this.addGlobalModToStack(baselineModifiers, resName);
 		stack.push(baselineModifiers);
 		//<----
+
+		// VILLAGE CONSUMPTION (certain jobs)
+		var resAmbassadorConsumption = this.diplomacy.getAmbassadorEffect(res.name + "ConsumptionAmbassadors");
+		if (resAmbassadorConsumption > 0) {
+			stack.push({
+				name: $I("res.stack.village"),
+				type: "fixed",
+				value: -resAmbassadorConsumption
+			});
+		}
+
 		// +CRAFTING JOB PRODUCTION
 		stack.push({
 			name: $I("res.stack.engineer"),
@@ -3788,7 +3799,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				resConsumption += resConsumption * hapinnessConsumption * (1 + this.getEffect(res.name + "DemandWorkerRatioGlobal")) * (1 - this.village.getFreeKittens() / this.village.sim.kittens.length);
 			}
 		}
+		stack.push({
+			name: $I("res.stack.demand"),
+			type: "fixed",
+			value: resConsumption
+		});
 
+		// BIOME EXPLORATION
 		if (res.name == "manpower"){
 			var biome = this.village.getBiome(this.village.map.currentBiome);
 			if (biome){
@@ -3800,12 +3817,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				});
 			}
 		}
-
-		stack.push({
-			name: $I("res.stack.demand"),
-			type: "fixed",
-			value: resConsumption
-		});
 
 		// TIME extra-compare with this.calcResourcePerTick
 		stack.push({
@@ -4108,8 +4119,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 		return this.getEffect(resName + "Production") * (1 + this.getEffect(resName + "PolicyRatio")) * (1 + this.getEffect("pyramidPerYearRatio"));
 	},
+	//Returns a negative value if something consumes the resource each tick (such as a Smelter)
 	getResourcePerTickConvertion: function(resName) {
-		return this.fixFloatPointNumber(this.getEffect(resName + "PerTickCon"));
+		return this.fixFloatPointNumber(this.getEffect(resName + "PerTickCon") -
+			/*use subtraction because getAmbassadorEffect returns positive value*/
+			this.diplomacy.getAmbassadorEffect(resName + "ConsumptionAmbassadors"));
 	},
 
 	craft: function(resName, value){
