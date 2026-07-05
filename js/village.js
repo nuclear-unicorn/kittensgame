@@ -149,7 +149,16 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		title: $I("village.job.ambassador"),
 		description: $I("village.job.ambassador.desc"),
 		modifiers: {
-			//TODO: Give ambassadors some interesting effects in exchange for consuming resources
+			//TODO: add/remove/modify effects until you feel like they are balanced
+			//TODO: i18n names for ALL these effects
+			"embassyEffectCap": 0.004,
+			//TODO: trade volume effect, MULTIPLICATIVE with game.getEffect(tradeVolume)
+			"tradeBlueprintChance": 0.00015,
+			"tradeSpiceChance":     0.00006,
+			"tradeNormalResChance": 0.00009,
+			//TODO: lackResConvert logic?
+			"cultureConsumptionAmbassadors": 20,
+			"spiceConsumptionAmbassadors": 0.8
 		},
 		calculateEffects: function(self, game) { //Mostly just updating the description, honestly
 			var scalesBasedOnEmbassies = game.getEffect("embassiesPerAmbassadorSlot") > 0; //Boolean variable
@@ -439,9 +448,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 		//calculate production and happiness modifiers
 		this.updateHappines();
-
-        //XXX FW7: add some messeging system? Get rid of direct UI update calls completely?
-		//this.game.ui.updateFastHunt();
+		this.actionAmbassadors(1);
 
 		this.map.update();
 
@@ -451,8 +458,38 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		}
 	},
 
+	//Attempt to consume resources with ambassadors.  Call this once per tick, every tick.
+	//Scale ambassador effects based on the amount of resource SUCCESSFULY consumed.
+	//@param times	number	If set equal to zero, no resources will be consumed & ambassador effects will be set to full strength.
+	actionAmbassadors: function(times) {
+		var villageEffectsMap = this.getResProduction();
+		var cultureConsPerTick = villageEffectsMap["cultureConsumptionAmbassadors"] || 0;
+		var spiceConsPerTick = villageEffectsMap["spiceConsumptionAmbassadors"] || 0;
+		var effectScaling = 1; //Scales ALL effects of ambassadors based on whether or not we can afford them
+
+		//Consume culture & spice
+		if (cultureConsPerTick > 0 || spiceConsPerTick > 0 && times > 0) {
+			effectScaling = this.game.resPool.getAmtDependsOnStock(
+				[{res: "culture", amt: cultureConsPerTick},
+				 {res: "spice", amt: spiceConsPerTick}],
+				times);
+		}
+
+		this.game.diplomacy.cachedAmbassadorEffects = {};
+		for (var effectName in this.getJob("ambassador").modifiers) {
+			var effectAmt = effectScaling * (villageEffectsMap[effectName] || 0);
+			if (effectName.includes("Chance")) {
+				//All additive bonuses to probabilities are limited to +25% chance.
+				//This applies before the effect of embassies.
+				effectAmt = this.game.getLimitedDR(effectAmt, 0.25);
+			}
+			this.game.diplomacy.cachedAmbassadorEffects[effectName] = effectAmt;
+		}
+	},
+
 	fastforward: function(daysOffset){
 		var times = daysOffset * this.game.calendar.ticksPerDay;
+		this.actionAmbassadors(times);
 		//calculate kittens
 		var kittensPerTick = this.calculateKittensPerTick();
 		this.sim.maxKittens = this.calculateSimMaxKittens();

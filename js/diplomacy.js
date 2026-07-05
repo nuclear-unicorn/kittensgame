@@ -10,6 +10,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	baseGoldCost: 15,
 	baseManpowerCost: 50,
 
+	cachedAmbassadorEffects: null, //We need to cache this separately from globalEffectsCached because, I dunno, reasons.  ???  I guess there just are problems with how globalEffectsCached is recalculated, & we want these cached effects to update every tick.
+
 	nonRandomTrades: 0, //Way to prevent using the undo feature to exploit RNG
 	nonRandomResetDays: 0, //nonRandomTrades will get reset to 0 after enough game-days have passed
 
@@ -33,6 +35,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			}},
 			{name: "beam", value: 10, chance: 0.25, width: 0.15, minLevel: 5},
 			{name: "scaffold", value: 1, chance: 0.1, width: 0.1, minLevel: 10}
+			//TODO: give each race a resource with negative base chance, requiring ambassadors to unlock trade
+			//TODO: give each trade resource some seasonal variation because it's a cool & underutilized mechanic
 		],
 		collapsed: false,
 		pinned: false
@@ -206,6 +210,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 	constructor: function(game){
 		this.game = game;
+		this.cachedAmbassadorEffects = {};
 	},
 
 	get: function(raceName){
@@ -258,6 +263,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 		this.nonRandomTrades = 0;
 		this.nonRandomResetDays = 0;
+		this.cachedAmbassadorEffects = {};
 	},
 
 	save: function(saveData){
@@ -278,6 +284,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 		this.nonRandomTrades = 0; //Don't preserve this in the save-state (has very little meaningful gameplay value)
 		this.nonRandomResetDays = 0;
+		this.cachedAmbassadorEffects = {};
 	},
 
 	hasUnlockedRaces: function(){
@@ -309,6 +316,10 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		var hasHighEnoughEmbassyLevel = !sell.minLevel || race.embassyLevel >= sell.minLevel;
 		var isResourceTradeable = this.game.resPool.get(resName).unlocked || resName === "uranium" || race.name === "leviathans";
 		return hasHighEnoughEmbassyLevel && isResourceTradeable;
+	},
+
+	getAmbassadorEffect: function(effectName) {
+		return this.cachedAmbassadorEffects[effectName] || 0;
 	},
 
 	unlockRandomRace: function(){
@@ -788,10 +799,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 
 		//-------------- 10% chance to get blueprint ---------------
-		var blueprintTradeChance = 0.1;
-		if (race.name == "nagas") {
-			blueprintTradeChance += this.game.getEffect("nagaBlueprintTradeChance");
-		}
+		var blueprintTradeChance = this.getBlueprintTradeChance(race);
 		var eligibleForBlueprint = successfullTradeAmount;
 		if (blueprintTradeChance < 1 && this.nonRandomTrades) { //Non-random trades won't give blueprints unless it's guaranteed
 			eligibleForBlueprint = Math.max(successfullTradeAmount - this.nonRandomTrades, 0);
@@ -963,9 +971,19 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			return race.standing + bonusStanding / 2;
 		}
 	},
+	getBlueprintTradeChance: function(race) {
+		var retVal = 0.1 + this.getAmbassadorEffect("tradeBlueprintChance");
+		if (race.name == "nagas") {
+			retVal += this.game.getEffect("nagaBlueprintTradeChance");
+		}
+		return retVal;
+	},
+	//Spice is a unique resource in that if the chance exceeds 100%, it'll act as a multiplier to spice gain amounts.
+	//No other resource acts in this way.
 	getSpiceTradeChance: function(race) {
 		var embassyEffect = this.game.ironWill ? 0.0025 : 0.01;
-		return 0.35 * (1 + (race.embassyPrices ?  race.embassyLevel * embassyEffect : 0));
+		var baseChance = 0.35 + this.getAmbassadorEffect("tradeSpiceChance");
+		return baseChance * (1 + (race.embassyPrices ?  race.embassyLevel * embassyEffect : 0));
 	},
 	getResourceTradeChance: function(sellResourceOpts, race) {
 		var embassyEffect = this.game.ironWill ? 0.0025 : 0.01;
@@ -973,11 +991,16 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		if (!this.game.diplomacy.isValidTrade(sellResourceOpts, race)) {
 			return 0;
 		}
+		var baseChance = sellResourceOpts.chance + this.getAmbassadorEffect("tradeNormalResChance");
+		if (baseChance <= 0) {
+			//This way we can have resources with a negative chance in sellResourceOpts, & only Ambassadors can unlock them.
+			return 0;
+		}
 		//Else, chance is based on embassy level:
-		return sellResourceOpts.chance *
+		return baseChance *
 				(1 + (
 					race.embassyPrices ?
-					this.game.getLimitedDR(race.embassyLevel * embassyEffect, 0.75) :
+					this.game.getLimitedDR(race.embassyLevel * embassyEffect, 0.75 + this.getAmbassadorEffect("embassyEffectCap")) :
 					0)
 				);
 	},
@@ -1544,13 +1567,14 @@ var EmbassyButtonHelper = {
 	renderResourceChances: function(tooltip, game, race) {
 		//Build a list of each resource whose chance depends on embassies:
 		var chancesToDisplay = [];
+		var ambassadorBonus = game.diplomacy.getAmbassadorEffect("tradeNormalResChance");
 		for (var i = 0; i < race.sells.length; i += 1) {
 			var sellOptions = race.sells[i]; //Example: {name: "slab", value: 5, chance: 0.75, width: 0.15, minLevel: 5}
 			var sellResource = game.resPool.get(sellOptions.name); //Actual resources object.
 			if (!sellResource.unlocked) {
 				continue; //Don't display a resource that's not unlocked yet.
 			}
-			if (sellOptions.chance >= 1) {
+			if (sellOptions.chance + ambassadorBonus >= 1) {
 				continue; //Chance is fixed at 100%, therefore not based on embassies, so don't display.
 			}
 			var sellChance = Math.min(game.diplomacy.getResourceTradeChance(sellOptions, race), 1); //Cap at 100%
