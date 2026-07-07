@@ -1443,6 +1443,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"activeHG": 0
 		},
 		unlocked: false,
+		upgrades: {
+			jobs: ["ambassador"]
+		},
 		unlocks: {
 			challenges: ["postApocalypse"]
 		},

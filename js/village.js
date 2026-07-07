@@ -170,6 +170,9 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 				limitDescription = $I("village.job.ambassador.limit.calculated", [computedLimit]);
 			}
 			self.description = baseDescription + "<br>" + limitDescription;
+			if (game.religion.getTU("holyGenocide").val > 0) {
+				self.description += "<br>" + $I("village.job.notAffectedHG");
+			}
 		},
 		value: 0,
 		unlocked: false
@@ -479,9 +482,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		this.game.diplomacy.cachedAmbassadorEffects = {};
 		for (var effectName in this.getJob("ambassador").modifiers) {
 			var effectAmt = effectScaling * (villageEffectsMap[effectName] || 0);
-			if (effectName.includes("Chance")) {
-				//All additive bonuses to probabilities are limited to +25% chance.
-				//This applies before the effect of embassies.
+			if (effectName.length > 6 && effectName.substring(effectName.length - 6) == "Chance") {
+				//Probability-related effects are subject to diminishing returns, for balance reasons
 				effectAmt = this.game.getLimitedDR(effectAmt, 0.25);
 			}
 			this.game.diplomacy.cachedAmbassadorEffects[effectName] = effectAmt;

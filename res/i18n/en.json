@@ -2100,6 +2100,7 @@
     "village.job.miner": "Miner",
     "village.job.miner.desc": "+0.25 mineral per second",
     "village.job.miner.flavor": "I don't really understand how can I hold a pick with my paws",
+    "village.job.notAffectedHG": "Not affected by Holy Genocides.",
     "village.job.priest": "Priest",
     "village.job.priest.desc": "+0.0075 faith per second",
     "village.job.scholar": "Scholar",
