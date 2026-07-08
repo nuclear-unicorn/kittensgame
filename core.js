@@ -12,7 +12,13 @@ if (document.all && !window.localStorage) {
     window.LCstorage.removeItem = function () { };
 }
 
-dojo.declare("com.nuclearunicorn.core.Control", null, {
+/**
+ * The result of dojo.declare is captured in a plain global var so the type
+ * checker can infer the class shape from the object literal and follow the
+ * inheritance chain. dojo.declare still registers the dotted path
+ * (com.nuclearunicorn.core.Control) exactly as before.
+ */
+var Control = dojo.declare("com.nuclearunicorn.core.Control", null, {
 	//Base control class. Must be a superclass for all game components.
 });
 
@@ -29,7 +35,7 @@ dojo.declare("com.nuclearunicorn.core.Control", null, {
  * A base class for every tab manager component like science, village, bld, etc
  * Ideally every manager should be a subclass of a TabManager. See reference implementation in religion.js
  */
-dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Control, {
+var TabManager = dojo.declare("com.nuclearunicorn.core.TabManager", Control, {
 
 	/**
 	 * This may not be obvious, but all objects instantiated there will be STATIC and shared among all the instances of the class.
@@ -47,9 +53,19 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 
 	//effectsCachedExisting is a table of the names of every possible effect on each item in this game tab.
 	//If an effect somehow isn't in here, the TabManager doesn't know it exists.
+	/** @type {Record<string, number>} */
 	effectsCachedExisting: null,
+	/** @type {{meta: any[], provider?: {getEffect: (item: any, effectName: string) => number}}[]} */
 	meta: null,
+	/** @type {Record<string, {collapsed: boolean}>} */
 	panelData: null,
+
+	//Declared by subclasses; listed here so the base methods that rely on
+	//them (updateEffectCached, etc.) are part of the checked contract.
+	/** @type {any} TODO: type as the GamePage class once game.js is converted */
+	game: null,
+	/** @type {Record<string, number>} */
+	effectsBase: null,
 
 	/**
 	 * Constructors are INHERITED automatically and CHAINED in the class hierarchy
@@ -1392,7 +1408,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 	}
 });
 
-ButtonModernHelper = {
+var ButtonModernHelper = {
 	getTooltipHTML : function(controller, model){
 		//Some aspects of the metadata may have changed, so fetch the latest version of the model:
 		model = controller.fetchModel(model.options);
@@ -2641,7 +2657,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab", [com.nuclearunicorn.game.ui.Conte
  * 	html
  * }
  */
-UIUtils = {
+var UIUtils = {
 	attachTooltip: function(game, container, topPosition, leftPosition, htmlProvider) {
 		var gameNode = dojo.byId("game");
 		var tooltip = dojo.byId("tooltip");
