@@ -4100,17 +4100,31 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	craftAll: function(resName){
-		// some way to protect people from refining all catnip during the winter
-		if (resName != "wood" || this.getResourcePerTick("catnip", true) > 0) {
-			this.workshop.craftAll(resName);
-			this.updateResources();
-		} else {
+		if (resName == "wood"){
 			var game = this;
-			this.ui.confirm($I("kittens.craft.confirmation.title"), $I("kittens.craft.confirmation.msg"), function() {
-				game.workshop.craftAll(resName);
-				game.updateResources();
-			});
+			// some way to protect people from refining all catnip during the winter
+			if (this.getResourcePerTick("catnip", true) < 0){
+				this.ui.confirm($I("kittens.craft.confirmation.title"), $I("kittens.craft.confirmation.msg"), function() {
+					game.workshop.craftAll(resName);
+					game.updateResources();
+				});
+				return;
+			}
+			var calendar = this.calendar,
+                winterDays = calendar.daysPerSeason -
+                (calendar.getCurSeason().name === "winter" ? calendar.day : 0);
+            var catnipPerTick = game.winterCatnipPerTick;
+			// adviser will advise against spending so much catnip that you couldn't survive the winter!
+			if ((0 + winterDays * catnipPerTick * calendar.ticksPerDay) <= 0){
+				this.ui.confirm($I("kittens.craft.confirmation.title"), $I("general.food.advisor.text"), function() {
+					game.workshop.craftAll(resName);
+					game.updateResources();
+				});
+				return;
+			}
 		}
+		this.workshop.craftAll(resName);
+		this.updateResources();
 	},
 
 	getRequiredResources: function(bld){
