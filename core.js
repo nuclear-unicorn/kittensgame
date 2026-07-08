@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Workaround for IE9 local storage :V
  *
@@ -284,7 +285,7 @@ var TabManager = dojo.declare("com.nuclearunicorn.core.TabManager", Control, {
 				if (!elem) { continue; }
 
 				for (var fld in savedMetaElem){
-					if (fld == name) {
+					if (fld == "name") {
 						continue;
 					}
 					if (!elem.hasOwnProperty(fld)){
@@ -485,6 +486,8 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 	messageIdCounter: 0,
 	ui: null,
 	game: null,
+	/** @type {Record<string, {title: string, enabled: boolean, unlocked: boolean, defaultUnlocked?: boolean}>} */
+	filters: null,
 
 	constructor: function(game) {
 		this.game = game;
@@ -2422,6 +2425,8 @@ dojo.declare("com.nuclearunicorn.game.ui.ContentRowRenderer", null, {
 
 	leftRow: null,
 	rightRow: null,
+	/** @type {HTMLElement} */
+	content: null,
 
 	initRenderer: function(content){
 		this.content = content;

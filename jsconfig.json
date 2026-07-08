@@ -8,7 +8,6 @@
 		// "lib" is what the CHECKER assumes exists at runtime; it does not
 		// change the shipped code or the supported browsers.
 		"lib": ["es2017", "dom"],
-		"target": "es5",
 		"strict": false,
 		"skipLibCheck": true
 	},
