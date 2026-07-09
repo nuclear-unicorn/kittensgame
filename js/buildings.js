@@ -2236,7 +2236,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		priceRatio: 1.25,
 		zebraRequired: 1,
 		effects: {
-			"zebraMax": 1,
+			"zebrasMax": 1,
 		},
 	},
 	{
