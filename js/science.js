@@ -2425,7 +2425,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 
 dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.BuildingNotStackableBtnController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.tooltipName = true;
 		result.simplePrices = false;
 		return result;
@@ -2445,7 +2445,7 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 			return label + "<div>" + $I("btn.blocked.capital") + "</div>";
 		}
 
-		return this.inherited(arguments);
+		return this.inherited("getName", arguments);
 	},
 	getPrices: function(model){
 		var meta = model.metadata;
@@ -2605,7 +2605,7 @@ dojo.declare("classes.ui.PolicyPanel", com.nuclearunicorn.game.ui.Panel, {
 	toggleBlockedSpan: null,
 
 	render: function(container){
-		var content = this.inherited(arguments),
+		var content = this.inherited("render", arguments),
 			self = this;
 		var msgBox = dojo.create("span", { style: { display: "inline-block", marginBottom: "10px", width: "50%"}}, content);
 		msgBox.innerHTML = $I("msg.policy.exclusivity");
@@ -2684,7 +2684,7 @@ dojo.declare("classes.ui.PolicyPanel", com.nuclearunicorn.game.ui.Panel, {
 dojo.declare("com.nuclearunicorn.game.ui.TechButtonController", com.nuclearunicorn.game.ui.BuildingNotStackableBtnController, {
 
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.tooltipName = true;
 		result.simplePrices = false;
 		return result;

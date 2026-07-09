@@ -2144,7 +2144,7 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		if (!this.biome){
 			this.biome = this.game.village.getBiome(options.id);
 		}
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		model.biome = this.biome;
 
 		return model;
@@ -2290,7 +2290,7 @@ dojo.declare("classes.ui.village.BiomeBtn", com.nuclearunicorn.game.ui.ButtonMod
 
 dojo.declare("classes.village.ui.map.UpgradeHQController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.simplePrices = false;
 		return result;
 	},
@@ -2318,7 +2318,7 @@ dojo.declare("classes.village.ui.map.UpgradeHQController", com.nuclearunicorn.ga
 
 	buyItem: function(model, event) {
 		this.game.ui.render();
-		return this.inherited(arguments);
+		return this.inherited("buyItem", arguments);
 		
 	},
 
@@ -2338,7 +2338,7 @@ dojo.declare("classes.village.ui.map.UpgradeHQController", com.nuclearunicorn.ga
 
 dojo.declare("classes.village.ui.map.UpgradeExplorersController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.simplePrices = false;
 		return result;
 	},
@@ -2366,7 +2366,7 @@ dojo.declare("classes.village.ui.map.UpgradeExplorersController", com.nuclearuni
 
 	buyItem: function(model, event) {
 		this.game.ui.render();
-		return this.inherited(arguments);
+		return this.inherited("buyItem", arguments);
 	},
 
 	incrementValue: function(model) {
@@ -3709,7 +3709,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 dojo.declare("com.nuclearunicorn.game.ui.LoadoutButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.tooltipName = true;
 		return result;
 	},
@@ -3758,7 +3758,7 @@ dojo.declare("com.nuclearunicorn.game.ui.LoadoutButtonController", com.nuclearun
 
 
 	fetchModel: function(options){
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		var self = this;
 		var loadout = model.options.loadout;
 		model.editLinks = [
@@ -3829,13 +3829,13 @@ dojo.declare("com.nuclearunicorn.game.ui.LoadoutButton", com.nuclearunicorn.game
 dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.tooltipName = true;
 		return result;
 	},
 
 	initModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("initModel", arguments);
 		model.job = this.getJob(model);
 		return model;
 	},
@@ -3852,7 +3852,7 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 	},
 
 	getName: function(model){
-		var name = this.inherited(arguments);
+		var name = this.inherited("getName", arguments);
 		return name + " (" + model.job.value + ")";
 	},
 
@@ -3908,7 +3908,7 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 	},
 
 	fetchModel: function(options){
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		var self = this;
 		//We will generate links for assigning/unassigning this many kittens:
 		var LINK_AMOUNTS = [5, 25, 100];
@@ -4678,7 +4678,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CensusPanel", com.nuclearunicorn.game.u
 dojo.declare("classes.village.ui.VillageButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.simplePrices = false;
 		result.hasResourceHover = true;
 		return result;
@@ -4706,7 +4706,7 @@ dojo.declare("classes.village.ui.HuntBtn", com.nuclearunicorn.game.ui.ButtonMode
 
 dojo.declare("classes.village.ui.HuntButtonController", classes.village.ui.VillageButtonController, {
 	fetchModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		var village = this.game.village;
 		//We use bind(village) to ensure that the huntFraction functions work properly.
 		model.fifthLink = this._newLink(model, 5, village.huntFifth.bind(village));
@@ -4773,7 +4773,7 @@ dojo.declare("classes.village.ui.HuntButtonController", classes.village.ui.Villa
 
 dojo.declare("classes.village.ui.FestivalButtonController", classes.village.ui.VillageButtonController, {
 	fetchModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		model.x10Link = this._newLink(10);
 		model.x100Link = this._newLink(100);
 		return model;

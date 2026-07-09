@@ -533,7 +533,7 @@ dojo.declare("classes.ui.AchievementsPanel", com.nuclearunicorn.game.ui.Panel, {
 	},
 
     render: function(container){
-        var content = this.inherited(arguments);
+        var content = this.inherited("render", arguments);
         
 		this.achievementsContainer = dojo.create("div", {}, content);
 
@@ -733,7 +733,7 @@ dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
 	},
 
     render: function(container){
-        var content = this.inherited(arguments);
+        var content = this.inherited("render", arguments);
         
 		var div = dojo.create("div", {className: "badges-container"}, content);
 		div.innerHTML = "";

@@ -2789,7 +2789,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearunicorn.game.ui.BuildingNotStackableBtnController, {
 
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.tooltipName = true;
 		result.simplePrices = false;
 		return result;
@@ -2807,7 +2807,7 @@ dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearun
     },
 
 	getPrices: function(model) {
-		var prices = this.inherited(arguments);
+		var prices = this.inherited("getPrices", arguments);
 
 		if (this.game.challenges.isActive("unicornTears")) {
 			//In the Unicorn Tears Challenge, we give each Workshop upgrade a price of unicorns or unicorn tears based on its weight.
@@ -2881,14 +2881,14 @@ dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearun
 dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.hasResourceHover = true;
 		result.simplePrices = false;
 		return result;
 	},
 
 	initModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("initModel", arguments);
 		model.craft = this.getCraft(model);
 		return model;
 	},
@@ -2915,7 +2915,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 
 			return "<div class=\"label\"><span class=\"label-content\">" + model.craft.label + "</span></div><div>(" + craft.value + ")</div><div class=\"progress\">[" + progressDisplayed + "%]</div>";
 		} else {
-			return this.inherited(arguments);
+			return this.inherited("getName", arguments);
 		}
 	},
 
@@ -2992,7 +2992,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 
 
 	fetchModel: function(options){
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		var self = this;
 		if (this.game.science.get("mechanization").researched) {
 			//We will generate links for assigning/unassigning this many engineers:
@@ -3099,7 +3099,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButton", com.nuclearunicorn.game.u
 dojo.declare("com.nuclearunicorn.game.ui.ZebraUpgradeButtonController", com.nuclearunicorn.game.ui.BuildingNotStackableBtnController, {
 
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.tooltipName = true;
 		result.simplePrices = false;
 		return result;
@@ -3117,7 +3117,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ZebraUpgradeButtonController", com.nucl
 	},
 
 	getPrices: function(model) {
-        return this.game.village.getEffectLeader("scientist", this.inherited(arguments));
+        return this.game.village.getEffectLeader("scientist", this.inherited("getPrices", arguments));
     },
 
 	updateVisible: function(model){

@@ -19,11 +19,38 @@ type MixinInstances<T extends readonly AnyCtor[]> = T extends readonly [
 	? InstanceType<H> & MixinInstances<R>
 	: unknown;
 
-interface DojoInheritable {
+/** Names of S's members that are methods (the ones `inherited` can dispatch to). */
+type SuperMethodNames<S> = {
+	[K in keyof S]: S[K] extends (...a: any[]) => any ? K : never;
+}[keyof S];
+
+interface DojoInheritable<S = {}> {
 	/**
-	 * dojo's dynamic super-call. Which base method it dispatches to is decided
-	 * at runtime, so the checker cannot verify it — it accepts anything and
-	 * returns `any`. This is the one deliberate blind spot of the shim.
+	 * Typed super-call: `this.inherited("save", arguments)`.
+	 *
+	 * dojo 1.6 accepts an explicit method name as the first argument
+	 * (declare.js cracks it with `if(typeof args == "string")`); when the name
+	 * matches the calling method's own name this takes the exact same dispatch
+	 * path as the nameless form. The name is looked up on the SUPERCLASS type
+	 * `S` — that is what `inherited` dispatches to, and it keeps the checker
+	 * out of the circular-inference trap of resolving against `this` while the
+	 * props literal is still being inferred.
+	 *
+	 * Passing a name that differs from the enclosing method's name compiles
+	 * (any super method name is accepted) but is a runtime hazard — always
+	 * pass the enclosing method's own name.
+	 */
+	inherited<K extends SuperMethodNames<S>>(
+		name: K,
+		args: IArguments,
+		newArgs?: S[K] extends (...a: infer A) => any ? A : never
+	): S[K] extends (...a: any[]) => infer R ? R : never;
+
+	/**
+	 * Nameless form: which base method it dispatches to is decided at runtime
+	 * from `arguments.callee`, so the checker cannot verify it — it accepts
+	 * anything and returns `any`. This is the one deliberate blind spot of the
+	 * shim; prefer the name-first form wherever the return value is used.
 	 */
 	inherited(args: IArguments, newArgs?: any[]): any;
 }
@@ -40,15 +67,15 @@ interface DojoDeclare {
 	<B extends AnyCtor, P extends object>(
 		className: string,
 		superclass: B,
-		props: P & ThisType<InstanceType<B> & P & DojoInheritable>
-	): new (...args: any[]) => InstanceType<B> & P & DojoInheritable;
+		props: P & ThisType<InstanceType<B> & P & DojoInheritable<InstanceType<B>>>
+	): new (...args: any[]) => InstanceType<B> & P & DojoInheritable<InstanceType<B>>;
 
 	// dojo.declare("name", [Base, MixinA, MixinB], {...})
 	<B extends readonly AnyCtor[], P extends object>(
 		className: string,
 		superclasses: readonly [...B],
-		props: P & ThisType<MixinInstances<B> & P & DojoInheritable>
-	): new (...args: any[]) => MixinInstances<B> & P & DojoInheritable;
+		props: P & ThisType<MixinInstances<B> & P & DojoInheritable<MixinInstances<B>>>
+	): new (...args: any[]) => MixinInstances<B> & P & DojoInheritable<MixinInstances<B>>;
 }
 
 declare var dojo: {

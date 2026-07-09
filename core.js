@@ -590,7 +590,7 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 	}
 });
 
-dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
+var ButtonController = dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	game: null,
 	controllerOpts: null,
 
@@ -1217,10 +1217,10 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 
 
-dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearunicorn.game.ui.ButtonController, {
+var ButtonModernController = dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", ButtonController, {
 
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 
 		result.simplePrices = true;
 		result.hasResourceHover = false;
@@ -1632,16 +1632,16 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 });
 
 
-dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
+var BuildingBtnController = dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", ButtonModernController, {
 
 	initModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("initModel", arguments);
 		model.metadata = this.getMetadata(model);
 		return model;
 	},
 
 	fetchModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		model.hasSellLink = this.hasSellLink(model);
 		model.showSellLink = model.metadata && model.metadata.val && model.hasSellLink;
 		var self = this;
@@ -1681,8 +1681,8 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 
 
 	getMetadata: function(model){
-		if (this.model.options.building){
-			var meta = this.game.bld.get(this.model.options.building);
+		if (model.options.building){
+			var meta = this.game.bld.get(model.options.building);
 			return meta;
 		}
 		return null;
@@ -2042,9 +2042,9 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 	}
 });
 
-dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nuclearunicorn.game.ui.BuildingBtnController, {
+dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", BuildingBtnController, {
 	defaults: function(){
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.simplePrices = false;
 		result.multiplyEffects = true;
 		return result;
@@ -2324,14 +2324,14 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtn", com.nuclearunico
 
 });
 
-dojo.declare("com.nuclearunicorn.game.ui.BuildingNotStackableBtnController", com.nuclearunicorn.game.ui.BuildingBtnController, {
+dojo.declare("com.nuclearunicorn.game.ui.BuildingNotStackableBtnController", BuildingBtnController, {
 
 	getDescription: function(model){
 		var meta = model.metadata;
 		if (meta.effectDesc && meta.researched){
-			return this.inherited(arguments) + "<br>" + $I("res.effect") + ": " + meta.effectDesc;
+			return this.inherited("getDescription", arguments) + "<br>" + $I("res.effect") + ": " + meta.effectDesc;
 		} else {
-			return this.inherited(arguments);
+			return this.inherited("getDescription", arguments);
 		}
 	},
 
