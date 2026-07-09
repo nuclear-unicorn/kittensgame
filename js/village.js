@@ -151,8 +151,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		modifiers: {
 			//TODO: add/remove/modify effects until you feel like they are balanced
 			//TODO: i18n names for ALL these effects
+			"tradeVolume": 0.0007,
 			"embassyEffectCap": 0.004,
-			//TODO: trade volume effect, MULTIPLICATIVE with game.getEffect(tradeVolume)
 			"tradeBlueprintChance": 0.00015,
 			"tradeSpiceChance":     0.00006,
 			"tradeNormalResChance": 0.00009,

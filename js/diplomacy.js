@@ -740,7 +740,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 
 		var boughtResources = {};
-		var tradeVolume = 1 + this.game.getEffect("tradeVolume");
+		var tradeVolume = this.getTradeVolume();
 		var tradeRatio = 
 			1
 			+ this.game.diplomacy.getTradeRatio()
@@ -861,6 +861,14 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		return (goldCost < 0) ? 0 : goldCost;
 	},
 
+	//Trade volume is a multiplier to the race.buys & race.sells arrays.
+	//It also affects titanium gained from trading with Zebras.
+	//Does not affect special rare resources gained (blueprint, spice).
+	//Note that this function returns 1 by default (with no modifiers active), unlike other ratio calculations that return 0 by default.
+	getTradeVolume: function() {
+		return (1 + this.game.getEffect("tradeVolume")) * (1 + this.getAmbassadorEffect("tradeVolume"));
+	},
+
 	trade: function(race){
 		this.gainTradeRes(this.tradeImpl(race, 1), 1);
 	},
@@ -870,24 +878,22 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		if (!this.hasMultipleResources(race, amt)) {
 			return;
 		}
-		var tradeVolume = 1 + this.game.getEffect("tradeVolume");
 
 		//-------------- pay prices ------------------
 		var manpowerCost = this.getManpowerCost();
 		var goldCost = this.getGoldCost();
 		this.game.resPool.addResEvent("manpower", -manpowerCost * amt);
 		this.game.resPool.addResEvent("gold", -goldCost * amt);
-		this.game.resPool.addResEvent(race.buys[0].name, -race.buys[0].val * amt * tradeVolume);
+		this.game.resPool.addResEvent(race.buys[0].name, -race.buys[0].val * amt * this.getTradeVolume());
 
 		//---------- calculate yield -----------------
 		this.gainTradeRes(this.tradeImpl(race, amt), amt);
  	},
 
 	hasMultipleResources: function(race, amt){
-		var tradeVolume = 1 + this.game.getEffect("tradeVolume");
 		return (this.game.resPool.get("gold").value >= this.getGoldCost() * amt &&
 			this.game.resPool.get("manpower").value >= this.getManpowerCost() * amt &&
-			this.game.resPool.get(race.buys[0].name).value >= race.buys[0].val * amt * tradeVolume);
+			this.game.resPool.get(race.buys[0].name).value >= race.buys[0].val * amt * this.getTradeVolume());
 	},
 
 	tradeAll: function(race){
@@ -926,7 +932,6 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	getMaxTradeAmt: function(race){
 		var manpowerCost = this.getManpowerCost();
 		var goldCost = this.getGoldCost();
-		var tradeVolume = 1 + this.game.getEffect("tradeVolume");
 
 		var amt = [
 			Math.floor(this.game.resPool.get("gold").value /
@@ -935,7 +940,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			Math.floor(this.game.resPool.get("manpower").value / Math.max(
 				manpowerCost, 1)
 			),
-			Math.floor(this.game.resPool.get(race.buys[0].name).value / (race.buys[0].val * tradeVolume))
+			Math.floor(this.game.resPool.get(race.buys[0].name).value / (race.buys[0].val * this.getTradeVolume()))
 		];
 
 		amt[0] += (goldCost > 0) ? 0 : Number.MAX_VALUE;
@@ -1827,7 +1832,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 		dojo.create("div", { class: "clear"}, tabContainer);
 
 		var baseTradeRatio = 1 + this.game.diplomacy.getTradeRatio();
-		var tradeVolume = 1 + this.game.getEffect("tradeVolume");
+		var tradeVolume = this.game.diplomacy.getTradeVolume();
 		var currentSeason = this.game.calendar.getCurSeason().name;
 		for (var i = 0; i < races.length; i++) {
 			var race = races[i];
