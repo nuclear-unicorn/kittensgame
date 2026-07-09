@@ -1070,7 +1070,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
 dojo.declare("classes.ui.time.AccelerateTimeBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
     fetchModel: function(options) {
-        var model = this.inherited(arguments);
+        var model = this.inherited("fetchModel", arguments);
         var self = this;
         model.toggle = {
             title: this.game.time.isAccelerated ? $I("btn.on.minor") : $I("btn.off.minor"),
@@ -1170,13 +1170,13 @@ dojo.declare("classes.ui.TimeControlWgt", [mixin.IChildrenAware, mixin.IGameAwar
 dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 
     defaults: function() {
-        var result = this.inherited(arguments);
+        var result = this.inherited("defaults", arguments);
         result.hasResourceHover = true;
         return result;
     },
 
     fetchModel: function(options) {
-        var model = this.inherited(arguments);
+        var model = this.inherited("fetchModel", arguments);
         model.nextCycleLink = this._newLink(model, this.game.calendar.yearsPerCycle);
         model.previousCycleLink = this._newLink(model, this.game.calendar.yearsPerCycle * (this.game.calendar.cyclesPerEra - 1));
         model.tenErasLink = this._newLink(model, 10 * this.game.calendar.yearsPerCycle * this.game.calendar.cyclesPerEra);
@@ -1205,7 +1205,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
     },
 
     getName: function(model) {
-        var name = this.inherited(arguments);
+        var name = this.inherited("getName", arguments);
         if (this.game.time.heat > this.game.getEffect("heatMax")) {
             name += $I("common.warning");
         }
@@ -1477,7 +1477,7 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
 
 dojo.declare("classes.ui.time.UseHeatBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	fetchModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		model.useAllLink = this._newLink(model, "all");
 		var shatterYearBoost = this.game.getEffect("shatterYearBoost");
 		if (shatterYearBoost){
@@ -1636,7 +1636,7 @@ dojo.declare("classes.ui.time.ChronoforgeBtnController", com.nuclearunicorn.game
     getName: function(model){
         var meta = model.metadata;
         var game = this.game;
-        var label = this.inherited(arguments);
+        var label = this.inherited("getName", arguments);
 
         if (meta.delayTicks > 0) {
             //It's kind of a happy accident that delayTicks has one of 24 different values & that there are 24 clock emoji.
@@ -1657,7 +1657,7 @@ dojo.declare("classes.ui.time.ChronoforgeBtnController", com.nuclearunicorn.game
 			this.game.upgrade({chronoforge: [building.name]});
 	},
 	build: function(model, opts) {
-		var counter = this.inherited(arguments);
+		var counter = this.inherited("build", arguments);
 		if (!counter) {
 			return; //Skip undo if nothing was built
 		}
@@ -1720,12 +1720,12 @@ dojo.declare("classes.ui.time.VoidSpaceBtnController", com.nuclearunicorn.game.u
 		if (meta.name == "cryochambers" && meta.on != meta.val) {
 			return meta.label + " (" + meta.on + "/" + meta.val + ")";
 		} else {
-			return this.inherited(arguments);
+			return this.inherited("getName", arguments);
 		}
 	},
 
 	getPrices: function(model) {
-		var prices = this.inherited(arguments);
+		var prices = this.inherited("getPrices", arguments);
 		if (model.metadata.name == "cryochambers") {
 			for (var i = 0; i < prices.length; i++) {
 				if (prices[i].name == "karma") {
@@ -1737,7 +1737,7 @@ dojo.declare("classes.ui.time.VoidSpaceBtnController", com.nuclearunicorn.game.u
 	},
 
 	build: function(model, opts) {
-		var counter = this.inherited(arguments);
+		var counter = this.inherited("build", arguments);
 		if (!counter) {
 			return; //Skip undo if nothing was built
 		}
@@ -1752,7 +1752,7 @@ dojo.declare("classes.ui.time.VoidSpaceBtnController", com.nuclearunicorn.game.u
 
 dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
     defaults: function() {
-        var result = this.inherited(arguments);
+        var result = this.inherited("defaults", arguments);
         result.hasResourceHover = true;
         return result;
     },

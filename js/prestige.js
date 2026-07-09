@@ -581,7 +581,7 @@ dojo.declare("classes.ui.PrestigeBtnController", com.nuclearunicorn.game.ui.Buil
 
    	buyItem: function(model, event) {
 		if (this.game.science.get("metaphysics").researched) {
-			return this.inherited(arguments);
+			return this.inherited("buyItem", arguments);
 		} else {
 			return {
 				itemBought: false,
@@ -620,7 +620,7 @@ dojo.declare("classes.ui.PrestigePanel", com.nuclearunicorn.game.ui.Panel, {
 	},
 
     render: function(container){
-		var content = this.inherited(arguments);
+		var content = this.inherited("render", arguments);
 
 		var self = this;
 		//---------------------------------------------------------------

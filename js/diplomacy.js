@@ -968,7 +968,7 @@ dojo.declare("classes.diplomacy.ui.RacePanel", com.nuclearunicorn.game.ui.Panel,
 					? "hostile"
 					: "nowNeutral";
 		this.name = this.race.title + " <span class='attitude'>" + $I("trade.attitude." + attitude) + "</span>";
-		return this.inherited(arguments);
+		return this.inherited("render", arguments);
 	},
 
 	update: function(){
@@ -988,7 +988,7 @@ dojo.declare("classes.diplomacy.ui.EldersPanel", classes.diplomacy.ui.RacePanel,
 	feedBtn: null,
 
 	render: function(container){
-		var content = this.inherited(arguments);
+		var content = this.inherited("render", arguments);
 
 		var self = this;
 		this.feedBtn = new com.nuclearunicorn.game.ui.ButtonModern({
@@ -1053,7 +1053,7 @@ dojo.declare("classes.diplomacy.ui.EldersPanel", classes.diplomacy.ui.RacePanel,
 
 dojo.declare("com.nuclearunicorn.game.ui.CrashBcoinButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.hasResourceHover = true;
 		result.simplePrices = true;
 		return result;
@@ -1102,7 +1102,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CrashBcoinButtonController", com.nuclea
 
 dojo.declare("com.nuclearunicorn.game.ui.TradeButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.hasResourceHover = true;
 		result.simplePrices = false;
 		return result;
@@ -1205,7 +1205,7 @@ dojo.declare("com.nuclearunicorn.game.ui.TradeButton", com.nuclearunicorn.game.u
 
 dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.simplePrices = false;
 		return result;
 	},
@@ -1265,7 +1265,7 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 	},
 
 	build: function(model, opts) {
-		var counter = this.inherited(arguments);
+		var counter = this.inherited("build", arguments);
 		if (!counter) {
 			return; //Skip triggers & undo if nothing was built
 		}
@@ -1447,7 +1447,7 @@ dojo.declare("classes.diplomacy.ui.EmbassyButton", com.nuclearunicorn.game.ui.Bu
 
 dojo.declare("classes.diplomacy.ui.autoPinnedButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.hasResourceHover = false;
 		result.simplePrices = false;
 		return result;
@@ -1503,7 +1503,7 @@ dojo.declare("classes.diplomacy.ui.autoPinnedButton", com.nuclearunicorn.game.ui
 
 dojo.declare("classes.trade.ui.SendExplorersButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.hasResourceHover = true;
 		result.simplePrices = false;
 		return result;
