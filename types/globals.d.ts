@@ -26,3 +26,30 @@ declare var gamePage: any;
 declare var $r: any;
 declare var React: any;
 declare var unsafeWindow: any;
+
+/** lz-string (vendored) — save blob compression */
+declare var LZString: {
+	compressToBase64(input: string): string;
+	decompressFromBase64(input: string): string;
+	compressToUTF16(input: string): string;
+	decompressFromUTF16(input: string): string;
+};
+
+/** Dropbox SDK, loaded from a <script> tag in index.html */
+declare var Dropbox: any;
+
+interface Window {
+	/** New Relic browser agent; absent unless the page was served with it */
+	newrelic: any;
+	/** KGNet save blob, parked on window by the Server manager */
+	saveData: any;
+}
+
+interface Performance {
+	/** Non-standard, Chromium-only heap counters */
+	memory?: {
+		usedJSHeapSize: number;
+		totalJSHeapSize: number;
+		jsHeapSizeLimit: number;
+	};
+}
