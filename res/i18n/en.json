@@ -99,7 +99,7 @@
     "btn.all.unassign": "[-all]",
     "btn.aoff.tooltip": "Automation disabled",
     "btn.aon.tooltip": "Automation enabled",
-    "btn.almostlimited.tooltip": "* - Upgrading will disable Autocracy",
+    "btn.almostlimited.tooltip": "* - Upgrading will decrease your Autocracy bonus",
     "btn.pollution.tooltip": "Generates pollution",
     "btn.build": "Build",
     "btn.challenge": "Start Challenge",
