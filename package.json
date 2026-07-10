@@ -1,4 +1,4 @@
-  {
+{
   "name": "kitten-game",
   "version": "14.8.0",
   "description": "A game of kittens",
@@ -36,7 +36,7 @@
     "http-server": "^0.12.3",
     "husky": "^4.2.5",
     "jest": "^26.1.0",
-    "typescript": "^7.0.2"
+    "typescript": "^5"
   },
   "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72"
 }
