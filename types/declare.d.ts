@@ -87,8 +87,19 @@ declare var dojo: {
 	byId(id: string | HTMLElement): HTMLElement;
 	connect(obj: any, event: string, context: any, method?: any, dontFix?: boolean): any;
 	disconnect(handle: any): void;
-	hitch(scope: object, method: Function | string, ...args: any[]): (...args: any[]) => any;
+	/**
+	 * Declaring `this: T` on the callback is what lets the checker see `this`
+	 * inside an inline `dojo.hitch(this, function(){ ... })` — without it the
+	 * function expression gets no contextual `this` and every member access on
+	 * it errors. Method references (`dojo.hitch(this, this.save)`) still match:
+	 * a function that declares no `this` accepts any.
+	 */
+	hitch<T>(scope: T, method: (this: T, ...args: any[]) => any, ...args: any[]): (...args: any[]) => any;
+	hitch(scope: object, method: string, ...args: any[]): (...args: any[]) => any;
 	partial(method: Function | string, ...args: any[]): (...args: any[]) => any;
+	animateProperty(args: any): any;
+	isIE: number;
+	version: { major: number; minor: number; patch: number; flag: string; toString(): string };
 	clone<T>(obj: T): T;
 	mixin<A, B>(dest: A, source: B): A & B;
 	forEach<T>(arr: ArrayLike<T>, callback: (item: T, idx: number, arr: ArrayLike<T>) => void, thisObject?: any): void;
