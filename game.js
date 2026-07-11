@@ -504,6 +504,12 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 					resName: resname,
 					type: "ratio"
 				};
+			case type == "ConsumptionAmbassadors":
+				return {
+					title: $I("effectsMgr.type.villageConsumption", [restitle]),
+					resName: resname,
+					type: "perTick"
+				};
 			case type == "Max":
 				return {
 					title: $I("effectsMgr.type.resMax", [restitle]),
@@ -693,6 +699,23 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			},
 			"standingRatio": {
 				title: $I("effectsMgr.statics.standingRatio.title"),
+				type: "ratio"
+			},
+			//Ambassador effects
+			"embassyEffectCap": {
+				title: $I("effectsMgr.statics.embassyEffectCap.title"),
+				type: "ratio"
+			},
+			"tradeBlueprintChance": {
+				title: $I("effectsMgr.statics.tradeBlueprintChance.title"),
+				type: "ratio"
+			},
+			"tradeSpiceChance": {
+				title: $I("effectsMgr.statics.tradeSpiceChance.title"),
+				type: "ratio"
+			},
+			"tradeNormalResChance": {
+				title: $I("effectsMgr.statics.tradeNormalResChance.title"),
 				type: "ratio"
 			},
 
