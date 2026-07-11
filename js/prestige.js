@@ -205,7 +205,8 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		unlocked: false,
 		researched: false,
 		effects: {
-			"embassiesPerAmbassadorSlot": 30
+			"embassiesPerAmbassadorSlot": 30,
+			"ambassadorBoostPerRank": 0.1
 		},
 		calculateEffects: function(self, game) {
 			self.description = $I("prestige.treaties.desc", [

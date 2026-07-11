@@ -718,6 +718,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.tradeNormalResChance.title"),
 				type: "ratio"
 			},
+			"ambassadorBoostPerRank": {
+				title: $I("effectsMgr.statics.jobBoostPerRank.title", [$I("village.job.ambassador")]),
+				type: "ratio"
+			},
 
 			"resStasisRatio": {
 				title: $I("effectsMgr.statics.resStasisRatio.title"),

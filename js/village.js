@@ -152,7 +152,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			//TODO: add/remove/modify effects until you feel like they are balanced
 			//TODO: i18n names for ALL these effects
 			"tradeVolume": 0.0007,
-			"embassyEffectCap": 0.004,
+			"embassyEffectCap": 0.00133,
 			"tradeBlueprintChance": 0.00015,
 			"tradeSpiceChance":     0.00006,
 			"tradeNormalResChance": 0.00009,
@@ -611,10 +611,12 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 					// Is there a shorter path to this function? I could go from gamePage but I'm trying to keep the style consistent.
 					//TODO: move to the village manager
 					var mod = this.game.village.getValueModifierPerSkill(kitten.skills[kitten.job] || 0);
+					var rankMultiplier = 1 + this.game.getEffect(kitten.job + "BoostPerRank") * kitten.rank;
 
 					for (var jobResMod in job.modifiers){
 
 						var diff = job.modifiers[jobResMod] + job.modifiers[jobResMod] * mod;
+						diff *= rankMultiplier;
 
 						if (diff > 0 ){
 							if (kitten.isLeader){
