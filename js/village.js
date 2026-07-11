@@ -160,7 +160,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			"spiceConsumptionAmbassadors": 0.8
 		},
 		lackResConvert: false,
-		calculateEffects: function(self, game) { //Mostly just updating the description, honestly
+		calculateEffects: function(self, game) {
+			//--- UPDATE DESCRIPTION
 			var scalesBasedOnEmbassies = game.getEffect("embassiesPerAmbassadorSlot") > 0; //Boolean variable
 			var baseDescription = $I("village.job.ambassador.desc");
 			var limitDescription = $I("village.job.ambassador.limit.per.race");
@@ -172,6 +173,16 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			self.description = baseDescription + "<br>" + limitDescription;
 			if (game.religion.getTU("holyGenocide").val > 0) {
 				self.description += "<br>" + $I("village.job.notAffectedHG");
+			}
+
+			//--- UPDATE RESOURCE CONSUMPTION
+			if (self.value > 5) {
+				var scalingBase = self.value - 5;
+				self.modifiers["cultureConsumptionAmbassadors"] = 20 * (1 + 0.025*scalingBase); //Quadratic scaling
+				self.modifiers["spiceConsumptionAmbassadors"] = 0.8 * (1 + 0.001*scalingBase*scalingBase); //Cubic scaling
+			} else {
+				self.modifiers["cultureConsumptionAmbassadors"] = 20;
+				self.modifiers["spiceConsumptionAmbassadors"] = 0.8;
 			}
 		},
 		value: 0,
@@ -4515,6 +4526,9 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 
 		if (amt > 0) {
 			this.game.village.sim.removeJob(job.name, amt);
+			if (typeof(model.job.calculateEffects) === "function") {
+				model.job.calculateEffects(model.job, this.game);
+			}
 		}
 	},
 
@@ -4524,6 +4538,9 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 
 	assignJobs: function(model, amt){
 		this.game.village.assignJob(model.job, amt);
+		if (typeof(model.job.calculateEffects) === "function") {
+			model.job.calculateEffects(model.job, this.game);
+		}
 	},
 
 	assignAllJobs: function(model){
