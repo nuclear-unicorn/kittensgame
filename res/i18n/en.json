@@ -734,6 +734,10 @@
     "notification.save.title": "Game Saved",
     "notification.save.desc": "Game was successfully saved",
 
+    "ota.available": "Update available",
+    "ota.confirm.title": "Install update?",
+    "ota.confirm.msg": "Version {0} is ready. The game will be saved and restarted.",
+
     "navbar.energy": "Energy: {0}Wt",
     "navbar.pollution" : "Pollution: {0}",
 
@@ -1839,6 +1843,7 @@
     "ui.filter.togglable": "Togglable",
 
     "ui.kgnet.login": "Log in",
+    "ui.kgnet.logout": "Log out",
     "ui.kgnet.online": "Online",
     "ui.kgnet.save.current": "current",
     "ui.kgnet.save.save": "↑ Save",
