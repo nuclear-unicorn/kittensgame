@@ -149,13 +149,13 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		title: $I("village.job.ambassador"),
 		description: $I("village.job.ambassador.desc"),
 		modifiers: {
-			//TODO: add/remove/modify effects until you feel like they are balanced
-			//TODO: i18n names for ALL these effects
+			//July 2026: I've purposely made these effects a little weaker than is necessary.
+			//We'll buff them later once we get a better feel for how strong they *ought* to be.
 			"tradeVolume": 0.0007,
 			"embassyEffectCap": 0.00133,
-			"tradeBlueprintChance": 0.00015,
-			"tradeSpiceChance":     0.00006,
-			"tradeNormalResChance": 0.00009,
+			"tradeBlueprintChance": 0.00008,
+			"tradeSpiceChance":     0.00009,
+			"tradeNormalResChance": 0.00003,
 			"cultureConsumptionAmbassadors": 20,
 			"spiceConsumptionAmbassadors": 0.8
 		},
@@ -496,6 +496,10 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			if (effectName.length > 6 && effectName.substring(effectName.length - 6) == "Chance") {
 				//Probability-related effects are subject to diminishing returns, for balance reasons
 				effectAmt = this.game.getLimitedDR(effectAmt, 0.25);
+			}
+			if (effectName == "embassyEffectCap" && effectAmt > 1) {
+				//Past a certain point, it gets harder to increase the cap...
+				effectAmt = Math.sqrt(effectAmt);
 			}
 			this.game.diplomacy.cachedAmbassadorEffects[effectName] = effectAmt;
 		}
