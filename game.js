@@ -4307,20 +4307,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				}
 			}
 		}
-		//TODO: redo this logic to decrease repetition
-		if (res.calculatePerTickAndDay && res.name == "alicorn"){ 
-			var resStackDay = this.getResourcePerDayStack(res.name),
-				resStringDay = this.processResourcePerTickStack(resStackDay, res, 0), //processResourcePerTickStack can work with perDay stack
-				resPerDay = this.getResourcePerDay(res.name);
-				if (this.opts.usePercentageResourceValues){
-					resStringDay = "<br>" + resStringDay;
-					resStringDay += "<br> " + $I("res.netGain") + ": " + this.getDisplayValueExt(resPerDay, true, true);
-				}
-			var totalPerDayDelta =  "<br>" + $I("res.netGainPerDay") + ": " + 
-			this.getDisplayValueExt(resPerTick * this.calendar.ticksPerDay + this.getEffect("alicornPerDay"))
-			;
-			return resString + resStringDay + totalPerDayDelta;
-		}
 		return resString;
 	},
 
