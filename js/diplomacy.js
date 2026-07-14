@@ -1579,14 +1579,15 @@ var EmbassyButtonHelper = {
 			if (!sellResource.unlocked) {
 				continue; //Don't display a resource that's not unlocked yet.
 			}
-			if (sellOptions.chance + ambassadorBonus >= 1) {
+			if (sellOptions.chance + ambassadorBonus >= 1 && !game.devMode) {
 				continue; //Chance is fixed at 100%, therefore not based on embassies, so don't display.
+				//Override: In dev mode, we display it anyways.
 			}
 			var sellChance = Math.min(game.diplomacy.getResourceTradeChance(sellOptions, race), 1); //Cap at 100%
 			if (sellChance == 0 ) {
 				continue; //Don't display a resource that we can't get from them.
 			}
-			chancesToDisplay.push({ title: sellResource.title, chance: sellChance });
+			chancesToDisplay.push({ title: sellResource.title, chance: sellChance, originalChance: sellOptions.chance });
 		}
 		//Don't forget to include spice, which is special:
 		var spiceResource = game.resPool.get("spice");
@@ -1597,7 +1598,7 @@ var EmbassyButtonHelper = {
 			chancesToDisplay.push({ title: spiceResource.title, chance: spiceChance, multi: spiceMulti });
 		}
 
-		//Don't mention blueprints or titanium because neither of those is affected by embassies.
+		//Don't mention blueprints or titanium because neither of those are affected by embassies.
 
 		if (chancesToDisplay.length < 1) {
 			return; //Skip modifying the tooltip if there's nothing to show.
@@ -1615,10 +1616,33 @@ var EmbassyButtonHelper = {
 				marginBottom: "8px"
 		}}, tooltip);
 		for (var i = 0; i < chancesToDisplay.length; i += 1) {
-			dojo.create("div", {
-				innerHTML: chancesToDisplay[i].title + ": " + (100 * chancesToDisplay[i].chance).toFixed(1) + "%" + (chancesToDisplay[i].multi ? ", ×" + game.getDisplayValueExt(chancesToDisplay[i].multi) : ""),
-				className: "effectName"
-			}, tooltip);
+			if (game.devMode) {
+				//Show really detailed info, a breakdown of the calculation, even, intended for dev use.
+				if (chancesToDisplay[i].title === "spice") {
+					dojo.create("div", {
+						innerHTML: "<strong>" + chancesToDisplay[i].title + "</strong>: " + (100 * 0.35).toFixed(1) + "% original + " +
+							(100 * game.diplomacy.getAmbassadorEffect("tradeSpiceChance")).toFixed(1) + "% from ambassadors yields " +
+							(100 * (0.35 + game.diplomacy.getAmbassadorEffect("tradeSpiceChance"))).toFixed(1) + "% pre-embassies, boosted to a final value of <strong>" +
+							(100 * chancesToDisplay[i].chance).toFixed(1) + "%</strong> by embassies.  The multiplier is <strong>×" + game.getDisplayValueExt(chancesToDisplay[i].multi || 1) + "</strong>.",
+						className: "effectName"
+					}, tooltip);
+				} else {
+					dojo.create("div", {
+						innerHTML: "<strong>" + chancesToDisplay[i].title + "</strong>: " + (100 * chancesToDisplay[i].originalChance).toFixed(1) + "% original + " +
+							(100 * ambassadorBonus).toFixed(1) + "% from ambassadors yields " +
+							(100 * (chancesToDisplay[i].originalChance + ambassadorBonus)).toFixed(1) + "% pre-embassies, boosted to a final value of <strong>" +
+							(100 * chancesToDisplay[i].chance).toFixed(1) + "%</strong> by embassies.  The cap is " +
+							(100 * (chancesToDisplay[i].originalChance + ambassadorBonus) * (1.75 + game.diplomacy.getAmbassadorEffect("embassyEffectCap"))).toFixed(1) + "%.",
+						className: "effectName"
+					}, tooltip);
+				}
+			} else {
+				//Show normal info to the player
+				dojo.create("div", {
+					innerHTML: chancesToDisplay[i].title + ": " + (100 * chancesToDisplay[i].chance).toFixed(1) + "%" + (chancesToDisplay[i].multi ? ", ×" + game.getDisplayValueExt(chancesToDisplay[i].multi) : ""),
+					className: "effectName"
+				}, tooltip);
+			}
 		}
 	}
 };
