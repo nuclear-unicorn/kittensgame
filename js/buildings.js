@@ -860,12 +860,15 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}
 			if (game.workshop.get("freightfulExchange").researched){
 				stageMeta.description = $I("buildings.spaceport.desc") + "<br>" + $I("buildings.spaceport.desc.automation");
+			} else{
+				stageMeta.description = $I("buildings.spaceport.desc");
 			}
 			if (game.workshop.get("freightfulExchange").researched && self.isAutomationEnabled === null){
 				self.isAutomationEnabled = true;
 				stageMeta.isAutomationEnabled = true;
 			} else if (!game.workshop.get("freightfulExchange").researched && self.isAutomationEnabled !== null) {
 				self.isAutomationEnabled = null;
+				stageMeta.isAutomationEnabled = null;
 			}
 			if (self.isAutomationEnabled){
 				effects["tradeVolume"] = 0.5 + (game.workshop.get("transportSuperposition").researched? 0.5 : 0);
