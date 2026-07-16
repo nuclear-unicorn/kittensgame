@@ -870,7 +870,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}
 			if (game.workshop.get("freightfulExchange").researched){
 				stageMeta.description = $I("buildings.spaceport.desc") + "<br>" + $I("buildings.spaceport.desc.automation");
-			} else{
+			} else {
 				stageMeta.description = $I("buildings.spaceport.desc");
 			}
 			if (game.workshop.get("freightfulExchange").researched && self.isAutomationEnabled === null){
@@ -3201,6 +3201,23 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 	fetchModel: function(options) {
 		var model = this.inherited(arguments);
 		model.stageLinks = this.getStageLinks(model);
+		if (typeof(model.metadata.isAutomationEnabled) == "boolean" || 
+			(model.metadata.stages && typeof(model.metaAccessor.meta.isAutomationEnabled) == "boolean") //stage hack
+		) {
+			var isEnabled = model.metaAccessor.meta.isAutomationEnabled;
+			var self = this;
+			model.toggleAutomationLink = {
+				title: isEnabled ? "A" : "*",
+				tooltip: isEnabled ? $I("btn.aon.tooltip") : $I("btn.aoff.tooltip"),
+				//reserved for mobile
+				//if you remove it one more time I will find where you live
+				enabled: model.metadata.val > 0,
+				cssClass: isEnabled ? "auto-on" : "auto-off",
+				handler: function(btn){
+					self.handleToggleAutomationLinkClick(model);
+				}
+			};
+		}
 
 
 		return model;
@@ -3261,9 +3278,7 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 	handleToggleAutomationLinkClick: function(model) {
 		var building = model.metadata;
 		building.isAutomationEnabled = !building.isAutomationEnabled;
-		if (building.stages){
-			model.metaAccessor.meta.isAutomationEnabled = building.isAutomationEnabled; //stage hack
-		}
+		model.metaAccessor.meta.isAutomationEnabled = building.isAutomationEnabled; //stage hack
 		this.game.upgrade({buildings: [building.name]});
 	},
 
