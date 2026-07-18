@@ -417,7 +417,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				description: $I("buildings.hydroplant.desc") ,
 				prices: [
 					{ name : "titanium", val: 2500 },
-					{ name : "concrate", val: 100 }
+					{ name : "concrate", val: 100 },
+					{ name : "gear", val: 5 }
 				],
 				priceRatio: 1.15,
 				effects: {
