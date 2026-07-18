@@ -1409,7 +1409,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"woodRatio" : 0
 		},
 		calculateEffects: function(self, game){
-			self.effects["woodRatio"] = 0.1 + game.getEffect("lumberMillRatio") * 0.1;
+			var woodRatio = 0.1 + game.getEffect("lumberMillRatio") * 0.1;
+			self.effects["woodRatio"] = woodRatio;
+			self.description = $I("buildings.lumberMill.desc.parameterized", [game.toDisplayPercentage(woodRatio) + "%"]);
 		},
 		flavor: $I("buildings.lumberMill.flavor")
 	},

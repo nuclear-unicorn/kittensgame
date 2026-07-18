@@ -192,6 +192,7 @@
     "buildings.logHouse.flavor": "The Cabin in the Woods",
     "buildings.lumberMill.label": "Lumber Mill",
     "buildings.lumberMill.desc": "Improves wood production by 10%",
+    "buildings.lumberMill.desc.parameterized": "Improves wood production by {0}",
     "buildings.lumberMill.flavor": "Best log analysing tool",
     "buildings.magneto.label": "Magneto",
     "buildings.magneto.desc": "Improves your total resource production by 2%. Every Steamworks will boost this effect by 15%. Consumes oil.",
