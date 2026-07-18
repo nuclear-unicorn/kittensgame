@@ -2243,6 +2243,17 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		progressHandicap: 5,
 		tier: 2
     },{
+        name: "microchip",
+        label: $I("workshop.crafts.microchip.label"),
+        description: $I("workshop.crafts.microchip.desc"),
+        prices:[
+            { name: "plastic", val: 50 },
+			{ name: "gold", val: 1000 },
+			{ name: "spice", val: 1000 }
+        ],
+		progressHandicap: 20,
+		tier: 3
+    },{
 		name: "parchment",
 		label: $I("workshop.crafts.parchment.label"),
 		description: $I("workshop.crafts.parchment.desc"),

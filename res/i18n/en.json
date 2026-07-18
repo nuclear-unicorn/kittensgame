@@ -2377,6 +2377,8 @@
     "workshop.crafts.manuscript.desc": "Written document required for technological advancement. Every manuscript will give a minor bonus to a maximum culture (this effect has a diminishing return)",
     "workshop.crafts.megalith.label": "Megalith",
     "workshop.crafts.megalith.desc": "A massive block that can be used to construct enormous structures",
+    "workshop.crafts.microchip.label": "Microchip",
+    "workshop.crafts.microchip.desc": "A compact assembly of electronic circuits. Required for most electronic technologies.",
     "workshop.crafts.parchment.label": "Parchment",
     "workshop.crafts.parchment.desc": "A material for writing on made from animal skin, required for cultural buildings.",
     "workshop.crafts.plastic.label": "Plastic",

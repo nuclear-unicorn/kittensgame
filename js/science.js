@@ -483,6 +483,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 				{bld:"amphitheatre", stage:1}	// Broadcast Tower
 			],
 			tech: ["nuclearFission", "rocketry", "robotics"],
+			crafts: ["microchip"],
 			upgrades: ["cadSystems", "refrigeration", "seti", "factoryLogistics", "factoryOptimization", "internet"]
 		}
 	}, {

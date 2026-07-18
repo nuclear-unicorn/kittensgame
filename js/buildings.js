@@ -542,7 +542,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				description: $I("buildings.dataCenter.desc"),
 				prices: [
 					{ name : "steel", val: 100 },
-					{ name : "concrate", val: 10 }
+					{ name : "concrate", val: 10 },
+					{ name : "microchip", val: 5 },
 				],
 				//togglable: true,
 				effects: {
