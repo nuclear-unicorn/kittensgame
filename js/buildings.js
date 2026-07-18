@@ -3206,6 +3206,15 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 		return model;
 	},
 
+	/**
+	 * Checks to see if the next higher stage for this building is unlocked.
+	 * If we are at the highest stage already, returns false.
+	 */
+	getIsNextStageUnlocked: function(model) {
+		return model.metadata.stage < model.metadata.stages.length - 1 &&
+			model.metadata.stages[model.metadata.stage + 1].stageUnlocked;
+	},
+
 	getEffects: function(model){
 		var effects = model.metadata.effects;
 		var currentStage = model.metadata.stages[model.metadata.stage];
@@ -3249,13 +3258,24 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 		return stageLinks;
 	},
 
-	getDescription: function(model){
-		if (model.metadata.stages){
-			description = model.metaAccessor.meta.stages[model.metaAccessor.meta.stage].description;
-			return typeof(description) != "undefined" ? description : "";
+	getName: function(model) {
+		var formattedName = this.inherited(arguments);
+		if (this.getIsNextStageUnlocked(model)) {
+			formattedName = "<div class=\"upgrade-available\">(!)</div>" + formattedName;
 		}
-		var description = model.metadata.description;
-		return typeof(description) != "undefined" ? description : "";
+		return formattedName;
+	},
+
+	getDescription: function(model){
+		var description = model.metadata.stages ? model.metaAccessor.meta.stages[model.metaAccessor.meta.stage].description : model.metadata.description;
+		if (typeof(description) === "undefined") {
+			description = "";
+		}
+		if (this.getIsNextStageUnlocked(model)) {
+			var nextStageLabel = model.metadata.stages[model.metadata.stage + 1].label;
+			description = "<div class=\"upgrade-available\">" + $I("buildings.upgrade.desc.available", [nextStageLabel]) + "</div>" + description;
+		}
+		return description;
 	},
 
 	handleToggleAutomationLinkClick: function(model) {
