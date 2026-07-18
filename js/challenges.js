@@ -829,7 +829,7 @@ dojo.declare("classes.reserveMan", null,{
 dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.BuildingBtnController, {
 
 	initModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("initModel", arguments);
 		model.multiplyEffects = true; //When the player holds the SHIFT key, it'll multiply Challenge effects by number of times completed.
 		return model;
 	},
@@ -844,9 +844,9 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 	getDescription: function(model) {
 		if (model.metadata.name == "ironWill") { //Show the "your game will be reset" bit for Iron Will only
 			var msgChronosphere = (this.game.bld.get("chronosphere").val > 0) ? $I("challendge.btn.chronosphere.with.ironWill.desc") : "";
-			return this.inherited(arguments) + $I("challendge.btn.desc", [model.metadata.effectDesc, msgChronosphere]);
+			return this.inherited("getDescription", arguments) + $I("challendge.btn.desc", [model.metadata.effectDesc, msgChronosphere]);
 		}
-		return this.inherited(arguments) + $I("challendge.btn.desc.new", [model.metadata.effectDesc]);
+		return this.inherited("getDescription", arguments) + $I("challendge.btn.desc.new", [model.metadata.effectDesc]);
 	},
 
 	getName: function(model){
@@ -908,7 +908,7 @@ dojo.declare("classes.ui.ChallengePanel", com.nuclearunicorn.game.ui.Panel, {
 	},
 
 	render: function(container){
-		var content = this.inherited(arguments);
+		var content = this.inherited("render", arguments);
 		this.updateResetMessage();
 
 		var self = this;
@@ -962,7 +962,7 @@ dojo.declare("classes.ui.ReservesPanel", com.nuclearunicorn.game.ui.Panel, {
 	},
 
 	render: function(container) {
-		var content = this.inherited(arguments);
+		var content = this.inherited("render", arguments);
 		
 		this.reclaimInstructionsText = dojo.create("span", {
 			innerHTML: $I("challendge.reserves.panel.summary"), style: "display: inline-block; margin-bottom: 16px" }, content);
@@ -1176,7 +1176,7 @@ dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Pane
 	},
 
 	render: function(container) {
-		var content = this.inherited(arguments);
+		var content = this.inherited("render", arguments);
 		this.listElement = dojo.create("ul", { style: "margin-top: 0px; margin-bottom: 0px;" }, content);
 		this.generateEffectsList();
 	},

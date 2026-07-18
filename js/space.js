@@ -1356,7 +1356,7 @@ dojo.declare("com.nuclearunicorn.game.ui.SpaceProgramBtnController", com.nuclear
 
 	buyItem: function(model, event) {
 		if (model.metadata.val == 0) {
-			return this.inherited(arguments);
+			return this.inherited("buyItem", arguments);
 		} else {
 			return {
 				itemBought: false,
@@ -1366,7 +1366,7 @@ dojo.declare("com.nuclearunicorn.game.ui.SpaceProgramBtnController", com.nuclear
 	},
 
 	build: function(model, maxBld){
-		var counter = this.inherited(arguments);
+		var counter = this.inherited("build", arguments);
 		model.metadata.on = 0;
 		if (model.metadata.name == "rorschachMission") {
 			model.metadata.on = 1;
@@ -1425,7 +1425,7 @@ dojo.declare("classes.ui.space.PlanetBuildingBtnController", com.nuclearunicorn.
 	},
 
 	build: function(model, opts) {
-		var counter = this.inherited(arguments);
+		var counter = this.inherited("build", arguments);
 		if (!counter) {
 			return; //Skip undo if nothing was built
 		}
@@ -1438,7 +1438,7 @@ dojo.declare("classes.ui.space.PlanetBuildingBtnController", com.nuclearunicorn.
 	},
 
 	sell: function(event, model){
-		var amtSold = this.inherited(arguments);
+		var amtSold = this.inherited("sell", arguments);
 
 		if (amtSold > 0) {
 			var undo = this.game.registerUndoChange();
@@ -1455,7 +1455,7 @@ dojo.declare("classes.ui.space.PlanetPanel", com.nuclearunicorn.game.ui.Panel, {
 	planet: null,
 
 	render: function(){
-		var container = this.inherited(arguments);
+		var container = this.inherited("render", arguments);
 
 		var self = this;
 
@@ -1489,7 +1489,7 @@ dojo.declare("classes.ui.space.FurthestRingPanel", [classes.ui.space.PlanetPanel
 	render: function(container){
 		//var wrapper = new mixin.IReactAware(WChiral, this.game);
 
-		var content = this.inherited(arguments);
+		var content = this.inherited("render", arguments);
 		//wrapper.render(content);
 
 		return content;

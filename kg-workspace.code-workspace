@@ -6,6 +6,12 @@
 	],
 	"settings": {
 		"jestrunner.configPath": "jest.config.unittest.json",
+
+		// Mirrored from .vscode/settings.json: typescript.tsdk is window-scoped,
+		// and VS Code ignores window-scoped folder settings when a .code-workspace
+		// is open — without this copy, workspace-file users get the bundled TS.
+		"typescript.tsdk": "node_modules/typescript/lib",
+		"typescript.enablePromptUseWorkspaceTsdk": true,
 		"files.exclude": {
 			"**/.git": true,
 			"**/.svn": true,

@@ -1804,7 +1804,6 @@
     "ui.option.scheme": "Color del tema:",
     "ui.option.scheme.relock": "Volver a bloquear temas",
     "ui.option.scheme.tip": "Los temas que no puedes seleccionar aún pueden ser desbloqueados permanentemente por acciones específicas.",
-    "ui.option.workers": "Usar usuario web\n<i>(el juego funciona correctamente en la pestaña de segundo plano, puede causar problemas de rendimiento)<br>Necesitas actualizar la página del navegador para que esta configuración surta efecto.</i>",
     "ui.option.force.high.precision": "Usar alta precisión para los valores de los recursos",
     "ui.option.use.per.second.values": "Usar valores por segundo <i>(por tick de otra manera)</i>",
     "ui.option.use.percentage.resource.values": "Usar valores porcentuales de producción de recursos",

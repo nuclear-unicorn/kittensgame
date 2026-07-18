@@ -1,6 +1,17 @@
+// @ts-check
 /**
  * A class for a game page container
  *
+ */
+
+/**
+ * One line of a resource breakdown tooltip.
+ * @typedef {{name: any, type: string, value: any, forceDisplay?: boolean}} ResStackEntry
+ */
+/**
+ * A resource breakdown, as consumed by `processResourcePerTickStack`. Entries
+ * nest: an element that is itself an array is rendered as an indented sub-stack.
+ * @typedef {(ResStackEntry | ResStack)[]} ResStack
  */
 
 
@@ -15,6 +26,8 @@ dojo.declare("classes.game.Timer", null, {
 	ticksTotal: 0,
 	timestampStart: null,
 	totalUpdateTime: null,
+	currentTime: 0,
+	averageTime: 0,
 
 
 
@@ -67,6 +80,11 @@ dojo.declare("classes.game.Timer", null, {
 });
 
 dojo.declare("mixin.IDataStorageAware", null, {
+	/**
+	 * `save`/`load` are the contract this mixin imposes on whatever class mixes
+	 * it in; they are not defined here.
+	 * @this {{save: (...args: any[]) => any, load: (...args: any[]) => any}}
+	 */
 	constructor: function(){
 		dojo.subscribe("server/save", dojo.hitch(this, this.save));
 		dojo.subscribe("server/load", dojo.hitch(this, this.load));
@@ -269,7 +287,7 @@ dojo.declare("classes.game.Server", null, {
 	/**
 	 * Make an XHR request to KGNet server
 	 * 
-	 * @param {A s} url - relative endpoint URL
+	 * @param {string} url - relative endpoint URL
 	 * @param {*} method - "GET" or "POST"
 	 * @param {*} data - post data
 	 * @param {*} handler - onDone callback handler
@@ -346,12 +364,13 @@ dojo.declare("classes.game.Server", null, {
 	 * }
 	 */
 	pushSaveMetadata: function(guid, metadata){
-		return this._xhr("/kgnet/save/update/", "POST", 
+		var self = this;
+		return this._xhr("/kgnet/save/update/", "POST",
 		{
 			//pre-parsing guid to avoid checking it on the backend side
 			guid: guid,
 			metadata: metadata
-		}, 
+		},
 		function(resp){
 			self.saveData = resp;
 		});
@@ -1905,10 +1924,40 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	diplomacy: null,
 	achievements: null,
 
+	//the rest of the managers, installed by the `managers` loop in the constructor
+	challenges: null,
+	religion: null,
+	space: null,
+	time: null,
+	prestige: null,
+	stats: null,
+	void: null,
+	settings: null,
+
+	//tab handles, installed by the `tabRegistry` loop in the constructor
+	bldTab: null,
+	villageTab: null,
+	libraryTab: null,
+	workshopTab: null,
+	diplomacyTab: null,
+	religionTab: null,
+	spaceTab: null,
+	timeTab: null,
+	challengesTab: null,
+	achievementTab: null,
+	statsTab: null,
+	queueTab: null,
+	settingsTab: null,
+
 	console: null,
 	telemetry: null,
 	server: null,
 	math: null,
+
+	worker: null,			//web worker driving the update loop off the main thread
+	_lastFrameTimestamp: null,
+	lastBackup: null,		//timestamp of the last KGNet save upload
+	isKSDetected: false,	//true if the Kitten Scientists mod is present
 
 	//global cache
 	globalEffectsCached: {},
@@ -2001,6 +2050,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	isLocalhost: false,
 	devMode: false,
 	mobileSaveOnPause: true,
+
+	// whether loading the save from localstorage failed.
+	// used to prevent overwriting the potentially-broken save data in
+	// localstorage with definitely-broken data from a partial save load.
+	currentSaveIsBroken: false,
 
 	//should this go to the res pool?
 	winterCatnipPerTick: 0,
@@ -2421,6 +2475,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	save: function(){
+		if (this.currentSaveIsBroken) {
+			// if the save is broken, we return the original save that we tried to import.
+			// (unfortunately we need to parse it a little bit, since callers of save() expect the unserialized data...)
+			return this._parseLSSaveData(LCstorage["com.nuclearunicorn.kittengame.savedata"]);
+		}
+
 		this.ticksBeforeSave = this.autosaveFrequency;
 
 		var saveData = {
@@ -2550,9 +2610,14 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			: LZString.compressToBase64(json);
 	},
 
-	_parseLSSaveData: function(){
+	/**
+	 * @param {string} [lsData] - raw save blob; defaults to the one in localStorage
+	 */
+	_parseLSSaveData: function(lsData){
 		var data = null;
-		var localStorageData = LCstorage["com.nuclearunicorn.kittengame.savedata"];
+		var localStorageData = (lsData !== undefined)
+			? lsData
+			: LCstorage["com.nuclearunicorn.kittengame.savedata"];
 
 		if (localStorageData && localStorageData[0] == "{"){
 			data = localStorageData;
@@ -2568,6 +2633,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	load: function(){
 		var data = LCstorage["com.nuclearunicorn.kittengame.savedata"];
 		this.resetState();
+		this.currentSaveIsBroken = false;
 		if (!data){
 			this.calculateAllEffects();
 			this.updateOptionsUI();
@@ -2615,6 +2681,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 			this.msg("Unable to load save data. Contact the devs and provide the faulty save file.", "important");
 			success = false;
+			this.currentSaveIsBroken = true;
 		}
 
 
@@ -2677,6 +2744,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			this.prestige.getPerk("adjustmentBureau").reserve);
 
 		this.ui.load();
+		this.village.updateHappines();
+		this.village.updateResourceProduction();
 		this.updateCaches();
 
 		return success;
@@ -3088,7 +3157,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		if (save.saveVersion == 12) {
 			if (save.religion && save.religion.tcratio && save.religion.tu) {
-				var transcendenceLevel = Math.max(0, Math.round(Math.log(10 * this.game.getUnlimitedDR(save.religion.tcratio, 0.1))));
+				var transcendenceLevel = Math.max(0, Math.round(Math.log(10 * this.getUnlimitedDR(save.religion.tcratio, 0.1))));
 				for (var i = 0; i < save.religion.tu.length; i++) {
 					if (transcendenceLevel >= this.religion.getTU(save.religion.tu[i].name).tier) {
 						save.religion.tu[i].unlocked = true;
@@ -3123,11 +3192,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		if (save.saveVersion == 14) {
 			if (save.space && save.space.planets) {
-				for (var i in save.space.planets){
-					var planet = save.space.planets[i];
+				for (var planetId in save.space.planets){
+					var planet = save.space.planets[planetId];
 					if (planet.buildings){
-						for (var j in planet.buildings) {
-							var building = planet.buildings[j];
+						for (var buildingId in planet.buildings) {
+							var building = planet.buildings[buildingId];
 							if (typeof(building.unlocked) != "undefined") {
 								building.unlockable = building.unlocked;
 							} else {
@@ -3398,16 +3467,18 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			value: game.getEffect(resName + "PolicyRatio")
 		});
 		array.push({
-			name: $I("res.stack.chronicler"),
+			name: $I("res.stack.destruction"),
 			type: "ratio",
-			value: game.getEffect("pyramidPerYearRatio")
+			value: game.getEffect("pyramidGlobalProductionRatio")
 		});
 		return array;
 	},
 	/**
 	 * Generates a stack of resource modifiers. (TODO: use it with resource per tick calculation logic)
 	 */
+	/** @returns {ResStack} */
 	getResourcePerTickStack: function(resName, calcAutomatedEffect, season){
+		/** @type {ResStack} */
 		var stack = [];
 
 		var res = null;
@@ -3803,11 +3874,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return stack;
 	},
 
+	/** @returns {ResStack} */
 	getResourcePerDayStack: function(resName){
+		/** @type {ResStack} */
 		var stack = [];
 		var res = null;
-		for (var i in this.resPool.resources){
-			var _res = this.resPool.resources[i];
+		for (var resId in this.resPool.resources){
+			var _res = this.resPool.resources[resId];
 			if (_res.name == resName){
 				res = _res;
 				break;
@@ -3834,12 +3907,15 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		if (resName == "necrocorn"){
 			//ReligionManager keeps data on all corruption-related effects
 			var corruptionModifiers = this.religion.corruptionCached || [];
-			var corruptionStack = [];
-			corruptionStack.push({
+			/** @type {ResStackEntry} */
+			var corruptionTotal = {
 				name: $I("res.stack.corruptionPerDay"),
 				type: "perDay",
 				value: (corruptionModifiers.finalCorruptionPerTick || 0) * this.calendar.ticksPerDay
-			});
+			};
+			/** @type {ResStack} */
+			var corruptionStack = [];
+			corruptionStack.push(corruptionTotal);
 			for (var i = 0; i < corruptionModifiers.length; i += 1) {
 				var modifier = corruptionModifiers[i];
 				switch (modifier.behavior) {
@@ -3852,7 +3928,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 					});
 					//Hack to make the total corruption line display if net corruption is 0 due to Siphoning
 					if (modifier.value) {
-						corruptionStack[0].forceDisplay = true;
+						corruptionTotal.forceDisplay = true;
 					}
 					break;
 				case "multiplicative":
@@ -3871,7 +3947,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return stack;
 	},
 
+	/** @returns {ResStack} */
 	getResourceOnYearStack: function(resName){
+		/** @type {ResStack} */
 		var stack = [];
 		var res = null;
 		for (var i in this.resPool.resources){
@@ -4105,17 +4183,31 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	craftAll: function(resName){
-		// some way to protect people from refining all catnip during the winter
-		if (resName != "wood" || this.getResourcePerTick("catnip", true) > 0) {
-			this.workshop.craftAll(resName);
-			this.updateResources();
-		} else {
+		if (resName == "wood"){
 			var game = this;
-			this.ui.confirm($I("kittens.craft.confirmation.title"), $I("kittens.craft.confirmation.msg"), function() {
-				game.workshop.craftAll(resName);
-				game.updateResources();
-			});
+			// some way to protect people from refining all catnip during the winter
+			if (this.getResourcePerTick("catnip", true) < 0){
+				this.ui.confirm($I("kittens.craft.confirmation.title"), $I("kittens.craft.confirmation.msg"), function() {
+					game.workshop.craftAll(resName);
+					game.updateResources();
+				});
+				return;
+			}
+			var calendar = this.calendar,
+                winterDays = calendar.daysPerSeason -
+                (calendar.getCurSeason().name === "winter" ? calendar.day : 0);
+            var catnipPerTick = game.winterCatnipPerTick;
+			// adviser will advise against spending so much catnip that you couldn't survive the winter!
+			if ((0 + winterDays * catnipPerTick * calendar.ticksPerDay) <= 0){
+				this.ui.confirm($I("kittens.craft.confirmation.title"), $I("general.food.advisor.text"), function() {
+					game.workshop.craftAll(resName);
+					game.updateResources();
+				});
+				return;
+			}
 		}
+		this.workshop.craftAll(resName);
+		this.updateResources();
 	},
 
 	getRequiredResources: function(bld){
@@ -4235,23 +4327,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				}
 			}
 		}
-		//TODO: redo this logic to decrease repetition
-		if (res.calculatePerTickAndDay && res.name == "alicorn"){ 
-			var resStackDay = this.getResourcePerDayStack(res.name),
-				resStringDay = this.processResourcePerTickStack(resStackDay, res, 0), //processResourcePerTickStack can work with perDay stack
-				resPerDay = this.getResourcePerDay(res.name);
-				if (this.opts.usePercentageResourceValues){
-					resStringDay = "<br>" + resStringDay;
-					resStringDay += "<br> " + $I("res.netGain") + ": " + this.getDisplayValueExt(resPerDay, true, true);
-				}
-			var totalPerDayDelta =  "<br>" + $I("res.netGainPerDay") + ": " + 
-			this.getDisplayValueExt(resPerTick * this.calendar.ticksPerDay + this.getEffect("alicornPerDay"))
-			;
-			return resString + resStringDay + totalPerDayDelta;
-		}
 		return resString;
 	},
 
+	/** @param {ResStack} resStack */
 	processResourcePerTickStack: function(resStack, res, depth, hasFixed) {
 		var resString = "";
 		if (depth < 2) {
@@ -4261,7 +4340,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		for (var i = 0; i < resStack.length; i++) {
 			var stackElem = resStack[i];
 
-			if (stackElem.length) {
+			if (Array.isArray(stackElem)) {
 				var subStack = this.processResourcePerTickStack(stackElem, res, depth + 1, hasFixed);
 				if (subStack.length) {
 					resString += subStack;
@@ -4869,7 +4948,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	doDiscardParagon: function() {
 		this.resPool.get("burnedParagon").value += this.resPool.get("paragon").value;
 		this.resPool.get("paragon").value = 0;
-		this.ironWill &= this.achievements.get("spaceOddity").starUnlocked;
+		this.ironWill = Boolean(this.ironWill && this.achievements.get("spaceOddity").starUnlocked);
 		//TODO: add some special hidden effect for this mechanics
 	},
 
@@ -4964,7 +5043,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			"paragon": paragonPoints
 		};
 
-		var karmaZebras = parseInt(this.karmaZebras);	//hack
+		var karmaZebras = parseInt(String(this.karmaZebras));	//hack
 		//that's all folks
 
 		var addStats = {
@@ -5042,8 +5121,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		var anachronomancy = this.prestige.getPerk("anachronomancy");
 		var fluxCondensator = this.workshop.get("fluxCondensator");
-		for (var i in this.resPool.resources) {
-			var res = this.resPool.resources[i];
+		for (var resId in this.resPool.resources) {
+			var res = this.resPool.resources[resId];
 
 			// undefined is NOT falsy here
 			if (res.persists === false
@@ -5089,10 +5168,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			this.village.sim.sortKittensByExp();
 			this.village.sim.sortKittensByFavorite();
 			newKittens = this.village.sim.kittens.slice(-cryochambers);
-			for (var i in newKittens) {
-				delete newKittens[i].job;
-				delete newKittens[i].engineerSpeciality;
-				newKittens[i].favorite = true;
+			for (var kittenId in newKittens) {
+				delete newKittens[kittenId].job;
+				delete newKittens[kittenId].engineerSpeciality;
+				newKittens[kittenId].favorite = true;
 			}
 			var usedCryochambers_reset = this.time.filterMetadata([this.time.getVSU("usedCryochambers")], ["name", "val", "on"]);
 			usedCryochambers_reset[0]["val"] = cryochambers;
@@ -5150,8 +5229,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var reservesSaveData = this.challenges.reserves.getSaveData();
 
 		var loadouts = [];
-		for (var i in this.village.loadoutController.loadouts){
-			var _loadout = this.village.loadoutController.loadouts[i].save();
+		for (var loadoutId in this.village.loadoutController.loadouts){
+			var _loadout = this.village.loadoutController.loadouts[loadoutId].save();
 			loadouts.push(_loadout);
 		}
 

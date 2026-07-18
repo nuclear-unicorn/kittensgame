@@ -3031,7 +3031,7 @@ dojo.declare("classes.game.ui.GatherCatnipButtonController", com.nuclearunicorn.
 
 dojo.declare("classes.game.ui.RefineCatnipButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	fetchModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 	    var self = this;
 		var catnipVal = this.game.resPool.get("catnip").value;
 		var catnipCost = model.prices[0].val;
@@ -3122,7 +3122,7 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 			}
 		}
 
-		var name = this.inherited(arguments);
+		var name = this.inherited("getName", arguments);
 
 		var sim = this.game.village.sim;
 		if (meta.name == "hut" && sim.nextKittenProgress && sim.maxKittens <= 10 ){
@@ -3144,7 +3144,7 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 	},
 
     build: function(model, opts){
-		var counter = this.inherited(arguments);
+		var counter = this.inherited("build", arguments);
 		if (!counter) {
 			return; //Skip stats & undo if nothing was built
 		}
@@ -3163,7 +3163,7 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 	},
 
 	sell: function(event, model){
-		var amtSold = this.inherited(arguments);
+		var amtSold = this.inherited("sell", arguments);
 
 		if (amtSold > 0) {
 			var undo = this.game.registerUndoChange();
@@ -3199,7 +3199,7 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 	},
 
 	fetchModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		model.stageLinks = this.getStageLinks(model);
 		if (typeof(model.metadata.isAutomationEnabled) == "boolean" || 
 			(model.metadata.stages && typeof(model.metaAccessor.meta.isAutomationEnabled) == "boolean") //stage hack

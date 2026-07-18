@@ -1,0 +1,23 @@
+{
+	// Type-checking config only — nothing is compiled or emitted, ever.
+	// Files are opted in one by one with a `// @ts-check` comment on line 1.
+	"compilerOptions": {
+		"noEmit": true,
+		"allowJs": true,
+		"checkJs": false,
+		// "lib" is what the CHECKER assumes exists at runtime; it does not
+		// change the shipped code or the supported browsers.
+		"lib": ["es2017", "dom"],
+		"strict": false,
+		"skipLibCheck": true
+	},
+	"include": [
+		"types/**/*.d.ts",
+		"core.js",
+		"config.js",
+		"game.js",
+		"i18n.js",
+		"js/**/*.js"
+	],
+	"exclude": ["node_modules", "lib", "types-dist"]
+}
