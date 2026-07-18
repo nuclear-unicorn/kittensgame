@@ -1311,6 +1311,20 @@ a.link.collapse:hover {
     padding: 20px;
 }
 
+.btnTitle > .upgrade-available {
+	padding-right: 6px;
+	font-weight: bold;
+}
+.desc > .upgrade-available {
+	padding-bottom: 4px;
+	margin-bottom: 4px;
+	border-bottom: 1px solid gray;
+	font-weight: bold;
+}
+.scheme_default .upgrade-available {
+	color: green; /*Color specified separately for each different color theme in the game*/
+}
+
 /*--------------------------------------
                 Village
 ---------------------------------------*/

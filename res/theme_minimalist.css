@@ -772,6 +772,9 @@ body.scheme_minimalist.with_background_image,
 	color: #90b23e;
 	font-weight: bold;
 }
+.scheme_minimalist .upgrade-available {
+	color: green !important;
+}
 .scheme_minimalist .panelContainer div.censusFilters {
 	margin-bottom: 3px; /* for add a margin under the 2 lists (select) in the settlement tab */
 }

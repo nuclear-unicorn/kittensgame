@@ -279,6 +279,7 @@
     "buildings.group.science": "Science",
     "buildings.group.storage": "Storage",
     "buildings.group.zebraBuildings": "Zebras",
+    "buildings.upgrade.desc.available": "Can be upgraded into {0}",
     "buildings.upgrade.confirmation.msg": "Do you want to upgrade this building?\n\nYou will lose all of those currently built.",
     "buildings.downgrade.confirmation.msg": "Do you want to downgrade this building?\n\nYou will lose all of those currently built.",
 

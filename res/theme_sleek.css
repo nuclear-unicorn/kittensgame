@@ -74,6 +74,10 @@
     color: #DCDCDC;
 }
 
+.scheme_sleek .upgrade-available {
+	color: #80C080 !important;
+}
+
 .scheme_sleek .button_tooltip {
     color: white;
     background-color: #201F1D;

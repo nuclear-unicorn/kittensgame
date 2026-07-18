@@ -659,6 +659,9 @@ body.scheme_anthracite.with_background_image,
 .scheme_anthracite .container.trade-race a[title='Pinned']:hover {
 	color: #58cc49;
 }
+.scheme_anthracite .upgrade-available {
+	color: #20A020 !important;
+}
 .scheme_anthracite .panelContainer div.censusFilters {
 	margin-bottom: 2px; /* for add a margin under the 2 lists (select) in the settlement tab */
 }
