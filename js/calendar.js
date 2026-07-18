@@ -1137,6 +1137,13 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 		}
 	},
 
+	/**
+	 * Gets a simulated ramndom-walk or a real life crypto price
+	 */
+	getCryptoPrice: function() {
+		return this.game.opts.hodl ? this.game.server.bcoinPrice : this.cryptoPrice;
+	},
+
 	adjustCryptoPrice: function() {
 		if (this.game.science.get("antimatter").researched) {
 			// 3 times -1, 3 times 0, 4 times +1
@@ -1149,7 +1156,10 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 
 	correctCryptoPrice: function() {
 		this.cryptoPrice *= 0.7 + 0.1 * Math.random();
-		this.game.msg($I("trade.correct.bcoin"), "important");
+		//Hide correction message in a legacy mode
+		if (!this.game.opts.hodl) {
+			this.game.msg($I("trade.correct.bcoin"), "important");
+		}
 	},
 
 	getWeatherMod: function(res){

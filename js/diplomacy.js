@@ -952,7 +952,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	},
 
 	buyBcoin: function(){
-		var amt = this.game.resPool.get("relic").value / this.game.calendar.cryptoPrice;
+		var amt = this.game.resPool.get("relic").value / this.game.calendar.getCryptoPrice();
 		amt = this.game.resPool.addResEvent("blackcoin", amt);
 		this.game.resPool.get("relic").value = 0;
 		this.game.msg($I("trade.bcoin.buy.msg", [this.game.getDisplayValueExt(amt)]), "", "blackcoin");
@@ -960,7 +960,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	},
 
 	sellBcoin: function(){
-		var amt = this.game.resPool.get("blackcoin").value * this.game.calendar.cryptoPrice;
+		var amt = this.game.resPool.get("blackcoin").value * this.game.calendar.getCryptoPrice();
 		var amt = this.game.resPool.addResEvent("relic", amt);
 		this.game.resPool.get("blackcoin").value = 0;
 		this.game.msg($I("trade.bcoin.sell.msg", [this.game.getDisplayValueExt(amt)])), "", "blackcoin";
@@ -1137,7 +1137,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CrashBcoinButtonController", com.nuclea
 
 	updateEnabled: function(model) {
 		this.inherited(arguments);
-		model.enabled &= this.game.calendar.cryptoPrice > 550;
+		model.enabled &= this.game.calendar.getCryptoPrice() > 550;
 	},
 
 	fetchExtendedModel: function(model) {
@@ -1165,7 +1165,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CrashBcoinButtonController", com.nuclea
 
 		var tcPerTick = Math.max(tcPerTick_phase0, tcPerTick_phase1, tcPerTick_phase2);
 		// 10 ticks/day / (1.2499270834635280e-6 logInc/day), see calendar.js
-		var ticksUntilNextNaturalCrash = 8000466.693057134 * Math.log(1100 / this.game.calendar.cryptoPrice);
+		var ticksUntilNextNaturalCrash = 8000466.693057134 * Math.log(1100 / this.game.calendar.getCryptoPrice());
 		var tcBasePrice = Math.max(256, tcPerTick * ticksUntilNextNaturalCrash) / 8;
 		var tcPrice = Math.pow(2, Math.ceil(Math.log(tcBasePrice) * Math.LOG2E));
 		return [{name: "timeCrystal", val: tcPrice}];
@@ -1894,8 +1894,9 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 			this.leviathansInfo.innerHTML += $I("trade.leviathans.timeToLeave") + this.game.toDisplayDays(leviathans.duration);
 			//B-coin price:
 			if (this.game.science.get("antimatter").researched){
-				this.leviathansInfo.innerHTML += "<br /> " + $I("trade.bcoin.price") + " <span style='cursor:pointer' title='" + this.game.calendar.cryptoPrice + "'>" +
-					this.game.getDisplayValueExt(this.game.calendar.cryptoPrice, false, false, 5) + "R</span>";
+				var bcoinPrice = this.game.calendar.getCryptoPrice();
+				this.leviathansInfo.innerHTML += "<br /> " + $I("trade.bcoin.price") + " <span style='cursor:pointer' title='" + bcoinPrice + "'>" +
+					this.game.getDisplayValueExt(bcoinPrice, false, false, 5) + "R</span>";
 			}
 		}
 

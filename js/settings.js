@@ -170,6 +170,12 @@ dojo.declare("classes.managers.SettingsManager", com.nuclearunicorn.core.TabMana
 		label: $I("ui.option.compress.savefile"), //Compress exported save file, not compatible with older save versions
 		isExtra: true
 	}, {
+		name: "hodl", //Periodically fetches the real-world b-coin price through game.server.
+		defaultValue: true,
+		label: $I("ui.option.hodl"),
+		tooltip: $I("ui.option.hodl.tip"),
+		isExtra: true
+	}, {
 		name: "disableCMBR", //CMBR was an old feature which granted a global production & storage bonus.
 		defaultValue: false,
 		devModeOnly: true

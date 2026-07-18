@@ -418,7 +418,7 @@ test("Safe infinity tests", () => {
 
     // -------- buyBcoin / sellBcoin --------
     let reserves = new classes.reserveMan(game);
-    const price = game.calendar.cryptoPrice;
+    const price = game.calendar.getCryptoPrice();
     const chronoVector = [
         [2e6/price,   2e6,   2e6*price],
         [4e12/price,  4e12,  4e12*price],

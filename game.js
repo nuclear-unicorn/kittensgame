@@ -207,6 +207,11 @@ dojo.declare("classes.game.Server", null, {
 	motdContent: null,
 	//<----
 
+	/**
+	 * Last known real-world b-coin price, used by hodl mode (game.opts.hodl).
+	 */
+	bcoinPrice: 63918,
+
 	game: null,
 	motdContentPrevious: null,
 	motdFreshMessage: false,
@@ -393,9 +398,38 @@ dojo.declare("classes.game.Server", null, {
 		});
 	},
 
+	/**
+	 * "hodl" mode price feed.
+	 * Fetches the current real-world b-coin price and caches it in this.bcoinPrice
+	 * (which is persisted in the save file). On any failure we simply keep the last
+	 * known price, so the feature degrades gracefully when offline or rate-limited.
+	 *
+	 * @param {(price: number) => void} [handler] - optional callback invoked with the fresh price
+	 */
+	fetchBcoinPrice: function(handler){
+		var self = this;
+		return $.ajax({
+			cache: false,
+			type: "GET",
+			dataType: "json",
+			url: "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
+		}).done(function(resp){
+			var price = resp && resp.bitcoin && resp.bitcoin.usd;
+			if (typeof price === "number" && price > 0){
+				self.bcoinPrice = price;
+				if (handler){
+					handler(price);
+				}
+			}
+		}).fail(function(err){
+			console.log("Unable to fetch b-coin price, keeping last known value", self.bcoinPrice, err);
+		});
+	},
+
 	save: function(saveData) {
 		saveData.server = {
-			motdContent: this.motdContent
+			motdContent: this.motdContent,
+			bcoinPrice: this.bcoinPrice
 		};
 	},
 
@@ -2277,6 +2311,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var ONE_MIN = this.ticksPerSecond * 60;
 		this.timer.addEvent(dojo.hitch(this, function(){ this.achievements.update(); }), 50);	//once per 50 ticks, we hardly need this
 		this.timer.addEvent(dojo.hitch(this, function(){ this.server.refresh(); }), ONE_MIN * 10);	//reload MOTD and server info every 10 minutes
+		this.timer.addEvent(dojo.hitch(this, function(){ if (this.opts.hodl){ this.server.fetchBcoinPrice(); } }), ONE_MIN * 5);	//refresh real-world b-coin price every 5 min
 		this.timer.addEvent(dojo.hitch(this, function(){ this.heartbeat(); }), ONE_MIN * 10);	//send heartbeat every 10 min	//TODO: 30 min eventually
 		this.timer.addEvent(dojo.hitch(this, function(){ this.updateWinterCatnip(); }), 25);	//same as achievements, albeit a bit more frequient
 		this.timer.addEvent(dojo.hitch(this, function(){ this.ui.checkForUpdates(); }), ONE_MIN * 5);	//check new version every 5 min
@@ -2649,6 +2684,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 				if (saveData.server){
 					this.server.motdContentPrevious = saveData.server.motdContent;
+					if (typeof saveData.server.bcoinPrice === "number"){
+						this.server.bcoinPrice = saveData.server.bcoinPrice; //last known "hodl" mode price
+					}
 				}
 
 				if (!saveData.saveVersion || saveData.saveVersion != this.saveVersion) {
@@ -2714,6 +2752,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				if (data.opts.fontSize == undefined){
 					this.opts.fontSize = 14;
 				}
+			}
+
+			//Opt out existing saves, opt in all new games
+			if (!data.opts || data.opts.hodl === undefined) {
+				this.opts.hodl = false;
 			}
 
 			this.updateOptionsUI();

@@ -1938,6 +1938,8 @@
     "ui.option.batch.size": "Batch size of Ctrl-click",
     "ui.option.force.lz": "Always compress in-memory save, in UTF-16 <i>(experimental)</i>",
     "ui.option.compress.savefile": "Compress exported save file <i>(experimental)<br>\nWARNING: it generates save files that are NOT COMPATIBLE with older versions.</i>",
+    "ui.option.hodl": "HODL mode",
+    "ui.option.hodl.tip": "Use dynamic b-coin value",
     "ui.option.dev.mode.only": "(Only available in Dev Mode)",
     "ui.option.export.button": "Export",
     "ui.option.import.button": "Import",
