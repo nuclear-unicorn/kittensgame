@@ -156,6 +156,14 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		visible: true,
 		persists: false
 	},{
+		name : "artifact",
+		title: $I("resources.artifact.title"),
+		type : "common",
+		transient: true,
+		color: "#99815d",
+		visible: true,
+		persists: false
+	},{
 		name : "zebras",
 		title: $I("resources.zebras.title"),
 		type : "common",
@@ -926,6 +934,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 
 		//Stuff for Refrigiration and (potentially) similar effects
 		maxValue *= 1 + this.game.getEffect(res.name + "MaxRatio");
+		maxValue *= 1 + this.game.getEffect(res.name + "ArtifactMaxRatio");
+
 
 		if (!this.isNormalCraftableResource(res) && !res.transient) {
 			maxValue *= 1 + this.game.getEffect("globalResourceRatio");

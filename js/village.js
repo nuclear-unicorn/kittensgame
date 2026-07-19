@@ -156,6 +156,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 	sim: null,
 	map: null,
+	artifactSim: null,
 	deathTimeout: 0,
 
 	leader: null,	//a reference to a leader kitten for fast access, must be restored on load,
@@ -230,12 +231,14 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 	updateEffectCached: function(){
 		this.map.updateEffectCached();
+		this.artifactSim.updateEffectCached();
 	},
 
 	constructor: function(game){
 		this.game = game;
 		this.sim = new classes.village.KittenSim(game);
 		this.map = new classes.village.Map(game);
+		this.artifactSim = new classes.village.ArtifactSim(game);
 
 		this.jobNames = [];
 		for (var i = 0; i < this.jobs.length; ++i) {
@@ -332,11 +335,16 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		}
 		return kittensPerTick;
 	},
+	calculateSimMaxArtifact: function(){
+		var maxArtifacts = this.game.getEffect("maxArtifacts") + Math.min(10, this.game.getEffect("maxArtifactsMuseum"));
+		return maxArtifacts;
+	},
 	update: function(){
 		//calculate kittens
 		var kittensPerTick = this.calculateKittensPerTick();
 
 		this.sim.maxKittens = this.calculateSimMaxKittens();
+		this.artifactSim.maxArtifacts = this.calculateSimMaxArtifact();
 		//this.sim.maxKittens = Math.round(this.maxKittens * (1 + this.game.getLimitedDR(maxKittensRatio, 1)));
 		//todo: consider discarding extra population, but DO account for disabled buildings like space stations
 		//likely the best way to do it is once, upon HG upgrade
@@ -402,6 +410,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		//this.game.ui.updateFastHunt();
 
 		this.map.update();
+		this.artifactSim.update();
 
 		//Fix rare edge cases with unusual (but valid!) methods of unlocking this tab not working
 		if (!this.game.villageTab.visible) {
@@ -414,7 +423,9 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		//calculate kittens
 		var kittensPerTick = this.calculateKittensPerTick();
 		this.sim.maxKittens = this.calculateSimMaxKittens();
+		this.artifactSim.maxArtifacts = this.calculateSimMaxArtifact();
 		this.sim.update(kittensPerTick, times);
+		this.artifactSim.update(times);
 	},
 
 	getDiligentKittens: function() {
@@ -711,6 +722,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 		saveData.village = {
 			kittens : kittens,
+			artifacts : this.artifactSim.artifacts || [],
 			maxKittens: this.maxKittens,
 			jobs: this.filterMetadata(this.jobs, ["name", "unlocked", "value"]),
 			biomes: this.filterMetadata(this.map.biomes, ["name", "unlocked", "val", "on", "cp"]),
@@ -718,6 +730,9 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			lastBiome: this.map.lastBiome,
 			hadKittenHunters: this.sim.hadKittenHunters,
 			nextKittenProgress: this.sim.nextKittenProgress,
+			huntArtifactProgress: this.artifactSim.huntArtifactProgress,
+			tradeArtifactProgress: this.artifactSim.tradeArtifactProgress,
+			mapArtifactProgress: this.artifactSim.mapArtifactProgress,
 			map: this.map.save(),
 			loadouts: loadouts
 		};
@@ -733,6 +748,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 			this.sim.kittens = [];
 			this.game.village.traits = [];
+			this.artifactSim.artifacts = [];
 
 			for (var i = kittens.length - 1; i >= 0; i--) {
 				var kitten = kittens[i];
@@ -748,6 +764,9 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 						this.game.village.leader = newKitten;
 				}
 				this.sim.kittens.unshift(newKitten);
+			}
+			if (saveData.village.artifacts) {
+				this.artifactSim.artifacts = saveData.village.artifacts;
 			}
 
 			this.maxKittens  = saveData.village.maxKittens;
@@ -769,6 +788,9 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			}
 			this.sim.hadKittenHunters = (saveData.village.hadKittenHunters === undefined) ? true: saveData.village.hadKittenHunters;
 			this.sim.nextKittenProgress = saveData.village.nextKittenProgress || 0;
+			this.artifactSim.huntArtifactProgress = saveData.village.huntArtifactProgress || 0;
+			this.artifactSim.tradeArtifactProgress = saveData.village.tradeArtifactProgress || 0;
+			this.artifactSim.mapArtifactProgress = saveData.village.mapArtifactProgress || 0;
 			if (saveData.village.map){
 				this.map.load(saveData.village.map);
 			}
@@ -784,7 +806,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 				this.loadoutController.loadouts.push(newLoadout);
 			}
 		}
-
+		this.artifactSim.refreshArtifactGroups();
 		this.updateResourceProduction();
 	},
 
@@ -909,6 +931,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		if (squads >= 1000&&!this.game.challenges.getChallenge("pacifism").unlocked){
 			this.game.challenges.getChallenge("pacifism").unlocked = true;
 		}
+
+		this.game.village.artifactSim.addHuntArtifact(); //Discover artifact if enough time passed in artifactSim
 
 		var unicorns = this.game.resPool.addResEvent("unicorns", this.game.math.binominalRandomInteger(squads, this.getHuntUnicornChance()));
 		if (unicorns > 0) {
@@ -1226,7 +1250,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 /**
  * Kitten container
  */
-dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
+dojo.declare("com.nuclearunicorn.game.village.Kitten", null, { //
 
 	statics: {
 		SAVE_PACKET_OFFSET: 100,
@@ -2263,6 +2287,9 @@ dojo.declare("classes.village.Map", null, {
 				}
 			}
 		}
+		if (killedFauna.length) {
+			this.game.village.artifactSim.addMapArtifact(biome);
+		}
 	},
 
 	getHitRate: function(src, tgt){
@@ -3034,10 +3061,1055 @@ dojo.declare("classes.village.ui.MapOverviewWgt", [mixin.IChildrenAware, mixin.I
 
 //=================	MAP END =====================
 
+dojo.declare("classes.village.ui.artifacts.CherishBtn", com.nuclearunicorn.game.ui.ButtonModern, {
+
+	renderLinks: function() {
+		var artifact = this.controller.artifact;
+
+		if (artifact.preserve) {
+			if (artifact.on == 0) {
+				this.rememberLink = this.addLink(this.model.rememberLink);
+				this.forgetLink = this.addLink(this.model.forgetLink);
+			} else if (artifact.on > 0) {
+				this.storeLink = this.addLink(this.model.storeLink);
+			}
+		} else {
+			this.discardLink = this.addLink(this.model.discardLink);
+		}
+	},
+
+	onClick: function(model) {
+		this.inherited(arguments);
+		this.game.villageTab.requestMuseumRefresh();
+	},
+});
+
+dojo.declare("classes.village.ui.artifacts.CherishController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
+	artifact : null,
+	constructor: function(game, controllerOpts, artifact) {
+		this.inherited(arguments);
+		this.artifact = artifact;
+		this.game = game;
+	},
+
+	defaults: function() {
+		var result = this.inherited(arguments);
+		result.simplePrices = false;
+		return result;
+	},
+
+	fetchModel: function(options){
+		var model = this.inherited(arguments);
+		var artifactSim = this.game.village.artifactSim;
+		var artifact = this.artifact;
+		model.discardLink = {
+			id: "discard",
+			title: $I("village.artifactList.btn.discard"),
+			tooltip: $I("village.artifactList.btn.discard.tooltip"),
+			handler: function(){
+				artifactSim.removeArtifact(artifact);
+			}
+		};
+		model.forgetLink = {
+			id: "forget",
+			title: $I("village.artifactList.btn.forget"),
+			tooltip: $I("village.artifactList.btn.forget.tooltip"),	
+			handler: function(){
+				artifactSim.removeArtifact(artifact);
+			}
+		};
+		model.rememberLink = {
+			id: "remember",
+			title: $I("village.artifactList.btn.remember"),
+			tooltip: $I("village.artifactList.btn.remember.tooltip"),	
+			handler: function(){
+					artifactSim.rememberArtifact(artifact);
+				}
+		};
+		model.storeLink = {
+			id: "store",
+			title: $I("village.artifactList.btn.store"),
+			tooltip: $I("village.artifactList.btn.store.tooltip"),	
+			handler: function(){
+				artifactSim.storeArtifact(artifact);
+				artifact.on = 0;
+				this.game.villageTab.requestMuseumRefresh();
+			}
+		};
+		return model;
+	},
+
+
+	getMetadata: function(model) {
+		var artifact = this.artifact;
+		if (!model.metaCached) {
+			model.metaCached = {
+				label: $I("village.btn.cherish"),
+				description: $I("village.btn.cherish.desc"),
+				val: artifact.val,
+				on: artifact.on,
+			};
+		}
+		
+		return model.metaCached;
+	},
+
+	getPrices: function(model) {
+		var prices = dojo.clone(model.options.prices);
+		for (var i = 0; i < prices.length; i++) {
+            prices[i].val *= Math.pow(2, this.artifact.val);
+		}
+		return prices;
+	},
+
+	incrementValue: function(model) {
+		this.inherited(arguments);
+		this.artifact.val++;
+		if (this.artifact.on > 0) {
+			this.artifact.on = this.artifact.val;
+		}
+	},
+
+	updateVisible: function(model){
+		model.visible = true;
+	},
+
+	/*hasSellLink: function(model){
+		return true;
+	},
+
+	renderLinks: function() {
+		
+    },*/
+});
+
+dojo.declare("classes.village.Artifact", null, {
+	name: null,
+	title: null,
+	preserve: false,
+
+	effects: {},
+
+	//creator: "",
+	
+	description: "",
+
+	artifactTypes: [{
+		//Village and Trading
+		name: "book",
+		dropPools: ["village", "trade"],
+		title: $I("village.artifact.artifactType.book.title"),
+		effects: {"scienceArtifactMaxRatio" : 0.005, "scienceArtifactRatio" : 0.01, "skillMultiplier" : 0.005},
+		description: [{
+				pool: ["technology"],
+				text: "village.artifact.description.book.technology"
+			},{
+				pool: ["policy"],
+				text: "village.artifact.description.book.policy"
+			},{
+				pool: ["spaceMission"],
+				text: "village.artifact.description.book.program"
+			}
+		]
+	},{
+		name: "painting",
+		dropPools: ["village", "trade"],
+		title: $I("village.artifact.artifactType.painting.title"),
+		effects: {"cultureArtifactMaxRatio": 0.005, "cultureArtifactRatio": 0.01, "tradeRatio": 0.01},
+		description: [{
+				pool: ["building", "spaceBuilding"],
+				text: "village.artifact.description.painting.building"
+			},{
+				pool: ["zigguratUpgrade"],
+				text: "village.artifact.description.painting.zigguratUpgrade"
+			},{
+				pool: ["planet"],
+				text: "village.artifact.description.painting.planet"
+			}
+		]
+	},{
+		name: "music",
+		dropPools: ["village", "trade"],
+		title: $I("village.artifact.artifactType.music.title"),
+		effects: {"faithArtifactRatio": 0.01, "happiness": 1, "festivalRatio": 0.001},
+		description: [{
+			pool: ["job"],
+			text: "village.artifact.description.music.job"
+		},{
+			pool: ["religionUpgrade"],
+			text: "village.artifact.description.music.religionUpgrade"
+		},{
+			pool: ["governmentPolicy"],
+			text: "village.artifact.description.music.governmentPolicy"
+		}
+	]
+	},{
+		name: "sculpture",
+		dropPools: ["village", "trade"],
+		title: $I("village.artifact.artifactType.sculpture.title"),
+		effects: {"faithArtifactMaxRatio": 0.005, "craftRatio": 0.01, "embassyCostReduction": 0.005},
+		description: [{
+				pool: ["race"/*, "animal"*/],
+				text: "village.artifact.description.sculpture.race"
+			},{
+				pool: ["traitKitten"],
+				text: "village.artifact.description.sculpture.traitKitten"
+			},{
+				pool: ["jobKitten"],
+				text: "village.artifact.description.sculpture.jobKitten"
+			},{
+				pool: ["trait"],
+				text: "village.artifact.description.sculpture.trait"
+			}
+		]
+	},{
+		name: "tapestry",
+		dropPools: ["village", "trade"],
+		title: $I("village.artifact.artifactType.tapestry.title"),
+		effects: {"manpowerArtifactMaxRatio": 0.005, "manpowerArtifactRatio": 0.01, "tradeRatio": 0.005},
+		description: [{
+				pool: ["race"],
+				text: "village.artifact.description.tapestry.raceTrade"
+			},{
+				pool: ["race"],
+				pool2: ["villageTitle"],
+				text: "village.artifact.description.tapestry.emissaries"
+			},{
+				pool: ["religionUpgrade", "zigguratUpgrade"],
+				text: "village.artifact.description.tapestry.religion"
+			}
+		]
+	},
+	//-----------Hunting-----------
+	{
+		name: "fossil",
+		dropPools: ["hunt", "plains"],
+		title: $I("village.artifact.artifactType.fossil.title"),
+		effects: {"unicornsArtifactRatio": 0.01, "manpowerArtifactMaxRatio": 0.005, "coalArtifactRatio": 0.01},
+	},{
+		name: "fossilPrimeval",
+		dropPools: ["hunt", "plains", "spiders"],
+		title: $I("village.artifact.artifactType.fossilPrimeval.title"),
+		effects: {"oilArtifactRatio": 0.01, "manpowerArtifactRatio": 0.01, "mintIvoryRatio": 0.01},
+	},
+	//-----------Tools-----------
+	{
+		name: "toolsHunterAncient",
+		dropPools: ["hunt", "plains", "griffins", "zebras"],
+		title: $I("village.artifact.artifactType.toolsHunterAncient.title"),
+		effects: {"hunterRatio": 0.01, "manpowerArtifactRatio": 0.006, "manpowerArtifactMaxRatio": 0.005},
+	},{ 
+		name: "toolsPrehistoric",
+		dropPools: ["hunt", "plains", "forest"],
+		title: $I("village.artifact.artifactType.toolsPrehistoric.title"),
+		effects: {"catnipArtifactRatio": 0.01, "woodArtifactRatio": 0.005, "mineralsArtifactRatio": 0.01},
+	},{
+		name: "toolsAncinet",
+		dropPools: ["hunt", "hills", "mountain"],
+		title: $I("village.artifact.artifactType.toolsAncinet.title"),
+		effects: {"coalArtifactRatio": 0.01, "ironArtifactRatio": 0.005, "craftRatio": 0.015},
+	},{
+		name: "toolsWoodworking",
+		dropPools: ["forest", "lizards"],
+		title: $I("village.artifact.artifactType.toolsWoodworking.title"),
+		effects: {"woodArtifactRatio": 0.01, "beamCraftRatio": 0.08, "scaffoldCraftRatio": 0.07},
+	},{
+		name: "toolsWriting",
+		dropPools: ["plains", "sharks"],
+		title: $I("village.artifact.artifactType.toolsWriting.title"),
+		effects: {"cultureArtifactRatio": 0.01, "parchmentCraftRatio": 0.1, "manuscriptCraftRatio": 0.05},
+	},{
+		name: "toolsIronCasting",
+		dropPools: ["hills", "griffins", "mountain"],
+		title: $I("village.artifact.artifactType.toolsIronCasting.title"),
+		effects: {"ironArtifactRatio": 0.01, "plateCraftRatio": 0.06, "steelCraftRatio": 0.05},
+	},{
+		name: "toolsCultist",
+		dropPools: ["mountain", "nagas"],
+		title: $I("village.artifact.artifactType.toolsCultist.title"),
+		effects: {"faithRatio": 0.01, "faithArtifactMaxRatio": 0.005, "cultureArtifactMaxRatio": 0.005},
+	},{
+		name: "toolsMasonry",
+		dropPools: ["hills", "mountain", "nagas"],
+		title: $I("village.artifact.artifactType.toolsMasonry.title"),
+		effects: {"slabCraftRatio": 0.1, "megalithCraftRatio": 0.08, "concrateCraftRatio": 0.07},
+	},{
+		name: "toolsPaleontology",
+		dropPools: ["hills", "mountain", "spiders"],
+		title: $I("village.artifact.artifactType.toolsPaleontology.title"),
+		effects: {"mintIvoryRatio": 0.015, "oilArtifactRatio": 0.015, "coalArtifactRatio": 0.015},
+	},{
+		name: "toolsAstrology",
+		dropPools: ["mountain", "dragons"],
+		title: $I("village.artifact.artifactType.toolsAstrology.title"),
+		effects: {"starEventChance": 0.001, "starAutoSuccessChance": 0.002, "scienceArtifactRatio": 0.01},
+	},
+	//-----------Techniques-----------
+	{
+		name: "techniqueSmelting",
+		dropPools: ["hills", "mountain", "griffins"],
+		title: $I("village.artifact.artifactType.techniqueSmelting.title"),
+		effects: {"smelterRatio": 0.012, "goldRatio": 0.008, "steelCraftRatio": 0.06},
+	},{
+		name: "techniqueSmeltingAdvanced",
+		dropPools: ["mountain", "boneForest", "zebras"],
+		title: $I("village.artifact.artifactType.techniqueSmeltingAdvanced.title"),
+		effects: {"calcinerRatio": 0.025, "alloyCraftRatio": 0.025, "titaniumArtifactMaxRatio": 0.005},
+	}],
+
+
+	constructor: function(game, type, pools, effectCount){ //Use type if a specific type is needed, or pool if we want to select a random one from given pools
+		var tempArtifactType = null;
+		this.effects = {};
+		this.preserve = false;
+		this.queue = false;
+		if (!effectCount) {
+			effectCount = 1;
+		}
+		if (type) {
+			for (var i in this.artifactTypes) {
+				var artifactType = this.artifactTypes[i];
+				if (artifactType.name == type) {
+					tempArtifactType = artifactType;
+					break;
+				}
+				
+			}
+		} else if (pools) {
+			var typesFiltered = [];
+			for (var i in this.artifactTypes) {
+				var artifactType = this.artifactTypes[i];
+				for (var i in pools) {
+					if (artifactType.dropPools.includes(pools[i])) {
+						typesFiltered.push(artifactType);
+						break;
+					}	
+				}
+
+			}
+			tempArtifactType = typesFiltered[this.rand(typesFiltered.length)];
+		} else {
+			tempArtifactType = this.artifactTypes[this.rand(this.artifactTypes.length)];
+		}
+
+		if (!tempArtifactType) {
+			tempArtifactType = this.artifactTypes[this.rand(this.artifactTypes.length)];
+		}
+		
+		this.name = tempArtifactType.name;
+		this.title = tempArtifactType.title;
+		
+		var effects = [];
+		for (var i in tempArtifactType.effects) {
+			effects.push(i);
+		}
+		var effectCount = Math.min(effectCount, effects.length);
+		for (var i = 0; i < effectCount; i++) {
+
+			var randomEffect = this.rand(effects.length);
+			var key = effects[randomEffect];
+			this.effects[key] = tempArtifactType.effects[key];
+			effects.splice(randomEffect, 1);
+		}
+
+		this.run = game.stats.getStat("totalResets").val + 1;
+		this.val = 1;
+		this.on = 1;
+
+		/*var tempDescription = tempArtifactType.description[this.rand(tempArtifactType.description.length)];
+		var randomItem = [this.getRandomItem(tempDescription.pool, self.game)];
+		if (tempDescription.pool2) {
+			randomItem.push(this.getRandomItem(tempDescription.pool2, self.game));
+		}*/
+		//var kitten = self.game.village.sim.kittens[this.rand(self.game.village.sim.kittens.length)];
+		//this.creator = kitten.name + " " +kitten.surname;
+		//this.year = self.game.calendar.year;
+		/*if (!tempDescription.pool2) {
+			description = $I(tempDescription.text, [randomItem]);
+		} else {
+			description = $I(tempDescription.text, [this.getRandomItem(tempDescription.pool, self.game), this.getRandomItem(tempDescription.pool2, self.game)]);
+		}*/
+		/*if(randomItem){
+			this.description = $I(tempDescription.text, randomItem);
+		} else {
+			this.description = "";
+		}*/			
+	},
+
+	/*getRandomItem: function(pool, game) {
+		var tempPool = [];
+		for (var i = 0; pool.length > i; i++) {
+			switch (pool[0]) {
+				case "technology":
+					var technologies = game.science.techs;
+					for (var j in technologies){
+						var technology = technologies[j];
+						if (technology.researched){
+							tempPool.push(technology.label);
+						}
+					}
+					break;
+				case "policy":
+					var policies = game.science.policies;
+					for (var j in policies){
+						var policy = policies[j];
+						if (policy.researched){
+							tempPool.push(policy.label);
+						}
+					}
+					break;
+				case "religionUpgrade":
+					var religionUpgrades = game.religion.religionUpgrades;
+					for (var j in religionUpgrades){
+						var upgrade = religionUpgrades[j];
+						if (upgrade.val){
+							tempPool.push(upgrade.label);
+						}
+					}
+					break;
+				case "spaceMission":
+					var spaceMissions = game.space.programs;
+					for (var j in spaceMissions){
+						var program = spaceMissions[j];
+						if (program.val){
+							tempPool.push(program.label);
+						}
+					}
+					break;
+				case "building":
+					var bld = game.bld;
+					for (var j in bld.buildingsData){
+						var building = bld.buildingsData[j];
+						if (building.val){
+							var label = building.label;
+							if (building.stages){
+								if (building.stages){
+									label = building.stages[building.stage].label;
+								}
+							}
+							tempPool.push(label);
+						}
+					}
+					break;
+				case "spaceBuilding":
+					var spaceBuildMap = game.space.spaceBuildingsMap;
+					for (var j in spaceBuildMap){
+                    var building = this.game.space.getBuilding(spaceBuildMap[j]);
+						if (building.val){
+							tempPool.push(building.label);
+						}
+					}
+					break;
+				case "zigguratUpgrade":
+					var zigguratUpgrades = game.religion.zigguratUpgrades;
+					for (var j in zigguratUpgrades){
+						var upgrade = game.religion.zigguratUpgrades[j];
+						if (upgrade.val){
+							tempPool.push(upgrade.label);
+						}
+					}
+					break;
+				case "planet":
+					var planets = game.space.planets;
+					for (var j in planets){
+						var planet = planets[j];
+						if (planet.unlocked){
+							tempPool.push(planet.label);
+						}
+					}
+					break;
+				case "job":
+					var jobs = game.village.jobs;
+					for (var j in jobs){
+						var job = jobs[j];
+						if (job.unlocked){
+							tempPool.push(job.title);
+						}
+					}
+					break;
+				case "governmentPolicy":
+					var policies = game.science.policies;
+					for (var j in policies){
+						var policy = policies[j];
+						if (policy.researched && policy.type == "government"){
+							tempPool.push(policy.label);
+						}
+					}
+					break;
+				case "race":
+					var races = game.diplomacy.races;
+					for (var j in races){
+						var race = races[j];
+						if (race.unlocked){
+							tempPool.push(race.title);
+						}
+					}
+					break;
+				case "trait":
+					var traits = game.village.traits;
+					for (var j in traits){
+						var trait = traits[j];
+						if (trait.name != "none"){
+							tempPool.push(trait.title);
+						}
+					}
+					break;
+				case "traitKitten":
+					var kitten = game.village.sim.kittens[this.rand(game.village.sim.kittens.length)];
+						var trait = kitten.trait.title;
+						if (trait == "None" || !trait) {
+							trait = "";
+						}
+						tempPool.push(trait + " " + kitten.name + " " + kitten.surname);
+						break;
+				case "jobKitten":
+					var kitten = game.village.sim.kittens[this.rand(game.village.sim.kittens.length)];
+						var job = kitten.job;
+						if (!job) {
+							job = "";
+						}
+						tempPool.push(job + " " + kitten.name + " " + kitten.surname);
+						break;
+				case "villageTitle":
+					tempPool.push(game.villageTab.getVillageTitle());
+			}
+			
+			return tempPool[this.rand(tempPool.length)];
+		}
+	},*/
+
+	rand: function(ratio){
+		return (Math.floor(Math.random() * ratio));
+	},
+});
+
+dojo.declare("classes.village.ArtifactSim", null, {
+
+	game: null,
+	artifacts: null,
+	
+	
+
+	maxArtifacts: 0,
+	huntArtifactProgress : 0,
+	huntArtifactsPerTick: 0.002,
+	hunterRatioArtifact: 5, //Will decide if an extra effect is given when discovering artifact through hunting
+
+	tradeArtifactProgress: 0,
+	tradeArtifactsPerTick: 0.002,
+	tradeArtifact: 100, //Will decide if an extra effect is given when discovering artifact through trading
+
+	mapArtifactProgress: 0,
+	mapArtifactProgressMax: 10, //How many fauna need to be killed for an artifact, affected by terrain penalty and level
+	mapArtifactCondition: 1, //Will decide if an extra effect is given when gaining artifact through the map. affected by biome penalty and level
+
+	maxPreserved: 0,
+	activeArtifacts: 0,
+	preservedArtifacts: 0,
+
+	constructor: function(game){
+		this.artifacts = [];
+		this.game = game;
+	},
+
+	update: function(times){
+		
+		var game = this.game;
+		if (!times) {
+			times = 1;
+		}
+		this.maxPreserved = game.getEffect("maxArtifactsPreserved");
+
+		if (this.huntArtifactProgress < 1) {
+			this.huntArtifactProgress += times * this.huntArtifactsPerTick;
+			this.huntArtifactProgress = Math.min(1, this.huntArtifactProgress);
+		}
+
+		if (this.tradeArtifactProgress < 1) {
+			this.tradeArtifactProgress += times * this.tradeArtifactsPerTick;
+			this.tradeArtifactProgress = Math.min(1, this.tradeArtifactProgress);
+		}
+
+	},
+
+	addArtifact: function(type, pool, effectCount, msg) {
+		var artifact = new classes.village.Artifact(this.game, type, pool, effectCount); //
+		this.artifacts.unshift(artifact);
+		this.refreshArtifactGroups();
+		this.game.msg(msg, "important");
+		this.game.villageTab.requestMuseumRefresh();
+		return true;
+	},
+
+	removeArtifact: function(artifact){
+		this.artifacts.splice(this.artifacts.indexOf(artifact), 1);
+		this.refreshArtifactGroups();
+		this.game.villageTab.requestMuseumRefresh();
+	},
+
+	rememberArtifact: function(artifact){
+		if (this.activeArtifacts < this.maxArtifacts) {
+			artifact.on = artifact.val;
+			this.refreshArtifactGroups();
+			this.game.villageTab.requestMuseumRefresh();
+		} else {
+			this.game.msg($I("village.msg.artifact.remember"));
+		}
+
+	},
+
+	storeArtifact: function(artifact){
+		artifact.on = 0;
+		this.refreshArtifactGroups();
+		this.game.villageTab.requestMuseumRefresh();
+	},
+
+	togglePreserveArtifact: function(artifact){
+		if (!artifact.preserve) {
+			if (this.preservedArtifacts < this.maxPreserved) {
+				artifact.preserve = true;
+				this.refreshArtifactGroups();
+				this.game.villageTab.requestMuseumRefresh();
+			} else {
+				this.game.msg($I("village.msg.artifact.preserve"));
+			}
+		} else {
+			artifact.preserve = false;
+			this.refreshArtifactGroups();
+			this.game.villageTab.requestMuseumRefresh();
+		}
+	},
+
+	addHuntArtifact: function (){
+		if (this.huntArtifactProgress >= 1 && this.getFreeArtifactSlot()) {
+			var hunterRatio = this.game.getEffect("hunterRatio");
+			var effectCount = 1;
+			for (var i = 2; i > 0; i--) { //Can give up to 2 extra effects based on Hunting effectiveness
+				var hunterRatioArtifact = Math.random() * this.hunterRatioArtifact;
+				if (hunterRatio > hunterRatioArtifact) {
+					effectCount++;
+				}
+			} 
+			if (this.addArtifact(null,["hunt"],effectCount, $I("village.msg.artifact.hunt"))) {
+				this.huntArtifactProgress = 0;
+				return true;
+			}
+
+		}
+		return false;
+	},
+
+	addTradeArtifact: function(race){
+		if (this.tradeArtifactProgress >= 1 && this.getFreeArtifactSlot()) {
+			var effectChance = race.embassyLevel + race.energy/10;
+			var effectCount = 1;
+			for (var i = 2; i > 0; i--) { // Can give up to 2 extra effects based on number of embassies or tenth of leviathan energy
+				var tradeArtifactRandom = Math.random() * this.tradeArtifact;
+				if (effectChance > tradeArtifactRandom) {
+					effectCount++;
+				}
+			}
+			 //60% Chance to get race specific artifact instead of generic trade artifact
+			var pool = null;
+			if (Math.random() > 0.6) {
+				pool = race.name;
+			} else {
+				pool = "trade";
+			}
+			if (this.addArtifact(null,[pool],effectCount, $I("village.msg.artifact.trade"))) {
+				this.tradeArtifactProgress = 0;
+				return true;
+			}
+		}
+		return false;
+	},
+
+	addMapArtifact: function(biome){
+		var progress = biome.terrainPenalty * (1 + biome.on/10); //Terrain penalty and level affect progress
+		this.mapArtifactProgress += progress;
+		
+		if (this.mapArtifactProgress >= this.mapArtifactProgressMax && this.getFreeArtifactSlot()) {
+			var effectChance = 0.1 + biome.on * 0.05; //Small chance increased by biome level
+			var effectCount = 1;
+			
+			for (var i = 2; i > 0; i--) { // Can give up to 2 extra effects based on biome level
+				var mapArtifactRandom = Math.random() * this.mapArtifactCondition;
+				if (effectChance > mapArtifactRandom) {
+					effectCount++;
+				}
+			}
+			if (this.addArtifact(null,[biome.name],effectCount, $I("village.msg.artifact.map", [biome.title]))) {
+				this.mapArtifactProgress = 0;
+				return true;
+			}
+		}
+		this.mapArtifactProgress = Math.min(this.mapArtifactProgressMax, this.mapArtifactProgress);
+		return false;
+	},
+
+	getFreeArtifactSlot: function(){
+		if (this.activeArtifacts >= this.maxArtifacts) {
+			return false;
+		}
+		return true;
+	},
+
+	getArtifactEffectTotal: function(effectVal, val){
+		return effectVal * val;
+	},
+
+	updateEffectCached: function(){
+		
+		//update cached effects based on owned artifacts
+		for (var i in this.artifacts){
+			var artifact = this.artifacts[i];
+
+			for (var effect in artifact.effects) {
+				var effectVal = artifact.effects[effect];
+				var globalEffectsCached = this.game.globalEffectsCached;
+				if (!globalEffectsCached[effect]){
+					globalEffectsCached[effect] = 0;
+				}
+				globalEffectsCached[effect] += (effectVal * artifact.on);
+			}
+		}
+	},
+
+	getActiveArtifacts: function() {
+		var activeArtifacts = [];
+		for (var i in this.artifacts) {
+			var artifact = this.artifacts[i];
+			if (artifact.on > 0) {
+				activeArtifacts.push(artifact);
+			}
+		}
+		return activeArtifacts;
+	},
+
+	getPreservedArtifacts: function() {
+		var preservedArtifacts = [];
+		for (var i in this.artifacts) {
+			var artifact = this.artifacts[i];
+			if (artifact.preserve) {
+				preservedArtifacts.push(artifact);
+			} else if (artifact.on == 0) {
+				artifact.on = artifact.val;
+			}
+		}
+		return preservedArtifacts;
+	},
+
+	refreshArtifactGroups: function() {
+		this.activeArtifacts = this.getActiveArtifacts().length;
+		this.preservedArtifacts = this.getPreservedArtifacts().length;
+	}
+});
+
+dojo.declare("com.nuclearunicorn.game.ui.MuseumPanel", com.nuclearunicorn.game.ui.Panel, {
+
+	activeArtifactList: null,
+	preservedArtifactList: null,
+	artifactSim: null,
+
+	constructor: function(name, village, game){
+		this.game = game;
+		this.tabManager = village;
+		this.artifactSim = game.village.artifactSim;
+
+		//This panel only shows artifacts that are active
+		this.activeArtifactList = new classes.ui.village.ArtifactList($I("village.artifactList.active.title"), this.tabManager, game, "active"); 
+		//This shows artifacts that are preserved
+		this.preservedArtifactList = new classes.ui.village.ArtifactList($I("village.artifactList.preserved.title"), this.tabManager, game, "preserved");
+		this.sortArtifacts();
+	},
+
+	render: function(container){
+		this.sortArtifacts();
+		this.inherited(arguments);
+		this.progressDiv = dojo.create("div", {	
+			style : {
+				overflow: "hidden"
+			}
+		}, this.contentDiv);
+		this.artifactListsDiv = dojo.create("div", {	
+			style : {
+				overflow: "hidden"
+			}
+		}, this.contentDiv);
+
+		this.renderProgressDiv(this.progressDiv);
+		this.renderArtifactLists(this.artifactListsDiv);
+	},
+
+	refresh: function(){
+		this.sortArtifacts();
+		this.renderProgressDiv(this.progressDiv);
+		this.renderArtifactLists(this.contentDiv);
+	},
+
+	renderArtifactLists: function(container){
+		dojo.empty(this.artifactListsDiv);
+		this.activeArtifactList.render(this.artifactListsDiv);
+		if (this.game.prestige.getPerk("remembrance").researched) {
+			this.preservedArtifactList.render(this.artifactListsDiv);	
+		}
+	},
+
+	renderProgressDiv: function(container) {		
+		dojo.empty(this.progressDiv);
+
+		var huntProgress = $I("village.museum.panel.hunt.progress") + ": [" + ( this.artifactSim.huntArtifactProgress * 100 ).toFixed()  + "%]";
+		var tradeProgress = $I("village.museum.panel.trade.progress") + ": [" + ( this.artifactSim.tradeArtifactProgress * 100 ).toFixed()  + "%]";
+
+		var huntProgressDiv = dojo.create("div", {
+			innerHTML: huntProgress,
+			style: {
+				float: "left"
+			}
+		}, container);
+
+		var tradeProgressDiv = dojo.create("div", {
+			innerHTML: tradeProgress,
+			style: {
+				float: "right"
+			}
+		}, container);
+	},
+
+	sortArtifacts: function(){
+		this.activeArtifacts = this.artifactSim.getActiveArtifacts(); 
+		this.preservedArtifacts = this.artifactSim.getPreservedArtifacts();
+
+		if (this.activeArtifactList && this.preservedArtifactList) {
+			this.activeArtifactList.artifacts = this.activeArtifacts;
+			this.preservedArtifactList.artifacts = this.preservedArtifacts;
+		}
+	},
+
+	update: function(){
+		this.activeArtifactList.update();
+		this.preservedArtifactList.update();
+		this.renderProgressDiv(this.progressDiv);
+	}
+
+});
+
+dojo.declare("classes.ui.village.ArtifactList", com.nuclearunicorn.game.ui.Panel, {
+
+	game: null,
+	artifacts: null,
+	container: null,
+	groupType: null,
+
+	glossaryDiv: null,
+	cherishButtons: null,
+	
+	statics: { /*make configuration options static so they persist between tab switching*/
+		hideActiveEffects: true,
+		hidePreservedEffects: true,
+	},
+
+	constructor: function(name, tabManager, game, groupType){
+		this.game = game;
+		this.groupType = groupType;
+		this.panelTitle = name;
+		this.artifacts = [];
+		this.cherishButtons = [];
+	},
+
+
+	render: function(container){
+		if (this.groupType == "active") {
+			this.name = this.panelTitle + " (" + this.game.village.artifactSim.activeArtifacts + "/" + this.game.village.artifactSim.maxArtifacts + ")";
+		} else if (this.groupType == "preserved") {
+			this.name = this.panelTitle + " (" + this.game.village.artifactSim.preservedArtifacts + "/" + this.game.village.artifactSim.maxPreserved + ")";
+		}
+		var panelContainer = this.inherited(arguments);
+
+		var glossaryDiv = dojo.create("div", { className: "censusFilters"}, panelContainer);
+		this.glossaryDiv = glossaryDiv;
+		var hide = this.manageVisibleEffects(this.groupType, false);
+
+		//var result = this.controller.buyItem(this.model, event);
+
+		//Button that levels up all artifacts
+
+		this.cherishAllHref = dojo.create("a", { 
+			href: "#", innerHTML: $I("village.artifactList.cherish.all"),
+			className: "cherisAllHref",
+			style: {
+				float: "right"
+			}
+		}, glossaryDiv);
+
+		//Button to show or hide total effects
+
+		var toggleText = $I("village.artifactList.effects.hide");
+		var effectBarDisplay = "block";
+		if (hide){
+			toggleText = $I("village.artifactList.effects.show");
+			var effectBarDisplay = "none";
+		}
+
+		this.showEffectsHref = dojo.create("a", { 
+			href: "#", innerHTML: toggleText,
+			className: "showEffectsHref",
+		}, glossaryDiv);
+
+
+		
+		//Total effects
+
+		this.effectBar = dojo.create("div", {
+			className: "effects",
+			style: {
+				display: effectBarDisplay
+			}
+		}, glossaryDiv);
+		var effects = {};
+		for (var i = 0; this.artifacts.length > i; i++) {
+			for (var effect in this.artifacts[i].effects) {
+				if (!effects[effect]) {
+					effects[effect] = 0;
+				}
+				effects[effect] += this.game.village.artifactSim.getArtifactEffectTotal(this.artifacts[i].effects[effect], this.artifacts[i].val);
+
+			}
+		}
+		this.effectBar.innerHTML = $I("village.artifactList.effects.title");
+		for (var effect in effects) {
+			var displayParams = this.game.getEffectDisplayParams(effect, effects[effect], false, true /*showIfLocked*/);
+			if (!displayParams) {
+				continue;
+			}
+			var textToDisplay = displayParams.displayEffectName + ": " + displayParams.displayEffectValue;
+			this.effectBar.innerHTML += "<br>" + textToDisplay;
+		}
+
+		dojo.connect(this.showEffectsHref, "onclick", this, dojo.partial(function(effectBar){ //Used to hide Total effects
+			if (this.manageVisibleEffects(this.groupType, true)) {
+				effectBar.style.display = "none";
+				this.showEffectsHref.innerHTML = $I("village.artifactList.effects.show");
+			} else {
+				effectBar.style.display = "block";
+				this.showEffectsHref.innerHTML = $I("village.artifactList.effects.hide");
+			}
+		}, this.effectBar));
+
+
+
+		
+		this.cherishButtons = [];
+		for (i = 0; this.artifacts.length - 1 >= i; i++) {
+			var artifact = this.artifacts[i];
+			
+			var textToDisplay = "";
+
+			var div = dojo.create("div", {
+				className: "census-block",
+			}, glossaryDiv );
+
+			var content = dojo.create("div", {
+				style: {
+					display: "inline-block",
+					width: "40%"
+				}
+			}, div);
+
+			var linksDiv = dojo.create("div", {
+				style: {
+					display: "inline-block",
+					float: "right"
+				}
+			}, div);
+
+			var cherishButton = new classes.village.ui.artifacts.CherishBtn({
+				name: $I("village.btn.cherish"),
+				description: $I("village.btn.cherish.desc"),				
+				prices: [{ name : "culture", val: 2000 }],
+				controller: new classes.village.ui.artifacts.CherishController(this.game, this.game.opts, artifact)
+			}, this.game);
+
+			cherishButton.render(linksDiv);
+
+			var preserveHref = dojo.create("a", {
+				className: "btn modern",
+				style: {
+					width: "20px"
+				},
+				title: $I("village.museum.btn.preserve")
+			}, linksDiv);
+			preserveHref.innerHTML = artifact.preserve ? "&#9733;" : "&#9734;",
+
+			dojo.connect(preserveHref, "onclick", this, dojo.partial(function(game, artifact){
+				game.village.artifactSim.togglePreserveArtifact(artifact);
+			}, this.game, artifact));
+			if (this.game.getEffect("maxArtifactsPreserved") <= 0 || artifact.on == 0) {
+				preserveHref.style.visibility = "hidden";
+			} else { //Hide preserve button if artifact is preserved and inactive, or if preserve is not unlocked
+				preserveHref.style.visibility = "visible";
+			}
+
+			var effects = artifact.effects;
+			content.innerHTML = artifact.title + "<br>";
+			var remembrance = this.game.prestige.getPerk("remembrance").researched;
+			for (var effect in effects) {
+				var displayParams = this.game.getEffectDisplayParams(effect, effects[effect] * artifact.val, true, remembrance /*showIfLocked*/);
+				if (!displayParams) {
+					textToDisplay += $I("village.museum.artifact.discovered" + "<br>"); // Display if affected resource is not yet unlocked
+				} else {
+					textToDisplay += /*artifact.description + "<br>" + */displayParams.displayEffectName + ": " + displayParams.displayEffectValue
+					+ "<br>"/* + $I("village.artifact.creator") + ": " + artifact.creator*/
+					/*+ "<br>" + Math.trunc(artifact.exp) + "/" +  artifact.val * 100 + "XP"*/;
+				}
+
+				content.innerHTML += textToDisplay;
+				textToDisplay = "";
+			}
+			this.cherishButtons.push(cherishButton);
+		}
+		dojo.connect(this.cherishAllHref, "onclick", this, dojo.partial(function(cherishButtons){ //Used to hide Total effects
+			for (var i in cherishButtons) {
+				var controller = cherishButtons[i].controller;
+				controller.buyItem(cherishButtons[i].model, event);
+			}
+			this.game.villageTab.requestMuseumRefresh();
+		}, this.cherishButtons));
+		this.update();
+	},
+
+	manageVisibleEffects: function(groupType, toggle){
+		switch (groupType) {
+			case "active":
+				if (toggle) {
+					this.statics.hideActiveEffects = !this.statics.hideActiveEffects;
+				}
+				
+				return this.statics.hideActiveEffects;
+			case "preserved":
+				if (toggle) {
+					this.statics.hidePreservedEffects = !this.statics.hidePreservedEffects;					
+				}
+				return this.statics.hidePreservedEffects;
+			default:
+				break;
+		}
+	},
+
+		hideActiveEffects: true,
+		hidePreservedEffects: true,
+
+	update: function(){
+		for (var i in this.cherishButtons) {
+			this.cherishButtons[i].update();
+		}
+	}
+}),
+
 /**
  * Detailed kitten simulation
  */
-dojo.declare("classes.village.KittenSim", null, {
+dojo.declare("classes.village.KittenSim", null, { //
 
 	kittens: null,
 
@@ -4541,7 +5613,7 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButton", com.nuclearunicorn.game.ui.
 	}
 });
 
-dojo.declare("classes.ui.village.Census", null, {
+dojo.declare("classes.ui.village.Census", null, {//
 
 	game: null,
 	records: null,
@@ -5574,6 +6646,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		this.mapWgt = new classes.village.ui.MapOverviewWgt(this.game);
 		this.mapWgt.render(mapPanelContainer);
 
+
 		//----------------- happiness and things ----------------------
 
 		this.statisticsPanel = new com.nuclearunicorn.game.ui.Panel($I("village.panel.management"), this.game.village);
@@ -5696,8 +6769,14 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		if (!this.game.science.get("civil").researched){
 			this.censusPanel.setVisible(false);
 		}
-		this.censusPanel.render(tabContainer);
-
+		this.censusPanelContainer = this.censusPanel.render(tabContainer);
+		//--------------- artifacts ------------------
+		this.museumPanel = new com.nuclearunicorn.game.ui.MuseumPanel($I("village.panel.artifacts"), this.game.village, this.game);
+		var museumPanelConatiner = this.museumPanel.render(tabContainer);
+		if (!this.game.science.get("archeologyArtifact").researched){
+			this.museumPanel.setVisible(false);
+		}
+		
 		this.update();
 	},
 
@@ -5744,6 +6823,13 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		}
 		var jobsHidden = (this.game.ironWill && !this.game.village.getKittens());
 		this.jobsPanel.setVisible(!jobsHidden);
+
+		if (this.museumPanel) {
+			if (this.game.village.artifactSim.artifacts.length || this.game.science.get("archeologyArtifact").researched) {
+				this.museumPanel.setVisible(true);
+				this.museumPanel.update();
+			}
+		}
 
 
 		this.updateTab();
@@ -5854,6 +6940,12 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 	requestCensusRefresh: function() {
 		if (this.censusPanel) {
 			this.censusPanel.needsRefresh = true;
+		}
+	},
+
+	requestMuseumRefresh: function() {
+		if (this.museumPanel) {
+			this.museumPanel.refresh();
 		}
 	},
 

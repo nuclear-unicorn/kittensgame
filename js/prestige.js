@@ -290,6 +290,88 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			"perks": ["malkuth"]
 		}
 	},
+	//---------------------------------------------------
+
+	{
+        name: "remembrance",
+        label: $I("prestige.remembrance.label"),
+        description: $I("prestige.remembrance.desc"),
+        prices: [{ name: "paragon", val: 5 }],
+        unlocked: true,
+        researched: false,
+        effects:{
+            "maxArtifacts" : 3,
+			"maxArtifactsPreserved": 3
+        },
+		unlocks: {
+			"perks": ["treasury"]
+		}
+    },
+
+	{
+		name: "treasury",
+        label: $I("prestige.treasury.label"),
+        description: $I("prestige.treasury.desc"),
+		prices: [{ name: "paragon", val: 100 }],
+        unlocked: false,
+        researched: false,
+        effects:{
+            "maxArtifacts" : 2,
+			"maxArtifactsPreserved": 2
+        },
+		unlocks: {
+			"perks": ["vault"]
+		}
+    },
+
+	{
+        name: "vault",
+        label: $I("prestige.vault.label"),
+        description: $I("prestige.vault.desc"),
+        prices: [{ name: "paragon", val: 200 }],
+        unlocked: false,
+        researched: false,
+        effects:{
+            "maxArtifacts" : 1,
+			"maxArtifactsPreserved": 1
+        },
+		unlocks: {
+			"perks": ["reliquary"]
+		}
+    },
+
+	{
+        name: "reliquary",
+        label: $I("prestige.reliquary.label"),
+        description: $I("prestige.reliquary.desc"),
+        prices: [{ name: "paragon", val: 500 }],
+        unlocked: false,
+        researched: false,
+        effects:{
+            "maxArtifacts" : 1,
+			"maxArtifactsPreserved": 1
+        },
+		unlocks: {
+			"perks": ["hoard"]
+		}
+    },
+
+	{
+        name: "hoard",
+        label: $I("prestige.hoard.label"),
+        description: $I("prestige.hoard.desc"),
+        prices: [{ name: "paragon", val: 1000}],
+        unlocked: false,
+        researched: false,
+        effects:{
+            "maxArtifacts" : 1,
+			"maxArtifactsPreserved": 1
+        },
+		unlocks: {
+			"perks": ["reliquary"]
+		}
+    },
+
     //---------------------------------------------------
     {
         name: "malkuth",

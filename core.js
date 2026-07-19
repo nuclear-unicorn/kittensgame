@@ -1353,7 +1353,7 @@ var ButtonModernController = dojo.declare("com.nuclearunicorn.game.ui.ButtonMode
 				}
 			}
 
-			var displayParams = this.game.getEffectDisplayParams(effectName, effectValue, false /*showIfZero*/);
+			var displayParams = this.game.getEffectDisplayParams(effectName, effectValue, false /*showIfZero*/, false /*showIfLocked*/);
 			//The function might have returned null if this is the type of effect that's supposed to be hidden.
 			if (displayParams) {
 				model.effectModels.push(displayParams);

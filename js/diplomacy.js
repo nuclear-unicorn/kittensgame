@@ -752,6 +752,12 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		//Consume non-random trades:
 		this.nonRandomTrades = Math.max(this.nonRandomTrades - successfullTradeAmount, 0);
 
+		//Gain artifact on succesful trade
+		if (successfullTradeAmount > 0) {
+			this.game.village.artifactSim.addTradeArtifact(race); //Kittens trade for artifact if enough time passed in artifactSim
+		}
+		
+
 		var undo = this.game.registerUndoChange();
 		var resSpent = { "manpower": this.getManpowerCost() * totalTradeAmount,
 			"gold": this.getGoldCost() * totalTradeAmount };

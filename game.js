@@ -609,6 +609,18 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 					resName: resname,
 					type: "ratio"
 				};
+			case type == "ArtifactRatio":
+				return {
+					title: $I("effectsMgr.type.resArtifactRatio", [restitle]),
+					resName: resname,
+					type: "ratio"
+				};
+			case type == "ArtifactMaxRatio":
+				return {
+					title: $I("effectsMgr.type.resArtifactMaxRatio", [restitle]),
+					resName: resname,
+					type: "ratio"
+				};
 			default:
 				return 0;
 		}
@@ -641,6 +653,15 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio"
 			},
 
+			"manpowerMaxRatio" : {
+				title: $I("effectsMgr.statics.manpowerMaxRatio.title"),
+				type: "ratio"
+			},
+
+			"scienceMaxRatio" : {
+				title: $I("effectsMgr.statics.scienceMaxRatio.title"),
+				type: "ratio"
+			},
 			"coalRatioGlobal" : {
 				title: $I("effectsMgr.statics.coalRatioGlobal.title"),
 				resName: "coal",
@@ -711,6 +732,16 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"skillXP" : {
 				title: $I("effectsMgr.statics.skillXP.title"),
 				type: "perTick"
+			},
+
+			"artifactXP" : {
+				title: $I("effectsMgr.statics.artifactXP.title"),
+				type: "perTick"
+			},
+
+			"faithMaxRatio" : {
+				title: $I("effectsMgr.statics.faithMaxRatio.title"),
+				type: "ratio"
 			},
 
 			"refineRatio": {
@@ -1884,6 +1915,20 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.pactSpaceCompendiumRatio.title"),
 				type: "ratio"
 			},
+			//atrifacts
+			"maxArtifacts":{
+				title: $I("effectsMgr.statics.maxArtifacts.title"),
+			},
+
+			"maxArtifactsMuseum":{
+				title: $I("effectsMgr.statics.maxArtifactsMuseum.title"),
+				type: "hidden"
+			},
+
+			"maxArtifactsPreserved":{
+				title: $I("effectsMgr.statics.maxArtifactsPreserved.title"),
+			},
+			
 			"pactcraftRatio": {
 				title: $I("effectsMgr.statics.pactcraftRatio.title"),
 				type: "ratio"
@@ -3429,6 +3474,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		// +*FAITH BONUS
 		perTick *= 1 + this.religion.getSolarRevolutionRatio() * (1 + ((res.name == "wood" || res.name == "catnip")? this.bld.pollutionEffects["solarRevolutionPollution"] : 0));
+
+		// +*ARTIFACT EFFECTS
+		perTick *= 1 + this.getEffect(res.name + "ArtifactRatio");
 		
 		//+COSMIC RADIATION
 		if (!this.opts.disableCMBR && res.name != "coal") {
@@ -3734,6 +3782,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				value: this.getCMBRBonus()
 			});
 		}
+
+		// +*ARTIFACT EFFECTS
+		stack.push({
+			name: $I("res.stack.artifacts"),
+			type: "ratio",
+			value: this.getEffect(res.name + "ArtifactRatio")
+		});
 
 		//ParagonSpaceProductionRatio definition 4/4
 		paragonSpaceProductionRatio *= 1 + this.religion.getSolarRevolutionRatio();
@@ -4158,6 +4213,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var kittens = this.resPool.get("kittens");
 		kittens.value = this.village.getKittens();	//just a simple way to display them
 		kittens.maxValue = this.village.sim.maxKittens; //for HG
+
+		var artifacts = this.resPool.get("artifact");
+		artifacts.value = this.village.artifactSim.activeArtifacts;
+		artifacts.maxValue = this.village.artifactSim.maxArtifacts;
 
 		this.timer.update();
 	},
@@ -4594,12 +4653,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * 			displayEffectName = the localized title;
 	 * 			displayEffectValue = the value of the effect, formatted & localized properly
 	 */
-	getEffectDisplayParams: function(effectName, effectValue, showIfZero) {
+	getEffectDisplayParams: function(effectName, effectValue, showIfZero, showIfLocked) {
 		var effectMeta = this.getEffectMeta(effectName);
 		if (effectMeta.type === "hidden") {
 			return null;	//Don't display because it's a hidden effect.
 		}
-		if (effectMeta.resName && !this.resPool.get(effectMeta.resName).unlocked) {
+		if (effectMeta.resName && !this.resPool.get(effectMeta.resName).unlocked && !showIfLocked) {
 			return null;	//hide resource-related effects if we did not unlocked this effect yet
 		}
 		if (!effectValue && !showIfZero) {
@@ -5276,6 +5335,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			var _loadout = this.village.loadoutController.loadouts[loadoutId].save();
 			loadouts.push(_loadout);
 		}
+		var newArtifacts = this.village.artifactSim.getPreservedArtifacts();
+
 
 		var saveData = {
 			saveVersion: this.saveVersion,
@@ -5332,6 +5393,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				jobs: [],
 				traits: [],
 				hadKittenHunters: false,
+				artifacts: newArtifacts,
 				loadouts: loadouts
 			},
 			workshop: {
