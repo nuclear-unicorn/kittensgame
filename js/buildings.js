@@ -3289,22 +3289,24 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 
 
 	downgrade: function(model) {
-		if (this.game.opts.noConfirm) {
+		if (model.metaAccessor.meta.val == 0 || this.game.opts.noConfirm) {
 			this.deltagrade(model, -1);
 		} else {
 			var self = this;
-			this.game.ui.confirm("", $I("buildings.downgrade.confirmation.msg"), function() {
+			var confirmMsg = $I("buildings.downgrade.confirmation.msg", [this.game.toDisplayPercentage(model.refundPercentage) + "%"]);
+			this.game.ui.confirm("", confirmMsg, function() {
 				self.deltagrade.apply(self, [model, -1]);
 			});
 		}
 	},
 
 	upgrade: function(model) {
-		if (this.game.opts.noConfirm) {
+		if (model.metaAccessor.meta.val == 0 || this.game.opts.noConfirm) {
 			this.deltagrade(model, +1);
 		} else {
 			var self = this;
-			this.game.ui.confirm("", $I("buildings.upgrade.confirmation.msg"), function() {
+			var confirmMsg = $I("buildings.upgrade.confirmation.msg", [this.game.toDisplayPercentage(model.refundPercentage) + "%"]);
+			this.game.ui.confirm("", confirmMsg, function() {
 				self.deltagrade.apply(self, [model, +1]);
 			});
 		}
