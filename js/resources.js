@@ -156,6 +156,14 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		visible: true,
 		persists: false
 	},{
+		name : "artifact",
+		title: $I("resources.artifact.title"),
+		type : "common",
+		transient: true,
+		color: "#99815d",
+		visible: true,
+		persists: false
+	},{
 		name : "zebras",
 		title: $I("resources.zebras.title"),
 		type : "common",
