@@ -67,7 +67,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		prices: [{name : "science", val: 900}],
 		unlocks: {
 			buildings: ["smelter"],
-			upgrades: ["huntingArmor"]
+			upgrades: ["huntingArmor", "prospecting"]
 		}
 	},
 	{
@@ -362,6 +362,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		],
 		unlocks: {
 			buildings: ["biolab"],
+			crafts: ["plastic"],
+			upgrades: ["petri"],
 			tech: ["biochemistry"]
 		},
 		flavor: $I("science.biology.flavor")
@@ -481,6 +483,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 				{bld:"amphitheatre", stage:1}	// Broadcast Tower
 			],
 			tech: ["nuclearFission", "rocketry", "robotics"],
+			crafts: ["microchip"],
 			upgrades: ["cadSystems", "refrigeration", "seti", "factoryLogistics", "factoryOptimization", "internet"]
 		}
 	}, {
@@ -644,7 +647,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: 	"blueprint", val: 350}
 		],
 		unlocks: {
-			upgrades: ["eludiumCracker", "eludiumReflectors", "eludiumHuts", "mWReactor" /*, "eludiumDrill"*/],
+			upgrades: ["eludiumCracker", "eludiumReflectors", "eludiumHuts", "mWReactor", "freightfulExchange" /*, "eludiumDrill"*/],
 			crafts: ["eludium"],
 			stages: [{bld:"warehouse", stage:1}],
 		}
@@ -735,7 +738,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			buildings: ["accelerator"],
 			tech: ["chronophysics", "dimensionalPhysics"],
 			upgrades: ["enrichedUranium", "railgun"]
-		}
+		},
+		flavor: $I("science.particlePhysics.flavor")
 	}, {
 		name: "dimensionalPhysics",
 		label: $I("science.dimensionalPhysics.label"),
@@ -745,7 +749,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name : "science", val: 235000}
 		],
 		unlocks: {
-			upgrades: ["energyRifts", "lhc"]
+			upgrades: ["energyRifts", "lhc", "transportSuperposition"]
 			// tech: ["artificialGravity"] -- see SPACE_EXPL feature flag
 		}
 	}, {
@@ -800,10 +804,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			upgrades: ["relicStation"]
 		},
-		calculateEffects: function(self, game){
-			if (self.researched){
-				game.time.queue.unlockQueueSource("transcendenceUpgrades");
-			}
+		handler: function(game) {
+			game.time.queue.unlockQueueSource("transcendenceUpgrades");
 		}
 	}, {
 		name: "voidSpace",
@@ -821,11 +823,11 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			voidSpace: ["cryochambers"],
 			challenges: ["atheism"]
 		},
-        calculateEffects: function(self, game){
-			if (self.researched){
-				game.time.queue.unlockQueueSource("voidSpace");
-			}
-        },
+		handler: function(game) {
+			//This function is called at the time this tech is researched.
+			//It's also called during the game-load process, but only if this tech is already researched.
+			game.time.queue.unlockQueueSource("voidSpace");
+		},
 	}, {
 		name: "paradoxalKnowledge",
 		label: $I("science.paradoxalKnowledge.label"),
@@ -840,7 +842,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["distorsion"],
 			chronoforge: ["ressourceRetrieval"],
 			voidSpace: ["chronocontrol", "voidResonator"]
-		}
+		},
+		flavor: $I("science.paradoxalKnowledge.flavor")
 	}],
 
 	/**
@@ -1070,7 +1073,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		effects:{
 			"technocracyScienceCap": 0.2,
 			"antimatterPolicyRatio": 0.0625,
-			"queueCap": 2
+			"queueCapRatio": 0.2
 		},
 		unlocked: false,
 		blocked: false,
@@ -1403,50 +1406,16 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		}
 	}, {
 		name: "sharkRelationsScribes",
-        label: $I("policy.sharkRelationsScribes.label"),
-        description: $I("policy.sharkRelationsScribes.desc"),
-        prices: [
-            {name : "culture", val: 2200}
-        ],
-        effects:{
-            "parchmentTradeChanceIncrease" : 0.25,
-			"manuscriptTradeChanceIncrease" : 0.15,
-			"ironBuyRatioIncrease": 0.5
-        },
-        unlocked: false,
-        blocked: false,
+		label: $I("policy.sharkRelationsScribes.label"),
+		description: $I("policy.sharkRelationsScribes.desc"),
+		prices: [
+			{name : "culture", val: 2200}
+		],
+		//effects: see DiplomacyManager#updateSharkScribes
+		unlocked: false,
+		blocked: false,
 		isRelation: true,
-        blocks:["sharkRelationsMerchants", "sharkRelationsBotanists"],
-		calculateEffects: function(self, game){
-			var sharks = game.diplomacy.get("sharks");
-				for (var i = 0; i < sharks.sells.length; i++) {
-					var sell = sharks.sells[i]["name"];
-					if (sell == "parchment") {
-						if (self.researched) {
-							sharks.sells[i].chance = 0.25 + self.effects["parchmentTradeChanceIncrease"];
-						} else {
-							sharks.sells[i].chance = 0.25;
-						}
-					}
-					if (sell == "manuscript"){
-						if (self.researched) {
-							sharks.sells[i].chance = 0.15 + self.effects["manuscriptTradeChanceIncrease"];
-						} else {
-							sharks.sells[i].chance = 0.15;
-						}
-					}
-				}
-				for (i = 0; i < sharks.buys.length; i++) {
-					var buy = sharks.buys[i]["name"];
-					if (buy == "iron") {
-						if (self.researched){
-							sharks.buys[i].val = 100 * (1 + self.effects["ironBuyRatioIncrease"]);
-						} else {
-							sharks.buys[i].val = 100;
-						}
-					}
-				}
-		},
+		blocks: [ "sharkRelationsMerchants", "sharkRelationsBotanists" ],
 		evaluateLocks: function(game){
 			return game.science.checkRelation("sharks", 20);
 		}
@@ -1483,7 +1452,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             "refinePolicyRatio" : 0.25,
 			"biolabEnergyRatio" : -0.75,
 			"breweryPolicyManpowerRatio" : 0.01,
-			"woodRatio" : 0
+			"woodRatio" : 0,
+			"biolabBiofuelScienceMaxRatio": 0.02
         },
         unlocked: false,
         blocked: false,
@@ -2350,12 +2320,23 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			this.loadMetadata(this.techs, saveData.science.techs, "technologies");
 			this.loadMetadata(this.policies, saveData.science.policies, "policies");
 		}
+	},
 
+	/**
+	 * If the game has been updated since the player last played, the devs may have added new features that
+	 * are unlocked by techs the player already has.  If that's the case, we need to re-unlock things so
+	 * that the player can use the new features as intended.
+	 */
+	afterLoad: function() {
 		//re-unlock technologies in case we have modified something
+		//re-trigger handlers
 		for (var i = this.techs.length - 1; i >= 0; i--) {
 			var tech = this.techs[i];
 			if (!tech.researched) {
 				continue;
+			}
+			if (tech.handler) {
+				tech.handler(this.game);
 			}
 
 			this.game.unlock(tech.unlocks);
@@ -2369,7 +2350,6 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 
 			this.game.unlock(policy.unlocks);
 		}
-
 	},
 
 	unlockAll: function(){

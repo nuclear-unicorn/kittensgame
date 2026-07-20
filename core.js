@@ -477,6 +477,16 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 				title: $I("console.filter.undo"),
 				enabled: true,
 				unlocked: false
+			},
+			"explore": {
+				title: $I("console.filter.explore"),
+				enabled: true,
+				unlocked: false
+			},
+			"combat": {
+				title: $I("console.filter.combat"),
+				enabled: true,
+				unlocked: false
 			}
 		}
 	},
@@ -636,6 +646,7 @@ var ButtonController = dojo.declare("com.nuclearunicorn.game.ui.ButtonController
 	initModel: function(options) {
 		var mdl = this.defaults();
 		mdl.options = options;
+		mdl.isInQueue = Boolean(options.isInQueue);
 		return mdl;
 	},
 
@@ -654,8 +665,8 @@ var ButtonController = dojo.declare("com.nuclearunicorn.game.ui.ButtonController
 			// ---
 			highlightUnavailable: false,
 			resourceIsLimited: "",
-			multiplyEffects: false
-
+			multiplyEffects: false,
+			isInQueue: false //Used for tooltip rendering (queued embassies)
 		};
 	},
 
@@ -1658,7 +1669,9 @@ var BuildingBtnController = dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn
 				}
 			};
 		}
-		if (typeof(model.metadata.isAutomationEnabled) == "boolean") {
+		if (typeof(model.metadata.isAutomationEnabled) == "boolean" || 
+			(model.metadata.stages && typeof(model.metaAccessor.meta.isAutomationEnabled) == "boolean") //stage hack
+		) {
 			model.toggleAutomationLink = {
 				title: model.metadata.isAutomationEnabled ? "A" : "*",
 				tooltip: model.metadata.isAutomationEnabled ? $I("btn.aon.tooltip") : $I("btn.aoff.tooltip"),

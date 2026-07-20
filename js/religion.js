@@ -1077,7 +1077,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			self.noStackable = (game.religion.getRU("transcendence").on == 0);
 		},
 		noStackable: true,
-		priceRatio: 2.5
+		priceRatio: 2.5,
+		flavor: $I("religion.ru.scholasticism.flavor")
 	},{
 		name: "goldenSpire",
 		label: $I("religion.ru.goldenSpire.label"),
@@ -1442,6 +1443,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"activeHG": 0
 		},
 		unlocked: false,
+		upgrades: {
+			jobs: ["ambassador"]
+		},
 		unlocks: {
 			challenges: ["postApocalypse"]
 		},
@@ -1452,6 +1456,29 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		flavor: $I("religion.tu.holyGenocide.flavor")
 	},
 		//Holy Memecide
+		//I'm not sure if TT27 is good place yet
+	{
+		name: "darkParacosm",
+		label: $I("religion.tu.darkParacosm.label"),
+		description: $I("religion.tu.darkParacosm.desc"),
+		prices: [
+			{ name : "relic", val: 230000},
+			{ name : "void", val: 29000},
+			{ name : "paragon", val: 8}
+		],
+		tier: 27,
+		priceRatio: 2,
+		effects: {
+			"milleninumParagon": 1
+		},
+		calculateEffects: function(self, game){
+			if (!game.getFeatureFlag("DARK_PARACOSM")){
+				self.unlocked = false;
+			}
+		},
+		unlocked: false,
+		flavor: $I("religion.tu.darkParacosm.flavor")
+	},
 	],
 
 	effectsBase: {

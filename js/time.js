@@ -733,6 +733,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 		game.upgrade({
 			buildings: ["pasture"]
 		});
+        this.updateQueue();
     },
     /* shatterInCycles does this:
     1) indepenently calculates space travel
@@ -823,6 +824,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 		this.game.upgrade({
 			buildings: ["pasture"]
 		});
+        this.updateQueue();
     },
     /*
     shatterInGroupCycles does this:
@@ -981,6 +983,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 		this.game.upgrade({
 			buildings: ["pasture"]
 		});
+        this.updateQueue();
     },
     compareShatterTime: function(shatters, times, ignoreOldFunction, ignoreShatterInCycles, ignoreGroupCycles){
         if (!ignoreOldFunction){
@@ -2103,15 +2106,12 @@ dojo.declare("classes.queue.manager", null,{
         }
         self.queueSourcesArr;
     },
-    /*queueSources : ["policies", "tech", "buildings", "spaceMission",
-                    "spaceBuilding","chronoforge", "voidSpace", "zigguratUpgrades",  
-                    "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],*/
-    //queueSources: ["buildings", "spaceBuilding", "zigguratUpgrades", "transcendenceUpgrades"],
     queueLabels: {
         "buildings" : $I("buildings.tabName"),
         "tech" : $I("techs.panel.label"),
         "upgrades" : $I("workshop.upgradePanel.label"),
         "policies" : $I("policy.panel.label"),
+        "embassies" : $I("trade.embassy.queue.source"),
         "religion" : $I("religion.panel.orderOfTheSun.label"),
         "zebraUpgrades" : $I("workshop.zebraUpgradesPanel.label"),
         "spaceMission" : $I("space.ground.control.label"),
@@ -2127,6 +2127,7 @@ dojo.declare("classes.queue.manager", null,{
         "tech": false,
         "upgrades": false,
         "policies": false,
+        "embassies": false,
         "religion": false,
         "zebraUpgrades": false,
         "spaceMission": false,
@@ -2163,11 +2164,12 @@ dojo.declare("classes.queue.manager", null,{
     },
 
     /**
-     * Get maximum amount if individual (not grouped) items in the queue (see #queueLength)
+     * Get maximum amount of individual (not grouped) items in the queue (see #queueLength)
      */
     calculateCap: function(){
         var aiCore = this.game.bld.getBuildingExt("aiCore");
-        return aiCore.meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap + this.game.getEffect("queueCap");
+        var capBeforeMultipliers = aiCore.meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap + this.game.getEffect("queueCap");
+        return Math.floor(capBeforeMultipliers * (1 + this.game.getEffect("queueCapRatio")));
     },
 
     /**
@@ -2533,6 +2535,19 @@ dojo.declare("classes.queue.manager", null,{
                 }
                 return options;
 
+            case "embassies":
+                if (this.game.prestige.getPerk("treaties").researched) {
+                    //"Cheapest embassy" quality-of-life feature is unlocked by a Metaphysics upgrade
+                    options.push({ name: "cheapest", label: $I("trade.embassy.queue.cheapest") });
+                }
+                this.game.diplomacy.races.forEach( function(race) {
+                    if (race.unlocked &&
+                        race.embassyPrices /*is truthy iff the race *has* embassies at all*/) {
+                        options.push({ name: race.name, label: $I("trade.embassy.queue.item", [race.title]) });
+                    }
+                });
+                return options;
+
             default:
                 return options;
         }
@@ -2566,7 +2581,8 @@ dojo.declare("classes.queue.manager", null,{
         }
 
         var props = {
-            id: itemMetaRaw.name
+            id: itemMetaRaw.name,
+            isInQueue: true
         };
         switch (el.type){
             case "policies":
@@ -2584,7 +2600,8 @@ dojo.declare("classes.queue.manager", null,{
                     key:            bld.name,
                     name:           bld.label,
                     description:    bld.description,
-                    building:       bld.name
+                    building:       bld.name,
+                    isInQueue:      true
                 };
                 if (typeof(bld.stages) == "object"){
                     props.controller = new classes.ui.btn.StagingBldBtnController(this.game);
@@ -2648,6 +2665,17 @@ dojo.declare("classes.queue.manager", null,{
 
             case "zebraUpgrades":
                 props.controller = new com.nuclearunicorn.game.ui.ZebraUpgradeButtonController(this.game);
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "embassies":
+                props = {
+                    race: itemMetaRaw,
+                    prices: itemMetaRaw.embassyPrices,
+                    isInQueue: true,
+                    recalculateCheapestRace: el.name === "cheapest"
+                };
+                props.controller = new classes.diplomacy.ui.EmbassyButtonController(this.game);
                 var model = props.controller.fetchModel(props);
                 break;
         }
