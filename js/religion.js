@@ -1077,7 +1077,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			self.noStackable = (game.religion.getRU("transcendence").on == 0);
 		},
 		noStackable: true,
-		priceRatio: 2.5
+		priceRatio: 2.5,
+		flavor: $I("religion.ru.scholasticism.flavor")
 	},{
 		name: "goldenSpire",
 		label: $I("religion.ru.goldenSpire.label"),

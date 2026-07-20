@@ -738,7 +738,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			buildings: ["accelerator"],
 			tech: ["chronophysics", "dimensionalPhysics"],
 			upgrades: ["enrichedUranium", "railgun"]
-		}
+		},
+		flavor: $I("science.particlePhysics.flavor")
 	}, {
 		name: "dimensionalPhysics",
 		label: $I("science.dimensionalPhysics.label"),
@@ -841,7 +842,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["distorsion"],
 			chronoforge: ["ressourceRetrieval"],
 			voidSpace: ["chronocontrol", "voidResonator"]
-		}
+		},
+		flavor: $I("science.paradoxalKnowledge.flavor")
 	}],
 
 	/**
