@@ -557,6 +557,12 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 					resName: resname,
 					type: "ratio"
 				};
+			case type == "ConsumptionAmbassadors":
+				return {
+					title: $I("effectsMgr.type.villageConsumption", [restitle]),
+					resName: resname,
+					type: "perTick"
+				};
 			case type == "Max":
 				return {
 					title: $I("effectsMgr.type.resMax", [restitle]),
@@ -664,6 +670,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "ratio"
 			},
 
+			"embassiesPerAmbassadorSlot": {
+				type: "hidden"
+			},
+
 			//kittens
 
 			"maxKittens" : {
@@ -742,6 +752,27 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			},
 			"standingRatio": {
 				title: $I("effectsMgr.statics.standingRatio.title"),
+				type: "ratio"
+			},
+			//Ambassador effects
+			"embassyEffectCap": {
+				title: $I("effectsMgr.statics.embassyEffectCap.title"),
+				type: "ratio"
+			},
+			"tradeBlueprintChance": {
+				title: $I("effectsMgr.statics.tradeBlueprintChance.title"),
+				type: "ratio"
+			},
+			"tradeSpiceChance": {
+				title: $I("effectsMgr.statics.tradeSpiceChance.title"),
+				type: "ratio"
+			},
+			"tradeNormalResChance": {
+				title: $I("effectsMgr.statics.tradeNormalResChance.title"),
+				type: "ratio"
+			},
+			"ambassadorBoostPerRank": {
+				title: $I("effectsMgr.statics.jobBoostPerRank.title", [$I("village.job.ambassador")]),
 				type: "ratio"
 			},
 
@@ -1534,6 +1565,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			},
 			"neutralRaceEmbassyStanding": {
 				title: $I("effectsMgr.statics.neutralRaceEmbassyStanding.title"),
+				type: "ratio"
+			},
+			"raceSpecificStanding": { //Used only in tooltips to communicate with the player (has no gameplay effect)
+				title: $I("effectsMgr.statics.raceSpecificStanding.title"),
 				type: "ratio"
 			},
 			"calcinerSteelRatioBonus":{
@@ -2704,8 +2739,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 					console.log("game#load - Processing", this.managers[i].id, "...");
 					this.managers[i].load(saveData);
 				}
-				//Ensure Cryptotheology-based unlock conditions for various things work properly:
-				this.religion.afterLoad(); //Kind of unelegant, but it works
+				//Do a second pass for features which require communication between game systems.
+				this.managers.forEach( function(manager) {
+					if (typeof(manager.afterLoad) === "function") {
+						console.log("game#load - Processing (afterLoad) " + manager.id + " ...");
+						manager.afterLoad();
+					}
+				});
 				
 				this._publish("server/load", saveData);
 			}
@@ -3866,6 +3906,17 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			this.addGlobalModToStack(baselineModifiers, resName);
 		stack.push(baselineModifiers);
 		//<----
+
+		// VILLAGE CONSUMPTION (certain jobs)
+		var resAmbassadorConsumption = this.diplomacy.getAmbassadorEffect(res.name + "ConsumptionAmbassadors");
+		if (resAmbassadorConsumption > 0) {
+			stack.push({
+				name: $I("res.stack.village"),
+				type: "fixed",
+				value: -resAmbassadorConsumption
+			});
+		}
+
 		// +CRAFTING JOB PRODUCTION
 		stack.push({
 			name: $I("res.stack.engineer"),
@@ -3889,7 +3940,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				resConsumption += resConsumption * hapinnessConsumption * (1 + this.getEffect(res.name + "DemandWorkerRatioGlobal")) * (1 - this.village.getFreeKittens() / this.village.sim.kittens.length);
 			}
 		}
+		stack.push({
+			name: $I("res.stack.demand"),
+			type: "fixed",
+			value: resConsumption
+		});
 
+		// BIOME EXPLORATION
 		if (res.name == "manpower"){
 			var biome = this.village.getBiome(this.village.map.currentBiome);
 			if (biome){
@@ -3901,12 +3958,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				});
 			}
 		}
-
-		stack.push({
-			name: $I("res.stack.demand"),
-			type: "fixed",
-			value: resConsumption
-		});
 
 		// TIME extra-compare with this.calcResourcePerTick
 		stack.push({
@@ -4216,8 +4267,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 		return this.getEffect(resName + "Production") * (1 + this.getEffect(resName + "PolicyRatio")) * (1 + this.getEffect("pyramidPerYearRatio"));
 	},
+	//Returns a negative value if something consumes the resource each tick (such as a Smelter)
 	getResourcePerTickConvertion: function(resName) {
-		return this.fixFloatPointNumber(this.getEffect(resName + "PerTickCon"));
+		return this.fixFloatPointNumber(this.getEffect(resName + "PerTickCon") -
+			/*use subtraction because getAmbassadorEffect returns positive value*/
+			this.diplomacy.getAmbassadorEffect(resName + "ConsumptionAmbassadors"));
 	},
 
 	craft: function(resName, value){
@@ -5443,36 +5497,46 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	getUnlockByName: function(unlockId, type){
 		switch (type) {
+			case "tabs":
+				return this.getTab(unlockId);
+			case "schemes":
+				return unlockId;
+			//--- Bonfire tab
+			case "buildings":
+				return this.bld.get(unlockId);
+			case "stages":
+				return this.bld.get(unlockId.bld);
+			//--- Village tab
+			case "jobs":
+				return this.village.getJob(unlockId);
+			case "biomes":
+				return this.village.getBiome(unlockId);
+			//--- Science tab
 			case "tech":
 				return this.science.get(unlockId);
 			case "policies":
 				return this.science.getPolicy(unlockId);
 			case "perks":
 				return this.prestige.getPerk(unlockId);
-			case "jobs":
-				return this.village.getJob(unlockId);
-			case "crafts":
-				return this.workshop.getCraft(unlockId);
+			//--- Workshop tab
 			case "upgrades":
 				return this.workshop.get(unlockId);
+			case "crafts":
+				return this.workshop.getCraft(unlockId);
 			case "zebraUpgrades":
 				return this.workshop.getZebraUpgrade(unlockId);
-			case "tabs":
-				return this.getTab(unlockId);
-			case "buildings":
-				return this.bld.get(unlockId);
-			case "spaceMission":
-				return this.space.getProgram(unlockId);
-			case "spaceBuilding":
-				return this.space.getBuilding(unlockId);
-			case "planet":
-				return this.space.getPlanet(unlockId);
-			case "chronoforge":
-				return this.time.getCFU(unlockId);
-			case "voidSpace":
-				return this.time.getVSU(unlockId);
-			case "stages":
-				return this.bld.get(unlockId.bld);
+			//--- Trade tab
+			case "embassies":
+				if (unlockId === "cheapest") {
+					unlockId = this.diplomacy.getCheapestEmbassy();
+				}
+				var raceObj = this.diplomacy.get(unlockId);
+				if (raceObj.embassyPrices) {
+					return raceObj;
+				}
+				//Else, this race has no embassies
+				return undefined;
+			//--- Religion tab
 			case "zigguratUpgrades":
 				return this.religion.getZU(unlockId);
 			case "religion":
@@ -5481,12 +5545,21 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				return this.religion.getTU(unlockId);
 			case "pacts":
 				return this.religion.getPact(unlockId);
+			//--- Space tab
+			case "spaceMission":
+				return this.space.getProgram(unlockId);
+			case "planet":
+				return this.space.getPlanet(unlockId);
+			case "spaceBuilding":
+				return this.space.getBuilding(unlockId);
+			//--- Time tab
+			case "chronoforge":
+				return this.time.getCFU(unlockId);
+			case "voidSpace":
+				return this.time.getVSU(unlockId);
+			//--- Challenges tab
 			case "challenges":
 				return this.challenges.getChallenge(unlockId);
-			case "schemes":
-				return unlockId;
-			case "biomes":
-				return this.village.getBiome(unlockId);
 		}
 	},
 

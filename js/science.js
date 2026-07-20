@@ -803,10 +803,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			upgrades: ["relicStation"]
 		},
-		calculateEffects: function(self, game){
-			if (self.researched){
-				game.time.queue.unlockQueueSource("transcendenceUpgrades");
-			}
+		handler: function(game) {
+			game.time.queue.unlockQueueSource("transcendenceUpgrades");
 		}
 	}, {
 		name: "voidSpace",
@@ -824,11 +822,11 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			voidSpace: ["cryochambers"],
 			challenges: ["atheism"]
 		},
-        calculateEffects: function(self, game){
-			if (self.researched){
-				game.time.queue.unlockQueueSource("voidSpace");
-			}
-        },
+		handler: function(game) {
+			//This function is called at the time this tech is researched.
+			//It's also called during the game-load process, but only if this tech is already researched.
+			game.time.queue.unlockQueueSource("voidSpace");
+		},
 	}, {
 		name: "paradoxalKnowledge",
 		label: $I("science.paradoxalKnowledge.label"),
@@ -2320,12 +2318,23 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			this.loadMetadata(this.techs, saveData.science.techs, "technologies");
 			this.loadMetadata(this.policies, saveData.science.policies, "policies");
 		}
+	},
 
+	/**
+	 * If the game has been updated since the player last played, the devs may have added new features that
+	 * are unlocked by techs the player already has.  If that's the case, we need to re-unlock things so
+	 * that the player can use the new features as intended.
+	 */
+	afterLoad: function() {
 		//re-unlock technologies in case we have modified something
+		//re-trigger handlers
 		for (var i = this.techs.length - 1; i >= 0; i--) {
 			var tech = this.techs[i];
 			if (!tech.researched) {
 				continue;
+			}
+			if (tech.handler) {
+				tech.handler(this.game);
 			}
 
 			this.game.unlock(tech.unlocks);
@@ -2339,7 +2348,6 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 
 			this.game.unlock(policy.unlocks);
 		}
-
 	},
 
 	unlockAll: function(){

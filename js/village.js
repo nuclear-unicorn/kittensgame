@@ -144,6 +144,49 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		},
 		value: 0,
 		unlocked: false
+	}, {
+		name: "ambassador",
+		title: $I("village.job.ambassador"),
+		description: $I("village.job.ambassador.desc"),
+		modifiers: {
+			//July 2026: I've purposely made these effects a little weaker than is necessary.
+			//We'll buff them later once we get a better feel for how strong they *ought* to be.
+			"tradeVolume": 0.0007,
+			"embassyEffectCap": 0.00133,
+			"tradeBlueprintChance": 0.00008,
+			"tradeSpiceChance":     0.00009,
+			"tradeNormalResChance": 0.00003,
+			"cultureConsumptionAmbassadors": 20,
+			"spiceConsumptionAmbassadors": 0.8
+		},
+		lackResConvert: false,
+		calculateEffects: function(self, game) {
+			//--- UPDATE DESCRIPTION
+			var scalesBasedOnEmbassies = game.getEffect("embassiesPerAmbassadorSlot") > 0; //Boolean variable
+			var baseDescription = $I("village.job.ambassador.desc");
+			var limitDescription = $I("village.job.ambassador.limit.per.race");
+
+			if (scalesBasedOnEmbassies) {
+				var computedLimit = game.village.getJobLimit(self.name);
+				limitDescription = $I("village.job.ambassador.limit.calculated", [computedLimit]);
+			}
+			self.description = baseDescription + "<br>" + limitDescription;
+			if (game.religion.getTU("holyGenocide").val > 0) {
+				self.description += "<br>" + $I("village.job.notAffectedHG");
+			}
+
+			//--- UPDATE RESOURCE CONSUMPTION
+			if (self.value > 5) {
+				var scalingBase = self.value - 5;
+				self.modifiers["cultureConsumptionAmbassadors"] = 20 * (1 + 0.025*scalingBase); //Quadratic scaling
+				self.modifiers["spiceConsumptionAmbassadors"] = 0.8 * (1 + 0.001*scalingBase*scalingBase); //Cubic scaling
+			} else {
+				self.modifiers["cultureConsumptionAmbassadors"] = 20;
+				self.modifiers["spiceConsumptionAmbassadors"] = 0.8;
+			}
+		},
+		value: 0,
+		unlocked: false
 	}],
 	jobNames: null,
 
@@ -264,6 +307,28 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 	getJobLimit: function(jobName) {
 		if (jobName == "engineer"){
 			return this.game.bld.get("factory").val;
+		} else if (jobName == "ambassador") {
+			//Check the unlock condition for this job in the first place:
+			if (!this.game.prestige.getPerk("ambassadors").researched) {
+				return 0;
+			}
+			//Limit is 1 per unlocked race, so compute that number:
+			var unlockedRaces = 0;
+			this.game.diplomacy.races.forEach( function(race) {
+				if (race.name == "leviathans") {
+					//Leviathans come & go as they please.  To handle this, we count them as unlocked iff we've fed them.
+					unlockedRaces += race.energy > 0 ? 1 : 0;
+				} else {
+					unlockedRaces += race.unlocked;
+				}
+			});
+			//Effect of Treaties (Metaphysics upgrade) increases job limit based on embassies:
+			var embassyDivisor = this.game.getEffect("embassiesPerAmbassadorSlot"); //Every N embassies adds +1 slot
+			var fromEmbassies = 0;
+			if (embassyDivisor > 0) {
+				fromEmbassies = Math.floor(this.game.diplomacy.getSumEmbassyLevels() / embassyDivisor);
+			}
+			return unlockedRaces + fromEmbassies;
 		} else if (jobName == "priest" && this.game.challenges.isActive("atheism")){
 			return 0;
 		} else {
@@ -397,9 +462,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 		//calculate production and happiness modifiers
 		this.updateHappines();
-
-        //XXX FW7: add some messeging system? Get rid of direct UI update calls completely?
-		//this.game.ui.updateFastHunt();
+		this.actionAmbassadors(1);
 
 		this.map.update();
 
@@ -409,8 +472,42 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		}
 	},
 
+	//Attempt to consume resources with ambassadors.  Call this once per tick, every tick.
+	//Scale ambassador effects based on the amount of resource SUCCESSFULY consumed.
+	//@param times	number	If set equal to zero, no resources will be consumed & ambassador effects will be set to full strength.
+	actionAmbassadors: function(times) {
+		var villageEffectsMap = this.getResProduction();
+		var cultureConsPerTick = villageEffectsMap["cultureConsumptionAmbassadors"] || 0;
+		var spiceConsPerTick = villageEffectsMap["spiceConsumptionAmbassadors"] || 0;
+		var effectScaling = 1; //Scales ALL effects of ambassadors based on whether or not we can afford them
+
+		//Consume culture & spice
+		if (cultureConsPerTick > 0 || spiceConsPerTick > 0 && times > 0) {
+			effectScaling = this.game.resPool.getAmtDependsOnStock(
+				[{res: "culture", amt: cultureConsPerTick},
+				 {res: "spice", amt: spiceConsPerTick}],
+				times);
+		}
+		this.getJob("ambassador").lackResConvert = effectScaling < 1;
+
+		this.game.diplomacy.cachedAmbassadorEffects = {};
+		for (var effectName in this.getJob("ambassador").modifiers) {
+			var effectAmt = effectScaling * (villageEffectsMap[effectName] || 0);
+			if (effectName.length > 6 && effectName.substring(effectName.length - 6) == "Chance") {
+				//Probability-related effects are subject to diminishing returns, for balance reasons
+				effectAmt = this.game.getLimitedDR(effectAmt, 0.25);
+			}
+			if (effectName == "embassyEffectCap" && effectAmt > 1) {
+				//Past a certain point, it gets harder to increase the cap...
+				effectAmt = Math.sqrt(effectAmt);
+			}
+			this.game.diplomacy.cachedAmbassadorEffects[effectName] = effectAmt;
+		}
+	},
+
 	fastforward: function(daysOffset){
 		var times = daysOffset * this.game.calendar.ticksPerDay;
+		this.actionAmbassadors(times);
 		//calculate kittens
 		var kittensPerTick = this.calculateKittensPerTick();
 		this.sim.maxKittens = this.calculateSimMaxKittens();
@@ -529,10 +626,12 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 					// Is there a shorter path to this function? I could go from gamePage but I'm trying to keep the style consistent.
 					//TODO: move to the village manager
 					var mod = this.game.village.getValueModifierPerSkill(kitten.skills[kitten.job] || 0);
+					var rankMultiplier = 1 + this.game.getEffect(kitten.job + "BoostPerRank") * kitten.rank;
 
 					for (var jobResMod in job.modifiers){
 
 						var diff = job.modifiers[jobResMod] + job.modifiers[jobResMod] * mod;
+						diff *= rankMultiplier;
 
 						if (diff > 0 ){
 							if (kitten.isLeader){
@@ -4440,6 +4539,9 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 
 		if (amt > 0) {
 			this.game.village.sim.removeJob(job.name, amt);
+			if (typeof(model.job.calculateEffects) === "function") {
+				model.job.calculateEffects(model.job, this.game);
+			}
 		}
 	},
 
@@ -4449,6 +4551,9 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 
 	assignJobs: function(model, amt){
 		this.game.village.assignJob(model.job, amt);
+		if (typeof(model.job.calculateEffects) === "function") {
+			model.job.calculateEffects(model.job, this.game);
+		}
 	},
 
 	assignAllJobs: function(model){
@@ -4538,6 +4643,21 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButton", com.nuclearunicorn.game.ui.
 		this.unassignLinks = this.addLinkList(this.model.unassignLinks);
 
 		this.assignLinks = this.addLinkList(this.model.assignLinks);
+	},
+
+	update: function () {
+		this.inherited(arguments);
+		var job = this.model.job; //The job object associated with this button
+
+		if (typeof(job.lackResConvert) === "boolean") {
+			dojo.removeClass(this.domNode, "bldEnabled");
+			dojo.removeClass(this.domNode, "bldlackResConvert");
+			if (job.lackResConvert) {
+				dojo.toggleClass(this.domNode, "bldlackResConvert", job.value > 0);
+			} else {
+				dojo.toggleClass(this.domNode, "bldEnabled", job.value > 0);
+			}
+		}
 	}
 });
 
