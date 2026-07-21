@@ -404,6 +404,8 @@ dojo.declare("classes.game.Server", null, {
 	 * (which is persisted in the save file). On any failure we simply keep the last
 	 * known price, so the feature degrades gracefully when offline or rate-limited.
 	 *
+	 * Plain $.ajax, not _xhr: the latter sends credentials, which a wildcard CORS API rejects.
+	 * 
 	 * @param {(price: number) => void} [handler] - optional callback invoked with the fresh price
 	 */
 	fetchBcoinPrice: function(handler){
