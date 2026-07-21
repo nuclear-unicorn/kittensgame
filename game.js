@@ -250,13 +250,28 @@ dojo.declare("classes.game.Server", null, {
 		this.userProfile = userProfile;
 	},
 
+	/**
+	 * Terminate the current KGNet session and clear local session state.
+	 * Returns the jqXHR so callers can chain UI updates.
+	 */
+	logout: function(){
+		var self = this;
+
+		return this._xhr("/user/logout/", "POST", {}, function(){
+			//no-op: state is cleared in .always below regardless of response
+		}).always(function(){
+			self.userProfile = null;
+			self.saveData = null;
+		});
+	},
+
     getServerUrl: function(){
-		var host = window.location.hostname;
-		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1" || host.startsWith("192.168");
+		/*var host = window.location.hostname;
+		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1";
         if (isLocalhost && !this.game.isMobile()){
             //if you are running chilar locally you should know what you are doing
             return "http://localhost:7780";
-        }
+        }*/
         return "https://kittensgame.com";
     },
 
@@ -2177,7 +2192,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * Should never be changed, override for KGM
 	 */
 	isMobile: function(){
-		return false;
+		return true;
 	},
 
 	constructor: function(containerId){
@@ -2358,15 +2373,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	getFeatureFlag: function(flagId){
-		var host = window.location.hostname;
-		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1" || host.startsWith("192.168");
-
-		if (isLocalhost){
-			return true;
-		}
-
-		var isBeta = (window.location.href.indexOf("beta") >= 0);
-		return this.featureFlags[flagId][isBeta ? "beta" : "main"];
+		return this.featureFlags[flagId]["mobile"];
 	},
 
 	//update winter catnip consumption for the UI every 5-10 seconds to avoid calculating it every tick
@@ -2803,6 +2810,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 			this.updateOptionsUI();
 		}
+
+		if (saveData.ks){
+			this.isKSDetected = true;
+			if (this.opts.ksEnabled){
+				this.loadKS();
+			}
+		}
 		// Calculate effects (needs to be done after all managers and save data are loaded)
 		this.calculateAllEffects();
 		//------------------------------------
@@ -2834,6 +2848,14 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.updateCaches();
 
 		return success;
+	},
+
+	loadKS: function(){
+		window.gamePage = this;
+		var script = document.createElement("script");
+        // Break caching through dynamic query parameter.
+        script.src = "ks.js?t=" + new Date().valueOf();
+		document.body.appendChild(script);
 	},
 
 	//btw, ie11 is horrible crap and should not exist
@@ -2904,28 +2926,20 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	exportToDropbox: function(lzdata, callback) {
 		var game = this;
-		var authUrl = game.getDropboxAuthUrl();
-		window.open(authUrl, "DropboxAuthPopup", "dialog=yes,dependent=yes,scrollbars=yes,location=yes");
-		var handler = function(e) {
-			window.removeEventListener("message", handler);
-
-			if (window.location.origin !== e.origin) {
-				callback("Unable to save file");
-			} else {
-				var dbxt = new Dropbox.Dropbox({accessToken: e.data["#access_token"]});
+		var authUrl = game.dropBoxClient.getAuthenticationUrl('https://' + window.location.host + '/games/kittens/dropboxauth_v2.html');
+		game.dropBoxClient.authenticateWithCordova(function(accessToken){
+			var dbxt = new Dropbox.Dropbox({accessToken: accessToken});
 			dbxt.filesUpload({
 				path: "/kittens.save",
 				contents: lzdata,
-					mode: "overwrite"
+				mode: 'overwrite'
 			}).then(function (response) {
 				game.msg($I("save.export.msg"));
 				callback();
 			}).catch(function (error) {
 				callback("Unable to save file:" + JSON.stringify(error));
 			});
-			}
-		};
-		window.addEventListener("message", handler ,false);
+		});
     },
 
 	saveImportDropbox: function() {
@@ -2940,15 +2954,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
     importFromDropbox: function (callback) {
         var game = this;
-		var authUrl = game.getDropboxAuthUrl();
-
-		window.open(authUrl, "DropboxAuthPopup", "dialog=yes,dependent=yes,scrollbars=yes,location=yes");
-		var handler = function(e) {
-			window.removeEventListener("message", handler);
-			if (window.location.origin !== e.origin) {
-				callback("Unable to load file");
-			} else {
-				var dbxt = new Dropbox.Dropbox({accessToken: e.data["#access_token"]});
+		game.dropBoxClient.authenticateWithCordova(function(accessToken){
+			var dbxt = new Dropbox.Dropbox({accessToken: accessToken});
 			dbxt.filesDownload({path: "/kittens.save"}).then(function (response) {
 				var blob = response.fileBlob;
 				var reader = new FileReader();
@@ -2959,9 +2966,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}).catch(function (error) {
 				callback("Unable to load file:" + JSON.stringify(error));
 			});
-			}
-		};
-		window.addEventListener("message", handler ,false);
+		});
     },
 
     saveImportDropboxFileRead: function(callback){
@@ -4456,15 +4461,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				}
 			}
 
-			var indent = i == 0 ? depth - 1 : depth;
-			for (var j = 0; j < indent - 1; j++) {
-				resString += "<span style='visibility: hidden;'>|-> </span>";
-			}
-			if (indent > 0) {
-				resString += "|-> ";
-			}
-
-			resString += this.getStackElemString(stackElem, res);
+			resString += this.getStackElemString(stackElem, res, i == 0 ? depth - 1 : depth);
 			if (stackElem.type == "fixed" || stackElem.type == "perDay" || stackElem.type == "perYear") {
 				//Below this point, display all ratio effects
 				hasFixed = true;
@@ -4474,32 +4471,47 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return resString;
 	},
 
-	getStackElemString: function(stackElem, res){
-		var resString = stackElem.name + ":&nbsp;<div style=\"float: right;\">";
+	/**
+	 * A single row of the resource breakdown. The cells are formatted here, but laying them
+	 * out is up to the UI: the web tooltip is a flat text blob, mobile builds real rows.
+	 * @param indent nesting depth of the stack element, 0 or less for a top level row
+	 */
+	getStackElemString: function(stackElem, res, indent){
+		return this.ui.formatStackRow(this.formatStackLabel(stackElem, indent), this.formatStackValue(stackElem));
+	},
 
-		if (stackElem.type == "fixed") {
-			resString += this.getDisplayValueExt(stackElem.value, true, true);
-		} else if (stackElem.type == "ratio") {
-			resString += this.getDisplayValueExt((stackElem.value * 100).toFixed(), true) + "%";
-		} else if (stackElem.type == "multiplier") {
-			resString += "×" + this.getDisplayValueExt((stackElem.value * 100).toFixed()) + "%";
-		} else if (stackElem.type == "ratioIndent") {
-			resString = "|->" + resString + this.getDisplayValueExt((stackElem.value * 100).toFixed(), true) + "%";
-		} else if (stackElem.type == "perDay") {
-			if (stackElem.value>0){
-				resString += "+";
-			}
-			resString += this.getDisplayValueExt((stackElem.value)) + "/" + $I("res.per.day");
-		} else if (stackElem.type == "perYear"){
-			if (stackElem.value > 0){
-				resString += "+";
-			}
-			resString += this.getDisplayValueExt((stackElem.value)) + "/" + $I("res.per.year");
+	/** Label cell: the tree indentation prefix, then the name of the effect. */
+	formatStackLabel: function(stackElem, indent){
+		var label = "";
+
+		for (var j = 0; j < indent - 1; j++) {
+			label += "<span style='visibility: hidden;'>|-> </span>";
+		}
+		if (indent > 0) {
+			label += "|-> ";
+		}
+		if (stackElem.type == "ratioIndent") {
+			label += "|->";
 		}
 
-		resString += "</div><br>";
+		return label + stackElem.name + ":";
+	},
 
-		return resString;
+	/** Value cell, formatted according to the stack element type. */
+	formatStackValue: function(stackElem){
+		if (stackElem.type == "fixed") {
+			return this.getDisplayValueExt(stackElem.value, true, true);
+		} else if (stackElem.type == "ratio" || stackElem.type == "ratioIndent") {
+			return this.getDisplayValueExt((stackElem.value * 100).toFixed(), true) + "%";
+		} else if (stackElem.type == "multiplier") {
+			return "×" + this.getDisplayValueExt((stackElem.value * 100).toFixed()) + "%";
+		} else if (stackElem.type == "perDay") {
+			return (stackElem.value > 0 ? "+" : "") + this.getDisplayValueExt(stackElem.value) + "/" + $I("res.per.day");
+		} else if (stackElem.type == "perYear") {
+			return (stackElem.value > 0 ? "+" : "") + this.getDisplayValueExt(stackElem.value) + "/" + $I("res.per.year");
+		}
+
+		return "";
 	},
 
 	/**
