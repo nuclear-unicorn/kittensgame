@@ -1783,7 +1783,6 @@
     "trade.bcoin.crash.desc": "強制讓黑色硬幣市場崩盤",
     "trade.bcoin.crash.confirmation.title": "確定要這樣做嗎？",
     "trade.bcoin.crash.confirmation.msg": "你目前持有 {0} 枚黑色硬幣；如果你導致市場崩盤，價值將受到嚴重影響。",
-    "trade.bcoin.crash.confirmation.msg.alt": "這將顯著影響黑色硬幣的價值。",
     "trade.bcoin.crash.confirmation.tcCost": "此操作將消耗你大量的時間水晶。你確定嗎？",
     "trade.correct.bcoin": "發生了巨大的加密貨幣市場修正",
     "trade.embassy.label": "大使館",
