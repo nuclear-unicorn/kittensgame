@@ -266,12 +266,12 @@ dojo.declare("classes.game.Server", null, {
 	},
 
     getServerUrl: function(){
-		/*var host = window.location.hostname;
-		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1" || host.startsWith("192.168");
+		var host = window.location.hostname;
+		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1";
         if (isLocalhost && !this.game.isMobile()){
             //if you are running chilar locally you should know what you are doing
             return "http://localhost:7780";
-        }*/
+        }
         return "https://kittensgame.com";
     },
 
@@ -2189,10 +2189,15 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	/**
-	 * Should never be changed, override for KGM
+	 * Build platform, from version.json: "web" | "mobile" | "steam".
+	 * Single source of truth - never fork this per platform, ship a different version.json instead.
 	 */
+	getPlatform: function(){
+		return (window.KGVersion && window.KGVersion.platform) || "web";
+	},
+
 	isMobile: function(){
-		return false;
+		return this.getPlatform() == "mobile";
 	},
 
 	constructor: function(containerId){
