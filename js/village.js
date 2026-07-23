@@ -2509,62 +2509,6 @@ dojo.declare("classes.village.Map", null, {
 			}
 		}
 	},
-	/*
-		Simplified version of above method with additional penalty for efficiency and base exp multiplier
-		Courtesy of proto23
-	*/
-	getKillExp: function(playerLvl, efficiency, mobExp, mobLvl) {
-		//formulas are courtesy of proto23
-		return Math.max(1, Math.round(mobExp * (1 + mobLvl / 10) * (0.4 + efficiency * 0.6)) - (playerLvl - 1));
-	},
-
-
-
-	/**
-	 * A version of seeded rand that takes string as a seed (mainly used for multiple parameters)
-	 */
-	xmur3: function(str) {
-		var h = 1779033703 ^ str.length;
-		for (var i = 0; i < str.length; i++) {
-			h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
-			h = h << 13 | h >>> 19;
-		}
-		return function() {
-			h = Math.imul(h ^ h >>> 16, 2246822507);
-			h = Math.imul(h ^ h >>> 13, 3266489909);
-			return (h ^= h >>> 16) >>> 0;
-		};
-	},
-
-	getSeededStatRoll: function(seed, level, statIndex) {
-		// xmur3 hash over a composite string key
-		var h = this.xmur3(seed + ":" + level + ":" + statIndex);
-		return (h() >>> 0) / 0xFFFFFFFF;
-	},
-
-	//TODO: just pick one seeded RNG method
-	rand: function(v) {
-		v = Math.imul(v ^ v >>> 16, 0x85ebca6b);
-		v = Math.imul(v ^ v >>> 13, 0xc2b2ae35);
-		return ((v ^ v >>> 16) >>> 0) / 4294967296;
-	},
-
-	getStatAtLevel: function(seed, lvl, statID, cfg) {
-		//bake the randomness based on the stat id to make them grow differently
-		var statSeed = (seed ^ (statID * 0xdeadbeef)) >>> 0;
-
-		//bake macro level luck based on the stat seed
-		var macroLuck = 0.9 + (this.rand(statSeed) * 0.2);
-
-		// stat = base + (level * growthPerLevel * classModifier * macroLuck)
-		var curve = cfg.base + (lvl * cfg.growth * cfg.bias * macroLuck);
-
-		// add a pseudo-random jitter based on the level
-		var jitterSeed = (statSeed ^ (lvl * 0x85ebca6b)) >>> 0;
-		var jitter = (this.rand(jitterSeed) - 0.5) * (cfg.growth * 0.5);
-
-		return Math.floor(curve + jitter);
-	},
 
 	/**
 	 * Combat stats for a given seed/level. Traitless kittens get a small bias bonus.
@@ -2585,35 +2529,6 @@ dojo.declare("classes.village.Map", null, {
 			}
 		}
 		return stats;
-	},
-
-	getLeaderCombatStats: function(leader) {
-		if (!leader) {
-			return null;
-		}
-		var seed = leader.seed;
-
-		if (!seed){
-			seed = this.xmur3(leader.name + ":" + leader.surname);
-		}
-		var lvl = this.game.village.getCombatLevel(leader.combatExp);
-		return this.getCombatStatsAt(seed, lvl, leader.trait);
-	},
-
-	updateSquadStats: function() {
-		var leader = this.game.village.leader;
-		var stats = leader ? this.getLeaderCombatStats(leader) : null;
-		if (stats) {
-			this.squad.atk = stats.atk + this.game.getEffect("explorerAtk");
-			this.squad.def = stats.def + this.game.getEffect("explorerDef");
-			this.squad.agi = stats.agi;
-			this.squad.str = stats.str;
-			this.squad.spd = stats.spd;
-			var maxHp = stats.hp;
-			if (this.squad.hp > maxHp) {
-				this.squad.hp = maxHp;
-			}
-		}
 	},
 
 	attack: function(src, tgt){
