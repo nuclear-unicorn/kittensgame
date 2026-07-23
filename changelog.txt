@@ -1,3 +1,18 @@
+v 1.5.0.3 (29 Jul 2026)
+
+Plastic
+Petri Dish
+
+Minor:
+
+Adjusted compendium science/manuscript price by 10%
+Bio Lab will now require plastic for construction
+Added Hebrew language to the list of available localizations
+
+Biome overhaul (fixed biomes not being avalable past default two, added combat exp and stats for leaders, removed obsolete buildings)
+
+
+
 v 1.5.0.2 (24 Apr 2026)
 
 Major:

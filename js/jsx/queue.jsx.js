@@ -49,8 +49,6 @@ WQueueItem = React.createClass({
         //Mark this queue item as limited, but respect the setting in the options menu:
         var resourceIsLimited = this.props.game.opts.highlightUnavailable && this.isStorageLimited();
 
-        //TODO: red indicator when can't process
-        //TODO: attach tooltip as if it is a button
         return $r("div", { className: resourceIsLimited ? "limited" : ""},
         [
             this.props.game.devMode ? ("[" + item.type + "] - ") : "",
@@ -92,7 +90,12 @@ WQueueItem = React.createClass({
         if (!controllerAndModel) {
             return;
         }
-        UIUtils.attachTooltip(game, node, 0, 200, dojo.partial(ButtonModernHelper.getTooltipHTML, controllerAndModel.controller, controllerAndModel.model));
+        var controller = controllerAndModel.controller;
+        var model = controllerAndModel.model;
+
+        //Create tooltip
+        var tooltipHelperObj = item.type === "embassies" ? EmbassyButtonHelper : ButtonModernHelper;
+        UIUtils.attachTooltip(game, node, 0, 200, dojo.partial(tooltipHelperObj.getTooltipHTML, controller, model));
     },
 
     //Ask the game engine if this item is storage-limited
@@ -214,6 +217,9 @@ WQueue = React.createClass({
         var typeId = this.state.typeId;
         var options = game.time.queue.getQueueOptions(typeId);
 
+        var queueLength = game.time.queue.queueLength();
+        var queueCap = game.time.queue.cap;
+
         return $r("div", {
             className: "queue-container"
         }, [
@@ -248,6 +254,12 @@ WQueue = React.createClass({
                 }),
                 $I("queue.alphabeticalToggle")
             ]),
+
+            $r("div", { className: queueLength >= queueCap ? "limited" : "", style: { marginLeft: "30px" }},
+                $r("span", {},
+                    $I("queue.length.indicator", [queueLength, queueCap])
+                )
+            ),
 
             this.getQueueItems()
         ]);

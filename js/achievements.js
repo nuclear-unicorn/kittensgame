@@ -255,6 +255,20 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             starCondition: function() {
                 return this.game.challenges.getCountCompletions() >= 100;
             }
+        }, {
+			name: "betterSafeThanSorry",
+			title: $I("achievements.betterSafeThanSorry.title"),
+			description: $I("achievements.betterSafeThanSorry.desc"),
+			starDescription: $I("achievements.betterSafeThanSorry.starDesc"),
+			condition: function() {
+				// grant the achievement to saves that had the old basge
+				return this.game.achievements.getBadge("betterSafeThanSorry").unlocked;
+			},
+			starCondition: function() {
+				// this is awarded manually, but we need starCondition to be
+				// defined for the star to show up in UI
+				return false;
+			}
         }
     ],
 
@@ -404,9 +418,10 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             }
         },{
             name: "betterSafeThanSorry",
-            title: "Better Safe Than Sorry",
+            title: "Better Safe Than Sorry (old)",
             description: "Get Carbon Sequestration with no pollution.",
-            difficulty: "E"
+            difficulty: "E",
+			fullyHidden: true
         },{
             name: "soLongAndThanksForAllTheHay", //Because horses eat hay
             title: "So Long, and Thanks for All the Hay",
@@ -431,11 +446,33 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
         return this.getMeta(name, this.badges);
     },
 
-    unlockBadge: function(name){
-        var badge = this.getBadge(name);
+	_unlockBadge: function(badge) {
         badge.unlocked = true;
         this.game.achievements.badgesUnlocked = true;
+	},
+	_unlockAchievement: function(ach) {
+		if (!ach.unlocked) {
+			ach.unlocked = true;
+			this.game.msg($I("achievements.msg.unlock", [ach.title]));
+			this.game.achievementTab.visible = true;
+		}
+	},
+	_unlockStarAchievement: function(ach) {
+		if (!ach.starUnlocked) {
+			ach.starUnlocked = true;
+			this.game.msg($I("achievements.msg.starUnlock", [ach.title]));
+			this.game.achievementTab.visible = true;
+		}
+	},
+    unlockBadge: function(name){
+		this._unlockBadge(this.getBadge(name));
     },
+	unlockAchievement: function(name){
+		this._unlockAchievement(this.get(name));
+	},
+	unlockStarAchievement: function(name){
+		this._unlockStarAchievement(this.get(name));
+	},
 
     hasUnlocked: function () {
         for (var i = 0; i < this.achievements.length; i++) {
@@ -450,24 +487,17 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
         for (var i in this.achievements) {
             var ach = this.achievements[i];
             if (!ach.unlocked && ach.condition && ach.condition.call(this)) {
-                ach.unlocked = true;
-                this.game.msg($I("achievements.msg.unlock", [ach.title]));
-                this.game.achievementTab.visible = true;
-
+				this._unlockAchievement(ach);
             }
             if (!ach.starUnlocked && ach.starCondition && ach.starCondition.call(this)) {
-                ach.starUnlocked = true;
-                this.game.msg($I("achievements.msg.starUnlock", [ach.title]));
-                this.game.achievementTab.visible = true;
-
+				this._unlockStarAchievement(ach);
             }
         }
 
         for (var i in this.badges) {
             var badge = this.badges[i];
             if (!badge.unlocked && badge.condition && badge.condition.call(this)) {
-                badge.unlocked = true;
-                this.badgesUnlocked = true;
+				this._unlockBadge(badge);
             }
         }
 
@@ -533,7 +563,7 @@ dojo.declare("classes.ui.AchievementsPanel", com.nuclearunicorn.game.ui.Panel, {
 	},
 
     render: function(container){
-        var content = this.inherited(arguments);
+        var content = this.inherited("render", arguments);
         
 		this.achievementsContainer = dojo.create("div", {}, content);
 
@@ -733,7 +763,7 @@ dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
 	},
 
     render: function(container){
-        var content = this.inherited(arguments);
+        var content = this.inherited("render", arguments);
         
 		var div = dojo.create("div", {className: "badges-container"}, content);
 		div.innerHTML = "";
@@ -743,6 +773,9 @@ dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
 		this.badgesMap = {}; //Associates each badge in the game with a UI element representing it
 		for (var i in this.game.achievements.badges){
 			var badge = this.game.achievements.badges[i];
+			if (badge.fullyHidden) {
+				continue;
+			}
             totalBadges++;
             if (badge.unlocked) { completedBadges++; }
 
@@ -760,6 +793,9 @@ dojo.declare("classes.ui.BadgesPanel", com.nuclearunicorn.game.ui.Panel, {
 		var completedBadges = 0;
 		for (var i in this.game.achievements.badges){
 			var badge = this.game.achievements.badges[i];
+			if (badge.fullyHidden) {
+				continue;
+			}
 			var span = this.badgesMap[badge.name];
 			//Recount every tick
 			totalBadges++;

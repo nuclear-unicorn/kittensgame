@@ -673,10 +673,16 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.compositeBow.label"),
 		description: $I("workshop.compositeBow.desc"),
 		effects: {
-			"manpowerJobRatio" : 0.5
+			"manpowerJobRatio" : 0.5,
+			"manpowerMax": 0,
+			"explorerAtk": 5
 		},
 		calculateEffects: function(self, game){
 			self.effects["manpowerJobRatio"] = 0.5 * (1 + game.getEffect("weaponEfficency")); //weaponEfficency can't go beyond -1, see challenges.js for more info
+			// give a small amount of catpower storage in iron will.
+			// together with bolas and huntingArmor, this makes the base catpower
+			// max 1000 (when at 0 paragon), which is necessary for unlocking trading
+			self.effects["manpowerMax"] = game.ironWill ? 100 : 0;
 		},
 		prices:[
 			{ name : "wood", val: 200 },
@@ -688,7 +694,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.crossbow.label"),
 		description: $I("workshop.crossbow.desc"),
 		effects: {
-			"manpowerJobRatio" : 0.25
+			"manpowerJobRatio" : 0.25,
+			"explorerAtk": 10
 		},
 		calculateEffects: function(self, game){
 			self.effects["manpowerJobRatio"] = 0.25 * (1 + game.getEffect("weaponEfficency")); //weaponEfficency can't go beyond -1, see challenges.js for more info
@@ -702,7 +709,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.railgun.label"),
 		description: $I("workshop.railgun.desc"),
 		effects: {
-			"manpowerJobRatio" : 0.25
+			"manpowerJobRatio" : 0.25,
+			"explorerAtk": 20,
 		},
 		calculateEffects: function(self, game){
 			self.effects["manpowerJobRatio"] = 0.25 * (1 + game.getEffect("weaponEfficency")); //weaponEfficency can't go beyond -1, see challenges.js for more info
@@ -718,7 +726,12 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.bolas.label"),
 		description: $I("workshop.bolas.desc"),
 		effects: {
-			"hunterRatio" : 1
+			"hunterRatio" : 1,
+			"explorerAtk": 2,
+			"manpowerMax": 0
+		},
+		calculateEffects: function(self, game){
+			self.effects["manpowerMax"] = game.ironWill ? 200 : 0;
 		},
 		prices:[
 			{ name : "wood", val: 50 },
@@ -731,7 +744,12 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.huntingArmor.label"),
 		description: $I("workshop.huntingArmor.desc"),
 		effects: {
-			"hunterRatio" : 2
+			"hunterRatio" : 2,
+			"explorerDef": 2,
+			"manpowerMax": 0
+		},
+		calculateEffects: function(self, game){
+			self.effects["manpowerMax"] = game.ironWill ? 600 : 0;
 		},
 		prices:[
 			{ name : "iron", val: 750 },
@@ -743,7 +761,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.steelArmor.label"),
 		description: $I("workshop.steelArmor.desc"),
 		effects: {
-			"hunterRatio" : 0.5
+			"hunterRatio" : 0.5,
+			"explorerDef": 5,
 		},
 		prices:[
 			{ name : "science", val: 10000 },
@@ -754,7 +773,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.alloyArmor.label"),
 		description: $I("workshop.alloyArmor.desc"),
 		effects: {
-			"hunterRatio" : 0.5
+			"hunterRatio" : 0.5,
+			"explorerDef": 10,
 		},
 		prices:[
 			{ name : "science", val: 50000 },
@@ -765,7 +785,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.nanosuits.label"),
 		description: $I("workshop.nanosuits.desc"),
 		effects: {
-			"hunterRatio" : 0.5
+			"hunterRatio" : 0.5,
+			"explorerDef": 20,
 		},
 		prices:[
 			{ name : "science", val: 185000 },
@@ -787,6 +808,49 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		},
 		flavor: $I("workshop.caravanserai.flavor")
 	},
+	{
+		name: "freightfulExchange",
+		label: $I("workshop.freightfulExchange.label"),
+		description: $I("workshop.freightfulExchange.desc"),
+		effects: {
+		},
+		prices:[
+			{ name : "science", val: 450000},
+			{ name : "eludium", val: 100 },
+			{ name : "titanium", val: 1000 },
+			{ name : "tanker", val: 5000 }
+		],
+		upgrades: {
+			buildings: ["warehouse"],
+			stages: [{bld:"warehouse", stage:1}],
+		},
+		unlocks:{
+			upgrades: ["transportSuperposition"]
+		}
+		// flavor: $I("workshop.transportSuperposition.flavor")
+	
+	},
+	{
+		name: "transportSuperposition",
+		label: $I("workshop.transportSuperposition.label"),
+		description: $I("workshop.transportSuperposition.desc"),
+		effects: {
+		},
+		prices:[
+			{ name : "science", val: 500000},
+			{ name : "eludium", val: 1500 },
+			{ name : "thorium", val: 25000 },
+			{ name : "tanker", val: 500000 },
+		],
+		upgrades: {
+			buildings: ["warehouse"],
+			stages: [{bld:"warehouse", stage:1}],
+		},
+		flavor: $I("workshop.transportSuperposition.flavor"),
+		evaluateLocks: function(game){
+			return game.workshop.get("freightfulExchange").researched && game.science.get("dimensionalPhysics").researched;
+		}
+	},
 	//--------------------- stuff ----------------------
 	{
 		name: "advancedRefinement",
@@ -802,6 +866,14 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			game.workshop.getCraft("wood").prices = [{name: "catnip", val: 50}];
 		},
 		flavor: $I("workshop.advancedRefinement.flavor")
+	},{
+		name: "prospecting",
+		label: $I("workshop.prospecting.label"),
+		description: $I("workshop.prospecting.desc"),
+		prices:[
+			{ name : "minerals", val: 1000 },
+			{ name : "science",  val: 1000 }
+		],
 	},{
 		name: "goldOre",
 		label: $I("workshop.goldOre.label"),
@@ -1563,7 +1635,22 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		upgrades: {
 			buildings: ["oilWell"]
 		}
-	},{
+	},
+	{
+		name: "petri",
+		label: $I("workshop.petri.label"),
+		description: $I("workshop.petri.desc"),
+		effects: {
+		},
+		prices:[
+			{ name : "plastic", val: 250 },
+			{ name : "science",  val: 65000 }
+		],
+		upgrades: {
+			buildings: ["biolab"]
+		}
+	},
+	{
 		name: "biofuel",
 		label: $I("workshop.biofuel.label"),
 		description: $I("workshop.biofuel.desc"),
@@ -2147,6 +2234,26 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		progressHandicap: 5,
 		tier: 2
     },{
+        name: "plastic",
+        label: $I("workshop.crafts.plastic.label"),
+        description: $I("workshop.crafts.plastic.desc"),
+        prices:[
+            { name: "oil", val: 1000 }
+        ],
+		progressHandicap: 5,
+		tier: 2
+    },{
+        name: "microchip",
+        label: $I("workshop.crafts.microchip.label"),
+        description: $I("workshop.crafts.microchip.desc"),
+        prices:[
+            { name: "plastic", val: 50 },
+			{ name: "gold", val: 1000 },
+			{ name: "spice", val: 1000 }
+        ],
+		progressHandicap: 20,
+		tier: 3
+    },{
 		name: "parchment",
 		label: $I("workshop.crafts.parchment.label"),
 		description: $I("workshop.crafts.parchment.desc"),
@@ -2170,8 +2277,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		label: $I("workshop.crafts.compedium.label"),
 		description: $I("workshop.crafts.compedium.desc"),
 		prices:[
-			{name: "science", val: 10000},
-			{name: "manuscript", val: 50}
+			{name: "science", val: 9000},
+			{name: "manuscript", val: 55}
 		],
 		progressHandicap: 5,
 		tier: 3
@@ -2776,7 +2883,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearunicorn.game.ui.BuildingNotStackableBtnController, {
 
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.tooltipName = true;
 		result.simplePrices = false;
 		return result;
@@ -2794,7 +2901,7 @@ dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearun
     },
 
 	getPrices: function(model) {
-		var prices = this.inherited(arguments);
+		var prices = this.inherited("getPrices", arguments);
 
 		if (this.game.challenges.isActive("unicornTears")) {
 			//In the Unicorn Tears Challenge, we give each Workshop upgrade a price of unicorns or unicorn tears based on its weight.
@@ -2859,7 +2966,10 @@ dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearun
 
 	onPurchase: function(model) {
 		if (model.metadata.name == "carbonSequestration" && this.game.bld.cathPollution == 0) {
-			this.game.achievements.unlockBadge("betterSafeThanSorry");
+			this.game.achievements.unlockAchievement("betterSafeThanSorry");
+			if (this.game.startedWithoutChronospheres) {
+				this.game.achievements.unlockStarAchievement("betterSafeThanSorry");
+			}
 		}
 		this.inherited(arguments);
 	}
@@ -2868,14 +2978,14 @@ dojo.declare("com.nuclearunicorn.game.ui.UpgradeButtonController", com.nuclearun
 dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.hasResourceHover = true;
 		result.simplePrices = false;
 		return result;
 	},
 
 	initModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("initModel", arguments);
 		model.craft = this.getCraft(model);
 		return model;
 	},
@@ -2902,7 +3012,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 
 			return "<div class=\"label\"><span class=\"label-content\">" + model.craft.label + "</span></div><div>(" + craft.value + ")</div><div class=\"progress\">[" + progressDisplayed + "%]</div>";
 		} else {
-			return this.inherited(arguments);
+			return this.inherited("getName", arguments);
 		}
 	},
 
@@ -2979,7 +3089,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButtonController", com.nuclearunic
 
 
 	fetchModel: function(options){
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		var self = this;
 		if (this.game.science.get("mechanization").researched) {
 			//We will generate links for assigning/unassigning this many engineers:
@@ -3086,7 +3196,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CraftButton", com.nuclearunicorn.game.u
 dojo.declare("com.nuclearunicorn.game.ui.ZebraUpgradeButtonController", com.nuclearunicorn.game.ui.BuildingNotStackableBtnController, {
 
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.tooltipName = true;
 		result.simplePrices = false;
 		return result;
@@ -3104,7 +3214,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ZebraUpgradeButtonController", com.nucl
 	},
 
 	getPrices: function(model) {
-        return this.game.village.getEffectLeader("scientist", this.inherited(arguments));
+        return this.game.village.getEffectLeader("scientist", this.inherited("getPrices", arguments));
     },
 
 	updateVisible: function(model){

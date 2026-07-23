@@ -85,5 +85,20 @@ dojo.declare("com.nuclearunicorn.game.Math", null, {
         	result += coefficients[i];
         }
         return result;
+    },
+
+    // the geometric distribution is how many attempts are needed until an event of probability p occurs
+    geometricRandom: function(p) {
+        // normalize p to the range (0,1)
+        if (p >= 1) { return 1; }
+        if (p <= 0) {
+            // event is impossible, so an "infinite number" of tries is needed.
+            // returning infinity here instead of throwing an error makes code like
+            // "N = Math.max(N - geometricRandom(p), 0)" work correctly automatically
+            return Infinity;
+        }
+        var u = 0;
+        while (u === 0) {u = Math.random();} //Converting [0,1) to (0,1)
+        return Math.ceil(Math.log(u) / this.log1p(-p));
     }
 });

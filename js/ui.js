@@ -362,6 +362,10 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             //Else, undoState doesn't exist currently:
             return "";
         });
+
+        UIUtils.attachTooltip(game, $("#schemeTip")[0], 0, 20, function() {
+            return "<div class='option-tooltip'>" + $I("ui.option.scheme.tip") + "</div>";
+        });
     },
 
     render: function(){
@@ -624,6 +628,21 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             this.game.tooltipUpdateFunc();
         }
 
+		// clear tooltips/highlights if their owning element doesn't exist
+		// anymore. if an element disappears (i.e. is removed from the DOM),
+		// its onmouseout handler does not fire, so the highlights/tooltips
+		// would get stuck.
+		if (this.game.tooltipOwnerDomNode) {
+			if (!document.contains(this.game.tooltipOwnerDomNode)) {
+				UIUtils.hideTooltip(this.game);
+			}
+		}
+		if (this.game.selectedBuildingDomNode) {
+			if (!document.contains(this.game.selectedBuildingDomNode)) {
+				this.game.clearSelectedObject();
+			}
+		}
+
         //wat
         /*React.render($r(WLeftPanel, {
             game: this.game
@@ -713,7 +732,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             }
 
             calendarDiv.innerHTML = $I("calendar.year.full", [year.toLocaleString(), seasonTitle + mod, Math.floor(calendar.day)]);
-            document.title = $I("navbar.title") + " - " + $I("calendar.year.full", [calendar.year, seasonTitle, Math.floor(calendar.day)]);
+            document.title = $I("navbar.title") + " - " + $I("calendar.year.full", [this.game.getDisplayValueExt(calendar.year), seasonTitle, Math.floor(calendar.day)]);
 
             if (this.game.ironWill && calendar.observeBtn) {
                 document.title = "[EVENT!]" + document.title;
@@ -948,7 +967,6 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         $("#optionNotation").text($I("ui.option.notation"));
         $("#optionScheme").text($I("ui.option.scheme"));
         $("#schemeRelock").text($I("ui.option.scheme.relock"));
-        $("#schemeTip").text($I("ui.option.scheme.tip"));
         $("#optionMore").text($I("ui.option.more"));
         $("#optionBatchSize").text($I("ui.option.batch.size"));
         $("#exportButton").attr("value", $I("ui.option.export.button"));

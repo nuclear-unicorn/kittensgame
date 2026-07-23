@@ -137,6 +137,7 @@
     bottom: 0px;
     right: 0px;
     min-width: 1180px;
+    max-width: unset;
     width: auto !important;
     overflow: hidden;
 }
@@ -166,7 +167,6 @@
     max-height: initial;
     min-width: initial;
     /*max-width: initial;*/
-    overflow: hidden;
     max-width: 1800px !important;
     margin: auto !important;
 }

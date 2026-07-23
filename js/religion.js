@@ -170,7 +170,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		console.log("pactsAdjustment");
 		if (!this.getPact("fractured").researched && this.getZU("blackPyramid").val > 0 && (this.game.religion.getTU("mausoleum").val > 0 || this.game.science.getPolicy("radicalXenophobia").researched)){
 			this.game.unlock({
-				pacts: ["pactOfCleansing", "pactOfDestruction",  "pactOfExtermination", "pactOfPurity"]
+				pacts: ["pactOfCleansing", "pactOfDestruction",  "pactOfExtermination", "pactOfPurity", "pactOfArcane", "pactOfChronicler"]
 			});
 		}
 	},
@@ -304,7 +304,13 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 	},
 	update: function(){
 		if (this.game.resPool.get("faith").value > 0 || this.game.challenges.isActive("atheism") && this.game.bld.get("ziggurat").val > 0){
-			this.game.religionTab.visible = true;
+			//Re-render when the tab first becomes visible (e.g. right after the first priest
+			// produces faith) so it appears immediately instead of on the player's next action.
+			//Guarded so we only render on the hidden->visible transition, not every tick.
+			if (!this.game.religionTab.visible){
+				this.game.religionTab.visible = true;
+				this.game.render();
+			}
 		}
 
 		//safe switch for a certain type of pesky bugs with conversion
@@ -340,6 +346,20 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		if (isNaN(this.faith)){
 			this.faith = 0;
 		}
+		
+		// calculate percentage of days in paradox by floor of which reduce days
+		// this is partially duplicating calendar.js fastForward which might need revisiting in the future
+		// TODO: test/necrocorns.test.js for necrocornFastForward
+		var temporalParadoxChance = this.game.getEffect("temporalParadoxChance");
+		if (temporalParadoxChance > 0)
+		{
+			var daysInParadox = 10 + this.game.getEffect("temporalParadoxDay");
+			var daysBetweenParadox = daysInParadox + 100 * Math.max( 1 , 1 / temporalParadoxChance );
+			var percentTimeInParadox = daysInParadox / daysBetweenParadox;
+			var daysInParadox = Math.floor(daysOffset * percentTimeInParadox);
+			daysOffset -= daysInParadox;
+		}
+
 		this.necrocornFastForward(daysOffset, times);
 
 		this.triggerOrderOfTheVoid(times);
@@ -871,6 +891,12 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		},
 		calculateEffects: function(self, game) {
 			self.effects["corruptionRatio"] = 0.000001 * (1 + game.getEffect("corruptionBoostRatioChallenge")); //LDR specified in challenges.js
+
+			// markers immediately unlock necrocorns, but only in UT challenge
+			// (so that the necrocorn tooltip has a countdown to the end of the challenge).
+			if (self.val > 0 && game.challenges.isActive("unicornTears")) {
+				game.resPool.get("necrocorn").unlocked = true;
+			}
 		},
 		unlocked: false,
 		unlocks: {
@@ -982,11 +1008,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 				self.effectsPreDeficit[self.prefixEffectNames[counter]] = game.getEffect("pact" + self.prefixEffectNames[counter]) * transcendenceTierModifier;
 			}
 			self.effectsPreDeficit["deficitRecoveryRatio"] = game.getEffect("pactDeficitRecoveryRatio");
+
 			var pactBlackLibraryBoost = game.getEffect("pactBlackLibraryBoost") * transcendenceTierModifier;
-			if (pactBlackLibraryBoost) {
-				var unicornGraveyard = game.religion.getZU("unicornGraveyard");
-				self.effectsPreDeficit["blackLibraryBonus"] = pactBlackLibraryBoost * unicornGraveyard.effects["blackLibraryBonus"] * (1 + unicornGraveyard.on);
-			}
+			var unicornGraveyard = game.religion.getZU("unicornGraveyard");
+			self.effectsPreDeficit["blackLibraryBonus"] = pactBlackLibraryBoost * unicornGraveyard.effects["blackLibraryBonus"] * (1 + unicornGraveyard.on);
 		},
 		updateEffects: function(self, game){
 			if (!self.jammed){
@@ -1052,7 +1077,8 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			self.noStackable = (game.religion.getRU("transcendence").on == 0);
 		},
 		noStackable: true,
-		priceRatio: 2.5
+		priceRatio: 2.5,
+		flavor: $I("religion.ru.scholasticism.flavor")
 	},{
 		name: "goldenSpire",
 		label: $I("religion.ru.goldenSpire.label"),
@@ -1417,6 +1443,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			"activeHG": 0
 		},
 		unlocked: false,
+		upgrades: {
+			jobs: ["ambassador"]
+		},
 		unlocks: {
 			challenges: ["postApocalypse"]
 		},
@@ -1427,6 +1456,29 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		flavor: $I("religion.tu.holyGenocide.flavor")
 	},
 		//Holy Memecide
+		//I'm not sure if TT27 is good place yet
+	{
+		name: "darkParacosm",
+		label: $I("religion.tu.darkParacosm.label"),
+		description: $I("religion.tu.darkParacosm.desc"),
+		prices: [
+			{ name : "relic", val: 230000},
+			{ name : "void", val: 29000},
+			{ name : "paragon", val: 8}
+		],
+		tier: 27,
+		priceRatio: 2,
+		effects: {
+			"milleninumParagon": 1
+		},
+		calculateEffects: function(self, game){
+			if (!game.getFeatureFlag("DARK_PARACOSM")){
+				self.unlocked = false;
+			}
+		},
+		unlocked: false,
+		flavor: $I("religion.tu.darkParacosm.flavor")
+	},
 	],
 
 	effectsBase: {
@@ -1798,7 +1850,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
  */
 dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.tooltipName = false;
 		return result;
 	},
@@ -1819,7 +1871,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 			var progress = this.game.toDisplayPercentage(this.game.religion.corruption, 0, true);
 			return model.metadata.label + " [" + progress + "%] (" + model.metadata.val + ")";
 		} else {
-			return this.inherited(arguments);
+			return this.inherited("getName", arguments);
 		}
 	},
 
@@ -1847,7 +1899,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
 	},
 
 	build: function(model, opts) {
-		var counter = this.inherited(arguments);
+		var counter = this.inherited("build", arguments);
 		if (!counter) {
 			return; //Skip undo if nothing was built
 		}
@@ -1866,7 +1918,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ZigguratBtnController", com.nuclearunic
  */
 dojo.declare("com.nuclearunicorn.game.ui.ReligionBtnController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.tooltipName = false;
 		return result;
 	},
@@ -1887,7 +1939,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ReligionBtnController", com.nuclearunic
 	},
 
 	getPrices: function(model){
-		var defaultPrices = this.inherited(arguments);
+		var defaultPrices = this.inherited("getPrices", arguments);
 		for (var i = 0; i < defaultPrices.length; i++) {
 			if (defaultPrices[i].name == "faith" || defaultPrices[i].name == "gold") {
 				defaultPrices[i].val = defaultPrices[i].val * (1 + this.game.getEffect("religionUpgradesDiscount"));
@@ -1901,7 +1953,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ReligionBtnController", com.nuclearunic
 	},
 
 	build: function(model, opts) {
-		var counter = this.inherited(arguments);
+		var counter = this.inherited("build", arguments);
 		if (!counter) {
 			return; //Skip undo if nothing was built
 		}
@@ -1914,7 +1966,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ReligionBtnController", com.nuclearunic
 	},
 
 	sell: function(event, model){
-		var amtSold = this.inherited(arguments);
+		var amtSold = this.inherited("sell", arguments);
 
 		if (amtSold > 0) {
 			var undo = this.game.registerUndoChange();
@@ -1930,7 +1982,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ReligionBtnController", com.nuclearunic
 
 dojo.declare("classes.ui.TranscendenceBtnController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.tooltipName = false;
 		return result;
 	},
@@ -1984,14 +2036,14 @@ dojo.declare("com.nuclearunicorn.game.ui.TranscendBtnController", com.nuclearuni
 
 dojo.declare("classes.ui.religion.TransformBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.hasResourceHover = true;
 		result.simplePrices = false;
 		return result;
 	},
 
 	fetchModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		model.fifthLink = this._newLink(model, 5);
 		model.halfLink = this._newLink(model, 2);
 		model.allLink = this._newLink(model, 1);
@@ -2196,14 +2248,14 @@ dojo.declare("classes.ui.religion.MultiLinkBtn", com.nuclearunicorn.game.ui.Butt
 
 dojo.declare("classes.ui.religion.RefineTearsBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 
 		result.hasResourceHover = true;
 		return result;
 	},
 
 	fetchModel: function (options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		model.fiveLink = this._newLink(model, 5);
 		model.twentyFiveLink = this._newLink(model, 25);
 		model.hundredLink = this._newLink(model, 100);
@@ -2378,7 +2430,7 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
  */
  dojo.declare("com.nuclearunicorn.game.ui.PactsBtnController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.tooltipName = true;
 		return result;
 	},
@@ -2397,7 +2449,7 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 	},
 
 	getPrices: function(model) {
-		var retVal = this.inherited(arguments);
+		var retVal = this.inherited("getPrices", arguments);
 		var upfront = this.game.getEffect("pactNecrocornUpfrontCost");
 		if (!model.metadata.special && upfront > 0) {
 			retVal.push({ name: "necrocorn", val: upfront });

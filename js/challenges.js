@@ -179,6 +179,11 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 		checkCompletionConditionOnReset: function(game){
 			return game.time.getVSU("cryochambers").on > 0 || game.bld.get("stasisPod").on > 0;
 		},
+		actionOnCompletion: function(game){
+			if (game.ironWill) {
+				game.achievements.unlockBadge("ivoryTower");
+			}
+		},
 		reserveDelay: true
 	},{
 		name: "1000Years",
@@ -292,11 +297,17 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			self.effects["tradeKnowledgeRatio"] = self.getTradeBonusEffect(game);
 		},
 		checkCompletionConditionOnReset: function(game){
+			// hack: this code is here as a sort of general "code that runs on
+			// reset when pacifism is active" hook. it intentionally does not
+			// require the completion condition to actually be met. (otherwise
+			// it might be too difficult to get this basge if one already has
+			// a lot of pacifism completions.)
 			if (game.diplomacy.baseManpowerCost > 0) { // BSK+IW precaution
 				if (!game.village.sim.hadKittenHunters && game.stats.getStatCurrent("totalTrades").val > 0){
-					game.achievements.unlockBadge("cleanPaws"); //hack
+					game.achievements.unlockBadge("cleanPaws");
 				}
 			}
+
 			return game.science.getPolicy("outerSpaceTreaty").researched;
 		},
 		upgrades: {
@@ -818,7 +829,7 @@ dojo.declare("classes.reserveMan", null,{
 dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.BuildingBtnController, {
 
 	initModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("initModel", arguments);
 		model.multiplyEffects = true; //When the player holds the SHIFT key, it'll multiply Challenge effects by number of times completed.
 		return model;
 	},
@@ -833,9 +844,9 @@ dojo.declare("classes.ui.ChallengeBtnController", com.nuclearunicorn.game.ui.Bui
 	getDescription: function(model) {
 		if (model.metadata.name == "ironWill") { //Show the "your game will be reset" bit for Iron Will only
 			var msgChronosphere = (this.game.bld.get("chronosphere").val > 0) ? $I("challendge.btn.chronosphere.with.ironWill.desc") : "";
-			return this.inherited(arguments) + $I("challendge.btn.desc", [model.metadata.effectDesc, msgChronosphere]);
+			return this.inherited("getDescription", arguments) + $I("challendge.btn.desc", [model.metadata.effectDesc, msgChronosphere]);
 		}
-		return this.inherited(arguments) + $I("challendge.btn.desc.new", [model.metadata.effectDesc]);
+		return this.inherited("getDescription", arguments) + $I("challendge.btn.desc.new", [model.metadata.effectDesc]);
 	},
 
 	getName: function(model){
@@ -897,7 +908,7 @@ dojo.declare("classes.ui.ChallengePanel", com.nuclearunicorn.game.ui.Panel, {
 	},
 
 	render: function(container){
-		var content = this.inherited(arguments);
+		var content = this.inherited("render", arguments);
 		this.updateResetMessage();
 
 		var self = this;
@@ -951,7 +962,7 @@ dojo.declare("classes.ui.ReservesPanel", com.nuclearunicorn.game.ui.Panel, {
 	},
 
 	render: function(container) {
-		var content = this.inherited(arguments);
+		var content = this.inherited("render", arguments);
 		
 		this.reclaimInstructionsText = dojo.create("span", {
 			innerHTML: $I("challendge.reserves.panel.summary"), style: "display: inline-block; margin-bottom: 16px" }, content);
@@ -1165,7 +1176,7 @@ dojo.declare("classes.ui.ChallengeEffectsPanel", com.nuclearunicorn.game.ui.Pane
 	},
 
 	render: function(container) {
-		var content = this.inherited(arguments);
+		var content = this.inherited("render", arguments);
 		this.listElement = dojo.create("ul", { style: "margin-top: 0px; margin-bottom: 0px;" }, content);
 		this.generateEffectsList();
 	},

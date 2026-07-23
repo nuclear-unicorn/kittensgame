@@ -157,7 +157,7 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			policies: ["lizardRelationsEcologists"]
 		},
 		unlocks: {
-			"perks": ["zebraDiplomacy"]
+			"perks": ["zebraDiplomacy", "ambassadors"]
 		}
 	},{
 		name: "zebraDiplomacy",
@@ -186,6 +186,36 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		prices: [{ name: "paragon", val: 300 }],
 		unlocked: false,
 		researched: false
+	},{
+		name: "ambassadors",
+		label: $I("prestige.ambassadors.label"),
+		description: $I("prestige.ambassadors.desc"),
+		prices: [{ name: "paragon", val: 100 }],
+		unlocked: false,
+		researched: false,
+		unlocks: {
+			"jobs": ["ambassador"],
+			"perks": ["treaties"]
+		}
+	},{
+		name: "treaties",
+		label: $I("prestige.treaties.label"),
+		description: "",
+		prices: [{ name: "paragon", val: 500 }],
+		unlocked: false,
+		researched: false,
+		effects: {
+			"embassiesPerAmbassadorSlot": 30,
+			"ambassadorBoostPerRank": 0.1
+		},
+		calculateEffects: function(self, game) {
+			self.description = $I("prestige.treaties.desc", [
+				game.getDisplayValueExt(self.effects["embassiesPerAmbassadorSlot"])
+			]);
+		},
+		upgrades: {
+			jobs: ["ambassador"]
+		}
 	},{
 		name: "chronomancy",
 		label: $I("prestige.chronomancy.label"),
@@ -544,6 +574,24 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		return storageRatio;
 	},
 
+	/**
+	 * Marginal bonuses (as fractions, e.g. 0.1 == +10%) that a reset's prestige points would add on top of the current totals.
+	 * Storage scales linearly with paragon, but production is diminishing, so the gain must be the delta of the curve.
+	 */
+	getResetBonusBreakdown: function(extraParagon, extraKarma){
+		var paragonRatio = this.getParagonRatio();
+		var paragon = this.game.resPool.get("paragon").value;
+
+		var prodCur = this.game.getLimitedDR((paragon * 0.010) * paragonRatio, 2 * paragonRatio);
+		var prodNew = this.game.getLimitedDR(((paragon + extraParagon) * 0.010) * paragonRatio, 2 * paragonRatio);
+
+		return {
+			happiness: extraKarma / 100, //+1% happiness per karma point
+			storage: (extraParagon / 1000) * paragonRatio,
+			production: prodNew - prodCur
+		};
+	},
+
 	unlockAll: function(){
 		for (var i in this.perks){
 			this.perks[i].unlocked = true;
@@ -563,7 +611,7 @@ dojo.declare("classes.ui.PrestigeBtnController", com.nuclearunicorn.game.ui.Buil
 
    	buyItem: function(model, event) {
 		if (this.game.science.get("metaphysics").researched) {
-			return this.inherited(arguments);
+			return this.inherited("buyItem", arguments);
 		} else {
 			return {
 				itemBought: false,
@@ -602,7 +650,7 @@ dojo.declare("classes.ui.PrestigePanel", com.nuclearunicorn.game.ui.Panel, {
 	},
 
     render: function(container){
-		var content = this.inherited(arguments);
+		var content = this.inherited("render", arguments);
 
 		var self = this;
 		//---------------------------------------------------------------

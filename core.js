@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Workaround for IE9 local storage :V
  *
@@ -12,7 +13,13 @@ if (document.all && !window.localStorage) {
     window.LCstorage.removeItem = function () { };
 }
 
-dojo.declare("com.nuclearunicorn.core.Control", null, {
+/**
+ * The result of dojo.declare is captured in a plain global var so the type
+ * checker can infer the class shape from the object literal and follow the
+ * inheritance chain. dojo.declare still registers the dotted path
+ * (com.nuclearunicorn.core.Control) exactly as before.
+ */
+var Control = dojo.declare("com.nuclearunicorn.core.Control", null, {
 	//Base control class. Must be a superclass for all game components.
 });
 
@@ -29,7 +36,7 @@ dojo.declare("com.nuclearunicorn.core.Control", null, {
  * A base class for every tab manager component like science, village, bld, etc
  * Ideally every manager should be a subclass of a TabManager. See reference implementation in religion.js
  */
-dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Control, {
+var TabManager = dojo.declare("com.nuclearunicorn.core.TabManager", Control, {
 
 	/**
 	 * This may not be obvious, but all objects instantiated there will be STATIC and shared among all the instances of the class.
@@ -47,9 +54,19 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 
 	//effectsCachedExisting is a table of the names of every possible effect on each item in this game tab.
 	//If an effect somehow isn't in here, the TabManager doesn't know it exists.
+	/** @type {Record<string, number>} */
 	effectsCachedExisting: null,
+	/** @type {{meta: any[], provider?: {getEffect: (item: any, effectName: string) => number}}[]} */
 	meta: null,
+	/** @type {Record<string, {collapsed: boolean}>} */
 	panelData: null,
+
+	//Declared by subclasses; listed here so the base methods that rely on
+	//them (updateEffectCached, etc.) are part of the checked contract.
+	/** @type {any} TODO: type as the GamePage class once game.js is converted */
+	game: null,
+	/** @type {Record<string, number>} */
+	effectsBase: null,
 
 	/**
 	 * Constructors are INHERITED automatically and CHAINED in the class hierarchy
@@ -268,7 +285,7 @@ dojo.declare("com.nuclearunicorn.core.TabManager", com.nuclearunicorn.core.Contr
 				if (!elem) { continue; }
 
 				for (var fld in savedMetaElem){
-					if (fld == name) {
+					if (fld == "name") {
 						continue;
 					}
 					if (!elem.hasOwnProperty(fld)){
@@ -460,6 +477,16 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 				title: $I("console.filter.undo"),
 				enabled: true,
 				unlocked: false
+			},
+			"explore": {
+				title: $I("console.filter.explore"),
+				enabled: true,
+				unlocked: false
+			},
+			"combat": {
+				title: $I("console.filter.combat"),
+				enabled: true,
+				unlocked: false
 			}
 		}
 	},
@@ -469,6 +496,8 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 	messageIdCounter: 0,
 	ui: null,
 	game: null,
+	/** @type {Record<string, {title: string, enabled: boolean, unlocked: boolean, defaultUnlocked?: boolean}>} */
+	filters: null,
 
 	constructor: function(game) {
 		this.game = game;
@@ -571,7 +600,7 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 	}
 });
 
-dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
+var ButtonController = dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	game: null,
 	controllerOpts: null,
 
@@ -617,6 +646,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	initModel: function(options) {
 		var mdl = this.defaults();
 		mdl.options = options;
+		mdl.isInQueue = Boolean(options.isInQueue);
 		return mdl;
 	},
 
@@ -635,8 +665,8 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 			// ---
 			highlightUnavailable: false,
 			resourceIsLimited: "",
-			multiplyEffects: false
-
+			multiplyEffects: false,
+			isInQueue: false //Used for tooltip rendering (queued embassies)
 		};
 	},
 
@@ -1198,10 +1228,10 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 
 
-dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearunicorn.game.ui.ButtonController, {
+var ButtonModernController = dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", ButtonController, {
 
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 
 		result.simplePrices = true;
 		result.hasResourceHover = false;
@@ -1352,18 +1382,20 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 		return false;
 	},
 
-	precraft: function(model){
+	//craftWood: also convert catnip into the wood shortfall (long-press precraft). Off by default
+	//since crafting wood while kittens are present risks catnip starvation.
+	precraft: function(model, craftWood){
 		this.fetchExtendedModel(model);
 		for (var i in model.priceModels){
 			var price = model.priceModels[i];
-			this._precraftRes(price);
+			this._precraftRes(price, craftWood);
 		}
 	},
 
-	_precraftRes: function(price) {
+	_precraftRes: function(price, craftWood) {
 		if (price.children) {
 			for (var i in price.children) {
-				this._precraftRes(price.children[i]);
+				this._precraftRes(price.children[i], craftWood);
 			}
 		}
 
@@ -1376,7 +1408,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 		if (amt <= 0) {
 			return;
 		}
-		if (res.name == "wood" && game.village.getKittens() > 0) {
+		if (res.name == "wood" && game.village.getKittens() > 0 && !craftWood) {
 			//Don't craft wood if we have kittens, as there's risk of causing starvation
 			return;
 		}
@@ -1390,7 +1422,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModernController", com.nuclearuni
 	}
 });
 
-ButtonModernHelper = {
+var ButtonModernHelper = {
 	getTooltipHTML : function(controller, model){
 		//Some aspects of the metadata may have changed, so fetch the latest version of the model:
 		model = controller.fetchModel(model.options);
@@ -1565,7 +1597,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 		if (this.model.hasResourceHover) {
 			dojo.connect(this.domNode, "onmouseover", this,
 				dojo.hitch( this, function(){
-					this.game.setSelectedObject(this.getSelectedObject());
+					this.game.setSelectedObject(this.getSelectedObject(), this.domNode);
 				}));
 			dojo.connect(this.domNode, "onmouseout", this,
 				dojo.hitch( this, function(){
@@ -1611,16 +1643,16 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 });
 
 
-dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
+var BuildingBtnController = dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", ButtonModernController, {
 
 	initModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("initModel", arguments);
 		model.metadata = this.getMetadata(model);
 		return model;
 	},
 
 	fetchModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		model.hasSellLink = this.hasSellLink(model);
 		model.showSellLink = model.metadata && model.metadata.val && model.hasSellLink;
 		var self = this;
@@ -1637,7 +1669,9 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 				}
 			};
 		}
-		if (typeof(model.metadata.isAutomationEnabled) == "boolean") {
+		if (typeof(model.metadata.isAutomationEnabled) == "boolean" || 
+			(model.metadata.stages && typeof(model.metaAccessor.meta.isAutomationEnabled) == "boolean") //stage hack
+		) {
 			model.toggleAutomationLink = {
 				title: model.metadata.isAutomationEnabled ? "A" : "*",
 				tooltip: model.metadata.isAutomationEnabled ? $I("btn.aon.tooltip") : $I("btn.aoff.tooltip"),
@@ -1660,8 +1694,8 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtnController", com.nuclearunic
 
 
 	getMetadata: function(model){
-		if (this.model.options.building){
-			var meta = this.game.bld.get(this.model.options.building);
+		if (model.options.building){
+			var meta = this.game.bld.get(model.options.building);
 			return meta;
 		}
 		return null;
@@ -2021,9 +2055,9 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 	}
 });
 
-dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nuclearunicorn.game.ui.BuildingBtnController, {
+dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", BuildingBtnController, {
 	defaults: function(){
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.simplePrices = false;
 		result.multiplyEffects = true;
 		return result;
@@ -2249,7 +2283,10 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", com.nu
 			var zebraOutpostMeta = this.game.bld.getBuildingExt("zebraOutpost").meta;
 			zebraOutpostMeta.calculateEffects(zebraOutpostMeta, this.game);
 			zebraOutpostMeta.jammed = false;
-			this.game.upgrade({policies : ["sharkRelationsBotanists"]});
+			this.game.upgrade({
+				policies: ["sharkRelationsBotanists"],
+				upgrades: ["huntingArmor", "bolas", "compositeBow"]
+			});
 			this.game.diplomacy.onLeavingIW();
 		}
 
@@ -2300,14 +2337,14 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtn", com.nuclearunico
 
 });
 
-dojo.declare("com.nuclearunicorn.game.ui.BuildingNotStackableBtnController", com.nuclearunicorn.game.ui.BuildingBtnController, {
+dojo.declare("com.nuclearunicorn.game.ui.BuildingNotStackableBtnController", BuildingBtnController, {
 
 	getDescription: function(model){
 		var meta = model.metadata;
 		if (meta.effectDesc && meta.researched){
-			return this.inherited(arguments) + "<br>" + $I("res.effect") + ": " + meta.effectDesc;
+			return this.inherited("getDescription", arguments) + "<br>" + $I("res.effect") + ": " + meta.effectDesc;
 		} else {
-			return this.inherited(arguments);
+			return this.inherited("getDescription", arguments);
 		}
 	},
 
@@ -2401,6 +2438,8 @@ dojo.declare("com.nuclearunicorn.game.ui.ContentRowRenderer", null, {
 
 	leftRow: null,
 	rightRow: null,
+	/** @type {HTMLElement} */
+	content: null,
 
 	initRenderer: function(content){
 		this.content = content;
@@ -2636,7 +2675,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab", [com.nuclearunicorn.game.ui.Conte
  * 	html
  * }
  */
-UIUtils = {
+var UIUtils = {
 	attachTooltip: function(game, container, topPosition, leftPosition, htmlProvider) {
 		var gameNode = dojo.byId("game");
 		var tooltip = dojo.byId("tooltip");
@@ -2646,6 +2685,8 @@ UIUtils = {
 				tooltip.innerHTML = dojo.hitch(game, htmlProvider)();
 			};
 			game.tooltipUpdateFunc();
+
+			game.tooltipOwnerDomNode = container;
 
 			var pos = $(container).offset();
 
@@ -2677,8 +2718,7 @@ UIUtils = {
 		dojo.connect(container, "onmouseover", this, showTooltip);
 
 		dojo.connect(container, "onmouseout", this, function(){
-			game.tooltipUpdateFunc = null;
-			dojo.style(tooltip, "display", "none");
+			UIUtils.hideTooltip(game);
 		});
 		
 		dojo.connect(container, "onkeydown", this, function(e){
@@ -2692,5 +2732,10 @@ UIUtils = {
 		});
 
 		return htmlProvider;
+	},
+	hideTooltip: function(game){
+		game.tooltipUpdateFunc = null;
+		game.tooltipOwnerDomNode = null;
+		dojo.style(dojo.byId("tooltip"), "display", "none");
 	}
 };

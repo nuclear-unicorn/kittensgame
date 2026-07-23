@@ -733,6 +733,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 		game.upgrade({
 			buildings: ["pasture"]
 		});
+        this.updateQueue();
     },
     /* shatterInCycles does this:
     1) indepenently calculates space travel
@@ -823,6 +824,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 		this.game.upgrade({
 			buildings: ["pasture"]
 		});
+        this.updateQueue();
     },
     /*
     shatterInGroupCycles does this:
@@ -981,6 +983,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 		this.game.upgrade({
 			buildings: ["pasture"]
 		});
+        this.updateQueue();
     },
     compareShatterTime: function(shatters, times, ignoreOldFunction, ignoreShatterInCycles, ignoreGroupCycles){
         if (!ignoreOldFunction){
@@ -1070,7 +1073,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
 dojo.declare("classes.ui.time.AccelerateTimeBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
     fetchModel: function(options) {
-        var model = this.inherited(arguments);
+        var model = this.inherited("fetchModel", arguments);
         var self = this;
         model.toggle = {
             title: this.game.time.isAccelerated ? $I("btn.on.minor") : $I("btn.off.minor"),
@@ -1170,13 +1173,13 @@ dojo.declare("classes.ui.TimeControlWgt", [mixin.IChildrenAware, mixin.IGameAwar
 dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 
     defaults: function() {
-        var result = this.inherited(arguments);
+        var result = this.inherited("defaults", arguments);
         result.hasResourceHover = true;
         return result;
     },
 
     fetchModel: function(options) {
-        var model = this.inherited(arguments);
+        var model = this.inherited("fetchModel", arguments);
         model.nextCycleLink = this._newLink(model, this.game.calendar.yearsPerCycle);
         model.previousCycleLink = this._newLink(model, this.game.calendar.yearsPerCycle * (this.game.calendar.cyclesPerEra - 1));
         model.tenErasLink = this._newLink(model, 10 * this.game.calendar.yearsPerCycle * this.game.calendar.cyclesPerEra);
@@ -1205,7 +1208,7 @@ dojo.declare("classes.ui.time.ShatterTCBtnController", com.nuclearunicorn.game.u
     },
 
     getName: function(model) {
-        var name = this.inherited(arguments);
+        var name = this.inherited("getName", arguments);
         if (this.game.time.heat > this.game.getEffect("heatMax")) {
             name += $I("common.warning");
         }
@@ -1477,7 +1480,7 @@ dojo.declare("classes.ui.time.ShatterTCBtn", com.nuclearunicorn.game.ui.ButtonMo
 
 dojo.declare("classes.ui.time.UseHeatBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	fetchModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		model.useAllLink = this._newLink(model, "all");
 		var shatterYearBoost = this.game.getEffect("shatterYearBoost");
 		if (shatterYearBoost){
@@ -1527,17 +1530,23 @@ dojo.declare("classes.ui.time.UseHeatBtnController", com.nuclearunicorn.game.ui.
 		var price = this.getPricesMultiple(model, amt);
 		var furnace = this.game.time.getCFU("blastFurnace");
 		if (furnace.heat < price.heat) {
-			callback(false /*itemBought*/, { reason: "cannot-afford" });
-			return true;
+            return {
+                itemBought: false,
+                reason: "cannot-afford"
+            };
 		}
 		if (!model.enabled) {
-			callback(false /*itemBought*/, { reason: "not-enabled" });
-			return true;
+            return {
+                itemBought: false,
+                reason: "not-enabled"
+            };
 		}
 		furnace.heat -= price.heat;
 		this.doShatter(model, amt);
-		callback(true /*itemBought*/, { reason: "paid-for" });
-		return true;
+		return {
+            itemBought: true /*itemBought*/,
+            reason: "paid-for"
+        };
 	},
 
 	doShatterAmt: function(model, amt) {
@@ -1630,7 +1639,7 @@ dojo.declare("classes.ui.time.ChronoforgeBtnController", com.nuclearunicorn.game
     getName: function(model){
         var meta = model.metadata;
         var game = this.game;
-        var label = this.inherited(arguments);
+        var label = this.inherited("getName", arguments);
 
         if (meta.delayTicks > 0) {
             //It's kind of a happy accident that delayTicks has one of 24 different values & that there are 24 clock emoji.
@@ -1651,7 +1660,7 @@ dojo.declare("classes.ui.time.ChronoforgeBtnController", com.nuclearunicorn.game
 			this.game.upgrade({chronoforge: [building.name]});
 	},
 	build: function(model, opts) {
-		var counter = this.inherited(arguments);
+		var counter = this.inherited("build", arguments);
 		if (!counter) {
 			return; //Skip undo if nothing was built
 		}
@@ -1714,12 +1723,12 @@ dojo.declare("classes.ui.time.VoidSpaceBtnController", com.nuclearunicorn.game.u
 		if (meta.name == "cryochambers" && meta.on != meta.val) {
 			return meta.label + " (" + meta.on + "/" + meta.val + ")";
 		} else {
-			return this.inherited(arguments);
+			return this.inherited("getName", arguments);
 		}
 	},
 
 	getPrices: function(model) {
-		var prices = this.inherited(arguments);
+		var prices = this.inherited("getPrices", arguments);
 		if (model.metadata.name == "cryochambers") {
 			for (var i = 0; i < prices.length; i++) {
 				if (prices[i].name == "karma") {
@@ -1731,7 +1740,7 @@ dojo.declare("classes.ui.time.VoidSpaceBtnController", com.nuclearunicorn.game.u
 	},
 
 	build: function(model, opts) {
-		var counter = this.inherited(arguments);
+		var counter = this.inherited("build", arguments);
 		if (!counter) {
 			return; //Skip undo if nothing was built
 		}
@@ -1746,7 +1755,7 @@ dojo.declare("classes.ui.time.VoidSpaceBtnController", com.nuclearunicorn.game.u
 
 dojo.declare("classes.ui.time.FixCryochamberBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
     defaults: function() {
-        var result = this.inherited(arguments);
+        var result = this.inherited("defaults", arguments);
         result.hasResourceHover = true;
         return result;
     },
@@ -1937,10 +1946,13 @@ dojo.declare("classes.ui.ResetWgt", [mixin.IChildrenAware, mixin.IGameAware], {
         var karmaPointsAfter = this.game.getUnlimitedDR(karmaKittens, stripe);
 		var karmaPoints = Math.floor((karmaPointsAfter - karmaPointsPresent) * 100) / 100;
 
+        var bonus = this.game.prestige.getResetBonusBreakdown(paragonPoints, karmaPoints);
 
-
-        msg += "<br>" + $I("time.reset.karma") + ": " + karmaPoints;
-        msg += "<br>" + $I("time.reset.paragon") + ": " + paragonPoints;
+        msg += "<br>" + $I("time.reset.karma") + ": " + karmaPoints
+            + " <span style='color:gray;'>(" + $I("time.reset.bonus.happiness", [this.game.getDisplayValueExt(bonus.happiness * 100)]) + ")</span>";
+        msg += "<br>" + $I("time.reset.paragon") + ": " + paragonPoints
+            + " <span style='color:gray;'>(" + $I("time.reset.bonus.storage", [this.game.getDisplayValueExt(bonus.storage * 100)])
+            + ", " + $I("time.reset.bonus.production", [this.game.getDisplayValueExt(bonus.production * 100)]) + ")</span>";
 
         if (this.game.ironWill){
             msg += "<br>" + $I("time.reset.zebra") + ": " + this.game._getBonusZebras();
@@ -2094,15 +2106,12 @@ dojo.declare("classes.queue.manager", null,{
         }
         self.queueSourcesArr;
     },
-    /*queueSources : ["policies", "tech", "buildings", "spaceMission",
-                    "spaceBuilding","chronoforge", "voidSpace", "zigguratUpgrades",  
-                    "religion", "upgrades", "zebraUpgrades", "transcendenceUpgrades"],*/
-    //queueSources: ["buildings", "spaceBuilding", "zigguratUpgrades", "transcendenceUpgrades"],
     queueLabels: {
         "buildings" : $I("buildings.tabName"),
         "tech" : $I("techs.panel.label"),
         "upgrades" : $I("workshop.upgradePanel.label"),
         "policies" : $I("policy.panel.label"),
+        "embassies" : $I("trade.embassy.queue.source"),
         "religion" : $I("religion.panel.orderOfTheSun.label"),
         "zebraUpgrades" : $I("workshop.zebraUpgradesPanel.label"),
         "spaceMission" : $I("space.ground.control.label"),
@@ -2118,6 +2127,7 @@ dojo.declare("classes.queue.manager", null,{
         "tech": false,
         "upgrades": false,
         "policies": false,
+        "embassies": false,
         "religion": false,
         "zebraUpgrades": false,
         "spaceMission": false,
@@ -2154,11 +2164,12 @@ dojo.declare("classes.queue.manager", null,{
     },
 
     /**
-     * Get maximum amount if individual (not grouped) items in the queue (see #queueLength)
+     * Get maximum amount of individual (not grouped) items in the queue (see #queueLength)
      */
     calculateCap: function(){
         var aiCore = this.game.bld.getBuildingExt("aiCore");
-        return aiCore.meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap + this.game.getEffect("queueCap");
+        var capBeforeMultipliers = aiCore.meta.on + this.game.space.getBuilding("entangler").effects["hashRateLevel"] + this.baseCap + this.game.getEffect("queueCap");
+        return Math.floor(capBeforeMultipliers * (1 + this.game.getEffect("queueCapRatio")));
     },
 
     /**
@@ -2524,6 +2535,19 @@ dojo.declare("classes.queue.manager", null,{
                 }
                 return options;
 
+            case "embassies":
+                if (this.game.prestige.getPerk("treaties").researched) {
+                    //"Cheapest embassy" quality-of-life feature is unlocked by a Metaphysics upgrade
+                    options.push({ name: "cheapest", label: $I("trade.embassy.queue.cheapest") });
+                }
+                this.game.diplomacy.races.forEach( function(race) {
+                    if (race.unlocked &&
+                        race.embassyPrices /*is truthy iff the race *has* embassies at all*/) {
+                        options.push({ name: race.name, label: $I("trade.embassy.queue.item", [race.title]) });
+                    }
+                });
+                return options;
+
             default:
                 return options;
         }
@@ -2557,7 +2581,8 @@ dojo.declare("classes.queue.manager", null,{
         }
 
         var props = {
-            id: itemMetaRaw.name
+            id: itemMetaRaw.name,
+            isInQueue: true
         };
         switch (el.type){
             case "policies":
@@ -2575,7 +2600,8 @@ dojo.declare("classes.queue.manager", null,{
                     key:            bld.name,
                     name:           bld.label,
                     description:    bld.description,
-                    building:       bld.name
+                    building:       bld.name,
+                    isInQueue:      true
                 };
                 if (typeof(bld.stages) == "object"){
                     props.controller = new classes.ui.btn.StagingBldBtnController(this.game);
@@ -2639,6 +2665,17 @@ dojo.declare("classes.queue.manager", null,{
 
             case "zebraUpgrades":
                 props.controller = new com.nuclearunicorn.game.ui.ZebraUpgradeButtonController(this.game);
+                var model = props.controller.fetchModel(props);
+                break;
+
+            case "embassies":
+                props = {
+                    race: itemMetaRaw,
+                    prices: itemMetaRaw.embassyPrices,
+                    isInQueue: true,
+                    recalculateCheapestRace: el.name === "cheapest"
+                };
+                props.controller = new classes.diplomacy.ui.EmbassyButtonController(this.game);
                 var model = props.controller.fetchModel(props);
                 break;
         }

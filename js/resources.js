@@ -33,7 +33,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		craftable: true,
 		visible: true,
 		calculatePerTick: true,
-		aiCanDestroy: true
+		aiCanDestroy: true,
 	},{
 		name : "minerals",
 		title: $I("resources.minerals.title"),
@@ -46,6 +46,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		title: $I("resources.coal.title"),
 		type : "common",
 		visible: true,
+		color: "gray",
 		calculatePerTick: true,
 		aiCanDestroy: true
 	},{
@@ -397,7 +398,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		name : "beam",
 		title: $I("resources.beam.title"),
 		type : "common",
-		craftable: true
+		craftable: true,
+		color: "#df9000"
 	},{
 		name : "slab",
 		title: $I("resources.slab.title"),
@@ -472,6 +474,20 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
         craftable: true,
         color: "olive",
 		isNotRefundable: true,
+		tag: "chemist"
+	},{
+        name: "plastic",
+        title: $I("resources.plastic.title"),
+        type: "common",
+        craftable: true,
+        color: "#9B9A5A",
+		tag: "chemist"
+	},{
+        name: "microchip",
+        title: $I("resources.microchip.title"),
+        type: "common",
+        craftable: true,
+        color: "#9B9A5A",
 		tag: "chemist"
 	},{
 		name : "parchment",
@@ -649,7 +665,17 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 			res.value = this.game.getUnlimitedDR(this.game.karmaKittens, 5);
 		}
 
-		return res.value - prevValue;
+		// return the amount the resource actually changed by.
+		if (res.value == prevValue + addedValue) {
+			// In this case, computing the return value as (res.value - prevValue) would yield the
+			// original addedValue, but with a double-rounding. This is usually minor, but it might
+			// make the return value be non-integer even though addedValue was an integer. So we
+			// return the original addedValue directly.
+			return addedValue;
+		} else {
+			// change was limited in some way; recompute the change amount.
+			return res.value - prevValue;
+		}
 	},
 
 	addResPerTick: function(name, value){
@@ -764,6 +790,10 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		}
 
 		var maxValue = game.getEffect(res.name + "Max") || 0;
+
+		if (res.name == "zebras") {
+			maxValue += (game.karmaZebras || 0) + 1;
+		}
 
 		maxValue = Math.min(this.addResMaxRatios(res, maxValue), Number.MAX_VALUE);
 		
@@ -882,7 +912,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	 * Called in tooltips for more accurate per-building resMax increases
 	 */
 	addResMaxRatios: function(res, maxValue) {
-		if (res.name == "temporalFlux") {
+		if (res.name == "temporalFlux" || res.name == "zebras") {
 			return maxValue;
 		}
 

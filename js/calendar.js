@@ -384,6 +384,27 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		return Math.min(autoChance, 1);
 	},
 
+	/**
+	 * Handles one effect of Alicornmancy: if the other conditions for random
+	 * wandering unicorn arrivals are met, one unicorn will arrive every 2 years.
+	 * This means you can start doing unicorns in year 4 (at the latest).
+	 * @param numTwoYears how many increments of 2 years have passed.
+	 * @param message whether to show a log message for unicorn arrivals.
+	 */
+	giveAlicornmancyYearlyUnicorns: function(numTwoYears, message) {
+		var hasAlicornmancy = this.game.prestige.getPerk("alicornmancy").researched;
+		var hasPacifism = this.game.challenges.isActive("pacifism");
+		var hasAnimal = this.game.science.get("animal").researched;
+		var unicorns = this.game.resPool.get("unicorns");
+		if (hasAlicornmancy && hasPacifism && hasAnimal && unicorns.value < 2) {
+			var delta = Math.min(2 - unicorns.value, numTwoYears);
+			this.game.resPool.addResEvent("unicorns", delta);
+			if (message) {
+				this.game.msg($I("calendar.msg.unicorn"));
+			}
+		}
+	},
+
 	trueYear: function() {
 		return (this.day / this.daysPerSeason + this.season) / this.seasonsPerYear + this.year - this.game.time.flux;
 	},
@@ -562,12 +583,19 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 				sciBonus *= 1 + minerologyBonus;
 				sciGain = this.game.resPool.addResEvent("science", sciBonus);
 			}
+			var ironGain = 0;
+			if (this.game.workshop.get("prospecting").researched) {
+				ironGain = this.game.resPool.addResEvent("iron", 5);
+			}
 
-			if (mineralsGain > 0 || sciGain > 0){
+			if (mineralsGain > 0 || sciGain > 0 || ironGain > 0){
 				var meteorMsg = $I("calendar.msg.meteor");
 
 				if (mineralsGain > 0){
 					meteorMsg += ", +" + this.game.getDisplayValueExt(mineralsGain) + " " + $I("resources.minerals.title");
+				}
+				if (ironGain > 0) {
+					meteorMsg += ", +" + this.game.getDisplayValueExt(ironGain) + " " + $I("resources.iron.title");
 				}
 				if (sciGain > 0) {
 					meteorMsg += ", +" + this.game.getDisplayValueExt(sciGain) + " " + $I("resources.science.title");
@@ -602,7 +630,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			if (!zebras.value && archery.researched){
 				this.game.resPool.addResEvent("zebras", 1);
 				this.game.msg($I("calendar.msg.zebra.hunter"));
-			} else if ( zebras.value > 0 && zebras.value <= this.game.karmaZebras && this.game.karmaZebras > 0){
+			} else if ( zebras.value > 0 && zebras.value < zebras.maxValue){
 				var chanceModifier = (this.game.workshop.getZebraUpgrade("darkBrew").researched && this.festivalDays)?
 				2 + this.game.getEffect("festivalArrivalRatio") : 1; //bigger chance for zebras to arive after darkBrew is researched
 				if (this.game.rand(100000) <= 500 * chanceModifier){
@@ -614,10 +642,10 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		} else {
 			var zTreshold = 0;
 			if (this.game.prestige.getPerk("zebraDiplomacy").researched){
-				zTreshold = Math.floor(0.10 * (this.game.karmaZebras + 1));   //5 - 10% of hunters will stay
+				zTreshold = Math.floor(0.10 * zebras.maxValue);   //5 - 10% of hunters will stay
 			}
 			if (this.game.prestige.getPerk("zebraCovenant").researched){
-				zTreshold = Math.floor(0.50 * (this.game.karmaZebras + 1));   //5 - 50% of hunters will stay
+				zTreshold = Math.floor(0.50 * zebras.maxValue);   //5 - 50% of hunters will stay
 			}
 			if (zebras.value > zTreshold ){
 				this.game.msg( zebras.value > 1 ?
@@ -633,18 +661,24 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 
 		var riftChance = this.game.getEffect("riftChance");	//5 OPTK
 		if (this.game.rand(10000) < riftChance * 10000 * unicornChanceRatio){
+			//10% of ziggurat buildings bonus
 			var unicornBonus = 500 * (1 + this.game.getEffect("unicornsRatioReligion") * 0.1);
-			this.game.msg($I("calendar.msg.rift", [this.game.getDisplayValueExt(unicornBonus)]), "notice", "unicornRift");
+			var unicornsGain = this.game.resPool.addResEvent("unicorns", unicornBonus);
 
-			this.game.resPool.addResEvent("unicorns", unicornBonus);	//10% of ziggurat buildings bonus
+			if (unicornsGain > 0) {
+				this.game.msg($I("calendar.msg.rift", [this.game.getDisplayValueExt(unicornsGain)]), "notice", "unicornRift");
+			}
+
 		}
 		//----------------------------------------------
 		var aliChance = this.game.getEffect("alicornChance");	//0.2 OPTK
 		aliChance *= 1 + this.game.getLimitedDR(this.game.getEffect("alicornPerTickRatio"), 1.2);
 		if (this.game.rand(100000) < aliChance * 100000){
-			this.game.msg($I("calendar.msg.alicorn"), "important", "alicornRift");
+			var alicornsGain = this.game.resPool.addResEvent("alicorn", 1);
+			if (alicornsGain > 0) {
+				this.game.msg($I("calendar.msg.alicorn"), "important", "alicornRift");
+			}
 
-			this.game.resPool.addResEvent("alicorn", 1);
 			this.game.upgrade({
 				zigguratUpgrades: ["skyPalace", "unicornUtopia", "sunspire"]
 			});
@@ -739,16 +773,22 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			numberEvents = Math.round(daysOffset * (baseChance + iwChance) / 10000);
 
 			var mineralsAmt = 50 + 25 * this.game.getEffect("mineralsRatio");
+			var minerologyBonus = this.game.getEffect("academyMeteorBonus");
 
 			if (this.game.ironWill){
 				mineralsAmt += mineralsAmt * 0.1;	//+10% of minerals for iron will
+				mineralsAmt *= 1 + this.game.getEffect("mineralsPolicyRatio") / 3;
 			}
-
+			mineralsAmt *= 1 + minerologyBonus;
 			this.game.resPool.addResEvent("minerals", numberEvents * mineralsAmt);
 
 			if (this.game.workshop.get("celestialMechanics").researched) {
 				var sciBonus = 15 * (1 + this.game.getEffect("scienceRatio"));
 				this.game.resPool.addResEvent("science", numberEvents * sciBonus);
+			}
+
+			if (this.game.workshop.get("prospecting").researched) {
+				this.game.resPool.addResEvent("iron", numberEvents * 5);
 			}
 
 			//TODO: make meteors give titanium on higher levels
@@ -770,7 +810,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 				totalNumberOfEvents += numberEvents;
 			}
 
-			if ( zebras.value > 0 && zebras.value <= this.game.karmaZebras && this.game.karmaZebras > 0){
+			if ( zebras.value > 0 && zebras.value < zebras.maxValue){
 				numberEvents = Math.round(daysOffset * 500 / 100000);
 				this.game.resPool.addResEvent("zebras", numberEvents);
 				totalNumberOfEvents += numberEvents;
@@ -867,8 +907,15 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			this.game.stats.getStat("totalParagon").val += paragon;
 		}
 		this.game.religion.pactsManager.pactsMilleniumKarmaKittens(paragon);
+		var oldYear = this.year;
 		this.year += yearsOffset;
 		this.game.stats.getStat("totalYears").val += yearsOffset;
+
+		// how many times did we cross a 2-year boundary?
+		var numTwoYears = Math.floor(this.year/2) - Math.floor(oldYear/2);
+		if (numTwoYears > 0) {
+			this.giveAlicornmancyYearlyUnicorns(numTwoYears, false);
+		}
 		//------------------------------------------------------------------
 
         return totalNumberOfEvents;
@@ -918,8 +965,11 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		return Math.max(0, (Math.floor(endYear / 1000) * 1000 - Math.floor(startYear / 1000) * 1000) / 1000);
 	},
 	calculateMilleniumProduction: function(milleniums){
-		this.game.resPool.addResEvent("paragon", milleniums);
-		this.game.stats.getStat("totalParagon").val += milleniums;
+		var paragonRatio = this.game.getFeatureFlag("DARK_PARACOSM")? 
+		(1 + this.game.getEffect("milleninumParagon"))
+		: 1;
+		this.game.resPool.addResEvent("paragon", milleniums * paragonRatio);
+		this.game.stats.getStat("totalParagon").val += milleniums * paragonRatio;
 		this.game.religion.pactsManager.pactsMilleniumKarmaKittens(milleniums);
 	},
 	onNewYears: function(updateUI, years, milleniumChangeCalculated) {
@@ -1076,11 +1126,22 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 			}
 		}
 
+		if (this.year % 2 == 0) {
+			this.giveAlicornmancyYearlyUnicorns(1, true);
+		}
+
 		this.game.upgrade({policies: ["authocracy", "dragonRelationsAstrologers", "lizardRelationsEcologists"]});
 		
 		if (updateUI) {
 			this.game.ui.render();
 		}
+	},
+
+	/**
+	 * Gets a simulated ramndom-walk or a real life crypto price
+	 */
+	getCryptoPrice: function() {
+		return this.game.opts.hodl ? this.game.server.bcoinPrice : this.cryptoPrice;
 	},
 
 	adjustCryptoPrice: function() {
@@ -1095,7 +1156,10 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 
 	correctCryptoPrice: function() {
 		this.cryptoPrice *= 0.7 + 0.1 * Math.random();
-		this.game.msg($I("trade.correct.bcoin"), "important");
+		//Hide correction message in a legacy mode
+		if (!this.game.opts.hodl) {
+			this.game.msg($I("trade.correct.bcoin"), "important");
+		}
 	},
 
 	getWeatherMod: function(res){

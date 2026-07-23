@@ -436,6 +436,12 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
     pointer-events: none;
 }
 
+/* Wrapper for plain-text option tooltips (e.g. the "(?)" hints in the options
+   window), so long text wraps onto multiple lines instead of running off-screen. */
+.option-tooltip {
+    max-width: 250px;
+}
+
 #tooltip.tooltip-in-right-column {
     min-height: initial !important;
     max-height: initial !important;
@@ -848,9 +854,15 @@ label:hover {
 -----------------------------------*/
 
 #optionsDiv {
-    overflow-y: scroll;
-    height: 440px;
-    margin-top:-220px;
+    /* Size to the content instead of a fixed height, but cap it & scroll if the
+       content (e.g. dev mode with many options) would overflow the screen. */
+    height: auto;
+    max-height: 440px;
+    overflow-y: auto;
+    /* The dialog is positioned with top:50%; translate up by half its own (now
+       variable) height to stay vertically centered regardless of content height. */
+    margin-top: 0;
+    transform: translateY(-50%);
 }
 
 #optionsDiv input[type="checkbox"] {
@@ -860,6 +872,12 @@ label:hover {
 #optionsDiv input[type="checkbox"] + label:before {
     content: "·";
 	display: inline-block;
+	/* Fixed width + centering so the indicator occupies the same horizontal space
+	   regardless of glyph or font-size (which vary by checked state & by theme),
+	   keeping every option's label text aligned in a column. */
+	width: 18px;
+	text-align: center;
+	box-sizing: border-box;
 	font: 16px sans-serif;
 	margin: 0px 6px 0px 2px;
 }
@@ -1906,6 +1924,27 @@ span.genericWarning {
 .svg-icon.left {
     mask: url('img/left.svg') no-repeat center / contain;
     -webkit-mask: url('img/left.svg') no-repeat center / contain;
+}
+
+.svg-icon.res-icon {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.trade-icons {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-right: 4px;
+    text-decoration: none;
+}
+
+.trade-arrow {
+    margin: 0 1px;
+    letter-spacing: 1px;
+    opacity: 0.4;
+    font-size: 0.85em;
+    vertical-align: middle;
 }
 
 #headerToolbar {
