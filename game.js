@@ -1516,6 +1516,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				title: $I("effectsMgr.statics.breweryPolicyManpowerRatio.title"),
 				type: "ratio"
 			},
+			"biolabBiofuelScienceMaxRatio": {
+				title: $I("effectsMgr.statics.biolabBiofuelScienceMaxRatio.title"),
+				type: "ratio"
+			},
 			"religionUpgradesDiscount":{
 				title: $I("effectsMgr.statics.religionUpgradesDiscount.title"),
 				type: "ratio"
@@ -1876,6 +1880,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 				type: "fixed",
 				calculation: "nonProportional"
 
+			},
+			"milleninumParagon":{
+				title: $I("effectsMgr.statics.milleninumParagon.title"),
+				type: "fixed",
 			}
 		}
 	}
@@ -2037,6 +2045,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			beta: true,
 			main: true,
 			mobile: true
+		},
+		DARK_PARACOSM: {
+			beta: true,
+			main: false,
+			mobile: false
 		}
 	},
 
@@ -3765,6 +3778,18 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				resConsumption += resConsumption * hapinnessConsumption * (1 + this.getEffect(res.name + "DemandWorkerRatioGlobal"));
 			} else {
 				resConsumption += resConsumption * hapinnessConsumption * (1 + this.getEffect(res.name + "DemandWorkerRatioGlobal")) * (1 - this.village.getFreeKittens() / this.village.sim.kittens.length);
+			}
+		}
+
+		if (res.name == "manpower"){
+			var biome = this.village.getBiome(this.village.map.currentBiome);
+			if (biome){
+				var exploreCost = this.village.map.getExplorationCost();
+				stack.push({
+					name: $I("res.stack.exploration"),
+					type: "fixed",
+					value: -exploreCost
+				});
 			}
 		}
 

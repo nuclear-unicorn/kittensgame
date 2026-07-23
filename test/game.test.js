@@ -63,6 +63,87 @@ const _get = (id) => {
     return model;
 }
 
+test("New kittens save seed-generated attributes by seed", () => {
+    game.village.sim.addKitten();
+
+    let kitten = game.village.sim.kittens[0];
+    let generatedAttributes = {
+        name: kitten.name,
+        surname: kitten.surname,
+        age: kitten.age,
+        trait: kitten.trait.name,
+        color: kitten.color,
+        variety: kitten.variety,
+        rarity: kitten.rarity
+    };
+    kitten.job = "woodcutter";
+    kitten.skills.woodcutter = 100;
+    kitten.exp = 25;
+    kitten.rank = 1;
+    kitten.favorite = true;
+
+    expect(kitten.seed).toBeGreaterThanOrEqual(0);
+    expect(kitten.seed).toBeLessThanOrEqual(999999);
+
+    let saveData = kitten.save(true, game.village.jobNames);
+
+    expect(saveData.seed).toBe(kitten.seed);
+    expect(saveData.ssn).toBeUndefined();
+    expect(saveData.name).toBeUndefined();
+    expect(saveData.surname).toBeUndefined();
+
+    let loadedKitten = new com.nuclearunicorn.game.village.Kitten();
+    loadedKitten.load(saveData, game.village.jobNames);
+
+    expect(loadedKitten.name).toBe(generatedAttributes.name);
+    expect(loadedKitten.surname).toBe(generatedAttributes.surname);
+    expect(loadedKitten.age).toBe(generatedAttributes.age);
+    expect(loadedKitten.trait.name).toBe(generatedAttributes.trait);
+    expect(loadedKitten.color).toBe(generatedAttributes.color);
+    expect(loadedKitten.variety).toBe(generatedAttributes.variety);
+    expect(loadedKitten.rarity).toBe(generatedAttributes.rarity);
+    expect(loadedKitten.job).toBe("woodcutter");
+    expect(loadedKitten.skills.woodcutter).toBe(100);
+    expect(loadedKitten.exp).toBe(25);
+    expect(loadedKitten.rank).toBe(1);
+    expect(loadedKitten.favorite).toBe(true);
+});
+
+test("Seedless kittens save and load generated attributes directly", () => {
+    let kitten = new com.nuclearunicorn.game.village.Kitten();
+    kitten.seed = null;
+    kitten.name = "Legacy";
+    kitten.surname = "Kitten";
+    kitten.age = 42;
+    kitten.trait = kitten.traits[2];
+    kitten.color = 5;
+    kitten.variety = 3;
+    kitten.rarity = 2;
+
+    let saveData = kitten.save(false, game.village.jobNames);
+
+    expect(saveData.seed).toBeUndefined();
+    expect(saveData.name).toBe("Legacy");
+    expect(saveData.surname).toBe("Kitten");
+    expect(saveData.age).toBe(42);
+    expect(saveData.trait.name).toBe("engineer");
+    expect(saveData.color).toBe(5);
+    expect(saveData.variety).toBe(3);
+    expect(saveData.rarity).toBe(2);
+
+    let loadedKitten = new com.nuclearunicorn.game.village.Kitten(123456);
+    loadedKitten.load(saveData, game.village.jobNames);
+
+    expect(loadedKitten.seed).toBe(null);
+    expect(loadedKitten.name).toBe("Legacy");
+    expect(loadedKitten.surname).toBe("Kitten");
+    expect(loadedKitten.age).toBe(42);
+    expect(loadedKitten.trait.name).toBe("engineer");
+    expect(loadedKitten.color).toBe(5);
+    expect(loadedKitten.variety).toBe(3);
+    expect(loadedKitten.rarity).toBe(2);
+});
+
 //----------------------------------
 //  Basic building and unlocks
 //  Effects and metadata processing
@@ -460,14 +541,18 @@ test("Test NR calls", () => {
 //--------------------------------
 test("Explored biomes should update effects", () => {
 
-    game.village.getBiome("plains").level = 1;
+    var plainsBiome = game.village.getBiome("plains");
+    plainsBiome.val = 1;
+    plainsBiome.on = 1;
     game.updateCaches();
     //expect(game.globalEffectsCached["catnipRatio"]).toBe(0.01);
     expect(game.getEffect("catnipRatio")).toBe(0.01);
 
     //buildings effects and biomes should compound and not interfeer with each other
 
-    game.village.getBiome("forest").level = 10;
+    var forestBiome = game.village.getBiome("forest");
+    forestBiome.val = 10;
+    forestBiome.on = 10;
     _build("lumberMill", 10);
     game.updateCaches();
 
@@ -476,7 +561,7 @@ test("Explored biomes should update effects", () => {
 
 test("Explored biome should produce rewards", () => {
     var plainsBiome = game.village.getBiome("plains");
-    plainsBiome.level = 1;
+    plainsBiome.val = 1;
     
     //check that obtained random reward is within base value +- width
     var rewardSpec = plainsBiome.rewards[0];
@@ -497,8 +582,8 @@ test("Explored biome should produce rewards", () => {
     expect(amt).toBeGreaterThanOrEqual(rewardSpec.value * (1 - rewardSpec.width ) * fuzzBuffer);
     expect(amt).toBeLessThanOrEqual(rewardSpec.value * (1 + rewardSpec.width ) * fuzzBuffer);
 
-    plainsBiome.level = 2;
-    var multiplier = Math.pow(plainsBiome.level, rewardSpec.multiplier);
+    plainsBiome.val = 2;
+    var multiplier = Math.pow(plainsBiome.val, rewardSpec.multiplier | 1.2);
 
     var rewards = game.village.map.getBiomeRewards(plainsBiome);
     var amt = rewards["catnip"];
