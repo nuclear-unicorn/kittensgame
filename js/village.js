@@ -2454,6 +2454,48 @@ dojo.declare("classes.village.Map", null, {
 		return Math.floor(curve + jitter);
 	},
 
+	getLeaderCombatStats: function(leader) {
+		if (!leader) {
+			return null;
+		}
+		var seed = leader.seed;
+
+		if (!seed){
+			seed = this.xmur3(leader.name + ":" + leader.surname);
+		}
+		var lvl = this.game.village.getCombatLevel(leader.combatExp);
+		var stats = {};
+		for (var stat in this.leaderStatIds) {
+			var statID = this.leaderStatIds[stat];
+			var cfg = dojo.clone(this.leaderStatConfigs[stat]);
+			if (!leader.trait){
+				cfg.bias += 0.05;
+			}
+			stats[stat] = this.getStatAtLevel(seed, lvl, statID, cfg);
+
+			if (stats[stat] == 0) {
+				stats[stat] = 1;
+			}
+		}
+		return stats;
+	},
+
+	updateSquadStats: function() {
+		var leader = this.game.village.leader;
+		var stats = leader ? this.getLeaderCombatStats(leader) : null;
+		if (stats) {
+			this.squad.atk = stats.atk + this.game.getEffect("explorerAtk");
+			this.squad.def = stats.def + this.game.getEffect("explorerDef");
+			this.squad.agi = stats.agi;
+			this.squad.str = stats.str;
+			this.squad.spd = stats.spd;
+			var maxHp = stats.hp;
+			if (this.squad.hp > maxHp) {
+				this.squad.hp = maxHp;
+			}
+		}
+	},
+
 	/**
 	 * Combat stats for a given seed/level. Traitless kittens get a small bias bonus.
 	 * Pulled out of getLeaderCombatStats so it can be evaluated without a full leader.
@@ -2473,35 +2515,6 @@ dojo.declare("classes.village.Map", null, {
 			}
 		}
 		return stats;
-	},
-
-	getLeaderCombatStats: function(leader) {
-		if (!leader) {
-			return null;
-		}
-		var seed = leader.seed;
-
-		if (!seed){
-			seed = this.xmur3(leader.name + ":" + leader.surname);
-		}
-		var lvl = this.game.village.getCombatLevel(leader.combatExp);
-		return this.getCombatStatsAt(seed, lvl, leader.trait);
-	},
-
-	updateSquadStats: function() {
-		var leader = this.game.village.leader;
-		var stats = leader ? this.getLeaderCombatStats(leader) : null;
-		if (stats) {
-			this.squad.atk = stats.atk + this.game.getEffect("explorerAtk");
-			this.squad.def = stats.def + this.game.getEffect("explorerDef");
-			this.squad.agi = stats.agi;
-			this.squad.str = stats.str;
-			this.squad.spd = stats.spd;
-			var maxHp = stats.hp;
-			if (this.squad.hp > maxHp) {
-				this.squad.hp = maxHp;
-			}
-		}
 	},
 
 	attack: function(src, tgt){

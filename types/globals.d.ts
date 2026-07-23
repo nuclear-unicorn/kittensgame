@@ -43,6 +43,12 @@ interface Window {
 	newrelic: any;
 	/** KGNet save blob, parked on window by the Server manager */
 	saveData: any;
+	/** version.json payload, parked on window by the platform bootstrap (index.html / steam main.js) */
+	KGVersion?: {
+		version: string;
+		versionCode: number;
+		platform: "web" | "mobile" | "steam";
+	};
 }
 
 interface Performance {
