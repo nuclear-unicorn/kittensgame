@@ -1054,8 +1054,9 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 	},
 
-	sellBcoin: function(){
-		var amt = this.game.resPool.get("blackcoin").value * this.game.calendar.getCryptoPrice();
+	//isHodl settles the sale at the pre-switch price, see getCryptoPrice
+	sellBcoin: function(isHodl){
+		var amt = this.game.resPool.get("blackcoin").value * this.game.calendar.getCryptoPrice(isHodl);
 		var amt = this.game.resPool.addResEvent("relic", amt);
 		this.game.resPool.get("blackcoin").value = 0;
 		this.game.msg($I("trade.bcoin.sell.msg", [this.game.getDisplayValueExt(amt)])), "", "blackcoin";

@@ -40,6 +40,8 @@ dojo.declare("classes.managers.SettingsManager", com.nuclearunicorn.core.TabMana
 	 * 		If true, whenever the player toggles this setting, it'll re-render the UI.
 	 * 	devModeOnly - boolean - If truthy, this setting is hidden unless dev mode is active.
 	 * 	showOnlyIfKSDetected - If truthy, this setting is hidden.  (nothing to see here %citizen%)
+	 * 	onChange - function(game, oldValue, newValue) - Side effect to run when the player changes this setting.
+	 * 		Only fires on a genuine change, so game start & resets don't trigger it.
 	 */
 	settingsArr: [{
 		name: "useWorkers",
@@ -174,7 +176,11 @@ dojo.declare("classes.managers.SettingsManager", com.nuclearunicorn.core.TabMana
 		defaultValue: true,
 		label: $I("ui.option.hodl"),
 		tooltip: $I("ui.option.hodl.tip"),
-		isExtra: true
+		isExtra: true,
+		//Holding a stash across the switch would be free arbitrage, so cash it out at the old price
+		onChange: function(game, oldValue /*, newValue*/) {
+			game.diplomacy.sellBcoin(oldValue);
+		}
 	}, {
 		name: "disableCMBR", //CMBR was an old feature which granted a global production & storage bonus.
 		defaultValue: false,
@@ -272,7 +278,14 @@ dojo.declare("classes.managers.SettingsManager", com.nuclearunicorn.core.TabMana
 	 */
 	set: function(setting, newValue) {
 		var settingName = typeof(setting) === "object" ? setting.name : setting;
+		var meta = typeof(setting) === "object" ? setting : this.getSetting(settingName);
+		var oldValue = this.game.opts[settingName];
 		this.game.opts[settingName] = newValue;
+
+		//Only trigger when option changes. Registration & resets assign over an undefined opt, not a change
+		if (meta && meta.onChange && oldValue !== undefined && oldValue !== newValue) {
+			meta.onChange(this.game, oldValue, newValue);
+		}
 	},
 
 	/**

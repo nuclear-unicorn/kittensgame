@@ -1177,3 +1177,31 @@ test("Metaphysics upgrade unlock tree must be sensible", () => {
         }
     }
 });
+
+test("Toggling hodl mode must liquidate b-coin at the pre-switch price", () => {
+    const hodl = game.settings.getSetting("hodl");
+    game.calendar.cryptoPrice = 1000; //legacy simulated price
+    game.server.bcoinPrice = 63918;   //real-world price
+
+    //Start out in legacy mode & buy a stash at the cheap simulated price
+    game.settings.set(hodl, false);
+    game.resPool.get("relic").value = 1e6;
+    game.resPool.get("blackcoin").value = 0;
+    game.diplomacy.buyBcoin();
+    expect(game.resPool.get("blackcoin").value).toBe(1000);
+    expect(game.resPool.get("relic").value).toBe(0);
+
+    //Flipping to hodl cashes out at the old price, otherwise it'd be 1000 x 63918 relics for free
+    game.settings.set(hodl, true);
+    expect(game.opts.hodl).toBe(true);
+    expect(game.resPool.get("blackcoin").value).toBe(0);
+    expect(game.resPool.get("relic").value).toBe(1e6);
+
+    //...and the same holds switching back, so neither direction is arbitrage
+    game.diplomacy.buyBcoin();
+    expect(game.resPool.get("blackcoin").value).toBe(1e6 / 63918);
+    game.settings.set(hodl, false);
+    expect(game.opts.hodl).toBe(false);
+    expect(game.resPool.get("blackcoin").value).toBe(0);
+    expect(game.resPool.get("relic").value).toBe(1e6);
+});

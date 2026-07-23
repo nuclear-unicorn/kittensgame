@@ -1,15 +1,30 @@
-v 1.5.0.3 (29 Jul 2026)
+v 1.5.0.3 (20 Jul 2026)
 
-Plastic
-Petri Dish
+New resources: plastic, microchip
+New upgrades:
+* Petri Dish
+* Prospecting (trillian)
+* Freightful Exchange, Transport Superposition (Ziggurat)
+New metaphysics:
+* Ambassadors, Treaties (Brent)
+  * Unlocks new Ambassador kitten job and allows queueing of embassies
 
 Minor:
 
 Adjusted compendium science/manuscript price by 10%
 Bio Lab will now require plastic for construction
+Data Centers require microchips
 Added Hebrew language to the list of available localizations
+"hodl mode"
+Better Safe Than Sorry is now an achievement with a starred variant (trillian)
+Buffed Technocracy policy (Brent)
+Buffed Shark Relations: Botanists (Ziggurat)
+Buffed Shark Relations: Scribes (Brent)
+Shattering time crystals will trigger queue before workshop automation (Brent)
+Various improvements to how loadouts assign kittens (SilenceFactor)
 
 Biome overhaul (fixed biomes not being avalable past default two, added combat exp and stats for leaders, removed obsolete buildings)
+N.B: biomes are only available on Beta currently
 
 
 
