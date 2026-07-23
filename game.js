@@ -3957,6 +3957,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				resConsumption += resConsumption * hapinnessConsumption * (1 + this.getEffect(res.name + "DemandWorkerRatioGlobal")) * (1 - this.village.getFreeKittens() / this.village.sim.kittens.length);
 			}
 		}
+		stack.push({
+			name: $I("res.stack.demand"),
+			type: "fixed",
+			value: resConsumption
+		});
 
 		stack.push({
 			name: $I("res.stack.demand"),

@@ -2468,6 +2468,27 @@ dojo.declare("classes.village.Map", null, {
 		return Math.floor(curve + jitter);
 	},
 
+	/**
+	 * Combat stats for a given seed/level. Traitless kittens get a small bias bonus.
+	 * Pulled out of getLeaderCombatStats so it can be evaluated without a full leader.
+	 */
+	getCombatStatsAt: function(seed, lvl, hasTrait) {
+		var stats = {};
+		for (var stat in this.leaderStatIds) {
+			var statID = this.leaderStatIds[stat];
+			var cfg = dojo.clone(this.leaderStatConfigs[stat]);
+			if (!hasTrait){
+				cfg.bias += 0.05;
+			}
+			stats[stat] = this.getStatAtLevel(seed, lvl, statID, cfg);
+
+			if (stats[stat] == 0) {
+				stats[stat] = 1;
+			}
+		}
+		return stats;
+	},
+
 	getLeaderCombatStats: function(leader) {
 		if (!leader) {
 			return null;
@@ -2478,20 +2499,7 @@ dojo.declare("classes.village.Map", null, {
 			seed = this.xmur3(leader.name + ":" + leader.surname);
 		}
 		var lvl = this.game.village.getCombatLevel(leader.combatExp);
-		var stats = {};
-		for (var stat in this.leaderStatIds) {
-			var statID = this.leaderStatIds[stat];
-			var cfg = dojo.clone(this.leaderStatConfigs[stat]);
-			if (!leader.trait){
-				cfg.bias += 0.05;
-			}
-			stats[stat] = this.getStatAtLevel(seed, lvl, statID, cfg);
-
-			if (stats[stat] == 0) {
-				stats[stat] = 1;
-			}
-		}
-		return stats;
+		return this.getCombatStatsAt(seed, lvl, leader.trait);
 	},
 
 	updateSquadStats: function() {
@@ -2519,6 +2527,16 @@ dojo.declare("classes.village.Map", null, {
 	},
 
 
+		var efficiency = src.efficiency ? src.efficiency : 1;
+		var damage = Math.floor((src.str * efficiency + src.atk) - (tgt.str + tgt.def) * (0.9 + Math.random() * 0.2));	//+-10% damage variation
+
+		if (damage < 1){
+			damage = 1;
+		}
+
+		//console.log(src, "attacks", tgt, "hit chance:", hitChance);
+		if (this.game.rand(100) <= hitChance) {
+			tgt.hp -= damage;
 
 	/**
 	 * A version of seeded rand that takes string as a seed (mainly used for multiple parameters)
@@ -2701,6 +2719,54 @@ dojo.declare("classes.village.Map", null, {
 	}
 });
 
+dojo.declare("classes.village.ui.map.UpgradeHQController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
+	defaults: function() {
+		var result = this.inherited("defaults", arguments);
+		result.simplePrices = false;
+		return result;
+	},
+
+	getMetadata: function(model) {
+		var map = this.game.village.map;
+		if (!model.metaCached) {
+			model.metaCached = {
+				label: $I("village.btn.upgradeHQ"),
+				description: $I("village.btn.upgradeHQ.desc"),
+				val: map.hqLevel,
+				on: map.hqLevel
+			};
+		}
+		return model.metaCached;
+	},
+
+	getPrices: function(model) {
+		var prices = dojo.clone(model.options.prices);
+		for (var i = 0; i < prices.length; i++) {
+            prices[i].val *= Math.pow(1.25, this.game.village.map.hqLevel);
+		}
+		return prices;
+	},
+
+	buyItem: function(model, event) {
+		this.game.ui.render();
+		return this.inherited("buyItem", arguments);
+		
+	},
+
+	incrementValue: function(model) {
+		this.inherited(arguments);
+		this.game.village.map.hqLevel++;
+	},
+
+	hasSellLink: function(model){
+		return false;
+	},
+
+	updateVisible: function(model){
+		model.visible = true;
+	}
+});
+
 dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	fetchModel: function(options){
 		if (!this.biome){
@@ -2758,6 +2824,63 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		var toLevel = this.game.village.map.toLevel(this.biome);
 		return desc + ", cp: " + this.biome.cp.toFixed(2) + " / " + toLevel.toFixed(2);
 	},*/
+
+	metadataHasChanged: function(model) {
+		this.game.village.map.updateEffectCached();
+	},
+	
+	buyItem: function(model, event) {
+		this.game.ui.render();
+		return this.inherited("buyItem", arguments);
+	},
+
+	on: function(model, amt) {
+		amt = amt || 1;
+		var biome = model.metadata;
+		if (amt > biome.val - (biome.on || 0)){
+			amt = biome.val - (biome.on || 0);
+		}
+		if ((biome.on || 0) + amt <= biome.val){
+			biome.on = (biome.on || 0) + amt;
+			biome.cp = 0;
+			biome.fauna = [];
+			this.metadataHasChanged(model);
+		}
+	},
+
+	off: function(model, amt) {
+		amt = amt || 1;
+		var biome = model.metadata;
+		if (amt > (biome.on || 0)){
+			amt = biome.on || 0;
+		}
+		if ((biome.on || 0) >= amt){
+			biome.on -= amt;
+			biome.cp = 0;
+			biome.fauna = [];
+			this.metadataHasChanged(model);
+		}
+	},
+
+	onAll: function(model) {
+		var biome = model.metadata;
+		if ((biome.on || 0) < biome.val){
+			biome.on = biome.val;
+			biome.cp = 0;
+			biome.fauna = [];
+			this.metadataHasChanged(model);
+		}
+	},
+
+	offAll: function(model) {
+		var biome = model.metadata;
+		if (biome.on){
+			biome.on = 0;
+			biome.cp = 0;
+			biome.fauna = [];
+			this.metadataHasChanged(model);
+		}
+	},
 
 	updateVisible: function(model){
 		model.visible = this.biome.unlocked;
