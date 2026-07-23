@@ -1139,9 +1139,11 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 
 	/**
 	 * Gets a simulated ramndom-walk or a real life crypto price
+	 * isHodl defaults to the active mode, pass it to price against the one we just left
 	 */
-	getCryptoPrice: function() {
-		return this.game.opts.hodl ? this.game.server.bcoinPrice : this.cryptoPrice;
+	getCryptoPrice: function(isHodl) {
+		var hodl = isHodl === undefined ? this.game.opts.hodl : isHodl;
+		return hodl ? this.game.server.bcoinPrice : this.cryptoPrice;
 	},
 
 	adjustCryptoPrice: function() {
