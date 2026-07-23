@@ -724,8 +724,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			for (var i in self.effects) {
 				self.effectsCalculated[i] = self.effects[i];
 			}
-			self.effects["scienceMax"] *= (1 + game.getEffect("biolabBiofuelScienceMaxRatio") * self.on);
-
+			if (game.workshop.get("biofuel").researched){
+				self.effects["scienceMax"] *= (1 + game.getEffect("biolabBiofuelScienceMaxRatio") * self.on);
+			}
 		},
 		lackResConvert: false,
 		action: function(self, game){
