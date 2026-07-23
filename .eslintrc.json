@@ -21,7 +21,7 @@
           }
         }
     ],
-    "ignorePatterns": ["lib/**/*", "node_modules/**/*"],
+    "ignorePatterns": ["lib/**/*", "node_modules/**/*", "simulate-combat.js"],
     "rules": {
         "quotes": [
             "warn",

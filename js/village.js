@@ -144,6 +144,49 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		},
 		value: 0,
 		unlocked: false
+	}, {
+		name: "ambassador",
+		title: $I("village.job.ambassador"),
+		description: $I("village.job.ambassador.desc"),
+		modifiers: {
+			//July 2026: I've purposely made these effects a little weaker than is necessary.
+			//We'll buff them later once we get a better feel for how strong they *ought* to be.
+			"tradeVolume": 0.0007,
+			"embassyEffectCap": 0.00133,
+			"tradeBlueprintChance": 0.00008,
+			"tradeSpiceChance":     0.00009,
+			"tradeNormalResChance": 0.00003,
+			"cultureConsumptionAmbassadors": 20,
+			"spiceConsumptionAmbassadors": 0.8
+		},
+		lackResConvert: false,
+		calculateEffects: function(self, game) {
+			//--- UPDATE DESCRIPTION
+			var scalesBasedOnEmbassies = game.getEffect("embassiesPerAmbassadorSlot") > 0; //Boolean variable
+			var baseDescription = $I("village.job.ambassador.desc");
+			var limitDescription = $I("village.job.ambassador.limit.per.race");
+
+			if (scalesBasedOnEmbassies) {
+				var computedLimit = game.village.getJobLimit(self.name);
+				limitDescription = $I("village.job.ambassador.limit.calculated", [computedLimit]);
+			}
+			self.description = baseDescription + "<br>" + limitDescription;
+			if (game.religion.getTU("holyGenocide").val > 0) {
+				self.description += "<br>" + $I("village.job.notAffectedHG");
+			}
+
+			//--- UPDATE RESOURCE CONSUMPTION
+			if (self.value > 5) {
+				var scalingBase = self.value - 5;
+				self.modifiers["cultureConsumptionAmbassadors"] = 20 * (1 + 0.025*scalingBase); //Quadratic scaling
+				self.modifiers["spiceConsumptionAmbassadors"] = 0.8 * (1 + 0.001*scalingBase*scalingBase); //Cubic scaling
+			} else {
+				self.modifiers["cultureConsumptionAmbassadors"] = 20;
+				self.modifiers["spiceConsumptionAmbassadors"] = 0.8;
+			}
+		},
+		value: 0,
+		unlocked: false
 	}],
 	jobNames: null,
 
@@ -264,6 +307,28 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 	getJobLimit: function(jobName) {
 		if (jobName == "engineer"){
 			return this.game.bld.get("factory").val;
+		} else if (jobName == "ambassador") {
+			//Check the unlock condition for this job in the first place:
+			if (!this.game.prestige.getPerk("ambassadors").researched) {
+				return 0;
+			}
+			//Limit is 1 per unlocked race, so compute that number:
+			var unlockedRaces = 0;
+			this.game.diplomacy.races.forEach( function(race) {
+				if (race.name == "leviathans") {
+					//Leviathans come & go as they please.  To handle this, we count them as unlocked iff we've fed them.
+					unlockedRaces += race.energy > 0 ? 1 : 0;
+				} else {
+					unlockedRaces += race.unlocked;
+				}
+			});
+			//Effect of Treaties (Metaphysics upgrade) increases job limit based on embassies:
+			var embassyDivisor = this.game.getEffect("embassiesPerAmbassadorSlot"); //Every N embassies adds +1 slot
+			var fromEmbassies = 0;
+			if (embassyDivisor > 0) {
+				fromEmbassies = Math.floor(this.game.diplomacy.getSumEmbassyLevels() / embassyDivisor);
+			}
+			return unlockedRaces + fromEmbassies;
 		} else if (jobName == "priest" && this.game.challenges.isActive("atheism")){
 			return 0;
 		} else {
@@ -397,9 +462,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 
 		//calculate production and happiness modifiers
 		this.updateHappines();
-
-        //XXX FW7: add some messeging system? Get rid of direct UI update calls completely?
-		//this.game.ui.updateFastHunt();
+		this.actionAmbassadors(1);
 
 		this.map.update();
 
@@ -409,8 +472,42 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		}
 	},
 
+	//Attempt to consume resources with ambassadors.  Call this once per tick, every tick.
+	//Scale ambassador effects based on the amount of resource SUCCESSFULY consumed.
+	//@param times	number	If set equal to zero, no resources will be consumed & ambassador effects will be set to full strength.
+	actionAmbassadors: function(times) {
+		var villageEffectsMap = this.getResProduction();
+		var cultureConsPerTick = villageEffectsMap["cultureConsumptionAmbassadors"] || 0;
+		var spiceConsPerTick = villageEffectsMap["spiceConsumptionAmbassadors"] || 0;
+		var effectScaling = 1; //Scales ALL effects of ambassadors based on whether or not we can afford them
+
+		//Consume culture & spice
+		if (cultureConsPerTick > 0 || spiceConsPerTick > 0 && times > 0) {
+			effectScaling = this.game.resPool.getAmtDependsOnStock(
+				[{res: "culture", amt: cultureConsPerTick},
+				 {res: "spice", amt: spiceConsPerTick}],
+				times);
+		}
+		this.getJob("ambassador").lackResConvert = effectScaling < 1;
+
+		this.game.diplomacy.cachedAmbassadorEffects = {};
+		for (var effectName in this.getJob("ambassador").modifiers) {
+			var effectAmt = effectScaling * (villageEffectsMap[effectName] || 0);
+			if (effectName.length > 6 && effectName.substring(effectName.length - 6) == "Chance") {
+				//Probability-related effects are subject to diminishing returns, for balance reasons
+				effectAmt = this.game.getLimitedDR(effectAmt, 0.25);
+			}
+			if (effectName == "embassyEffectCap" && effectAmt > 1) {
+				//Past a certain point, it gets harder to increase the cap...
+				effectAmt = Math.sqrt(effectAmt);
+			}
+			this.game.diplomacy.cachedAmbassadorEffects[effectName] = effectAmt;
+		}
+	},
+
 	fastforward: function(daysOffset){
 		var times = daysOffset * this.game.calendar.ticksPerDay;
+		this.actionAmbassadors(times);
 		//calculate kittens
 		var kittensPerTick = this.calculateKittensPerTick();
 		this.sim.maxKittens = this.calculateSimMaxKittens();
@@ -529,10 +626,12 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 					// Is there a shorter path to this function? I could go from gamePage but I'm trying to keep the style consistent.
 					//TODO: move to the village manager
 					var mod = this.game.village.getValueModifierPerSkill(kitten.skills[kitten.job] || 0);
+					var rankMultiplier = 1 + this.game.getEffect(kitten.job + "BoostPerRank") * kitten.rank;
 
 					for (var jobResMod in job.modifiers){
 
 						var diff = job.modifiers[jobResMod] + job.modifiers[jobResMod] * mod;
+						diff *= rankMultiplier;
 
 						if (diff > 0 ){
 							if (kitten.isLeader){
@@ -1592,22 +1691,26 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 		};
 		if (this.seed !== null && this.seed !== undefined) {
 			compressedSave.seed = this.seed;
-		} else {
-			var nameIndex = this.names.indexOf(this.name);
-			var surnameIndex = this.surnames.indexOf(this.surname);
-			compressedSave.ssn = this._mergeSSN([
-				nameIndex > -1 ? nameIndex : 0,
-				surnameIndex > -1 ? surnameIndex : 0,
-				this.age,
-				this._getTraitIndex(this.trait.name),
-				this.color,
-				this.variety,
-				this.rarity]);
-			// Custom sur/names
-			if (nameIndex <= 0 || surnameIndex <= 0) {
-				compressedSave.name = this.name;
-				compressedSave.surname = this.surname;
-			}
+		}
+		// If this.seed is defined, then this data is redundant, since all the
+		// information can be derived from the seed. However, old versions of
+		// the game will fail to load saves that only have the seed. Thus we
+		// keep writing the redundant info until all supported versions of the
+		// game can load from seed.
+		var nameIndex = this.names.indexOf(this.name);
+		var surnameIndex = this.surnames.indexOf(this.surname);
+		compressedSave.ssn = this._mergeSSN([
+			nameIndex > -1 ? nameIndex : 0,
+			surnameIndex > -1 ? surnameIndex : 0,
+			this.age,
+			this._getTraitIndex(this.trait.name),
+			this.color,
+			this.variety,
+			this.rarity]);
+		// Custom sur/names
+		if (nameIndex <= 0 || surnameIndex <= 0) {
+			compressedSave.name = this.name;
+			compressedSave.surname = this.surname;
 		}
 		return compressedSave;
 	},
@@ -2046,30 +2149,17 @@ dojo.declare("classes.village.Map", null, {
 			if (!biome.fauna || !biome.fauna.length){
 				var spawnChance = 1000 * (biome.faunaPenalty || 1.0);
 				if (this.game.rand(10000) <= spawnChance){
-					//use power law instead of exp law to avoid broken levels on biomes 20+
-					var powerLawMultiplier = biome.biomePenalty || 1.0;
-
-					var offset = Math.round(biome.mobLevel * Math.pow(biome.on, 0.6 * powerLawMultiplier)); 
-					var mobLevel = Math.round(
-						biome.mobLevel / 3 + 
-						(1.8 * Math.pow(biome.on, 1.50 * powerLawMultiplier) + offset) * 
-						(1 + (Math.random() * 2 - 1) * 0.15)
-					);
-					if (mobLevel <= 0) {
-						mobLevel = 1;
-					}
+					var mobLevel = Math.round(biome.mobLevel * Math.pow(1.05, biome.level));	//adjust by +- 15%
 					
 					
-					var hp = Math.round((15 * Math.pow(mobLevel, 1.25)) * (1 + (Math.random() * 2 - 1) * 0.15));
+					var hp = Math.round((this.game.rand(10) + 5) * Math.pow(1.05, mobLevel));
 					biome.fauna = [{
 						title: faunaName,
 						level: mobLevel,
-						exp: Math.round(8 * Math.pow(mobLevel, 1.50)),
 						prevHp: hp,
-						maxHp: hp,
 						hp: hp,
-						atk: Math.round(1.5 * Math.pow(mobLevel, 1.05)),
-						def: Math.round(1.5 * Math.pow(mobLevel, 1.1)),
+						atk: 2.5 * Math.pow(1.05, mobLevel),
+						def: (1 + mobLevel) * Math.pow(1.01, mobLevel),
 						str: (1 + mobLevel) * Math.pow(1.01, mobLevel),
 						agi: (1 + mobLevel) * Math.pow(1.01, mobLevel),
 						spd: (1 + mobLevel) * Math.pow(1.01, mobLevel)
@@ -2106,6 +2196,43 @@ dojo.declare("classes.village.Map", null, {
 		if (this.squad.hp > this.getMaxHP()) {
 			this.squad.hp = this.getMaxHP();
 		}
+	},
+
+	/**
+	 * Roll a single fauna mob for a biome at its current exploration level (biome.on).
+	 * HP and mob level carry a +/-15% spawn jitter; pass deterministic=true to get the
+	 * un-jittered baseline (used by the balance simulator to read average stats).
+	 */
+	createFauna: function(biome, faunaName, deterministic){
+		//use power law instead of exp law to avoid broken levels on biomes 20+
+		var powerLawMultiplier = biome.biomePenalty || 1.0;
+		var levelJitter = deterministic ? 1 : (1 + (Math.random() * 2 - 1) * 0.15);
+		var hpJitter = deterministic ? 1 : (1 + (Math.random() * 2 - 1) * 0.15);
+
+		var offset = Math.round(biome.mobLevel * Math.pow(biome.on, 0.6 * powerLawMultiplier));
+		var mobLevel = Math.round(
+			biome.mobLevel / 3 +
+			(1.8 * Math.pow(biome.on, 1.50 * powerLawMultiplier) + offset) *
+			levelJitter
+		);
+		if (mobLevel <= 0) {
+			mobLevel = 1;
+		}
+
+		var hp = Math.round((15 * Math.pow(mobLevel, 1.25)) * hpJitter);
+		return {
+			title: faunaName,
+			level: mobLevel,
+			exp: Math.round(8 * Math.pow(mobLevel, 1.50)),
+			prevHp: hp,
+			maxHp: hp,
+			hp: hp,
+			atk: Math.round(1.2 * Math.pow(mobLevel, 1.02)),
+			def: Math.round(0.6 * Math.pow(mobLevel, 1.01)),
+			str: Math.round(0.6 * Math.pow(mobLevel, 1.02)),
+			agi: Math.round(1.5 * Math.pow(mobLevel, 1.05)),
+			spd: Math.round(1.5 * Math.pow(mobLevel, 1.05))
+		};
 	},
 
 	getMaxEnergy: function(){
@@ -2382,39 +2509,120 @@ dojo.declare("classes.village.Map", null, {
 			}
 		}
 	},
+	/*
+		Simplified version of above method with additional penalty for efficiency and base exp multiplier
+		Courtesy of proto23
+	*/
+	getKillExp: function(playerLvl, efficiency, mobExp, mobLvl) {
+		//formulas are courtesy of proto23
+		return Math.max(1, Math.round(mobExp * (1 + mobLvl / 10) * (0.4 + efficiency * 0.6)) - (playerLvl - 1));
+	},
+
+
+
+	/**
+	 * A version of seeded rand that takes string as a seed (mainly used for multiple parameters)
+	 */
+	xmur3: function(str) {
+		var h = 1779033703 ^ str.length;
+		for (var i = 0; i < str.length; i++) {
+			h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+			h = h << 13 | h >>> 19;
+		}
+		return function() {
+			h = Math.imul(h ^ h >>> 16, 2246822507);
+			h = Math.imul(h ^ h >>> 13, 3266489909);
+			return (h ^= h >>> 16) >>> 0;
+		};
+	},
+
+	getSeededStatRoll: function(seed, level, statIndex) {
+		// xmur3 hash over a composite string key
+		var h = this.xmur3(seed + ":" + level + ":" + statIndex);
+		return (h() >>> 0) / 0xFFFFFFFF;
+	},
+
+	//TODO: just pick one seeded RNG method
+	rand: function(v) {
+		v = Math.imul(v ^ v >>> 16, 0x85ebca6b);
+		v = Math.imul(v ^ v >>> 13, 0xc2b2ae35);
+		return ((v ^ v >>> 16) >>> 0) / 4294967296;
+	},
+
+	getStatAtLevel: function(seed, lvl, statID, cfg) {
+		//bake the randomness based on the stat id to make them grow differently
+		var statSeed = (seed ^ (statID * 0xdeadbeef)) >>> 0;
+
+		//bake macro level luck based on the stat seed
+		var macroLuck = 0.9 + (this.rand(statSeed) * 0.2);
+
+		// stat = base + (level * growthPerLevel * classModifier * macroLuck)
+		var curve = cfg.base + (lvl * cfg.growth * cfg.bias * macroLuck);
+
+		// add a pseudo-random jitter based on the level
+		var jitterSeed = (statSeed ^ (lvl * 0x85ebca6b)) >>> 0;
+		var jitter = (this.rand(jitterSeed) - 0.5) * (cfg.growth * 0.5);
+
+		return Math.floor(curve + jitter);
+	},
+
+	/**
+	 * Combat stats for a given seed/level. Traitless kittens get a small bias bonus.
+	 * Pulled out of getLeaderCombatStats so it can be evaluated without a full leader.
+	 */
+	getCombatStatsAt: function(seed, lvl, hasTrait) {
+		var stats = {};
+		for (var stat in this.leaderStatIds) {
+			var statID = this.leaderStatIds[stat];
+			var cfg = dojo.clone(this.leaderStatConfigs[stat]);
+			if (!hasTrait){
+				cfg.bias += 0.05;
+			}
+			stats[stat] = this.getStatAtLevel(seed, lvl, statID, cfg);
+
+			if (stats[stat] == 0) {
+				stats[stat] = 1;
+			}
+		}
+		return stats;
+	},
+
+	getLeaderCombatStats: function(leader) {
+		if (!leader) {
+			return null;
+		}
+		var seed = leader.seed;
+
+		if (!seed){
+			seed = this.xmur3(leader.name + ":" + leader.surname);
+		}
+		var lvl = this.game.village.getCombatLevel(leader.combatExp);
+		return this.getCombatStatsAt(seed, lvl, leader.trait);
+	},
+
+	updateSquadStats: function() {
+		var leader = this.game.village.leader;
+		var stats = leader ? this.getLeaderCombatStats(leader) : null;
+		if (stats) {
+			this.squad.atk = stats.atk + this.game.getEffect("explorerAtk");
+			this.squad.def = stats.def + this.game.getEffect("explorerDef");
+			this.squad.agi = stats.agi;
+			this.squad.str = stats.str;
+			this.squad.spd = stats.spd;
+			var maxHp = stats.hp;
+			if (this.squad.hp > maxHp) {
+				this.squad.hp = maxHp;
+			}
+		}
+	},
 
 	attack: function(src, tgt){
 		//hit change
 		var hitChance = this.getHitRate(src, tgt);
 
-		//console.log(src, "attacks", tgt, "hit chance:", hitChance);
+		console.log(src, "attacks", tgt, "hit chance:", hitChance);
 		if (this.game.rand(100) <= hitChance) {
 			tgt.hp -= src.atk;
-
-			if (tgt.hp < 0){
-				tgt.hp = 0;
-			}
-		}
-	},
-
-	grantBiomeRewards: function(biome){
-		if (!biome.rewards){
-			return;
-		}
-		var rewards = this.getBiomeRewards(biome);
-		for (var res in rewards) {
-			var amt = this.game.resPool.addResEvent(res, rewards[res]);
-			if (amt > 0) {
-				var resPool = this.game.resPool.get(res);
-				var name = resPool.title || res;
-				var msg = "Your explorers have brought " + this.game.getDisplayValueExt(amt) + " " + name;
-				var type = null;
-				if (res == "titanium" || res == "blueprint" || res == "relic"){
-					msg += "!";
-					type = "notice";
-				}
-				this.game.msg(msg, type, "explore");
-			}
 		}
 	},
 
@@ -2493,54 +2701,6 @@ dojo.declare("classes.village.Map", null, {
 	}
 });
 
-dojo.declare("classes.village.ui.map.UpgradeHQController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
-	defaults: function() {
-		var result = this.inherited(arguments);
-		result.simplePrices = false;
-		return result;
-	},
-
-	getMetadata: function(model) {
-		var map = this.game.village.map;
-		if (!model.metaCached) {
-			model.metaCached = {
-				label: $I("village.btn.upgradeHQ"),
-				description: $I("village.btn.upgradeHQ.desc"),
-				val: map.hqLevel,
-				on: map.hqLevel
-			};
-		}
-		return model.metaCached;
-	},
-
-	getPrices: function(model) {
-		var prices = dojo.clone(model.options.prices);
-		for (var i = 0; i < prices.length; i++) {
-            prices[i].val *= Math.pow(1.25, this.game.village.map.hqLevel);
-		}
-		return prices;
-	},
-
-	buyItem: function(model, event) {
-		this.game.ui.render();
-		return this.inherited(arguments);
-		
-	},
-
-	incrementValue: function(model) {
-		this.inherited(arguments);
-		this.game.village.map.hqLevel++;
-	},
-
-	hasSellLink: function(model){
-		return false;
-	},
-
-	updateVisible: function(model){
-		model.visible = true;
-	}
-});
-
 dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	fetchModel: function(options){
 		if (!this.biome){
@@ -2598,58 +2758,6 @@ dojo.declare("classes.ui.village.BiomeBtnController", com.nuclearunicorn.game.ui
 		var toLevel = this.game.village.map.toLevel(this.biome);
 		return desc + ", cp: " + this.biome.cp.toFixed(2) + " / " + toLevel.toFixed(2);
 	},*/
-
-	metadataHasChanged: function(model) {
-		this.game.village.map.updateEffectCached();
-	},
-
-	on: function(model, amt) {
-		amt = amt || 1;
-		var biome = model.metadata;
-		if (amt > biome.val - (biome.on || 0)){
-			amt = biome.val - (biome.on || 0);
-		}
-		if ((biome.on || 0) + amt <= biome.val){
-			biome.on = (biome.on || 0) + amt;
-			biome.cp = 0;
-			biome.fauna = [];
-			this.metadataHasChanged(model);
-		}
-	},
-
-	off: function(model, amt) {
-		amt = amt || 1;
-		var biome = model.metadata;
-		if (amt > (biome.on || 0)){
-			amt = biome.on || 0;
-		}
-		if ((biome.on || 0) >= amt){
-			biome.on -= amt;
-			biome.cp = 0;
-			biome.fauna = [];
-			this.metadataHasChanged(model);
-		}
-	},
-
-	onAll: function(model) {
-		var biome = model.metadata;
-		if ((biome.on || 0) < biome.val){
-			biome.on = biome.val;
-			biome.cp = 0;
-			biome.fauna = [];
-			this.metadataHasChanged(model);
-		}
-	},
-
-	offAll: function(model) {
-		var biome = model.metadata;
-		if (biome.on){
-			biome.on = 0;
-			biome.cp = 0;
-			biome.fauna = [];
-			this.metadataHasChanged(model);
-		}
-	},
 
 	updateVisible: function(model){
 		model.visible = this.biome.unlocked;
@@ -4224,7 +4332,7 @@ dojo.declare("com.nuclearunicorn.game.village.Loadout", null, {
 dojo.declare("com.nuclearunicorn.game.ui.LoadoutButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.tooltipName = true;
 		return result;
 	},
@@ -4273,7 +4381,7 @@ dojo.declare("com.nuclearunicorn.game.ui.LoadoutButtonController", com.nuclearun
 
 
 	fetchModel: function(options){
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		var self = this;
 		var loadout = model.options.loadout;
 		model.editLinks = [
@@ -4344,13 +4452,13 @@ dojo.declare("com.nuclearunicorn.game.ui.LoadoutButton", com.nuclearunicorn.game
 dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.tooltipName = true;
 		return result;
 	},
 
 	initModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("initModel", arguments);
 		model.job = this.getJob(model);
 		return model;
 	},
@@ -4367,7 +4475,7 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 	},
 
 	getName: function(model){
-		var name = this.inherited(arguments);
+		var name = this.inherited("getName", arguments);
 		return name + " (" + model.job.value + ")";
 	},
 
@@ -4406,6 +4514,9 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 
 		if (amt > 0) {
 			this.game.village.sim.removeJob(job.name, amt);
+			if (typeof(model.job.calculateEffects) === "function") {
+				model.job.calculateEffects(model.job, this.game);
+			}
 		}
 	},
 
@@ -4415,6 +4526,9 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 
 	assignJobs: function(model, amt){
 		this.game.village.assignJob(model.job, amt);
+		if (typeof(model.job.calculateEffects) === "function") {
+			model.job.calculateEffects(model.job, this.game);
+		}
 	},
 
 	assignAllJobs: function(model){
@@ -4423,7 +4537,7 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButtonController", com.nuclearunicor
 	},
 
 	fetchModel: function(options){
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		var self = this;
 		//We will generate links for assigning/unassigning this many kittens:
 		var LINK_AMOUNTS = [5, 25, 100];
@@ -4504,6 +4618,21 @@ dojo.declare("com.nuclearunicorn.game.ui.JobButton", com.nuclearunicorn.game.ui.
 		this.unassignLinks = this.addLinkList(this.model.unassignLinks);
 
 		this.assignLinks = this.addLinkList(this.model.assignLinks);
+	},
+
+	update: function () {
+		this.inherited(arguments);
+		var job = this.model.job; //The job object associated with this button
+
+		if (typeof(job.lackResConvert) === "boolean") {
+			dojo.removeClass(this.domNode, "bldEnabled");
+			dojo.removeClass(this.domNode, "bldlackResConvert");
+			if (job.lackResConvert) {
+				dojo.toggleClass(this.domNode, "bldlackResConvert", job.value > 0);
+			} else {
+				dojo.toggleClass(this.domNode, "bldEnabled", job.value > 0);
+			}
+		}
 	}
 });
 
@@ -5193,7 +5322,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CensusPanel", com.nuclearunicorn.game.u
 dojo.declare("classes.village.ui.VillageButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.simplePrices = false;
 		result.hasResourceHover = true;
 		return result;
@@ -5221,7 +5350,7 @@ dojo.declare("classes.village.ui.HuntBtn", com.nuclearunicorn.game.ui.ButtonMode
 
 dojo.declare("classes.village.ui.HuntButtonController", classes.village.ui.VillageButtonController, {
 	fetchModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		var village = this.game.village;
 		//We use bind(village) to ensure that the huntFraction functions work properly.
 		model.fifthLink = this._newLink(model, 5, village.huntFifth.bind(village));
@@ -5288,7 +5417,7 @@ dojo.declare("classes.village.ui.HuntButtonController", classes.village.ui.Villa
 
 dojo.declare("classes.village.ui.FestivalButtonController", classes.village.ui.VillageButtonController, {
 	fetchModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		model.x10Link = this._newLink(10);
 		model.x100Link = this._newLink(100);
 		return model;

@@ -140,6 +140,15 @@ dojo.declare("classes.ui.UISystem", null, {
         return false;
     },
 
+    /**
+     * Lays out one resource breakdown row (see GamePage.getStackElemString).
+     * The legacy tooltip is a flat text blob, so the value is floated to the right
+     * and rows are separated by line breaks.
+     */
+    formatStackRow: function(label, value){
+        return label + "&nbsp;<div style=\"float: right;\">" + value + "</div><br>";
+    },
+
     checkForUpdates: function(){
         //nothing
     }
@@ -732,7 +741,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             }
 
             calendarDiv.innerHTML = $I("calendar.year.full", [year.toLocaleString(), seasonTitle + mod, Math.floor(calendar.day)]);
-            document.title = $I("navbar.title") + " - " + $I("calendar.year.full", [calendar.year, seasonTitle, Math.floor(calendar.day)]);
+            document.title = $I("navbar.title") + " - " + $I("calendar.year.full", [this.game.getDisplayValueExt(calendar.year), seasonTitle, Math.floor(calendar.day)]);
 
             if (this.game.ironWill && calendar.observeBtn) {
                 document.title = "[EVENT!]" + document.title;

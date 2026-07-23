@@ -542,7 +542,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				description: $I("buildings.dataCenter.desc"),
 				prices: [
 					{ name : "steel", val: 100 },
-					{ name : "concrate", val: 10 }
+					{ name : "concrate", val: 10 },
+					{ name : "microchip", val: 5 },
 				],
 				//togglable: true,
 				effects: {
@@ -678,6 +679,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		prices: [
 			{ name : "science", val: 1500 },
 			{ name : "slab", val: 100 },
+			{ name: "plastic", val: 15 },
 			{ name : "alloy", val: 25 }
 		],
 		priceRatio: 1.10,
@@ -687,7 +689,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"scienceMax": 0,
 			"catnipPerTickCon": 0,
 			"oilPerTickProd": 0,
-			"energyConsumption": 0
+			"energyConsumption": 0,
+			"compediumCraftRatio": 0,
+			"compediumGlobalCraftRatio": 0
 		},
 		upgrades: {
 			buildings: ["library"]
@@ -704,6 +708,11 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				self.effects["catnipPerTickCon"] = 0;
 				self.effects["oilPerTickProd"] = 0;
 				self.effects["energyConsumption"] = 0;
+			}
+
+			if (game.workshop.get("petri").researched){
+				self.effects["compediumCraftRatio"] = 0.01;
+				self.effects["compediumGlobalCraftRatio"] = 0.001;
 			}
 
 			self.effects["scienceMax"] = 1500;
@@ -780,6 +789,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	},
 	{
 		name: "warehouse",
+		isAutomationEnabled: null,
 		stages: [
 			{
 				label: $I("buildings.warehouse.label"),
@@ -818,10 +828,12 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					"moonBaseStorageBonus": 0,
 					"planetCrackerStorageBonus": 0,
 					"cryostationStorageBonus": 0,
-					"energyConsumption": 0
+					"energyConsumption": 0,
+					"tradeVolume": 0
 				},
 				stageUnlocked: true,
-				togglable: true
+				togglable: true,
+				// isAutomationEnabled: null
 			}
 		],
 		calculateEffects: function(self, game){
@@ -847,7 +859,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					"moonBaseStorageBonus": 0.0085,
 					"planetCrackerStorageBonus": 0.0085,
 					"cryostationStorageBonus": 0.0085,
-					"energyConsumption": 5
+					"energyConsumption": 5,
+					"tradeVolume": 0
 			};
 			if (self.on >= 10) {
 				//The first 10 Spaceports each cost 5Wt to run.
@@ -856,11 +869,31 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				//etc.
 				effects[ "energyConsumption" ] = 0.5 * (self.on - 9) + 45 / self.on;
 			}
+			if (game.workshop.get("freightfulExchange").researched){
+				stageMeta.description = $I("buildings.spaceport.desc") + "<br>" + $I("buildings.spaceport.desc.automation");
+			} else {
+				stageMeta.description = $I("buildings.spaceport.desc");
+			}
+			if (game.workshop.get("freightfulExchange").researched && self.isAutomationEnabled === null){
+				self.isAutomationEnabled = true;
+				stageMeta.isAutomationEnabled = true;
+			} else if (!game.workshop.get("freightfulExchange").researched && self.isAutomationEnabled !== null) {
+				self.isAutomationEnabled = null;
+				stageMeta.isAutomationEnabled = null;
+			}
+			if (self.isAutomationEnabled){
+				effects["tradeVolume"] = 0.5 + (game.workshop.get("transportSuperposition").researched? 0.5 : 0);
+			} else {
+				effects["tradeVolume"] = 0;
+			}
                 stageMeta.effects = effects;
             }
 		},
 		upgrades: {
 			spaceBuilding: ["moonBase", "planetCracker", "cryostation"]
+		},
+		unlocks: {
+			upgrades: ["transportSuperposition"]
 		},
 		flavor: $I("buildings.warehouse.flavor"),
 		unlockScheme: {
@@ -2207,7 +2240,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		priceRatio: 1.25,
 		zebraRequired: 1,
 		effects: {
-			"zebraMax": 1,
+			"zebrasMax": 1,
 		},
 	},
 	{
@@ -2999,7 +3032,7 @@ dojo.declare("classes.game.ui.GatherCatnipButtonController", com.nuclearunicorn.
 
 dojo.declare("classes.game.ui.RefineCatnipButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	fetchModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 	    var self = this;
 		var catnipVal = this.game.resPool.get("catnip").value;
 		var catnipCost = model.prices[0].val;
@@ -3090,7 +3123,7 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 			}
 		}
 
-		var name = this.inherited(arguments);
+		var name = this.inherited("getName", arguments);
 
 		var sim = this.game.village.sim;
 		if (meta.name == "hut" && sim.nextKittenProgress && sim.maxKittens <= 10 ){
@@ -3112,7 +3145,7 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 	},
 
     build: function(model, opts){
-		var counter = this.inherited(arguments);
+		var counter = this.inherited("build", arguments);
 		if (!counter) {
 			return; //Skip stats & undo if nothing was built
 		}
@@ -3131,7 +3164,7 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 	},
 
 	sell: function(event, model){
-		var amtSold = this.inherited(arguments);
+		var amtSold = this.inherited("sell", arguments);
 
 		if (amtSold > 0) {
 			var undo = this.game.registerUndoChange();
@@ -3167,8 +3200,25 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 	},
 
 	fetchModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		model.stageLinks = this.getStageLinks(model);
+		if (typeof(model.metadata.isAutomationEnabled) == "boolean" || 
+			(model.metadata.stages && typeof(model.metaAccessor.meta.isAutomationEnabled) == "boolean") //stage hack
+		) {
+			var isEnabled = model.metaAccessor.meta.isAutomationEnabled;
+			var self = this;
+			model.toggleAutomationLink = {
+				title: isEnabled ? "A" : "*",
+				tooltip: isEnabled ? $I("btn.aon.tooltip") : $I("btn.aoff.tooltip"),
+				//reserved for mobile
+				//if you remove it one more time I will find where you live
+				enabled: model.metadata.val > 0,
+				cssClass: isEnabled ? "auto-on" : "auto-off",
+				handler: function(btn){
+					self.handleToggleAutomationLinkClick(model);
+				}
+			};
+		}
 
 
 		return model;
@@ -3216,6 +3266,23 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 
 		return stageLinks;
 	},
+
+	getDescription: function(model){
+		if (model.metadata.stages){
+			description = model.metaAccessor.meta.stages[model.metaAccessor.meta.stage].description;
+			return typeof(description) != "undefined" ? description : "";
+		}
+		var description = model.metadata.description;
+		return typeof(description) != "undefined" ? description : "";
+	},
+
+	handleToggleAutomationLinkClick: function(model) {
+		var building = model.metadata;
+		building.isAutomationEnabled = !building.isAutomationEnabled;
+		model.metaAccessor.meta.isAutomationEnabled = building.isAutomationEnabled; //stage hack
+		this.game.upgrade({buildings: [building.name]});
+	},
+
 
 	downgrade: function(model) {
 		if (this.game.opts.noConfirm) {
