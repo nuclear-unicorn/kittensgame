@@ -250,28 +250,13 @@ dojo.declare("classes.game.Server", null, {
 		this.userProfile = userProfile;
 	},
 
-	/**
-	 * Terminate the current KGNet session and clear local session state.
-	 * Returns the jqXHR so callers can chain UI updates.
-	 */
-	logout: function(){
-		var self = this;
-
-		return this._xhr("/user/logout/", "POST", {}, function(){
-			//no-op: state is cleared in .always below regardless of response
-		}).always(function(){
-			self.userProfile = null;
-			self.saveData = null;
-		});
-	},
-
     getServerUrl: function(){
-		/*var host = window.location.hostname;
-		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1";
+		var host = window.location.hostname;
+		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1" || host.startsWith("192.168");
         if (isLocalhost && !this.game.isMobile()){
             //if you are running chilar locally you should know what you are doing
             return "http://localhost:7780";
-        }*/
+        }
         return "https://kittensgame.com";
     },
 
@@ -419,8 +404,6 @@ dojo.declare("classes.game.Server", null, {
 	 * (which is persisted in the save file). On any failure we simply keep the last
 	 * known price, so the feature degrades gracefully when offline or rate-limited.
 	 *
-	 * Plain $.ajax, not _xhr: the latter sends credentials, which a wildcard CORS API rejects.
-	 * 
 	 * @param {(price: number) => void} [handler] - optional callback invoked with the fresh price
 	 */
 	fetchBcoinPrice: function(handler){
@@ -3963,12 +3946,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			value: resConsumption
 		});
 
-		stack.push({
-			name: $I("res.stack.demand"),
-			type: "fixed",
-			value: resConsumption
-		});
-
 		// BIOME EXPLORATION
 		if (res.name == "manpower"){
 			var biome = this.village.getBiome(this.village.map.currentBiome);
@@ -4477,7 +4454,15 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				}
 			}
 
-			resString += this.getStackElemString(stackElem, res, i == 0 ? depth - 1 : depth);
+			var indent = i == 0 ? depth - 1 : depth;
+			for (var j = 0; j < indent - 1; j++) {
+				resString += "<span style='visibility: hidden;'>|-> </span>";
+			}
+			if (indent > 0) {
+				resString += "|-> ";
+			}
+
+			resString += this.getStackElemString(stackElem, res);
 			if (stackElem.type == "fixed" || stackElem.type == "perDay" || stackElem.type == "perYear") {
 				//Below this point, display all ratio effects
 				hasFixed = true;
@@ -4487,47 +4472,32 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return resString;
 	},
 
-	/**
-	 * A single row of the resource breakdown. The cells are formatted here, but laying them
-	 * out is up to the UI: the web tooltip is a flat text blob, mobile builds real rows.
-	 * @param indent nesting depth of the stack element, 0 or less for a top level row
-	 */
-	getStackElemString: function(stackElem, res, indent){
-		return this.ui.formatStackRow(this.formatStackLabel(stackElem, indent), this.formatStackValue(stackElem));
-	},
+	getStackElemString: function(stackElem, res){
+		var resString = stackElem.name + ":&nbsp;<div style=\"float: right;\">";
 
-	/** Label cell: the tree indentation prefix, then the name of the effect. */
-	formatStackLabel: function(stackElem, indent){
-		var label = "";
-
-		for (var j = 0; j < indent - 1; j++) {
-			label += "<span style='visibility: hidden;'>|-> </span>";
-		}
-		if (indent > 0) {
-			label += "|-> ";
-		}
-		if (stackElem.type == "ratioIndent") {
-			label += "|->";
-		}
-
-		return label + stackElem.name + ":";
-	},
-
-	/** Value cell, formatted according to the stack element type. */
-	formatStackValue: function(stackElem){
 		if (stackElem.type == "fixed") {
-			return this.getDisplayValueExt(stackElem.value, true, true);
-		} else if (stackElem.type == "ratio" || stackElem.type == "ratioIndent") {
-			return this.getDisplayValueExt((stackElem.value * 100).toFixed(), true) + "%";
+			resString += this.getDisplayValueExt(stackElem.value, true, true);
+		} else if (stackElem.type == "ratio") {
+			resString += this.getDisplayValueExt((stackElem.value * 100).toFixed(), true) + "%";
 		} else if (stackElem.type == "multiplier") {
-			return "×" + this.getDisplayValueExt((stackElem.value * 100).toFixed()) + "%";
+			resString += "×" + this.getDisplayValueExt((stackElem.value * 100).toFixed()) + "%";
+		} else if (stackElem.type == "ratioIndent") {
+			resString = "|->" + resString + this.getDisplayValueExt((stackElem.value * 100).toFixed(), true) + "%";
 		} else if (stackElem.type == "perDay") {
-			return (stackElem.value > 0 ? "+" : "") + this.getDisplayValueExt(stackElem.value) + "/" + $I("res.per.day");
-		} else if (stackElem.type == "perYear") {
-			return (stackElem.value > 0 ? "+" : "") + this.getDisplayValueExt(stackElem.value) + "/" + $I("res.per.year");
+			if (stackElem.value>0){
+				resString += "+";
+			}
+			resString += this.getDisplayValueExt((stackElem.value)) + "/" + $I("res.per.day");
+		} else if (stackElem.type == "perYear"){
+			if (stackElem.value > 0){
+				resString += "+";
+			}
+			resString += this.getDisplayValueExt((stackElem.value)) + "/" + $I("res.per.year");
 		}
 
-		return "";
+		resString += "</div><br>";
+
+		return resString;
 	},
 
 	/**

@@ -72,6 +72,7 @@
     "btn.all.assign": "[+toate]",
     "btn.aoff.tooltip": "Automatizare dezactivată",
     "btn.aon.tooltip": "Automatizare activată",
+    "btn.almostlimited.tooltip": "Îmbunătățirea va dezactiva Autocrația",
     "btn.pollution.tooltip": "Generează poluare",
     "btn.build": "Construire",
     "btn.challenge": "Începe provocarea",
