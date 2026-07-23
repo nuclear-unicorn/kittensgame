@@ -67,7 +67,7 @@
 
 		<script type="text/javascript">
 
-			var version = "1503";
+			var version = "1.6.1.0"; // fallback only; real value from version.json (stamped by metachrome release.ts)
 			var buildRevision = 0;
 
 			var invalidateCache = false;
@@ -125,11 +125,11 @@
 			}
 
 			dojo.addOnLoad(function() {
-				var displayedVersion = version.split('').join('.');
+				var channelSuffix = ""; // version now comes from version.json; .rN still from build.version.json
 				if (window.location.href.indexOf("alpha") >= 0) {
-					displayedVersion += "-&alpha;";
+					channelSuffix = "-&alpha;";
 				} else if (window.location.href.indexOf("beta") >= 0) {
-					displayedVersion += "-&beta;";
+					channelSuffix = "-&beta;";
 				}
 
 				$("#tooltip").hide();
@@ -179,10 +179,10 @@
 					}
 				}
 
-				var def = $.getJSON("build.version.json?="+now).then(function(json){
+				var def = $.getJSON("version.json?="+now).then(function(vjson){ window.KGVersion = vjson; version = vjson.version; }).then(function(){ return $.getJSON("build.version.json?="+now); }, function(){ return $.getJSON("build.version.json?="+now); }).then(function(json){
 					buildRevision = json.buildRevision;
 					console.log("build revison is: " + buildRevision);
-					$("#versionLink").html(displayedVersion + ".r" + buildRevision);
+					$("#versionLink").html(version + channelSuffix + ".r" + buildRevision);
 				});
 				def = _import("config", def);
 				def.then(function() {
