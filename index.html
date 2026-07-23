@@ -179,7 +179,7 @@
 					}
 				}
 
-				var def = $.getJSON("version.json?="+now).then(function(vjson){ version = vjson.version; }).then(function(){ return $.getJSON("build.version.json?="+now); }, function(){ return $.getJSON("build.version.json?="+now); }).then(function(json){
+				var def = $.getJSON("version.json?="+now).then(function(vjson){ window.KGVersion = vjson; version = vjson.version; }).then(function(){ return $.getJSON("build.version.json?="+now); }, function(){ return $.getJSON("build.version.json?="+now); }).then(function(json){
 					buildRevision = json.buildRevision;
 					console.log("build revison is: " + buildRevision);
 					$("#versionLink").html(version + channelSuffix + ".r" + buildRevision);
