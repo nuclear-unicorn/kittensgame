@@ -1593,7 +1593,7 @@ var EmbassyButtonHelper = {
 				//Override: In dev mode, we display it anyways.
 			}
 			var sellChance = Math.min(game.diplomacy.getResourceTradeChance(sellOptions, race), 1); //Cap at 100%
-			if (sellChance == 0 ) {
+			if (sellChance <= 0 ) {
 				continue; //Don't display a resource that we can't get from them.
 			}
 			chancesToDisplay.push({ title: sellResource.title, chance: sellChance, originalChance: sellOptions.chance });
