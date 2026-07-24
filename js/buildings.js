@@ -2209,7 +2209,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game){
 			var zebraPreparations = 41 + game.getEffect("zebraPreparations");
-			console.warn(zebraPreparations);
 			var zebrasMax = game.resPool.get("zebras").maxValue;
 			var difference =  zebrasMax - zebraPreparations * 0.75;
 			if (game.workshop.getZebraUpgrade("bloodstoneInstitute").researched){
