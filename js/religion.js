@@ -1466,6 +1466,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			{ name : "void", val: 29000},
 			{ name : "paragon", val: 8, priceRatio: 2}
 		],
+		priceRules: true,
 		tier: 27,
 		priceRatio: 1.75,
 		effects: {

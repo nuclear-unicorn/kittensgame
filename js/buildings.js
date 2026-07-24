@@ -858,6 +858,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	
 				stageMeta.effects = game.resPool.addBarnWarehouseRatio(effects);
             } else if (self.stage == 1){
+			stageMeta.priceRules = true;
 			var effects = {
 					"moonBaseStorageBonus": 0.0085,
 					"planetCrackerStorageBonus": 0.0085,
@@ -2427,13 +2428,29 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		var pricesDiscount = this.game.getLimitedDR((this.game.getEffect(bldName + "CostReduction")), 1);
 		var priceModifier = 1 - pricesDiscount;
 		var fakeBought = this.game.getEffect(bldName + "FakeBought") + additionalBought;
-
-		for (var i = 0; i < bldPrices.length; i++) {
-			var resPriceDiscount = this.game.getLimitedDR(this.game.getEffect(bldPrices[i].name + "CostReduction"), 1);
-			var resPriceModifier = 1 - resPriceDiscount;
-			var cost = bldPrices[i].val * Math.pow(ratio, bldVal + fakeBought) * priceModifier * resPriceModifier;
-			if (bldPrices[i].multPriceRatio) {
-				cost *= Math.pow(bldPrices[i].multPriceRatio, bldVal + fakeBought)
+		
+		if (bld.get("priceRules")){
+			for (var i = 0; i < bldPrices.length; i++) {
+				var resPriceDiscount = this.game.getLimitedDR(this.game.getEffect(bldPrices[i].name + "CostReduction"), 1);
+				var resPriceModifier = 1 - resPriceDiscount;
+				var cost = bldPrices[i].val * Math.pow(ratio, bldVal + fakeBought) * priceModifier * resPriceModifier;
+				if (bldPrices[i].multPriceRatio) {
+					cost *= Math.pow(bldPrices[i].multPriceRatio, bldVal + fakeBought)
+				}
+				prices.push({
+					val: cost,
+					name: bldPrices[i].name
+				});
+			}
+		} else {
+			for (var i = 0; i < bldPrices.length; i++) {
+				var resPriceDiscount = this.game.getLimitedDR(this.game.getEffect(bldPrices[i].name + "CostReduction"), 1);
+				var resPriceModifier = 1 - resPriceDiscount;
+				var cost = bldPrices[i].val * Math.pow(ratio, bldVal + fakeBought) * priceModifier * resPriceModifier;
+				prices.push({
+					val: cost,
+					name: bldPrices[i].name
+				});
 			}
 			prices.push({
 				val: cost,
