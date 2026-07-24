@@ -760,7 +760,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		for (var i = 0; i < race.sells.length; i++) {
 			var sellResource = race.sells[i];
 			var tradeChance = this.getResourceTradeChance(sellResource, race);
-			if (tradeChance == 0) {
+			if (tradeChance <= 0) {
 				continue;
 			}
 
