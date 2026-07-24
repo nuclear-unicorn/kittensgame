@@ -821,6 +821,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					{ name: "eludium", val: 500 },
 					{ name: "kerosene", val: 1000 },
 					{ name: "blueprint", val: 500 },
+					/**
+					* Spaceport uses  a much steper price ratio for starcharts to be a dedicated starchart sinker
+					*/
 					{ name: "starchart", val: 100000, priceRatios: [1.35] },
 				],
 				priceRatio: 1.15,
@@ -2508,17 +2511,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				//Else, if the weight is under 100, we don't add anything to the price.
 			}
 		}
-		/**
-		 * Spaceport will use a much steper price ratio for starcharts to be a dedicated starchart sinker
-		 */
-		if (bldName == "warehouse" && bld.get("stage") == 1){
-			for (var i = 0; i < prices.length; i++) {
-				if (prices[i].name == "starchart"){
-					prices[i].val = prices[i].val * Math.pow(1.35, bldVal);
-				}
-			}
-		}
-
 		return prices;
 	 },
 
