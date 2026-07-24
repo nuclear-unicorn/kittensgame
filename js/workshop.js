@@ -2410,9 +2410,6 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			upgrades:{
 				buildings: ["zebraForge"]
 			},
-			evaluateLocks: function(game){
-				return game.workshop.getZebraUpgrade("zebraTrappers").researched;
-			}
 		},
 		//resources:
 		//tMythril
