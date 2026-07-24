@@ -1984,6 +1984,11 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"milleninumParagon":{
 				title: $I("effectsMgr.statics.milleninumParagon.title"),
 				type: "fixed",
+			},
+			"missingZebraPreparations":{
+				title: $I("effectsMgr.statics.missingZebraPreparations.title"),
+				type: "fixed",
+				calculation: "nonProportional"
 			}
 		}
 	}

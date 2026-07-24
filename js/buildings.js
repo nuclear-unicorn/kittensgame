@@ -2197,6 +2197,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			//"bloodstoneCraftRatio" : 0.01
 		},
 		calculateEffects: function(self, game){
+			var zebraVocations = 41 + game.getEffect("zebraPreparations");
 			if (game.workshop.getZebraUpgrade("bloodstoneInstitute").researched){
 				self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(self.on * (game.ironWill? 1:0.1) * (game.karmaZebras + 1), game.getEffect("zebraPreparations") + 40) / self.on;
 			}
