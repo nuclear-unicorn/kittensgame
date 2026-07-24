@@ -2352,7 +2352,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				buildings: ["zebraOutpost"]
 			},
 			unlocks: {
-				zebraUpgrades: ["backpacks"]
+				zebraUpgrades: ["zebraTrappers"]
 			}
 		},{
 			name: "darkBrew",
@@ -2369,13 +2369,13 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				zebraUpgrades: ["infusedBackpacks"]
 			}
 		},{
-			name: "backpacks",
-			// label: $I("workshop.zebraUpgrade.backpacks.label"),
-			// description: $I("workshop.zebraUpgrade.backpacks.desc"),
-			label: "Backpacks",
-			description: "Backpacks allow for longer voyages. Outpost create more preparations",
+			name: "zebraTrappers",
+			// label: $I("workshop.zebraUpgrade.zebraTrappers.label"),
+			// description: $I("workshop.zebraUpgrade.zebraTrappers.desc"),
+			label: "zebraTrappers",
+			description: "Zebras set up traps, preparing better for the hunts",
 			effects: {
-				"harthRatio": 1,
+				"overpreparation": 1,
 			},
 			prices:[
 				{ name : "plastic", val: 100 },
@@ -2405,7 +2405,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				buildings: ["zebraForge"]
 			},
 			evaluateLocks: function(game){
-				return game.workshop.getZebraUpgrade("backpacks").researched && game.workshop.getZebraUpgrade("darkBrew").researched;
+				return game.workshop.getZebraUpgrade("zebraTrappers").researched && game.workshop.getZebraUpgrade("darkBrew").researched;
 			}
 		},
 		//resources:
