@@ -2162,6 +2162,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		calculateEffects: function(self, game){
 			if (game.workshop.getZebraUpgrade("darkRevolution").researched){
 				self.effects["zebraPreparations"] = game.ironWill? 1:0.1;
+				self.effects["zebraPreparations"] *= 1 + game.getEffect("harthRatio");
 				self.jammed = false;
 			}
 		},
@@ -2193,13 +2194,26 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		zebraRequired: 10,
 		effects: {
 			"manpowerMax": 25,
-			"bloodstoneRatio": 0
+			"bloodstoneRatio": 0,
 			//"bloodstoneCraftRatio" : 0.01
 		},
 		calculateEffects: function(self, game){
 			var zebraVocations = 41 + game.getEffect("zebraPreparations");
+			var zebras = game.resPool.get("zebras").maxValue;
+			var difference =  zebras - zebraVocations * 0.75;
 			if (game.workshop.getZebraUpgrade("bloodstoneInstitute").researched){
-				self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(self.on * (game.ironWill? 1:0.1) * (game.karmaZebras + 1), game.getEffect("zebraPreparations") + 40) / self.on;
+				var unlimited = self.on * (game.ironWill? 1:0.1) * (zebras);
+				var limit = zebraVocations;
+				// var limit = zebraVocations * (1 + game.getEffect("harthRatio"));
+				self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(unlimited, limit) / self.on;
+				// if (unlimited - limit * 0.75 > difference) {
+				// 	difference = unlimited - limit * 0.75;
+				// }
+				// var unlimited = (game.ironWill? 1:0.1) * (zebras);
+				// self.effects["bloodstoneRatio"] = 0.005 * game.getLimitedDR(unlimited, zebraVocations);
+			}
+			if (difference > 0){
+				self.effects["missingZebraPreparations"] = difference;
 			}
 			if (self.val) {
 				game.time.queue.unlockQueueSource("zebraUpgrades");
@@ -2226,7 +2240,19 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			//"bloodstoneCraftRatio" : 0.02,
 			"manpowerMax": 50,
 			"tMythrilCraftRatio" : 0.01,
+			"harthRatio" : 0
 		},
+		calculateEffects: function(self, game){
+			if (game.workshop.getZebraUpgrade("infusedBackpacks").researched){
+				self.effects["harthRatio"] = Math.floor(self.val / 10) + 1;
+			} else {
+				self.effects["harthRatio"] = 0;
+			}
+			game.upgrade(self.upgrades);
+		},
+		upgrades: {
+			buildings: ["zebraOutpost", "zebraWorkshop"]
+		}
 	},
 	{
 		name: "stasisPod",
@@ -2425,7 +2451,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		var pricesDiscount = this.game.getLimitedDR((this.game.getEffect(bldName + "CostReduction")), 1);
 		var priceModifier = 1 - pricesDiscount;
 		var fakeBought = this.game.getEffect(bldName + "FakeBought") + additionalBought;
-
 		for (var i = 0; i < bldPrices.length; i++) {
 			var resPriceDiscount = this.game.getLimitedDR(this.game.getEffect(bldPrices[i].name + "CostReduction"), 1);
 			var resPriceModifier = 1 - resPriceDiscount;
