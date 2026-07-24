@@ -1464,10 +1464,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		prices: [
 			{ name : "relic", val: 230000},
 			{ name : "void", val: 29000},
-			{ name : "paragon", val: 8}
+			{ name : "paragon", val: 8, priceRatio: 2}
 		],
 		tier: 27,
-		priceRatio: 2,
+		priceRatio: 1.75,
 		effects: {
 			"milleninumParagon": 1
 		},
