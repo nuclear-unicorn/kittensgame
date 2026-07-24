@@ -2435,7 +2435,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				var resPriceModifier = 1 - resPriceDiscount;
 				var cost = bldPrices[i].val * Math.pow(ratio, bldVal + fakeBought) * priceModifier * resPriceModifier;
 				if (bldPrices[i].multPriceRatio) {
-					cost *= Math.pow(bldPrices[i].multPriceRatio, bldVal + fakeBought)
+					cost *= Math.pow(bldPrices[i].multPriceRatio, bldVal + fakeBought);
 				}
 				prices.push({
 					val: cost,
