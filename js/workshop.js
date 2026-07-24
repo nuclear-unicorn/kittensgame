@@ -2350,6 +2350,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			],
 			upgrades:{
 				buildings: ["zebraOutpost"]
+			},
+			unlocks: {
+				zebraUpgrades: ["zebraTrappers"]
 			}
 		},{
 			name: "darkBrew",
@@ -2361,7 +2364,49 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				{ name : "bloodstone", val: 1 },
 				{ name : "parchment", val: 3000 },
 				{ name : "science", val: 100 }
-			]
+			],
+			unlocks: {
+				zebraUpgrades: ["infusedBackpacks"]
+			}
+		},{
+			name: "zebraTrappers",
+			// label: $I("workshop.zebraUpgrade.zebraTrappers.label"),
+			// description: $I("workshop.zebraUpgrade.zebraTrappers.desc"),
+			label: "zebraTrappers",
+			description: "Zebras set up traps, preparing better for the hunts",
+			effects: {
+				"overpreparation": 1,
+			},
+			prices:[
+				{ name : "plastic", val: 100 },
+				{ name : "tMythril", val: 10 },
+				{ name : "science", val: 1000 }
+			],
+			upgrades:{
+				buildings: ["zebraOutpost"]
+			},
+			unlocks: {
+				zebraUpgrades: ["infusedBackpacks"]
+			}
+		},{
+			name: "infusedBackpacks",
+			// label: $I("workshop.zebraUpgrade.infusedBackpacks.label"),
+			// description: $I("workshop.zebraUpgrade.infusedBackpacks.desc"),
+			label: "Infused Backpacks",
+			description: "Every 10 zebra forges infuse outposts with extra preparation",
+			effects: {
+			},
+			prices:[
+				// { name : "bloodstone", val: 100 },
+				{ name : "tMythril", val: 100 },
+				{ name : "microchip", val: 25 }
+			],
+			upgrades:{
+				buildings: ["zebraForge"]
+			},
+			evaluateLocks: function(game){
+				return game.workshop.getZebraUpgrade("zebraTrappers").researched && game.workshop.getZebraUpgrade("darkBrew").researched;
+			}
 		},
 		//resources:
 		//tMythril
