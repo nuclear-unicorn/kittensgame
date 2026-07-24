@@ -323,7 +323,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		var resName = sell.name;
 		var hasHighEnoughEmbassyLevel = !sell.minLevel || race.embassyLevel >= sell.minLevel;
 		var isResourceTradeable = this.game.resPool.get(resName).unlocked || resName === "coal"  || resName === "uranium" || race.name === "leviathans";
-		return hasHighEnoughEmbassyLevel && isResourceTradeable;
+		var positiveChance = (sell.chance + this.getAmbassadorEffect("tradeNormalResChance")) > 0;
+		return hasHighEnoughEmbassyLevel && isResourceTradeable && positiveChance;
 	},
 
 	getAmbassadorEffect: function(effectName) {
@@ -760,7 +761,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		for (var i = 0; i < race.sells.length; i++) {
 			var sellResource = race.sells[i];
 			var tradeChance = this.getResourceTradeChance(sellResource, race);
-			if (tradeChance <= 0) {
+			if (tradeChance == 0) {
 				continue;
 			}
 
@@ -1593,7 +1594,7 @@ var EmbassyButtonHelper = {
 				//Override: In dev mode, we display it anyways.
 			}
 			var sellChance = Math.min(game.diplomacy.getResourceTradeChance(sellOptions, race), 1); //Cap at 100%
-			if (sellChance <= 0 ) {
+			if (sellChance == 0 ) {
 				continue; //Don't display a resource that we can't get from them.
 			}
 			chancesToDisplay.push({ title: sellResource.title, chance: sellChance, originalChance: sellOptions.chance });
