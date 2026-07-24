@@ -2181,6 +2181,7 @@
     "workshop.crafts.megalith.desc": "거대한 구조물을 지을 때 사용하는 커다란 블럭입니다",
     "workshop.crafts.parchment.label": "양피지",
     "workshop.crafts.parchment.desc": "동물의 가죽으로 만든 필기용 재료입니다. 문화 건축물에 필요합니다.",
+    "workshop.crafts.plastic.desc": "석유로 만든 합성 소재. 과학과 첨단 기술에 필요합니다.",
     "workshop.crafts.plate.label": "철판",
     "workshop.crafts.plate.desc": "금속 철판. 고급 건물의 건설에 필요합니다.",
     "workshop.crafts.scaffold.label": "비계",
