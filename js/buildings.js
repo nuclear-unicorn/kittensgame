@@ -2452,10 +2452,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					name: bldPrices[i].name
 				});
 			}
-			prices.push({
-				val: cost,
-				name: bldPrices[i].name
-			});
 		}
 
 		if (this.game.challenges.isActive("blackSky")
