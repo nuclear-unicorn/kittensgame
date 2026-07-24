@@ -243,9 +243,11 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
             if (self.active) {
                 self.effects["corruptionBoostRatioChallenge"] = 0;
                 self.effects["bskSattelitePenalty"] = 0.1 * (game.ironWill ? 0 : (self.on || 0));
+				game.bld.getBuildingExt("calciner").meta.priceRules = true;
             } else {
 				self.effects["corruptionBoostRatioChallenge"] = 0.1;
 				self.effects["bskSattelitePenalty"] = 0;
+				game.bld.getBuildingExt("calciner").meta.priceRules = undefined;
 			}
 			game.upgrade(self.upgrades);
         },
@@ -282,6 +284,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["embassyFakeBought"] = 1;
 				self.effects["steamworksFakeBought"] = Math.floor(1.5 * self.on || 1)/ (self.on || 1);
                 self.effects["tradeKnowledgeRatio"] = 0;
+				game.bld.getBuildingExt("steamworks").meta.priceRules = true;
             } else {
 				self.effects["alicornPerTickRatio"] = 0.1;
 				self.effects["tradeKnowledge"] = 1;
@@ -290,6 +293,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 				self.effects["embassyFakeBought"] = 0;
 				self.effects["steamworksFakeBought"] = 0;
                 self.effects["tradeKnowledgeRatio"] = self.getTradeBonusEffect(game);
+				game.bld.getBuildingExt("steamworks").meta.priceRules = undefined;
 			}
 			game.upgrade(self.upgrades); //this is a hack, might need to think of a better sollution later
 		},
@@ -464,9 +468,11 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			if (self.active){
 				self.effects["arrivalSlowdown"] = 10;
 				self.effects["cryochamberSupport"] = 1; //this is a quick fix for cryochamber cap when resetting into PA; does not make PA easier so it's ok
+				game.bld.getBuildingExt("field").meta.priceRules = true;
 			} else {
 				self.effects["arrivalSlowdown"] = 0;
 				self.effects["cryochamberSupport"] = 1;
+				game.bld.getBuildingExt("field").meta.priceRules = undefined;
 			}
 		},
 		findRuins: function (self, game) {

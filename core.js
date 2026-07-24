@@ -2094,6 +2094,19 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", Buildi
 		var pricesDiscount = this.game.getLimitedDR((this.game.getEffect(meta.name + "CostReduction")), 1);
 		var priceModifier = 1 - pricesDiscount;
 
+		if (meta.priceRules) {
+			for (var i = 0; i < meta.prices.length; i++){
+				var resPriceDiscount = this.game.getEffect(meta.prices[i].name + "CostReduction");
+				resPriceDiscount = this.game.getLimitedDR(resPriceDiscount, 1);
+				var resPriceModifier = 1 - resPriceDiscount;
+				var resourcePriceRatio = meta.prices[i].priceRatio || ratio;
+				prices.push({
+					val: meta.prices[i].val * Math.pow(resourcePriceRatio, meta.val) * resPriceModifier * priceModifier,
+					name: meta.prices[i].name
+				});
+        	}
+			return prices;
+		}
         for (var i = 0; i < meta.prices.length; i++){
 			var resPriceDiscount = this.game.getEffect(meta.prices[i].name + "CostReduction");
 			resPriceDiscount = this.game.getLimitedDR(resPriceDiscount, 1);

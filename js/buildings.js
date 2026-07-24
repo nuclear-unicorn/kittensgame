@@ -822,7 +822,10 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					{ name: "eludium", val: 500 },
 					{ name: "kerosene", val: 1000 },
 					{ name: "blueprint", val: 500 },
-					{ name: "starchart", val: 100000 },
+					/**
+					* Spaceport uses  a much steper price ratio for starcharts to be a dedicated starchart sinker
+					*/
+					{ name: "starchart", val: 100000, multPriceRatio: 1.35 },
 				],
 				priceRatio: 1.15,
 				effects: {
@@ -856,6 +859,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	
 				stageMeta.effects = game.resPool.addBarnWarehouseRatio(effects);
             } else if (self.stage == 1){
+			stageMeta.priceRules = true;
 			var effects = {
 					"moonBaseStorageBonus": 0.0085,
 					"planetCrackerStorageBonus": 0.0085,
@@ -2426,97 +2430,124 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		var priceModifier = 1 - pricesDiscount;
 		var fakeBought = this.game.getEffect(bldName + "FakeBought") + additionalBought;
 
-		for (var i = 0; i < bldPrices.length; i++) {
-			var resPriceDiscount = this.game.getLimitedDR(this.game.getEffect(bldPrices[i].name + "CostReduction"), 1);
-			var resPriceModifier = 1 - resPriceDiscount;
-			prices.push({
-				val: bldPrices[i].val * Math.pow(ratio, bldVal + fakeBought) * priceModifier * resPriceModifier,
-				name: bldPrices[i].name
-			});
-		}
-
-		if (this.game.challenges.isActive("blackSky")
-		 && bldName == "calciner"
-		 && bldVal == 0) {
-			for (var i = 0; i < prices.length; i++) {
-				prices[i].val *= prices[i].name == "titanium" ? 0 : 11;
+		// The most simple case of all: priceRules tag is not true and we aren't in unicornTears challenge! Allows early escape patch
+		// TODO: code duplication might be solvable!
+		if (!bld.get("priceRules") && !this.game.challenges.isActive("unicornTears")){
+			for (var i = 0; i < bldPrices.length; i++) {
+				var resPriceDiscount = this.game.getLimitedDR(this.game.getEffect(bldPrices[i].name + "CostReduction"), 1);
+				var resPriceModifier = 1 - resPriceDiscount;
+				var cost = bldPrices[i].val * Math.pow(ratio, bldVal + fakeBought) * priceModifier * resPriceModifier;
+				prices.push({
+					val: cost,
+					name: bldPrices[i].name
+				});
 			}
+			return prices;
 		}
+		if (bld.get("priceRules")){
+			for (var i = 0; i < bldPrices.length; i++) {
+				var resPriceDiscount = this.game.getLimitedDR(this.game.getEffect(bldPrices[i].name + "CostReduction"), 1);
+				var resPriceModifier = 1 - resPriceDiscount;
+				var cost = bldPrices[i].val * Math.pow(ratio, bldVal + fakeBought) * priceModifier * resPriceModifier;
+				if (bldPrices[i].multPriceRatio) {
+					cost *= Math.pow(bldPrices[i].multPriceRatio, bldVal + fakeBought);
+				}
+				prices.push({
+					val: cost,
+					name: bldPrices[i].name
+				});
+			}
 
-		if (this.game.challenges.isActive("pacifism")
-		 && bldName == "steamworks"
-		 && bldVal == 0) {
-			for (var i = 0; i < prices.length; i++) {
-				if (prices[i].name == "blueprint"){
-					prices[i].val = this.game.challenges.getChallenge("pacifism").on * 5 + 1;
+			if (this.game.challenges.isActive("blackSky")
+		 	&& bldName == "calciner"
+		 	&& bldVal == 0) {
+				for (var i = 0; i < prices.length; i++) {
+					prices[i].val *= prices[i].name == "titanium" ? 0 : 11;
 				}
 			}
-		}
-		if (this.game.challenges.isActive("postApocalypse")
-		&& bldName == "field"
-		&& this.getPollutionLevel() >= 5
-		&& bldVal >= Math.max(95 - this.game.time.getVSU("usedCryochambers").val - this.getPollutionLevel(), 7 + (this.game.ironWill? 8 : 0)) ) {
-			var builtWithUnobtanium = Math.max(bldVal + this.game.time.getVSU("usedCryochambers").val - 100, 0);
-			prices.push({val: 15 * Math.pow(ratio, builtWithUnobtanium),
+			if (this.game.challenges.isActive("pacifism")
+			&& bldName == "steamworks"
+			&& bldVal == 0) {
+				for (var i = 0; i < prices.length; i++) {
+					if (prices[i].name == "blueprint"){
+						prices[i].val = this.game.challenges.getChallenge("pacifism").on * 5 + 1;
+					}
+				}
+			}
+
+			if (this.game.challenges.isActive("postApocalypse")
+			&& bldName == "field"
+			&& this.getPollutionLevel() >= 5
+			&& bldVal >= Math.max(95 - this.game.time.getVSU("usedCryochambers").val - this.getPollutionLevel(), 7 + (this.game.ironWill? 8 : 0)) ) {
+				var builtWithUnobtanium = Math.max(bldVal + this.game.time.getVSU("usedCryochambers").val - 100, 0);
+				prices.push({val: 15 * Math.pow(ratio, builtWithUnobtanium),
 						name : "unobtainium",
 						isTemporary: true //can't exploit buy manipulating pollution in postApocalypse
-					});
-		}
-		if (this.game.challenges.isActive("unicornTears")
-		 && bldVal > 0 /*For the purposes of Challenge compatibility, the first one will always have its price unmodified.*/) {
-			//In the Unicorn Tears Challenge, we give each Bonfire building a price of unicorns, unicorn tears, or alicorns.
-			if (bldName == "warehouse" && bld.get("stage") == 0 /*Affects Warehouses but not Spaceports*/) {
-				//I don't like having these special cases, but I want to avoid the player getting stuck.
-				prices.push({ name: "unicorns",
-					val: 2 * bldVal * priceModifier, //Linear (not exponential) scaling
-					isTemporary: true
 				});
-			} else if (bldName == "harbor") {
-				//I don't like having these special cases, but I want to avoid the player getting stuck.
-				prices.push({ name: "tears",
-					val: 2 * bldVal * priceModifier, //Linear (not exponential) scaling
-					isTemporary: true
-				});
-			} else {
-				//We use the base price of a building (not affected by policies that reduce resource prices) to calculate the weight:
-				var weight = this.game.challenges.getChallenge("unicornTears").sumPricesWeighted(bldPrices);
-				if (weight > 0) {
-					//We use a price ratio determined by the Unicorn Tears Challenge.
-					weight *= Math.pow(this.game.getEffect("bonfireTearsPriceRatioChallenge"), bldVal - 1);
-				}
-				if (weight > 1e9) {
-					prices.push({ name: "alicorn",
-						val: (Math.log(weight) - 19.7232) * priceModifier, //With a weight of exactly 1e9, this is just a smidge over 1
-						isTemporary: true
-					});
-				} else if (weight > 100000) {
-					prices.push({ name: "tears",
-						val: weight / 100000 * priceModifier,
-						isTemporary: true
-					});
-				} else if (weight >= 100) {
-					prices.push({ name: "unicorns",
-						val: weight / 100 * priceModifier,
-						isTemporary: true
-					});
-				}
-				//Else, if the weight is under 100, we don't add anything to the price.
 			}
-		}
-		/**
-		 * Spaceport will use a much steper price ratio for starcharts to be a dedicated starchart sinker
-		 */
-		if (bldName == "warehouse" && bld.get("stage") == 1){
-			for (var i = 0; i < prices.length; i++) {
-				if (prices[i].name == "starchart"){
-					prices[i].val = prices[i].val * Math.pow(1.35, bldVal);
-				}
+		
+		} else {
+			for (var i = 0; i < bldPrices.length; i++) {
+				var resPriceDiscount = this.game.getLimitedDR(this.game.getEffect(bldPrices[i].name + "CostReduction"), 1);
+				var resPriceModifier = 1 - resPriceDiscount;
+				var cost = bldPrices[i].val * Math.pow(ratio, bldVal + fakeBought) * priceModifier * resPriceModifier;
+				prices.push({
+					val: cost,
+					name: bldPrices[i].name
+				});
 			}
 		}
 
+		// unicornTears can't really use the priceRules because it affects basically everything!
+		// But this refactor limited the number of checks for other challenge modifying prices and such
+		if (this.game.challenges.isActive("unicornTears")
+		 && bldVal > 0 /*For the purposes of Challenge compatibility, the first one will always have its price unmodified.*/) {
+			prices = this.applyUnicornTearsPrices(bld, bldName, bldVal, priceModifier, bldPrices, prices);
+		}
 		return prices;
 	 },
 
+	applyUnicornTearsPrices: function(bld, bldName, bldVal, priceModifier, bldPrices, prices){
+		//In the Unicorn Tears Challenge, we give each Bonfire building a price of unicorns, unicorn tears, or alicorns.
+		if (bldName == "warehouse" && bld.get("stage") == 0 /*Affects Warehouses but not Spaceports*/) {
+			//I don't like having these special cases, but I want to avoid the player getting stuck.
+			prices.push({ name: "unicorns",
+				val: 2 * bldVal * priceModifier, //Linear (not exponential) scaling
+				isTemporary: true
+			});
+		} else if (bldName == "harbor") {
+			//I don't like having these special cases, but I want to avoid the player getting stuck.
+			prices.push({ name: "tears",
+				val: 2 * bldVal * priceModifier, //Linear (not exponential) scaling
+				isTemporary: true
+			});
+		} else {
+			//We use the base price of a building (not affected by policies that reduce resource prices) to calculate the weight:
+			var weight = this.game.challenges.getChallenge("unicornTears").sumPricesWeighted(bldPrices);
+			if (weight > 0) {
+				//We use a price ratio determined by the Unicorn Tears Challenge.
+				weight *= Math.pow(this.game.getEffect("bonfireTearsPriceRatioChallenge"), bldVal - 1);
+			}
+			if (weight > 1e9) {
+				prices.push({ name: "alicorn",
+					val: (Math.log(weight) - 19.7232) * priceModifier, //With a weight of exactly 1e9, this is just a smidge over 1
+					isTemporary: true
+				});
+			} else if (weight > 100000) {
+				prices.push({ name: "tears",
+					val: weight / 100000 * priceModifier,
+					isTemporary: true
+				});
+			} else if (weight >= 100) {
+				prices.push({ name: "unicorns",
+					val: weight / 100 * priceModifier,
+					isTemporary: true
+				});
+			}
+			//Else, if the weight is under 100, we don't add anything to the price.
+		}
+		return prices;
+	},
 
 	calculatePollutionEffects: function(){
 		var POL_LBASE = this.getPollutionLevelBase();
