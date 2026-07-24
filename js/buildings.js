@@ -821,7 +821,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					{ name: "eludium", val: 500 },
 					{ name: "kerosene", val: 1000 },
 					{ name: "blueprint", val: 500 },
-					{ name: "starchart", val: 100000 },
+					{ name: "starchart", val: 100000, priceRatios: [1.35] },
 				],
 				priceRatio: 1.15,
 				effects: {
@@ -2428,8 +2428,14 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		for (var i = 0; i < bldPrices.length; i++) {
 			var resPriceDiscount = this.game.getLimitedDR(this.game.getEffect(bldPrices[i].name + "CostReduction"), 1);
 			var resPriceModifier = 1 - resPriceDiscount;
+			var cost = bldPrices[i].val * Math.pow(ratio, bldVal + fakeBought) * priceModifier * resPriceModifier;
+			if (bldPrices[i].priceRatios) {
+				for (var localRatio in bldPrices[i].priceRatios){
+					cost *= Math.pow(bldPrices[i].priceRatios, bldVal + fakeBought)
+				}
+			}
 			prices.push({
-				val: bldPrices[i].val * Math.pow(ratio, bldVal + fakeBought) * priceModifier * resPriceModifier,
+				val: cost,
 				name: bldPrices[i].name
 			});
 		}
