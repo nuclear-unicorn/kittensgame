@@ -2302,6 +2302,8 @@
     "workshop.orbitalGeodesy.desc": "채석장에서 소량의 우라늄을 채굴할 수 있게 됩니다.",
     "workshop.oxidation.label": "산화",
     "workshop.oxidation.desc": "하소로의 철 생산량이 두 배로, 티타늄 생산량이 네 배로 증가합니다.",
+    "workshop.petri.label": "패트리 접시",
+    "workshop.petri.desc": "생명과학 연구소를 지을 때마다 필사본의 제작 효율이 증가합니다",
     "workshop.photolithography.label": "사진석판술",
     "workshop.photolithography.desc": "인쇄기의 효율이 네 배가 됩니다.",
     "workshop.photovoltaic.label": "광전지",
