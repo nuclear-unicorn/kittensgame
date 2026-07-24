@@ -165,7 +165,15 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				"autumn": 0.15,
 				"winter": -0.05
 			}},
-			{name: "oil", value: 100, chance: 0.25, width: 0.15, minLevel: 5}
+			{name: "oil", value: 100, chance: 0.25, width: 0.15, minLevel: 5},
+			{name: "plastic", value: 1, chance: -1.0, width: 0.8, minLevel: 15, seasons:{
+				"spring": 1.0,
+				"summer": -0.3,
+				"autumn": -0.6,
+				"winter": 2.0
+			}} 
+			// Spiders will sell some plastics with A LOT OF ambassadors.
+			// Numbers are small on purpose. Buffing better than nerfing.
 		],
 		collapsed: false,
 		pinned: false
