@@ -2240,7 +2240,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			//"bloodstoneCraftRatio" : 0.02,
 			"manpowerMax": 50,
 			"tMythrilCraftRatio" : 0.01,
-			"harthRatio" : 0
+			"harthRatio" : 0,
+			// "zebratradeNormalResChance": 0.1
 		},
 		calculateEffects: function(self, game){
 			if (game.workshop.getZebraUpgrade("infusedBackpacks").researched){
