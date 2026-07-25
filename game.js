@@ -5391,7 +5391,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				activeHolyGenocide: this.religion.getTU("holyGenocide").on,
 				zu: [],
 				ru: [],
-				tu: this.religion.filterMetadata(this.religion.transcendenceUpgrades, ["name", "val", "on", "unlocked"])
+				tu: this.religion.filterMetadata(this.religion.transcendenceUpgrades, ["name", "val", "on", "unlocked"]),
+				pact: []
 			},
 			science: {
 				hideResearched: this.science.hideResearched,
