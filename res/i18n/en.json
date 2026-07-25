@@ -122,6 +122,8 @@
     "btn.reset": "Reset",
     "btn.sell": "Sell",
     "btn.sell.minor": "sell",
+    "btn.sell.tooltip": "Sell to recover {0} of its cost.",
+    "btn.sell.res.not.refundable": "({0} cannot be refunded)",
     "btn.trade": "Trade",
     "btn.blocked.capital": "(Blocked)",
     "btn.applyPending": "Apply challenges",
