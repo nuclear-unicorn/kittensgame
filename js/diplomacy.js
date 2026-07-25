@@ -10,6 +10,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	baseGoldCost: 15,
 	baseManpowerCost: 50,
 
+	cachedAmbassadorEffects: null, //We need to cache this separately from globalEffectsCached because, I dunno, reasons.  ???  I guess there just are problems with how globalEffectsCached is recalculated, & we want these cached effects to update every tick.
+
 	nonRandomTrades: 0, //Way to prevent using the undo feature to exploit RNG
 	nonRandomResetDays: 0, //nonRandomTrades will get reset to 0 after enough game-days have passed
 
@@ -33,6 +35,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			}},
 			{name: "beam", value: 10, chance: 0.25, width: 0.15, minLevel: 5},
 			{name: "scaffold", value: 1, chance: 0.1, width: 0.1, minLevel: 10}
+			//TODO: give each race a resource with negative base chance, requiring ambassadors to unlock trade
+			//TODO: give each trade resource some seasonal variation because it's a cool & underutilized mechanic
 		],
 		collapsed: false,
 		pinned: false
@@ -161,7 +165,15 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				"autumn": 0.15,
 				"winter": -0.05
 			}},
-			{name: "oil", value: 100, chance: 0.25, width: 0.15, minLevel: 5}
+			{name: "oil", value: 100, chance: 0.25, width: 0.15, minLevel: 5},
+			{name: "plastic", value: 1, chance: -1.0, width: 0.8, minLevel: 15, seasons:{
+				"spring": 1.0,
+				"summer": -0.3,
+				"autumn": -0.6,
+				"winter": 2.0
+			}} 
+			// Spiders will sell some plastics with A LOT OF ambassadors.
+			// Numbers are small on purpose. Buffing better than nerfing.
 		],
 		collapsed: false,
 		pinned: false
@@ -206,6 +218,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 	constructor: function(game){
 		this.game = game;
+		this.cachedAmbassadorEffects = {};
 	},
 
 	get: function(raceName){
@@ -216,6 +229,30 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 		console.error("Failed to get race for id '" + raceName + "'");
 		return null;
+	},
+
+	/**
+	 * Calculates which race (out of all the unlocked races) has the least expensive embassy.
+	 * If no race is unlocked, returns null.
+	 * @return string | null	The internal name of the race chosen
+	 */
+	getCheapestEmbassy: function() {
+		var priceCoeficient = 1 - this.game.getEffect("embassyCostReduction");
+		var fakeEmbassies = this.game.getEffect("embassyFakeBought");
+
+		var raceArr = [];
+		this.races.forEach( function(race) {
+			if (race.unlocked && race.embassyPrices) {
+				//Duplicate of EmbassyButtonController#getPrices logic
+				raceArr.push({ name: race.name, price: race.embassyPrices[0].val * priceCoeficient * Math.pow(1.15, race.embassyLevel + fakeEmbassies) });
+			}
+		});
+		//raceArr now holds information on each unlocked race & the price of its embassy
+		if (raceArr.length < 1) {
+			return null;
+		}
+		raceArr.sort( function( a, b ) { return a.price - b.price; });
+		return raceArr[0].name;
 	},
 
 	getTradeRatio: function() {
@@ -234,6 +271,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 		this.nonRandomTrades = 0;
 		this.nonRandomResetDays = 0;
+		this.cachedAmbassadorEffects = {};
 	},
 
 	save: function(saveData){
@@ -254,6 +292,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 		this.nonRandomTrades = 0; //Don't preserve this in the save-state (has very little meaningful gameplay value)
 		this.nonRandomResetDays = 0;
+		this.cachedAmbassadorEffects = {};
 	},
 
 	hasUnlockedRaces: function(){
@@ -266,13 +305,30 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	},
 
 	/**
+	 * Counts the TOTAL number of embassies built across all races in the current run.
+	 * @return A nonnegative integer
+	 */
+	getSumEmbassyLevels: function() {
+		var retVal = 0;
+		this.races.forEach( function(race) {
+			retVal += race.embassyLevel;
+		});
+		return retVal;
+	},
+
+	/**
 	 * Returns true if particular resource can be traded to you by a race
 	 */
 	isValidTrade: function(sell, race){
 		var resName = sell.name;
 		var hasHighEnoughEmbassyLevel = !sell.minLevel || race.embassyLevel >= sell.minLevel;
-		var isResourceTradeable = this.game.resPool.get(resName).unlocked || resName === "uranium" || race.name === "leviathans";
-		return hasHighEnoughEmbassyLevel && isResourceTradeable;
+		var isResourceTradeable = this.game.resPool.get(resName).unlocked || resName === "coal"  || resName === "uranium" || race.name === "leviathans";
+		var positiveChance = (sell.chance + this.getAmbassadorEffect("tradeNormalResChance")) > 0;
+		return hasHighEnoughEmbassyLevel && isResourceTradeable && positiveChance;
+	},
+
+	getAmbassadorEffect: function(effectName) {
+		return this.cachedAmbassadorEffects[effectName] || 0;
 	},
 
 	unlockRandomRace: function(){
@@ -404,6 +460,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 			this.game.msg($I("trade.msg.emissary", [race.title]), "notice");
 		}
+		this.checkQueueEmbassyUnlockCondition();
 
 		 if (this.game.ironWill && this.game.challenges.isActive('blackSky')) {
 
@@ -451,6 +508,33 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			}
 		}
 
+	},
+
+	/**
+	 * Evaluates the unlock condition for whether or not the player can queue embassies.
+	 * Calls the unlockQueueSource function if the player has met the requirements.
+	 * Has no return value.
+	 */
+	checkQueueEmbassyUnlockCondition: function() {
+		var queueManager = this.game.time.queue;
+		if (queueManager.queueSources["embassies"] === true) {
+			//Queuing embassies is already unlocked!
+			return;
+		}
+		if (!this.game.science.get("writing").researched) {
+			//Embassies are not unlocked yet.
+			return;
+		}
+		if (this.game.prestige.getPerk("ambassadors").researched || this.game.science.getPolicy("bigStickPolicy").researched) {
+			//One of these two items is required in order to queue embassies.
+			var unlockedEmbassies = 0;
+			this.races.forEach( function(race) {
+				if (race.unlocked && race.embassyPrices) { unlockedEmbassies += 1; }
+			});
+			if (unlockedEmbassies > 0) {
+				queueManager.unlockQueueSource("embassies");
+			}
+		}
 	},
 
 	onLeavingIW: function(){
@@ -561,7 +645,10 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	//Some upgrades care about the number of embassies there are.
 	//Call this function to recalculate this, as needed:
 	triggerOnEmbassyCountChanged: function() {
-		this.game.upgrade({policies: ["lizardRelationsDiplomats", "nagaRelationsArchitects", "spiderRelationsGeologists"]});
+		this.game.upgrade({
+			jobs: ["ambassador"],
+			policies: ["lizardRelationsDiplomats", "nagaRelationsArchitects", "spiderRelationsGeologists"]
+		});
 		this.game.science.unlockRelations();
 		this.game.ui.render();
 	},
@@ -662,7 +749,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 
 		var boughtResources = {};
-		var tradeVolume = 1 + this.game.getEffect("tradeVolume");
+		var tradeVolume = this.getTradeVolume();
 		var tradeRatio = 
 			1
 			+ this.game.diplomacy.getTradeRatio()
@@ -721,10 +808,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		}
 
 		//-------------- 10% chance to get blueprint ---------------
-		var blueprintTradeChance = 0.1;
-		if (race.name == "nagas") {
-			blueprintTradeChance += this.game.getEffect("nagaBlueprintTradeChance");
-		}
+		var blueprintTradeChance = this.getBlueprintTradeChance(race);
 		var eligibleForBlueprint = successfullTradeAmount;
 		if (blueprintTradeChance < 1 && this.nonRandomTrades) { //Non-random trades won't give blueprints unless it's guaranteed
 			eligibleForBlueprint = Math.max(successfullTradeAmount - this.nonRandomTrades, 0);
@@ -786,6 +870,14 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		return (goldCost < 0) ? 0 : goldCost;
 	},
 
+	//Trade volume is a multiplier to the race.buys & race.sells arrays.
+	//It also affects titanium gained from trading with Zebras.
+	//Does not affect special rare resources gained (blueprint, spice).
+	//Note that this function returns 1 by default (with no modifiers active), unlike other ratio calculations that return 0 by default.
+	getTradeVolume: function() {
+		return (1 + this.game.getEffect("tradeVolume")) * (1 + this.getAmbassadorEffect("tradeVolume"));
+	},
+
 	trade: function(race){
 		this.gainTradeRes(this.tradeImpl(race, 1), 1);
 	},
@@ -795,24 +887,22 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		if (!this.hasMultipleResources(race, amt)) {
 			return;
 		}
-		var tradeVolume = 1 + this.game.getEffect("tradeVolume");
 
 		//-------------- pay prices ------------------
 		var manpowerCost = this.getManpowerCost();
 		var goldCost = this.getGoldCost();
 		this.game.resPool.addResEvent("manpower", -manpowerCost * amt);
 		this.game.resPool.addResEvent("gold", -goldCost * amt);
-		this.game.resPool.addResEvent(race.buys[0].name, -race.buys[0].val * amt * tradeVolume);
+		this.game.resPool.addResEvent(race.buys[0].name, -race.buys[0].val * amt * this.getTradeVolume());
 
 		//---------- calculate yield -----------------
 		this.gainTradeRes(this.tradeImpl(race, amt), amt);
  	},
 
 	hasMultipleResources: function(race, amt){
-		var tradeVolume = 1 + this.game.getEffect("tradeVolume");
 		return (this.game.resPool.get("gold").value >= this.getGoldCost() * amt &&
 			this.game.resPool.get("manpower").value >= this.getManpowerCost() * amt &&
-			this.game.resPool.get(race.buys[0].name).value >= race.buys[0].val * amt * tradeVolume);
+			this.game.resPool.get(race.buys[0].name).value >= race.buys[0].val * amt * this.getTradeVolume());
 	},
 
 	tradeAll: function(race){
@@ -851,7 +941,6 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	getMaxTradeAmt: function(race){
 		var manpowerCost = this.getManpowerCost();
 		var goldCost = this.getGoldCost();
-		var tradeVolume = 1 + this.game.getEffect("tradeVolume");
 
 		var amt = [
 			Math.floor(this.game.resPool.get("gold").value /
@@ -860,7 +949,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			Math.floor(this.game.resPool.get("manpower").value / Math.max(
 				manpowerCost, 1)
 			),
-			Math.floor(this.game.resPool.get(race.buys[0].name).value / (race.buys[0].val * tradeVolume))
+			Math.floor(this.game.resPool.get(race.buys[0].name).value / (race.buys[0].val * this.getTradeVolume()))
 		];
 
 		amt[0] += (goldCost > 0) ? 0 : Number.MAX_VALUE;
@@ -896,9 +985,19 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			return race.standing + bonusStanding / 2;
 		}
 	},
+	getBlueprintTradeChance: function(race) {
+		var retVal = 0.1 + this.getAmbassadorEffect("tradeBlueprintChance");
+		if (race.name == "nagas") {
+			retVal += this.game.getEffect("nagaBlueprintTradeChance");
+		}
+		return retVal;
+	},
+	//Spice is a unique resource in that if the chance exceeds 100%, it'll act as a multiplier to spice gain amounts.
+	//No other resource acts in this way.
 	getSpiceTradeChance: function(race) {
 		var embassyEffect = this.game.ironWill ? 0.0025 : 0.01;
-		return 0.35 * (1 + (race.embassyPrices ?  race.embassyLevel * embassyEffect : 0));
+		var baseChance = 0.35 + this.getAmbassadorEffect("tradeSpiceChance");
+		return baseChance * (1 + (race.embassyPrices ?  race.embassyLevel * embassyEffect : 0));
 	},
 	getResourceTradeChance: function(sellResourceOpts, race) {
 		var embassyEffect = this.game.ironWill ? 0.0025 : 0.01;
@@ -906,11 +1005,16 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		if (!this.game.diplomacy.isValidTrade(sellResourceOpts, race)) {
 			return 0;
 		}
+		var baseChance = sellResourceOpts.chance + this.getAmbassadorEffect("tradeNormalResChance");
+		if (baseChance <= 0) {
+			//This way we can have resources with a negative chance in sellResourceOpts, & only Ambassadors can unlock them.
+			return 0;
+		}
 		//Else, chance is based on embassy level:
-		return sellResourceOpts.chance *
+		return baseChance *
 				(1 + (
 					race.embassyPrices ?
-					this.game.getLimitedDR(race.embassyLevel * embassyEffect, 0.75) :
+					this.game.getLimitedDR(race.embassyLevel * embassyEffect, 0.75 + this.getAmbassadorEffect("embassyEffectCap")) :
 					0)
 				);
 	},
@@ -952,15 +1056,16 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	},
 
 	buyBcoin: function(){
-		var amt = this.game.resPool.get("relic").value / this.game.calendar.cryptoPrice;
+		var amt = this.game.resPool.get("relic").value / this.game.calendar.getCryptoPrice();
 		amt = this.game.resPool.addResEvent("blackcoin", amt);
 		this.game.resPool.get("relic").value = 0;
 		this.game.msg($I("trade.bcoin.buy.msg", [this.game.getDisplayValueExt(amt)]), "", "blackcoin");
 
 	},
 
-	sellBcoin: function(){
-		var amt = this.game.resPool.get("blackcoin").value * this.game.calendar.cryptoPrice;
+	//isHodl settles the sale at the pre-switch price, see getCryptoPrice
+	sellBcoin: function(isHodl){
+		var amt = this.game.resPool.get("blackcoin").value * this.game.calendar.getCryptoPrice(isHodl);
 		var amt = this.game.resPool.addResEvent("relic", amt);
 		this.game.resPool.get("blackcoin").value = 0;
 		this.game.msg($I("trade.bcoin.sell.msg", [this.game.getDisplayValueExt(amt)])), "", "blackcoin";
@@ -1029,7 +1134,7 @@ dojo.declare("classes.diplomacy.ui.RacePanel", com.nuclearunicorn.game.ui.Panel,
 					? "hostile"
 					: "nowNeutral";
 		this.name = this.race.title + " <span class='attitude'>" + $I("trade.attitude." + attitude) + "</span>";
-		return this.inherited(arguments);
+		return this.inherited("render", arguments);
 	},
 
 	update: function(){
@@ -1049,7 +1154,7 @@ dojo.declare("classes.diplomacy.ui.EldersPanel", classes.diplomacy.ui.RacePanel,
 	feedBtn: null,
 
 	render: function(container){
-		var content = this.inherited(arguments);
+		var content = this.inherited("render", arguments);
 
 		var self = this;
 		this.feedBtn = new com.nuclearunicorn.game.ui.ButtonModern({
@@ -1129,7 +1234,7 @@ dojo.declare("classes.diplomacy.ui.EldersPanel", classes.diplomacy.ui.RacePanel,
 
 dojo.declare("com.nuclearunicorn.game.ui.CrashBcoinButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.hasResourceHover = true;
 		result.simplePrices = true;
 		return result;
@@ -1137,7 +1242,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CrashBcoinButtonController", com.nuclea
 
 	updateEnabled: function(model) {
 		this.inherited(arguments);
-		model.enabled &= this.game.calendar.cryptoPrice > 550;
+		model.enabled &= this.game.calendar.getCryptoPrice() > 550;
 	},
 
 	fetchExtendedModel: function(model) {
@@ -1165,7 +1270,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CrashBcoinButtonController", com.nuclea
 
 		var tcPerTick = Math.max(tcPerTick_phase0, tcPerTick_phase1, tcPerTick_phase2);
 		// 10 ticks/day / (1.2499270834635280e-6 logInc/day), see calendar.js
-		var ticksUntilNextNaturalCrash = 8000466.693057134 * Math.log(1100 / this.game.calendar.cryptoPrice);
+		var ticksUntilNextNaturalCrash = 8000466.693057134 * Math.log(1100 / this.game.calendar.getCryptoPrice());
 		var tcBasePrice = Math.max(256, tcPerTick * ticksUntilNextNaturalCrash) / 8;
 		var tcPrice = Math.pow(2, Math.ceil(Math.log(tcBasePrice) * Math.LOG2E));
 		return [{name: "timeCrystal", val: tcPrice}];
@@ -1178,7 +1283,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CrashBcoinButtonController", com.nuclea
 
 dojo.declare("com.nuclearunicorn.game.ui.TradeButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.hasResourceHover = true;
 		result.simplePrices = false;
 		return result;
@@ -1281,19 +1386,39 @@ dojo.declare("com.nuclearunicorn.game.ui.TradeButton", com.nuclearunicorn.game.u
 
 dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.game.ui.BuildingStackableBtnController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.simplePrices = false;
 		return result;
 	},
 
+	//Since all embassies have the same name by default, that'd make the "cheapest embassy"
+	// queued item really confusing to use.  So, we use use custom behavior to change the
+	// displayed name of the embassy, but only for the tooltip of an item in the queue.
+	initModel: function(options) {
+		var model = this.inherited(arguments);
+		model.tooltipName = Boolean(options.isInQueue);
+		return model;
+	},
+
 	getEffects: function(model) {
+		var scienceManager = this.game.science;
 		var race = model.options.race;
-		var nagaArchitects = this.game.science.getPolicy("nagaRelationsArchitects");
-		if (race.name == "nagas" && nagaArchitects.researched) {
-			return nagaArchitects.effects;
+		var lizardDiplomats = scienceManager.getPolicy("lizardRelationsDiplomats");
+		var nagaArchitects = scienceManager.getPolicy("nagaRelationsArchitects");
+		var spiderGeologists = scienceManager.getPolicy("spiderRelationsGeologists");
+
+		//Build a table to hold total effects of all embassies from this race:
+		var retVal = {};
+		if (race.standing == 0 && lizardDiplomats.researched) {
+			$.extend( true, retVal, { "raceSpecificStanding": race.embassyLevel * this.game.getEffect("neutralRaceEmbassyStanding")});
 		}
-		//Else,there are no effects associated with this embassy.
-		return undefined;
+		if (race.name == "nagas" && nagaArchitects.researched) {
+			$.extend( true, retVal, nagaArchitects.effects );
+		}
+		if (race.name == "spiders" && spiderGeologists.researched) {
+			$.extend( true, retVal, spiderGeologists.effects );
+		}
+		return retVal;
 	},
 	getTotalEffects: function(model) {
 		//Force this to return a falsy value so the game uses normal getEffects() instead
@@ -1304,7 +1429,7 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 		if (!model.metaCached) {
 			var race = model.options.race;
 			model.metaCached = {
-				label: $I("trade.embassy.label"),
+				label: model.isInQueue ? $I("trade.embassy.queue.item", [race.title]) : $I("trade.embassy.label"),
 				description: $I("trade.embassy.desc"),
 				val: race.embassyLevel,
 				on: race.embassyLevel
@@ -1340,8 +1465,28 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 		model.visible = this.game.science.get("writing").researched;
 	},
 
+	buyItem: function(model, event) {
+		//Fail if the race in question isn't unlocked yet:
+		if (!model.options.race.unlocked) {
+			return {
+				itemBought: false,
+				reason: "not-unlocked"
+			};
+		}
+		//Fail if the prerequisite tech isn't researched:
+		if (!this.game.science.get("writing").researched) {
+			console.log("Failed to buy embassy because embassies aren't unlocked yet.");
+			return {
+				itemBought: false,
+				reason: "not-unlocked"
+			};
+		}
+		//Else, this embassy is unlocked, so proceed:
+		return this.inherited(arguments);
+	},
+
 	build: function(model, opts) {
-		var counter = this.inherited(arguments);
+		var counter = this.inherited("build", arguments);
 		if (!counter) {
 			return; //Skip triggers & undo if nothing was built
 		}
@@ -1365,8 +1510,14 @@ dojo.declare("classes.diplomacy.ui.EmbassyButtonController", com.nuclearunicorn.
 var EmbassyButtonHelper = {
 	//This is a modified version of ButtonModernHelper.getTooltipHTML from core.js.
 	getTooltipHTML: function(controller, model) {
+		if (model.options.recalculateCheapestRace) { //Used for "cheapest embassy" queue option
+			var diplomacyManager = controller.game.diplomacy;
+			model.options.race = diplomacyManager.get(diplomacyManager.getCheapestEmbassy());
+			model.options.prices = model.options.race.embassyPrices;
+		}
+		//Some aspects of the metadata may have changed, so fetch the latest version of the model:
+		model = controller.fetchModel(model.options);
 		controller.fetchExtendedModel(model);
-		//throw "ButtonModern::getTooltipHTML must be implemented";
 
 		var tooltip = dojo.create("div", { className: "tooltip-inner" }, null);
 
@@ -1431,20 +1582,22 @@ var EmbassyButtonHelper = {
 	renderResourceChances: function(tooltip, game, race) {
 		//Build a list of each resource whose chance depends on embassies:
 		var chancesToDisplay = [];
+		var ambassadorBonus = game.diplomacy.getAmbassadorEffect("tradeNormalResChance");
 		for (var i = 0; i < race.sells.length; i += 1) {
 			var sellOptions = race.sells[i]; //Example: {name: "slab", value: 5, chance: 0.75, width: 0.15, minLevel: 5}
 			var sellResource = game.resPool.get(sellOptions.name); //Actual resources object.
 			if (!sellResource.unlocked) {
 				continue; //Don't display a resource that's not unlocked yet.
 			}
-			if (sellOptions.chance >= 1) {
+			if (sellOptions.chance + ambassadorBonus >= 1 && !game.devMode) {
 				continue; //Chance is fixed at 100%, therefore not based on embassies, so don't display.
+				//Override: In dev mode, we display it anyways.
 			}
 			var sellChance = Math.min(game.diplomacy.getResourceTradeChance(sellOptions, race), 1); //Cap at 100%
 			if (sellChance == 0 ) {
 				continue; //Don't display a resource that we can't get from them.
 			}
-			chancesToDisplay.push({ title: sellResource.title, chance: sellChance });
+			chancesToDisplay.push({ title: sellResource.title, chance: sellChance, originalChance: sellOptions.chance });
 		}
 		//Don't forget to include spice, which is special:
 		var spiceResource = game.resPool.get("spice");
@@ -1455,7 +1608,7 @@ var EmbassyButtonHelper = {
 			chancesToDisplay.push({ title: spiceResource.title, chance: spiceChance, multi: spiceMulti });
 		}
 
-		//Don't mention blueprints or titanium because neither of those is affected by embassies.
+		//Don't mention blueprints or titanium because neither of those are affected by embassies.
 
 		if (chancesToDisplay.length < 1) {
 			return; //Skip modifying the tooltip if there's nothing to show.
@@ -1473,10 +1626,33 @@ var EmbassyButtonHelper = {
 				marginBottom: "8px"
 		}}, tooltip);
 		for (var i = 0; i < chancesToDisplay.length; i += 1) {
-			dojo.create("div", {
-				innerHTML: chancesToDisplay[i].title + ": " + (100 * chancesToDisplay[i].chance).toFixed(1) + "%" + (chancesToDisplay[i].multi ? ", ×" + game.getDisplayValueExt(chancesToDisplay[i].multi) : ""),
-				className: "effectName"
-			}, tooltip);
+			if (game.devMode) {
+				//Show really detailed info, a breakdown of the calculation, even, intended for dev use.
+				if (chancesToDisplay[i].title === "spice") {
+					dojo.create("div", {
+						innerHTML: "<strong>" + chancesToDisplay[i].title + "</strong>: " + (100 * 0.35).toFixed(1) + "% original + " +
+							(100 * game.diplomacy.getAmbassadorEffect("tradeSpiceChance")).toFixed(1) + "% from ambassadors yields " +
+							(100 * (0.35 + game.diplomacy.getAmbassadorEffect("tradeSpiceChance"))).toFixed(1) + "% pre-embassies, boosted to a final value of <strong>" +
+							(100 * chancesToDisplay[i].chance).toFixed(1) + "%</strong> by embassies.  The multiplier is <strong>×" + game.getDisplayValueExt(chancesToDisplay[i].multi || 1) + "</strong>.",
+						className: "effectName"
+					}, tooltip);
+				} else {
+					dojo.create("div", {
+						innerHTML: "<strong>" + chancesToDisplay[i].title + "</strong>: " + (100 * chancesToDisplay[i].originalChance).toFixed(1) + "% original + " +
+							(100 * ambassadorBonus).toFixed(1) + "% from ambassadors yields " +
+							(100 * (chancesToDisplay[i].originalChance + ambassadorBonus)).toFixed(1) + "% pre-embassies, boosted to a final value of <strong>" +
+							(100 * chancesToDisplay[i].chance).toFixed(1) + "%</strong> by embassies.  The cap is " +
+							(100 * (chancesToDisplay[i].originalChance + ambassadorBonus) * (1.75 + game.diplomacy.getAmbassadorEffect("embassyEffectCap"))).toFixed(1) + "%.",
+						className: "effectName"
+					}, tooltip);
+				}
+			} else {
+				//Show normal info to the player
+				dojo.create("div", {
+					innerHTML: chancesToDisplay[i].title + ": " + (100 * chancesToDisplay[i].chance).toFixed(1) + "%" + (chancesToDisplay[i].multi ? ", ×" + game.getDisplayValueExt(chancesToDisplay[i].multi) : ""),
+					className: "effectName"
+				}, tooltip);
+			}
 		}
 	}
 };
@@ -1523,7 +1699,7 @@ dojo.declare("classes.diplomacy.ui.EmbassyButton", com.nuclearunicorn.game.ui.Bu
 
 dojo.declare("classes.diplomacy.ui.autoPinnedButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.hasResourceHover = false;
 		result.simplePrices = false;
 		return result;
@@ -1579,7 +1755,7 @@ dojo.declare("classes.diplomacy.ui.autoPinnedButton", com.nuclearunicorn.game.ui
 
 dojo.declare("classes.trade.ui.SendExplorersButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.hasResourceHover = true;
 		result.simplePrices = false;
 		return result;
@@ -1690,7 +1866,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 		dojo.create("div", { class: "clear"}, tabContainer);
 
 		var baseTradeRatio = 1 + this.game.diplomacy.getTradeRatio();
-		var tradeVolume = 1 + this.game.getEffect("tradeVolume");
+		var tradeVolume = this.game.diplomacy.getTradeVolume();
 		var currentSeason = this.game.calendar.getCurSeason().name;
 		for (var i = 0; i < races.length; i++) {
 			var race = races[i];
@@ -1894,8 +2070,9 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 			this.leviathansInfo.innerHTML += $I("trade.leviathans.timeToLeave") + this.game.toDisplayDays(leviathans.duration);
 			//B-coin price:
 			if (this.game.science.get("antimatter").researched){
-				this.leviathansInfo.innerHTML += "<br /> " + $I("trade.bcoin.price") + " <span style='cursor:pointer' title='" + this.game.calendar.cryptoPrice + "'>" +
-					this.game.getDisplayValueExt(this.game.calendar.cryptoPrice, false, false, 5) + "R</span>";
+				var bcoinPrice = this.game.calendar.getCryptoPrice();
+				this.leviathansInfo.innerHTML += "<br /> " + $I("trade.bcoin.price") + " <span style='cursor:pointer' title='" + bcoinPrice + "'>" +
+					this.game.getDisplayValueExt(bcoinPrice, false, false, 5) + "R</span>";
 			}
 		}
 

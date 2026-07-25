@@ -90,7 +90,12 @@ WQueueItem = React.createClass({
         if (!controllerAndModel) {
             return;
         }
-        UIUtils.attachTooltip(game, node, 0, 200, dojo.partial(ButtonModernHelper.getTooltipHTML, controllerAndModel.controller, controllerAndModel.model));
+        var controller = controllerAndModel.controller;
+        var model = controllerAndModel.model;
+
+        //Create tooltip
+        var tooltipHelperObj = item.type === "embassies" ? EmbassyButtonHelper : ButtonModernHelper;
+        UIUtils.attachTooltip(game, node, 0, 200, dojo.partial(tooltipHelperObj.getTooltipHTML, controller, model));
     },
 
     //Ask the game engine if this item is storage-limited

@@ -157,7 +157,7 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			policies: ["lizardRelationsEcologists"]
 		},
 		unlocks: {
-			"perks": ["zebraDiplomacy"]
+			"perks": ["zebraDiplomacy", "ambassadors"]
 		}
 	},{
 		name: "zebraDiplomacy",
@@ -186,6 +186,36 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		prices: [{ name: "paragon", val: 300 }],
 		unlocked: false,
 		researched: false
+	},{
+		name: "ambassadors",
+		label: $I("prestige.ambassadors.label"),
+		description: $I("prestige.ambassadors.desc"),
+		prices: [{ name: "paragon", val: 100 }],
+		unlocked: false,
+		researched: false,
+		unlocks: {
+			"jobs": ["ambassador"],
+			"perks": ["treaties"]
+		}
+	},{
+		name: "treaties",
+		label: $I("prestige.treaties.label"),
+		description: "",
+		prices: [{ name: "paragon", val: 500 }],
+		unlocked: false,
+		researched: false,
+		effects: {
+			"embassiesPerAmbassadorSlot": 30,
+			"ambassadorBoostPerRank": 0.1
+		},
+		calculateEffects: function(self, game) {
+			self.description = $I("prestige.treaties.desc", [
+				game.getDisplayValueExt(self.effects["embassiesPerAmbassadorSlot"])
+			]);
+		},
+		upgrades: {
+			jobs: ["ambassador"]
+		}
 	},{
 		name: "chronomancy",
 		label: $I("prestige.chronomancy.label"),
@@ -581,7 +611,7 @@ dojo.declare("classes.ui.PrestigeBtnController", com.nuclearunicorn.game.ui.Buil
 
    	buyItem: function(model, event) {
 		if (this.game.science.get("metaphysics").researched) {
-			return this.inherited(arguments);
+			return this.inherited("buyItem", arguments);
 		} else {
 			return {
 				itemBought: false,
@@ -620,7 +650,7 @@ dojo.declare("classes.ui.PrestigePanel", com.nuclearunicorn.game.ui.Panel, {
 	},
 
     render: function(container){
-		var content = this.inherited(arguments);
+		var content = this.inherited("render", arguments);
 
 		var self = this;
 		//---------------------------------------------------------------

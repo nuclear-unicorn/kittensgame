@@ -1,3 +1,9 @@
 {
-    "eslint.enable": true
+    "eslint.enable": true,
+
+    // Use the repo's own TypeScript for IntelliSense so in-editor diagnostics
+    // match `yarn lint` / the pre-commit hook exactly. New contributors get a
+    // one-click "Allow" prompt on first open.
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true
 }

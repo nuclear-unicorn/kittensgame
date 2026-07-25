@@ -483,6 +483,13 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
         color: "#9B9A5A",
 		tag: "chemist"
 	},{
+        name: "microchip",
+        title: $I("resources.microchip.title"),
+        type: "common",
+        craftable: true,
+        color: "#9B9A5A",
+		tag: "chemist"
+	},{
 		name : "parchment",
 		title: $I("resources.parchment.title"),
 		type : "common",

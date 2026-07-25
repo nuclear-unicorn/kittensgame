@@ -333,7 +333,12 @@ WLoginForm = React.createClass({
                 + "?s=15"}),
                 $r("a", {
                     href:"/ui/profile", target:"_blank"
-                }, userProfile.id)
+                }, userProfile.id),
+                $r("a", {
+                    className: "link logout",
+                    href: "#",
+                    onClick: this.logout
+                }, $I("ui.kgnet.logout"))
             ]);
 
         }
@@ -388,6 +393,19 @@ WLoginForm = React.createClass({
         e.nativeEvent.stopImmediatePropagation();
 
         this.setState({password: e.target.value});
+    },
+
+    logout: function(e){
+        e.preventDefault();
+        e.stopPropagation();
+
+        var self = this;
+
+        self.setState({error: null, isLoading: true});
+        this.props.game.server.logout().always(function(){
+            //reset the form so the login inputs come back empty
+            self.setState({login: null, password: null, isLoading: false});
+        });
     },
 
     login: function(){

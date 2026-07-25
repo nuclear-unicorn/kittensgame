@@ -140,6 +140,15 @@ dojo.declare("classes.ui.UISystem", null, {
         return false;
     },
 
+    /**
+     * Lays out one resource breakdown row (see GamePage.getStackElemString).
+     * The legacy tooltip is a flat text blob, so the value is floated to the right
+     * and rows are separated by line breaks.
+     */
+    formatStackRow: function(label, value){
+        return label + "&nbsp;<div style=\"float: right;\">" + value + "</div><br>";
+    },
+
     checkForUpdates: function(){
         //nothing
     }

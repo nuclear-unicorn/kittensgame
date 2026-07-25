@@ -543,7 +543,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				description: $I("buildings.dataCenter.desc"),
 				prices: [
 					{ name : "steel", val: 100 },
-					{ name : "concrate", val: 10 }
+					{ name : "concrate", val: 10 },
+					{ name : "microchip", val: 5 },
 				],
 				//togglable: true,
 				effects: {
@@ -724,8 +725,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			for (var i in self.effects) {
 				self.effectsCalculated[i] = self.effects[i];
 			}
-			self.effects["scienceMax"] *= (1 + game.getEffect("biolabBiofuelScienceMaxRatio") * self.on);
-
+			if (game.workshop.get("biofuel").researched){
+				self.effects["scienceMax"] *= (1 + game.getEffect("biolabBiofuelScienceMaxRatio") * self.on);
+			}
 		},
 		lackResConvert: false,
 		action: function(self, game){
@@ -871,12 +873,15 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}
 			if (game.workshop.get("freightfulExchange").researched){
 				stageMeta.description = $I("buildings.spaceport.desc") + "<br>" + $I("buildings.spaceport.desc.automation");
+			} else {
+				stageMeta.description = $I("buildings.spaceport.desc");
 			}
 			if (game.workshop.get("freightfulExchange").researched && self.isAutomationEnabled === null){
 				self.isAutomationEnabled = true;
 				stageMeta.isAutomationEnabled = true;
 			} else if (!game.workshop.get("freightfulExchange").researched && self.isAutomationEnabled !== null) {
 				self.isAutomationEnabled = null;
+				stageMeta.isAutomationEnabled = null;
 			}
 			if (self.isAutomationEnabled){
 				effects["tradeVolume"] = 0.5 + (game.workshop.get("transportSuperposition").researched? 0.5 : 0);
@@ -3031,7 +3036,7 @@ dojo.declare("classes.game.ui.GatherCatnipButtonController", com.nuclearunicorn.
 
 dojo.declare("classes.game.ui.RefineCatnipButtonController", com.nuclearunicorn.game.ui.ButtonModernController, {
 	fetchModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 	    var self = this;
 		var catnipVal = this.game.resPool.get("catnip").value;
 		var catnipCost = model.prices[0].val;
@@ -3122,7 +3127,7 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 			}
 		}
 
-		var name = this.inherited(arguments);
+		var name = this.inherited("getName", arguments);
 
 		var sim = this.game.village.sim;
 		if (meta.name == "hut" && sim.nextKittenProgress && sim.maxKittens <= 10 ){
@@ -3144,7 +3149,7 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 	},
 
     build: function(model, opts){
-		var counter = this.inherited(arguments);
+		var counter = this.inherited("build", arguments);
 		if (!counter) {
 			return; //Skip stats & undo if nothing was built
 		}
@@ -3163,7 +3168,7 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 	},
 
 	sell: function(event, model){
-		var amtSold = this.inherited(arguments);
+		var amtSold = this.inherited("sell", arguments);
 
 		if (amtSold > 0) {
 			var undo = this.game.registerUndoChange();
@@ -3199,8 +3204,25 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 	},
 
 	fetchModel: function(options) {
-		var model = this.inherited(arguments);
+		var model = this.inherited("fetchModel", arguments);
 		model.stageLinks = this.getStageLinks(model);
+		if (typeof(model.metadata.isAutomationEnabled) == "boolean" || 
+			(model.metadata.stages && typeof(model.metaAccessor.meta.isAutomationEnabled) == "boolean") //stage hack
+		) {
+			var isEnabled = model.metaAccessor.meta.isAutomationEnabled;
+			var self = this;
+			model.toggleAutomationLink = {
+				title: isEnabled ? "A" : "*",
+				tooltip: isEnabled ? $I("btn.aon.tooltip") : $I("btn.aoff.tooltip"),
+				//reserved for mobile
+				//if you remove it one more time I will find where you live
+				enabled: model.metadata.val > 0,
+				cssClass: isEnabled ? "auto-on" : "auto-off",
+				handler: function(btn){
+					self.handleToggleAutomationLinkClick(model);
+				}
+			};
+		}
 
 
 		return model;
@@ -3281,9 +3303,7 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 	handleToggleAutomationLinkClick: function(model) {
 		var building = model.metadata;
 		building.isAutomationEnabled = !building.isAutomationEnabled;
-		if (building.stages){
-			model.metaAccessor.meta.isAutomationEnabled = building.isAutomationEnabled; //stage hack
-		}
+		model.metaAccessor.meta.isAutomationEnabled = building.isAutomationEnabled; //stage hack
 		this.game.upgrade({buildings: [building.name]});
 	},
 

@@ -483,6 +483,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 				{bld:"amphitheatre", stage:1}	// Broadcast Tower
 			],
 			tech: ["nuclearFission", "rocketry", "robotics"],
+			crafts: ["microchip"],
 			upgrades: ["cadSystems", "refrigeration", "seti", "factoryLogistics", "factoryOptimization", "internet"]
 		}
 	}, {
@@ -738,7 +739,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			buildings: ["accelerator"],
 			tech: ["chronophysics", "dimensionalPhysics"],
 			upgrades: ["enrichedUranium", "railgun"]
-		}
+		},
+		flavor: $I("science.particlePhysics.flavor")
 	}, {
 		name: "dimensionalPhysics",
 		label: $I("science.dimensionalPhysics.label"),
@@ -803,10 +805,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			upgrades: ["relicStation"]
 		},
-		calculateEffects: function(self, game){
-			if (self.researched){
-				game.time.queue.unlockQueueSource("transcendenceUpgrades");
-			}
+		handler: function(game) {
+			game.time.queue.unlockQueueSource("transcendenceUpgrades");
 		}
 	}, {
 		name: "voidSpace",
@@ -824,11 +824,11 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			voidSpace: ["cryochambers"],
 			challenges: ["atheism"]
 		},
-        calculateEffects: function(self, game){
-			if (self.researched){
-				game.time.queue.unlockQueueSource("voidSpace");
-			}
-        },
+		handler: function(game) {
+			//This function is called at the time this tech is researched.
+			//It's also called during the game-load process, but only if this tech is already researched.
+			game.time.queue.unlockQueueSource("voidSpace");
+		},
 	}, {
 		name: "paradoxalKnowledge",
 		label: $I("science.paradoxalKnowledge.label"),
@@ -843,7 +843,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			upgrades: ["distorsion"],
 			chronoforge: ["ressourceRetrieval"],
 			voidSpace: ["chronocontrol", "voidResonator"]
-		}
+		},
+		flavor: $I("science.paradoxalKnowledge.flavor")
 	}],
 
 	/**
@@ -2320,12 +2321,23 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			this.loadMetadata(this.techs, saveData.science.techs, "technologies");
 			this.loadMetadata(this.policies, saveData.science.policies, "policies");
 		}
+	},
 
+	/**
+	 * If the game has been updated since the player last played, the devs may have added new features that
+	 * are unlocked by techs the player already has.  If that's the case, we need to re-unlock things so
+	 * that the player can use the new features as intended.
+	 */
+	afterLoad: function() {
 		//re-unlock technologies in case we have modified something
+		//re-trigger handlers
 		for (var i = this.techs.length - 1; i >= 0; i--) {
 			var tech = this.techs[i];
 			if (!tech.researched) {
 				continue;
+			}
+			if (tech.handler) {
+				tech.handler(this.game);
 			}
 
 			this.game.unlock(tech.unlocks);
@@ -2339,7 +2351,6 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 
 			this.game.unlock(policy.unlocks);
 		}
-
 	},
 
 	unlockAll: function(){
@@ -2395,7 +2406,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 
 dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.BuildingNotStackableBtnController, {
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.tooltipName = true;
 		result.simplePrices = false;
 		return result;
@@ -2415,7 +2426,7 @@ dojo.declare("classes.ui.PolicyBtnController", com.nuclearunicorn.game.ui.Buildi
 			return label + "<div>" + $I("btn.blocked.capital") + "</div>";
 		}
 
-		return this.inherited(arguments);
+		return this.inherited("getName", arguments);
 	},
 	getPrices: function(model){
 		var meta = model.metadata;
@@ -2575,7 +2586,7 @@ dojo.declare("classes.ui.PolicyPanel", com.nuclearunicorn.game.ui.Panel, {
 	toggleBlockedSpan: null,
 
 	render: function(container){
-		var content = this.inherited(arguments),
+		var content = this.inherited("render", arguments),
 			self = this;
 		var msgBox = dojo.create("span", { style: { display: "inline-block", marginBottom: "10px", width: "50%"}}, content);
 		msgBox.innerHTML = $I("msg.policy.exclusivity");
@@ -2654,7 +2665,7 @@ dojo.declare("classes.ui.PolicyPanel", com.nuclearunicorn.game.ui.Panel, {
 dojo.declare("com.nuclearunicorn.game.ui.TechButtonController", com.nuclearunicorn.game.ui.BuildingNotStackableBtnController, {
 
 	defaults: function() {
-		var result = this.inherited(arguments);
+		var result = this.inherited("defaults", arguments);
 		result.tooltipName = true;
 		result.simplePrices = false;
 		return result;
