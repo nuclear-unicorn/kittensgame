@@ -287,7 +287,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 	load: function(saveData){
 		if (saveData.diplomacy) {
-			this.game.bld.loadMetadata(this.races, saveData.diplomacy.races);
+			this.game.bld.loadMetadata(this.races, saveData.diplomacy.races, "races");
 			this.get("leviathans").autoPinned = saveData.diplomacy.autoPinLeviathans || false;
 		}
 		this.nonRandomTrades = 0; //Don't preserve this in the save-state (has very little meaningful gameplay value)

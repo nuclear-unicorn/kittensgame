@@ -269,6 +269,11 @@ var TabManager = dojo.declare("com.nuclearunicorn.core.TabManager", Control, {
 		console.error("Could not find metadata for ", name, "in", metadata);
 	},
 
+	/**
+	 * @param {string} [metaId] A human-readable name for the metadata we're trying to load.
+	 * 				Optional parameter displayed only in error logging messages.
+	 * 				Exists for developer convenience purposes.
+	 */
 	loadMetadata: function(meta, saveMeta, metaId){
 		if (!saveMeta){
 			console.trace();
@@ -293,7 +298,7 @@ var TabManager = dojo.declare("com.nuclearunicorn.core.TabManager", Control, {
 					}
 					if (savedMetaElem[fld] !== undefined) {
 						if (savedMetaElem[fld] != null && typeof(savedMetaElem[fld]) == "object") {
-							this.loadMetadata(elem[fld], savedMetaElem[fld]);
+							this.loadMetadata(elem[fld], savedMetaElem[fld], metaId + "." + fld);
 						} else {
 							elem[fld] = savedMetaElem[fld];
 						}

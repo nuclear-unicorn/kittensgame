@@ -1009,7 +1009,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	},
 
 	load: function(saveData){
-		this.loadMetadata(this.resources, saveData.resources);
+		this.loadMetadata(this.resources, saveData.resources, "resources");
 
 		if (saveData.res){
 			this.isLocked = Boolean(saveData.res.isLocked);

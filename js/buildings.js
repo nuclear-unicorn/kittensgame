@@ -2681,7 +2681,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	load: function(saveData){
 		this.groupBuildings = saveData.bldData ? saveData.bldData.groupBuildings : false;
 		this.twoRows = saveData.bldData ? saveData.bldData.twoRows : false;
-		this.loadMetadata(this.buildingsData, saveData.buildings);
+		this.loadMetadata(this.buildingsData, saveData.buildings, "buildings");
 		this.cathPollution = saveData.cathPollution|| 0;
 		this.calculatePollutionEffects();
 	},

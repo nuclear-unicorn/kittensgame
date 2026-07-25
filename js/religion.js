@@ -140,10 +140,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			this.transcendenceTier = Math.max(0, Math.round(Math.log(10 * this.game.getUnlimitedDR(_data.tcratio, 0.1))));
 		}
 
-		this.loadMetadata(this.zigguratUpgrades, _data.zu);
-		this.loadMetadata(this.religionUpgrades, _data.ru);
-		this.loadMetadata(this.transcendenceUpgrades, _data.tu);
-		this.loadMetadata(this.pactsManager.pacts, _data.pact);
+		this.loadMetadata(this.zigguratUpgrades, _data.zu, "zigguratUpgrades");
+		this.loadMetadata(this.religionUpgrades, _data.ru, "religionUpgrades");
+		this.loadMetadata(this.transcendenceUpgrades, _data.tu, "transcendenceUpgrades");
+		this.loadMetadata(this.pactsManager.pacts, _data.pact, "pacts");
 	},
 	/**
 	 * This function is meant to be called while loading a savefile, AFTER everything has been initialized.
