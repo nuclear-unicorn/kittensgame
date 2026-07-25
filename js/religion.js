@@ -1477,7 +1477,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			}
 		},
 		evaluateLocks: function(game){
-			game.getFeatureFlag("DARK_PARACOSM");
+			return game.getFeatureFlag("DARK_PARACOSM");
 		},
 		unlocked: false,
 		flavor: $I("religion.tu.darkParacosm.flavor")
