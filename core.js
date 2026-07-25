@@ -1862,6 +1862,9 @@ var BuildingBtnController = dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn
 
 		var start = building.val;
 		var end = building.val - 1;
+		if (event.ctrlKey || event.metaKey /*osx tears*/) {
+			end = Math.max(0, building.val - (this.game.opts.batchSize || 10));
+		}
 		if (end > 0 && event && event.shiftKey) { //no need to confirm if selling just 1
 			end = 0;
 			if (this.game.opts.noConfirm) {
@@ -1876,8 +1879,7 @@ var BuildingBtnController = dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn
 				return amtSold;
 			}
 		} else if (end >= 0) {
-			this.sellInternal(model, end, true /*requireSellLink*/);
-			return start - end; //Should be just 1 if you do the algebra
+			return this.sellInternal(model, end, true /*requireSellLink*/);
 		}
 	},
 
