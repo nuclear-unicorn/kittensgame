@@ -3967,13 +3967,6 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			type: "fixed",
 			value: resConsumption
 		});
-		
-		stack.push({
-			name: $I("res.stack.demand"),
-			type: "fixed",
-			value: resConsumption
-		});
-
 
 		// BIOME EXPLORATION
 		if (res.name == "manpower"){
