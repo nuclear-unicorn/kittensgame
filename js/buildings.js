@@ -3388,6 +3388,13 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 
 		var groups = dojo.clone(this.game.bld.buildingGroups, true);
 
+		//This is a semi-hacky way to modify buildingGroups at runtime.
+		//We're technically modifying a deep copy of it.
+		if (this.game.workshop.get("energyRifts").researched) {
+			var storageGroup = this.game.bld.getMeta("storage", groups);
+			storageGroup.buildings.push("accelerator");
+		}
+
 		//non-group filters
 		if (this.game.ironWill && this.game.libraryTab.visible){
 			groups.unshift({
