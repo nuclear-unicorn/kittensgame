@@ -1634,6 +1634,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			var capRatio = 0;
 			if (game.workshop.get("energyRifts").researched){
 				capRatio = (1 + game.getEffect("acceleratorRatio"));
+				self.description = $I("buildings.accelerator.desc") + "<br>" + $I("buildings.accelerator.desc2");
+			} else {
+				self.description = $I("buildings.accelerator.desc");
 			}
 
 			self.effects["catnipMax"]   = 30000 * capRatio;
