@@ -2822,6 +2822,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 		// Calculate effects (needs to be done after all managers and save data are loaded)
 		this.calculateAllEffects();
+		this.resPool.updateMaxValueAll();
 		//------------------------------------
 
 		this.villageTab.visible = this.villageTab.evaluateLocks();
