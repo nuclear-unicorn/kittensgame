@@ -989,6 +989,9 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	},
 
 	save: function(saveData){
+		saveData.resources = this.filterMetadata(
+			this.resources, ["name", "value", "unlocked", "isHidden", "isHiddenFromCrafting"]
+		);
 		saveData.res = {
 			isLocked: this.isLocked,
 			showHiddenResources: this.showHiddenResources || undefined
