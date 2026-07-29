@@ -203,6 +203,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		}
 	},
 
+	//Use getBuildingGroups if you want a metadata array which is updated based on game-state.
 	buildingGroups: [{
 		name: "food",
 		title: $I("buildings.group.food"),
@@ -1639,6 +1640,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			var capRatio = 0;
 			if (game.workshop.get("energyRifts").researched){
 				capRatio = (1 + game.getEffect("acceleratorRatio"));
+				self.description = $I("buildings.accelerator.desc") + "<br>" + $I("buildings.accelerator.desc2");
+			} else {
+				self.description = $I("buildings.accelerator.desc");
 			}
 
 			self.effects["catnipMax"]   = 30000 * capRatio;
@@ -2367,6 +2371,65 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
             }
         }
     },
+
+	/**
+	 * Returns a deep copy of all building groups.
+	 * @param {boolean} includeNonGroupFilters If enabled, includes extra things like "IW", "Togglable", "All", etc.
+	 * 			The UI code treats these as special building groups for the sake of player convenience.
+	 * @return An array of buildingGroup objects, which have 3 fields: name (string), title (string), buildings (array of strings)
+	 */
+	getBuildingGroups: function(includeNonGroupFilters) {
+		var game = this.game;
+		var groupsArr = [];
+
+		//See renderActiveGroup for how these are handled, since their buildings arrays are empty.
+		if (includeNonGroupFilters) {
+			groupsArr.push({
+				name: "all",
+				title: $I("ui.filter.all"),
+				buildings: []
+			});
+			groupsArr.push({
+				name: "available",
+				title: $I("ui.filter.available"),
+				buildings: []
+			});
+			groupsArr.push({
+				name: "allEnabled",
+				title: $I("ui.filter.enabled"),
+				buildings: []
+			});
+			groupsArr.push({
+				name: "togglable",
+				title: $I("ui.filter.togglable"),
+				buildings: []
+			});
+
+			if (game.ironWill && game.libraryTab.visible) {
+				groupsArr.push({
+					name: "iw",
+					title: $I("ui.filter.ironWill"),
+					buildings: []
+				});
+			}
+		}
+
+		//Now, deep-copy this.buildingGroups into groupsArr:
+		this.buildingGroups.forEach(function(bldGroup) {
+			groupsArr.push({
+				name: bldGroup.name,
+				title: bldGroup.title,
+				buildings: bldGroup.buildings.slice() //Shallow-copy array
+			});
+		});
+
+		//Apply modifications at runtime such as upgrades which give buildings dual purpose:
+		if (game.workshop.get("energyRifts").researched) {
+			var storageGroup = this.getMeta("storage", groupsArr);
+			storageGroup.buildings.push("accelerator");
+		}
+		return groupsArr;
+	},
 	getAutoProductionRatio: function() {
 		var autoProdRatio = 1;
 
@@ -3442,36 +3505,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 			className: "bldTopContainer"
 		}, content);
 
-		var groups = dojo.clone(this.game.bld.buildingGroups, true);
-
-		//non-group filters
-		if (this.game.ironWill && this.game.libraryTab.visible){
-			groups.unshift({
-				name: "iw",
-				title: "IW",
-				buildings: []
-			});
-		}
-		groups.unshift({
-			name: "togglable",
-			title: $I("ui.filter.togglable"),
-			buildings: []
-		});
-		groups.unshift({
-			name: "allEnabled",
-			title: $I("ui.filter.enabled"),
-			buildings: []
-		});
-		groups.unshift({
-			name: "available",
-			title: $I("ui.filter.available"),
-			buildings: []
-		});
-		groups.unshift({
-			name: "all",
-			title: $I("ui.filter.all"),
-			buildings: []
-		});
+		var groups = this.game.bld.getBuildingGroups(true /*includeNonGroupFilters*/);
 
 		if (!this.activeGroup){
 			this.activeGroup = groups[0].name;

@@ -2576,10 +2576,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.ticksBeforeSave = this.autosaveFrequency;
 
 		var saveData = {
-			saveVersion: this.saveVersion,
-			resources: this.resPool.filterMetadata(
-				this.resPool.resources, ["name", "value", "unlocked", "isHidden", "isHiddenFromCrafting"]
-			)
+			saveVersion: this.saveVersion
 		};
 
 		this.server.save(saveData);
@@ -2589,9 +2586,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.console.save(saveData);
 		this.telemetry.save(saveData);
 
-        for (var i in this.managers){
-            this.managers[i].save(saveData);
-        }
+		for (var i in this.managers){
+			this.managers[i].save(saveData);
+		}
 
 		saveData.game = {
 			isCMBREnabled: this.isCMBREnabled,
@@ -2825,6 +2822,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 		// Calculate effects (needs to be done after all managers and save data are loaded)
 		this.calculateAllEffects();
+		this.resPool.updateMaxValueAll();
 		//------------------------------------
 
 		this.villageTab.visible = this.villageTab.evaluateLocks();

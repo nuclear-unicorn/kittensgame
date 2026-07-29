@@ -139,6 +139,7 @@
     "buildings.academy.flavor": "Curiosity is the basis of science. Our cats died nobly",
     "buildings.accelerator.label": "Accelerator",
     "buildings.accelerator.desc": "Converts titanium to the uranium (sic)",
+    "buildings.accelerator.desc2": "Storage bonuses remain effective even if powered off.",
     "buildings.accelerator.flavor": "Large Catron Collider",
     "buildings.aicore.label": "AI Core",
     "buildings.aicore.desc": "FelineOS, a state of the art artificial intelligence. Absolutely harmless. Every level of upgrade will increase Core energy consumption by 75%.",
@@ -1876,6 +1877,7 @@
     "ui.filter.all": "All",
     "ui.filter.available": "Available",
     "ui.filter.enabled": "Enabled",
+    "ui.filter.ironWill": "IW",
     "ui.filter.togglable": "Togglable",
 
     "ui.kgnet.login": "Log in",
