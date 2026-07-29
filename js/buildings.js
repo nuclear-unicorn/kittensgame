@@ -3281,7 +3281,7 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 	getName: function(model) {
 		var formattedName = this.inherited(arguments);
 		if (this.getIsNextStageUnlocked(model)) {
-			formattedName = "<div class=\"upgrade-available\">(!)</div>" + formattedName;
+			formattedName = $I("common.upgrade.available") + formattedName;
 		}
 		return formattedName;
 	},

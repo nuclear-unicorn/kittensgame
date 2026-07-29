@@ -385,6 +385,7 @@
     "common.collapse.all": "Collapse all",
     "common.expand.all": "Expand all",
     "common.warning": "<span class='genericWarning'>(!)</span>",
+    "common.upgrade.available": "<div class=\"upgrade-available\">(^)</div>",
 
     "cycle.effects.title": "Cycle Effects",
     "cycle.effects.festival.title": "Cycle Festival Effects:",
