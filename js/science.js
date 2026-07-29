@@ -685,6 +685,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		effectDesc: $I("science.antimatter.effectDesc"),
 		prices: [
 			{name : "science", val: 500000},
+			{name : "antimatter", val: 1},
 			{name : "relic",   val: 1}
 		],
 		unlocks: {

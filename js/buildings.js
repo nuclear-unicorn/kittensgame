@@ -417,7 +417,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				description: $I("buildings.hydroplant.desc") ,
 				prices: [
 					{ name : "titanium", val: 2500 },
-					{ name : "concrate", val: 100 }
+					{ name : "concrate", val: 100 },
+					{ name : "gear", val: 5 }
 				],
 				priceRatio: 1.15,
 				effects: {
@@ -2709,7 +2710,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	load: function(saveData){
 		this.groupBuildings = saveData.bldData ? saveData.bldData.groupBuildings : false;
 		this.twoRows = saveData.bldData ? saveData.bldData.twoRows : false;
-		this.loadMetadata(this.buildingsData, saveData.buildings);
+		this.loadMetadata(this.buildingsData, saveData.buildings, "buildings");
 		this.cathPollution = saveData.cathPollution|| 0;
 		this.calculatePollutionEffects();
 	},
@@ -3256,6 +3257,15 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 		return model;
 	},
 
+	/**
+	 * Checks to see if the next higher stage for this building is unlocked.
+	 * If we are at the highest stage already, returns false.
+	 */
+	getIsNextStageUnlocked: function(model) {
+		return model.metadata.stage < model.metadata.stages.length - 1 &&
+			model.metadata.stages[model.metadata.stage + 1].stageUnlocked;
+	},
+
 	getEffects: function(model){
 		var effects = model.metadata.effects;
 		var currentStage = model.metadata.stages[model.metadata.stage];
@@ -3299,13 +3309,24 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 		return stageLinks;
 	},
 
-	getDescription: function(model){
-		if (model.metadata.stages){
-			description = model.metaAccessor.meta.stages[model.metaAccessor.meta.stage].description;
-			return typeof(description) != "undefined" ? description : "";
+	getName: function(model) {
+		var formattedName = this.inherited(arguments);
+		if (this.getIsNextStageUnlocked(model)) {
+			formattedName = $I("common.upgrade.available") + formattedName;
 		}
-		var description = model.metadata.description;
-		return typeof(description) != "undefined" ? description : "";
+		return formattedName;
+	},
+
+	getDescription: function(model){
+		var description = model.metadata.stages ? model.metaAccessor.meta.stages[model.metaAccessor.meta.stage].description : model.metadata.description;
+		if (typeof(description) === "undefined") {
+			description = "";
+		}
+		if (this.getIsNextStageUnlocked(model)) {
+			var nextStageLabel = model.metadata.stages[model.metadata.stage + 1].label;
+			description = "<div class=\"upgrade-available\">" + $I("buildings.upgrade.desc.available", [nextStageLabel]) + "</div>" + description;
+		}
+		return description;
 	},
 
 	handleToggleAutomationLinkClick: function(model) {
@@ -3317,22 +3338,26 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 
 
 	downgrade: function(model) {
-		if (this.game.opts.noConfirm) {
+		if (model.metaAccessor.meta.val == 0 || this.game.opts.noConfirm) {
 			this.deltagrade(model, -1);
 		} else {
 			var self = this;
-			this.game.ui.confirm("", $I("buildings.downgrade.confirmation.msg"), function() {
+			var confirmMsg = $I("buildings.downgrade.confirmation.msg") + "\n\n" +
+				$I("buildings.deltagrade.refund.msg", [this.game.toDisplayPercentage(model.refundPercentage) + "%"]);
+			this.game.ui.confirm("", confirmMsg, function() {
 				self.deltagrade.apply(self, [model, -1]);
 			});
 		}
 	},
 
 	upgrade: function(model) {
-		if (this.game.opts.noConfirm) {
+		if (model.metaAccessor.meta.val == 0 || this.game.opts.noConfirm) {
 			this.deltagrade(model, +1);
 		} else {
 			var self = this;
-			this.game.ui.confirm("", $I("buildings.upgrade.confirmation.msg"), function() {
+			var confirmMsg = $I("buildings.upgrade.confirmation.msg") + "\n\n" +
+				$I("buildings.deltagrade.refund.msg", [this.game.toDisplayPercentage(model.refundPercentage) + "%"]);
+			this.game.ui.confirm("", confirmMsg, function() {
 				self.deltagrade.apply(self, [model, +1]);
 			});
 		}

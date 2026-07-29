@@ -752,6 +752,9 @@ body.scheme_vessel {
 .scheme_vessel .tabInner.Stats table.statTable:last-of-type tr:last-child td:last-child { /* select time played value */
 	color: #358393;
 }
+.scheme_vessel .upgrade-available {
+	color: lightgreen !important;
+}
 /* ---------- Village ----------*/
 /* container 'Census' -> list of kittens in settlement tab */
 .scheme_vessel .currentLeader .name {

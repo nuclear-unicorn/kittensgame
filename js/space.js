@@ -1060,8 +1060,8 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 		}
 
 		this.hideResearched = saveData.space.hideResearched || false;
-		this.loadMetadata(this.programs, saveData.space.programs);
-		this.loadMetadata(this.planets, saveData.space.planets);
+		this.loadMetadata(this.programs, saveData.space.programs, "programs");
+		this.loadMetadata(this.planets, saveData.space.planets, "planets");
 
 		//TODO: move to some common method?
 		for (var i = this.programs.length - 1; i >= 0; i--) {

@@ -286,6 +286,11 @@ var TabManager = dojo.declare("com.nuclearunicorn.core.TabManager", Control, {
 		console.error("Could not find metadata for ", name, "in", metadata);
 	},
 
+	/**
+	 * @param {string} [metaId] A human-readable name for the metadata we're trying to load.
+	 * 				Optional parameter displayed only in error logging messages.
+	 * 				Exists for developer convenience purposes.
+	 */
 	loadMetadata: function(meta, saveMeta, metaId){
 		if (!saveMeta){
 			console.trace();
@@ -310,7 +315,7 @@ var TabManager = dojo.declare("com.nuclearunicorn.core.TabManager", Control, {
 					}
 					if (savedMetaElem[fld] !== undefined) {
 						if (savedMetaElem[fld] != null && typeof(savedMetaElem[fld]) == "object") {
-							this.loadMetadata(elem[fld], savedMetaElem[fld]);
+							this.loadMetadata(elem[fld], savedMetaElem[fld], metaId + "." + fld);
 						} else {
 							elem[fld] = savedMetaElem[fld];
 						}
@@ -1115,8 +1120,11 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		}
 	},
 
-	//Fast access snippet to create button links like "on", "off", "sell", etc.
-	addLink: function(linkModel) {
+	/**
+	 * Fast access snippet to create button links like "on", "off", "sell", etc.
+	 * @param {function} [tooltipHtmlProvider] Optional.  If provided, this link will have its own tooltip.
+	 */
+	addLink: function(linkModel, tooltipHtmlProvider) {
 
 		var longTitleClass = (linkModel.title.length > 4) ? "small" : "";
 		var link = dojo.create("a", {
@@ -1147,6 +1155,10 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		}, linkModel.handler));
 
 		dojo.place(link, this.buttonContent);
+
+		if (tooltipHtmlProvider) {
+			UIUtils.attachTooltip(this.game, link, 0, 300, tooltipHtmlProvider);
+		}
 
 		return {
 			link: link,
@@ -1440,6 +1452,29 @@ var ButtonModernController = dojo.declare("com.nuclearunicorn.game.ui.ButtonMode
 });
 
 var ButtonModernHelper = {
+	getSellTooltip: function(game, model) {
+		var tooltip = dojo.create("div", { className: "tooltip-inner" }, null);
+		dojo.create("div", {
+			innerHTML: $I("btn.sell.tooltip", [game.toDisplayPercentage(model.refundPercentage) +"%"]),
+			className: "desc"
+		}, tooltip);
+
+		//Enumerate which prices cannot be refunded
+		if (Array.isArray(model.prices)) {
+			model.prices.forEach(function(price) {
+				var res = game.resPool.get(price.name);
+				if (price.isTemporary || !res.isRefundable(game)) {
+					dojo.create("div", {
+						className: "desc small",
+						innerHTML: $I("btn.sell.res.not.refundable", [res.title])
+					}, tooltip);
+				}
+			});
+		}
+
+		return tooltip.outerHTML;
+	},
+
 	getTooltipHTML : function(controller, model){
 		//Some aspects of the metadata may have changed, so fetch the latest version of the model:
 		model = controller.fetchModel(model.options);
@@ -1844,6 +1879,9 @@ var BuildingBtnController = dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn
 
 		var start = building.val;
 		var end = building.val - 1;
+		if (event.ctrlKey || event.metaKey /*osx tears*/) {
+			end = Math.max(0, building.val - (this.game.opts.batchSize || 10));
+		}
 		if (end > 0 && event && event.shiftKey) { //no need to confirm if selling just 1
 			end = 0;
 			if (this.game.opts.noConfirm) {
@@ -1858,8 +1896,7 @@ var BuildingBtnController = dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn
 				return amtSold;
 			}
 		} else if (end >= 0) {
-			this.sellInternal(model, end, true /*requireSellLink*/);
-			return start - end; //Should be just 1 if you do the algebra
+			return this.sellInternal(model, end, true /*requireSellLink*/);
 		}
 	},
 
@@ -1949,7 +1986,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 					handler: function(event) {
 						this.sell(event);
 					}
-				});
+				}, dojo.partial(ButtonModernHelper.getSellTooltip, this.game, this.model));
 				//var sellLinkAdded = true;
 				dojo.addClass(this.domNode, "hasSellLink");
 			}
@@ -2710,7 +2747,8 @@ var UIUtils = {
 		var gameNode = dojo.byId("game");
 		var tooltip = dojo.byId("tooltip");
 
-		var showTooltip = function () {
+		var showTooltip = function (e) {
+			e.stopPropagation();
 			game.tooltipUpdateFunc = function(){
 				tooltip.innerHTML = dojo.hitch(game, htmlProvider)();
 			};

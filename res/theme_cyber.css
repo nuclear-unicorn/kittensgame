@@ -807,6 +807,9 @@
 .scheme_cyber .container.trade-race a[title='Pinned']:hover {
 	color: #00e26e;
 }
+.scheme_cyber .upgrade-available {
+	color: #00e26e !important;
+}
 /* .scheme_cyber .btn.explore { */
     /* default margin-right: 9px; */
 /* } */

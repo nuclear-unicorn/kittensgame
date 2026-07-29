@@ -542,7 +542,7 @@ dojo.declare("classes.managers.ChallengesManager", com.nuclearunicorn.core.TabMa
 			return;
 		}
 
-		this.loadMetadata(this.challenges, saveData.challenges.challenges);
+		this.loadMetadata(this.challenges, saveData.challenges.challenges, "challenges");
 
 		//legacy saves compatibility mode
 		var currentChallenge = saveData.challenges.currentChallenge;

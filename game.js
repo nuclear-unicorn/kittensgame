@@ -5369,22 +5369,23 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				cryptoPrice: this.calendar.cryptoPrice
 			},
 			challenges: {
-				challenges: this.challenges.challenges,
+				challenges: this.challenges.filterMetadata(this.challenges.challenges, [ "name",
+					"researched" /*deprecated, but still kept in savefile for some reason*/,
+					"on", "unlocked", "active" ]),
 				reserves: reservesSaveData
 			},
 			diplomacy: {
 				races: []
 			},
-			prestige: {
-				perks: this.prestige.perks
-			},
+			prestige: lsData.prestige,
 			religion: {
 				transcendenceTier: this.religion.transcendenceTier,
 				faithRatio: faithRatio,
 				activeHolyGenocide: this.religion.getTU("holyGenocide").on,
 				zu: [],
 				ru: [],
-				tu: this.religion.filterMetadata(this.religion.transcendenceUpgrades, ["name", "val", "on", "unlocked"])
+				tu: this.religion.filterMetadata(this.religion.transcendenceUpgrades, ["name", "val", "on", "unlocked"]),
+				pact: []
 			},
 			science: {
 				hideResearched: this.science.hideResearched,
@@ -5434,7 +5435,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		};
 
 		if (anachronomancy.researched){
-			saveData.science.techs.push(this.science.get("chronophysics"));
+			var chronophysicsTech = this.science.get("chronophysics");
+			saveData.science.techs.push({
+				name: chronophysicsTech.name,
+				unlocked: chronophysicsTech.unlocked,
+				researched: chronophysicsTech.researched
+			});
 		}
 
 		var preparedSaveData = this._prepareSaveData(saveData);
