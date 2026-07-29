@@ -1415,9 +1415,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"woodRatio" : 0
 		},
 		calculateEffects: function(self, game){
-			var woodRatio = 0.1 + game.getEffect("lumberMillRatio") * 0.1;
-			self.effects["woodRatio"] = woodRatio;
-			self.description = $I("buildings.lumberMill.desc.parameterized", [game.toDisplayPercentage(woodRatio) + "%"]);
+			self.effects["woodRatio"] = 0.1 + game.getEffect("lumberMillRatio") * 0.1;
 		},
 		flavor: $I("buildings.lumberMill.flavor")
 	},
@@ -3313,7 +3311,8 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 			this.deltagrade(model, -1);
 		} else {
 			var self = this;
-			var confirmMsg = $I("buildings.downgrade.confirmation.msg", [this.game.toDisplayPercentage(model.refundPercentage) + "%"]);
+			var confirmMsg = $I("buildings.downgrade.confirmation.msg") + "\n\n" +
+				$I("buildings.deltagrade.refund.msg", [this.game.toDisplayPercentage(model.refundPercentage) + "%"]);
 			this.game.ui.confirm("", confirmMsg, function() {
 				self.deltagrade.apply(self, [model, -1]);
 			});
@@ -3325,7 +3324,8 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 			this.deltagrade(model, +1);
 		} else {
 			var self = this;
-			var confirmMsg = $I("buildings.upgrade.confirmation.msg", [this.game.toDisplayPercentage(model.refundPercentage) + "%"]);
+			var confirmMsg = $I("buildings.upgrade.confirmation.msg") + "\n\n" +
+				$I("buildings.deltagrade.refund.msg", [this.game.toDisplayPercentage(model.refundPercentage) + "%"]);
 			this.game.ui.confirm("", confirmMsg, function() {
 				self.deltagrade.apply(self, [model, +1]);
 			});
