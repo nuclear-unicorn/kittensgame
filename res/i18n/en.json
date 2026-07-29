@@ -1872,6 +1872,7 @@
     "ui.filter.all": "All",
     "ui.filter.available": "Available",
     "ui.filter.enabled": "Enabled",
+    "ui.filter.ironWill": "IW",
     "ui.filter.togglable": "Togglable",
 
     "ui.kgnet.login": "Log in",
