@@ -2434,6 +2434,7 @@
     "workshop.orbitalGeodesy.desc": "采石场现在将提供少量铀",
     "workshop.oxidation.label": "氧化反应",
     "workshop.oxidation.desc": "煅烧炉的铁生产效率增至 2 倍，钛生产效率增至 4 倍",
+    "workshop.petri.desc": "每个生物实验室略微提升概要工艺制作效率",
     "workshop.photolithography.label": "光刻机",
     "workshop.photolithography.desc": "印刷机效率增至 4 倍",
     "workshop.photovoltaic.label": "光伏电池",
