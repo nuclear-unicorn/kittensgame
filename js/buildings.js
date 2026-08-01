@@ -1030,8 +1030,298 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			self.togglable = game.science.get("ecology").researched;
 		},
 		flavor : $I("buildings.quarry.flavor")
+	},{
+		name: "lumberMill",
+		label: $I("buildings.lumberMill.label"),
+		description: $I("buildings.lumberMill.desc"),
+		unlockRatio: 0.3,
+		prices: [
+			{name : "wood", val: 100},
+			{name : "minerals", val: 250},
+			{name : "iron", val: 50}
+		],
+		priceRatio: 1.15,
+		effects: {
+			"woodRatio" : 0
+		},
+		calculateEffects: function(self, game){
+			self.effects["woodRatio"] = 0.1 + game.getEffect("lumberMillRatio") * 0.1;
+		},
+		flavor: $I("buildings.lumberMill.flavor")
+	},{
+		name: "oilWell",
+		label: $I("buildings.oilWell.label"),
+		description: $I("buildings.oilWell.desc"),
+		prices: [
+			{name : "steel", val: 50},
+			{name : "gear",  val: 25},
+			{name : "scaffold", val: 25}
+		],
+		priceRatio: 1.15,
+		effects: {
+			"oilPerTickBase" : 0.02,
+			"oilMax" : 1500,
+			"energyConsumption": 0,
+			"cathPollutionPerTickProd": 0
+		},
+		isAutomationEnabled: null,
+		calculateEffects: function(self, game) {
+			//The upgrade that optionally increases oil prod at the cost of energy:
+			var hasPumpjack = game.workshop.get("pumpjack").researched;
+			self.togglable = hasPumpjack;
+
+			if (hasPumpjack) {
+				self.description = $I("buildings.oilWell.desc") + "<br>" + $I("buildings.oilWell.desc.automation");
+				if (self.isAutomationEnabled == null) { //force non-null value
+					self.isAutomationEnabled = true;
+				}
+			} else {
+				self.description = $I("buildings.oilWell.desc");
+				self.isAutomationEnabled = null;
+			}
+
+			var oilRatio = 1 + game.getEffect("oilWellRatio");
+			if (self.isAutomationEnabled == false) {
+				oilRatio -= game.workshop.get("pumpjack").effects["oilWellRatio"];
+			}
+			self.effects["oilPerTickBase"] = 0.02 * oilRatio;
+
+			self.effects["energyConsumption"] = self.isAutomationEnabled
+				? 1 : 0;
+			self.effects["cathPollutionPerTickProd"] = self.isAutomationEnabled
+				? 1 : 0;
+		},
+		flavor: $I("buildings.oilWell.flavor"),
+		unlockScheme: {
+			name: "oil",
+			threshold: 73
+		}
+	},{
+		name: "accelerator",
+		label: $I("buildings.accelerator.label"),
+		description: $I("buildings.accelerator.desc"),
+		prices: [
+			{ name : "titanium",    val: 7500 },
+			{ name : "uranium",   	val: 25   },
+			{ name : "concrate",    val: 125  }
+		],
+		priceRatio: 1.15,
+		effects: {
+			"titaniumPerTickCon" : -0.015,
+			"uraniumPerTickAutoprod" : 0.0025,
+			"catnipMax": 0,
+			"woodMax": 0,
+			"mineralsMax": 0,
+			"coalMax": 0,
+			"ironMax": 0,
+			"titaniumMax": 0,
+			"goldMax": 0,
+			"scienceMax": 0,
+			"energyConsumption": 0
+		},
+		calculateEffects: function(self, game){
+			self.effects["energyConsumption"] = 2;
+
+			self.effects["scienceMax"] = 0;
+			if (game.workshop.get("lhc").researched){
+				self.effects["scienceMax"] = 2500;
+			}
+
+			//------------- limit upgrades ------------
+			var capRatio = 0;
+			if (game.workshop.get("energyRifts").researched){
+				capRatio = (1 + game.getEffect("acceleratorRatio"));
+				self.description = $I("buildings.accelerator.desc") + "<br>" + $I("buildings.accelerator.desc2");
+			} else {
+				self.description = $I("buildings.accelerator.desc");
+			}
+
+			self.effects["catnipMax"]   = 30000 * capRatio;
+			self.effects["woodMax"]     = 20000 * capRatio;
+			self.effects["mineralsMax"] = 25000 * capRatio;
+			self.effects["coalMax"]     =  2500 * capRatio;
+			self.effects["ironMax"]     =  7500 * capRatio;
+			self.effects["titaniumMax"] =   750 * capRatio;
+			self.effects["goldMax"]     =   250 * capRatio;
+		},
+		lackResConvert: false,
+		action: function(self, game){
+			// TODO: How to integrate autoProdRatio with calculateEffects?
+
+			self.effects["titaniumPerTickCon"] = -0.015;
+			self.effects["uraniumPerTickAutoprod"] = 0.0025;
+
+			var amt = game.resPool.getAmtDependsOnStock(
+				[{res: "titanium", amt: -self.effects["titaniumPerTickCon"]}],
+				self.on
+			);
+			self.effects["titaniumPerTickCon"] *= amt;
+			self.effects["uraniumPerTickAutoprod"] *= amt;
+
+			return amt;
+		},
+		flavor: $I("buildings.accelerator.flavor")
 	},
+	//-------------------------- Industry (power generation & metal processing) -------------------------------
 	{
+		name: "steamworks",
+		label: $I("buildings.steamworks.label"),
+		description: $I("buildings.steamworks.desc"),
+		prices: [
+			{ name : "steel", val: 65 },
+			{ name : "gear",  val: 20 },
+			{ name : "blueprint",  val: 1 }
+		],
+		priceRatio: 1.25,
+		effects: {
+			"coalRatioGlobal" : 0,
+			"manuscriptPerTickProd": 0,
+			"energyProduction": 1,
+			"magnetoBoostRatio": 0.15,
+			"cathPollutionPerTickProd": 1
+		},
+		calculateEffects: function(self, game){
+			self.effects["coalRatioGlobal"] = -0.8 + game.getEffect("coalRatioGlobalReduction");
+
+			var amt = 0;
+			if (game.workshop.get("printingPress").researched){
+				amt = 0.0005;						// 2 per year per SW
+
+				if (game.workshop.get("offsetPress").researched){
+					amt *= 4;
+				}
+				if (game.workshop.get("photolithography").researched){
+					amt *= 4;
+				}
+			}
+			self.effects["manuscriptPerTickProd"] = amt;
+			self.effects["magnetoBoostRatio"] = 0.15 + game.getEffect("magnetoBoostBonusPolicy");
+
+			//Update description to explain what automation does:
+			if (game.workshop.get("factoryAutomation").researched) {
+				self.description = $I("buildings.steamworks.desc") + "<br>" + $I("buildings.steamworks.desc.automation");
+			} else {
+				self.description = $I("buildings.steamworks.desc");
+			}
+		},
+		jammed: false,
+		togglableOnOff: true,
+		isAutomationEnabled: null,
+		action: function(self, game) {
+			if (game.workshop.get("factoryAutomation").researched) {
+				if (self.isAutomationEnabled == null) { //force non-null value
+					self.isAutomationEnabled = true;
+				}
+			} else {
+				self.isAutomationEnabled = null;
+				return;
+			}
+			if (self.on < 1 || self.jammed) {
+				return;
+			}
+
+			var wood = game.resPool.get("wood");
+			var minerals = game.resPool.get("minerals");
+			var iron = game.resPool.get("iron");
+
+			if (wood.maxValue == 0 || minerals.maxValue == 0) {
+				// Hack to prevent factory automation from starting
+				// when the page is first loaded, before caps are
+				return;
+			}
+
+			var baseAutomationRate = 0.02;
+			// Cap automation at 90% of resource cap to prevent trying to craft more than you have
+			var automationRate = Math.min(baseAutomationRate * (self.on + 1), 0.9);
+
+			var newCrafter = function(consumedResource, craftedResourceName, isAllowed) {
+				var consumedQuantity = consumedResource.value * automationRate;
+				return {
+					numberOfCrafts: isAllowed && consumedResource.value >= consumedResource.maxValue * (1 - baseAutomationRate)
+						? Math.max(0, Math.floor(consumedQuantity / game.workshop.getCraft(craftedResourceName).prices[0].val))
+						: 0,
+					craft: function() {
+						if (this.numberOfCrafts > 0) {
+							game.workshop.craft(craftedResourceName, this.numberOfCrafts, true /*suppressUndo*/);
+							// Automated production, metallurgist leader won't help here
+							game.msg($I("bld.msg.automation." + craftedResourceName + "s", [game.getDisplayValueExt(consumedQuantity), game.getDisplayValueExt(this.numberOfCrafts * (1 + game.getCraftRatio()))]), null, "workshopAutomation", true);
+						}
+					}
+				};
+			};
+
+			var beamCrafter = newCrafter(wood, "beam", true);
+			var slabCrafter = newCrafter(minerals, "slab", true);
+			var plateCrafter = newCrafter(iron, "plate", game.workshop.get("pneumaticPress").researched);
+
+			if (beamCrafter.numberOfCrafts == 0 && slabCrafter.numberOfCrafts == 0 && plateCrafter.numberOfCrafts == 0) {
+				return;
+			}
+
+			//Jam until next year
+			self.jammed = true;
+
+			if (!self.isAutomationEnabled) {
+				game.msg($I("bld.msg.automation.skip"), null, "workshopAutomation");
+				return;
+			}
+
+			beamCrafter.craft();
+			slabCrafter.craft();
+			plateCrafter.craft();
+			game.msg($I("bld.msg.automation"), null, "workshopAutomation");
+		},
+		flavor: $I("buildings.steamworks.flavor")
+	},{
+		name: "magneto",
+		label: $I("buildings.magneto.label"),
+		description: $I("buildings.magneto.desc"),
+		prices: [
+			{ name : "gear",  val: 5 },
+			{ name : "alloy", val: 10 },
+			{ name : "blueprint",  val: 1 }
+		],
+		priceRatio: 1.25,
+		effects: {
+			"oilPerTick" : -0.05,
+			"energyProduction" : 5,
+			"magnetoRatio": 0.02,
+			"cathPollutionPerTickProd": 5
+		},
+		calculateEffects: function(self, game) {
+			var maxPhantoms = self.getMaxPhantoms(self, game);
+			if (maxPhantoms > 0) {
+				self.description = $I("buildings.magneto.desc") + "<br>" + $I("buildings.magneto.phantoms", [maxPhantoms]);
+			} else {
+				self.description = $I("buildings.magneto.desc");
+			}
+		},
+		action: function(self, game){
+			var oil = game.resPool.get("oil");
+			if (oil.value + self.effects["oilPerTick"] <= 0){
+				self.on--;//Turn off one per tick until oil flow is sufficient
+			}
+		},
+		getMaxPhantoms: function(self, game) {
+			var hydroPlant = game.bld.getBuildingExt("aqueduct").meta;
+			if (hydroPlant.stage == 1 && game.science.getPolicy("lizardRelationsEcologists").researched) {
+				return Math.floor(Math.min(hydroPlant.on / 3, self.val * 0.8));
+			}
+			//Else, policy isn't active
+			return 0;
+		},
+		//Phantom Magnetos contribute to production bonus without consuming resources or producing pollution.
+		//Maybe this was a bad name.  They're not like phantom Tradeposts.
+		//These ones have to be built & turned off.
+		getPhantomMagnetos: function(self, game) {
+			if (self.on == 0) {
+				//At least 1 real Magneto must be on to benefit from phantoms.
+				return 0;
+			}
+			//Can't benefit from more phantoms than there are inactive Magnetos
+			return Math.min(self.getMaxPhantoms(self, game), self.val - self.on);
+		}
+	},{
 		name: "smelter",
 		label: $I("buildings.smelter.label"),
 		description: $I("buildings.smelter.desc"),
@@ -1240,264 +1530,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}
 			return amtFinal;
 		}
-	},
-	{
-		name: "steamworks",
-		label: $I("buildings.steamworks.label"),
-		description: $I("buildings.steamworks.desc"),
-		prices: [
-			{ name : "steel", val: 65 },
-			{ name : "gear",  val: 20 },
-			{ name : "blueprint",  val: 1 }
-		],
-		priceRatio: 1.25,
-		effects: {
-			"coalRatioGlobal" : 0,
-			"manuscriptPerTickProd": 0,
-			"energyProduction": 1,
-			"magnetoBoostRatio": 0.15,
-			"cathPollutionPerTickProd": 1
-		},
-		calculateEffects: function(self, game){
-			self.effects["coalRatioGlobal"] = -0.8 + game.getEffect("coalRatioGlobalReduction");
-
-			var amt = 0;
-			if (game.workshop.get("printingPress").researched){
-				amt = 0.0005;						// 2 per year per SW
-
-				if (game.workshop.get("offsetPress").researched){
-					amt *= 4;
-				}
-				if (game.workshop.get("photolithography").researched){
-					amt *= 4;
-				}
-			}
-			self.effects["manuscriptPerTickProd"] = amt;
-			self.effects["magnetoBoostRatio"] = 0.15 + game.getEffect("magnetoBoostBonusPolicy");
-
-			//Update description to explain what automation does:
-			if (game.workshop.get("factoryAutomation").researched) {
-				self.description = $I("buildings.steamworks.desc") + "<br>" + $I("buildings.steamworks.desc.automation");
-			} else {
-				self.description = $I("buildings.steamworks.desc");
-			}
-		},
-		jammed: false,
-		togglableOnOff: true,
-		isAutomationEnabled: null,
-		action: function(self, game) {
-			if (game.workshop.get("factoryAutomation").researched) {
-				if (self.isAutomationEnabled == null) { //force non-null value
-					self.isAutomationEnabled = true;
-				}
-			} else {
-				self.isAutomationEnabled = null;
-				return;
-			}
-			if (self.on < 1 || self.jammed) {
-				return;
-			}
-
-			var wood = game.resPool.get("wood");
-			var minerals = game.resPool.get("minerals");
-			var iron = game.resPool.get("iron");
-
-			if (wood.maxValue == 0 || minerals.maxValue == 0) {
-				// Hack to prevent factory automation from starting
-				// when the page is first loaded, before caps are
-				return;
-			}
-
-			var baseAutomationRate = 0.02;
-			// Cap automation at 90% of resource cap to prevent trying to craft more than you have
-			var automationRate = Math.min(baseAutomationRate * (self.on + 1), 0.9);
-
-			var newCrafter = function(consumedResource, craftedResourceName, isAllowed) {
-				var consumedQuantity = consumedResource.value * automationRate;
-				return {
-					numberOfCrafts: isAllowed && consumedResource.value >= consumedResource.maxValue * (1 - baseAutomationRate)
-						? Math.max(0, Math.floor(consumedQuantity / game.workshop.getCraft(craftedResourceName).prices[0].val))
-						: 0,
-					craft: function() {
-						if (this.numberOfCrafts > 0) {
-							game.workshop.craft(craftedResourceName, this.numberOfCrafts, true /*suppressUndo*/);
-							// Automated production, metallurgist leader won't help here
-							game.msg($I("bld.msg.automation." + craftedResourceName + "s", [game.getDisplayValueExt(consumedQuantity), game.getDisplayValueExt(this.numberOfCrafts * (1 + game.getCraftRatio()))]), null, "workshopAutomation", true);
-						}
-					}
-				};
-			};
-
-			var beamCrafter = newCrafter(wood, "beam", true);
-			var slabCrafter = newCrafter(minerals, "slab", true);
-			var plateCrafter = newCrafter(iron, "plate", game.workshop.get("pneumaticPress").researched);
-
-			if (beamCrafter.numberOfCrafts == 0 && slabCrafter.numberOfCrafts == 0 && plateCrafter.numberOfCrafts == 0) {
-				return;
-			}
-
-			//Jam until next year
-			self.jammed = true;
-
-			if (!self.isAutomationEnabled) {
-				game.msg($I("bld.msg.automation.skip"), null, "workshopAutomation");
-				return;
-			}
-
-			beamCrafter.craft();
-			slabCrafter.craft();
-			plateCrafter.craft();
-			game.msg($I("bld.msg.automation"), null, "workshopAutomation");
-		},
-		flavor: $I("buildings.steamworks.flavor")
-	},{
-		name: "magneto",
-		label: $I("buildings.magneto.label"),
-		description: $I("buildings.magneto.desc"),
-		prices: [
-			{ name : "gear",  val: 5 },
-			{ name : "alloy", val: 10 },
-			{ name : "blueprint",  val: 1 }
-		],
-		priceRatio: 1.25,
-		effects: {
-			"oilPerTick" : -0.05,
-			"energyProduction" : 5,
-			"magnetoRatio": 0.02,
-			"cathPollutionPerTickProd": 5
-		},
-		calculateEffects: function(self, game) {
-			var maxPhantoms = self.getMaxPhantoms(self, game);
-			if (maxPhantoms > 0) {
-				self.description = $I("buildings.magneto.desc") + "<br>" + $I("buildings.magneto.phantoms", [maxPhantoms]);
-			} else {
-				self.description = $I("buildings.magneto.desc");
-			}
-		},
-		action: function(self, game){
-			var oil = game.resPool.get("oil");
-			if (oil.value + self.effects["oilPerTick"] <= 0){
-				self.on--;//Turn off one per tick until oil flow is sufficient
-			}
-		},
-		getMaxPhantoms: function(self, game) {
-			var hydroPlant = game.bld.getBuildingExt("aqueduct").meta;
-			if (hydroPlant.stage == 1 && game.science.getPolicy("lizardRelationsEcologists").researched) {
-				return Math.floor(Math.min(hydroPlant.on / 3, self.val * 0.8));
-			}
-			//Else, policy isn't active
-			return 0;
-		},
-		//Phantom Magnetos contribute to production bonus without consuming resources or producing pollution.
-		//Maybe this was a bad name.  They're not like phantom Tradeposts.
-		//These ones have to be built & turned off.
-		getPhantomMagnetos: function(self, game) {
-			if (self.on == 0) {
-				//At least 1 real Magneto must be on to benefit from phantoms.
-				return 0;
-			}
-			//Can't benefit from more phantoms than there are inactive Magnetos
-			return Math.min(self.getMaxPhantoms(self, game), self.val - self.on);
-		}
-	},
-	{
-		name: "lumberMill",
-		label: $I("buildings.lumberMill.label"),
-		description: $I("buildings.lumberMill.desc"),
-		unlockRatio: 0.3,
-		prices: [
-			{name : "wood", val: 100},
-			{name : "minerals", val: 250},
-			{name : "iron", val: 50}
-		],
-		priceRatio: 1.15,
-		effects: {
-			"woodRatio" : 0
-		},
-		calculateEffects: function(self, game){
-			self.effects["woodRatio"] = 0.1 + game.getEffect("lumberMillRatio") * 0.1;
-		},
-		flavor: $I("buildings.lumberMill.flavor")
-	},
-	{
-		name: "oilWell",
-		label: $I("buildings.oilWell.label"),
-		description: $I("buildings.oilWell.desc"),
-		prices: [
-			{name : "steel", val: 50},
-			{name : "gear",  val: 25},
-			{name : "scaffold", val: 25}
-		],
-		priceRatio: 1.15,
-		effects: {
-			"oilPerTickBase" : 0.02,
-			"oilMax" : 1500,
-			"energyConsumption": 0,
-			"cathPollutionPerTickProd": 0
-		},
-		isAutomationEnabled: null,
-		calculateEffects: function(self, game) {
-			//The upgrade that optionally increases oil prod at the cost of energy:
-			var hasPumpjack = game.workshop.get("pumpjack").researched;
-			self.togglable = hasPumpjack;
-
-			if (hasPumpjack) {
-				self.description = $I("buildings.oilWell.desc") + "<br>" + $I("buildings.oilWell.desc.automation");
-				if (self.isAutomationEnabled == null) { //force non-null value
-					self.isAutomationEnabled = true;
-				}
-			} else {
-				self.description = $I("buildings.oilWell.desc");
-				self.isAutomationEnabled = null;
-			}
-
-			var oilRatio = 1 + game.getEffect("oilWellRatio");
-			if (self.isAutomationEnabled == false) {
-				oilRatio -= game.workshop.get("pumpjack").effects["oilWellRatio"];
-			}
-			self.effects["oilPerTickBase"] = 0.02 * oilRatio;
-
-			self.effects["energyConsumption"] = self.isAutomationEnabled
-				? 1 : 0;
-			self.effects["cathPollutionPerTickProd"] = self.isAutomationEnabled
-				? 1 : 0;
-		},
-		flavor: $I("buildings.oilWell.flavor"),
-		unlockScheme: {
-			name: "oil",
-			threshold: 73
-		}
-	},
-	//----------------------------------- Other ----------------------------------------
-	{
-		name: "workshop",
-		label: $I("buildings.workshop.label"),
-		description: $I("buildings.workshop.desc"),
-		defaultUnlockable: true,
-		unlockRatio: 0.0025,
-		prices: [
-			{ name : "wood", val: 100 },
-			{ name : "minerals", val: 400 }
-		],
-		priceRatio: 1.15,
-		unlocks: {
-			tabs: ["workshop"]
-		},
-		effects: {
-			"craftRatio" : 0.06	//6% for craft output
-		},
-		calculateEffects: function(self, game){
-			if (self.val) {
-				game.time.queue.unlockQueueSource("upgrades");
-				if (self.val > 1) {
-					var thePolicy = game.science.getPolicy("scientificCommunism");
-					if (!thePolicy.researched) {
-						thePolicy.blocked = true;
-					}
-				}
-			}
-		},
-		flavor: $I("buildings.workshop.flavor")
 	},{
 		name: "factory",
 		label: $I("buildings.factory.label"),
@@ -1600,206 +1632,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			self.effects["energyProduction"] = 10 * energyRatio;
 		},
 		flavor: $I("buildings.reactor.flavor")
-	},{
-		name: "accelerator",
-		label: $I("buildings.accelerator.label"),
-		description: $I("buildings.accelerator.desc"),
-		prices: [
-			{ name : "titanium",    val: 7500 },
-			{ name : "uranium",   	val: 25   },
-			{ name : "concrate",    val: 125  }
-		],
-		priceRatio: 1.15,
-		effects: {
-			"titaniumPerTickCon" : -0.015,
-			"uraniumPerTickAutoprod" : 0.0025,
-			"catnipMax": 0,
-			"woodMax": 0,
-			"mineralsMax": 0,
-			"coalMax": 0,
-			"ironMax": 0,
-			"titaniumMax": 0,
-			"goldMax": 0,
-			"scienceMax": 0,
-			"energyConsumption": 0
-		},
-		calculateEffects: function(self, game){
-			self.effects["energyConsumption"] = 2;
-
-			self.effects["scienceMax"] = 0;
-			if (game.workshop.get("lhc").researched){
-				self.effects["scienceMax"] = 2500;
-			}
-
-			//------------- limit upgrades ------------
-			var capRatio = 0;
-			if (game.workshop.get("energyRifts").researched){
-				capRatio = (1 + game.getEffect("acceleratorRatio"));
-				self.description = $I("buildings.accelerator.desc") + "<br>" + $I("buildings.accelerator.desc2");
-			} else {
-				self.description = $I("buildings.accelerator.desc");
-			}
-
-			self.effects["catnipMax"]   = 30000 * capRatio;
-			self.effects["woodMax"]     = 20000 * capRatio;
-			self.effects["mineralsMax"] = 25000 * capRatio;
-			self.effects["coalMax"]     =  2500 * capRatio;
-			self.effects["ironMax"]     =  7500 * capRatio;
-			self.effects["titaniumMax"] =   750 * capRatio;
-			self.effects["goldMax"]     =   250 * capRatio;
-		},
-		lackResConvert: false,
-		action: function(self, game){
-			// TODO: How to integrate autoProdRatio with calculateEffects?
-
-			self.effects["titaniumPerTickCon"] = -0.015;
-			self.effects["uraniumPerTickAutoprod"] = 0.0025;
-
-			var amt = game.resPool.getAmtDependsOnStock(
-				[{res: "titanium", amt: -self.effects["titaniumPerTickCon"]}],
-				self.on
-			);
-			self.effects["titaniumPerTickCon"] *= amt;
-			self.effects["uraniumPerTickAutoprod"] *= amt;
-
-			return amt;
-		},
-		flavor: $I("buildings.accelerator.flavor")
-	},
-	{
-		name: "tradepost",
-		label: $I("buildings.tradepost.label"),
-		description: $I("buildings.tradepost.desc"),
-		unlockRatio: 0.3,
-		prices: [
-			{ name : "wood", val: 500 },
-			{ name : "minerals", val: 200 },
-			{ name : "gold", val: 10 }
-		],
-		priceRatio: 1.15,
-		effects: {
-			"fursDemandRatio"   : -0.04,
-			"ivoryDemandRatio"  : -0.04,
-			"spiceDemandRatio"  : -0.04,
-			"tradeRatio" : 0.015,
-			"standingRatio": 0
-		},
-		calculateEffects: function(self, game) {
-			self.effects["standingRatio"] = game.workshop.get("caravanserai").researched ? 0.0035 : 0;
-       },
-		upgrades: {
-			challenges: ["pacifism"]
-		},
-		flavor: $I("buildings.tradepost.flavor")
-	},{
-		name: "mint",
-		label: $I("buildings.mint.label"),
-		description: $I("buildings.mint.desc"),
-		prices: [
-			{ name : "minerals", val: 5000 },
-			{ name : "gold", val: 500 },
-			{ name : "plate", val: 200 }
-		],
-		priceRatio: 1.15,
-		effects: {
-			"goldPerTickCon" : -0.005,
-			"manpowerPerTickCon" : -0.75,
-			"fursPerTickProd": 0.00875,
-			"ivoryPerTickProd": 0.0021,
-			"goldMax": 100
-		},
-		calculateEffects: function (self, game){
-			self.effects["goldMax"] = 100 * (1 + game.getEffect("warehouseRatio"));
-		},
-		lackResConvert: false,
-		action: function(self, game){
-			// TODO: How to integrate max manpower with calculateEffects?
-
-			if (self.on < 1){
-				return;
-			}
-			self.effects["goldPerTickCon"] = -0.005; //~5 smelters
-			self.effects["manpowerPerTickCon"] = -0.75;
-
-			var manpower = game.resPool.get("manpower");
-			var mpratio = (manpower.maxValue * 0.007) / 100;
-			var autocracyBonus = game.getEffect("rankLeaderBonusConversion") * ((game.village.leader) ? game.village.leader.rank : 0);
-
-			//hidden 1% boost to mints from village level
-			mpratio *= (1 + game.village.map.villageLevel * 0.005);
-			mpratio *= (1 + game.getEffect("mintRatio"));
-			self.effects["fursPerTickProd"]  = mpratio * (1 + autocracyBonus / 2) * 1.25;	//2
-			self.effects["ivoryPerTickProd"] = mpratio * (1 + autocracyBonus / 6) * 0.3 * (1 + game.getEffect("mintIvoryRatio"));	//1.5
-
-			var amt = game.resPool.getAmtDependsOnStock(
-				[{res: "gold", amt: -self.effects["goldPerTickCon"]},
-				 {res: "manpower", amt: -self.effects["manpowerPerTickCon"]}],
-				self.on
-			);
-			self.effects["goldPerTickCon"] *= amt;
-			self.effects["manpowerPerTickCon"] *= amt;
-			self.effects["fursPerTickProd"] *= amt;
-			self.effects["ivoryPerTickProd"] *= amt;
-
-			return amt;
-		},
-		unlockScheme: {
-			name: "gold",
-			threshold: 24
-		}
-	},{
-		name: "brewery",
-		label: $I("buildings.brewery.label"),
-		description: $I("buildings.brewery.desc"),
-		unlockRatio: 0.2,
-		prices: [
-			{ name : "wood", val: 1000 },
-			{ name : "culture", val: 750 },
-			{ name : "spice", val: 5 },
-			{ name : "parchment", val: 375 }
-		],
-		priceRatio: 1.5,
-		effects: {
-			"catnipPerTickCon" : -1,
-			"spicePerTickCon" : -0.1,
-			"festivalRatio" : 0.01,
-			"festivalArrivalRatio" : 0.001,
-			"manpowerRatio" : 0
-		},
-		effectsCalculated: {},
-		togglable: true,
-		lackResConvert: false,
-		calculateEffects: function(self, game){
-			self.effects = {
-				"catnipPerTickCon" : -1 * (1 + game.getEffect("breweryConsumptionRatio")),
-				"spicePerTickCon" : -0.1 * (1 + game.getEffect("breweryConsumptionRatio")),
-				"festivalRatio" : 0.01,
-				"festivalArrivalRatio" : 0.001,
-				"manpowerRatio" : game.getEffect("breweryPolicyManpowerRatio")
-			};
-			self.effectsCalculated = dojo.clone(self.effects);
-		},
-		action: function(self, game) {
-			var amt = game.resPool.getAmtDependsOnStock(
-				[{res: "catnip", amt: -self.effectsCalculated["catnipPerTickCon"]},
-				 {res: "spice", amt: -self.effectsCalculated["spicePerTickCon"]}],
-				self.on
-			);
-			self.effects["catnipPerTickCon"] = self.effectsCalculated["catnipPerTickCon"] * amt;
-			self.effects["spicePerTickCon"] = self.effectsCalculated["spicePerTickCon"] * amt;
-			self.effects["festivalRatio"] = self.effectsCalculated["festivalRatio"] * amt;
-			self.effects["festivalArrivalRatio"] = self.effectsCalculated["festivalArrivalRatio"] * amt;
-			self.effects["manpowerRatio"] = self.effectsCalculated["manpowerRatio"] * amt;
-			return amt;
-		},
-		flavor: $I("buildings.brewery.flavor"),
-		unlocks:{
-			zebraUpgrades: ["darkBrew"]
-		},
-		unlockScheme: {
-			name: "chocolate",
-			threshold: 10
-		}
 	},
 	//-------------------------- Culture -------------------------------
 	{
@@ -1993,7 +1825,118 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		flavor: $I("buildings.temple.flavor")
 	},
+	//----------------------------------- Other ----------------------------------------
 	{
+		name: "workshop",
+		label: $I("buildings.workshop.label"),
+		description: $I("buildings.workshop.desc"),
+		defaultUnlockable: true,
+		unlockRatio: 0.0025,
+		prices: [
+			{ name : "wood", val: 100 },
+			{ name : "minerals", val: 400 }
+		],
+		priceRatio: 1.15,
+		unlocks: {
+			tabs: ["workshop"]
+		},
+		effects: {
+			"craftRatio" : 0.06	//6% for craft output
+		},
+		calculateEffects: function(self, game){
+			if (self.val) {
+				game.time.queue.unlockQueueSource("upgrades");
+				if (self.val > 1) {
+					var thePolicy = game.science.getPolicy("scientificCommunism");
+					if (!thePolicy.researched) {
+						thePolicy.blocked = true;
+					}
+				}
+			}
+		},
+		flavor: $I("buildings.workshop.flavor")
+	},{
+		name: "tradepost",
+		label: $I("buildings.tradepost.label"),
+		description: $I("buildings.tradepost.desc"),
+		unlockRatio: 0.3,
+		prices: [
+			{ name : "wood", val: 500 },
+			{ name : "minerals", val: 200 },
+			{ name : "gold", val: 10 }
+		],
+		priceRatio: 1.15,
+		effects: {
+			"fursDemandRatio"   : -0.04,
+			"ivoryDemandRatio"  : -0.04,
+			"spiceDemandRatio"  : -0.04,
+			"tradeRatio" : 0.015,
+			"standingRatio": 0
+		},
+		calculateEffects: function(self, game) {
+			self.effects["standingRatio"] = game.workshop.get("caravanserai").researched ? 0.0035 : 0;
+       },
+		upgrades: {
+			challenges: ["pacifism"]
+		},
+		flavor: $I("buildings.tradepost.flavor")
+	},{
+		name: "mint",
+		label: $I("buildings.mint.label"),
+		description: $I("buildings.mint.desc"),
+		prices: [
+			{ name : "minerals", val: 5000 },
+			{ name : "gold", val: 500 },
+			{ name : "plate", val: 200 }
+		],
+		priceRatio: 1.15,
+		effects: {
+			"goldPerTickCon" : -0.005,
+			"manpowerPerTickCon" : -0.75,
+			"fursPerTickProd": 0.00875,
+			"ivoryPerTickProd": 0.0021,
+			"goldMax": 100
+		},
+		calculateEffects: function (self, game){
+			self.effects["goldMax"] = 100 * (1 + game.getEffect("warehouseRatio"));
+		},
+		lackResConvert: false,
+		action: function(self, game){
+			// TODO: How to integrate max manpower with calculateEffects?
+
+			if (self.on < 1){
+				return;
+			}
+			self.effects["goldPerTickCon"] = -0.005; //~5 smelters
+			self.effects["manpowerPerTickCon"] = -0.75;
+
+			var manpower = game.resPool.get("manpower");
+			var mpratio = (manpower.maxValue * 0.007) / 100;
+			var autocracyBonus = game.getEffect("rankLeaderBonusConversion") * ((game.village.leader) ? game.village.leader.rank : 0);
+
+			//hidden 1% boost to mints from village level
+			mpratio *= (1 + game.village.map.villageLevel * 0.005);
+			mpratio *= (1 + game.getEffect("mintRatio"));
+			self.effects["fursPerTickProd"]  = mpratio * (1 + autocracyBonus / 2) * 1.25;	//2
+			self.effects["ivoryPerTickProd"] = mpratio * (1 + autocracyBonus / 6) * 0.3 * (1 + game.getEffect("mintIvoryRatio"));	//1.5
+
+			var amt = game.resPool.getAmtDependsOnStock(
+				[{res: "gold", amt: -self.effects["goldPerTickCon"]},
+				 {res: "manpower", amt: -self.effects["manpowerPerTickCon"]}],
+				self.on
+			);
+			self.effects["goldPerTickCon"] *= amt;
+			self.effects["manpowerPerTickCon"] *= amt;
+			self.effects["fursPerTickProd"] *= amt;
+			self.effects["ivoryPerTickProd"] *= amt;
+
+			return amt;
+		},
+		unlockScheme: {
+			name: "gold",
+			threshold: 24
+		}
+	},{
 		name: "unicornPasture",
 		label: $I("buildings.unicornPasture.label"),
 		description: $I("buildings.unicornPasture.desc"),
@@ -2020,6 +1963,59 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			}
 		},
 		flavor: $I("buildings.unicornPasture.flavor")
+	},{
+		name: "brewery",
+		label: $I("buildings.brewery.label"),
+		description: $I("buildings.brewery.desc"),
+		unlockRatio: 0.2,
+		prices: [
+			{ name : "wood", val: 1000 },
+			{ name : "culture", val: 750 },
+			{ name : "spice", val: 5 },
+			{ name : "parchment", val: 375 }
+		],
+		priceRatio: 1.5,
+		effects: {
+			"catnipPerTickCon" : -1,
+			"spicePerTickCon" : -0.1,
+			"festivalRatio" : 0.01,
+			"festivalArrivalRatio" : 0.001,
+			"manpowerRatio" : 0
+		},
+		effectsCalculated: {},
+		togglable: true,
+		lackResConvert: false,
+		calculateEffects: function(self, game){
+			self.effects = {
+				"catnipPerTickCon" : -1 * (1 + game.getEffect("breweryConsumptionRatio")),
+				"spicePerTickCon" : -0.1 * (1 + game.getEffect("breweryConsumptionRatio")),
+				"festivalRatio" : 0.01,
+				"festivalArrivalRatio" : 0.001,
+				"manpowerRatio" : game.getEffect("breweryPolicyManpowerRatio")
+			};
+			self.effectsCalculated = dojo.clone(self.effects);
+		},
+		action: function(self, game) {
+			var amt = game.resPool.getAmtDependsOnStock(
+				[{res: "catnip", amt: -self.effectsCalculated["catnipPerTickCon"]},
+				 {res: "spice", amt: -self.effectsCalculated["spicePerTickCon"]}],
+				self.on
+			);
+			self.effects["catnipPerTickCon"] = self.effectsCalculated["catnipPerTickCon"] * amt;
+			self.effects["spicePerTickCon"] = self.effectsCalculated["spicePerTickCon"] * amt;
+			self.effects["festivalRatio"] = self.effectsCalculated["festivalRatio"] * amt;
+			self.effects["festivalArrivalRatio"] = self.effectsCalculated["festivalArrivalRatio"] * amt;
+			self.effects["manpowerRatio"] = self.effectsCalculated["manpowerRatio"] * amt;
+			return amt;
+		},
+		flavor: $I("buildings.brewery.flavor"),
+		unlocks:{
+			zebraUpgrades: ["darkBrew"]
+		},
+		unlockScheme: {
+			name: "chocolate",
+			threshold: 10
+		}
 	},
 	//----------------------------------- Wonders ----------------------------------------
 
@@ -2231,24 +2227,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"manpowerMax": 50,
 			"tMythrilCraftRatio" : 0.01,
 		},
-	},
-	{
-		name: "stasisPod",
-		label: $I("buildings.stasisPod.label"),
-		description: $I("buildings.stasisPod.desc"),
-		unlockRatio: 0.01,
-		 prices: [
-            { name : "tMythril", val: 1 },
-            { name : "timeCrystal", val: 2 },
-            { name : "void", val: 100 }
-        ],
-		priceRatio: 1.25,
-		zebraRequired: 1,
-		effects: {
-			"zebrasMax": 1,
-		},
-	},
-	{
+	},{
 		name: "ivoryTemple",
 		defaultUnlockable: true,
 		label: $I("buildings.ivoryTemple.label"),
@@ -2307,6 +2286,21 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			self.effects["alicornPerTickCon"] *= amt;
 			self.effects["tMythrilPerTick"] *= amt;
 		}
+	},{
+		name: "stasisPod",
+		label: $I("buildings.stasisPod.label"),
+		description: $I("buildings.stasisPod.desc"),
+		unlockRatio: 0.01,
+		prices: [
+			{ name : "tMythril", val: 1 },
+			{ name : "timeCrystal", val: 2 },
+			{ name : "void", val: 100 }
+		],
+		priceRatio: 1.25,
+		zebraRequired: 1,
+		effects: {
+			"zebrasMax": 1,
+		},
 	}
 	],
 
