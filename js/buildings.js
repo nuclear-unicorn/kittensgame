@@ -2425,6 +2425,17 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		}
 		return groupsArr;
 	},
+
+	/**
+	 * Gets a building group OR a non-group filter by name.
+	 * (Note that this function returns a deep copy of the building group in question.)
+	 * @param {string} groupName	The name of this building group OR non-group filter
+	 * @return A buildingGroup object, which has 3 fields: name (string), title (string), buildings (array of strings)
+	 */
+	getBuildingGroup: function(groupName) {
+		return this.getMeta(groupName, this.getBuildingGroups(true /*includeNonGroupFilters*/));
+	},
+
 	getAutoProductionRatio: function() {
 		var autoProdRatio = 1;
 
@@ -3454,8 +3465,13 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 		if (!this.activeGroup){
 			this.activeGroup = groups[0].name;
 		}
+		var activeGroupObj = null;
 		for (var i = 0; i < groups.length; i++){
 			var isActiveGroup = (groups[i].name == this.activeGroup);
+			if (isActiveGroup) {
+				//Remember this value; we'll use it later
+				activeGroupObj = groups[i];
+			}
 
 			var hasVisibleBldngs = false;
 			for (var j = 0; j < groups[i].buildings.length; j++){
@@ -3506,12 +3522,21 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 		var groupContainer = dojo.create("div", { className: "bldGroupContainer"}, topContainer);
 		this.groupContainer = groupContainer;
 
-		this.renderActiveGroup(groupContainer);
+		this.renderActiveGroup(groupContainer, activeGroupObj);
 
 		this.update();
 	},
 
-	renderActiveGroup: function(groupContainer){
+	/**
+	 * Creates & renders all building buttons associated with a particular building group or non-group filter.
+	 * @param groupContainer	The DOM object inside which all rendered buttons will be placed
+	 * @param activeGroup	A building group (or a non-group filter) object
+	 */
+	renderActiveGroup: function(groupContainer, activeGroup){
+		if (typeof(activeGroup) !== "object") {
+			console.error("Error in renderActiveGroup where the active group is not properly specified!");
+			return;
+		}
 
 		dojo.empty(groupContainer);
 		this.children = [];
@@ -3519,81 +3544,27 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 		this.twoRows = (this.activeGroup == "all" || this.activeGroup == "iw");
 		this.initRenderer(groupContainer);
 
-		for ( var i = 0; i < this.bldGroups.length; i++){
-			if (this.bldGroups[i].group.name != this.activeGroup){
-				if (this.activeGroup != "all" &&
-					this.activeGroup != "available" &&
-					this.activeGroup != "allEnabled" &&
-					this.activeGroup != "togglable" &&
-					this.activeGroup != "iw"){
-
-						continue;
-				}
-			}
-			if (i == 0){
-				this.addCoreBtns(groupContainer);
-			}
-
-			var group = this.bldGroups[i].group;
-
-			for (var j = 0; j < group.buildings.length; j++){
-				var bldMetaRaw = this.game.bld.get(group.buildings[j]);
-				var bld = new classes.BuildingMeta(bldMetaRaw).getMeta();
-
-				var btn = null;
-				if (typeof(bld.stages) == "object"){
-					btn = new classes.ui.btn.StagingBldBtn({
-						name: 			bld.label,
-						description: 	bld.description,
-						building: 		bld.name,
-						type:           "buildings",
-						twoRow:			this.twoRows,
-						controller: new classes.ui.btn.StagingBldBtnController(this.game)
-					}, this.game);
-				} else {
-					btn = new com.nuclearunicorn.game.ui.BuildingStackableBtn({
-						name: 			bld.label,
-						description: 	bld.description,
-						building: 		bld.name,
-						type:           "buildings",
-						twoRow:			this.twoRows,
-						controller: new classes.ui.btn.BuildingBtnModernController(this.game)
-					}, this.game);
-				}
-				var mdl = btn.controller.fetchModel(btn.opts);
-
-				if (this.activeGroup == "available") {
-					if (mdl.resourceIsLimited) {
-						continue;
-					}
-				}
-				if (this.activeGroup == "allEnabled"){
-
-					if (!mdl.enabled){
-						continue;
-					}
-				}
-				if (this.activeGroup == "togglable"){
-					if (!mdl.togglable){
-						continue;
-					}
-				}
-
-				if (this.activeGroup == "iw"){
-					if (group.name == "population"){
-						continue;
-					}
-				}
-
-				btn.update();
-				if (!mdl.visible){
-					continue;	//skip invisible buttons to not make gaps in the two rows renderer
-				}
-
-				this.addChild(btn);
-			}
+		//buildingsArr is an array of building METADATA for each building we'll render.
+		var buildingsArr;
+		var isNonGroupFilter = activeGroup.buildings.length == 0;
+		if (isNonGroupFilter) {
+			//buildingsArr is useless if it's empty, so we will use the master array of ALL buildings.
+			//The special code to filter out IW/enabled/available/etc. will come later.
+			buildingsArr = this.game.bld.buildingsData;
+		} else {
+			//Convert an array of building names into metadata:
+			buildingsArr = activeGroup.buildings.map( function(bldName) {
+				return this.game.bld.get(bldName);
+			});
 		}
 
+		//Generate all the buttons which are visible right now:
+		if (isNonGroupFilter) {
+			this.addCoreBtns(groupContainer);
+		}
+		buildingsArr.forEach(this.addBuildingBtn, this);
+
+		//We've generated all of the buttons, but we still gotta render them:
 		for (var i = 0; i < this.children.length; i++){
 			var buttonContainer = this.twoRows ?
 						this.getElementContainer(i) : groupContainer;
@@ -3601,8 +3572,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 		}
 	},
 
-	addCoreBtns: function(container){
-
+	addCoreBtns: function(){
 		var btn = new com.nuclearunicorn.game.ui.ButtonModern({
 			name:	 $I("buildings.gatherCatnip.label"),
 			controller: new classes.game.ui.GatherCatnipButtonController(this.game),
@@ -3623,6 +3593,58 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 			prices: [ { name : "catnip", val: (isEnriched ? 50 : 100) }],
 			twoRow: this.twoRows
 		}, this.game);
+		this.addChild(btn);
+	},
+
+	addBuildingBtn: function(bldMetaRaw) {
+		var bld = new classes.BuildingMeta(bldMetaRaw).getMeta();
+		var btn = null;
+		if (typeof(bld.stages) == "object"){
+			btn = new classes.ui.btn.StagingBldBtn({
+				name:        bld.label,
+				description: bld.description,
+				building:    bld.name,
+				type:        "buildings",
+				twoRow:      this.twoRows,
+				controller:  new classes.ui.btn.StagingBldBtnController(this.game)
+			}, this.game);
+		} else {
+			btn = new com.nuclearunicorn.game.ui.BuildingStackableBtn({
+				name:        bld.label,
+				description: bld.description,
+				building:    bld.name,
+				type:        "buildings",
+				twoRow:      this.twoRows,
+				controller:  new classes.ui.btn.BuildingBtnModernController(this.game)
+			}, this.game);
+		}
+		var mdl = btn.controller.fetchModel(btn.opts);
+
+		if (this.activeGroup == "available") {
+			if (mdl.resourceIsLimited) {
+				return;
+			}
+		}
+		if (this.activeGroup == "allEnabled"){
+			if (!mdl.enabled){
+				return;
+			}
+		}
+		if (this.activeGroup == "togglable"){
+			if (!mdl.togglable){
+				return;
+			}
+		}
+		if (this.activeGroup == "iw"){
+			//Skip buildings that are part of "population" group
+			if (this.game.bld.getBuildingGroup("population").buildings.includes(bldMetaRaw.name)){
+				return;
+			}
+		}
+		btn.update();
+		if (!mdl.visible){
+			return;	//skip invisible buttons to not make gaps in the two rows renderer
+		}
 		this.addChild(btn);
 	},
 
