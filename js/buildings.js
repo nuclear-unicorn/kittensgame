@@ -232,7 +232,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	{
 		name: "culture",
 		title: $I("buildings.group.culture"),
-		buildings: ["amphitheatre", "chapel", "temple"]
+		buildings: ["amphitheatre", "chapel", "temple", "ziggurat"]
 	},{
 		name: "other",
 		title: $I("buildings.group.other"),
