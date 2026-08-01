@@ -2543,9 +2543,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		}
 
 		this.hideResearched = saveData.workshop.hideResearched;
-		this.loadMetadata(this.upgrades, saveData.workshop.upgrades);
-		this.loadMetadata(this.crafts, saveData.workshop.crafts);
-		this.loadMetadata(this.zebraUpgrades, saveData.workshop.zebraUpgrades);
+		this.loadMetadata(this.upgrades, saveData.workshop.upgrades, "upgrades");
+		this.loadMetadata(this.crafts, saveData.workshop.crafts, "crafts");
+		this.loadMetadata(this.zebraUpgrades, saveData.workshop.zebraUpgrades, "zebraUpgrades");
 
 		for (var i = 0; i < this.upgrades.length; i++){
 			var upgrade = this.upgrades[i];

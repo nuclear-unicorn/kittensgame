@@ -155,6 +155,9 @@
 	color: #201F1D;
 }
 
+.scheme_dark .upgrade-available {
+	color: lightgreen !important;
+}
 .scheme_dark .tooltip-content {
 	background-color: #201F1D;
 }

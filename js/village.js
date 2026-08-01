@@ -609,6 +609,16 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		var theocracy = this.game.science.getPolicy("theocracy");
 		var happiness = this.happiness + (this.happiness - 1)
 			* this.game.getEffect("happinessKittenProductionRatio");
+
+		//Calculate effects once per village update loop
+		var _effects = {};
+		_effects["boostFromLeader"] = this.game.getEffect("boostFromLeader");
+		_effects["masterSkillMultiplier"] = this.game.getEffect("masterSkillMultiplier");
+		_effects["skillMultiplier"] = this.game.getEffect("skillMultiplier");
+
+		var boostPerRankByJob = {};			//<job>BoostPerRank, filled in on demand
+		var automationBonusByCraft = {};	//<craft>AutomationBonus, filled in on demand
+
 		for (var i in this.sim.kittens){
 			var kitten = this.sim.kittens[i];
 
@@ -625,8 +635,13 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 				if (job) {
 					// Is there a shorter path to this function? I could go from gamePage but I'm trying to keep the style consistent.
 					//TODO: move to the village manager
-					var mod = this.game.village.getValueModifierPerSkill(kitten.skills[kitten.job] || 0);
-					var rankMultiplier = 1 + this.game.getEffect(kitten.job + "BoostPerRank") * kitten.rank;
+					var mod = this.game.village.getValueModifierPerSkill(
+						kitten.skills[kitten.job] || 0, _effects["masterSkillMultiplier"], _effects["skillMultiplier"]);
+
+					if (boostPerRankByJob[kitten.job] === undefined){
+						boostPerRankByJob[kitten.job] = this.game.getEffect(kitten.job + "BoostPerRank");
+					}
+					var rankMultiplier = 1 + boostPerRankByJob[kitten.job] * kitten.rank;
 
 					for (var jobResMod in job.modifiers){
 
@@ -639,7 +654,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 							}
 							if ((!kitten.isLeader) && (this.game.village.leader)){
 								diff *= (1 + (this.getLeaderBonus(this.game.village.leader.rank) - 1)
-								* this.game.getEffect("boostFromLeader"));
+								* _effects["boostFromLeader"]);
 							}
 							diff *= happiness;	//alter positive resource production from jobs
 						}
@@ -654,8 +669,11 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 					if (job.name == "engineer" && typeof(kitten.engineerSpeciality) != "undefined" && kitten.engineerSpeciality != null) {
 						var jobResMod = "ES" + kitten.engineerSpeciality;
 
-						var automationBonus = this.game.getEffect(kitten.engineerSpeciality + "AutomationBonus") || 0;
-						var diff = 1 + automationBonus;
+						if (automationBonusByCraft[kitten.engineerSpeciality] === undefined){
+							automationBonusByCraft[kitten.engineerSpeciality] =
+								this.game.getEffect(kitten.engineerSpeciality + "AutomationBonus") || 0;
+						}
+						var diff = 1 + automationBonusByCraft[kitten.engineerSpeciality];
 
 						var rankDiff = this.game.workshop.getCraft(kitten.engineerSpeciality).tier - kitten.rank;
 						if (rankDiff > 0) {
@@ -670,7 +688,7 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 							}
 							if ((!kitten.isLeader) && (this.game.village.leader)){
 								diff *= (1 + (this.getLeaderBonus(this.game.village.leader.rank) - 1)
-								* this.game.getEffect("boostFromLeader"));
+								* _effects["boostFromLeader"]);
 							}
 							diff *= happiness;
 						}
@@ -850,10 +868,10 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			}
 
 			this.maxKittens  = saveData.village.maxKittens;
-			this.loadMetadata(this.jobs, saveData.village.jobs);
+			this.loadMetadata(this.jobs, saveData.village.jobs, "jobs");
 
 			if (saveData.village.biomes){
-				this.loadMetadata(this.map.biomes, saveData.village.biomes);
+				this.loadMetadata(this.map.biomes, saveData.village.biomes, "biomes");
 				this.map.currentBiome = saveData.village.currentBiome;
 				this.map.lastBiome = saveData.village.lastBiome;
 				//migrate old biome.level to biome.val / biome.on
@@ -1226,9 +1244,6 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			candidates.sort(function (a, b) {
 				return b.rank - a.rank;
 			});
-			var promotedKittensCount = 0;
-			var missingGoldCount = 0;
-			var missingExpCount = 0;
 			for (var i = 0; i < candidates.length; i++) {
 				var result = this.sim.promote(candidates[i].kitten, candidates[i].rank > 0 ? candidates[i].rank : undefined);
 				if (result > 0) {
@@ -1244,7 +1259,14 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		return retVal;
 	},
 
-	getValueModifierPerSkill: function(value){
+	/**
+	 * Both multipliers are required.
+	 *
+	 * @param value                  skill experience for the job being evaluated
+	 * @param masterSkillMultiplier  game.getEffect("masterSkillMultiplier")
+	 * @param skillMultiplier        game.getEffect("skillMultiplier")
+	 */
+	getValueModifierPerSkill: function(value, masterSkillMultiplier, skillMultiplier){
 		if (this.game.challenges.isActive("anarchy")) {
 			return 0;
 		}
@@ -1269,9 +1291,9 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			bonus = 0.125;
 			break;
 		default:
-			bonus = 0.1875 * (1 + this.game.getEffect("masterSkillMultiplier")); //LDR specified in challenges.js
+			bonus = 0.1875 * (1 + masterSkillMultiplier); //LDR specified in challenges.js
 		}
-		return bonus * (1 + this.game.getEffect("skillMultiplier"));
+		return bonus * (1 + skillMultiplier);
 	},
 
 	getSkillExpRange: function(value){
@@ -1707,8 +1729,9 @@ dojo.declare("com.nuclearunicorn.game.village.Kitten", null, {
 			this.color,
 			this.variety,
 			this.rarity]);
-		// Custom sur/names
-		if (nameIndex <= 0 || surnameIndex <= 0) {
+
+		// Custom sur/names. indexOf returns -1 for a name that isn't in the list;
+		if (nameIndex < 0 || surnameIndex < 0) {
 			compressedSave.name = this.name;
 			compressedSave.surname = this.surname;
 		}
@@ -5080,7 +5103,8 @@ dojo.declare("classes.ui.village.Census", null, {
 			if (skillsArr[j].name == kitten.job) {
 				style = "style='font-weight: bold'";
 
-				var mod = this.game.village.getValueModifierPerSkill(kitten.skills[kitten.job]);
+				var mod = this.game.village.getValueModifierPerSkill(kitten.skills[kitten.job],
+					this.game.getEffect("masterSkillMultiplier"), this.game.getEffect("skillMultiplier"));
 				bonus = mod > 0 && kitten.isLeader ? (this.game.village.getLeaderBonus(kitten.rank) * (mod + 1) - 1) : mod;
 
 				//TODO: move me to getFromLeaderBonus

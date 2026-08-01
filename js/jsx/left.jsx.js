@@ -162,10 +162,18 @@ WResourceRow = React.createClass({
             specialClass = " blaze";
         } else if (res.value == 666) {
             specialClass = " hail";
-        } else if (res.value == 777) {
+        } else if (res.value == 777 || res.value == 7777) {
             specialClass = " pray";
         } else if (res.value == 1337) {
             specialClass = " leet";
+        } else if (res.value == 888 || res.value == 8888) {
+            specialClass = " lucky";
+        } else if (res.value == 42) {
+            specialClass = " cosmic";
+        } else if (res.value == 69) {
+            specialClass = " nice";
+        } else if (res.value == 404) {
+            specialClass = " notfound";
         }
 
         var resLeaderBonus = "";

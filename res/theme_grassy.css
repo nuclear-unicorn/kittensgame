@@ -124,6 +124,10 @@ body.scheme_grassy {
 	background: rgba(255, 255, 255, 0.2);
 }
 
+.scheme_grassy .upgrade-available {
+	color: green;
+}
+
 .scheme_grassy .button_tooltip {
 	left: 200px;
 

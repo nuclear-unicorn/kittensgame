@@ -842,6 +842,12 @@ body.scheme_factory {
 .scheme_factory .container.trade-race .btn.modern:not(.disabled) a[title='Pinned']:hover {
 	box-shadow: inset 0 1px 3px #312005, inset 0 -1px 3px #caad82, inset 1px 0 3px #54390f, inset -1px 0 3px #54390f, 0 0 5px 3px rgba(254, 211 , 73, 0.75);
 }
+.scheme_factory .btnTitle > .upgrade-available {
+	color: #107010;
+}
+.scheme_factory .desc > .upgrade-available {
+	color: #96ce82;
+}
 .scheme_factory .btn.explore {
 	/* default margin-right: 9px; */
 	margin-top: 5px;

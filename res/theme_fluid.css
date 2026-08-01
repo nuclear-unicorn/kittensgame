@@ -603,6 +603,13 @@ body.scheme_fluid,
 	border: ridge 3px rgba(17, 138, 194, 1); /* color #118AC2; */
 	box-shadow: 2px 2px 6px #000000, 0 -1px 0 rgba(187, 192, 202, 0.6); /* color #BBC0CA */
 }
+.scheme_fluid .btnTitle > .upgrade-available,
+.scheme_fluid .desc > .upgrade-available {
+	color: #50B050;
+}
+.scheme_fluid .btn.modern:not(.disabled):hover .btnTitle > .upgrade-available {
+	color: lightgreen;
+}
 .scheme_fluid .panelContainer div.censusFilters {
 	margin-bottom: 3px; /* for add a margin under the 2 lists (select) in the settlement tab */
 }

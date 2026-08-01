@@ -584,6 +584,9 @@ body.scheme_school.with_background_image,
 .scheme_school .container.trade-race a[title='Pinned']:hover {
 	color: #5eb252;
 }
+.scheme_school .upgrade-available {
+	color: #50B050 !important;
+}
 .scheme_school .panelContainer div.censusFilters {
 	margin-bottom: 3px; /* for add a margin under the 2 lists (select) in the settlement tab */
 }

@@ -212,7 +212,10 @@ test("Anarchy Challenge--Effects should have correct values", () => {
     const village = game.village;
 
     //Helper functions:
-    const masterSkill = function() { return village.getValueModifierPerSkill(9001); };
+    const masterSkill = function() {
+        return village.getValueModifierPerSkill(9001,
+            game.getEffect("masterSkillMultiplier"), game.getEffect("skillMultiplier"));
+    };
     const calculateWhatIsRelevant = function() { game.upgrade({ challenges: ["anarchy"]}); };
 
     //Let's add 300 kittens for testing purposes:

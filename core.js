@@ -181,13 +181,30 @@ var TabManager = dojo.declare("com.nuclearunicorn.core.TabManager", Control, {
 			meta.totalEffectsCached = {};
 			//The object named "meta" is an individual item in the game.
 
-			//Populate totalEffectsCached by looping through all types of effects we know about
-			for (var effectName in this.effectsCachedExisting){
+			//Every provider ultimately reads the value out of the item's own effects,
+			//so an effect the item does not define can only ever come back as 0.
+			//Looping over the item's effects instead of every effect name the manager
+			//knows about skips ~98% of the calls for an identical result.
+			var effects = meta.effects;
+			if (meta.stages){
+				//stageable buildings swap their effects out with the active stage
+				var stage = meta.stages[meta.stage || 0];
+				if (stage && stage.effects){
+					effects = stage.effects;
+				}
+			}
+
+			//Populate totalEffectsCached by looping through the effects this item has
+			for (var effectName in effects){
+				//effects not registered on the manager were skipped before, keep skipping them
+				if (!(effectName in this.effectsCachedExisting)){
+					continue;
+				}
 				var effect;
 				if (metadata.provider){
 					effect = metadata.provider.getEffect(meta, effectName) || 0;
 				} else {
-					effect = meta.effects[effectName] || 0;
+					effect = effects[effectName] || 0;
 				}
 				if (effect != 0) { //ONLY create the entry if it matters
 					meta.totalEffectsCached[effectName] = effect;
@@ -269,6 +286,11 @@ var TabManager = dojo.declare("com.nuclearunicorn.core.TabManager", Control, {
 		console.error("Could not find metadata for ", name, "in", metadata);
 	},
 
+	/**
+	 * @param {string} [metaId] A human-readable name for the metadata we're trying to load.
+	 * 				Optional parameter displayed only in error logging messages.
+	 * 				Exists for developer convenience purposes.
+	 */
 	loadMetadata: function(meta, saveMeta, metaId){
 		if (!saveMeta){
 			console.trace();
@@ -293,7 +315,7 @@ var TabManager = dojo.declare("com.nuclearunicorn.core.TabManager", Control, {
 					}
 					if (savedMetaElem[fld] !== undefined) {
 						if (savedMetaElem[fld] != null && typeof(savedMetaElem[fld]) == "object") {
-							this.loadMetadata(elem[fld], savedMetaElem[fld]);
+							this.loadMetadata(elem[fld], savedMetaElem[fld], metaId + "." + fld);
 						} else {
 							elem[fld] = savedMetaElem[fld];
 						}
@@ -1098,8 +1120,11 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		}
 	},
 
-	//Fast access snippet to create button links like "on", "off", "sell", etc.
-	addLink: function(linkModel) {
+	/**
+	 * Fast access snippet to create button links like "on", "off", "sell", etc.
+	 * @param {function} [tooltipHtmlProvider] Optional.  If provided, this link will have its own tooltip.
+	 */
+	addLink: function(linkModel, tooltipHtmlProvider) {
 
 		var longTitleClass = (linkModel.title.length > 4) ? "small" : "";
 		var link = dojo.create("a", {
@@ -1130,6 +1155,10 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		}, linkModel.handler));
 
 		dojo.place(link, this.buttonContent);
+
+		if (tooltipHtmlProvider) {
+			UIUtils.attachTooltip(this.game, link, 0, 300, tooltipHtmlProvider);
+		}
 
 		return {
 			link: link,
@@ -1423,6 +1452,29 @@ var ButtonModernController = dojo.declare("com.nuclearunicorn.game.ui.ButtonMode
 });
 
 var ButtonModernHelper = {
+	getSellTooltip: function(game, model) {
+		var tooltip = dojo.create("div", { className: "tooltip-inner" }, null);
+		dojo.create("div", {
+			innerHTML: $I("btn.sell.tooltip", [game.toDisplayPercentage(model.refundPercentage) +"%"]),
+			className: "desc"
+		}, tooltip);
+
+		//Enumerate which prices cannot be refunded
+		if (Array.isArray(model.prices)) {
+			model.prices.forEach(function(price) {
+				var res = game.resPool.get(price.name);
+				if (price.isTemporary || !res.isRefundable(game)) {
+					dojo.create("div", {
+						className: "desc small",
+						innerHTML: $I("btn.sell.res.not.refundable", [res.title])
+					}, tooltip);
+				}
+			});
+		}
+
+		return tooltip.outerHTML;
+	},
+
 	getTooltipHTML : function(controller, model){
 		//Some aspects of the metadata may have changed, so fetch the latest version of the model:
 		model = controller.fetchModel(model.options);
@@ -1827,6 +1879,9 @@ var BuildingBtnController = dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn
 
 		var start = building.val;
 		var end = building.val - 1;
+		if (event.ctrlKey || event.metaKey /*osx tears*/) {
+			end = Math.max(0, building.val - (this.game.opts.batchSize || 10));
+		}
 		if (end > 0 && event && event.shiftKey) { //no need to confirm if selling just 1
 			end = 0;
 			if (this.game.opts.noConfirm) {
@@ -1841,8 +1896,7 @@ var BuildingBtnController = dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn
 				return amtSold;
 			}
 		} else if (end >= 0) {
-			this.sellInternal(model, end, true /*requireSellLink*/);
-			return start - end; //Should be just 1 if you do the algebra
+			return this.sellInternal(model, end, true /*requireSellLink*/);
 		}
 	},
 
@@ -1932,7 +1986,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 					handler: function(event) {
 						this.sell(event);
 					}
-				});
+				}, dojo.partial(ButtonModernHelper.getSellTooltip, this.game, this.model));
 				//var sellLinkAdded = true;
 				dojo.addClass(this.domNode, "hasSellLink");
 			}
@@ -2094,6 +2148,19 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", Buildi
 		var pricesDiscount = this.game.getLimitedDR((this.game.getEffect(meta.name + "CostReduction")), 1);
 		var priceModifier = 1 - pricesDiscount;
 
+		if (meta.priceRules) {
+			for (var i = 0; i < meta.prices.length; i++){
+				var resPriceDiscount = this.game.getEffect(meta.prices[i].name + "CostReduction");
+				resPriceDiscount = this.game.getLimitedDR(resPriceDiscount, 1);
+				var resPriceModifier = 1 - resPriceDiscount;
+				var resourcePriceRatio = meta.prices[i].priceRatio || ratio;
+				prices.push({
+					val: meta.prices[i].val * Math.pow(resourcePriceRatio, meta.val) * resPriceModifier * priceModifier,
+					name: meta.prices[i].name
+				});
+        	}
+			return prices;
+		}
         for (var i = 0; i < meta.prices.length; i++){
 			var resPriceDiscount = this.game.getEffect(meta.prices[i].name + "CostReduction");
 			resPriceDiscount = this.game.getLimitedDR(resPriceDiscount, 1);
@@ -2680,7 +2747,8 @@ var UIUtils = {
 		var gameNode = dojo.byId("game");
 		var tooltip = dojo.byId("tooltip");
 
-		var showTooltip = function () {
+		var showTooltip = function (e) {
+			e.stopPropagation();
 			game.tooltipUpdateFunc = function(){
 				tooltip.innerHTML = dojo.hitch(game, htmlProvider)();
 			};

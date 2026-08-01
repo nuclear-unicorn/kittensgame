@@ -140,10 +140,10 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			this.transcendenceTier = Math.max(0, Math.round(Math.log(10 * this.game.getUnlimitedDR(_data.tcratio, 0.1))));
 		}
 
-		this.loadMetadata(this.zigguratUpgrades, _data.zu);
-		this.loadMetadata(this.religionUpgrades, _data.ru);
-		this.loadMetadata(this.transcendenceUpgrades, _data.tu);
-		this.loadMetadata(this.pactsManager.pacts, _data.pact);
+		this.loadMetadata(this.zigguratUpgrades, _data.zu, "zigguratUpgrades");
+		this.loadMetadata(this.religionUpgrades, _data.ru, "religionUpgrades");
+		this.loadMetadata(this.transcendenceUpgrades, _data.tu, "transcendenceUpgrades");
+		this.loadMetadata(this.pactsManager.pacts, _data.pact, "pacts");
 	},
 	/**
 	 * This function is meant to be called while loading a savefile, AFTER everything has been initialized.
@@ -1464,10 +1464,11 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		prices: [
 			{ name : "relic", val: 230000},
 			{ name : "void", val: 29000},
-			{ name : "paragon", val: 8}
+			{ name : "paragon", val: 8, priceRatio: 2}
 		],
+		priceRules: true,
 		tier: 27,
-		priceRatio: 2,
+		priceRatio: 1.75,
 		effects: {
 			"milleninumParagon": 1
 		},
@@ -1475,6 +1476,9 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			if (!game.getFeatureFlag("DARK_PARACOSM")){
 				self.unlocked = false;
 			}
+		},
+		evaluateLocks: function(game){
+			return game.getFeatureFlag("DARK_PARACOSM");
 		},
 		unlocked: false,
 		flavor: $I("religion.tu.darkParacosm.flavor")

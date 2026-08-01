@@ -653,6 +653,12 @@ body.scheme_unicorn.with_background_image {
 	color: #63872d;
 	font-weight: bold;
 }
+.scheme_unicorn .btnTitle > .upgrade-available {
+	color: green;
+}
+.scheme_unicorn .desc > .upgrade-available {
+	color: lightgreen;
+}
 /* ---------- Village ---------- */
 /* container 'Census' -> list of kittens in settlement tab */
 .scheme_unicorn .census-block {
