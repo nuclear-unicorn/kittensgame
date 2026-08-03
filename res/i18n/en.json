@@ -560,6 +560,7 @@
     "effectsMgr.statics.policyFakeBought.title": "1.25 policy cost multiplier",
     "effectsMgr.statics.planetCrackerStorageBonus.title": "Planet Cracker capacity bonus",
     "effectsMgr.statics.planetCracker-uraniumPerTickSpace.title": "Planet Cracker - Uranium conversion",
+    "effectsMgr.statics.preparationRatio.title": "Preparation ratio",
     "effectsMgr.statics.priceRatio.title": "Building's prices",
     "effectsMgr.statics.prodTransferBonus.title": "Transferred cath production bonus",
     "effectsMgr.statics.productionRatio.title": "Production bonus",

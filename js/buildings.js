@@ -2172,7 +2172,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		calculateEffects: function(self, game){
 			if (game.workshop.getZebraUpgrade("darkRevolution").researched){
 				self.effects["zebraPreparations"] = game.ironWill? 1:0.1;
-				self.effects["zebraPreparations"] *= 1 + game.getEffect("overpreparation");
+				self.effects["zebraPreparations"] *= 1 + game.getEffect("preparationRatio");
 				self.jammed = false;
 			}
 		},
@@ -2248,14 +2248,14 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"tMythrilCraftRatio" : 0.01,
 			"bloodstoneRatio": 0,
 			"manpowerMax": 50,
-			"overpreparation" : 0
+			"preparationRatio" : 0
 			// "zebratradeNormalResChance": 0.1
 		},
 		calculateEffects: function(self, game){
 			if (game.workshop.getZebraUpgrade("reforgedOutposts").researched){
-				self.effects["overpreparation"] = (Math.floor(self.val / 10)) / self.val;
+				self.effects["preparationRatio"] = (Math.floor(self.val / 10)) / self.val;
 			} else {
-				self.effects["overpreparation"] = 0;
+				self.effects["preparationRatio"] = 0;
 			}
 			if (game.workshop.getZebraUpgrade("rangefinders").researched){
 				self.effects["bloodstoneRatio"] = 0.01;

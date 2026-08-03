@@ -2382,7 +2382,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			label: $I("workshop.zebraUpgrade.zebraTrappers.label"),
 			description: $I("workshop.zebraUpgrade.zebraTrappers.desc"),
 			effects: {
-				"overpreparation": 1,
+				"preparationRatio": 1,
 			},
 			prices:[
 				{ name : "science", val: 1000 },
