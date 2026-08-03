@@ -2155,8 +2155,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		priceRatio: 1.35,
 		zebraRequired: 5,
 		effects: {
-			"hunterRatio" : 0.05,
 			"manpowerMax": 5,
+			"hunterRatio" : 0.05,
 			"zebraPreparations" : 0
 		},
 		calculateEffects: function(self, game){
@@ -2193,8 +2193,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		priceRatio: 1.15,
 		zebraRequired: 10,
 		effects: {
-			"manpowerMax": 25,
 			"bloodstoneRatio": 0,
+			"manpowerMax": 25,
 			//"bloodstoneCraftRatio" : 0.01
 		},
 		calculateEffects: function(self, game){
@@ -2235,10 +2235,10 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		zebraRequired: 50,
 		effects: {
 			//"bloodstoneCraftRatio" : 0.02,
-			"manpowerMax": 50,
 			"tMythrilCraftRatio" : 0.01,
-			"overpreparation" : 0,
-			"bloodstoneRatio": 0
+			"bloodstoneRatio": 0,
+			"manpowerMax": 50,
+			"overpreparation" : 0
 			// "zebratradeNormalResChance": 0.1
 		},
 		calculateEffects: function(self, game){
