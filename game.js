@@ -1971,6 +1971,10 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
                 title: $I("effectsMgr.statics.zebraPreparations.title"),
                 type: "fixed"
 			},
+			"preparationRatio": {
+                title: $I("effectsMgr.statics.preparationRatio.title"),
+                type: "ratio"
+			},
 			"academyMeteorBonus": {
                 title: $I("effectsMgr.statics.academyMeteorBonus.title"),
                 type: "ratio"
@@ -1984,6 +1988,11 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 			"milleninumParagon":{
 				title: $I("effectsMgr.statics.milleninumParagon.title"),
 				type: "fixed",
+			},
+			"missingZebraPreparations":{
+				title: $I("effectsMgr.statics.missingZebraPreparations.title"),
+				type: "fixed",
+				calculation: "nonProportional"
 			}
 		}
 	}

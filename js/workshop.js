@@ -729,7 +729,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science", val: 150000 },
 			{ name : "blueprint", val: 25 }
 		],
-		flavor: $I("workshop.railgun.flavor")
+		flavor: $I("workshop.railgun.flavor"),
+		unlocks: {
+			zebraUpgrades: ["rangefinders"]
+		}
 	},{
 		name: "bolas",
 		label: $I("workshop.bolas.label"),
@@ -2359,6 +2362,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			],
 			upgrades:{
 				buildings: ["zebraOutpost"]
+			},
+			unlocks: {
+				zebraUpgrades: ["zebraTrappers"]
 			}
 		},{
 			name: "darkBrew",
@@ -2371,6 +2377,42 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				{ name : "parchment", val: 3000 },
 				{ name : "science", val: 100 }
 			]
+		},{
+			name: "zebraTrappers",
+			label: $I("workshop.zebraUpgrade.zebraTrappers.label"),
+			description: $I("workshop.zebraUpgrade.zebraTrappers.desc"),
+			effects: {
+				"preparationRatio": 1,
+			},
+			prices:[
+				{ name : "science", val: 1000 },
+				{ name : "alloy", val: 100 },
+				{ name : "tMythril", val: 10 }
+			],
+			upgrades:{
+				buildings: ["zebraOutpost"]
+			},
+			unlocks: {
+				zebraUpgrades: ["reforgedOutposts"]
+			}
+		},{
+			name: "reforgedOutposts",
+			label: $I("workshop.zebraUpgrade.reforgedOutposts.label"),
+			description: $I("workshop.zebraUpgrade.reforgedOutposts.desc"),
+			effects: {
+			},
+			prices:[
+				{ name : "science", val: 1500 },
+				{ name : "coal", val: 10000 },
+				{ name : "bloodstone", val: 50 },
+				{ name : "tMythril", val: 10 }
+			],
+			upgrades:{
+				buildings: ["zebraForge"]
+			},
+			evaluateLocks: function(game){
+				return game.workshop.getZebraUpgrade("zebraTrappers").researched;
+			}
 		},
 		//resources:
 		//tMythril
@@ -2420,6 +2462,26 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			],
 			upgrades:{
 				buildings: ["zebraWorkshop"]
+			},
+			unlocks: {
+				zebraUpgrades: ["rangefinders"]
+			}
+		},{
+			name: "rangefinders",
+			label: $I("workshop.zebraUpgrade.rangefinders.label"),
+			description: $I("workshop.zebraUpgrade.rangefinders.desc"),
+			effects: {
+			},
+			prices:[
+				{ name : "science", val: 100000 },
+				{ name : "tMythril", val: 50 },
+				{ name : "microchip", val: 25 }
+			],
+			upgrades:{
+				buildings: ["zebraForge"]
+			},
+			evaluateLocks: function(game){
+				return game.workshop.getZebraUpgrade("bloodstoneInstitute").researched && game.workshop.get("railgun").researched;
 			}
 		},
 	],

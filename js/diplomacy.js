@@ -328,7 +328,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	},
 
 	getAmbassadorEffect: function(effectName) {
-		return this.cachedAmbassadorEffects[effectName] || 0;
+		return this.cachedAmbassadorEffects[effectName] || 0; //+ this.game.getEffect("zebra" + effectName);
 	},
 
 	unlockRandomRace: function(){

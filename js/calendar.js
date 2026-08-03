@@ -585,7 +585,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			}
 			var ironGain = 0;
 			if (this.game.workshop.get("prospecting").researched) {
-				ironGain = this.game.resPool.addResEvent("iron", 5);
+				ironGain = this.game.resPool.addResEvent("iron", 5 * (1 + minerologyBonus));
 			}
 
 			if (mineralsGain > 0 || sciGain > 0 || ironGain > 0){
@@ -788,7 +788,7 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 			}
 
 			if (this.game.workshop.get("prospecting").researched) {
-				this.game.resPool.addResEvent("iron", numberEvents * 5);
+				this.game.resPool.addResEvent("iron", numberEvents * 5 * (1 + minerologyBonus));
 			}
 
 			//TODO: make meteors give titanium on higher levels

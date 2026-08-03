@@ -560,6 +560,7 @@
     "effectsMgr.statics.policyFakeBought.title": "1.25 policy cost multiplier",
     "effectsMgr.statics.planetCrackerStorageBonus.title": "Planet Cracker capacity bonus",
     "effectsMgr.statics.planetCracker-uraniumPerTickSpace.title": "Planet Cracker - Uranium conversion",
+    "effectsMgr.statics.preparationRatio.title": "Preparation ratio",
     "effectsMgr.statics.priceRatio.title": "Building's prices",
     "effectsMgr.statics.prodTransferBonus.title": "Transferred cath production bonus",
     "effectsMgr.statics.productionRatio.title": "Production bonus",
@@ -690,6 +691,7 @@
     "effectsMgr.statics.milleninumParagon.title": "Paragon per millennium",
     "effectsMgr.statics.mineralsPolicyRatio.title": "Minerals production bonus",
     "effectsMgr.statics.mintRatio.title": "Mint ratio",
+    "effectsMgr.statics.missingZebraPreparations.title": "Missing zebra preparations",
     "effectsMgr.statics.oilPolicyRatio.title": "Oil production bonus",
     "effectsMgr.statics.woodPolicyRatio.title": "Wood production bonus",
     "effectsMgr.statics.goldPolicyRatio.title": "Gold production bonus",
@@ -2664,7 +2666,14 @@
     "workshop.zebraUpgrade.darkRevolution.flavor": "Mewing would be distracting...",
     "workshop.zebraUpgrade.minerologyDepartment.label": "Minerology department",
     "workshop.zebraUpgrade.minerologyDepartment.desc": "Minerology is being taught in the Academy, leading to better production from meteors",
+    "workshop.zebraUpgrade.rangefinders.label": "Rangefinders",
+    "workshop.zebraUpgrade.rangefinders.desc": "Rangefinders forged to find bloodstones. Forges increase chance to find Bloodstones in hunts.",
+    "workshop.zebraUpgrade.reforgedOutposts.label": "Reforged Outposts",
+    "workshop.zebraUpgrade.reforgedOutposts.desc": "Zebra Forges are used to retrofit Outposts. Each 10 Forges provide extra preparations.",
     "workshop.zebraUpgrade.whispers.label": "Whispers",
     "workshop.zebraUpgrade.whispers.desc": "Unlock Alicorn Ascension rituals at Ivory Temples. Alicorn Ascension produces T-Mythril and increases mineral production.",
+	"workshop.zebraUpgrade.zebraTrappers.label": "zebraTrappers",
+	"workshop.zebraUpgrade.zebraTrappers.desc": "Zebras set up traps, preparing better for the hunts",
     "workshop.zebraUpgradesPanel.label": "Zebra Upgrades"
+    
 }
