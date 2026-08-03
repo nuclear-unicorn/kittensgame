@@ -1805,7 +1805,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science", val: 100000 },
 			{ name : "steel", val: 10000 },
 			{ name : "gear", val: 250 }
-		]
+		],
+		unlocks: {
+			zebraUpgrades: ["bloodstoneRadar"]
+		}
 	},{
 		name: "enrichedUranium",
 		label: $I("workshop.enrichedUranium.label"),
@@ -2456,6 +2459,28 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			],
 			upgrades:{
 				buildings: ["zebraWorkshop"]
+			},
+			unlocks: {
+				zebraUpgrades: ["bloodstoneRadar"]
+			}
+		},{
+			name: "bloodstoneRadar", //TODO?
+			// label: $I("workshop.zebraUpgrade.bloodstoneRadar.label"),
+			// description: $I("workshop.zebraUpgrade.bloodstoneRadar.desc"),
+			label: "Bloodstone Radar", //TODO?
+			description: "Bloodstone ratio limit is now per building", //TODO?
+			effects: {
+			},
+			prices:[
+				// { name : "bloodstone", val: 100 },
+				{ name : "tMythril", val: 100 },
+				{ name : "microchip", val: 25 }
+			],
+			upgrades:{
+				buildings: ["zebraForge"]
+			},
+			evaluateLocks: function(game){
+				return game.workshop.getZebraUpgrade("bloodstoneInstitute").researched && game.workshop.get("assistance").researched;
 			}
 		},
 	],

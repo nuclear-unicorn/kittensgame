@@ -2198,19 +2198,25 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			//"bloodstoneCraftRatio" : 0.01
 		},
 		calculateEffects: function(self, game){
-			var zebraVocations = 41 + game.getEffect("zebraPreparations");
+			var zebraPreparations = 41 + game.getEffect("zebraPreparations");
 			var zebras = game.resPool.get("zebras").maxValue;
-			var difference =  zebras - zebraVocations * 0.75;
+			var difference =  zebras - zebraPreparations * 0.75;
 			if (game.workshop.getZebraUpgrade("bloodstoneInstitute").researched){
 				var unlimited = self.on * (game.ironWill? 1:0.1) * (zebras);
-				var limit = zebraVocations;
-				// var limit = zebraVocations * (1 + game.getEffect("overpreparation"));
-				self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(unlimited, limit) / self.on;
+				var limit = zebraPreparations;
+				if (game.workshop.getZebraUpgrade("bloodstoneRadar").researched){
+					self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(unlimited, limit);
+					// if the player somehow has more preparation than zebras let the chance grow anyways!
+				} else {
+					self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(unlimited, limit) / self.on;
+				}
+				// var limit = zebraPreparations * (1 + game.getEffect("overpreparation"));
+				// self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(unlimited, limit) / self.on;
 				// if (unlimited - limit * 0.75 > difference) {
 				// 	difference = unlimited - limit * 0.75;
 				// }
 				// var unlimited = (game.ironWill? 1:0.1) * (zebras);
-				// self.effects["bloodstoneRatio"] = 0.005 * game.getLimitedDR(unlimited, zebraVocations);
+				// self.effects["bloodstoneRatio"] = 0.005 * game.getLimitedDR(unlimited, zebraPreparations);
 			}
 			if (difference > 0){
 				self.effects["missingZebraPreparations"] = difference;
