@@ -2259,6 +2259,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			if (game.workshop.getZebraUpgrade("rangefinders").researched){
 				self.effects["bloodstoneRatio"] = 0.01;
 			}
+			if (game.workshop.getZebraUpgrade("rangefinders").researched){
+				self.effects["bloodstoneRatio"] = 0.01;
+			}
 			game.upgrade(self.upgrades);
 		},
 		upgrades: {
