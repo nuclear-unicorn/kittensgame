@@ -2370,10 +2370,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			]
 		},{
 			name: "zebraTrappers",
-			// label: $I("workshop.zebraUpgrade.zebraTrappers.label"),
-			// description: $I("workshop.zebraUpgrade.zebraTrappers.desc"),
-			label: "zebraTrappers",
-			description: "Zebras set up traps, preparing better for the hunts",
+			label: $I("workshop.zebraUpgrade.zebraTrappers.label"),
+			description: $I("workshop.zebraUpgrade.zebraTrappers.desc"),
 			effects: {
 				"overpreparation": 1,
 			},
@@ -2390,10 +2388,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			}
 		},{
 			name: "reforgedOutposts",
-			// label: $I("workshop.zebraUpgrade.reforgedOutposts.label"),
-			// description: $I("workshop.zebraUpgrade.reforgedOutposts.desc"),
-			label: "Reforged Outposts",
-			description: "Zebra Forges are used to retrofit Outposts. Each 10 Forges provide extra preparations.",
+			label: $I("workshop.zebraUpgrade.reforgedOutposts.label"),
+			description: $I("workshop.zebraUpgrade.reforgedOutposts.desc"),
 			effects: {
 			},
 			prices:[
@@ -2462,11 +2458,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				zebraUpgrades: ["rangefinders"]
 			}
 		},{
-			name: "rangefinders", //TODO?
-			// label: $I("workshop.zebraUpgrade.rangefinders.label"),
-			// description: $I("workshop.zebraUpgrade.rangefinders.desc"),
-			label: "Rangefinders", //TODO?
-			description: "Rangefinders forged to find bloodstones. Forges increase chance to find Bloodstones in hunts.", //TODO?
+			name: "rangefinders",
+			label: $I("workshop.zebraUpgrade.rangefinders.label"),
+			description: $I("workshop.zebraUpgrade.rangefinders.desc"),
 			effects: {
 			},
 			prices:[
