@@ -884,6 +884,10 @@ body.scheme_wood.with_background_image {
 .scheme_wood .container.trade-race a[title='Pinned']:hover {
 	color: #b6b042;
 }
+.scheme_wood .upgrade-available {
+	color: #40A040 !important;
+}
+
 /* .scheme_wood .btn.explore { */
     /* default margin-right: 9px; */
 /* } */

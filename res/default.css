@@ -1311,6 +1311,20 @@ a.link.collapse:hover {
     padding: 20px;
 }
 
+.btnTitle > .upgrade-available {
+	padding-right: 6px;
+	font-weight: bold;
+}
+.desc > .upgrade-available {
+	padding-bottom: 4px;
+	margin-bottom: 4px;
+	border-bottom: 1px solid gray;
+	font-weight: bold;
+}
+.scheme_default .upgrade-available {
+	color: green; /*Color specified separately for each different color theme in the game*/
+}
+
 /*--------------------------------------
                 Village
 ---------------------------------------*/
@@ -1554,6 +1568,35 @@ div.leet {
     text-align: right                                !important;
     color: #33FF00                                   !important;
     background-color: #282828                        !important;
+}
+
+div.lucky {
+            animation: lucky-fortune 1.5s linear infinite;
+    -webkit-animation: lucky-fortune 1.5s linear infinite;
+       -moz-animation: lucky-fortune 1.5s linear infinite;
+         -o-animation: lucky-fortune 1.5s linear infinite;
+}
+
+div.cosmic {
+    background-color: #0B0B2B !important;
+            animation: cosmic-void 4s linear infinite;
+    -webkit-animation: cosmic-void 4s linear infinite;
+       -moz-animation: cosmic-void 4s linear infinite;
+         -o-animation: cosmic-void 4s linear infinite;
+}
+
+div.nice {
+            animation: nice-neon 3s linear infinite;
+    -webkit-animation: nice-neon 3s linear infinite;
+       -moz-animation: nice-neon 3s linear infinite;
+         -o-animation: nice-neon 3s linear infinite;
+}
+
+div.notfound {
+    font-family: "Lucida Console", Monaco, monospace !important;
+    color: #8C8C8C                                   !important;
+    text-decoration: line-through                    !important;
+    opacity: 0.6                                     !important;
 }
 
 @keyframes blaze-rainbow {
@@ -1861,6 +1904,70 @@ div.leet {
     0 0 15px red,
     0 0 20px red,
     0 0 25px red;}
+}
+
+@keyframes lucky-fortune {
+    0% {color: #00C853; text-shadow: 0 0 10px #00E676;}
+    50% {color: #B9F6CA; text-shadow: 0 0 3px #69F0AE;}
+    100% {color: #00C853; text-shadow: 0 0 10px #00E676;}
+}
+@-webkit-keyframes lucky-fortune {
+    0% {color: #00C853; text-shadow: 0 0 10px #00E676;}
+    50% {color: #B9F6CA; text-shadow: 0 0 3px #69F0AE;}
+    100% {color: #00C853; text-shadow: 0 0 10px #00E676;}
+}
+@-moz-keyframes lucky-fortune {
+    0% {color: #00C853; text-shadow: 0 0 10px #00E676;}
+    50% {color: #B9F6CA; text-shadow: 0 0 3px #69F0AE;}
+    100% {color: #00C853; text-shadow: 0 0 10px #00E676;}
+}
+@-o-keyframes lucky-fortune {
+    0% {color: #00C853; text-shadow: 0 0 10px #00E676;}
+    50% {color: #B9F6CA; text-shadow: 0 0 3px #69F0AE;}
+    100% {color: #00C853; text-shadow: 0 0 10px #00E676;}
+}
+
+/* distant starlight twinkling out of the dark */
+@keyframes cosmic-void {
+    0% {color: #E6E6FF; text-shadow: 0 0 4px #FFF, 0 0 12px #6A5ACD;}
+    50% {color: #8FA5FF; text-shadow: 0 0 10px #FFF, 0 0 22px #4B0082;}
+    100% {color: #E6E6FF; text-shadow: 0 0 4px #FFF, 0 0 12px #6A5ACD;}
+}
+@-webkit-keyframes cosmic-void {
+    0% {color: #E6E6FF; text-shadow: 0 0 4px #FFF, 0 0 12px #6A5ACD;}
+    50% {color: #8FA5FF; text-shadow: 0 0 10px #FFF, 0 0 22px #4B0082;}
+    100% {color: #E6E6FF; text-shadow: 0 0 4px #FFF, 0 0 12px #6A5ACD;}
+}
+@-moz-keyframes cosmic-void {
+    0% {color: #E6E6FF; text-shadow: 0 0 4px #FFF, 0 0 12px #6A5ACD;}
+    50% {color: #8FA5FF; text-shadow: 0 0 10px #FFF, 0 0 22px #4B0082;}
+    100% {color: #E6E6FF; text-shadow: 0 0 4px #FFF, 0 0 12px #6A5ACD;}
+}
+@-o-keyframes cosmic-void {
+    0% {color: #E6E6FF; text-shadow: 0 0 4px #FFF, 0 0 12px #6A5ACD;}
+    50% {color: #8FA5FF; text-shadow: 0 0 10px #FFF, 0 0 22px #4B0082;}
+    100% {color: #E6E6FF; text-shadow: 0 0 4px #FFF, 0 0 12px #6A5ACD;}
+}
+
+@keyframes nice-neon {
+    0% {color: #FF4FD8;}
+    50% {color: #00E5FF;}
+    100% {color: #FF4FD8;}
+}
+@-webkit-keyframes nice-neon {
+    0% {color: #FF4FD8;}
+    50% {color: #00E5FF;}
+    100% {color: #FF4FD8;}
+}
+@-moz-keyframes nice-neon {
+    0% {color: #FF4FD8;}
+    50% {color: #00E5FF;}
+    100% {color: #FF4FD8;}
+}
+@-o-keyframes nice-neon {
+    0% {color: #FF4FD8;}
+    50% {color: #00E5FF;}
+    100% {color: #FF4FD8;}
 }
 
 .pin-link {

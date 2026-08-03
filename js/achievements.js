@@ -534,12 +534,12 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
     },
 
     load: function (saveData) {
-		this.loadMetadata(this.achievements, saveData.achievements);
+		this.loadMetadata(this.achievements, saveData.achievements, "achievements");
 
         var ach = saveData.ach || {};
         this.badgesUnlocked = ach.badgesUnlocked || false;
         if (ach.badges){
-            this.loadMetadata(this.badges, ach.badges);
+            this.loadMetadata(this.badges, ach.badges, "badges");
         }
     },
 

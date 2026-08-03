@@ -165,7 +165,15 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				"autumn": 0.15,
 				"winter": -0.05
 			}},
-			{name: "oil", value: 100, chance: 0.25, width: 0.15, minLevel: 5}
+			{name: "oil", value: 100, chance: 0.25, width: 0.15, minLevel: 5},
+			{name: "plastic", value: 1, chance: -1.0, width: 0.8, minLevel: 15, seasons:{
+				"spring": 1.0,
+				"summer": -0.3,
+				"autumn": -0.6,
+				"winter": 2.0
+			}} 
+			// Spiders will sell some plastics with A LOT OF ambassadors.
+			// Numbers are small on purpose. Buffing better than nerfing.
 		],
 		collapsed: false,
 		pinned: false
@@ -279,7 +287,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 	load: function(saveData){
 		if (saveData.diplomacy) {
-			this.game.bld.loadMetadata(this.races, saveData.diplomacy.races);
+			this.game.bld.loadMetadata(this.races, saveData.diplomacy.races, "races");
 			this.get("leviathans").autoPinned = saveData.diplomacy.autoPinLeviathans || false;
 		}
 		this.nonRandomTrades = 0; //Don't preserve this in the save-state (has very little meaningful gameplay value)
@@ -315,7 +323,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		var resName = sell.name;
 		var hasHighEnoughEmbassyLevel = !sell.minLevel || race.embassyLevel >= sell.minLevel;
 		var isResourceTradeable = this.game.resPool.get(resName).unlocked || resName === "coal"  || resName === "uranium" || race.name === "leviathans";
-		return hasHighEnoughEmbassyLevel && isResourceTradeable;
+		var positiveChance = (sell.chance + this.getAmbassadorEffect("tradeNormalResChance")) > 0;
+		return hasHighEnoughEmbassyLevel && isResourceTradeable && positiveChance;
 	},
 
 	getAmbassadorEffect: function(effectName) {

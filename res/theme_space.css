@@ -699,6 +699,9 @@ body.scheme_space.with_background_image {
 .scheme_space .tabInner.Stats table.statTable:last-of-type tr:last-child td:last-child { /* select time played value */
 	color: #14F0D8;
 }
+.scheme_space .upgrade-available {
+	color: #35C283 !important;
+}
 /* ---------- Village ---------- */
 /* container 'Census' -> list of kittens in settlement tab */
 .scheme_space .currentLeader .name {

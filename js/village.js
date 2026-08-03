@@ -868,10 +868,10 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			}
 
 			this.maxKittens  = saveData.village.maxKittens;
-			this.loadMetadata(this.jobs, saveData.village.jobs);
+			this.loadMetadata(this.jobs, saveData.village.jobs, "jobs");
 
 			if (saveData.village.biomes){
-				this.loadMetadata(this.map.biomes, saveData.village.biomes);
+				this.loadMetadata(this.map.biomes, saveData.village.biomes, "biomes");
 				this.map.currentBiome = saveData.village.currentBiome;
 				this.map.lastBiome = saveData.village.lastBiome;
 				//migrate old biome.level to biome.val / biome.on

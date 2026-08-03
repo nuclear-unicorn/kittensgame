@@ -900,6 +900,9 @@ body.scheme_spooky.with_background_image {
 .scheme_spooky .container.trade-race .btn.modern:not(.disabled) a[title='Pinned'] {
 	text-shadow: 1px 1px 2px #000000;
 }
+.scheme_spooky .upgrade-available {
+	color: #80D880 !important;
+}
 .scheme_spooky .btn.explore {
 	/* default margin-right: 9px; */
 	margin-top: 5px;

@@ -359,6 +359,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			buildings: ["accelerator"]
+		},
+		unlocks: {
+			upgrades: ["stasisChambers", "tachyonAccelerators"]
 		}
 	},{
 		name: "stasisChambers",
@@ -373,6 +376,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "timeCrystal", val: 1 },
 			{ name : "alloy", val: 	 200 }
 		],
+		evaluateLocks: function(game){
+			return game.workshop.get("energyRifts").researched && game.science.get("chronophysics").researched;
+		},
 		upgrades: {
 			buildings: ["accelerator"]
 		},
@@ -452,6 +458,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "timeCrystal", val: 10 },
 			{ name : "eludium",     val: 125 }
 		],
+		evaluateLocks: function(game){
+			return game.workshop.get("energyRifts").researched && game.science.get("tachyonTheory").researched;
+		},
 		upgrades: {
 			buildings: ["accelerator"]
 		}
@@ -2596,9 +2605,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		}
 
 		this.hideResearched = saveData.workshop.hideResearched;
-		this.loadMetadata(this.upgrades, saveData.workshop.upgrades);
-		this.loadMetadata(this.crafts, saveData.workshop.crafts);
-		this.loadMetadata(this.zebraUpgrades, saveData.workshop.zebraUpgrades);
+		this.loadMetadata(this.upgrades, saveData.workshop.upgrades, "upgrades");
+		this.loadMetadata(this.crafts, saveData.workshop.crafts, "crafts");
+		this.loadMetadata(this.zebraUpgrades, saveData.workshop.zebraUpgrades, "zebraUpgrades");
 
 		for (var i = 0; i < this.upgrades.length; i++){
 			var upgrade = this.upgrades[i];

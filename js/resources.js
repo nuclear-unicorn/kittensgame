@@ -815,6 +815,16 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		this.updateMaxValue(this.get(resName));
 	},
 
+	/**
+	 * Updates the storage limits for ALL resources.
+	 */
+	updateMaxValueAll: function() {
+		for (var i in this.resources){
+			var res = this.resources[i];
+			this.updateMaxValue(res);
+		}
+	},
+
 	//All energy production amounts are multiplied by this number.
 	getEnergyProductionRatio: function() {
 		var game = this.game;
@@ -989,6 +999,9 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	},
 
 	save: function(saveData){
+		saveData.resources = this.filterMetadata(
+			this.resources, ["name", "value", "unlocked", "isHidden", "isHiddenFromCrafting"]
+		);
 		saveData.res = {
 			isLocked: this.isLocked,
 			showHiddenResources: this.showHiddenResources || undefined
@@ -1009,7 +1022,7 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	},
 
 	load: function(saveData){
-		this.loadMetadata(this.resources, saveData.resources);
+		this.loadMetadata(this.resources, saveData.resources, "resources");
 
 		if (saveData.res){
 			this.isLocked = Boolean(saveData.res.isLocked);

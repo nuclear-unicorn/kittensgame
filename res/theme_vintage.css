@@ -732,6 +732,9 @@
 .scheme_vintage .container.trade-race a[title='Pinned']:hover {
 	color: #1b786d;
 }
+.scheme_vintage .upgrade-available {
+	color: #709c85 !important;
+}
 /* .scheme_vintage .btn.explore { */
     /* default margin-right: 9px; */
 /* } */
