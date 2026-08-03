@@ -2209,7 +2209,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game){
 			var zebraPreparations = 41 + game.getEffect("zebraPreparations");
-			console.warn(zebraPreparations);
 			var zebrasMax = game.resPool.get("zebras").maxValue;
 			var difference =  zebrasMax - zebraPreparations * 0.75;
 			if (game.workshop.getZebraUpgrade("bloodstoneInstitute").researched){
@@ -2277,6 +2276,11 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
             { name : "timeCrystal", val: 2 },
             { name : "void", val: 100 }
         ],
+		fewZebrasPrices : [
+			{ name : "eludium", val: 100 },
+            { name : "timeCrystal", val: 2 },
+            { name : "void", val: 100 }
+		],
 		priceRatio: 1.25,
 		zebraRequired: 1,
 		effects: {
@@ -2284,7 +2288,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		upgrades: {
 			buildings: ["zebraOutpost"]
-		}
+		},
+		priceRules: true,
 	},
 	{
 		name: "ivoryTemple",
@@ -2542,6 +2547,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			return prices;
 		}
 		if (bld.get("priceRules")){
+			if (bldName == "stasisPod" && game.resPool.get("zebras").maxValue < 10){
+				bldPrices = bld.get("fewZebrasPrices");
+			}
 			for (var i = 0; i < bldPrices.length; i++) {
 				var resPriceDiscount = this.game.getLimitedDR(this.game.getEffect(bldPrices[i].name + "CostReduction"), 1);
 				var resPriceModifier = 1 - resPriceDiscount;
