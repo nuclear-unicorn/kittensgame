@@ -2547,7 +2547,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			return prices;
 		}
 		if (bld.get("priceRules")){
-			if (bldName == "stasisPod" && game.resPool.get("zebras").maxValue < 10){
+			if (bldName == "stasisPod" && this.game.resPool.get("zebras").maxValue < 10){
 				bldPrices = bld.get("fewZebrasPrices");
 			}
 			for (var i = 0; i < bldPrices.length; i++) {
