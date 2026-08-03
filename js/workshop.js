@@ -721,6 +721,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "blueprint", val: 25 }
 		],
 		flavor: $I("workshop.railgun.flavor")
+		flavor: $I("workshop.railgun.flavor"),
+		unlocks: {
+			zebraUpgrades: ["rangefinders"]
+		}
 	},{
 		name: "bolas",
 		label: $I("workshop.bolas.label"),
@@ -1805,10 +1809,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science", val: 100000 },
 			{ name : "steel", val: 10000 },
 			{ name : "gear", val: 250 }
-		],
-		unlocks: {
-			zebraUpgrades: ["bloodstoneRadar"]
-		}
+		]
 	},{
 		name: "enrichedUranium",
 		label: $I("workshop.enrichedUranium.label"),
@@ -2367,10 +2368,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				{ name : "bloodstone", val: 1 },
 				{ name : "parchment", val: 3000 },
 				{ name : "science", val: 100 }
-			],
-			unlocks: {
-				zebraUpgrades: ["infusedBackpacks"]
-			}
+			]
 		},{
 			name: "zebraTrappers",
 			// label: $I("workshop.zebraUpgrade.zebraTrappers.label"),
@@ -2381,34 +2379,35 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				"overpreparation": 1,
 			},
 			prices:[
-				{ name : "plastic", val: 100 },
-				{ name : "tMythril", val: 10 },
-				{ name : "science", val: 1000 }
+				{ name : "science", val: 1000 },
+				{ name : "alloy", val: 100 },
+				{ name : "tMythril", val: 10 }
 			],
 			upgrades:{
 				buildings: ["zebraOutpost"]
 			},
 			unlocks: {
-				zebraUpgrades: ["infusedBackpacks"]
+				zebraUpgrades: ["reforgedOutposts"]
 			}
 		},{
-			name: "infusedBackpacks",
-			// label: $I("workshop.zebraUpgrade.infusedBackpacks.label"),
-			// description: $I("workshop.zebraUpgrade.infusedBackpacks.desc"),
-			label: "Infused Backpacks",
-			description: "Every 10 zebra forges infuse outposts with extra preparation",
+			name: "reforgedOutposts",
+			// label: $I("workshop.zebraUpgrade.reforgedOutposts.label"),
+			// description: $I("workshop.zebraUpgrade.reforgedOutposts.desc"),
+			label: "Reforged Outposts",
+			description: "Zebra Forges are used to retrofit Outposts. Each 10 Forges provide extra preparations.",
 			effects: {
 			},
 			prices:[
-				// { name : "bloodstone", val: 100 },
-				{ name : "tMythril", val: 100 },
-				{ name : "microchip", val: 25 }
+				{ name : "science", val: 1500 },
+				{ name : "coal", val: 10000 },
+				{ name : "bloodstone", val: 50 },
+				{ name : "tMythril", val: 10 }
 			],
 			upgrades:{
 				buildings: ["zebraForge"]
 			},
 			evaluateLocks: function(game){
-				return game.workshop.getZebraUpgrade("zebraTrappers").researched && game.workshop.getZebraUpgrade("darkBrew").researched;
+				return game.workshop.getZebraUpgrade("zebraTrappers").researched;
 			}
 		},
 		//resources:
@@ -2461,26 +2460,26 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				buildings: ["zebraWorkshop"]
 			},
 			unlocks: {
-				zebraUpgrades: ["bloodstoneRadar"]
+				zebraUpgrades: ["rangefinders"]
 			}
 		},{
-			name: "bloodstoneRadar", //TODO?
-			// label: $I("workshop.zebraUpgrade.bloodstoneRadar.label"),
-			// description: $I("workshop.zebraUpgrade.bloodstoneRadar.desc"),
-			label: "Bloodstone Radar", //TODO?
-			description: "Bloodstone ratio limit is now per building", //TODO?
+			name: "rangefinders", //TODO?
+			// label: $I("workshop.zebraUpgrade.rangefinders.label"),
+			// description: $I("workshop.zebraUpgrade.rangefinders.desc"),
+			label: "Rangefinders", //TODO?
+			description: "Rangefinders forged to find bloodstones. Forges increase chance to find Bloodstones in hunts.", //TODO?
 			effects: {
 			},
 			prices:[
-				// { name : "bloodstone", val: 100 },
-				{ name : "tMythril", val: 100 },
+				{ name : "science", val: 100000 },
+				{ name : "tMythril", val: 50 },
 				{ name : "microchip", val: 25 }
 			],
 			upgrades:{
 				buildings: ["zebraForge"]
 			},
 			evaluateLocks: function(game){
-				return game.workshop.getZebraUpgrade("bloodstoneInstitute").researched && game.workshop.get("assistance").researched;
+				return game.workshop.getZebraUpgrade("bloodstoneInstitute").researched && game.workshop.get("railgun").researched;
 			}
 		},
 	],

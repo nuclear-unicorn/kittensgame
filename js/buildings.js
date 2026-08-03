@@ -2199,19 +2199,18 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game){
 			var zebraPreparations = 41 + game.getEffect("zebraPreparations");
-			var zebras = game.resPool.get("zebras").maxValue;
-			var difference =  zebras - zebraPreparations * 0.75;
+			console.warn(zebraPreparations);
+			var zebrasMax = game.resPool.get("zebras").maxValue;
+			var difference =  zebrasMax - zebraPreparations * 0.75;
 			if (game.workshop.getZebraUpgrade("bloodstoneInstitute").researched){
-				var unlimited = self.on * (game.ironWill? 1:0.1) * (zebras);
+				var unlimited = self.on * (game.ironWill? 1:0.1) * zebrasMax;
 				var limit = zebraPreparations;
-				if (game.workshop.getZebraUpgrade("bloodstoneRadar").researched){
-					self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(unlimited, limit);
-				} else {
-					self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(unlimited, limit) / self.on;
-				}
+				self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(unlimited, limit) / self.on;
 			}
 			if (difference > 0){
 				self.effects["missingZebraPreparations"] = difference;
+			} else {
+				self.effects["missingZebraPreparations"] = 0;
 			}
 			if (self.val) {
 				game.time.queue.unlockQueueSource("zebraUpgrades");
@@ -2239,18 +2238,23 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			"manpowerMax": 50,
 			"tMythrilCraftRatio" : 0.01,
 			"overpreparation" : 0,
+			"bloodstoneRatio": 0
 			// "zebratradeNormalResChance": 0.1
 		},
 		calculateEffects: function(self, game){
-			if (game.workshop.getZebraUpgrade("infusedBackpacks").researched){
-				self.effects["overpreparation"] = Math.floor(self.val / 10) + 1;
+			if (game.workshop.getZebraUpgrade("reforgedOutposts").researched){
+				self.effects["overpreparation"] = (Math.floor(self.val / 10)) / self.val;
 			} else {
 				self.effects["overpreparation"] = 0;
+			}
+			if (game.workshop.getZebraUpgrade("rangefinders").researched){
+				self.effects["bloodstoneRatio"] = 0.01;
 			}
 			game.upgrade(self.upgrades);
 		},
 		upgrades: {
-			buildings: ["zebraOutpost", "zebraWorkshop"]
+			// buildings: ["zebraOutpost", "zebraWorkshop"]
+			buildings: ["zebraOutpost"]
 		}
 	},
 	{
@@ -2268,6 +2272,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		effects: {
 			"zebrasMax": 1,
 		},
+		upgrades: {
+			buildings: ["zebraOutpost"]
+		}
 	},
 	{
 		name: "ivoryTemple",
