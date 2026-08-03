@@ -1817,7 +1817,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science", val: 100000 },
 			{ name : "steel", val: 10000 },
 			{ name : "gear", val: 250 }
-		]
+		],
+		unlocks: {
+			zebraUpgrades: ["bloodstoneRadar"]
+		}
 	},{
 		name: "enrichedUranium",
 		label: $I("workshop.enrichedUranium.label"),
