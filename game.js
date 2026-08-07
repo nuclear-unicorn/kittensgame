@@ -2192,8 +2192,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		},
 		DARK_PARACOSM: {
 			beta: true,
-			main: false,
-			mobile: false
+			main: true,
+			mobile: true
 		}
 	},
 
