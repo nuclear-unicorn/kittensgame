@@ -29,14 +29,34 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		sells:[
 			{name: "wood", value: 500, chance: 1, width: 0.08, seasons:{
 				"spring": -0.05,
-				"summer": 0.35,
+				"summer": 0.35, //Wood surplus, as lumber harvest is well & truly over, & domestic demand is already satisfied
 				"autumn": 0.15,
 				"winter": 0.05
 			}},
-			{name: "beam", value: 10, chance: 0.25, width: 0.15, minLevel: 5},
-			{name: "scaffold", value: 1, chance: 0.1, width: 0.1, minLevel: 10}
-			//TODO: give each race a resource with negative base chance, requiring ambassadors to unlock trade
-			//TODO: give each trade resource some seasonal variation because it's a cool & underutilized mechanic
+			{name: "beam", value: 10, chance: 0.25, width: 0.15, minLevel: 5, seasons: {
+				"spring": -0.15,
+				"summer": 0.2, //Late summer-early autumn: surplus wood is gradually turned into beams
+				"autumn": 0.2,
+				"winter": 0.1
+			}},
+			{name: "scaffold", value: 1, chance: 0.1, width: 0.1, minLevel: 10, seasons: {
+				"spring": -0.1,
+				"summer": 0.05,
+				"autumn": 0.3, //By autumn, most beams are turned into scaffold
+				"winter": 0.1
+			}},
+			{name: "manuscript", value: 4, chance: -0.03, width: 0.42, minLevel: 25, seasons: {
+				"spring": 0.08,
+				"summer": 0.5, //Lots of literature & music is published in late spring, in time for summer festivals
+				"autumn": -0.04,
+				"winter": -0.12
+			}},
+			{name: "furs", value: 12, chance: -0.06, width: 0.25, minLevel: 40, seasons: {
+				"spring": -0.05,
+				"summer": 0.2,
+				"autumn": 0.1,
+				"winter": -0.5 //High domestic demand for furs
+			}}
 		],
 		collapsed: false,
 		pinned: false
@@ -56,11 +76,38 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				"spring": 0.2,
 				"summer": -0.05,
 				"autumn": 0.15,
-				"winter": 0.45
+				"winter": 0.45 //Peak catnip harvest time--no like actually please buy our catnip we don't want it we have too much
 			}},
-			{name: "parchment", value: 5, chance: 0.25, width: 0.25, minLevel: 5},
-			{name: "manuscript", value: 3, chance: 0.15, width: 0.25, minLevel: 10},
-			{name: "compedium", value: 1, chance: 0.1, width: 0.25, minLevel: 15}
+			{name: "parchment", value: 5, chance: 0.25, width: 0.25, minLevel: 5, seasons: {
+				"spring": 0.15,
+				"summer": -0.35, //Parchment production season
+				"autumn": -0.05,
+				"winter": 0.4 //Domestic demand is satisfied by now, surplus can be sold
+			}},
+			{name: "manuscript", value: 3, chance: 0.15, width: 0.25, minLevel: 10, seasons: {
+				"spring": -0.15, //Running out of parchments...printing presses sit idle
+				"summer": -0.35,
+				"autumn": 0.35, //Parchments are finished --> peak printing season
+				"winter": 0.1
+			}},
+			{name: "compedium", value: 1, chance: 0.1, width: 0.25, minLevel: 15, seasons: {
+				"spring": 0.4, //Peer review finishes, papers can be published
+				"summer": 0.2,
+				"autumn": -0.15,
+				"winter": -0.3 //Papers are stuck in peer review
+			}},
+			{name: "oil", value: 160, chance: -0.01, width: 0.7, minLevel: 25, seasons: { //Bio-oil made from catnip
+				"spring": 0.2,
+				"summer": -0.1,
+				"autumn": -0.1,
+				"winter": 0.3 //Peak catnip harvest time
+			}},
+			{name: "plastic", value: 0.5, chance: -0.2, width: 0.7, minLevel: 40, seasons: { //Bioplastic made from catnip
+				"spring": 0.25, //Takes a few weeks to process all the oil into plastic
+				"summer": 0.1,
+				"autumn": -0.2,
+				"winter": -0.1
+			}}
 		],
 		collapsed: false,
 		pinned: false
@@ -82,8 +129,30 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				"autumn": 0.35,
 				"winter": -0.2
 			}},
-			{name: "steel", value: 25, chance: 0.25, width: 0.1, minLevel: 5},
-			{name: "gear", value: 5, chance: 0.1, width: 0.25, minLevel: 10}
+			{name: "steel", value: 25, chance: 0.25, width: 0.1, minLevel: 5, seasons: {
+				"spring": -0.15,
+				"summer": 0.1,
+				"autumn": 0.15,
+				"winter": -0.4 //Coal is burned for heating, less is available for industrial use
+			}},
+			{name: "gear", value: 5, chance: 0.1, width: 0.25, minLevel: 10, seasons: {
+				"spring": 0,
+				"summer": 0.1,
+				"autumn": 0.25,
+				"winter": -0.35 //Production lines shut down during winter due to weather
+			}},
+			{name: "alloy", value: 2, chance: -0.05, width: 0.18, minLevel: 20, seasons: {
+				"spring": -0.05,
+				"summer": 0.05,
+				"autumn": 0.2,
+				"winter": -0.2
+			}},
+			{name: "microchip", value: 6, chance: -0.125, width: 0.5, minLevel: 30, seasons: {
+				"spring": -0.25, //High domestic demand for chips; few available for export
+				"summer": 0.05,
+				"autumn": 0.3,
+				"winter": -0.7
+			}}
 		],
 		collapsed: false,
 		pinned: false
@@ -99,16 +168,44 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			name: "culture",
 			val: 500
 		}],
-		sells:[
+		sells:[ //Stone-based materials are available year-round.
+			//Seasonal variation is due to cultural influences, not resource availability.
 			{name: "minerals", value: 1000, chance: 1, width: 0.18, seasons:{
 				"spring": 0.25,
 				"summer": 0.05,
-				"autumn": -0.35,
+				"autumn": -0.35, //Holiday season.  International trade slows down.
 				"winter": -0.05
 			}},
-			{name: "slab", value: 5, chance: 0.75, width: 0.15, minLevel: 5},
-			{name: "concrate", value: 5, chance: 0.25, width: 0.05, minLevel: 10},
-			{name: "megalith", value: 1, chance: 0.1, width: 0.1, minLevel: 15}
+			{name: "slab", value: 5, chance: 0.75, width: 0.15, minLevel: 5, seasons: {
+				"spring": 0.3, //Working season.  Peak time for international trade.
+				"summer": 0.075,
+				"autumn": -0.4,
+				"winter": -0.075
+			}},
+			{name: "concrate", value: 5, chance: 0.25, width: 0.05, minLevel: 10, seasons: {
+				"spring": 0.4, //Variance is higher for concrete blocks since they do be heavy
+				"summer": 0.1,
+				"autumn": -0.45,
+				"winter": -0.1
+			}},
+			{name: "megalith", value: 1, chance: 0.1, width: 0.1, minLevel: 15, seasons: {
+				"spring": 0.48, //Megaliths are hard to transport due to sheer physical dimensions,
+				"summer": 0.12, //so the seasonal variance is even higher.
+				"autumn": -0.48,
+				"winter": -0.12
+			}},
+			{name: "uranium", value: 0.2, chance: -0.08, width: 0.1, minLevel: 40, seasons: {
+				"spring": 0.6, //Working season.
+				"summer": 0.1,
+				"autumn": -0.4,
+				"winter": -0.3
+			}},
+			{name: "thorium", value: 0.05, chance: -0.16, width: 0.04, minLevel: 55, seasons: {
+				"spring": 0.5, //Working season.
+				"summer": 0.2,
+				"autumn": -0.7,
+				"winter": -0.3
+			}}
 		],
 		collapsed: false,
 		pinned: false
@@ -128,7 +225,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		sells:[
 			{name: "iron", value: 300, chance: 1, width: 0.08, seasons:{
 				"spring": 0,
-				"summer": 0.15,
+				"summer": 0.15, //Stronger focus on raw resource extraction
 				"autumn": -0.1,
 				"winter": -0.2
 			}},
@@ -136,9 +233,38 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				"spring": 0.05,
 				"summer": -0.15,
 				"autumn": 0.05,
-				"winter": 0.25
+				"winter": 0.25 //Stronger focus on crafting refined resources
 			}},
-			{name: "alloy", value: 0.25, chance: 0.05, width: 0.05, minLevel: 5}
+			{name: "alloy", value: 0.25, chance: 0.05, width: 0.05, minLevel: 5, seasons: {
+				"spring": -0.02,
+				"summer": 0,
+				"autumn": 0.03,
+				"winter": 0.08 //Stronger focus on crafting refined resources
+			}},
+			{name: "steel", value: 0.01, chance: -0.05, width: 0.1, minLevel: 15, seasons: { //Requires ambassadors
+				"spring": -0.15,
+				"summer": -0.15,
+				"autumn": 0,
+				"winter": 0.3 //Stronger focus on crafting refined resources
+			}},
+			{name: "starchart", value: 0.05, chance: -0.15, width: 0.6, minLevel: 30, seasons: { //The zebras hate you
+				"spring": 0.2,
+				"summer": -0.5, //All the smoke from the refineries makes stargazing hard
+				"autumn": 0.15,
+				"winter": -0.8 //Again, too much smoke
+			}},
+			{name: "coal", value: 0.004, chance: -0.2, width: 0.25, minLevel: 50, seasons: { //They're quite stingy with their resources
+				"spring": 0.05,
+				"summer": 0.2, //Stronger focus on raw resource extraction
+				"autumn": 0.05,
+				"winter": -0.15
+			}},
+			{name: "unobtainium", value: 1e-6 /*might be too high, even*/, chance: -0.245, width: 0.3, minLevel: 80, seasons: { //Exists purely to taunt the player
+				"spring": -0.1,
+				"summer": 0.6, //Stronger focus on raw resource extraction
+				"autumn": 0.2,
+				"winter": -0.4
+			}}
 		],
 		 unlocks:{
 			policies:["zebraRelationsAppeasement", "zebraRelationsBellicosity"]
@@ -163,10 +289,21 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				"spring": 0,
 				"summer": 0.05,
 				"autumn": 0.15,
-				"winter": -0.05
+				"winter": -0.05 //Domestic demand leaves slightly less available for selling
 			}},
-			{name: "oil", value: 100, chance: 0.25, width: 0.15, minLevel: 5},
-			{name: "plastic", value: 1, chance: -1.0, width: 0.8, minLevel: 15, seasons:{
+			{name: "oil", value: 100, chance: 0.25, width: 0.15, minLevel: 5, seasons: {
+				"spring": 0.11, //Oil not burned in the winter becomes surplus
+				"summer": -0.01,
+				"autumn": 0.04,
+				"winter": -0.06
+			}},
+			/*{name: "silk", value: 1, chance: -0.1, width: 0.3, minLevel: 15, seasons: {
+				"spring": 0.6,
+				"summer": -0.5,
+				"autumn": -0.9,
+				"winter": 1.5
+			}},*/
+			{name: "plastic", value: 1, chance: -0.2, width: 0.8, minLevel: 15, seasons:{ //Spider plastic is made from their own silk
 				"spring": 1.0,
 				"summer": -0.3,
 				"autumn": -0.6,
@@ -189,9 +326,11 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		buys: [
 			{name: "titanium", val: 250}
 		],
-		sells:[
+		sells:[ //Not affected by Cath seasons because they're so technologically advanced they don't care
 			{name: "uranium", value: 1, chance: 0.95, width: 0.25},
-			{name: "thorium", value: 1, chance: 0.5, width: 0.25, minLevel: 5}
+			{name: "thorium", value: 1, chance: 0.5, width: 0.25, minLevel: 5},
+			{name: "temporalFlux", value: 0.2, chance: -0.075, width: 0.18, minLevel: 30},
+			{name: "antimatter", value: 0.1, chance: -0.175, width: 0.18, minLevel: 50}
 		],
 		collapsed: false,
 		pinned: false
@@ -203,11 +342,13 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		buys: [
 			{name: "unobtainium", val: 5000}
 		],
-		sells:[
+		sells:[ //Not affected by Cath seasons in the slightest because they live offworld
 			{name: "starchart", value: 250, chance: 0.5, width: 0.8},
 			{name: "timeCrystal", value: 0.25, chance: 0.98, width: 0.15},
 			{name: "sorrow", value: 1, chance: 0.15, width: 0.1},
-			{name: "relic", value: 1, chance: 0.05, width: 0}
+			{name: "relic", value: 1, chance: 0.05, width: 0},
+			{name: "temporalFlux", value: 3, chance: -0.1, width: 0.2},
+			{name: "tears", value: 1500, chance: -0.1, width: 0.8}
 		],
 		unlocks:{
 			policies:["transkittenism", "necrocracy", "radicalXenophobia"]
@@ -1586,7 +1727,7 @@ var EmbassyButtonHelper = {
 		for (var i = 0; i < race.sells.length; i += 1) {
 			var sellOptions = race.sells[i]; //Example: {name: "slab", value: 5, chance: 0.75, width: 0.15, minLevel: 5}
 			var sellResource = game.resPool.get(sellOptions.name); //Actual resources object.
-			if (!sellResource.unlocked) {
+			if (!sellResource.unlocked && !game.devMode) {
 				continue; //Don't display a resource that's not unlocked yet.
 			}
 			if (sellOptions.chance + ambassadorBonus >= 1 && !game.devMode) {
@@ -1594,7 +1735,7 @@ var EmbassyButtonHelper = {
 				//Override: In dev mode, we display it anyways.
 			}
 			var sellChance = Math.min(game.diplomacy.getResourceTradeChance(sellOptions, race), 1); //Cap at 100%
-			if (sellChance == 0 ) {
+			if (sellChance == 0 && !game.devMode) {
 				continue; //Don't display a resource that we can't get from them.
 			}
 			chancesToDisplay.push({ title: sellResource.title, chance: sellChance, originalChance: sellOptions.chance });
