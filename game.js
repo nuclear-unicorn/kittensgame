@@ -306,13 +306,15 @@ dojo.declare("classes.game.Server", null, {
 
 	/**
 	 * Make an XHR request to KGNet server
-	 * 
+	 *
 	 * @param {string} url - relative endpoint URL
 	 * @param {*} method - "GET" or "POST"
 	 * @param {*} data - post data
 	 * @param {*} handler - onDone callback handler
+	 * @param {*} [errorHandler] - onFail callback handler, invoked with (jqXHR, textStatus)
 	 */
-	_xhr: function(url, method, data, handler){
+	_xhr: function(url, method, data, handler, errorHandler){
+		var self = this;
 		return $.ajax({
             cache: false,
             type: method || "GET",
@@ -324,7 +326,35 @@ dojo.declare("classes.game.Server", null, {
 			data: data
 		}).done(function(resp){
 			handler(resp);
+		}).fail(function(jqXHR, textStatus){
+			console.error("KGNet request failed:", method || "GET", url, "status:", jqXHR.status, textStatus);
+			if (jqXHR.status == 403){
+				//the HTTP session is gone (expired or revoked), the cached profile no longer reflects reality
+				self.setUserProfile(null);
+			}
+			if (errorHandler){
+				errorHandler(jqXHR, textStatus);
+			}
 		});
+	},
+
+	/**
+	 * Show a failed KGNet operation in the game log with a human-readable reason.
+	 * 403 means the session expired; status 0 means the server could not be reached at all.
+	 *
+	 * @param {string} i18nKey - operation message with a {0} placeholder for the reason
+	 * @param {*} jqXHR
+	 */
+	_notifyRequestError: function(i18nKey, jqXHR){
+		var reason;
+		if (jqXHR.status == 403){
+			reason = $I("ui.kgnet.error.auth");
+		} else if (jqXHR.status > 0){
+			reason = $I("ui.kgnet.error.status", [jqXHR.status]);
+		} else {
+			reason = $I("ui.kgnet.error.network");
+		}
+		this.game.msg($I(i18nKey, [reason]), "alert");
 	},
 
 	/**
@@ -353,10 +383,8 @@ dojo.declare("classes.game.Server", null, {
 		var self = this,
 			game = this.game;
 
-		game.lastBackup = new Date().getTime();
-
 		var saveData = this.game.save();
-		this._xhr("/kgnet/save/upload/", "POST", 
+		this._xhr("/kgnet/save/upload/", "POST",
 		{
 			//pre-parsing guid to avoid checking it on the backend side
 			guid: this.game.telemetry.guid,
@@ -367,11 +395,14 @@ dojo.declare("classes.game.Server", null, {
 					day: game.calendar.day
 				}
 			}
-		}, 
+		},
 		function(resp){
-			console.log("save successful?");
+			game.lastBackup = new Date().getTime();
 			self.saveData = resp;
 			self.game.msg($I("save.export.msg"));
+		},
+		function(jqXHR){
+			self._notifyRequestError("save.export.fail", jqXHR);
 		});
 	},
 
@@ -393,14 +424,19 @@ dojo.declare("classes.game.Server", null, {
 		},
 		function(resp){
 			self.saveData = resp;
+		},
+		function(jqXHR){
+			self._notifyRequestError("save.update.fail", jqXHR);
 		});
 	},
 
 	loadSave: function(guid){
 		var self = this;
 		this._xhr("/kgnet/save/" + guid + "/download/", "GET", {}, function(resp){
-			if (!resp.data){
+			if (!resp || !resp.data){
 				console.error("unable to load game data", resp);
+				self.game.msg($I("save.import.fail", [$I("ui.kgnet.error.nodata")]), "alert");
+				return;
 			}
 			var data = resp.data;
 			LCstorage["com.nuclearunicorn.kittengame.savedata"] = data;
@@ -410,6 +446,9 @@ dojo.declare("classes.game.Server", null, {
 			self.game.msg($I("save.import.msg"));
 
 			self.game.render();
+		},
+		function(jqXHR){
+			self._notifyRequestError("save.import.fail", jqXHR);
 		});
 	},
 
@@ -2610,8 +2649,14 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		var preparedSaveData = this._prepareSaveData(saveData);
 		var saveDataString = this._saveDataToString(preparedSaveData);
-		LCstorage["com.nuclearunicorn.kittengame.savedata"] = saveDataString;
-		console.log("Game saved");
+		try {
+			LCstorage["com.nuclearunicorn.kittengame.savedata"] = saveDataString;
+			console.log("Game saved");
+		} catch (e) {
+			//most likely the localStorage quota is exceeded (or storage is blocked, e.g. private browsing)
+			console.error("Unable to save the game:", e);
+			this.msg($I("save.fail"), "alert");
+		}
 
 		this.ui.save();
 

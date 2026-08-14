@@ -1390,8 +1390,12 @@
     "gift.metaphysics": "Got {0}!",
 
     "save.export.msg": "Save export successful!",
+    "save.export.fail": "Cloud save failed: {0}. Your progress was NOT uploaded!",
+    "save.fail": "Could not save the game — local storage is full or unavailable! Export your save manually to avoid losing progress.",
     "save.import.confirmation.msg": "Are your sure? This will overwrite your save!",
     "save.import.msg": "Save import successful!",
+    "save.import.fail": "Could not load the cloud save: {0}.",
+    "save.update.fail": "Could not update the cloud save: {0}.",
 
     "science.policyToggleBlocked.label": "Hide blocked policies",
     "science.policyToggleResearched.label": "Hide researched policies",
@@ -1881,6 +1885,10 @@
     "ui.kgnet.save.load": "↓ Load",
     "ui.kgnet.sync": "Sync cloud saves",
     "ui.kgnet.instructional": "<- Click this link to start. After data loads, click on the 'Create save'.",
+    "ui.kgnet.error.auth": "your session has expired, please log in again",
+    "ui.kgnet.error.status": "server error {0}",
+    "ui.kgnet.error.network": "could not reach the server",
+    "ui.kgnet.error.nodata": "the server returned no save data",
 
     "ui.toggle.researched": "Toggle Researched",
 
