@@ -21,6 +21,12 @@ const PORT = process.env.PORT || 7780;
 /** @type {Array<{guid:string,label:string,archived:boolean,index:object,timestamp:number,size:number,data:string}>} */
 const saves = [];
 
+// Failure injection: when non-zero, every /user/ and /kgnet/ endpoint returns
+// this HTTP status instead of its normal response. Toggle at runtime:
+//   curl -X POST localhost:7780/mock/fail/403   # simulate an expired session
+//   curl -X POST localhost:7780/mock/ok         # back to normal
+let forcedStatus = 0;
+
 // Saves are returned to the client without the (potentially huge) save blob.
 function snapshot() {
 	return saves.map(function (s) {
@@ -97,9 +103,36 @@ const server = http.createServer(async function (req, res) {
 		return send(req, res, 204);
 	}
 
+	// Failure-injection control endpoints (never affected by forcedStatus).
+	const fail = url.match(/^\/mock\/fail\/(\d{3})$/);
+	if (fail) {
+		forcedStatus = Number(fail[1]);
+		console.log("  -> forcing status", forcedStatus, "on all game endpoints");
+		return send(req, res, 200, { forcedStatus: forcedStatus });
+	}
+	if (url === "/mock/ok") {
+		forcedStatus = 0;
+		console.log("  -> back to normal responses");
+		return send(req, res, 200, { forcedStatus: forcedStatus });
+	}
+
+	if (forcedStatus) {
+		return send(req, res, forcedStatus, { error: "forced by /mock/fail/" + forcedStatus });
+	}
+
 	// Active session — any truthy id makes the client treat the user as logged in.
 	if (url === "/user/" && method === "GET") {
 		return send(req, res, 200, { id: 1, username: "mockkitten" });
+	}
+
+	// Login/logout — accepts any credentials.
+	if (url === "/user/login/" && method === "POST") {
+		await readBody(req);
+		return send(req, res, 200, { id: 1, username: "mockkitten" });
+	}
+	if (url === "/user/logout/" && method === "POST") {
+		await readBody(req);
+		return send(req, res, 200, {});
 	}
 
 	// List cloud saves.
