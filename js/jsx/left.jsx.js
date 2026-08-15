@@ -285,7 +285,7 @@ WResourceRow = React.createClass({
 
     componentDidUpdate: function(prevProps, prevState){
         var node = React.findDOMNode(this.refs.perTickNode);
-        if(this.refs.isTooltipAttached && !node) {
+        if (this.refs.isTooltipAttached && !node) {
             this.refs.isTooltipAttached = false;
         }
         if (node && !this.refs.isTooltipAttached) {
@@ -555,7 +555,7 @@ WCraftRow = React.createClass({
 
     componentDidUpdate: function(prevProps, prevState){
         var node = React.findDOMNode(this.refs.perTickNode);
-        if(this.refs.isTooltipAttached && !node) {
+        if (this.refs.isTooltipAttached && !node) {
             this.refs.isTooltipAttached = false;
         }
         if (node && !this.refs.isTooltipAttached) {
@@ -790,7 +790,7 @@ WPins = React.createClass({
                     handler: function(loadout){ 
                         loadout.setLoadout(true);
                     }.bind(this, loadout)
-                })
+                });
             }
         }
         return pins;
@@ -992,7 +992,7 @@ WTooltip = React.createClass({
 
     render: function(){
         return $r("div", {
-            tabIndex: this.props.tabindex ?? 0,
+            tabIndex: this.props.tabindex || 0,
             className: "tooltip-block", 
             onMouseOver: this.onMouseOver, 
             onMouseOut: this.onMouseOut,

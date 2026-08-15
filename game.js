@@ -2,6 +2,13 @@
 /**
  * A class for a game page container
  *
+ * See core.js for the conventions used here. In short: every dojo.declare result
+ * is captured in a plain global var so the checker can infer the class shape from
+ * the object literal, while dojo.declare still registers the dotted path
+ * (classes.game.Timer, com.nuclearunicorn.game.ui.GamePage, ...) exactly as before.
+ * `new classes.game.X(...)` call sites are deliberately left alone so mods that
+ * swap out a class on the global namespace keep working; the captured var is used
+ * only in superclass position and in type annotations.
  */
 
 /**
@@ -13,24 +20,75 @@
  * nest: an element that is itself an array is rendered as an indented sub-stack.
  * @typedef {(ResStackEntry | ResStack)[]} ResStack
  */
+/**
+ * Display metadata for one effect. Every field is optional - a bare `{title: ...}`
+ * is a valid meta, and `getEffectMeta` falls back to exactly that.
+ * @typedef {{title?: string, resName?: string, type?: string, calculation?: string}} EffectMeta
+ */
+/**
+ * A parsed save blob. Every manager owns a top level key and is free to put
+ * whatever it likes under it, so this stays an open record; `saveVersion` is the
+ * only field game.js itself reads.
+ * @typedef {{saveVersion?: number} & Record<string, any>} SaveData
+ */
+/**
+ * One undoable game action, as recorded by `UndoChange#addEvent`.
+ * @typedef {{managerId: string, data: any, description: string}} UndoEvent
+ */
+/**
+ * A recurring callback registered with `Timer#addEvent`. `phase` counts down once
+ * per tick; the handler fires and the phase resets when it reaches zero.
+ * @typedef {{handler: () => void, frequency: number, phase: number}} TimerEvent
+ */
+
+/**
+ * dojo.declare hands back a constructor *value*, not a TypeScript class, so the
+ * bare name cannot be used in a type position. These aliases give each captured
+ * class an instance type under the same name - the type and the var live in
+ * separate declaration spaces, so `Timer` means the constructor in an expression
+ * and the instance everywhere a type is expected.
+ *
+ * These are inferred from the object literals, so a component that types its
+ * `game` back-reference as `GamePage` may NOT be referenced back from GamePage's
+ * own props by type: the two inferences would chase each other and TS bails with
+ * "circularly references itself". The back-reference is the side worth keeping -
+ * it is what every manager in js/ wants (see the TODO on TabManager#game in
+ * core.js) - so GamePage's handles to those components stay loose instead.
+ *
+ * @typedef {InstanceType<typeof Timer>} Timer
+ * @typedef {InstanceType<typeof Telemetry>} Telemetry
+ * @typedef {InstanceType<typeof Server>} Server
+ * @typedef {InstanceType<typeof UndoChange>} UndoChange
+ * @typedef {InstanceType<typeof EffectsManager>} EffectsManager
+ * @typedef {InstanceType<typeof GamePage>} GamePage
+ */
 
 
 
 /**
  * Just a simple timer, js timer sucks
  */
-dojo.declare("classes.game.Timer", null, {
+var Timer = dojo.declare("classes.game.Timer", null, {
+	/** @type {TimerEvent[]} */
 	handlers: [],
+	/** @type {(() => void)[]} */
 	scheduledHandlers: [],
 
 	ticksTotal: 0,
+	/** @type {number} epoch ms captured by beforeUpdate */
 	timestampStart: null,
+	/** @type {number} running sum of every tick's duration, in ms */
 	totalUpdateTime: null,
 	currentTime: 0,
 	averageTime: 0,
 
 
 
+	/**
+	 * Register a handler to be fired every `frequency` ticks.
+	 * @param {() => void} handler
+	 * @param {number} frequency - in ticks
+	 */
 	addEvent: function(handler, frequency){
 		this.handlers.push({
 			handler: handler,
@@ -50,6 +108,11 @@ dojo.declare("classes.game.Timer", null, {
 		}
 	},
 
+	/**
+	 * Run `handler` once, at the top of the next tick. Used to keep save/load/reset
+	 * from landing in the middle of an update cycle.
+	 * @param {() => void} handler
+	 */
 	scheduleEvent: function(handler){
 		this.scheduledHandlers.push(handler);
 	},
@@ -79,7 +142,7 @@ dojo.declare("classes.game.Timer", null, {
 	}
 });
 
-dojo.declare("mixin.IDataStorageAware", null, {
+var IDataStorageAware = dojo.declare("mixin.IDataStorageAware", null, {
 	/**
 	 * `save`/`load` are the contract this mixin imposes on whatever class mixes
 	 * it in; they are not defined here.
@@ -91,33 +154,41 @@ dojo.declare("mixin.IDataStorageAware", null, {
 	}
 });
 
-dojo.declare("classes.game.Telemetry", [mixin.IDataStorageAware], {
+var Telemetry = dojo.declare("classes.game.Telemetry", [IDataStorageAware], {
 
+	/** @type {string} rfc4122 v4 id identifying this player across saves */
 	guid: null,
+	/** @type {GamePage} */
 	game: null,
 
+	/** @type {string} set by the platform bootstrap from build.version.json */
 	buildRevision: null,
+	/** @type {string} */
 	version: null,
 	errorCount: 0,
 
+	/** @param {GamePage} game */
 	constructor: function(game) {
 		this.guid = this.generateGuid();
 		this.game = game;
 	},
 
 	// See https://www.ietf.org/rfc/rfc4122.txt, section 4.4
+	/** @returns {string} */
 	generateGuid: function() {
 		return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
 			return (c == "x" ? 16 * Math.random() | 0 : 4 * Math.random() | 8).toString(16);
 		});
 	},
 
+	/** @param {SaveData} data */
 	save: function(data) {
 		data["telemetry"] = {
 			guid: this.guid
 		};
 	},
 
+	/** @param {SaveData} data */
 	load: function(data) {
 		if (data["telemetry"]) {
 			this.guid = data["telemetry"].guid || this.generateGuid();
@@ -164,6 +235,10 @@ dojo.declare("classes.game.Telemetry", [mixin.IDataStorageAware], {
 	},
 
 	// Use this method to create a new PageAction event
+	/**
+	 * @param {string} eventType
+	 * @param {any} [payload] - decorated with build/uid by the browser agent
+	 */
 	logEvent: function(eventType, payload) {
 		payload = payload || {};
 
@@ -173,6 +248,7 @@ dojo.declare("classes.game.Telemetry", [mixin.IDataStorageAware], {
 		}
 	},
 
+	/** @param {string} name - the tab the player switched to */
 	logRouteChange: function(name) {
 		if (window.newrelic && !this.game.opts.disableTelemetry){
 			// Record the current tab name so the charts look pretty in the NR UI.
@@ -198,12 +274,14 @@ dojo.declare("classes.game.Telemetry", [mixin.IDataStorageAware], {
  * Please see toolbar.jsx.js#WLogin widget for rendering part
  */
 
-dojo.declare("classes.game.Server", null, {
+var Server = dojo.declare("classes.game.Server", null, {
 
 	// Server datas
 	//---->
 	showMotd: true,
+	/** @type {string} */
 	motdTitle: null,
+	/** @type {string} */
 	motdContent: null,
 	//<----
 
@@ -212,7 +290,9 @@ dojo.declare("classes.game.Server", null, {
 	 */
 	bcoinPrice: 63918,
 
+	/** @type {GamePage} */
 	game: null,
+	/** @type {string} */
 	motdContentPrevious: null,
 	motdFreshMessage: false,
 
@@ -222,18 +302,22 @@ dojo.declare("classes.game.Server", null, {
 	 * KGNet user profile
 	 * Represents an active session, if not null, all XHR calls will be made
 	 * using session cookies
+	 * @type {{uid: string, id: string} & Record<string, any>}
 	 */
 	userProfile: null,
+	/** @type {string} last chiral client state, kept as pretty-printed JSON for display */
 	chiral: null,
 
 	/**
 	 * When was the last time save was uploaded to the cloud. (Unix timestamp)
+	 * @type {number}
 	 */
 	lastBackup: null,
 
 	/**
 	 * Current client snapshot of the save data
 	 * All operations with the cloud saves should return the save snapshot?
+	 * @type {any}
 	 */
 	saveData: null,
 
@@ -242,10 +326,12 @@ dojo.declare("classes.game.Server", null, {
 	 */
 	isKSDetected: false,
 
+	/** @param {GamePage} game */
 	constructor: function(game){
 		this.game = game;
 	},
 
+	/** @param {{uid: string, id: string} & Record<string, any>} userProfile */
 	setUserProfile: function(userProfile){
 		this.userProfile = userProfile;
 	},
@@ -308,9 +394,10 @@ dojo.declare("classes.game.Server", null, {
 	 * Make an XHR request to KGNet server
 	 * 
 	 * @param {string} url - relative endpoint URL
-	 * @param {*} method - "GET" or "POST"
-	 * @param {*} data - post data
-	 * @param {*} handler - onDone callback handler
+	 * @param {"GET"|"POST"} [method] - defaults to "GET"
+	 * @param {object} [data] - post data
+	 * @param {(resp: any) => void} [handler] - onDone callback handler
+	 * @returns {any} the jqXHR, so callers can chain .done/.fail/.always
 	 */
 	_xhr: function(url, method, data, handler){
 		return $.ajax({
@@ -376,12 +463,8 @@ dojo.declare("classes.game.Server", null, {
 	},
 
 	/**
-	 * 
-	 * @param {*} metadata 
-	 * {
-	 * 	archived?: boolean;
-	 *  label?: string
-	 * }
+	 * @param {string} guid - identifies which cloud save to update
+	 * @param {{archived?: boolean, label?: string}} metadata
 	 */
 	pushSaveMetadata: function(guid, metadata){
 		var self = this;
@@ -396,6 +479,7 @@ dojo.declare("classes.game.Server", null, {
 		});
 	},
 
+	/** @param {string} guid */
 	loadSave: function(guid){
 		var self = this;
 		this._xhr("/kgnet/save/" + guid + "/download/", "GET", {}, function(resp){
@@ -443,6 +527,7 @@ dojo.declare("classes.game.Server", null, {
 		});
 	},
 
+	/** @param {SaveData} saveData */
 	save: function(saveData) {
 		saveData.server = {
 			motdContent: this.motdContent,
@@ -451,6 +536,7 @@ dojo.declare("classes.game.Server", null, {
 	},
 
 	//TOOD: separate getting chiral client status and sending command to a separate component
+	/** @param {string} command */
 	sendCommand: function(command){
 		var self = this;
 		this._xhr("/kgnet/chiral/game/command/", "POST", {
@@ -470,11 +556,12 @@ dojo.declare("classes.game.Server", null, {
 /**
  * Undo Change state. Represents a change in one or multiple managers
  */
-dojo.declare("classes.game.UndoChange", null, {
+var UndoChange = dojo.declare("classes.game.UndoChange", null, {
 	_static:{
 		DEFAULT_TTL : 20
 	},
 	ttl: 0,
+	/** @type {UndoEvent[]} */
 	events: null,
 
 	constructor: function(){
@@ -489,14 +576,14 @@ dojo.declare("classes.game.UndoChange", null, {
 	 * Call this function whenever the player performs an action that can be undone.
 	 * Supply (as arguments) all the relevant data to reconstruct that action, or, if necessary, undo it.
 	 * 
-	 * @param managerId	string	Which manager class will handle the relevant undo operation.
+	 * @param {string} managerId	Which manager class will handle the relevant undo operation.
 	 * 						Typically corresponds to which subsystem of the game is associated with that action.
-	 * @param data	object	Any relevant data to reconstruct the action to be undone.
+	 * @param {any} data	Any relevant data to reconstruct the action to be undone.
 	 * 					For example, if the action is "build 10 Log Houses," then the data would somehow specify
 	 * 						that Log Houses are involved & that there are 10 of them.
 	 * 					The UndoChange system doesn't understand the data here--it is specific to the associated manager.
 	 * 					This allows each different manager to track all the data they care about & nothing more.
-	 * @param description string	An i18n string containing a general human-language description of this undo action.
+	 * @param {string} description	An i18n string containing a general human-language description of this undo action.
 	 * 						The idea is that this would be displayed somewhere in the UI so the player will know
 	 * 							what is being undone before they commit to undoing an action.
 	 */
@@ -512,8 +599,8 @@ dojo.declare("classes.game.UndoChange", null, {
 
 	/**
 	 * Converts an event object into a short, human-language description of what it is.
-	 * @param event	object	An object describing an event, like what would be created from the addEvent function.
-	 * @return string	If the event is valid, it's an i18n string which describes said event, ideally using concise language.
+	 * @param {UndoEvent} event	An object describing an event, like what would be created from the addEvent function.
+	 * @returns {string}	If the event is valid, it's an i18n string which describes said event, ideally using concise language.
 	 * 				If the event is not valid, it's a debug string which hopefully the devs can make use of.
 	 */
 	getEventDescription: function(event) {
@@ -531,13 +618,23 @@ dojo.declare("classes.game.UndoChange", null, {
 /*
  * Effects metadata manager
  */
-dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
+var EffectsManager = dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
+	/** @type {GamePage} */
 	game: null,
 
+	/** @param {GamePage} game */
 	constructor: function(game){
 		this.game = game;
 	},
 
+	/**
+	 * Derives display metadata for the resource-flavoured effects (`woodPerTick`,
+	 * `catnipMax`, ...) by splitting the effect name into a resource prefix and a
+	 * known suffix.
+	 * @param {string} effectName
+	 * @returns {EffectMeta | 0} 0 when the name matches no resource, which is the
+	 *   signal for `getEffectMeta` to fall back to the statics table.
+	 */
 	effectMeta: function(effectName) {
 		var game = this.game;
 		for (var i = 0; i < game.resPool.resources.length; i++) {
@@ -638,6 +735,9 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
 	},
 
 	statics: {
+		//Every effect that `effectMeta` can't derive from a resource name needs an
+		//entry here, or it falls through to a bare `{title: effectName}`.
+		/** @type {Record<string, EffectMeta>} */
 		effectMeta: {
 			// Specials meta of resources
 			"catnipJobRatio" : {
@@ -2002,59 +2102,100 @@ dojo.declare("com.nuclearunicorn.game.EffectsManager", null, {
  * Main game class, can be accessed globally as a 'gamePage' variable
  */
 
-dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
+var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
+	/** @type {string} id of the container DOM node */
 	id: null,
 
+	/** @type {any[]} */
 	tabs: null,
 
 	//components:
+	//Managers and tabs live in js/*.js, which are not checked yet, so they stay
+	//`any` for now. Give one a real type as soon as its file is opted in.
 
+	/** @type {any} */
 	resPool: null,
+	/** @type {any} */
 	calendar: null,
+	/** @type {any} */
 	bld: null,
+	/** @type {any} */
 	village: null,
+	/** @type {any} */
 	science: null,
+	/** @type {any} */
 	workshop: null,
+	/** @type {any} */
 	diplomacy: null,
+	/** @type {any} */
 	achievements: null,
 
 	//the rest of the managers, installed by the `managers` loop in the constructor
+	/** @type {any} */
 	challenges: null,
+	/** @type {any} */
 	religion: null,
+	/** @type {any} */
 	space: null,
+	/** @type {any} */
 	time: null,
+	/** @type {any} */
 	prestige: null,
+	/** @type {any} */
 	stats: null,
+	/** @type {any} */
 	void: null,
+	/** @type {any} */
 	settings: null,
 
 	//tab handles, installed by the `tabRegistry` loop in the constructor
+	/** @type {any} */
 	bldTab: null,
+	/** @type {any} */
 	villageTab: null,
+	/** @type {any} */
 	libraryTab: null,
+	/** @type {any} */
 	workshopTab: null,
+	/** @type {any} */
 	diplomacyTab: null,
+	/** @type {any} */
 	religionTab: null,
+	/** @type {any} */
 	spaceTab: null,
+	/** @type {any} */
 	timeTab: null,
+	/** @type {any} */
 	challengesTab: null,
+	/** @type {any} */
 	achievementTab: null,
+	/** @type {any} */
 	statsTab: null,
+	/** @type {any} */
 	queueTab: null,
+	/** @type {any} */
 	settingsTab: null,
 
+	/** @type {any} com.nuclearunicorn.game.log.Console, see core.js */
 	console: null,
+	/** @type {any} Telemetry - loose to break the back-reference cycle, see the typedefs above */
 	telemetry: null,
+	/** @type {any} Server - loose to break the back-reference cycle, see the typedefs above */
 	server: null,
+	/** @type {any} com.nuclearunicorn.game.Math, see js/math.js */
 	math: null,
 
+	/** @type {Worker} */
 	worker: null,			//web worker driving the update loop off the main thread
+	/** @type {number} */
 	_lastFrameTimestamp: null,
+	/** @type {number} */
 	lastBackup: null,		//timestamp of the last KGNet save upload
 	isKSDetected: false,	//true if the Kitten Scientists mod is present
 
 	//global cache
+	/** @type {Record<string, number>} */
 	globalEffectsCached: {},
 
 	//how much ticks are performed per second (5 ticks per second, 200 ms per tick)
@@ -2073,8 +2214,14 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	//current building selected in the Building tab by a mouse cursor, should affect resource table rendering
 	//TODO: move me to UI
+	/** @type {any} */
 	selectedBuilding: null,
+	/** @type {HTMLElement} */
 	selectedBuildingDomNode: null,
+	/**
+	 * @param {any} object - building metadata, or null to clear the selection
+	 * @param {HTMLElement} [domNode]
+	 */
 	setSelectedObject: function(object, domNode) {
 		this.selectedBuilding = object;
 		this.selectedBuildingDomNode = domNode;
@@ -2090,9 +2237,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	//		option settings
 	//=============================
 	colorScheme: "",
+	/** @type {string[]} ids of the themes the player has unlocked */
 	unlockedSchemes: null,
 
+	/** @type {Timer} */
 	timer: null,
+	/** @type {number} */
 	_mainTimer: null,	//main timer loop
 
 	//===========================================
@@ -2108,8 +2258,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	saveVersion: 15,
 
 	//FINALLY
+	//Booleans default in settings.js, so anything may be missing here; keep it open.
+	/** @type {{notation: string, batchSize: number} & Record<string, any>} */
 	opts: null,
 
+	/** @type {number} */
 	gatherTimeoutHandler: null,	//timeout till resetting gather counter, see below
 	gatherClicks: 0,	//how many clicks in a row was performed on a gather button
 	cheatMode: false,	//flag triggering Super Unethical Climax achievement
@@ -2120,23 +2273,30 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	totalUpdateTime: [0, 0, 0, 0, 0],	//total time spent on update cycle in milliseconds, useful for debug/fps counter. 1 ticks per second have more calculations
 	totalUpdateTimeTicks: 5,
 	totalUpdateTimeCurrent : 0,
+	/** @type {Record<string, number>} */
 	fps: null,	//fps breakdows of a render cycle
 
 	pauseTimestamp: 0, //time of last pause
 
+	/** @type {string} */
 	lastDateMessage: null,  //Stores the most recent date message to prevent header spam
 
+	/** @type {any} EffectsManager - loose to break the back-reference cycle, see the typedefs above */
 	effectsMgr: null,
 
+	/** @type {any[]} every TabManager instantiated by the `managers` loop, in order */
     managers: null,
 
     //TODO: this can potentially be an array
+	/** @type {UndoChange} */
     undoChange: null,
 
     //ui communication layer
+	/** @type {any} see js/ui.js */
     ui: null,
 
     //==========    external API's ========
+	/** @type {any} Dropbox SDK client, installed by the platform bootstrap */
     dropBoxClient: null,
 
 	/*
@@ -2159,6 +2319,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	//a quick way of disabling particular feature on mainline/beta without maintaining boolean flags in the code
 	//there is still no simple way to figure out on WHICH branch we are, especially on local, but we can parse URL
 
+	/** @type {Record<string, {beta: boolean, main: boolean, mobile: boolean}>} */
 	featureFlags: {
 		VILLAGE_MAP: {
 			beta: true,
@@ -2200,15 +2361,18 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	/**
 	 * Build platform, from version.json: "web" | "mobile" | "steam".
 	 * Single source of truth - never fork this per platform, ship a different version.json instead.
+	 * @returns {"web" | "mobile" | "steam"}
 	 */
 	getPlatform: function(){
 		return (window.KGVersion && window.KGVersion.platform) || "web";
 	},
 
+	/** @returns {boolean} */
 	isMobile: function(){
 		return this.getPlatform() == "mobile";
 	},
 
+	/** @param {string} containerId - id of the DOM node the game renders into */
 	constructor: function(containerId){
 		this.id = containerId;
 
@@ -2386,6 +2550,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.effectsMgr = new com.nuclearunicorn.game.EffectsManager(this);
 	},
 
+	/**
+	 * @param {string} flagId - key into `featureFlags`
+	 * @returns {boolean} always true on localhost, so devs see everything
+	 */
 	getFeatureFlag: function(flagId){
 		var host = window.location.hostname;
 		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1" || host.startsWith("192.168");
@@ -2405,6 +2573,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}});	//calculate estimate winter per tick for catnip;
 	},
 
+	/** @param {any} dropBoxClient */
     setDropboxClient: function(dropBoxClient) {
         this.dropBoxClient = dropBoxClient;
     },
@@ -2418,6 +2587,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	/**
 	 * Management of effects
+	 * @param {string} effectName
+	 * @returns {EffectMeta} never null - unknown effects fall back to `{title: effectName}`
 	 */
 	getEffectMeta: function(effectName) {
 		// Try to create Meta automatically, if it fails, check statics, if it fails, by default
@@ -2433,6 +2604,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			}
 		}
 	},
+	/**
+	 * @param {string} effectName
+	 * @returns {number} 0 for effects nothing contributes to
+	 */
 	getEffect: function(effectName){
 		 return this.globalEffectsCached[effectName] || 0;
 	},
@@ -2458,6 +2633,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	// Limited Diminishing Return
 	//getHyperbolicEffect
+	/**
+	 * @param {number} effect
+	 * @param {number} limit - the value the result asymptotically approaches
+	 * @returns {number} same sign as `effect`
+	 */
 	getLimitedDR: function(effect, limit) {
 		var absEffect = Math.abs(effect);
 
@@ -2482,6 +2662,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	/**
 	 * Display a message in the console. Returns a <span> node of a text container
+	 * @param {string} message
+	 * @param {string} [type] - log filter class, e.g. "important" or "notice"
+	 * @param {string} [tag] - filter id, lets the player mute this kind of message
+	 * @param {boolean} [noBullet]
+	 * @returns {HTMLElement}
 	 */
 	msg: function(message, type, tag, noBullet){
 		return this.console.msg(message, type, tag, noBullet);
@@ -2551,6 +2736,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this._publish("server/undoStateChanged");
 	},
 
+	/**
+	 * dojo 1.6 wants the args wrapped in an array, later versions don't.
+	 * @param {string} topic
+	 * @param {any} [arg]
+	 */
 	_publish: function(topic, arg){
 		if (dojo.version.minor == 6) {
 			dojo.publish(topic, [arg]);
@@ -2568,6 +2758,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	/**
 	 * Do not serialize properties with undefined values even if they exist on the metadata
+	 * @param {string} key
+	 * @param {any} value
+	 * @returns {any}
 	 */
 	JSONreplacer: function(key, value) {
 		return (value == undefined)
@@ -2575,6 +2768,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			: value;
 	},
 
+	/**
+	 * Collect every manager's state, write it to localStorage, and hand the
+	 * un-stringified blob back - callers (export, KGNet upload) expect the object.
+	 * @returns {SaveData}
+	 */
 	save: function(){
 		if (this.currentSaveIsBroken) {
 			// if the save is broken, we return the original save that we tried to import.
@@ -2624,6 +2822,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return preparedSaveData;
 	},
 
+	/**
+	 * @param {SaveData} saveData
+	 * @returns {SaveData} the same object - external `game/beforesave` listeners may have mutated it
+	 */
 	_prepareSaveData: function(saveData) {
 		// Allow external scripts to consume the `game/beforesave` event to manipulate
 		// this save data state.
@@ -2633,6 +2835,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return saveData;
 	},
 
+	/**
+	 * @param {SaveData} saveData
+	 * @returns {string} raw JSON, or an LZ blob once it outgrows the 5mb localStorage limit
+	 */
 	_saveDataToString: function(saveData) {
 		var saveDataString = JSON.stringify(saveData, this.JSONreplacer);
 		//5mb limit workaround
@@ -2666,6 +2872,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.render();
 	},
 
+	/** @param {string} themeId */
 	toggleScheme: function(themeId){
 		this.colorScheme = themeId;
 		this.updateOptionsUI();
@@ -2692,6 +2899,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	/**
 	 * Returns a save data JSON from a base64 or utf16 compressed lz blob
 	 * Use this instead of LZString.decompressX
+	 * @param {string} lzData
+	 * @returns {string}
 	 */
 	decompressLZData: function(lzData) {
 		var decompressedAsBase64 = LZString.decompressFromBase64(lzData);
@@ -2700,6 +2909,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			: LZString.decompressFromUTF16(lzData);
 	},
 
+	/**
+	 * @param {string} json
+	 * @param {boolean} [useUTF16] - utf16 packs denser, base64 survives copy-paste
+	 * @returns {string}
+	 */
 	compressLZData: function(json, useUTF16) {
 		//todo check game compatibility flags
 		//console.log("base64 length:", LZString.compressToBase64(json).length, "utf-16 length:", LZString.compressToUTF16(json).length);
@@ -2710,6 +2924,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	/**
 	 * @param {string} [lsData] - raw save blob; defaults to the one in localStorage
+	 * @returns {SaveData}
 	 */
 	_parseLSSaveData: function(lsData){
 		var data = null;
@@ -2728,6 +2943,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return saveData;
 	},
 
+	/**
+	 * Reset to a pristine state, then replay the localStorage save over it.
+	 * @returns {boolean} false if the blob failed to parse - the caller must NOT
+	 *   save over localStorage afterwards, or the broken save is made permanent.
+	 */
 	load: function(){
 		var data = LCstorage["com.nuclearunicorn.kittengame.savedata"];
 		this.resetState();
@@ -2866,9 +3086,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	//btw, ie11 is horrible crap and should not exist
 	saveExport: function(){
 		var data = this.save();
-		data = JSON.stringify(data);
+		var dataString = JSON.stringify(data);
 
-        var encodedData = this.compressLZData(data);
+        var encodedData = this.compressLZData(dataString);
         this.ui.saveExport(encodedData);
 
 	},
@@ -2886,6 +3106,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		});
 	},
 
+	/** @param {boolean} [withFullName] - tag the filename with run number and in-game date */
     saveToFile: function(withFullName) {
         var $link = $("#download-link");
 
@@ -2907,8 +3128,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	saveExportDropbox: function(){
 		this.save();
 		var data = this.save();
-		data = JSON.stringify(data);
-		var lzdata = this.compressLZData(data);
+		var dataString = JSON.stringify(data);
+		var lzdata = this.compressLZData(dataString);
 
 
         var callback = function() {
@@ -2919,6 +3140,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.exportToDropbox(lzdata, callback);
 	},
 
+	/** @returns {string} */
 	getDropboxAuthUrl: function (){
 		var host = window.location.host;
 		var redirectUrl = "/games/kittens/dropboxauth_v2.html";
@@ -2929,6 +3151,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return authUrl;
 	},
 
+	/**
+	 * @param {string} lzdata - compressed save blob
+	 * @param {(error?: string) => void} callback - called with a message on failure, no args on success
+	 */
 	exportToDropbox: function(lzdata, callback) {
 		var game = this;
 		var authUrl = game.getDropboxAuthUrl();
@@ -2965,6 +3191,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		});
 	},
 
+	/** @param {(error?: any) => void} callback */
     importFromDropbox: function (callback) {
         var game = this;
 		var authUrl = game.getDropboxAuthUrl();
@@ -2980,7 +3207,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				var blob = response.fileBlob;
 				var reader = new FileReader();
 				reader.addEventListener("loadend", function() {
-					game.saveImportDropboxText(reader.result, callback);
+					//readAsText below, so result is always a string here
+					game.saveImportDropboxText(/** @type {string} */ (reader.result), callback);
 				});
 				reader.readAsText(blob);
 			}).catch(function (error) {
@@ -2991,6 +3219,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		window.addEventListener("message", handler ,false);
     },
 
+	/** @param {(error?: any) => void} callback */
     saveImportDropboxFileRead: function(callback){
         var game = this;
         this.dropBoxClient.readFile("kittens.save", {}, function (error, lzdata){
@@ -3002,11 +3231,20 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
         });
     },
 
+	/**
+	 * Deferred to the next tick so a load never lands mid-update.
+	 * @param {string} lzdata - compressed save blob
+	 * @param {(error?: any) => void} callback
+	 */
     saveImportDropboxText: function(lzdata, callback){
         this.timer.scheduleEvent(dojo.hitch(this, this._loadSaveJson, lzdata, callback));
     },
 
 	//TODO: add some additional checks and stuff?
+	/**
+	 * @param {string} lzdata
+	 * @param {(error?: any) => void} callback
+	 */
 	_loadSaveJson: function(lzdata, callback){
         try {
 			var jsonString = this.decompressLZData(lzdata);
@@ -3037,6 +3275,9 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * Save migration must be considered as a measure of a last resolve, when everything else fails
 	 * Whenever possible, we should resolve to the code being backward compatible. Every time we bump a save version,
 	 * god kills a kitten somewhere.
+	 *
+	 * @param {SaveData} save - mutated in place, one saveVersion step at a time
+	 * @returns {SaveData} the same object, now at the current saveVersion
 	 */
 
 	migrateSave: function(save) {
@@ -3326,6 +3567,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	},
 
+	/** @param {any} ui - see js/ui.js; the web and mobile builds pass different ones */
     setUI: function(ui){
         this.ui = ui;
         ui.setGame(this);
@@ -3392,6 +3634,14 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return perTick;
 	}, */
 
+	/**
+	 * The authoritative per-tick number for a resource. `getResourcePerTickStack`
+	 * below recomputes the same thing as a displayable breakdown - the two must be
+	 * kept in step by hand.
+	 * @param {string} resName
+	 * @param {any} [season] - season override; the current one is used otherwise
+	 * @returns {number} 0 rather than NaN when the maths degenerates
+	 */
 	calcResourcePerTick: function(resName, season){
 		var res = this.resPool.get(resName);
 
@@ -3564,6 +3814,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		return perTick;
 	},
+	/**
+	 * Appends the modifiers that apply to every sub-stack (necrocracy, policy,
+	 * destruction) so each nested group totals up the same way the flat maths does.
+	 * @param {ResStack} array - mutated in place
+	 * @param {string} resName
+	 * @returns {ResStack} the same array
+	 */
 	addGlobalModToStack: function(array, resName){
 		var game = this;
 		if (game.science.getPolicy("necrocracy").researched){
@@ -3587,8 +3844,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 	/**
 	 * Generates a stack of resource modifiers. (TODO: use it with resource per tick calculation logic)
+	 * @param {string} resName
+	 * @param {boolean} [calcAutomatedEffect]
+	 * @param {any} [season]
+	 * @returns {ResStack} undefined for an unknown resource
 	 */
-	/** @returns {ResStack} */
 	getResourcePerTickStack: function(resName, calcAutomatedEffect, season){
 		/** @type {ResStack} */
 		var stack = [];
@@ -3997,7 +4257,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return stack;
 	},
 
-	/** @returns {ResStack} */
+	/**
+	 * @param {string} resName
+	 * @returns {ResStack} undefined for an unknown resource
+	 */
 	getResourcePerDayStack: function(resName){
 		/** @type {ResStack} */
 		var stack = [];
@@ -4070,7 +4333,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return stack;
 	},
 
-	/** @returns {ResStack} */
+	/**
+	 * @param {string} resName
+	 * @returns {ResStack} undefined for an unknown resource
+	 */
 	getResourceOnYearStack: function(resName){
 		/** @type {ResStack} */
 		var stack = [];
@@ -4113,14 +4379,23 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		});
 		return stack;
 	},
+	/** @returns {number} */
 	getCMBRBonus: function() {
 		return this.isCMBREnabled ? 0.2 : 0;
 	},
 
+	/**
+	 * @param {string} tag - craft category, e.g. "metal"; leaders boost their own
+	 * @returns {number}
+	 */
 	getCraftRatio: function(tag) {
 		return this.getEffect("craftRatio") + this.village.getEffectLeader("engineer", 0) + this.village.getEffectLeader(tag, 0);
 	},
 
+	/**
+	 * @param {string} craftedResName
+	 * @returns {number}
+	 */
 	getResCraftRatio: function(craftedResName) {
 		if (craftedResName == "wood") {
 			var policyRefineRatio = this.getEffect("refinePolicyRatio");
@@ -4182,10 +4457,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.timer.afterUpdate();
 	},
 
+	/** @returns {number} the effective tick rate, so countdowns respect time acceleration */
 	getTicksPerSecondUI: function() {
 		return this.ticksPerSecond * (1 + this.timeAccelerationRatio());
 	},
 
+	/** @returns {number} */
 	timeAccelerationRatio: function() {
 		return this.time.isAccelerated ? 0.5 : 0;
 	},
@@ -4242,16 +4519,19 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.timer.update();
 	},
 
+	/** @param {Event} event */
 	huntAll: function(event){
 		event.preventDefault();
 		this.village.huntAll();
 	},
 
+	/** @param {Event} event */
 	praise: function(event){
 		event.preventDefault();
 		this.religion.praise();
 	},
 
+	/** @param {Event} event */
 	sacrificeAllUnicorns: function(event){
 		event.preventDefault();
 		this.religion.sacrificeAllUnicorns();
@@ -4272,6 +4552,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 	},
 
+	/**
+	 * Reads the value cached by `updateResources`, so this is cheap to call per frame.
+	 * @param {string} resName
+	 * @param {boolean} [withConversion] - fold in what converters (smelters, ...) consume
+	 * @returns {number}
+	 */
 	getResourcePerTick: function(resName, withConversion){
 		var res = this.resPool.get(resName);
 		if (res.calculatePerTick) {
@@ -4281,6 +4567,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 	},
 
+	/**
+	 * @param {string} resName
+	 * @returns {number}
+	 */
 	getResourcePerDay: function(resName){
 		if (resName == "necrocorn"){
 			return (this.religion.pactsManager.getNecrocornDeficitConsumptionModifier() * this.getEffect(resName + "PerDay") +
@@ -4288,6 +4578,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 		return this.getEffect(resName + "PerDay");
 	},
+	/**
+	 * @param {string} resName
+	 * @returns {number}
+	 */
 	getResourceOnYearProduction: function(resName){
 		if (resName == "antimatter"){
 			if (this.resPool.energyProd < this.resPool.energyCons){
@@ -4297,17 +4591,26 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return this.getEffect(resName + "Production") * (1 + this.getEffect(resName + "PolicyRatio")) * (1 + this.getEffect("pyramidPerYearRatio"));
 	},
 	//Returns a negative value if something consumes the resource each tick (such as a Smelter)
+	/**
+	 * @param {string} resName
+	 * @returns {number}
+	 */
 	getResourcePerTickConvertion: function(resName) {
 		return this.fixFloatPointNumber(this.getEffect(resName + "PerTickCon") -
 			/*use subtraction because getAmbassadorEffect returns positive value*/
 			this.diplomacy.getAmbassadorEffect(resName + "ConsumptionAmbassadors"));
 	},
 
+	/**
+	 * @param {string} resName
+	 * @param {number} value - how many batches to craft
+	 */
 	craft: function(resName, value){
 		this.workshop.craft(resName, value);
 		this.updateResources();
 	},
 
+	/** @param {string} resName */
 	craftAll: function(resName){
 		if (resName == "wood"){
 			var game = this;
@@ -4336,6 +4639,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.updateResources();
 	},
 
+	/**
+	 * @param {any} bld - any metadata with a `prices` array
+	 * @returns {string[]} the names of the resources it costs
+	 */
 	getRequiredResources: function(bld){
 		var res = [];
 		if (bld && bld.prices) {
@@ -4350,6 +4657,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * Attaches onMouseOver/onMouseOut events to a given DOM node in order to display tooltip.
 	 * All tooltips will reuse the same container.
 	 *
+	 * @param {HTMLElement} container
+	 * @param {any} resRef - the resource this node stands for
 	 */
 	attachResourceTooltip: function(container, resRef){
 		UIUtils.attachTooltip(this, container, 0, 100, function() {
@@ -4378,6 +4687,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	/**
 	 * Returns a flat map of resource production
+	 * @param {any} res
+	 * @returns {string} the rendered tooltip body
 	 */
 	getDetailedResMap: function(res){
 		if (res.calculatePerDay){
@@ -4456,7 +4767,15 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return resString;
 	},
 
-	/** @param {ResStack} resStack */
+	/**
+	 * Walks the (nested) stack and renders the rows worth showing. Ratio rows are
+	 * suppressed until a fixed row has been emitted, otherwise they modify nothing.
+	 * @param {ResStack} resStack
+	 * @param {any} res
+	 * @param {number} depth - nesting level, drives indentation
+	 * @param {boolean} [hasFixed] - whether a fixed row was already emitted above
+	 * @returns {string}
+	 */
 	processResourcePerTickStack: function(resStack, res, depth, hasFixed) {
 		var resString = "";
 		if (depth < 2) {
@@ -4496,13 +4815,21 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	/**
 	 * A single row of the resource breakdown. The cells are formatted here, but laying them
 	 * out is up to the UI: the web tooltip is a flat text blob, mobile builds real rows.
-	 * @param indent nesting depth of the stack element, 0 or less for a top level row
+	 * @param {ResStackEntry} stackElem
+	 * @param {any} res
+	 * @param {number} indent nesting depth of the stack element, 0 or less for a top level row
+	 * @returns {string}
 	 */
 	getStackElemString: function(stackElem, res, indent){
 		return this.ui.formatStackRow(this.formatStackLabel(stackElem, indent), this.formatStackValue(stackElem));
 	},
 
-	/** Label cell: the tree indentation prefix, then the name of the effect. */
+	/**
+	 * Label cell: the tree indentation prefix, then the name of the effect.
+	 * @param {ResStackEntry} stackElem
+	 * @param {number} indent
+	 * @returns {string}
+	 */
 	formatStackLabel: function(stackElem, indent){
 		var label = "";
 
@@ -4519,14 +4846,21 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return label + stackElem.name + ":";
 	},
 
-	/** Value cell, formatted according to the stack element type. */
+	/**
+	 * Value cell, formatted according to the stack element type.
+	 * @param {ResStackEntry} stackElem
+	 * @returns {string} empty for a type with no display form
+	 */
 	formatStackValue: function(stackElem){
 		if (stackElem.type == "fixed") {
 			return this.getDisplayValueExt(stackElem.value, true, true);
 		} else if (stackElem.type == "ratio" || stackElem.type == "ratioIndent") {
-			return this.getDisplayValueExt((stackElem.value * 100).toFixed(), true) + "%";
+			//Percentages are rounded here and handed over as a string on purpose:
+			//getDisplayValue passes a non-number straight through rather than
+			//re-rounding it. Keep the cast until that pass-through is retired.
+			return this.getDisplayValueExt(/** @type {any} */ ((stackElem.value * 100).toFixed()), true) + "%";
 		} else if (stackElem.type == "multiplier") {
-			return "×" + this.getDisplayValueExt((stackElem.value * 100).toFixed()) + "%";
+			return "×" + this.getDisplayValueExt(/** @type {any} */ ((stackElem.value * 100).toFixed())) + "%";
 		} else if (stackElem.type == "perDay") {
 			return (stackElem.value > 0 ? "+" : "") + this.getDisplayValueExt(stackElem.value) + "/" + $I("res.per.day");
 		} else if (stackElem.type == "perYear") {
@@ -4538,15 +4872,15 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	/**
 	 * Outputs a formatted representation of time.  If the input is negative or NaN, treats it as zero instead.
-	 * @param secondsRaw Either a number or a string representing a number.
-	 * @return A string.  For the sake of consistency, all whitespace is trimmed from beginning & end.
+	 * @param {number|string} secondsRaw Either a number or a string representing a number.
+	 * @returns {string} For the sake of consistency, all whitespace is trimmed from beginning & end.
 	 */
 	toDisplaySeconds : function (secondsRaw) {
 		if (secondsRaw == Infinity) {
 			return "&infin;";
 		}
 		//We parseFloat because sometimes the numbers are so huge they end up being converted to scientific notation
-		var sec_num = Math.floor(parseFloat(secondsRaw));
+		var sec_num = Math.floor(parseFloat(String(secondsRaw)));
 		if (isNaN(sec_num) || sec_num < 1) {
 			return "0" + $I("unit.s");
 		}
@@ -4567,14 +4901,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			seconds = sec_num - (years * year_secs) - (days * 86400) - (hours * 3600) - (minutes * 60);
 		}
 
-        if (years > 0){
-            years = this.getDisplayValueExt(years);
-        }
+        //years is a count above and a formatted string below, so it gets its own variable
+        var yearsFormatted = years > 0 ? this.getDisplayValueExt(years) : "";
 
 	    var timeFormated = "";
-        if ( years ) { timeFormated = years + $I("unit.y") + " "; }
+        if ( yearsFormatted ) { timeFormated = yearsFormatted + $I("unit.y") + " "; }
 	    if ( days ) { timeFormated += days + $I("unit.d") + " "; }
-        if ( !years ){
+        if ( !yearsFormatted ){
             if ( hours ) {  timeFormated += hours + $I("unit.h") + " "; }
             if ( minutes) { timeFormated += minutes + $I("unit.m") + " "; }
             if ( seconds ) { timeFormated += seconds + $I("unit.s") + " "; }
@@ -4586,9 +4919,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	/**
 	 * The same as toDisplaySeconds, but converts ingame days into xYears xDays
 	 * Just for aestetical pleasness
+	 * @param {number|string} daysRaw
+	 * @returns {string}
 	 */
 	toDisplayDays: function(daysRaw){
-		var daysNum = Math.floor(parseFloat(daysRaw));
+		var daysNum = Math.floor(parseFloat(String(daysRaw)));
 		if (isNaN(daysNum) || daysNum < 1) {
 			return "0" + $I("unit.d");
 		}
@@ -4601,17 +4936,22 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			days = daysNum - years * daysPerYear;
 		}
 
-		if (years > 0){
-			years = this.getDisplayValueExt(years);
-		}
+		//years is a count above and a formatted string below, so it gets its own variable
+		var yearsFormatted = years > 0 ? this.getDisplayValueExt(years) : "";
 
 		var timeFormatted = "";
-		if ( years ) { timeFormatted = years + $I("unit.y") + " "; }
+		if ( yearsFormatted ) { timeFormatted = yearsFormatted + $I("unit.y") + " "; }
 		if ( days ) { timeFormatted += days + $I("unit.d") + " "; }
 
 		return timeFormatted.trim();
 	},
 
+	/**
+	 * @param {number} percentage - a ratio, i.e. 0.5 renders as "50"
+	 * @param {number} precision - decimal places; ignored unless precisionFixed
+	 * @param {boolean} [precisionFixed] - honour `precision` instead of picking one
+	 * @returns {string} no trailing "%" - callers append it
+	 */
 	toDisplayPercentage: function(percentage, precision, precisionFixed) {
 		percentage *= 100;
 		if (precisionFixed) {
@@ -4653,6 +4993,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	//shamelessly copied from Sandcastle Builder code
+	//Ordered largest first - getDisplayValueExt takes the first limit it clears.
+	/** @type {{limit: number, divisor: number, postfix: [string, string]}[]} */
 	postfixes: [
 		{limit:1e210,divisor:1e210,postfix:["Q"," Quita"]},
 		{limit:1e42,divisor:1e42,postfix:["W"," Wololo"]},
@@ -4674,12 +5016,13 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	/**
 	 * Determines the display name & display value (formatting it as per second, or as a percentage, etc.) of a given effect.
-	 * @param effectName	The internal name of the effect.
-	 * @param effectValue	The value of the effect.
-	 * @param showIfZero	Boolean.  Determines whether we still show an effect with zero value, or if that effect remains hidden.
+	 * @param {string} effectName	The internal name of the effect.
+	 * @param {number} effectValue	The value of the effect.
+	 * @param {boolean} [showIfZero]	Determines whether we still show an effect with zero value, or if that effect remains hidden.
 	 * 					I added it just in case someone wants to use it in the future.
 	 * 					If the effect would be hidden for any other reason, then this flag doesn't do anything.
-	 * @return	null if the effect shouldn't be displayed (because it's hidden or because it's zero).
+	 * @returns {{displayEffectName: string, displayEffectValue: string}}
+	 * 			null if the effect shouldn't be displayed (because it's hidden or because it's zero).
 	 * 			Otherwise, returns a table with the following keys:
 	 * 			displayEffectName = the localized title;
 	 * 			displayEffectValue = the value of the effect, formatted & localized properly
@@ -4752,6 +5095,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	/**
 	 * Converts raw resource value (e.g. 12345.67890) to a formatted representation (i.e. 12.34K)
 	 * If 'prefix' flag is true, positive value will be prefixed with '+', e.g. ("+12.34K")
+	 * @param {number} value
+	 * @param {boolean} [prefix] - prefix positive values with '+'
+	 * @param {boolean} [usePerTickHack] - rescale to per-second and append the unit
+	 * @param {number} [precision] - decimal places; defaults from opts.forceHighPrecision
+	 * @param {string} [postfix] - carried through the "si" recursion, not for callers
+	 * @returns {string}
 	 */
 	getDisplayValueExt: function(value, prefix, usePerTickHack, precision, postfix){
 
@@ -4763,7 +5112,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			return "-∞";
 		}
 
-		usePerTickHack &= this.opts.usePerSecondValues;
+		//was a bitwise &=, which coerced the flag to 0/1; same truthiness, no coercion
+		usePerTickHack = Boolean(usePerTickHack && this.opts.usePerSecondValues);
 		if (usePerTickHack) {
 			value = value * this.ticksPerSecond;
 		}
@@ -4819,6 +5169,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	/**
 	 * Formats float value to x.xx or x if value is integer
+	 * @param {number} floatVal - anything without .toFixed is returned as-is, see formatStackValue
+	 * @param {boolean} [plusPrefix] - prefix positive values with '+'
+	 * @param {number} [precision] - defaults from opts.forceHighPrecision
+	 * @returns {string}
 	 */
 	getDisplayValue: function(floatVal, plusPrefix, precision){
 
@@ -4853,6 +5207,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 	},
 
+	/**
+	 * @param {number} number
+	 * @returns {number} rounded to 7 decimal places, killing float drift
+	 */
 	fixFloatPointNumber: function(number) {
 		// Adjust value because of floating-point error
 		var numberAdjusted = Math.floor(number * 10000000) / 10000000;
@@ -4862,20 +5220,23 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return numberAdjusted;
 	},
 
+	/** @param {any} tab */
 	addTab: function(tab){
 		this.tabs.push(tab);
 		tab.game = this;
 	},
 
+	/** @returns {boolean} */
 	isWebWorkerSupported: function(){
 		var config = new classes.KGConfig();
 		if (config.statics.disableWebWorkers) {
 			return false;
 		}
 
-		return !dojo.isIE && window.Worker;
+		return !dojo.isIE && !!window.Worker;
 	},
 
+	/** @returns {number} monotonic where available, wall clock otherwise */
 	timestamp: function() {
 		return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
 	},
@@ -5085,6 +5446,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		//TODO: add some special hidden effect for this mechanics
 	},
 
+	/**
+	 * @param {number} kittens - population at the moment of the reset
+	 * @returns {number} karma kittens earned, on a rising scale past 35 kittens
+	 */
     _getKarmaKittens: function(kittens){
         var karmaKittens = 0;
 
@@ -5119,6 +5484,7 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
         return karmaKittens;
     },
 
+	/** @returns {number} bonus karma zebras, scaled off total science spent */
 	_getBonusZebras: function(){
 		var totalScience = 0;
 		var bonusZebras = 0;
@@ -5145,6 +5511,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return bonusZebras;
 	},
 
+	/**
+	 * What a reset would pay out right now. Read-only - safe to call for the UI.
+	 * @returns {{karmaKittens: number, paragonPoints: number}}
+	 */
 	getResetPrestige: function(){
 		var kittens = Math.round(
 			this.resPool.get("kittens").value * (1 + this.getEffect("simScalingRatio"))
@@ -5166,6 +5536,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		};
 	},
 
+	/**
+	 * Builds the post-reset save from scratch - what survives a reset is decided
+	 * here and nowhere else - writes it to localStorage and pauses the game so no
+	 * autosave can land before the caller reloads the page.
+	 * @returns {SaveData}
+	 */
 	_resetInternal: function(){
 		var _prestige = this.getResetPrestige();
 
@@ -5461,6 +5837,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	//TO BE USED EXTERNALLY
+	/**
+	 * @param {number} ratio - exclusive upper bound
+	 * @returns {number}
+	 */
 	rand: function(ratio){
 		return this.math.uniformRandomInteger(0, ratio);
 	},
@@ -5486,6 +5866,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	// Unlimited Diminishing Return
 	//getTriValue
+	/**
+	 * @param {number} value
+	 * @param {number} stripe - smaller values diminish faster
+	 * @returns {number}
+	 */
 	getUnlimitedDR: function(value, stripe) {
 		var result = (Math.sqrt(1 + (value / stripe) * 8) - 1) / 2;
 		return result == Infinity
@@ -5493,10 +5878,19 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			: result;
 	},
 
+	/**
+	 * @param {number} value
+	 * @param {number} stripe
+	 * @returns {number} the input getUnlimitedDR would map back to `value`
+	 */
 	getInverseUnlimitedDR: function(value, stripe) {
 		return stripe / 2 * value * (value + 1);
 	},
 
+	/**
+	 * @param {string} tabName - lowercase tab id
+	 * @returns {any} undefined if no tab matches
+	 */
 	getTab: function(tabName) {
 		for (var i in this.tabs){
 			if (this.tabs[i].tabId.toLowerCase() == tabName){
@@ -5537,6 +5931,12 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.upgrade({policies: ["authocracy"]});
 	},
 
+	/**
+	 * Resolves an id to the metadata object owning it, dispatching on meta type.
+	 * @param {any} unlockId - usually a string; "stages" and "schemes" pass richer values
+	 * @param {string} type - one of the cases below
+	 * @returns {any} undefined for an unknown type or a race with no embassies
+	 */
 	getUnlockByName: function(unlockId, type){
 		switch (type) {
 			case "tabs":
@@ -5613,8 +6013,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * 	space: [...]
 	 * }
 	 * See #getUnlockByName for a full list of types
-	 * @param {*} list 
-	 * 
+	 * @param {Record<string, any[]>} list - meta type -> ids to unlock
+	 *
 	 * TODO: clarify `unlockable` vs unlocked for buildings vs other stuff
 	 */
 	unlock: function(list) {
@@ -5670,6 +6070,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 	},
 
+	/**
+	 * Recalculates effects for a set of metadata elements, same shape as #unlock.
+	 * Caches are refreshed before and after, so effects that feed each other settle.
+	 * @param {Record<string, any[]>} list - meta type -> ids to recalculate
+	 */
 	upgrade: function(list){
 		this.updateCaches();
 		for (var type in list) {
@@ -5712,7 +6117,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	/**
 	 * Finds the manager object with the given ID.
-	 * @return The requested manager object, or null if the requested object could not be found.
+	 * @param {string} managerId
+	 * @returns {any} The requested manager object, or null if the requested object could not be found.
 	 */
 	getManager: function(managerId) {
 		if (typeof(managerId) !== "string") {
@@ -5731,6 +6137,10 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return null;
 	},
 
+	/**
+	 * Opens a fresh undo slot, replacing any pending one.
+	 * @returns {UndoChange} the caller is expected to addEvent onto it
+	 */
     registerUndoChange: function(){
         var undoChange = new classes.game.UndoChange();
         undoChange.ttl = undoChange._static.DEFAULT_TTL * this.ticksPerSecond;
@@ -5944,10 +6354,16 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.resPool.get("paragon").value = 1;
 	},
 
+	/** @returns {boolean} true for the second half of December */
 	isEldermass: function(){
 		var date = new Date();
 		return (date.getMonth() == 11 && date.getDate() >= 15  && date.getDate() <= 31);
 	},
+	/**
+	 * @param {number} [lenConst] - exact length; random 5-10 otherwise
+	 * @param {string} [charPool] - alphabet to draw from
+	 * @returns {string}
+	 */
 	createRandomName: function(lenConst, charPool) {
 		if (!charPool) {
 			charPool = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■◆◆åœ∑ß≈ç∂´®ƒ√∫©†¥˙˜µ∆¨ˆ˚µ≤¬øπ≥…π“æ÷æ«§¡™£¢∞§¶•ªº≠"; //◆ 
@@ -5963,6 +6379,11 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return name;
 	},
 
+	/**
+	 * @param {number} [ch1] - percent chance of a non-default colour, default 10
+	 * @param {number} [ch2] - percent chance of a rare variety once coloured, default 10
+	 * @returns {[number, number]} [color, variety], 0 meaning default
+	 */
 	createRandomVarietyAndColor: function(ch1, ch2){
 		if (ch1 == null) {
 			ch1 = 10;

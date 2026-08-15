@@ -63,7 +63,7 @@ var TabManager = dojo.declare("com.nuclearunicorn.core.TabManager", Control, {
 
 	//Declared by subclasses; listed here so the base methods that rely on
 	//them (updateEffectCached, etc.) are part of the checked contract.
-	/** @type {any} TODO: type as the GamePage class once game.js is converted */
+	/** @type {GamePage} the instance type is declared in game.js */
 	game: null,
 	/** @type {Record<string, number>} */
 	effectsBase: null,
@@ -517,6 +517,7 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 	maxMessages: 40,
 	messageIdCounter: 0,
 	ui: null,
+	/** @type {GamePage} */
 	game: null,
 	/** @type {Record<string, {title: string, enabled: boolean, unlocked: boolean, defaultUnlocked?: boolean}>} */
 	filters: null,
@@ -623,6 +624,7 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 });
 
 var ButtonController = dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
+	/** @type {GamePage} */
 	game: null,
 	controllerOpts: null,
 
@@ -901,6 +903,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 	model: null,
 	controller: null,
+	/** @type {GamePage} */
 	game: null,
 
 	//nodes
@@ -2540,6 +2543,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ContentRowRenderer", null, {
 });
 
 dojo.declare("mixin.IGameAware", null, {
+	/** @type {GamePage} */
 	game: null,
 
 	setGame: function(game){
@@ -2575,6 +2579,7 @@ dojo.declare("mixin.IChildrenAware", null, {
  * Collapsible panel for a tab
  */
 dojo.declare("com.nuclearunicorn.game.ui.Panel", [com.nuclearunicorn.game.ui.ContentRowRenderer, mixin.IChildrenAware], {
+	/** @type {GamePage} */
 	game: null,
 
 	collapsed: false,
