@@ -232,7 +232,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	{
 		name: "culture",
 		title: $I("buildings.group.culture"),
-		buildings: ["amphitheatre", "chapel", "temple"]
+		buildings: ["amphitheatre", "chapel", "temple", "ziggurat"]
 	},{
 		name: "other",
 		title: $I("buildings.group.other"),
@@ -247,6 +247,37 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		buildings: ["zebraOutpost", "zebraWorkshop", "zebraForge", "ivoryTemple", "stasisPod"]
 	}
 	],
+
+	//Canonical order of the buildings, 	
+	//Buildings missing from this list are rendered last
+	buildingsOrder: [
+		"field", "pasture", "aqueduct",
+		"hut", "logHouse", "mansion",
+		"library", "academy", "observatory", "biolab",
+		"barn", "warehouse", "harbor",
+		"mine", "quarry", "lumberMill", "oilWell", "accelerator",
+		"steamworks", "magneto", "smelter", "calciner", "factory", "reactor",
+		"amphitheatre", "chapel", "temple",
+		"workshop", "tradepost", "mint", "unicornPasture", "brewery",
+		"chronosphere", "aiCore", "ziggurat",
+		"zebraOutpost", "zebraWorkshop", "zebraForge", "ivoryTemple", "stasisPod"
+	],
+
+	_buildingsOrderIndex: null,
+
+	/**
+	 * @return {Object} Map of building name to its position in buildingsOrder, built once and cached
+	 */
+	getBuildingsOrderIndex: function() {
+		if (!this._buildingsOrderIndex) {
+			var index = {};
+			this.buildingsOrder.forEach(function(bldName, position) {
+				index[bldName] = position;
+			});
+			this._buildingsOrderIndex = index;
+		}
+		return this._buildingsOrderIndex;
+	},
 
 	/***
 	 ** STACKABLE BUILDINGS'S SPEC **
@@ -2468,6 +2499,41 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		}
 		return groupsArr;
 	},
+
+	/**
+	 * Render groups as a flat list of leaves, sorted by buildingsOrder.
+	 * 
+	 * @param {Array} groups Array of buildingGroup objects, as returned by getBuildingGroups
+	 * @return {Array} Array of building names, each appearing at most once
+	 */
+	unrollBuildingGroups: function(groups) {
+		var leaves = [];
+		var seen = {};
+		var order = this.getBuildingsOrderIndex();
+		var unordered = this.buildingsOrder.length;	//buildings missing from buildingsOrder go last
+
+		groups.forEach(function(bldGroup) {
+			bldGroup.buildings.forEach(function(bldName) {
+				if (seen[bldName]) {
+					return;	//another group already pulled in this building, e.g. ziggurat
+				}
+				seen[bldName] = true;
+				leaves.push({
+					name: bldName,
+					order: order[bldName] !== undefined ? order[bldName] : unordered,
+					index: leaves.length	//tiebreaker, keeps the sort stable on any engine
+				});
+			});
+		});
+
+		leaves.sort(function(a, b) {
+			return (a.order - b.order) || (a.index - b.index);
+		});
+		return leaves.map(function(leaf) {
+			return leaf.name;
+		});
+	},
+
 	getAutoProductionRatio: function() {
 		var autoProdRatio = 1;
 
@@ -3535,6 +3601,9 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 
 	activeGroup: null,
 
+	//Filters pulling their buildings from every group instead of just their own, see getBuildingGroups
+	aggregateGroups: ["all", "available", "allEnabled", "togglable", "iw"],
+
 	constructor: function(tabName){
 		this.bldGroups = [];
 	},
@@ -3608,6 +3677,10 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 		this.update();
 	},
 
+	isAggregateGroup: function(){
+		return this.aggregateGroups.indexOf(this.activeGroup) != -1;
+	},
+
 	renderActiveGroup: function(groupContainer){
 
 		dojo.empty(groupContainer);
@@ -3616,79 +3689,74 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 		this.twoRows = (this.activeGroup == "all" || this.activeGroup == "iw");
 		this.initRenderer(groupContainer);
 
-		for ( var i = 0; i < this.bldGroups.length; i++){
-			if (this.bldGroups[i].group.name != this.activeGroup){
-				if (this.activeGroup != "all" &&
-					this.activeGroup != "available" &&
-					this.activeGroup != "allEnabled" &&
-					this.activeGroup != "togglable" &&
-					this.activeGroup != "iw"){
+		var isAggregate = this.isAggregateGroup();
+		if (isAggregate){
+			this.addCoreBtns(groupContainer);
+		}
 
-						continue;
-				}
-			}
-			if (i == 0){
-				this.addCoreBtns(groupContainer);
-			}
-
+		var groups = [];
+		for (var i = 0; i < this.bldGroups.length; i++){
 			var group = this.bldGroups[i].group;
-
-			for (var j = 0; j < group.buildings.length; j++){
-				var bldMetaRaw = this.game.bld.get(group.buildings[j]);
-				var bld = new classes.BuildingMeta(bldMetaRaw).getMeta();
-
-				var btn = null;
-				if (typeof(bld.stages) == "object"){
-					btn = new classes.ui.btn.StagingBldBtn({
-						name: 			bld.label,
-						description: 	bld.description,
-						building: 		bld.name,
-						type:           "buildings",
-						twoRow:			this.twoRows,
-						controller: new classes.ui.btn.StagingBldBtnController(this.game)
-					}, this.game);
-				} else {
-					btn = new com.nuclearunicorn.game.ui.BuildingStackableBtn({
-						name: 			bld.label,
-						description: 	bld.description,
-						building: 		bld.name,
-						type:           "buildings",
-						twoRow:			this.twoRows,
-						controller: new classes.ui.btn.BuildingBtnModernController(this.game)
-					}, this.game);
-				}
-				var mdl = btn.controller.fetchModel(btn.opts);
-
-				if (this.activeGroup == "available") {
-					if (mdl.resourceIsLimited) {
-						continue;
-					}
-				}
-				if (this.activeGroup == "allEnabled"){
-
-					if (!mdl.enabled){
-						continue;
-					}
-				}
-				if (this.activeGroup == "togglable"){
-					if (!mdl.togglable){
-						continue;
-					}
-				}
-
-				if (this.activeGroup == "iw"){
-					if (group.name == "population"){
-						continue;
-					}
-				}
-
-				btn.update();
-				if (!mdl.visible){
-					continue;	//skip invisible buttons to not make gaps in the two rows renderer
-				}
-
-				this.addChild(btn);
+			if (!isAggregate && group.name != this.activeGroup){
+				continue;
 			}
+			if (this.activeGroup == "iw" && group.name == "population"){
+				continue;	//no kittens to house under Iron Will
+			}
+			groups.push(group);
+		}
+
+		//Unroll the groups to their leaf buildings
+		var buildings = this.game.bld.unrollBuildingGroups(groups);
+
+		for (var i = 0; i < buildings.length; i++){
+			var bld = this.game.bld.getBuildingExt(buildings[i]).getMeta();
+
+			var btn = null;
+			if (typeof(bld.stages) == "object"){
+				btn = new classes.ui.btn.StagingBldBtn({
+					name: 			bld.label,
+					description: 	bld.description,
+					building: 		bld.name,
+					type:           "buildings",
+					twoRow:			this.twoRows,
+					controller: new classes.ui.btn.StagingBldBtnController(this.game)
+				}, this.game);
+			} else {
+				btn = new com.nuclearunicorn.game.ui.BuildingStackableBtn({
+					name: 			bld.label,
+					description: 	bld.description,
+					building: 		bld.name,
+					type:           "buildings",
+					twoRow:			this.twoRows,
+					controller: new classes.ui.btn.BuildingBtnModernController(this.game)
+				}, this.game);
+			}
+			var mdl = btn.controller.fetchModel(btn.opts);
+
+			if (this.activeGroup == "available") {
+				if (mdl.resourceIsLimited) {
+					continue;
+				}
+			}
+			if (this.activeGroup == "allEnabled"){
+
+				if (!mdl.enabled){
+					continue;
+				}
+			}
+			if (this.activeGroup == "togglable"){
+				if (!mdl.togglable){
+					continue;
+				}
+			}
+
+			btn.update();
+			if (!mdl.visible){
+				continue;	//skip invisible buttons to not make gaps in the two rows renderer
+			}
+
+			this.addChild(btn);
 		}
 
 		for (var i = 0; i < this.children.length; i++){
