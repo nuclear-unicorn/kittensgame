@@ -304,6 +304,12 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		return this.getMeta(id, this.map.biomes);
 	},
 
+	//max explored level of a biome, 0 if never explored
+	getBiomeLevel: function(id){
+		var biome = this.getBiome(id);
+		return biome ? (biome.val || 0) : 0;
+	},
+
 	getJobLimit: function(jobName) {
 		if (jobName == "engineer"){
 			return this.game.bld.get("factory").val;
@@ -883,6 +889,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 						delete _biome.level;
 					}
 				}
+				//conditions may have changed since the save was made, so re-evaluate them
+				this.map.updateLocks();
 			}
 			this.sim.hadKittenHunters = (saveData.village.hadKittenHunters === undefined) ? true: saveData.village.hadKittenHunters;
 			this.sim.nextKittenProgress = saveData.village.nextKittenProgress || 0;
@@ -1930,7 +1938,7 @@ dojo.declare("classes.village.Map", null, {
 			biomes: ["mountain"]
 		},
 		evaluateLocks: function(game){
-			return game.village.getBiome("plains").level >= 5 || game.village.getBiome("forest").level >= 5;
+			return game.village.getBiomeLevel("plains") >= 5 || game.village.getBiomeLevel("forest") >= 5;
 		},
 		lore: {
 			5: "You can see small lizards enjoying the sun"
@@ -1972,7 +1980,7 @@ dojo.declare("classes.village.Map", null, {
 		faunaNames: ["bone spider"],
 		unlocked: false,
 		evaluateLocks: function(game){
-			return game.village.getBiome("forest").level >= 25 && game.village.getBiome("rainForest").level >= 5;
+			return game.village.getBiomeLevel("forest") >= 25 && game.village.getBiomeLevel("rainForest") >= 5;
 		},
 		lore: {
 			5: "A place where trees are made of bones"
@@ -2003,7 +2011,7 @@ dojo.declare("classes.village.Map", null, {
 
 		},
 		evaluateLocks: function(game){
-			return game.village.getBiome("hills").level >= 10;
+			return game.village.getBiomeLevel("hills") >= 10;
 		},
 		unlocks: {
 			biomes: ["volcano"]
@@ -2025,7 +2033,7 @@ dojo.declare("classes.village.Map", null, {
 			5: "TBD"
 		},
 		evaluateLocks: function(game){
-			return game.village.getBiome("mountain").level >= 25;
+			return game.village.getBiomeLevel("mountain") >= 25;
 		}
 	},
 	{
@@ -2040,7 +2048,7 @@ dojo.declare("classes.village.Map", null, {
 			5: "An endless white desert with occasional red rock formations"
 		},
 		evaluateLocks: function(game){
-			return game.village.getBiome("plains").level >= 15;
+			return game.village.getBiomeLevel("plains") >= 15;
 		},
 		effects:{
 			solarFarmRatio: 0.01
@@ -2151,18 +2159,28 @@ dojo.declare("classes.village.Map", null, {
 		this.activeMapId = mapId;
 	},
 
+	/**
+	 * Unlock every biome whose conditions are already satisfied.
+	 * Unlike the unlocks[] signal this does not depend on a level up event,
+	 * so biomes catch up on load or when unlock rules change.
+	 */
+	updateLocks: function(){
+		for (var i in this.biomes){
+			var biome = this.biomes[i];
+			if (!biome.unlocked && biome.evaluateLocks && biome.evaluateLocks(this.game)){
+				biome.unlocked = true;
+			}
+		}
+	},
+
 	update: function(){
+		this.updateLocks();
+
 		for (var i in this.biomes){
 			var biome = this.biomes[i];
 			if (biome.name == "village"){
 				this.game.globalEffectsCached["exploreRatio"] = (0.1 * ((biome.on || 0) - 1));
 			}
-
-			//TEMP TEMP TEMP
-			/*if (biome.unlocks){
-				this.game.unlock(biome.unlocks);
-			}*/
-			//TEMP TEMP TEMP
 
 			//todo: take it from the biome
 			var faunaNames = biome.faunaNames || this.defaultFaunaNames;
