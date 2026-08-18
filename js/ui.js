@@ -1034,7 +1034,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             || messageLatest.seasonTitle !== messagePrevious.seasonTitle;
 
         if (!messageLatest.span) {
-            var span = dojo.create("span", {className: "msg", innerHTML: messageLatest.text}, gameLog);
+            var span = dojo.create("span", {className: "msg", id: messageLatest.id, innerHTML: messageLatest.text}, gameLog);
 
             if (messageLatest.type) {
                 dojo.addClass(span, "type_" + messageLatest.type);
