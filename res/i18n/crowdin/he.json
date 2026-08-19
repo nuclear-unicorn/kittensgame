@@ -151,7 +151,7 @@
     "buildings.calciner.label": "קלצינר",
     "buildings.calciner.desc": "מקור יעיל ביותר למתכות. צורך 1.5 מינרלים ו-0.02 נפט כל פעימה. מייצר ברזל וכמות קטנה של טיטניום",
     "buildings.calciner.desc.automation": "אוטומציה ממירה {0}% מתפוקת הברזל לפלדה.",
-    "buildings.chapel.label": "בית תפילה\nבית תפילה",
+    "buildings.chapel.label": "בית תפילה",
     "buildings.chapel.desc": "מייצר קצת תרבות ואמונה בכל פעימה. ניתן לשיפור עם שדרוגי דת",
     "buildings.chapel.desc.atheism": "מפיק מעט תרבות.",
     "buildings.chronosphere.label": "כדור זמן",
