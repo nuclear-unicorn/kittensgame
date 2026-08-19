@@ -133,6 +133,21 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			}
 
 			self.modifiers = modifiers;
+
+			var perSecond = function(perTick){
+				return game.getDisplayValueExt(perTick * game.ticksPerSecond, false, false, 3);
+			};
+
+			var fullyUpgraded = game.workshop.get("miningDrill").researched
+				&& game.workshop.get("unobtainiumDrill").researched
+				&& game.workshop.get("geodesy").researched;
+
+			self.description = $I(fullyUpgraded
+				? "village.job.geologist.desc.upgraded"
+				: "village.job.geologist.desc", [perSecond(coal)]);
+			if (gold > 0){
+				self.description += "<br>" + $I("village.job.geologist.desc.gold", [perSecond(gold)]);
+			}
 		},
 		value: 0,
 		unlocked: false
