@@ -5421,7 +5421,8 @@ dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				races: []
 			},
 			prestige: {
-				perks: this.prestige.perks
+				perks: this.prestige.perks,
+				hideResearched: this.prestige.hideResearched
 			},
 			religion: {
 				transcendenceTier: this.religion.transcendenceTier,
