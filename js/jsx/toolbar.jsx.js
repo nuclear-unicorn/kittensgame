@@ -777,15 +777,17 @@ WToolbar = React.createClass({
     },
 
     getIcons: function(){
+        var game = this.state.game;
         var icons = [];
         icons.push(
-            $r(WToolbarFPS, {game: this.state.game}),
-            game.opts.disablePollution ? null : $r(WToolbarPollution, {game: this.state.game}),
-            $r(WToolbarHappiness, {game: this.state.game}),
-            $r(WToolbarEnergy, {game: this.state.game}),
-            $r(WBLS, {game: this.state.game}),
-            //$r(WToolbarMOTD, {game: this.state.game}),
-            $r(WLogin, {game: this.state.game})
+            $r(WToolbarFPS, {game: game}),
+            game.opts.disablePollution ? null : $r(WToolbarPollution, {game: game}),
+            $r(WToolbarHappiness, {game: game}),
+            $r(WToolbarEnergy, {game: game}),
+            $r(WBLS, {game: game}),
+            //$r(WToolbarMOTD, {game: game}),
+            //a preview is somebody else's save: no account of ours to log into or sync with
+            game.isReadOnly() ? null : $r(WLogin, {game: game})
 
         );
         return icons;

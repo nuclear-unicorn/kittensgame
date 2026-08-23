@@ -1133,6 +1133,15 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 	},
 
 	/**
+	 * Wrap sub-buttons in a hidden parent to keep update() working
+	 */
+	getButtonContent: function(){
+		return dojo.create("div", { style: { 
+			display: this.game.isReadOnly() ? "none" : "contents" }
+		}, this.buttonContent);
+	},
+
+	/**
 	 * Fast access snippet to create button links like "on", "off", "sell", etc.
 	 * @param {function} [tooltipHtmlProvider] Optional.  If provided, this link will have its own tooltip.
 	 */
@@ -1170,7 +1179,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 		}, linkModel.handler));
 
-		dojo.place(link, this.buttonContent);
+		dojo.place(link, this.getButtonContent());
 
 		if (tooltipHtmlProvider) {
 			UIUtils.attachTooltip(this.game, link, 0, 300, tooltipHtmlProvider);
@@ -1192,7 +1201,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			style: {
 				float: "right"
 			}
-		}, this.buttonContent);
+		}, this.getButtonContent());
 
 		var linksTooltip = dojo.create("div", {
 			className: "linkContent",

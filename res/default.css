@@ -2141,3 +2141,9 @@ body.preview-mode #queueViewport {
     pointer-events: none;
     opacity: 0.6;
 }
+
+/* sub-buttons are sunk in a hidden node, so titles get their full size back */
+body.preview-mode .btn.small-text span {
+    font-size: 100%;
+}
+

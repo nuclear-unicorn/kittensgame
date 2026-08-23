@@ -67,6 +67,7 @@ var Preview = dojo.declare("classes.game.Preview", null, {
 			return;
 		}
 
+		//this should normally go to game.ui, but no other UI will use browser URL for preview
 		$("#loadingContainer").hide();
 		$("#game").show();
 		dojo.addClass(document.body, "preview-mode");
