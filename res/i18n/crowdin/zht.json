@@ -1826,7 +1826,7 @@
     "ui.kgnet.save.load": "↓ 讀取",
     "ui.kgnet.sync": "同步雲端存檔",
     "ui.kgnet.instructional": "<- 點擊此鏈接開始。數據加載後，點擊「創建存檔」。",
-    "ui.kgnet.error.auth": "你的會話已過期，請重新登入。",
+    "ui.kgnet.error.auth": "你的會話已過期，請重新登入",
     "ui.kgnet.error.status": "伺服器錯誤 {0}",
     "ui.kgnet.error.network": "無法連接到伺服器",
     "ui.kgnet.error.nodata": "伺服器沒有回傳儲存進度",
