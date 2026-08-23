@@ -493,14 +493,33 @@ var Server = dojo.declare("classes.game.Server", null, {
 	},
 
 	/**
-	 * Fetch a cloud save blob without applying it anywhere.
-	 * Preview mode uses this to keep the save in memory; loadSave() layers the
-	 * "overwrite my game with it" part on top.
+	 * Fetch your own cloud save without applying it anywhere (see also downloadPreview)
+	 * loadSave() layers the "overwrite my game with it" part on top.
 	 * @param {string} guid
 	 * @returns {any} the jqXHR, resolving to {data: string, metadata?: object}
 	 */
 	downloadSave: function(guid){
 		return this._xhr("/kgnet/save/" + guid + "/download/", "GET", {});
+	},
+
+	/**
+	 * Fetch public save based on its shareId
+	 * 
+	 * @param {string} shareId
+	 * @returns {any} the jqXHR, resolving to {data: string, metadata?: object}
+	 */
+	downloadPreview: function(shareId){
+		return this._xhr("/preview/" + shareId + "/save/", "GET", {});
+	},
+
+	/**
+	 * Public sharable URL that goes through KGNET and generates openhost preview card
+	 * @param {string} shareId
+	 */
+	getPreviewUrl: function(shareId){
+		//generate redirect url, backend will verify the host
+		var returnPath = window.location.pathname.replace(/[^/]*$/, "");
+		return this.getServerUrl() + "/preview/" + shareId + "?r=" + encodeURIComponent(returnPath);
 	},
 
 	/** @param {string} guid */

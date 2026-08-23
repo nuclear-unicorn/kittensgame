@@ -192,16 +192,17 @@ function escapeHtml(text) {
 
 /**
  * @param {object} summary
+ * @param {string} shareId - the save's share token (guids are not unique server-wide)
  * @param {string} baseUrl - public origin of THIS server, e.g. https://kittensgame.com
  * @param {string} gameUrl - where a human should land, e.g. https://kittensgame.com/
  */
-function renderPreviewPage(summary, baseUrl, gameUrl) {
+function renderPreviewPage(summary, shareId, baseUrl, gameUrl) {
 	const title = summary.label + " — Kittens Game";
 	const description = describe(summary);
-	const pageUrl = baseUrl + "/preview/" + summary.guid;
+	const pageUrl = baseUrl + "/preview/" + shareId;
 	// cache-bust per save version so Discord's embed cache follows re-uploads
-	const imageUrl = baseUrl + "/kgnet/save/" + summary.guid + "/card.svg?v=" + summary.timestamp;
-	const playUrl = gameUrl + "?saveId=" + encodeURIComponent(summary.guid);
+	const imageUrl = pageUrl + "/card.svg?v=" + summary.timestamp;
+	const playUrl = gameUrl + "?saveId=" + encodeURIComponent(shareId);
 
 	return "<!doctype html>\n"
 		+ '<html lang="en">\n'

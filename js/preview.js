@@ -11,7 +11,7 @@ var Preview = dojo.declare("classes.game.Preview", null, {
 	/** @type {GamePage} */
 	game: null,
 
-	/** @type {string} the kgnet guid we are previewing, null outside preview mode */
+	/** @type {string} the kgnet share token we are previewing, null outside preview mode */
 	saveId: null,
 
 	/** Cloud metadata for the save, when the backend bothers to send it. */
@@ -27,7 +27,7 @@ var Preview = dojo.declare("classes.game.Preview", null, {
 
 	/**
 	 * Boot the game from a KGNet save instead of localStorage.
-	 * @param {string} saveId
+	 * @param {string} saveId - a share token, not a save guid (guids repeat across accounts)
 	 */
 	boot: function(saveId){
 		var self = this;
@@ -37,7 +37,7 @@ var Preview = dojo.declare("classes.game.Preview", null, {
 
 		this._setLoadingMessage($I("preview.loading"));
 
-		this.game.server.downloadSave(saveId)
+		this.game.server.downloadPreview(saveId)
 			.done(function(resp){
 				if (!resp || !resp.data){
 					self._fail($I("preview.error.empty"));
@@ -106,6 +106,7 @@ var Preview = dojo.declare("classes.game.Preview", null, {
 	_fail: function(reason){
 		console.error("preview: unable to load save", this.saveId, reason);
 		$("#loadingProgressBar").hide();
+		this._setLoadingMessage(reason);
 	},
 
 	/** @param {string} html */
