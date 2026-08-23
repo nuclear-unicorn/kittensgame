@@ -261,6 +261,7 @@ select>option {
 .btn .btnContent .btnTitle {
     display: inline-flex;
     gap: 4px;
+    align-items: baseline;
 }
 
 .btn.small-text span {
