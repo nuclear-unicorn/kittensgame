@@ -849,6 +849,12 @@ var ButtonController = dojo.declare("com.nuclearunicorn.game.ui.ButtonController
 	 * @returns BuyItemResult
 	 */
 	buyItem: function(model, event){
+		if (this.game.isReadOnly()) {
+			return {
+				itemBought: false,
+				reason: "read-only"
+			};
+		}
 		if (!this.hasResources(model)) {
 			return {
 				itemBought: false,
@@ -1055,6 +1061,9 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 	},
 
 	onClick: function(event){
+		if (this.game.isReadOnly()){
+			return;
+		}
 		this.animate();
 		var self = this;
 		var result = this.controller.buyItem(this.model, event);
@@ -1145,6 +1154,10 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			event.stopPropagation();
 			event.preventDefault();
 
+			if (this.game.isReadOnly()){
+				return;
+			}
+
 			var self = this;
 			this.animate();
 			// FIXME should as easy as handler.apply(this, [args...])
@@ -1215,6 +1228,10 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			event.stopPropagation();
 			event.preventDefault();
 
+			if (this.game.isReadOnly()){
+				return;
+			}
+
 			dojo.hitch(this, handler)();
 
 			this.update();
@@ -1246,6 +1263,10 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			dojo.connect(link, "onclick", this, dojo.partial(function(handler, event){
 				event.stopPropagation();
 				event.preventDefault();
+
+				if (this.game.isReadOnly()){
+					return;
+				}
 
 				dojo.hitch(this, handler)();
 
@@ -2207,6 +2228,12 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", Buildi
 	 */
 	
 	buyItem: function(model, event, buyType) {
+		if (this.game.isReadOnly()) {
+			return {
+				itemBought: false,
+				reason: "read-only"
+			};
+		}
 		if (event && event.shiftKey){
 			buyType = "all";
 		}
@@ -2440,6 +2467,12 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingNotStackableBtnController", Bui
 	},
 
 	buyItem: function(model, event, callback) {
+		if (this.game.isReadOnly()) {
+			return {
+				itemBought: false,
+				reason: "read-only"
+			};
+		}
 		var isInDevMode = this.game.devMode;
 		if (model.metadata.researched && !isInDevMode) {
 			return {

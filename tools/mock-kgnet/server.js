@@ -10,11 +10,19 @@
  *   node tools/mock-kgnet/server.js
  *
  * Saves are kept in memory only and are lost when the server stops.
+ *
+ * Also serves the read-only preview surface:
+ *   GET /preview/<guid>                  crawler-facing page with Open Graph tags
+ *   GET /kgnet/save/<guid>/card.svg      the embed image
+ * See docs/save-preview.md.
  */
 
 const http = require("http");
+const preview = require("./preview.js");
 
 const PORT = process.env.PORT || 7780;
+// where a human should be sent to actually view the save (the game's own origin)
+const GAME_URL = process.env.GAME_URL || "http://localhost:8080/";
 
 // --- in-memory "database" ---------------------------------------------------
 
@@ -86,6 +94,16 @@ function send(req, res, status, payload) {
 	res.end(payload === undefined ? "" : JSON.stringify(payload));
 }
 
+function sendText(req, res, status, contentType, body) {
+	res.writeHead(status, {
+		"Content-Type": contentType,
+		// unfurl crawlers are anonymous by definition - never gate these on a session
+		"Access-Control-Allow-Origin": "*",
+		"Cache-Control": "public, max-age=300"
+	});
+	res.end(body);
+}
+
 // --- routing ----------------------------------------------------------------
 
 const server = http.createServer(async function (req, res) {
@@ -150,7 +168,41 @@ const server = http.createServer(async function (req, res) {
 		if (!record) {
 			return send(req, res, 404, { error: "no such save" });
 		}
-		return send(req, res, 200, { data: record.data });
+		// metadata rides along so ?saveId= previews can label the banner without a second call
+		return send(req, res, 200, {
+			data: record.data,
+			metadata: {
+				label: record.label,
+				timestamp: record.timestamp,
+				size: record.size,
+				index: record.index
+			}
+		});
+	}
+
+	// The embed image for a save. SVG here; production has to rasterize (see the docs).
+	const card = url.match(/^\/kgnet\/save\/([^/]+)\/card\.svg$/);
+	if (card && method === "GET") {
+		const record = saves.find(function (s) { return s.guid === card[1]; });
+		if (!record) {
+			return send(req, res, 404, { error: "no such save" });
+		}
+		return sendText(req, res, 200, "image/svg+xml; charset=utf-8",
+			preview.renderCardSvg(preview.summarize(record)));
+	}
+
+	// Crawler-facing page. Discord et al. GET this, read the OG tags, and stop;
+	// a real browser follows the meta refresh into the game's preview mode.
+	const unfurl = url.match(/^\/preview\/([^/]+)\/?$/);
+	if (unfurl && method === "GET") {
+		const record = saves.find(function (s) { return s.guid === unfurl[1]; });
+		if (!record) {
+			return sendText(req, res, 404, "text/html; charset=utf-8",
+				"<!doctype html><title>No such save</title><p>No such save.</p>");
+		}
+		const baseUrl = "http://" + (req.headers.host || ("localhost:" + PORT));
+		return sendText(req, res, 200, "text/html; charset=utf-8",
+			preview.renderPreviewPage(preview.summarize(record), baseUrl, GAME_URL));
 	}
 
 	// Chiral command channel — stubbed so the call doesn't error.
@@ -165,4 +217,5 @@ const server = http.createServer(async function (req, res) {
 server.listen(PORT, function () {
 	console.log("mock KGNet backend listening on http://localhost:" + PORT);
 	console.log("saves are in-memory only and reset on restart");
+	console.log("previews:  http://localhost:" + PORT + "/preview/<guid>   ->  " + GAME_URL + "?saveId=<guid>");
 });

@@ -2072,3 +2072,72 @@ span.genericWarning {
     gap: 3px;
     display: inline-flex;
 }
+/* ---------------------------------------------------------------------------
+ * Read-only save preview (?saveId=...)
+ * ------------------------------------------------------------------------- */
+
+#previewBanner {
+    position: absolute;
+    top: 28px;
+    left: 0;
+    width: 100%;
+    min-width: 1180px;
+    height: 26px;
+    box-sizing: border-box;
+
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px;
+
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+
+    border-bottom: 1px solid gray;
+    background: rgba(127, 127, 127, 0.15);
+}
+
+#previewBanner .preview-badge {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 1px 5px;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+    opacity: 0.75;
+}
+
+#previewBanner .preview-title {
+    font-weight: bold;
+}
+
+#previewBanner .preview-info {
+    opacity: 0.7;
+}
+
+#previewBanner .preview-exit {
+    margin-left: auto;
+}
+
+/* the banner steals 26px, push the game viewport down by that much */
+body.preview-mode #game,
+body.preview-mode #loadingContainer {
+    top: 54px;
+}
+
+/* controls that mutate a save have no business being visible in a frozen one */
+body.preview-mode #pauseBtn,
+body.preview-mode #undoBtn,
+body.preview-mode #devPanel,
+body.preview-mode #exportButton,
+body.preview-mode #importButton,
+body.preview-mode #devPanelCheats {
+    display: none !important;
+}
+
+/* the queue is React-rendered and doesn't route through the button guards */
+body.preview-mode #queueViewport {
+    pointer-events: none;
+    opacity: 0.6;
+}

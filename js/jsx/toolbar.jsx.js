@@ -256,7 +256,7 @@ WToolbarFPS = React.createClass({
     render: function(){
         var game = this.props.game;
 
-        if (!game.isLocalhost){
+        if (!game.isLocalhost || game.isReadOnly()){
             return null;
         }
 
@@ -446,7 +446,30 @@ WCloudSaveRecord = React.createClass({
         return {
             showActions: false,
             isEditable: false,
+            linkCopied: false,
             label: this.props.save.label
+        }
+    },
+
+    /**
+     * Read-only preview link for this save: the game's own origin plus ?saveId=.
+     * Not the /preview/<guid> unfurl route - that one is for crawlers, and bouncing
+     * a human through it would just cost them a redirect.
+     */
+    copyPreviewLink() {
+        var self = this;
+        var url = window.location.origin + window.location.pathname + "?saveId=" + this.props.save.guid;
+
+        var done = function(){
+            self.setState({ linkCopied: true });
+            self.props.game.msg(url, "important");
+        };
+
+        //clipboard API needs https (or localhost); fall back to just logging the url
+        if (navigator.clipboard && navigator.clipboard.writeText){
+            navigator.clipboard.writeText(url).then(done, done);
+        } else {
+            done();
         }
     },
 
@@ -571,7 +594,14 @@ WCloudSaveRecord = React.createClass({
                         //(pushMetadata should return a new save snapshot)
                         self.forceUpdate();
                     });
-                }}, "archive")  
+                }}, "archive"),
+            this.state.showActions &&
+                $r("a", {
+                    title: "Copy a read-only preview link to this save",
+                    onClick: function(e){
+                        e.stopPropagation();
+                        self.copyPreviewLink();
+                }}, self.state.linkCopied ? "copied!" : "share")
         ]);
     }
 })

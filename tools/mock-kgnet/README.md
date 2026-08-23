@@ -30,11 +30,36 @@ server. `load` round-trips correctly as long as the server stays running.
 | GET    | `/kgnet/save/`                      | List cloud saves (no blobs)          |
 | POST   | `/kgnet/save/upload/`               | Create/overwrite a save              |
 | POST   | `/kgnet/save/update/`              | Update label / archived flag         |
-| GET    | `/kgnet/save/:guid/download/`       | Fetch a save blob (`{ data }`)       |
+| GET    | `/kgnet/save/:guid/download/`       | Fetch a save blob (`{ data, metadata }`) |
 | POST   | `/kgnet/chiral/game/command/`       | Stubbed (returns `{}`)               |
+| GET    | `/kgnet/save/:guid/card.svg`        | Link-preview card image              |
+| GET    | `/preview/:guid`                    | Crawler-facing page with OG tags     |
 
 CORS is set to reflect the request origin with credentials allowed, since the
 client uses `xhrFields: { withCredentials: true }`.
+
+## Save previews
+
+The last two endpoints back [save preview mode](../../docs/save-preview.md).
+`/preview/:guid` is what a player shares: crawlers (Discord, Slack, Twitter)
+read its Open Graph tags, real browsers follow its meta-refresh into the game at
+`?saveId=:guid`.
+
+```sh
+node tools/mock-kgnet/server.js
+curl -A Discordbot http://localhost:7780/preview/<guid>
+```
+
+Set `GAME_URL` if the game is not on `http://localhost:8080/`:
+
+```sh
+GAME_URL=http://localhost:9000/ node tools/mock-kgnet/server.js
+```
+
+Two things the mock does that production must **not** copy: it decompresses the
+whole save blob on every request to build the card (index that at upload time
+instead), and it serves the card as SVG (Discord and Twitter need PNG). Both are
+spelled out in [docs/save-preview.md](../../docs/save-preview.md).
 
 ## Notes
 
