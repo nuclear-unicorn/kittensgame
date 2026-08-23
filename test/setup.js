@@ -106,6 +106,7 @@ try {
     require("../js/challenges");
     require("../js/void");
     require("../js/math");
+    require("../js/preview");
     require("../game");
     require("../js/jsx/left.jsx");
     require("../js/ui");

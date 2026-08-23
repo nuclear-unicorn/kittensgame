@@ -2,6 +2,12 @@
 
     $r,
     WToolbar: writable,
+    WToolbarIconContainer: writable,
+    WToolbarHappiness: writable,
+    WToolbarEnergy: writable,
+    WToolbarMOTD: writable,
+    WToolbarPollution: writable,
+    WLoginForm: writable,
     game
 */
 
@@ -256,7 +262,7 @@ WToolbarFPS = React.createClass({
     render: function(){
         var game = this.props.game;
 
-        if (!game.isLocalhost){
+        if (!game.isLocalhost || game.isReadOnly()){
             return null;
         }
 
@@ -380,7 +386,7 @@ WLoginForm = React.createClass({
     },
 
     //block keyboard hooks from changing UI when we type login/password
-    setLogin(e){
+    setLogin: function(e){
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
 
@@ -388,7 +394,7 @@ WLoginForm = React.createClass({
     },
 
 
-    setPassword(e){
+    setPassword: function(e){
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
 
@@ -446,11 +452,59 @@ WCloudSaveRecord = React.createClass({
         return {
             showActions: false,
             isEditable: false,
+            linkCopied: false,
             label: this.props.save.label
         }
     },
 
-    bytesToSize(bytes) {
+    /**
+     * Read-only preview link for this save.
+     * The shareId is generated upon first save upload
+     */
+    copyPreviewLink: function() {
+        var self = this;
+        var game = this.props.game;
+        var save = this.props.save;
+
+        var copy = function(url){
+            var done = function(){
+                self.setState({ linkCopied: true });
+                game.msg(url, "important");
+            };
+            //clipboard API needs https (or localhost); fall back to just logging the url
+            if (navigator.clipboard && navigator.clipboard.writeText){
+                navigator.clipboard.writeText(url).then(done, done);
+            } else {
+                done();
+            }
+        };
+
+        if (save.shareId){
+            copy(game.server.getPreviewUrl(save.shareId));
+            return;
+        }
+
+        game.server.pushSaveMetadata(save.guid, { shared: true }).then(function(resp){
+            var shared = self.findSave(resp, save.guid);
+            if (shared && shared.shareId){
+                copy(game.server.getPreviewUrl(shared.shareId));
+            } else {
+                game.msg($I("ui.kgnet.save.share.failed"), "important");
+            }
+        });
+    },
+
+    /** @returns the record for `guid` in a save list response, or null */
+    findSave: function(saveList, guid) {
+        for (var i in saveList){
+            if (saveList[i].guid == guid){
+                return saveList[i];
+            }
+        }
+        return null;
+    },
+
+    bytesToSize: function(bytes) {
         var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
         if (bytes == 0) return '0 Byte';
         var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
@@ -571,10 +625,17 @@ WCloudSaveRecord = React.createClass({
                         //(pushMetadata should return a new save snapshot)
                         self.forceUpdate();
                     });
-                }}, "archive")  
+                }}, "archive"),
+            this.state.showActions &&
+                $r("a", {
+                    title: "Copy a read-only preview link to this save",
+                    onClick: function(e){
+                        e.stopPropagation();
+                        self.copyPreviewLink();
+                }}, self.state.linkCopied ? "copied!" : "share")
         ]);
     }
-})
+});
 
 WCloudSaves = React.createClass({
 
@@ -691,7 +752,7 @@ WLogin = React.createClass({
                             (game.server.userProfile ?
                             $I("ui.kgnet.online") : $I("ui.kgnet.login"))
                         ]
-                        ),
+                        )
                     ),
                     this.state.isExpanded && $r("div", {
                         className: "login-popup button_tooltip tooltip-block"
@@ -742,20 +803,21 @@ WToolbar = React.createClass({
         });
     },
 
-    componentWillUnmount(){
+    componentWillUnmount: function(){
         dojo.unsubscribe(this.onUpdateHandler);
     },
 
     getIcons: function(){
+        var game = this.state.game;
         var icons = [];
         icons.push(
-            $r(WToolbarFPS, {game: this.state.game}),
-            game.opts.disablePollution ? null : $r(WToolbarPollution, {game: this.state.game}),
-            $r(WToolbarHappiness, {game: this.state.game}),
-            $r(WToolbarEnergy, {game: this.state.game}),
-            $r(WBLS, {game: this.state.game}),
-            //$r(WToolbarMOTD, {game: this.state.game}),
-            $r(WLogin, {game: this.state.game})
+            $r(WToolbarFPS, {game: game}),
+            game.opts.disablePollution ? null : $r(WToolbarPollution, {game: game}),
+            $r(WToolbarHappiness, {game: game}),
+            $r(WToolbarEnergy, {game: game}),
+            $r(WBLS, {game: game}),
+            //$r(WToolbarMOTD, {game: game}),
+            game.isReadOnly() ? null : $r(WLogin, {game: game})
 
         );
         return icons;

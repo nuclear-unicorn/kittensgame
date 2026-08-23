@@ -242,6 +242,10 @@ var Telemetry = dojo.declare("classes.game.Telemetry", [IDataStorageAware], {
 	logEvent: function(eventType, payload) {
 		payload = payload || {};
 
+		if (this.game.isReadOnly()){
+			return;	//previewing someone else's save, none of this is our telemetry to send
+		}
+
 		if (window.newrelic && !this.game.opts.disableTelemetry){
 			// This will already be decorated by other common things like game build, uid, etc.
 			window.newrelic.addPageAction(eventType, payload);
@@ -410,7 +414,9 @@ var Server = dojo.declare("classes.game.Server", null, {
 			},
 			data: data
 		}).done(function(resp){
-			handler(resp);
+			if (handler){
+				handler(resp);
+			}
 		});
 	},
 
@@ -440,6 +446,10 @@ var Server = dojo.declare("classes.game.Server", null, {
 		var self = this,
 			game = this.game;
 
+		if (game.isReadOnly()){
+			return;
+		}
+
 		game.lastBackup = new Date().getTime();
 
 		var saveData = this.game.save();
@@ -468,6 +478,9 @@ var Server = dojo.declare("classes.game.Server", null, {
 	 */
 	pushSaveMetadata: function(guid, metadata){
 		var self = this;
+		if (this.game.isReadOnly()){
+			return $.Deferred().reject().promise();
+		}
 		return this._xhr("/kgnet/save/update/", "POST",
 		{
 			//pre-parsing guid to avoid checking it on the backend side
@@ -479,10 +492,43 @@ var Server = dojo.declare("classes.game.Server", null, {
 		});
 	},
 
+	/**
+	 * Fetch your own cloud save without applying it anywhere (see also downloadPreview)
+	 * loadSave() layers the "overwrite my game with it" part on top.
+	 * @param {string} guid
+	 * @returns {any} the jqXHR, resolving to {data: string, metadata?: object}
+	 */
+	downloadSave: function(guid){
+		return this._xhr("/kgnet/save/" + guid + "/download/", "GET", {});
+	},
+
+	/**
+	 * Fetch public save based on its shareId
+	 * 
+	 * @param {string} shareId
+	 * @returns {any} the jqXHR, resolving to {data: string, metadata?: object}
+	 */
+	downloadPreview: function(shareId){
+		return this._xhr("/preview/" + shareId + "/save/", "GET", {});
+	},
+
+	/**
+	 * Public sharable URL that goes through KGNET and generates openhost preview card
+	 * @param {string} shareId
+	 */
+	getPreviewUrl: function(shareId){
+		//generate redirect url, backend will verify the host
+		var returnPath = window.location.pathname.replace(/[^/]*$/, "");
+		return this.getServerUrl() + "/preview/" + shareId + "?r=" + encodeURIComponent(returnPath);
+	},
+
 	/** @param {string} guid */
 	loadSave: function(guid){
 		var self = this;
-		this._xhr("/kgnet/save/" + guid + "/download/", "GET", {}, function(resp){
+		if (this.game.isReadOnly()){
+			return;
+		}
+		this.downloadSave(guid).done(function(resp){
 			if (!resp.data){
 				console.error("unable to load game data", resp);
 			}
@@ -539,6 +585,9 @@ var Server = dojo.declare("classes.game.Server", null, {
 	/** @param {string} command */
 	sendCommand: function(command){
 		var self = this;
+		if (this.game.isReadOnly()){
+			return;
+		}
 		this._xhr("/kgnet/chiral/game/command/", "POST", {
 			command: command
 		}, function(resp){
@@ -2183,6 +2232,15 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	telemetry: null,
 	/** @type {any} Server - loose to break the back-reference cycle, see the typedefs above */
 	server: null,
+	/** @type {any} Preview - owns read-only KGNet save previews, see js/preview.js */
+	preview: null,
+
+	/**
+	 * True while we are displaying somebody else's KGNet save (?saveId=...).
+	 * Set by classes.game.Preview before the save is even fetched. Nothing that mutates
+	 * game state, storage or the cloud may run while this is up - see isReadOnly().
+	 */
+	previewMode: false,
 	/** @type {any} com.nuclearunicorn.game.Math, see js/math.js */
 	math: null,
 
@@ -2389,6 +2447,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.console = new com.nuclearunicorn.game.log.Console(this);
 		this.telemetry = new classes.game.Telemetry(this);
 		this.server = new classes.game.Server(this);
+		this.preview = new classes.game.Preview(this);
 		this.math = new com.nuclearunicorn.game.Math();
 
 		this.resPool = new classes.managers.ResourceManager(this);
@@ -2579,6 +2638,9 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
     },
 
 	heartbeat: function(){
+		if (this.isReadOnly()){
+			return;
+		}
 		this.telemetry.logEvent("heartbeat", {
 			opts: this.opts,
 			year: this.calendar.year
@@ -2679,6 +2741,9 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	saveUI: function(){
+		if (this.isReadOnly()){
+			return;
+		}
 		this.save();
 
 		dojo.style(dojo.byId("saveTooltip"), "opacity", "1");
@@ -2749,7 +2814,20 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 	},
 
+	/**
+	 * Gate for every mutating entry point: save, load, reset, wipe, cloud sync, buttons.
+	 * Callers short-circuit silently - a preview refusing to do things is the
+	 * advertised behaviour, not something worth logging about.
+	 * @returns {boolean} true while a read-only save preview is on screen
+	 */
+	isReadOnly: function(){
+		return this.previewMode;
+	},
+
 	reload: function(){
+		if (this.isReadOnly()){
+			return;
+		}
 		this.save();
 		window.location.reload();
 	},
@@ -2774,6 +2852,11 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * @returns {SaveData}
 	 */
 	save: function(){
+		if (this.previewMode) {
+			// read-only preview: hand back what we are showing, serialize nothing, store nothing
+			return this._parseLSSaveData();
+		}
+
 		if (this.currentSaveIsBroken) {
 			// if the save is broken, we return the original save that we tried to import.
 			// (unfortunately we need to parse it a little bit, since callers of save() expect the unserialized data...)
@@ -2860,6 +2943,9 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	wipe: function() {
 		var game = this;
+		if (this.isReadOnly()){
+			return;
+		}
 		this.ui.confirm($I("wipe.confirmation.title"), $I("wipe.confirmation.msg1"), function() {
 			game.ui.confirm($I("wipe.confirmation.title"), $I("wipe.confirmation.msg2"), function() {
 				game._wipe();
@@ -2879,6 +2965,9 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	togglePause: function(){
+		if (this.isReadOnly()){
+			return;
+		}
 		var pauseBtn = dojo.byId("pauseBtn");
 		this.isPaused = !this.isPaused;
 		pauseBtn.innerHTML = this.isPaused ? $I("ui.unpause") : $I("ui.pause");
@@ -3085,6 +3174,9 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	//btw, ie11 is horrible crap and should not exist
 	saveExport: function(){
+		if (this.isReadOnly()){
+			return;
+		}
 		var data = this.save();
 		var dataString = JSON.stringify(data);
 
@@ -3095,6 +3187,9 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	saveImport: function() {
 		var game = this;
+		if (this.isReadOnly()){
+			return;
+		}
 		this.ui.confirm("", $I("save.import.confirmation.msg"), function() {
 			var data = $("#importData").val().replace(/\s/g, "");
 			if (data) {
@@ -3108,6 +3203,9 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	/** @param {boolean} [withFullName] - tag the filename with run number and in-game date */
     saveToFile: function(withFullName) {
+        if (this.isReadOnly()){
+            return;
+        }
         var $link = $("#download-link");
 
         var data = JSON.stringify(this.save());
@@ -3126,6 +3224,9 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	saveExportDropbox: function(){
+		if (this.isReadOnly()){
+			return;
+		}
 		this.save();
 		var data = this.save();
 		var dataString = JSON.stringify(data);
@@ -3183,6 +3284,9 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 	saveImportDropbox: function() {
 		var game = this;
+		if (this.isReadOnly()){
+			return;
+		}
 		this.ui.confirm("", $I("save.import.confirmation.msg"), function() {
 			game.importFromDropbox(function(error) {
 				$("#importDiv").hide();
@@ -3246,6 +3350,10 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * @param {(error?: any) => void} callback
 	 */
 	_loadSaveJson: function(lzdata, callback){
+        if (this.isReadOnly()){
+            callback("read-only preview");
+            return;
+        }
         try {
 			var jsonString = this.decompressLZData(lzdata);
 			if (jsonString && jsonString[0] == "{"){
@@ -5242,6 +5350,13 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	start: function(){
+		if (this.isReadOnly()){
+			//a preview is a snapshot: no worker, no interval, no time passing at all
+			this.villageTab.updateTab();
+			this.workshopTab.updateTab();
+			return;
+		}
+
 		if (this.isWebWorkerSupported() && this.opts.useWorkers){	//IE10 has a nasty security issue with running blob workers
 			console.log("starting web worker...");
 			var blob = new Blob([
@@ -5374,6 +5489,9 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	},
 
 	reset: function(){
+		if (this.isReadOnly()){
+			return;
+		}
 		var msg = $I("reset.confirmation.title") + "\n\n"
 		        + $I("reset.confirmation.msgbase");
 		if (this.resPool.get("kittens").value > 70) {
@@ -6152,6 +6270,9 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
     },
 
 	undo: function() {
+		if (this.isReadOnly()){
+			return;
+		}
 		if (!this.undoChange) {
 			return;
 		}

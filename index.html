@@ -162,6 +162,7 @@
 					"js/challenges",
 					"js/void",
 					"js/math",
+					"js/preview",
 					"game",
 
 					"js/toolbar"
@@ -237,8 +238,16 @@
 
 			function initGame() {
 				console.log("About to initialize the game");
-				$("#loadingContainer").hide();
-				$("#game").show();
+
+				// ?saveId=<kgnet guid> boots a read-only preview of somebody else's save.
+				// Detach storage first so nothing downstream can touch the local save.
+				var previewSaveId = classes.game.Preview.getSaveId();
+				if (previewSaveId) {
+					classes.game.Preview.detachStorage();
+				} else {
+					$("#loadingContainer").hide();
+					$("#game").show();
+				}
 
 				try {
 					gamePage = game = new com.nuclearunicorn.game.ui.GamePage();
@@ -255,19 +264,24 @@
 					game.setDropboxClient(dropBoxClient);
 
 
-					gamePage.load();
-					gamePage.updateKarma();
+					if (previewSaveId) {
+						//async: the rest of the boot happens once the cloud save lands
+						gamePage.preview.boot(previewSaveId);
+					} else {
+						gamePage.load();
+						gamePage.updateKarma();
 
-					gamePage.render();
-					gamePage.ui.renderFilters();
-					gamePage.ui.onLoad();
-					gamePage.start();
+						gamePage.render();
+						gamePage.ui.renderFilters();
+						gamePage.ui.onLoad();
+						gamePage.start();
 
-					var config = new classes.KGConfig();
+						var config = new classes.KGConfig();
 
-					//update eldermass gifts on every game load pass
-					//TODO: toggle timer in the background?
-					gamePage.checkEldermass();
+						//update eldermass gifts on every game load pass
+						//TODO: toggle timer in the background?
+						gamePage.checkEldermass();
+					}
 					//---------------------------------
 					gamePage.isLocalhost = isLocalhost;
 					if (gamePage.isLocalhost){
@@ -370,6 +384,8 @@
 					<a href="#" id="newVersion" onClick="gamePage.reload();" title="New version available!" style="display:none">↻</a>
 				</div>
 			</div>
+
+			<div id="previewBanner" style="display: none;" aria-label="Read-only preview banner"></div>
 
 			<div id="loadingContainer" aria-label="Loading screen">
 				<div class="content">
@@ -624,8 +640,8 @@
 				<a id="discord" href="https://discord.gg/2arBf9K" target="_blank">Discord</a> |
 				<!-- <a href="http://kittensgame.tumblr.com" target="_blank">tumblr</a> | -->
 				<!-- <a href="#" onclick="$('#helpDiv').toggle();">help</a> | -->
-				<a id="credits" href="#" onclick="$('#creditsDiv').toggle();">credits</a> |
-				<a id="patreon" href="https://www.patreon.com/bloodrizer" target="_blank">Patreon</a>
+				<a id="credits" href="#" onclick="$('#creditsDiv').toggle();">credits</a>
+				<!--  | <a id="patreon" href="https://www.patreon.com/bloodrizer" target="_blank">Patreon</a> -->
 				<!--  | <a href="classic/" target="_blank">classic</a> -->
 			</div>
 		</div>
