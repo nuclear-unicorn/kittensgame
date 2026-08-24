@@ -675,6 +675,7 @@ WResourceTable = React.createClass({
 
     toggleHiddenResources: function(e){
         game.resPool.showHiddenResources = e.target.checked;
+        this.forceUpdate(); //the flag lives on resPool, so nothing else would re-render the table
     }
 });
 

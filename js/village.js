@@ -4923,6 +4923,7 @@ dojo.declare("classes.ui.village.Census", null, {
 		var kittensLimit = -this.statics.startKitten;
 
 		var isAnarchyActive = this.game.challenges.isActive("anarchy");
+		var isReadOnly = this.game.isReadOnly();
 
 		for (var i = sim.kittens.length - 1; i >= 0 && kittensLimit < 10; i--) {
 			var kitten = sim.kittens[i];
@@ -4961,12 +4962,16 @@ dojo.declare("classes.ui.village.Census", null, {
 			var linksDiv = dojo.create("div", {
 				className: "links-container"
 			}, div);
+			if (isReadOnly){
+				//favorite/leader glyphs stay on as indicators, but nothing here is clickable
+				dojo.style(linksDiv, "pointerEvents", "none");
+			}
 
 			var promoteHref = dojo.create("span", {
 				innerHTML: "^",
 				className: "btn modern promoteHref",
 				style: {
-					visibility: this.game.village.sim.canPromote(kitten) ? "visible" : "hidden"
+					visibility: (!isReadOnly && this.game.village.sim.canPromote(kitten)) ? "visible" : "hidden"
 				},
 				title: $I("village.census.btn.promote")
 			}, linksDiv);
@@ -4990,34 +4995,36 @@ dojo.declare("classes.ui.village.Census", null, {
 				href: "#", innerHTML:  $I("village.btn.unassign.job"),
 				className: "unassignHref",
 				style: {
-					visibility: kitten.job ? "visible" : "hidden"
+					visibility: (!isReadOnly && kitten.job) ? "visible" : "hidden"
 				}
 			}, linksDiv);
 
-			dojo.connect(promoteHref, "onclick", this, dojo.partial(function(game, i, event){
-				event.preventDefault();
-				game.village.sim.promote(game.village.sim.kittens[i]);
-				game.villageTab.requestCensusRefresh();
-			}, this.game, i));
+			if (!isReadOnly){
+				dojo.connect(promoteHref, "onclick", this, dojo.partial(function(game, i, event){
+					event.preventDefault();
+					game.village.sim.promote(game.village.sim.kittens[i]);
+					game.villageTab.requestCensusRefresh();
+				}, this.game, i));
 
-			dojo.connect(favoriteHref, "onclick", this, dojo.partial(function(game, i){
-				var kitten = game.village.sim.kittens[i];
-				kitten.favorite = !kitten.favorite;
-				game.villageTab.requestCensusRefresh();
-			}, this.game, i));
+				dojo.connect(favoriteHref, "onclick", this, dojo.partial(function(game, i){
+					var kitten = game.village.sim.kittens[i];
+					kitten.favorite = !kitten.favorite;
+					game.villageTab.requestCensusRefresh();
+				}, this.game, i));
 
-			dojo.connect(leaderHref, "onclick", this, dojo.partial(function(game, i, event){
-				event.preventDefault();
-				game.village.makeLeader(game.village.sim.kittens[i]);
-				game.render();
-			}, this.game, i));
+				dojo.connect(leaderHref, "onclick", this, dojo.partial(function(game, i, event){
+					event.preventDefault();
+					game.village.makeLeader(game.village.sim.kittens[i]);
+					game.render();
+				}, this.game, i));
 
-			dojo.connect(unassignHref, "onclick", this, dojo.partial(function(game, i, event){
-				event.preventDefault();
-				game.village.unassignJob(game.village.sim.kittens[i]);
-				game.village.updateResourceProduction();
-				game.villageTab.requestCensusRefresh();
-			}, this.game, i));
+				dojo.connect(unassignHref, "onclick", this, dojo.partial(function(game, i, event){
+					event.preventDefault();
+					game.village.unassignJob(game.village.sim.kittens[i]);
+					game.village.updateResourceProduction();
+					game.villageTab.requestCensusRefresh();
+				}, this.game, i));
+			}
 
 			this.records.push({
 				content: content,
@@ -5044,6 +5051,8 @@ dojo.declare("classes.ui.village.Census", null, {
 		} else {
 			this.renderPageSwitching(container);
 		}
+
+		this.update();	//force UI to update div instead of just rendering empty block
 	},
 
 	//Returns an object with 3 fields; each is a string which may contain HTML
@@ -5192,6 +5201,11 @@ dojo.declare("classes.ui.village.Census", null, {
 		}));
 
 		//-------------- links to promote or unassign ----------------------
+		if (this.game.isReadOnly()){
+			this.promoteLeaderHref = null;
+			this.unassignLeaderJobHref = null;
+			return;
+		}
 		//Links are invisible if there is a leader but the condition is not met.
 		var expToPromote = this.game.village.getRankExp(leader.rank);
 		var goldToPromote = 25 * (leader.rank + 1);
@@ -5352,6 +5366,7 @@ dojo.declare("classes.ui.village.Census", null, {
 		}
 
 		//Update all existing records (the things currently displayed onscreen)
+		var isReadOnly = this.game.isReadOnly();
 		for (var i = 0; i < this.records.length; i++) {
 			var record = this.records[i];
 			var kitten = record.kitten;
@@ -5367,11 +5382,11 @@ dojo.declare("classes.ui.village.Census", null, {
 			record.content.innerHTML += this.getSkillInfo(kitten);
 
 			//Update links
-			dojo.style(record.promoteHref, "visibility", this.game.village.sim.canPromote(kitten) ? "visible" : "hidden");
+			dojo.style(record.promoteHref, "visibility", (!isReadOnly && this.game.village.sim.canPromote(kitten)) ? "visible" : "hidden");
 			record.favoriteHref.innerHTML = kitten.favorite ? "&#9733;" : "&#9734;"; //star-shaped link to reduce visual noise
 			record.leaderHref.innerHTML = kitten.isLeader ? "&#9873;" : "&#9872;"; //flag-shaped link to reduce visual noise
 			dojo.style(record.leaderHref, "visibility", this.game.challenges.isActive("anarchy") ? "hidden" : "visible");
-			dojo.style(record.unassignHref, "visibility", kitten.job ? "visible" : "hidden");
+			dojo.style(record.unassignHref, "visibility", (!isReadOnly && kitten.job) ? "visible" : "hidden");
 		}
 	}
 });
@@ -5734,6 +5749,12 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		if (!this.game.prestige.getPerk("engeneering").researched){
 			loadoutDiv.style.visibility = "hidden";
 			tdTop2.style.visibility = "hidden";
+		}
+
+		if (this.game.isReadOnly()){
+			dojo.style(this.createLoadoutHref, "display", "none");
+			dojo.style(this.deleteAllLoadoutHref, "display", "none");
+			dojo.style(this.toggleDefaultLoadoutHref, "display", "none");
 		}
 		
 		//--------------------------	map ---------------------------
