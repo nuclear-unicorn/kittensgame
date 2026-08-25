@@ -1640,7 +1640,7 @@
     "time.reset.bonus.production": "+{0}% production",
     "time.reset.bonus.storage": "+{0}% stockage",
     "time.reset.desc": "Retour vers le futur.",
-    "time.reset.instructional": "Resetting the timeline will start the game from the scratch. You will keep all of your statistic and achievements. You may receive various game bonuses.<br><br>Resetting at this point will give you:",
+    "time.reset.instructional": "Réinitialiser la ligne temporelle démarrera une nouvelle partie depuis le départ. Vous garderez toutes vos statistiques et vos succès. Vous pourrez recevoir divers bonus de jeu.<br><br>Réinitialiser maintenant vous donnera :",
     "time.reset.karma": "Points de karma",
     "time.reset.paragon": "Points d'âme",
     "time.reset.title": "Réinitialisation",
