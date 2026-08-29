@@ -65,13 +65,13 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         this.heat = saveData["time"].heat || 0;
         this.testShatter = saveData["time"].testShatter || 0; //temporary
         this.isAccelerated = saveData["time"].isAccelerated || false;
-		this.loadMetadata(this.chronoforgeUpgrades, saveData.time.cfu);
-		this.loadMetadata(this.voidspaceUpgrades, saveData.time.vsu);
+		this.loadMetadata(this.chronoforgeUpgrades, saveData.time.cfu, "chronoforgeUpgrades");
+		this.loadMetadata(this.voidspaceUpgrades, saveData.time.vsu, "voidspaceUpgrades");
 
 		this.getCFU("timeBoiler").unlocked = this.getCFU("blastFurnace").val > 0;
 
 		if (saveData.time.usedCryochambers) { //after reset
-			this.loadMetadata(this.voidspaceUpgrades, saveData.time.usedCryochambers);
+			this.loadMetadata(this.voidspaceUpgrades, saveData.time.usedCryochambers, "usedCryochambers");
 		}
 
         if (this.getVSU("usedCryochambers").val > 0) {

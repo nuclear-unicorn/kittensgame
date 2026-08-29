@@ -733,6 +733,13 @@ body.scheme_catnip {
 	font-size: 14px; /* default.css font-size: 0.7em; */
 	line-height: unset;
 }
+.scheme_catnip .btnTitle > .upgrade-available {
+	color: #A0F0A0;
+	font-weight: normal; /*default bold font looks kinda bad for some reason*/
+}
+.scheme_catnip .desc > .upgrade-available {
+	color: lightgreen;
+}
 .scheme_catnip .btn.explore {
 	/* default margin-right: 9px; */
 	margin-top: 5px;

@@ -63,7 +63,7 @@ var TabManager = dojo.declare("com.nuclearunicorn.core.TabManager", Control, {
 
 	//Declared by subclasses; listed here so the base methods that rely on
 	//them (updateEffectCached, etc.) are part of the checked contract.
-	/** @type {any} TODO: type as the GamePage class once game.js is converted */
+	/** @type {GamePage} the instance type is declared in game.js */
 	game: null,
 	/** @type {Record<string, number>} */
 	effectsBase: null,
@@ -286,6 +286,11 @@ var TabManager = dojo.declare("com.nuclearunicorn.core.TabManager", Control, {
 		console.error("Could not find metadata for ", name, "in", metadata);
 	},
 
+	/**
+	 * @param {string} [metaId] A human-readable name for the metadata we're trying to load.
+	 * 				Optional parameter displayed only in error logging messages.
+	 * 				Exists for developer convenience purposes.
+	 */
 	loadMetadata: function(meta, saveMeta, metaId){
 		if (!saveMeta){
 			console.trace();
@@ -310,7 +315,7 @@ var TabManager = dojo.declare("com.nuclearunicorn.core.TabManager", Control, {
 					}
 					if (savedMetaElem[fld] !== undefined) {
 						if (savedMetaElem[fld] != null && typeof(savedMetaElem[fld]) == "object") {
-							this.loadMetadata(elem[fld], savedMetaElem[fld]);
+							this.loadMetadata(elem[fld], savedMetaElem[fld], metaId + "." + fld);
 						} else {
 							elem[fld] = savedMetaElem[fld];
 						}
@@ -512,6 +517,7 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 	maxMessages: 40,
 	messageIdCounter: 0,
 	ui: null,
+	/** @type {GamePage} */
 	game: null,
 	/** @type {Record<string, {title: string, enabled: boolean, unlocked: boolean, defaultUnlocked?: boolean}>} */
 	filters: null,
@@ -618,6 +624,7 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 });
 
 var ButtonController = dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
+	/** @type {GamePage} */
 	game: null,
 	controllerOpts: null,
 
@@ -842,6 +849,12 @@ var ButtonController = dojo.declare("com.nuclearunicorn.game.ui.ButtonController
 	 * @returns BuyItemResult
 	 */
 	buyItem: function(model, event){
+		if (this.game.isReadOnly()) {
+			return {
+				itemBought: false,
+				reason: "read-only"
+			};
+		}
 		if (!this.hasResources(model)) {
 			return {
 				itemBought: false,
@@ -896,6 +909,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 	model: null,
 	controller: null,
+	/** @type {GamePage} */
 	game: null,
 
 	//nodes
@@ -1047,6 +1061,9 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 	},
 
 	onClick: function(event){
+		if (this.game.isReadOnly()){
+			return;
+		}
 		this.animate();
 		var self = this;
 		var result = this.controller.buyItem(this.model, event);
@@ -1115,8 +1132,20 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		}
 	},
 
-	//Fast access snippet to create button links like "on", "off", "sell", etc.
-	addLink: function(linkModel) {
+	/**
+	 * Wrap sub-buttons in a hidden parent to keep update() working
+	 */
+	getButtonContent: function(){
+		return dojo.create("div", { style: { 
+			display: this.game.isReadOnly() ? "none" : "contents" }
+		}, this.buttonContent);
+	},
+
+	/**
+	 * Fast access snippet to create button links like "on", "off", "sell", etc.
+	 * @param {function} [tooltipHtmlProvider] Optional.  If provided, this link will have its own tooltip.
+	 */
+	addLink: function(linkModel, tooltipHtmlProvider) {
 
 		var longTitleClass = (linkModel.title.length > 4) ? "small" : "";
 		var link = dojo.create("a", {
@@ -1134,6 +1163,10 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			event.stopPropagation();
 			event.preventDefault();
 
+			if (this.game.isReadOnly()){
+				return;
+			}
+
 			var self = this;
 			this.animate();
 			// FIXME should as easy as handler.apply(this, [args...])
@@ -1146,7 +1179,11 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 		}, linkModel.handler));
 
-		dojo.place(link, this.buttonContent);
+		dojo.place(link, this.getButtonContent());
+
+		if (tooltipHtmlProvider) {
+			UIUtils.attachTooltip(this.game, link, 0, 300, tooltipHtmlProvider);
+		}
 
 		return {
 			link: link,
@@ -1164,7 +1201,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			style: {
 				float: "right"
 			}
-		}, this.buttonContent);
+		}, this.getButtonContent());
 
 		var linksTooltip = dojo.create("div", {
 			className: "linkContent",
@@ -1200,6 +1237,10 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			event.stopPropagation();
 			event.preventDefault();
 
+			if (this.game.isReadOnly()){
+				return;
+			}
+
 			dojo.hitch(this, handler)();
 
 			this.update();
@@ -1231,6 +1272,10 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			dojo.connect(link, "onclick", this, dojo.partial(function(handler, event){
 				event.stopPropagation();
 				event.preventDefault();
+
+				if (this.game.isReadOnly()){
+					return;
+				}
 
 				dojo.hitch(this, handler)();
 
@@ -1440,6 +1485,29 @@ var ButtonModernController = dojo.declare("com.nuclearunicorn.game.ui.ButtonMode
 });
 
 var ButtonModernHelper = {
+	getSellTooltip: function(game, model) {
+		var tooltip = dojo.create("div", { className: "tooltip-inner" }, null);
+		dojo.create("div", {
+			innerHTML: $I("btn.sell.tooltip", [game.toDisplayPercentage(model.refundPercentage) +"%"]),
+			className: "desc"
+		}, tooltip);
+
+		//Enumerate which prices cannot be refunded
+		if (Array.isArray(model.prices)) {
+			model.prices.forEach(function(price) {
+				var res = game.resPool.get(price.name);
+				if (price.isTemporary || !res.isRefundable(game)) {
+					dojo.create("div", {
+						className: "desc small",
+						innerHTML: $I("btn.sell.res.not.refundable", [res.title])
+					}, tooltip);
+				}
+			});
+		}
+
+		return tooltip.outerHTML;
+	},
+
 	getTooltipHTML : function(controller, model){
 		//Some aspects of the metadata may have changed, so fetch the latest version of the model:
 		model = controller.fetchModel(model.options);
@@ -1844,6 +1912,9 @@ var BuildingBtnController = dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn
 
 		var start = building.val;
 		var end = building.val - 1;
+		if (event.ctrlKey || event.metaKey /*osx tears*/) {
+			end = Math.max(0, building.val - (this.game.opts.batchSize || 10));
+		}
 		if (end > 0 && event && event.shiftKey) { //no need to confirm if selling just 1
 			end = 0;
 			if (this.game.opts.noConfirm) {
@@ -1858,8 +1929,7 @@ var BuildingBtnController = dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn
 				return amtSold;
 			}
 		} else if (end >= 0) {
-			this.sellInternal(model, end, true /*requireSellLink*/);
-			return start - end; //Should be just 1 if you do the algebra
+			return this.sellInternal(model, end, true /*requireSellLink*/);
 		}
 	},
 
@@ -1949,7 +2019,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 					handler: function(event) {
 						this.sell(event);
 					}
-				});
+				}, dojo.partial(ButtonModernHelper.getSellTooltip, this.game, this.model));
 				//var sellLinkAdded = true;
 				dojo.addClass(this.domNode, "hasSellLink");
 			}
@@ -2111,6 +2181,19 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", Buildi
 		var pricesDiscount = this.game.getLimitedDR((this.game.getEffect(meta.name + "CostReduction")), 1);
 		var priceModifier = 1 - pricesDiscount;
 
+		if (meta.priceRules) {
+			for (var i = 0; i < meta.prices.length; i++){
+				var resPriceDiscount = this.game.getEffect(meta.prices[i].name + "CostReduction");
+				resPriceDiscount = this.game.getLimitedDR(resPriceDiscount, 1);
+				var resPriceModifier = 1 - resPriceDiscount;
+				var resourcePriceRatio = meta.prices[i].priceRatio || ratio;
+				prices.push({
+					val: meta.prices[i].val * Math.pow(resourcePriceRatio, meta.val) * resPriceModifier * priceModifier,
+					name: meta.prices[i].name
+				});
+        	}
+			return prices;
+		}
         for (var i = 0; i < meta.prices.length; i++){
 			var resPriceDiscount = this.game.getEffect(meta.prices[i].name + "CostReduction");
 			resPriceDiscount = this.game.getLimitedDR(resPriceDiscount, 1);
@@ -2154,6 +2237,12 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", Buildi
 	 */
 	
 	buyItem: function(model, event, buyType) {
+		if (this.game.isReadOnly()) {
+			return {
+				itemBought: false,
+				reason: "read-only"
+			};
+		}
 		if (event && event.shiftKey){
 			buyType = "all";
 		}
@@ -2387,6 +2476,12 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingNotStackableBtnController", Bui
 	},
 
 	buyItem: function(model, event, callback) {
+		if (this.game.isReadOnly()) {
+			return {
+				itemBought: false,
+				reason: "read-only"
+			};
+		}
 		var isInDevMode = this.game.devMode;
 		if (model.metadata.researched && !isInDevMode) {
 			return {
@@ -2490,6 +2585,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ContentRowRenderer", null, {
 });
 
 dojo.declare("mixin.IGameAware", null, {
+	/** @type {GamePage} */
 	game: null,
 
 	setGame: function(game){
@@ -2525,6 +2621,7 @@ dojo.declare("mixin.IChildrenAware", null, {
  * Collapsible panel for a tab
  */
 dojo.declare("com.nuclearunicorn.game.ui.Panel", [com.nuclearunicorn.game.ui.ContentRowRenderer, mixin.IChildrenAware], {
+	/** @type {GamePage} */
 	game: null,
 
 	collapsed: false,
@@ -2697,7 +2794,8 @@ var UIUtils = {
 		var gameNode = dojo.byId("game");
 		var tooltip = dojo.byId("tooltip");
 
-		var showTooltip = function () {
+		var showTooltip = function (e) {
+			e.stopPropagation();
 			game.tooltipUpdateFunc = function(){
 				tooltip.innerHTML = dojo.hitch(game, htmlProvider)();
 			};

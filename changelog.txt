@@ -1,9 +1,26 @@
-v 1.6.1.3 (14 Aug 2026)
+v 1.6.1.5 (29 Aug 2026)
+
+New features:
+* Save Preview - open a read-only snapshot of a shared save (Labs)
+* Dark Paracosm
+
+Iron Will expansion:
+* New Iron Will content
+* Smoother first Iron Will run
 
 Minor:
 
-Improved village and overall game performance
-Fixed Dark Paracosm feature not unlocking correctly
+Notification when buildings are ready to be upgraded
+Seasonal variance added to trades, along with new rare trade options
+Spiders can now unlock coal
+Spiders selling plastic is now much rarer
+Shark Relations: Botanists now requires the biofuel upgrade
+Optimized village and overall game performance
+Buildings now display as a single, stably sorted list
+Energy Rifts UI improvements
+"kirakira numbers"
+
+N.B: Save Preview is a Labs feature and only available on Beta currently
 
 
 

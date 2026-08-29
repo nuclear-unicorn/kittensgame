@@ -162,10 +162,18 @@ WResourceRow = React.createClass({
             specialClass = " blaze";
         } else if (res.value == 666) {
             specialClass = " hail";
-        } else if (res.value == 777) {
+        } else if (res.value == 777 || res.value == 7777) {
             specialClass = " pray";
         } else if (res.value == 1337) {
             specialClass = " leet";
+        } else if (res.value == 888 || res.value == 8888) {
+            specialClass = " lucky";
+        } else if (res.value == 42) {
+            specialClass = " cosmic";
+        } else if (res.value == 69) {
+            specialClass = " nice";
+        } else if (res.value == 404) {
+            specialClass = " notfound";
         }
 
         var resLeaderBonus = "";
@@ -277,7 +285,7 @@ WResourceRow = React.createClass({
 
     componentDidUpdate: function(prevProps, prevState){
         var node = React.findDOMNode(this.refs.perTickNode);
-        if(this.refs.isTooltipAttached && !node) {
+        if (this.refs.isTooltipAttached && !node) {
             this.refs.isTooltipAttached = false;
         }
         if (node && !this.refs.isTooltipAttached) {
@@ -491,10 +499,10 @@ WCraftRow = React.createClass({
                 res.title || res.name
             ),
             $r("div", {className:"res-cell resource-value", ref:"perTickNode", title: resVal}, resVal),
-            $r(WCraftShortcut, {resource: res, recipe: recipe, craftFixed:1, craftPercent: 0.01}),
-            $r(WCraftShortcut, {resource: res, recipe: recipe, craftFixed:25, craftPercent: 0.05}),
-            $r(WCraftShortcut, {resource: res, recipe: recipe, craftFixed:100, craftPercent: 0.1}),
-            $r(WCraftShortcut, {resource: res, recipe: recipe, craftPercent: 1}),
+            !game.isReadOnly() ? $r(WCraftShortcut, {resource: res, recipe: recipe, craftFixed:1, craftPercent: 0.01}) : null,
+            !game.isReadOnly() ? $r(WCraftShortcut, {resource: res, recipe: recipe, craftFixed:25, craftPercent: 0.05}) : null,
+            !game.isReadOnly() ? $r(WCraftShortcut, {resource: res, recipe: recipe, craftFixed:100, craftPercent: 0.1}) : null,
+            !game.isReadOnly() ? $r(WCraftShortcut, {resource: res, recipe: recipe, craftPercent: 1}): null,
         ]);
     },
     onClickName: function(e){
@@ -547,7 +555,7 @@ WCraftRow = React.createClass({
 
     componentDidUpdate: function(prevProps, prevState){
         var node = React.findDOMNode(this.refs.perTickNode);
-        if(this.refs.isTooltipAttached && !node) {
+        if (this.refs.isTooltipAttached && !node) {
             this.refs.isTooltipAttached = false;
         }
         if (node && !this.refs.isTooltipAttached) {
@@ -667,6 +675,7 @@ WResourceTable = React.createClass({
 
     toggleHiddenResources: function(e){
         game.resPool.showHiddenResources = e.target.checked;
+        this.forceUpdate(); //the flag lives on resPool, so nothing else would re-render the table
     }
 });
 
@@ -782,7 +791,7 @@ WPins = React.createClass({
                     handler: function(loadout){ 
                         loadout.setLoadout(true);
                     }.bind(this, loadout)
-                })
+                });
             }
         }
         return pins;
@@ -859,14 +868,15 @@ WLeftPanel = React.createClass({
         var huntCount = Math.floor(catpower.value / huntCost);
 
         var canHunt = ((game.resPool.get("paragon").value > 0) || (game.science.get("archery").researched)) &&
-            (!game.challenges.isActive("pacifism"));
+            !game.challenges.isActive("pacifism") &&
+            !game.isReadOnly();
         var showFastHunt = (catpower.value >= huntCost);
 
         var map = game.village.map;
         var lastBiomeName = map.lastBiome ? game.village.getBiome(map.lastBiome).title : "";
-        var canExplore = map.lastBiome && !map.currentBiome && map.squad.hp >= map.getMaxHP();
+        var canExplore = map.lastBiome && !map.currentBiome && map.squad.hp >= map.getMaxHP() && !game.isReadOnly();
 
-        var canSacrifice = game.religion.getHasUnlockedUnicornSacrifice();
+        var canSacrifice = game.religion.getHasUnlockedUnicornSacrifice() && !game.isReadOnly();
         var maxAvailableSacrifices = game.religion.getAvailableUnicornSacrifices();
 
         //---------- advisor ---------
@@ -930,13 +940,16 @@ WLeftPanel = React.createClass({
                     ")"
                 )
             ),
-            $r("div", {id:"fastPraiseContainer", className:"pin-link sidebar-section", style:{visibility:"hidden"}},
+            $r("div", {id:"fastPraiseContainer", className:"pin-link sidebar-section", style:{
+                display: (!game.isReadOnly() ? "block" : "none"),
+                visibility:"hidden"}
+            },
                 $r("a", {href:"#", onClick: this.praiseAll},
                     $I("left.praise")
                 )
             ),
 
-            $r(WPins, {game: game}),
+            !game.isReadOnly() && $r(WPins, {game: game}),
             $r(WCraftTable, {resources: game.resPool.resources, reqRes: reqRes})
         ]);
     },
@@ -984,7 +997,7 @@ WTooltip = React.createClass({
 
     render: function(){
         return $r("div", {
-            tabIndex: this.props.tabindex ?? 0,
+            tabIndex: this.props.tabindex || 0,
             className: "tooltip-block", 
             onMouseOver: this.onMouseOver, 
             onMouseOut: this.onMouseOut,

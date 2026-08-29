@@ -659,6 +659,9 @@ body.scheme_chocolate.with_background_image {
 .scheme_chocolate .panelContainer div.censusFilters {
 	margin-bottom: 3px; /* for add a margin under the 2 lists (select) in the settlement tab */
 }
+.scheme_chocolate .upgrade-available {
+	color: #30B030 !important;
+}
 /* ---------- Village ---------- */
 /* container 'Census' -> list of kittens in settlement tab */
 .scheme_chocolate .census-block {

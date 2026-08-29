@@ -757,6 +757,9 @@ body.scheme_dune {
 	color: #93e70c;
 	font-weight: bold;
 }
+.scheme_dune .upgrade-available {
+	color: #30A030 !important;
+}
 .scheme_dune .panelContainer div.censusFilters {
 	margin-bottom: 3px; /* for add a margin under the 2 lists (select) in the settlement tab */
 }

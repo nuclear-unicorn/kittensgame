@@ -359,6 +359,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			buildings: ["accelerator"]
+		},
+		unlocks: {
+			upgrades: ["stasisChambers", "tachyonAccelerators"]
 		}
 	},{
 		name: "stasisChambers",
@@ -373,6 +376,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "timeCrystal", val: 1 },
 			{ name : "alloy", val: 	 200 }
 		],
+		evaluateLocks: function(game){
+			return game.workshop.get("energyRifts").researched && game.science.get("chronophysics").researched;
+		},
 		upgrades: {
 			buildings: ["accelerator"]
 		},
@@ -452,6 +458,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "timeCrystal", val: 10 },
 			{ name : "eludium",     val: 125 }
 		],
+		evaluateLocks: function(game){
+			return game.workshop.get("energyRifts").researched && game.science.get("tachyonTheory").researched;
+		},
 		upgrades: {
 			buildings: ["accelerator"]
 		}
@@ -720,7 +729,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science", val: 150000 },
 			{ name : "blueprint", val: 25 }
 		],
-		flavor: $I("workshop.railgun.flavor")
+		flavor: $I("workshop.railgun.flavor"),
+		unlocks: {
+			zebraUpgrades: ["rangefinders"]
+		}
 	},{
 		name: "bolas",
 		label: $I("workshop.bolas.label"),
@@ -2249,7 +2261,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
         prices:[
             { name: "plastic", val: 50 },
 			{ name: "gold", val: 1000 },
-			{ name: "spice", val: 1000 }
+			{ name: "spice", val: 750 }
         ],
 		progressHandicap: 20,
 		tier: 3
@@ -2350,6 +2362,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			],
 			upgrades:{
 				buildings: ["zebraOutpost"]
+			},
+			unlocks: {
+				zebraUpgrades: ["zebraTrappers"]
 			}
 		},{
 			name: "darkBrew",
@@ -2362,6 +2377,39 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 				{ name : "parchment", val: 3000 },
 				{ name : "science", val: 100 }
 			]
+		},{
+			name: "zebraTrappers",
+			label: $I("workshop.zebraUpgrade.zebraTrappers.label"),
+			description: $I("workshop.zebraUpgrade.zebraTrappers.desc"),
+			effects: {
+				"preparationRatio": 1,
+			},
+			prices:[
+				{ name : "science", val: 1000 },
+				{ name : "alloy", val: 100 },
+				{ name : "tMythril", val: 10 }
+			],
+			upgrades:{
+				buildings: ["zebraOutpost"]
+			},
+			unlocks: {
+				zebraUpgrades: ["reforgedOutposts"]
+			}
+		},{
+			name: "reforgedOutposts",
+			label: $I("workshop.zebraUpgrade.reforgedOutposts.label"),
+			description: $I("workshop.zebraUpgrade.reforgedOutposts.desc"),
+			effects: {
+			},
+			prices:[
+				{ name : "science", val: 1500 },
+				{ name : "coal", val: 10000 },
+				{ name : "bloodstone", val: 50 },
+				{ name : "tMythril", val: 10 }
+			],
+			upgrades:{
+				buildings: ["zebraForge"]
+			},
 		},
 		//resources:
 		//tMythril
@@ -2411,6 +2459,26 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			],
 			upgrades:{
 				buildings: ["zebraWorkshop"]
+			},
+			unlocks: {
+				zebraUpgrades: ["rangefinders"]
+			}
+		},{
+			name: "rangefinders",
+			label: $I("workshop.zebraUpgrade.rangefinders.label"),
+			description: $I("workshop.zebraUpgrade.rangefinders.desc"),
+			effects: {
+			},
+			prices:[
+				{ name : "science", val: 100000 },
+				{ name : "tMythril", val: 50 },
+				{ name : "microchip", val: 25 }
+			],
+			upgrades:{
+				buildings: ["zebraForge"]
+			},
+			evaluateLocks: function(game){
+				return game.workshop.getZebraUpgrade("bloodstoneInstitute").researched && game.workshop.get("railgun").researched;
 			}
 		},
 	],
@@ -2534,9 +2602,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		}
 
 		this.hideResearched = saveData.workshop.hideResearched;
-		this.loadMetadata(this.upgrades, saveData.workshop.upgrades);
-		this.loadMetadata(this.crafts, saveData.workshop.crafts);
-		this.loadMetadata(this.zebraUpgrades, saveData.workshop.zebraUpgrades);
+		this.loadMetadata(this.upgrades, saveData.workshop.upgrades, "upgrades");
+		this.loadMetadata(this.crafts, saveData.workshop.crafts, "crafts");
+		this.loadMetadata(this.zebraUpgrades, saveData.workshop.zebraUpgrades, "zebraUpgrades");
 
 		for (var i = 0; i < this.upgrades.length; i++){
 			var upgrade = this.upgrades[i];

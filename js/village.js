@@ -319,6 +319,12 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		return this.getMeta(id, this.map.biomes);
 	},
 
+	//max explored level of a biome, 0 if never explored
+	getBiomeLevel: function(id){
+		var biome = this.getBiome(id);
+		return biome ? (biome.val || 0) : 0;
+	},
+
 	getJobLimit: function(jobName) {
 		if (jobName == "engineer"){
 			return this.game.bld.get("factory").val;
@@ -883,10 +889,10 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			}
 
 			this.maxKittens  = saveData.village.maxKittens;
-			this.loadMetadata(this.jobs, saveData.village.jobs);
+			this.loadMetadata(this.jobs, saveData.village.jobs, "jobs");
 
 			if (saveData.village.biomes){
-				this.loadMetadata(this.map.biomes, saveData.village.biomes);
+				this.loadMetadata(this.map.biomes, saveData.village.biomes, "biomes");
 				this.map.currentBiome = saveData.village.currentBiome;
 				this.map.lastBiome = saveData.village.lastBiome;
 				//migrate old biome.level to biome.val / biome.on
@@ -898,6 +904,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 						delete _biome.level;
 					}
 				}
+				//conditions may have changed since the save was made, so re-evaluate them
+				this.map.updateLocks();
 			}
 			this.sim.hadKittenHunters = (saveData.village.hadKittenHunters === undefined) ? true: saveData.village.hadKittenHunters;
 			this.sim.nextKittenProgress = saveData.village.nextKittenProgress || 0;
@@ -1945,7 +1953,7 @@ dojo.declare("classes.village.Map", null, {
 			biomes: ["mountain"]
 		},
 		evaluateLocks: function(game){
-			return game.village.getBiome("plains").level >= 5 || game.village.getBiome("forest").level >= 5;
+			return game.village.getBiomeLevel("plains") >= 5 || game.village.getBiomeLevel("forest") >= 5;
 		},
 		lore: {
 			5: "You can see small lizards enjoying the sun"
@@ -1987,7 +1995,7 @@ dojo.declare("classes.village.Map", null, {
 		faunaNames: ["bone spider"],
 		unlocked: false,
 		evaluateLocks: function(game){
-			return game.village.getBiome("forest").level >= 25 && game.village.getBiome("rainForest").level >= 5;
+			return game.village.getBiomeLevel("forest") >= 25 && game.village.getBiomeLevel("rainForest") >= 5;
 		},
 		lore: {
 			5: "A place where trees are made of bones"
@@ -2018,7 +2026,7 @@ dojo.declare("classes.village.Map", null, {
 
 		},
 		evaluateLocks: function(game){
-			return game.village.getBiome("hills").level >= 10;
+			return game.village.getBiomeLevel("hills") >= 10;
 		},
 		unlocks: {
 			biomes: ["volcano"]
@@ -2040,7 +2048,7 @@ dojo.declare("classes.village.Map", null, {
 			5: "TBD"
 		},
 		evaluateLocks: function(game){
-			return game.village.getBiome("mountain").level >= 25;
+			return game.village.getBiomeLevel("mountain") >= 25;
 		}
 	},
 	{
@@ -2055,7 +2063,7 @@ dojo.declare("classes.village.Map", null, {
 			5: "An endless white desert with occasional red rock formations"
 		},
 		evaluateLocks: function(game){
-			return game.village.getBiome("plains").level >= 15;
+			return game.village.getBiomeLevel("plains") >= 15;
 		},
 		effects:{
 			solarFarmRatio: 0.01
@@ -2166,18 +2174,28 @@ dojo.declare("classes.village.Map", null, {
 		this.activeMapId = mapId;
 	},
 
+	/**
+	 * Unlock every biome whose conditions are already satisfied.
+	 * Unlike the unlocks[] signal this does not depend on a level up event,
+	 * so biomes catch up on load or when unlock rules change.
+	 */
+	updateLocks: function(){
+		for (var i in this.biomes){
+			var biome = this.biomes[i];
+			if (!biome.unlocked && biome.evaluateLocks && biome.evaluateLocks(this.game)){
+				biome.unlocked = true;
+			}
+		}
+	},
+
 	update: function(){
+		this.updateLocks();
+
 		for (var i in this.biomes){
 			var biome = this.biomes[i];
 			if (biome.name == "village"){
 				this.game.globalEffectsCached["exploreRatio"] = (0.1 * ((biome.on || 0) - 1));
 			}
-
-			//TEMP TEMP TEMP
-			/*if (biome.unlocks){
-				this.game.unlock(biome.unlocks);
-			}*/
-			//TEMP TEMP TEMP
 
 			//todo: take it from the biome
 			var faunaNames = biome.faunaNames || this.defaultFaunaNames;
@@ -2492,6 +2510,48 @@ dojo.declare("classes.village.Map", null, {
 		return Math.floor(curve + jitter);
 	},
 
+	getLeaderCombatStats: function(leader) {
+		if (!leader) {
+			return null;
+		}
+		var seed = leader.seed;
+
+		if (!seed){
+			seed = this.xmur3(leader.name + ":" + leader.surname);
+		}
+		var lvl = this.game.village.getCombatLevel(leader.combatExp);
+		var stats = {};
+		for (var stat in this.leaderStatIds) {
+			var statID = this.leaderStatIds[stat];
+			var cfg = dojo.clone(this.leaderStatConfigs[stat]);
+			if (!leader.trait){
+				cfg.bias += 0.05;
+			}
+			stats[stat] = this.getStatAtLevel(seed, lvl, statID, cfg);
+
+			if (stats[stat] == 0) {
+				stats[stat] = 1;
+			}
+		}
+		return stats;
+	},
+
+	updateSquadStats: function() {
+		var leader = this.game.village.leader;
+		var stats = leader ? this.getLeaderCombatStats(leader) : null;
+		if (stats) {
+			this.squad.atk = stats.atk + this.game.getEffect("explorerAtk");
+			this.squad.def = stats.def + this.game.getEffect("explorerDef");
+			this.squad.agi = stats.agi;
+			this.squad.str = stats.str;
+			this.squad.spd = stats.spd;
+			var maxHp = stats.hp;
+			if (this.squad.hp > maxHp) {
+				this.squad.hp = maxHp;
+			}
+		}
+	},
+
 	/**
 	 * Combat stats for a given seed/level. Traitless kittens get a small bias bonus.
 	 * Pulled out of getLeaderCombatStats so it can be evaluated without a full leader.
@@ -2511,35 +2571,6 @@ dojo.declare("classes.village.Map", null, {
 			}
 		}
 		return stats;
-	},
-
-	getLeaderCombatStats: function(leader) {
-		if (!leader) {
-			return null;
-		}
-		var seed = leader.seed;
-
-		if (!seed){
-			seed = this.xmur3(leader.name + ":" + leader.surname);
-		}
-		var lvl = this.game.village.getCombatLevel(leader.combatExp);
-		return this.getCombatStatsAt(seed, lvl, leader.trait);
-	},
-
-	updateSquadStats: function() {
-		var leader = this.game.village.leader;
-		var stats = leader ? this.getLeaderCombatStats(leader) : null;
-		if (stats) {
-			this.squad.atk = stats.atk + this.game.getEffect("explorerAtk");
-			this.squad.def = stats.def + this.game.getEffect("explorerDef");
-			this.squad.agi = stats.agi;
-			this.squad.str = stats.str;
-			this.squad.spd = stats.spd;
-			var maxHp = stats.hp;
-			if (this.squad.hp > maxHp) {
-				this.squad.hp = maxHp;
-			}
-		}
 	},
 
 	attack: function(src, tgt){
@@ -4907,6 +4938,7 @@ dojo.declare("classes.ui.village.Census", null, {
 		var kittensLimit = -this.statics.startKitten;
 
 		var isAnarchyActive = this.game.challenges.isActive("anarchy");
+		var isReadOnly = this.game.isReadOnly();
 
 		for (var i = sim.kittens.length - 1; i >= 0 && kittensLimit < 10; i--) {
 			var kitten = sim.kittens[i];
@@ -4945,12 +4977,16 @@ dojo.declare("classes.ui.village.Census", null, {
 			var linksDiv = dojo.create("div", {
 				className: "links-container"
 			}, div);
+			if (isReadOnly){
+				//favorite/leader glyphs stay on as indicators, but nothing here is clickable
+				dojo.style(linksDiv, "pointerEvents", "none");
+			}
 
 			var promoteHref = dojo.create("span", {
 				innerHTML: "^",
 				className: "btn modern promoteHref",
 				style: {
-					visibility: this.game.village.sim.canPromote(kitten) ? "visible" : "hidden"
+					visibility: (!isReadOnly && this.game.village.sim.canPromote(kitten)) ? "visible" : "hidden"
 				},
 				title: $I("village.census.btn.promote")
 			}, linksDiv);
@@ -4974,34 +5010,36 @@ dojo.declare("classes.ui.village.Census", null, {
 				href: "#", innerHTML:  $I("village.btn.unassign.job"),
 				className: "unassignHref",
 				style: {
-					visibility: kitten.job ? "visible" : "hidden"
+					visibility: (!isReadOnly && kitten.job) ? "visible" : "hidden"
 				}
 			}, linksDiv);
 
-			dojo.connect(promoteHref, "onclick", this, dojo.partial(function(game, i, event){
-				event.preventDefault();
-				game.village.sim.promote(game.village.sim.kittens[i]);
-				game.villageTab.requestCensusRefresh();
-			}, this.game, i));
+			if (!isReadOnly){
+				dojo.connect(promoteHref, "onclick", this, dojo.partial(function(game, i, event){
+					event.preventDefault();
+					game.village.sim.promote(game.village.sim.kittens[i]);
+					game.villageTab.requestCensusRefresh();
+				}, this.game, i));
 
-			dojo.connect(favoriteHref, "onclick", this, dojo.partial(function(game, i){
-				var kitten = game.village.sim.kittens[i];
-				kitten.favorite = !kitten.favorite;
-				game.villageTab.requestCensusRefresh();
-			}, this.game, i));
+				dojo.connect(favoriteHref, "onclick", this, dojo.partial(function(game, i){
+					var kitten = game.village.sim.kittens[i];
+					kitten.favorite = !kitten.favorite;
+					game.villageTab.requestCensusRefresh();
+				}, this.game, i));
 
-			dojo.connect(leaderHref, "onclick", this, dojo.partial(function(game, i, event){
-				event.preventDefault();
-				game.village.makeLeader(game.village.sim.kittens[i]);
-				game.render();
-			}, this.game, i));
+				dojo.connect(leaderHref, "onclick", this, dojo.partial(function(game, i, event){
+					event.preventDefault();
+					game.village.makeLeader(game.village.sim.kittens[i]);
+					game.render();
+				}, this.game, i));
 
-			dojo.connect(unassignHref, "onclick", this, dojo.partial(function(game, i, event){
-				event.preventDefault();
-				game.village.unassignJob(game.village.sim.kittens[i]);
-				game.village.updateResourceProduction();
-				game.villageTab.requestCensusRefresh();
-			}, this.game, i));
+				dojo.connect(unassignHref, "onclick", this, dojo.partial(function(game, i, event){
+					event.preventDefault();
+					game.village.unassignJob(game.village.sim.kittens[i]);
+					game.village.updateResourceProduction();
+					game.villageTab.requestCensusRefresh();
+				}, this.game, i));
+			}
 
 			this.records.push({
 				content: content,
@@ -5028,6 +5066,8 @@ dojo.declare("classes.ui.village.Census", null, {
 		} else {
 			this.renderPageSwitching(container);
 		}
+
+		this.update();	//force UI to update div instead of just rendering empty block
 	},
 
 	//Returns an object with 3 fields; each is a string which may contain HTML
@@ -5176,6 +5216,11 @@ dojo.declare("classes.ui.village.Census", null, {
 		}));
 
 		//-------------- links to promote or unassign ----------------------
+		if (this.game.isReadOnly()){
+			this.promoteLeaderHref = null;
+			this.unassignLeaderJobHref = null;
+			return;
+		}
 		//Links are invisible if there is a leader but the condition is not met.
 		var expToPromote = this.game.village.getRankExp(leader.rank);
 		var goldToPromote = 25 * (leader.rank + 1);
@@ -5336,6 +5381,7 @@ dojo.declare("classes.ui.village.Census", null, {
 		}
 
 		//Update all existing records (the things currently displayed onscreen)
+		var isReadOnly = this.game.isReadOnly();
 		for (var i = 0; i < this.records.length; i++) {
 			var record = this.records[i];
 			var kitten = record.kitten;
@@ -5351,11 +5397,11 @@ dojo.declare("classes.ui.village.Census", null, {
 			record.content.innerHTML += this.getSkillInfo(kitten);
 
 			//Update links
-			dojo.style(record.promoteHref, "visibility", this.game.village.sim.canPromote(kitten) ? "visible" : "hidden");
+			dojo.style(record.promoteHref, "visibility", (!isReadOnly && this.game.village.sim.canPromote(kitten)) ? "visible" : "hidden");
 			record.favoriteHref.innerHTML = kitten.favorite ? "&#9733;" : "&#9734;"; //star-shaped link to reduce visual noise
 			record.leaderHref.innerHTML = kitten.isLeader ? "&#9873;" : "&#9872;"; //flag-shaped link to reduce visual noise
 			dojo.style(record.leaderHref, "visibility", this.game.challenges.isActive("anarchy") ? "hidden" : "visible");
-			dojo.style(record.unassignHref, "visibility", kitten.job ? "visible" : "hidden");
+			dojo.style(record.unassignHref, "visibility", (!isReadOnly && kitten.job) ? "visible" : "hidden");
 		}
 	}
 });
@@ -5718,6 +5764,12 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Village", com.nuclearunicorn.game.u
 		if (!this.game.prestige.getPerk("engeneering").researched){
 			loadoutDiv.style.visibility = "hidden";
 			tdTop2.style.visibility = "hidden";
+		}
+
+		if (this.game.isReadOnly()){
+			dojo.style(this.createLoadoutHref, "display", "none");
+			dojo.style(this.deleteAllLoadoutHref, "display", "none");
+			dojo.style(this.toggleDefaultLoadoutHref, "display", "none");
 		}
 		
 		//--------------------------	map ---------------------------

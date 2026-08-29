@@ -613,6 +613,13 @@ body.scheme_oil,
 .scheme_oil .container.trade-race a[title='Pinned'] {
 	color: #ffc900;
 }
+.scheme_oil .btnTitle > .upgrade-available,
+.scheme_oil .desc > .upgrade-available {
+	color: #40A040;
+}
+.scheme_oil .btn.modern:not(.disabled):hover .btnTitle > .upgrade-available {
+	color: lightgreen;
+}
 .scheme_oil .panelContainer div.censusFilters {
 	margin-bottom: 3px; /* for add a margin under the 2 lists (select) in the settlement tab */
 }

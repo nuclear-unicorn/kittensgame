@@ -203,6 +203,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		}
 	},
 
+	//Use getBuildingGroups if you want a metadata array which is updated based on game-state.
 	buildingGroups: [{
 		name: "food",
 		title: $I("buildings.group.food"),
@@ -231,7 +232,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	{
 		name: "culture",
 		title: $I("buildings.group.culture"),
-		buildings: ["amphitheatre", "chapel", "temple"]
+		buildings: ["amphitheatre", "chapel", "temple", "ziggurat"]
 	},{
 		name: "other",
 		title: $I("buildings.group.other"),
@@ -246,6 +247,37 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		buildings: ["zebraOutpost", "zebraWorkshop", "zebraForge", "ivoryTemple", "stasisPod"]
 	}
 	],
+
+	//Canonical order of the buildings, 	
+	//Buildings missing from this list are rendered last
+	buildingsOrder: [
+		"field", "pasture", "aqueduct",
+		"hut", "logHouse", "mansion",
+		"library", "academy", "observatory", "biolab",
+		"barn", "warehouse", "harbor",
+		"mine", "quarry", "lumberMill", "oilWell", "accelerator",
+		"steamworks", "magneto", "smelter", "calciner", "factory", "reactor",
+		"amphitheatre", "chapel", "temple",
+		"workshop", "tradepost", "mint", "unicornPasture", "brewery",
+		"chronosphere", "aiCore", "ziggurat",
+		"zebraOutpost", "zebraWorkshop", "zebraForge", "ivoryTemple", "stasisPod"
+	],
+
+	_buildingsOrderIndex: null,
+
+	/**
+	 * @return {Object} Map of building name to its position in buildingsOrder, built once and cached
+	 */
+	getBuildingsOrderIndex: function() {
+		if (!this._buildingsOrderIndex) {
+			var index = {};
+			this.buildingsOrder.forEach(function(bldName, position) {
+				index[bldName] = position;
+			});
+			this._buildingsOrderIndex = index;
+		}
+		return this._buildingsOrderIndex;
+	},
 
 	/***
 	 ** STACKABLE BUILDINGS'S SPEC **
@@ -417,7 +449,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				description: $I("buildings.hydroplant.desc") ,
 				prices: [
 					{ name : "titanium", val: 2500 },
-					{ name : "concrate", val: 100 }
+					{ name : "concrate", val: 100 },
+					{ name : "gear", val: 5 }
 				],
 				priceRatio: 1.15,
 				effects: {
@@ -724,8 +757,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			for (var i in self.effects) {
 				self.effectsCalculated[i] = self.effects[i];
 			}
-			self.effects["scienceMax"] *= (1 + game.getEffect("biolabBiofuelScienceMaxRatio") * self.on);
-
+			if (game.workshop.get("biofuel").researched){
+				self.effects["scienceMax"] *= (1 + game.getEffect("biolabBiofuelScienceMaxRatio") * self.on);
+			}
 		},
 		lackResConvert: false,
 		action: function(self, game){
@@ -821,7 +855,10 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					{ name: "eludium", val: 500 },
 					{ name: "kerosene", val: 1000 },
 					{ name: "blueprint", val: 500 },
-					{ name: "starchart", val: 100000 },
+					/**
+					* Spaceport uses  a much steper price ratio for starcharts to be a dedicated starchart sinker
+					*/
+					{ name: "starchart", val: 100000, multPriceRatio: 1.35 },
 				],
 				priceRatio: 1.15,
 				effects: {
@@ -855,6 +892,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	
 				stageMeta.effects = game.resPool.addBarnWarehouseRatio(effects);
             } else if (self.stage == 1){
+			stageMeta.priceRules = true;
 			var effects = {
 					"moonBaseStorageBonus": 0.0085,
 					"planetCrackerStorageBonus": 0.0085,
@@ -1633,6 +1671,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			var capRatio = 0;
 			if (game.workshop.get("energyRifts").researched){
 				capRatio = (1 + game.getEffect("acceleratorRatio"));
+				self.description = $I("buildings.accelerator.desc") + "<br>" + $I("buildings.accelerator.desc2");
+			} else {
+				self.description = $I("buildings.accelerator.desc");
 			}
 
 			self.effects["catnipMax"]   = 30000 * capRatio;
@@ -2100,6 +2141,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		unlockRatio: 0.01,
 		prices: [
 			{ name : "antimatter", val: 125 },
+			{ name : "microchip", 	val: 25 },
 			{ name : "science", 	val: 500000 }
 		],
 		priceRatio: 1.15,
@@ -2155,13 +2197,14 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		priceRatio: 1.35,
 		zebraRequired: 5,
 		effects: {
-			"hunterRatio" : 0.05,
 			"manpowerMax": 5,
+			"hunterRatio" : 0.05,
 			"zebraPreparations" : 0
 		},
 		calculateEffects: function(self, game){
 			if (game.workshop.getZebraUpgrade("darkRevolution").researched){
 				self.effects["zebraPreparations"] = game.ironWill? 1:0.1;
+				self.effects["zebraPreparations"] *= 1 + game.getEffect("preparationRatio");
 				self.jammed = false;
 			}
 		},
@@ -2192,13 +2235,23 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		priceRatio: 1.15,
 		zebraRequired: 10,
 		effects: {
+			"bloodstoneRatio": 0,
 			"manpowerMax": 25,
-			"bloodstoneRatio": 0
 			//"bloodstoneCraftRatio" : 0.01
 		},
 		calculateEffects: function(self, game){
+			var zebraPreparations = 41 + game.getEffect("zebraPreparations");
+			var zebrasMax = game.resPool.get("zebras").maxValue;
+			var difference =  zebrasMax - zebraPreparations * 0.75;
 			if (game.workshop.getZebraUpgrade("bloodstoneInstitute").researched){
-				self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(self.on * (game.ironWill? 1:0.1) * (game.karmaZebras + 1), game.getEffect("zebraPreparations") + 40) / self.on;
+				var unlimited = self.on * (game.ironWill? 1:0.1) * zebrasMax;
+				var limit = zebraPreparations;
+				self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(unlimited, limit) / self.on;
+			}
+			if (difference > 0){
+				self.effects["missingZebraPreparations"] = difference;
+			} else {
+				self.effects["missingZebraPreparations"] = 0;
 			}
 			if (self.val) {
 				game.time.queue.unlockQueueSource("zebraUpgrades");
@@ -2223,9 +2276,27 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		zebraRequired: 50,
 		effects: {
 			//"bloodstoneCraftRatio" : 0.02,
-			"manpowerMax": 50,
 			"tMythrilCraftRatio" : 0.01,
+			"bloodstoneRatio": 0,
+			"manpowerMax": 50,
+			"preparationRatio" : 0
+			// "zebratradeNormalResChance": 0.1
 		},
+		calculateEffects: function(self, game){
+			if (game.workshop.getZebraUpgrade("reforgedOutposts").researched){
+				self.effects["preparationRatio"] = (Math.floor(self.val / 10)) / self.val;
+			} else {
+				self.effects["preparationRatio"] = 0;
+			}
+			if (game.workshop.getZebraUpgrade("rangefinders").researched){
+				self.effects["bloodstoneRatio"] = 0.01;
+			}
+			game.upgrade(self.upgrades);
+		},
+		upgrades: {
+			// buildings: ["zebraOutpost", "zebraWorkshop"]
+			buildings: ["zebraOutpost"]
+		}
 	},
 	{
 		name: "stasisPod",
@@ -2237,11 +2308,20 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
             { name : "timeCrystal", val: 2 },
             { name : "void", val: 100 }
         ],
+		fewZebrasPrices : [
+			{ name : "eludium", val: 100 },
+            { name : "timeCrystal", val: 2 },
+            { name : "void", val: 100 }
+		],
 		priceRatio: 1.25,
 		zebraRequired: 1,
 		effects: {
 			"zebrasMax": 1,
 		},
+		upgrades: {
+			buildings: ["zebraOutpost"]
+		},
+		priceRules: true,
 	},
 	{
 		name: "ivoryTemple",
@@ -2361,6 +2441,100 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
             }
         }
     },
+
+	/**
+	 * Returns a deep copy of all building groups.
+	 * @param {boolean} includeNonGroupFilters If enabled, includes extra things like "IW", "Togglable", "All", etc.
+	 * 			The UI code treats these as special building groups for the sake of player convenience.
+	 * @return An array of buildingGroup objects, which have 3 fields: name (string), title (string), buildings (array of strings)
+	 */
+	getBuildingGroups: function(includeNonGroupFilters) {
+		var game = this.game;
+		var groupsArr = [];
+
+		//See renderActiveGroup for how these are handled, since their buildings arrays are empty.
+		if (includeNonGroupFilters) {
+			groupsArr.push({
+				name: "all",
+				title: $I("ui.filter.all"),
+				buildings: []
+			});
+			groupsArr.push({
+				name: "available",
+				title: $I("ui.filter.available"),
+				buildings: []
+			});
+			groupsArr.push({
+				name: "allEnabled",
+				title: $I("ui.filter.enabled"),
+				buildings: []
+			});
+			groupsArr.push({
+				name: "togglable",
+				title: $I("ui.filter.togglable"),
+				buildings: []
+			});
+
+			if (game.ironWill && game.libraryTab.visible) {
+				groupsArr.push({
+					name: "iw",
+					title: $I("ui.filter.ironWill"),
+					buildings: []
+				});
+			}
+		}
+
+		//Now, deep-copy this.buildingGroups into groupsArr:
+		this.buildingGroups.forEach(function(bldGroup) {
+			groupsArr.push({
+				name: bldGroup.name,
+				title: bldGroup.title,
+				buildings: bldGroup.buildings.slice() //Shallow-copy array
+			});
+		});
+
+		//Apply modifications at runtime such as upgrades which give buildings dual purpose:
+		if (game.workshop.get("energyRifts").researched) {
+			var storageGroup = this.getMeta("storage", groupsArr);
+			storageGroup.buildings.push("accelerator");
+		}
+		return groupsArr;
+	},
+
+	/**
+	 * Render groups as a flat list of leaves, sorted by buildingsOrder.
+	 * 
+	 * @param {Array} groups Array of buildingGroup objects, as returned by getBuildingGroups
+	 * @return {Array} Array of building names, each appearing at most once
+	 */
+	unrollBuildingGroups: function(groups) {
+		var leaves = [];
+		var seen = {};
+		var order = this.getBuildingsOrderIndex();
+		var unordered = this.buildingsOrder.length;	//buildings missing from buildingsOrder go last
+
+		groups.forEach(function(bldGroup) {
+			bldGroup.buildings.forEach(function(bldName) {
+				if (seen[bldName]) {
+					return;	//another group already pulled in this building, e.g. ziggurat
+				}
+				seen[bldName] = true;
+				leaves.push({
+					name: bldName,
+					order: order[bldName] !== undefined ? order[bldName] : unordered,
+					index: leaves.length	//tiebreaker, keeps the sort stable on any engine
+				});
+			});
+		});
+
+		leaves.sort(function(a, b) {
+			return (a.order - b.order) || (a.index - b.index);
+		});
+		return leaves.map(function(leaf) {
+			return leaf.name;
+		});
+	},
+
 	getAutoProductionRatio: function() {
 		var autoProdRatio = 1;
 
@@ -2425,97 +2599,127 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		var priceModifier = 1 - pricesDiscount;
 		var fakeBought = this.game.getEffect(bldName + "FakeBought") + additionalBought;
 
-		for (var i = 0; i < bldPrices.length; i++) {
-			var resPriceDiscount = this.game.getLimitedDR(this.game.getEffect(bldPrices[i].name + "CostReduction"), 1);
-			var resPriceModifier = 1 - resPriceDiscount;
-			prices.push({
-				val: bldPrices[i].val * Math.pow(ratio, bldVal + fakeBought) * priceModifier * resPriceModifier,
-				name: bldPrices[i].name
-			});
-		}
-
-		if (this.game.challenges.isActive("blackSky")
-		 && bldName == "calciner"
-		 && bldVal == 0) {
-			for (var i = 0; i < prices.length; i++) {
-				prices[i].val *= prices[i].name == "titanium" ? 0 : 11;
+		// The most simple case of all: priceRules tag is not true and we aren't in unicornTears challenge! Allows early escape patch
+		// TODO: code duplication might be solvable!
+		if (!bld.get("priceRules") && !this.game.challenges.isActive("unicornTears")){
+			for (var i = 0; i < bldPrices.length; i++) {
+				var resPriceDiscount = this.game.getLimitedDR(this.game.getEffect(bldPrices[i].name + "CostReduction"), 1);
+				var resPriceModifier = 1 - resPriceDiscount;
+				var cost = bldPrices[i].val * Math.pow(ratio, bldVal + fakeBought) * priceModifier * resPriceModifier;
+				prices.push({
+					val: cost,
+					name: bldPrices[i].name
+				});
 			}
+			return prices;
 		}
+		if (bld.get("priceRules")){
+			if (bldName == "stasisPod" && this.game.resPool.get("zebras").maxValue < 10){
+				bldPrices = bld.get("fewZebrasPrices");
+			}
+			for (var i = 0; i < bldPrices.length; i++) {
+				var resPriceDiscount = this.game.getLimitedDR(this.game.getEffect(bldPrices[i].name + "CostReduction"), 1);
+				var resPriceModifier = 1 - resPriceDiscount;
+				var cost = bldPrices[i].val * Math.pow(ratio, bldVal + fakeBought) * priceModifier * resPriceModifier;
+				if (bldPrices[i].multPriceRatio) {
+					cost *= Math.pow(bldPrices[i].multPriceRatio, bldVal + fakeBought);
+				}
+				prices.push({
+					val: cost,
+					name: bldPrices[i].name
+				});
+			}
 
-		if (this.game.challenges.isActive("pacifism")
-		 && bldName == "steamworks"
-		 && bldVal == 0) {
-			for (var i = 0; i < prices.length; i++) {
-				if (prices[i].name == "blueprint"){
-					prices[i].val = this.game.challenges.getChallenge("pacifism").on * 5 + 1;
+			if (this.game.challenges.isActive("blackSky")
+		 	&& bldName == "calciner"
+		 	&& bldVal == 0) {
+				for (var i = 0; i < prices.length; i++) {
+					prices[i].val *= prices[i].name == "titanium" ? 0 : 11;
 				}
 			}
-		}
-		if (this.game.challenges.isActive("postApocalypse")
-		&& bldName == "field"
-		&& this.getPollutionLevel() >= 5
-		&& bldVal >= Math.max(95 - this.game.time.getVSU("usedCryochambers").val - this.getPollutionLevel(), 7 + (this.game.ironWill? 8 : 0)) ) {
-			var builtWithUnobtanium = Math.max(bldVal + this.game.time.getVSU("usedCryochambers").val - 100, 0);
-			prices.push({val: 15 * Math.pow(ratio, builtWithUnobtanium),
+			if (this.game.challenges.isActive("pacifism")
+			&& bldName == "steamworks"
+			&& bldVal == 0) {
+				for (var i = 0; i < prices.length; i++) {
+					if (prices[i].name == "blueprint"){
+						prices[i].val = this.game.challenges.getChallenge("pacifism").on * 5 + 1;
+					}
+				}
+			}
+
+			if (this.game.challenges.isActive("postApocalypse")
+			&& bldName == "field"
+			&& this.getPollutionLevel() >= 5
+			&& bldVal >= Math.max(95 - this.game.time.getVSU("usedCryochambers").val - this.getPollutionLevel(), 7 + (this.game.ironWill? 8 : 0)) ) {
+				var builtWithUnobtanium = Math.max(bldVal + this.game.time.getVSU("usedCryochambers").val - 100, 0);
+				prices.push({val: 15 * Math.pow(ratio, builtWithUnobtanium),
 						name : "unobtainium",
 						isTemporary: true //can't exploit buy manipulating pollution in postApocalypse
-					});
-		}
-		if (this.game.challenges.isActive("unicornTears")
-		 && bldVal > 0 /*For the purposes of Challenge compatibility, the first one will always have its price unmodified.*/) {
-			//In the Unicorn Tears Challenge, we give each Bonfire building a price of unicorns, unicorn tears, or alicorns.
-			if (bldName == "warehouse" && bld.get("stage") == 0 /*Affects Warehouses but not Spaceports*/) {
-				//I don't like having these special cases, but I want to avoid the player getting stuck.
-				prices.push({ name: "unicorns",
-					val: 2 * bldVal * priceModifier, //Linear (not exponential) scaling
-					isTemporary: true
 				});
-			} else if (bldName == "harbor") {
-				//I don't like having these special cases, but I want to avoid the player getting stuck.
-				prices.push({ name: "tears",
-					val: 2 * bldVal * priceModifier, //Linear (not exponential) scaling
-					isTemporary: true
-				});
-			} else {
-				//We use the base price of a building (not affected by policies that reduce resource prices) to calculate the weight:
-				var weight = this.game.challenges.getChallenge("unicornTears").sumPricesWeighted(bldPrices);
-				if (weight > 0) {
-					//We use a price ratio determined by the Unicorn Tears Challenge.
-					weight *= Math.pow(this.game.getEffect("bonfireTearsPriceRatioChallenge"), bldVal - 1);
-				}
-				if (weight > 1e9) {
-					prices.push({ name: "alicorn",
-						val: (Math.log(weight) - 19.7232) * priceModifier, //With a weight of exactly 1e9, this is just a smidge over 1
-						isTemporary: true
-					});
-				} else if (weight > 100000) {
-					prices.push({ name: "tears",
-						val: weight / 100000 * priceModifier,
-						isTemporary: true
-					});
-				} else if (weight >= 100) {
-					prices.push({ name: "unicorns",
-						val: weight / 100 * priceModifier,
-						isTemporary: true
-					});
-				}
-				//Else, if the weight is under 100, we don't add anything to the price.
 			}
-		}
-		/**
-		 * Spaceport will use a much steper price ratio for starcharts to be a dedicated starchart sinker
-		 */
-		if (bldName == "warehouse" && bld.get("stage") == 1){
-			for (var i = 0; i < prices.length; i++) {
-				if (prices[i].name == "starchart"){
-					prices[i].val = prices[i].val * Math.pow(1.35, bldVal);
-				}
+		
+		} else {
+			for (var i = 0; i < bldPrices.length; i++) {
+				var resPriceDiscount = this.game.getLimitedDR(this.game.getEffect(bldPrices[i].name + "CostReduction"), 1);
+				var resPriceModifier = 1 - resPriceDiscount;
+				var cost = bldPrices[i].val * Math.pow(ratio, bldVal + fakeBought) * priceModifier * resPriceModifier;
+				prices.push({
+					val: cost,
+					name: bldPrices[i].name
+				});
 			}
 		}
 
+		// unicornTears can't really use the priceRules because it affects basically everything!
+		// But this refactor limited the number of checks for other challenge modifying prices and such
+		if (this.game.challenges.isActive("unicornTears")
+		 && bldVal > 0 /*For the purposes of Challenge compatibility, the first one will always have its price unmodified.*/) {
+			prices = this.applyUnicornTearsPrices(bld, bldName, bldVal, priceModifier, bldPrices, prices);
+		}
 		return prices;
 	 },
 
+	applyUnicornTearsPrices: function(bld, bldName, bldVal, priceModifier, bldPrices, prices){
+		//In the Unicorn Tears Challenge, we give each Bonfire building a price of unicorns, unicorn tears, or alicorns.
+		if (bldName == "warehouse" && bld.get("stage") == 0 /*Affects Warehouses but not Spaceports*/) {
+			//I don't like having these special cases, but I want to avoid the player getting stuck.
+			prices.push({ name: "unicorns",
+				val: 2 * bldVal * priceModifier, //Linear (not exponential) scaling
+				isTemporary: true
+			});
+		} else if (bldName == "harbor") {
+			//I don't like having these special cases, but I want to avoid the player getting stuck.
+			prices.push({ name: "tears",
+				val: 2 * bldVal * priceModifier, //Linear (not exponential) scaling
+				isTemporary: true
+			});
+		} else {
+			//We use the base price of a building (not affected by policies that reduce resource prices) to calculate the weight:
+			var weight = this.game.challenges.getChallenge("unicornTears").sumPricesWeighted(bldPrices);
+			if (weight > 0) {
+				//We use a price ratio determined by the Unicorn Tears Challenge.
+				weight *= Math.pow(this.game.getEffect("bonfireTearsPriceRatioChallenge"), bldVal - 1);
+			}
+			if (weight > 1e9) {
+				prices.push({ name: "alicorn",
+					val: (Math.log(weight) - 19.7232) * priceModifier, //With a weight of exactly 1e9, this is just a smidge over 1
+					isTemporary: true
+				});
+			} else if (weight > 100000) {
+				prices.push({ name: "tears",
+					val: weight / 100000 * priceModifier,
+					isTemporary: true
+				});
+			} else if (weight >= 100) {
+				prices.push({ name: "unicorns",
+					val: weight / 100 * priceModifier,
+					isTemporary: true
+				});
+			}
+			//Else, if the weight is under 100, we don't add anything to the price.
+		}
+		return prices;
+	},
 
 	calculatePollutionEffects: function(){
 		var POL_LBASE = this.getPollutionLevelBase();
@@ -2677,7 +2881,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 	load: function(saveData){
 		this.groupBuildings = saveData.bldData ? saveData.bldData.groupBuildings : false;
 		this.twoRows = saveData.bldData ? saveData.bldData.twoRows : false;
-		this.loadMetadata(this.buildingsData, saveData.buildings);
+		this.loadMetadata(this.buildingsData, saveData.buildings, "buildings");
 		this.cathPollution = saveData.cathPollution|| 0;
 		this.calculatePollutionEffects();
 	},
@@ -3224,6 +3428,15 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 		return model;
 	},
 
+	/**
+	 * Checks to see if the next higher stage for this building is unlocked.
+	 * If we are at the highest stage already, returns false.
+	 */
+	getIsNextStageUnlocked: function(model) {
+		return model.metadata.stage < model.metadata.stages.length - 1 &&
+			model.metadata.stages[model.metadata.stage + 1].stageUnlocked;
+	},
+
 	getEffects: function(model){
 		var effects = model.metadata.effects;
 		var currentStage = model.metadata.stages[model.metadata.stage];
@@ -3267,13 +3480,24 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 		return stageLinks;
 	},
 
-	getDescription: function(model){
-		if (model.metadata.stages){
-			description = model.metaAccessor.meta.stages[model.metaAccessor.meta.stage].description;
-			return typeof(description) != "undefined" ? description : "";
+	getName: function(model) {
+		var formattedName = this.inherited(arguments);
+		if (this.getIsNextStageUnlocked(model)) {
+			formattedName = $I("common.upgrade.available") + formattedName;
 		}
-		var description = model.metadata.description;
-		return typeof(description) != "undefined" ? description : "";
+		return formattedName;
+	},
+
+	getDescription: function(model){
+		var description = model.metadata.stages ? model.metaAccessor.meta.stages[model.metaAccessor.meta.stage].description : model.metadata.description;
+		if (typeof(description) === "undefined") {
+			description = "";
+		}
+		if (this.getIsNextStageUnlocked(model)) {
+			var nextStageLabel = model.metadata.stages[model.metadata.stage + 1].label;
+			description = "<div class=\"upgrade-available\">" + $I("buildings.upgrade.desc.available", [nextStageLabel]) + "</div>" + description;
+		}
+		return description;
 	},
 
 	handleToggleAutomationLinkClick: function(model) {
@@ -3285,22 +3509,26 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 
 
 	downgrade: function(model) {
-		if (this.game.opts.noConfirm) {
+		if (model.metaAccessor.meta.val == 0 || this.game.opts.noConfirm) {
 			this.deltagrade(model, -1);
 		} else {
 			var self = this;
-			this.game.ui.confirm("", $I("buildings.downgrade.confirmation.msg"), function() {
+			var confirmMsg = $I("buildings.downgrade.confirmation.msg") + "\n\n" +
+				$I("buildings.deltagrade.refund.msg", [this.game.toDisplayPercentage(model.refundPercentage) + "%"]);
+			this.game.ui.confirm("", confirmMsg, function() {
 				self.deltagrade.apply(self, [model, -1]);
 			});
 		}
 	},
 
 	upgrade: function(model) {
-		if (this.game.opts.noConfirm) {
+		if (model.metaAccessor.meta.val == 0 || this.game.opts.noConfirm) {
 			this.deltagrade(model, +1);
 		} else {
 			var self = this;
-			this.game.ui.confirm("", $I("buildings.upgrade.confirmation.msg"), function() {
+			var confirmMsg = $I("buildings.upgrade.confirmation.msg") + "\n\n" +
+				$I("buildings.deltagrade.refund.msg", [this.game.toDisplayPercentage(model.refundPercentage) + "%"]);
+			this.game.ui.confirm("", confirmMsg, function() {
 				self.deltagrade.apply(self, [model, +1]);
 			});
 		}
@@ -3374,6 +3602,9 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 
 	activeGroup: null,
 
+	//Filters pulling their buildings from every group instead of just their own, see getBuildingGroups
+	aggregateGroups: ["all", "available", "allEnabled", "togglable", "iw"],
+
 	constructor: function(tabName){
 		this.bldGroups = [];
 	},
@@ -3385,36 +3616,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 			className: "bldTopContainer"
 		}, content);
 
-		var groups = dojo.clone(this.game.bld.buildingGroups, true);
-
-		//non-group filters
-		if (this.game.ironWill && this.game.libraryTab.visible){
-			groups.unshift({
-				name: "iw",
-				title: "IW",
-				buildings: []
-			});
-		}
-		groups.unshift({
-			name: "togglable",
-			title: $I("ui.filter.togglable"),
-			buildings: []
-		});
-		groups.unshift({
-			name: "allEnabled",
-			title: $I("ui.filter.enabled"),
-			buildings: []
-		});
-		groups.unshift({
-			name: "available",
-			title: $I("ui.filter.available"),
-			buildings: []
-		});
-		groups.unshift({
-			name: "all",
-			title: $I("ui.filter.all"),
-			buildings: []
-		});
+		var groups = this.game.bld.getBuildingGroups(true /*includeNonGroupFilters*/);
 
 		if (!this.activeGroup){
 			this.activeGroup = groups[0].name;
@@ -3476,6 +3678,10 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 		this.update();
 	},
 
+	isAggregateGroup: function(){
+		return this.aggregateGroups.indexOf(this.activeGroup) != -1;
+	},
+
 	renderActiveGroup: function(groupContainer){
 
 		dojo.empty(groupContainer);
@@ -3484,79 +3690,74 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 		this.twoRows = (this.activeGroup == "all" || this.activeGroup == "iw");
 		this.initRenderer(groupContainer);
 
-		for ( var i = 0; i < this.bldGroups.length; i++){
-			if (this.bldGroups[i].group.name != this.activeGroup){
-				if (this.activeGroup != "all" &&
-					this.activeGroup != "available" &&
-					this.activeGroup != "allEnabled" &&
-					this.activeGroup != "togglable" &&
-					this.activeGroup != "iw"){
+		var isAggregate = this.isAggregateGroup();
+		if (isAggregate){
+			this.addCoreBtns(groupContainer);
+		}
 
-						continue;
-				}
-			}
-			if (i == 0){
-				this.addCoreBtns(groupContainer);
-			}
-
+		var groups = [];
+		for (var i = 0; i < this.bldGroups.length; i++){
 			var group = this.bldGroups[i].group;
-
-			for (var j = 0; j < group.buildings.length; j++){
-				var bldMetaRaw = this.game.bld.get(group.buildings[j]);
-				var bld = new classes.BuildingMeta(bldMetaRaw).getMeta();
-
-				var btn = null;
-				if (typeof(bld.stages) == "object"){
-					btn = new classes.ui.btn.StagingBldBtn({
-						name: 			bld.label,
-						description: 	bld.description,
-						building: 		bld.name,
-						type:           "buildings",
-						twoRow:			this.twoRows,
-						controller: new classes.ui.btn.StagingBldBtnController(this.game)
-					}, this.game);
-				} else {
-					btn = new com.nuclearunicorn.game.ui.BuildingStackableBtn({
-						name: 			bld.label,
-						description: 	bld.description,
-						building: 		bld.name,
-						type:           "buildings",
-						twoRow:			this.twoRows,
-						controller: new classes.ui.btn.BuildingBtnModernController(this.game)
-					}, this.game);
-				}
-				var mdl = btn.controller.fetchModel(btn.opts);
-
-				if (this.activeGroup == "available") {
-					if (mdl.resourceIsLimited) {
-						continue;
-					}
-				}
-				if (this.activeGroup == "allEnabled"){
-
-					if (!mdl.enabled){
-						continue;
-					}
-				}
-				if (this.activeGroup == "togglable"){
-					if (!mdl.togglable){
-						continue;
-					}
-				}
-
-				if (this.activeGroup == "iw"){
-					if (group.name == "population"){
-						continue;
-					}
-				}
-
-				btn.update();
-				if (!mdl.visible){
-					continue;	//skip invisible buttons to not make gaps in the two rows renderer
-				}
-
-				this.addChild(btn);
+			if (!isAggregate && group.name != this.activeGroup){
+				continue;
 			}
+			if (this.activeGroup == "iw" && group.name == "population"){
+				continue;	//no kittens to house under Iron Will
+			}
+			groups.push(group);
+		}
+
+		//Unroll the groups to their leaf buildings
+		var buildings = this.game.bld.unrollBuildingGroups(groups);
+
+		for (var i = 0; i < buildings.length; i++){
+			var bld = this.game.bld.getBuildingExt(buildings[i]).getMeta();
+
+			var btn = null;
+			if (typeof(bld.stages) == "object"){
+				btn = new classes.ui.btn.StagingBldBtn({
+					name: 			bld.label,
+					description: 	bld.description,
+					building: 		bld.name,
+					type:           "buildings",
+					twoRow:			this.twoRows,
+					controller: new classes.ui.btn.StagingBldBtnController(this.game)
+				}, this.game);
+			} else {
+				btn = new com.nuclearunicorn.game.ui.BuildingStackableBtn({
+					name: 			bld.label,
+					description: 	bld.description,
+					building: 		bld.name,
+					type:           "buildings",
+					twoRow:			this.twoRows,
+					controller: new classes.ui.btn.BuildingBtnModernController(this.game)
+				}, this.game);
+			}
+			var mdl = btn.controller.fetchModel(btn.opts);
+
+			if (this.activeGroup == "available") {
+				if (mdl.resourceIsLimited) {
+					continue;
+				}
+			}
+			if (this.activeGroup == "allEnabled"){
+
+				if (!mdl.enabled){
+					continue;
+				}
+			}
+			if (this.activeGroup == "togglable"){
+				if (!mdl.togglable){
+					continue;
+				}
+			}
+
+			btn.update();
+			if (!mdl.visible){
+				continue;	//skip invisible buttons to not make gaps in the two rows renderer
+			}
+
+			this.addChild(btn);
 		}
 
 		for (var i = 0; i < this.children.length; i++){
