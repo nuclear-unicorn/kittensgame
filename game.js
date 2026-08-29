@@ -5227,38 +5227,25 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 		postfix = postfix || "";
 
+		var absValue = Math.abs(value);
+		var l = Math.floor(Math.log10(absValue));
+
 		switch (this.opts.notation) {
 			case "e":
-				var l = Math.floor(Math.log10(value));
 				if (l >= 4) {
 					value /= Math.pow(10, l);
 					postfix = "e" + l;
 				}
 				break;
 			case "sie":
-				var l = Math.floor(Math.log10(value));
-				if (value < 9000) {
-					postfix = "";
-				} else if (9000 <= value && l < 6) {
-					value /= 1000;
-					postfix = "K";
-				} else if (6 <= l && l < 9) {
-					value /= 1000 * 1000;
-					postfix = "M";
-				} else if (9 <= l && l < 12) {
-					value /= 1000 * 1000 * 1000;
-					postfix = "G";
-				} else if (12 <= l && l < 15) {
-					value /= 1000 * 1000 * 1000 * 1000;
-					postfix = "T";
-				} else {
-					value = value / Math.pow(10, l);
+				if (l >= 15) {
+					value /= Math.pow(10, l);
 					postfix = "e" + l;
+					break;
 				}
-				break;
+				// otherwise, fall through to "si"
 			case "si":
 			default:
-				var absValue = Math.abs(value);
 				for (var i = 0; i < this.postfixes.length; i++) {
 					var p = this.postfixes[i];
 					if (absValue >= p.limit){
