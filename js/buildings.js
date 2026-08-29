@@ -2141,6 +2141,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		unlockRatio: 0.01,
 		prices: [
 			{ name : "antimatter", val: 125 },
+			{ name : "microchip", 	val: 25 },
 			{ name : "science", 	val: 500000 }
 		],
 		priceRatio: 1.15,

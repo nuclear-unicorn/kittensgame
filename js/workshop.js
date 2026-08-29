@@ -2261,7 +2261,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
         prices:[
             { name: "plastic", val: 50 },
 			{ name: "gold", val: 1000 },
-			{ name: "spice", val: 1000 }
+			{ name: "spice", val: 750 }
         ],
 		progressHandicap: 20,
 		tier: 3
