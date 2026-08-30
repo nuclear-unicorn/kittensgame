@@ -356,6 +356,9 @@ var Server = dojo.declare("classes.game.Server", null, {
 	},
 
     getServerUrl: function(){
+		if (this.game.isMobile()){
+			return "https://kittensgame.com";
+		}
 		var host = window.location.hostname;
 		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1";
         if (isLocalhost && !this.game.isMobile()){
@@ -2392,10 +2395,6 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	/** @type {any} see js/ui.js */
     ui: null,
 
-    //==========    external API's ========
-	/** @type {any} Dropbox SDK client, installed by the platform bootstrap */
-    dropBoxClient: null,
-
 	/*
 		Whether the game is in developer mode or no
 	 */
@@ -2653,6 +2652,9 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * @returns {boolean} always true on localhost, so devs see everything
 	 */
 	getFeatureFlag: function(flagId){
+		if (this.isMobile()){
+			return this.featureFlags[flagId]["mobile"];
+		}
 		var host = window.location.hostname;
 		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1" || host.startsWith("192.168");
 
@@ -2670,11 +2672,6 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			"catnip" : 0.25
 		}});	//calculate estimate winter per tick for catnip;
 	},
-
-	/** @param {any} dropBoxClient */
-    setDropboxClient: function(dropBoxClient) {
-        this.dropBoxClient = dropBoxClient;
-    },
 
 	heartbeat: function(){
 		if (this.isReadOnly()){
@@ -3183,6 +3180,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 			this.updateOptionsUI();
 		}
+
 		// Calculate effects (needs to be done after all managers and save data are loaded)
 		this.calculateAllEffects();
 		this.resPool.updateMaxValueAll();
@@ -3217,6 +3215,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return success;
 	},
 
+
 	//btw, ie11 is horrible crap and should not exist
 	saveExport: function(){
 		if (this.isReadOnly()){
@@ -3238,7 +3237,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.ui.confirm("", $I("save.import.confirmation.msg"), function() {
 			var data = $("#importData").val().replace(/\s/g, "");
 			if (data) {
-				game.saveImportDropboxText(data, function(error) {
+				game.saveImportText(data, function(error) {
 					$("#importDiv").hide();
 					$("#optionsDiv").hide();
 				});
@@ -3268,124 +3267,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
         $link.get(0).dispatchEvent(new MouseEvent("click"));
 	},
 
-	saveExportDropbox: function(){
-		if (this.isReadOnly()){
-			return;
-		}
-		this.save();
-		var data = this.save();
-		var dataString = JSON.stringify(data);
-		var lzdata = this.compressLZData(dataString);
-
-
-        var callback = function() {
-            $("#exportDiv").hide();
-            $("#optionsDiv").hide();
-        };
-
-		this.exportToDropbox(lzdata, callback);
-	},
-
-	/** @returns {string} */
-	getDropboxAuthUrl: function (){
-		var host = window.location.host;
-		var redirectUrl = "/games/kittens/dropboxauth_v2.html";
-		if (host.indexOf("kittensgame") > -1){
-			redirectUrl = "/dropboxauth_v2.html";
-		}
-		var authUrl = this.dropBoxClient.getAuthenticationUrl("https://" + window.location.host + redirectUrl);
-		return authUrl;
-	},
-
-	/**
-	 * @param {string} lzdata - compressed save blob
-	 * @param {(error?: string) => void} callback - called with a message on failure, no args on success
-	 */
-	exportToDropbox: function(lzdata, callback) {
-		var game = this;
-		var authUrl = game.getDropboxAuthUrl();
-		window.open(authUrl, "DropboxAuthPopup", "dialog=yes,dependent=yes,scrollbars=yes,location=yes");
-		var handler = function(e) {
-			window.removeEventListener("message", handler);
-
-			if (window.location.origin !== e.origin) {
-				callback("Unable to save file");
-			} else {
-				var dbxt = new Dropbox.Dropbox({accessToken: e.data["#access_token"]});
-			dbxt.filesUpload({
-				path: "/kittens.save",
-				contents: lzdata,
-					mode: "overwrite"
-			}).then(function (response) {
-				game.msg($I("save.export.msg"));
-				callback();
-			}).catch(function (error) {
-				callback("Unable to save file:" + JSON.stringify(error));
-			});
-			}
-		};
-		window.addEventListener("message", handler ,false);
-    },
-
-	saveImportDropbox: function() {
-		var game = this;
-		if (this.isReadOnly()){
-			return;
-		}
-		this.ui.confirm("", $I("save.import.confirmation.msg"), function() {
-			game.importFromDropbox(function(error) {
-				$("#importDiv").hide();
-				$("#optionsDiv").hide();
-			});
-		});
-	},
-
-	/** @param {(error?: any) => void} callback */
-    importFromDropbox: function (callback) {
-        var game = this;
-		var authUrl = game.getDropboxAuthUrl();
-
-		window.open(authUrl, "DropboxAuthPopup", "dialog=yes,dependent=yes,scrollbars=yes,location=yes");
-		var handler = function(e) {
-			window.removeEventListener("message", handler);
-			if (window.location.origin !== e.origin) {
-				callback("Unable to load file");
-			} else {
-				var dbxt = new Dropbox.Dropbox({accessToken: e.data["#access_token"]});
-			dbxt.filesDownload({path: "/kittens.save"}).then(function (response) {
-				var blob = response.fileBlob;
-				var reader = new FileReader();
-				reader.addEventListener("loadend", function() {
-					//readAsText below, so result is always a string here
-					game.saveImportDropboxText(/** @type {string} */ (reader.result), callback);
-				});
-				reader.readAsText(blob);
-			}).catch(function (error) {
-				callback("Unable to load file:" + JSON.stringify(error));
-			});
-			}
-		};
-		window.addEventListener("message", handler ,false);
-    },
-
-	/** @param {(error?: any) => void} callback */
-    saveImportDropboxFileRead: function(callback){
-        var game = this;
-        this.dropBoxClient.readFile("kittens.save", {}, function (error, lzdata){
-            if (error) {
-                callback(error);
-            } else {
-                game.saveImportDropboxText(lzdata, callback);
-            }
-        });
-    },
-
-	/**
-	 * Deferred to the next tick so a load never lands mid-update.
-	 * @param {string} lzdata - compressed save blob
-	 * @param {(error?: any) => void} callback
-	 */
-    saveImportDropboxText: function(lzdata, callback){
+    saveImportText: function(lzdata, callback){
         this.timer.scheduleEvent(dojo.hitch(this, this._loadSaveJson, lzdata, callback));
     },
 
