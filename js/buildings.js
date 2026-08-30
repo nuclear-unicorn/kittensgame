@@ -259,7 +259,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		"steamworks", "magneto", "smelter", "calciner", "factory", "reactor",
 		"amphitheatre", "chapel", "temple",
 		"workshop", "tradepost", "mint", "unicornPasture", "brewery",
-		"chronosphere", "aiCore", "ziggurat",
+		"aiCore", "chronosphere", "ziggurat",
 		"zebraOutpost", "zebraWorkshop", "zebraForge", "ivoryTemple", "stasisPod"
 	],
 

@@ -1,5 +1,6 @@
 dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabManager, {
 
+    hideResearched: false,
     perks:[{
 		name: "engeneering",
 		label: $I("prestige.engeneering.label"),
@@ -500,11 +501,13 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 			perk.unlocked = perk.defaultUnlocked || false;
 			perk.researched = false;
 		}
+		this.hideResearched = false;
 	},
 
 	save: function(saveData){
 		saveData.prestige = {
-			perks: this.filterMetadata(this.perks, ["name", "unlocked", "researched"])
+			perks: this.filterMetadata(this.perks, ["name", "unlocked", "researched"]),
+			hideResearched: this.hideResearched
 		};
 	},
 
@@ -521,6 +524,7 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 				this.game.unlock(perk.unlocks);
 			}
 		}
+		this.hideResearched = saveData.prestige.hideResearched;
 	},
 
 	update: function(){
@@ -624,7 +628,7 @@ dojo.declare("classes.ui.PrestigeBtnController", com.nuclearunicorn.game.ui.Buil
 		var meta = model.metadata;
 		model.visible = meta.unlocked && (meta.researched || this.game.science.get("metaphysics").researched);
 
-		if (meta.researched && this.game.science.hideResearched){
+		if (meta.researched && this.game.prestige.hideResearched){
 			model.visible = false;
 		}
 	}
@@ -651,6 +655,30 @@ dojo.declare("classes.ui.PrestigePanel", com.nuclearunicorn.game.ui.Panel, {
 
     render: function(container){
 		var content = this.inherited("render", arguments);
+
+		self = this;
+		var msgBox = dojo.create("span", { style: { display: "inline-block", marginBottom: "10px", width: "50%"}}, content);
+
+		var div = dojo.create("div", { style: { float: "right"}}, content);
+
+		this.toggleResearchedSpan = dojo.create("span", null, div);
+
+		var groupCheckbox = dojo.create("input", {
+            id : "prestigeHideResearched",
+            type: "checkbox",
+            checked: this.game.prestige.hideResearched,
+            style: {
+                //display: hasCivil ? "" : "none"
+            }
+        }, this.toggleResearchedSpan);
+
+        dojo.connect(groupCheckbox, "onclick", this, function(){
+            this.game.prestige.hideResearched = !this.game.prestige.hideResearched;
+
+		  this.update(); //Update metaphysics panel UI
+        });
+
+		dojo.create("label", { innerHTML: $I("prestige.toggleResearched.label") + "<br>", for: "prestigeHideResearched"}, this.toggleResearchedSpan);
 
 		var self = this;
 		//---------------------------------------------------------------

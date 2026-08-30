@@ -32,6 +32,10 @@ server. `load` round-trips correctly as long as the server stays running.
 | POST   | `/kgnet/save/update/`              | Update label / archived flag         |
 | GET    | `/kgnet/save/:guid/download/`       | Fetch one of your own save blobs     |
 | POST   | `/kgnet/chiral/game/command/`       | Stubbed (returns `{}`)               |
+| POST   | `/user/login/`                      | Accepts any credentials              |
+| POST   | `/user/logout/`                     | No-op                                |
+| ANY    | `/mock/fail/:status`                | Force all game endpoints to return `:status` (e.g. `403` to simulate an expired session) |
+| ANY    | `/mock/ok`                          | Clear the forced status              |
 | GET    | `/preview/:shareId`                 | Crawler-facing page with OG tags     |
 | GET    | `/preview/:shareId/card.svg`        | Link-preview card image              |
 | GET    | `/preview/:shareId/save/`           | Shared save blob, no session needed  |
@@ -74,3 +78,6 @@ which Discord and Twitter will not embed (nunicorn renders a PNG).
   The server parses that back into nested objects.
 - There is no real auth — `/user/` always returns a session. To simulate a
   logged-out state, just don't run the server (the menu falls back to offline).
+- To exercise the client's error handling (e.g. the 403 expired-session path),
+  hit `POST /mock/fail/403`, do something in the online menu, then restore with
+  `POST /mock/ok`.

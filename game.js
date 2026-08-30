@@ -347,15 +347,16 @@ var Server = dojo.declare("classes.game.Server", null, {
 	logout: function(){
 		var self = this;
 
-		return this._xhr("/user/logout/", "POST", {}, function(){
-			//no-op: state is cleared in .always below regardless of response
-		}).always(function(){
+		return this._xhr("/user/logout/", "POST", {}).always(function(){
 			self.userProfile = null;
 			self.saveData = null;
 		});
 	},
 
     getServerUrl: function(){
+		if (this.game.isMobile()){
+			return "https://kittensgame.com";
+		}
 		var host = window.location.hostname;
 		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1";
         if (isLocalhost && !this.game.isMobile()){
@@ -395,15 +396,16 @@ var Server = dojo.declare("classes.game.Server", null, {
 	},
 
 	/**
-	 * Make an XHR request to KGNet server
-	 * 
+	 * Make an XHR request to KGNet server.
+	 * Callers attach their own .done/.fail/.always to the returned jqXHR.
+	 *
 	 * @param {string} url - relative endpoint URL
 	 * @param {"GET"|"POST"} [method] - defaults to "GET"
 	 * @param {object} [data] - post data
-	 * @param {(resp: any) => void} [handler] - onDone callback handler
-	 * @returns {any} the jqXHR, so callers can chain .done/.fail/.always
+	 * @returns {any} the jqXHR
 	 */
-	_xhr: function(url, method, data, handler){
+	_xhr: function(url, method, data){
+		var self = this;
 		return $.ajax({
             cache: false,
             type: method || "GET",
@@ -413,11 +415,32 @@ var Server = dojo.declare("classes.game.Server", null, {
 				withCredentials: true
 			},
 			data: data
-		}).done(function(resp){
-			if (handler){
-				handler(resp);
+		}).fail(function(jqXHR, textStatus){
+			console.error("KGNet request failed:", method || "GET", url, "status:", jqXHR.status, textStatus);
+			if (jqXHR.status == 403){
+				//the HTTP session is gone (expired or revoked), the cached profile no longer reflects reality
+				self.setUserProfile(null);
 			}
 		});
+	},
+
+	/**
+	 * Show a failed KGNet operation in the game log with a human-readable reason.
+	 * 403 means the session expired; status 0 means the server could not be reached at all.
+	 *
+	 * @param {string} i18nKey - operation message with a {0} placeholder for the reason
+	 * @param {*} jqXHR
+	 */
+	_notifyRequestError: function(i18nKey, jqXHR){
+		var reason;
+		if (jqXHR.status == 403){
+			reason = $I("ui.kgnet.error.auth");
+		} else if (jqXHR.status > 0){
+			reason = $I("ui.kgnet.error.status", [jqXHR.status]);
+		} else {
+			reason = $I("ui.kgnet.error.network");
+		}
+		this.game.msg($I(i18nKey, [reason]), "alert");
 	},
 
 	/**
@@ -427,7 +450,7 @@ var Server = dojo.declare("classes.game.Server", null, {
 	syncUserProfile: function(){
 		var self = this;
 
-		this._xhr("/user/", "GET", {}, function(resp){
+		this._xhr("/user/", "GET", {}).done(function(resp){
 			if (resp && resp.id){
 				self.setUserProfile(resp);
 				self.syncSaveData();
@@ -437,7 +460,7 @@ var Server = dojo.declare("classes.game.Server", null, {
 
 	syncSaveData: function(){
 		var self = this;
-		return this._xhr("/kgnet/save/", "GET", {}, function(resp){
+		return this._xhr("/kgnet/save/", "GET", {}).done(function(resp){
 			self.saveData = resp;
 		});
 	},
@@ -453,7 +476,7 @@ var Server = dojo.declare("classes.game.Server", null, {
 		game.lastBackup = new Date().getTime();
 
 		var saveData = this.game.save();
-		this._xhr("/kgnet/save/upload/", "POST", 
+		this._xhr("/kgnet/save/upload/", "POST",
 		{
 			//pre-parsing guid to avoid checking it on the backend side
 			guid: this.game.telemetry.guid,
@@ -464,11 +487,12 @@ var Server = dojo.declare("classes.game.Server", null, {
 					day: game.calendar.day
 				}
 			}
-		}, 
-		function(resp){
-			console.log("save successful?");
+		}).done(function(resp){
+			game.lastBackup = new Date().getTime();
 			self.saveData = resp;
 			self.game.msg($I("save.export.msg"));
+		}).fail(function(jqXHR){
+			self._notifyRequestError("save.export.fail", jqXHR);
 		});
 	},
 
@@ -486,9 +510,10 @@ var Server = dojo.declare("classes.game.Server", null, {
 			//pre-parsing guid to avoid checking it on the backend side
 			guid: guid,
 			metadata: metadata
-		},
-		function(resp){
+		}).done(function(resp){
 			self.saveData = resp;
+		}).fail(function(jqXHR){
+			self._notifyRequestError("save.update.fail", jqXHR);
 		});
 	},
 
@@ -529,8 +554,10 @@ var Server = dojo.declare("classes.game.Server", null, {
 			return;
 		}
 		this.downloadSave(guid).done(function(resp){
-			if (!resp.data){
+			if (!resp || !resp.data){
 				console.error("unable to load game data", resp);
+				self.game.msg($I("save.import.fail", [$I("ui.kgnet.error.nodata")]), "alert");
+				return;
 			}
 			var data = resp.data;
 			LCstorage["com.nuclearunicorn.kittengame.savedata"] = data;
@@ -540,6 +567,8 @@ var Server = dojo.declare("classes.game.Server", null, {
 			self.game.msg($I("save.import.msg"));
 
 			self.game.render();
+		}).fail(function(jqXHR){
+			self._notifyRequestError("save.import.fail", jqXHR);
 		});
 	},
 
@@ -590,7 +619,7 @@ var Server = dojo.declare("classes.game.Server", null, {
 		}
 		this._xhr("/kgnet/chiral/game/command/", "POST", {
 			command: command
-		}, function(resp){
+		}).done(function(resp){
 			if (resp.clientState){
                 self.setChiral(resp);
 			}
@@ -2353,10 +2382,6 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	/** @type {any} see js/ui.js */
     ui: null,
 
-    //==========    external API's ========
-	/** @type {any} Dropbox SDK client, installed by the platform bootstrap */
-    dropBoxClient: null,
-
 	/*
 		Whether the game is in developer mode or no
 	 */
@@ -2614,6 +2639,9 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	 * @returns {boolean} always true on localhost, so devs see everything
 	 */
 	getFeatureFlag: function(flagId){
+		if (this.isMobile()){
+			return this.featureFlags[flagId]["mobile"];
+		}
 		var host = window.location.hostname;
 		var isLocalhost = window.location.protocol == "file:" || host == "localhost" || host == "127.0.0.1" || host.startsWith("192.168");
 
@@ -2631,11 +2659,6 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			"catnip" : 0.25
 		}});	//calculate estimate winter per tick for catnip;
 	},
-
-	/** @param {any} dropBoxClient */
-    setDropboxClient: function(dropBoxClient) {
-        this.dropBoxClient = dropBoxClient;
-    },
 
 	heartbeat: function(){
 		if (this.isReadOnly()){
@@ -2897,8 +2920,14 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 		var preparedSaveData = this._prepareSaveData(saveData);
 		var saveDataString = this._saveDataToString(preparedSaveData);
-		LCstorage["com.nuclearunicorn.kittengame.savedata"] = saveDataString;
-		console.log("Game saved");
+		try {
+			LCstorage["com.nuclearunicorn.kittengame.savedata"] = saveDataString;
+			console.log("Game saved");
+		} catch (e) {
+			//most likely the localStorage quota is exceeded (or storage is blocked, e.g. private browsing)
+			console.error("Unable to save the game:", e);
+			this.msg($I("save.fail"), "alert");
+		}
 
 		this.ui.save();
 
@@ -3172,6 +3201,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return success;
 	},
 
+
 	//btw, ie11 is horrible crap and should not exist
 	saveExport: function(){
 		if (this.isReadOnly()){
@@ -3193,7 +3223,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		this.ui.confirm("", $I("save.import.confirmation.msg"), function() {
 			var data = $("#importData").val().replace(/\s/g, "");
 			if (data) {
-				game.saveImportDropboxText(data, function(error) {
+				game.saveImportText(data, function(error) {
 					$("#importDiv").hide();
 					$("#optionsDiv").hide();
 				});
@@ -3223,124 +3253,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
         $link.get(0).dispatchEvent(new MouseEvent("click"));
 	},
 
-	saveExportDropbox: function(){
-		if (this.isReadOnly()){
-			return;
-		}
-		this.save();
-		var data = this.save();
-		var dataString = JSON.stringify(data);
-		var lzdata = this.compressLZData(dataString);
-
-
-        var callback = function() {
-            $("#exportDiv").hide();
-            $("#optionsDiv").hide();
-        };
-
-		this.exportToDropbox(lzdata, callback);
-	},
-
-	/** @returns {string} */
-	getDropboxAuthUrl: function (){
-		var host = window.location.host;
-		var redirectUrl = "/games/kittens/dropboxauth_v2.html";
-		if (host.indexOf("kittensgame") > -1){
-			redirectUrl = "/dropboxauth_v2.html";
-		}
-		var authUrl = this.dropBoxClient.getAuthenticationUrl("https://" + window.location.host + redirectUrl);
-		return authUrl;
-	},
-
-	/**
-	 * @param {string} lzdata - compressed save blob
-	 * @param {(error?: string) => void} callback - called with a message on failure, no args on success
-	 */
-	exportToDropbox: function(lzdata, callback) {
-		var game = this;
-		var authUrl = game.getDropboxAuthUrl();
-		window.open(authUrl, "DropboxAuthPopup", "dialog=yes,dependent=yes,scrollbars=yes,location=yes");
-		var handler = function(e) {
-			window.removeEventListener("message", handler);
-
-			if (window.location.origin !== e.origin) {
-				callback("Unable to save file");
-			} else {
-				var dbxt = new Dropbox.Dropbox({accessToken: e.data["#access_token"]});
-			dbxt.filesUpload({
-				path: "/kittens.save",
-				contents: lzdata,
-					mode: "overwrite"
-			}).then(function (response) {
-				game.msg($I("save.export.msg"));
-				callback();
-			}).catch(function (error) {
-				callback("Unable to save file:" + JSON.stringify(error));
-			});
-			}
-		};
-		window.addEventListener("message", handler ,false);
-    },
-
-	saveImportDropbox: function() {
-		var game = this;
-		if (this.isReadOnly()){
-			return;
-		}
-		this.ui.confirm("", $I("save.import.confirmation.msg"), function() {
-			game.importFromDropbox(function(error) {
-				$("#importDiv").hide();
-				$("#optionsDiv").hide();
-			});
-		});
-	},
-
-	/** @param {(error?: any) => void} callback */
-    importFromDropbox: function (callback) {
-        var game = this;
-		var authUrl = game.getDropboxAuthUrl();
-
-		window.open(authUrl, "DropboxAuthPopup", "dialog=yes,dependent=yes,scrollbars=yes,location=yes");
-		var handler = function(e) {
-			window.removeEventListener("message", handler);
-			if (window.location.origin !== e.origin) {
-				callback("Unable to load file");
-			} else {
-				var dbxt = new Dropbox.Dropbox({accessToken: e.data["#access_token"]});
-			dbxt.filesDownload({path: "/kittens.save"}).then(function (response) {
-				var blob = response.fileBlob;
-				var reader = new FileReader();
-				reader.addEventListener("loadend", function() {
-					//readAsText below, so result is always a string here
-					game.saveImportDropboxText(/** @type {string} */ (reader.result), callback);
-				});
-				reader.readAsText(blob);
-			}).catch(function (error) {
-				callback("Unable to load file:" + JSON.stringify(error));
-			});
-			}
-		};
-		window.addEventListener("message", handler ,false);
-    },
-
-	/** @param {(error?: any) => void} callback */
-    saveImportDropboxFileRead: function(callback){
-        var game = this;
-        this.dropBoxClient.readFile("kittens.save", {}, function (error, lzdata){
-            if (error) {
-                callback(error);
-            } else {
-                game.saveImportDropboxText(lzdata, callback);
-            }
-        });
-    },
-
-	/**
-	 * Deferred to the next tick so a load never lands mid-update.
-	 * @param {string} lzdata - compressed save blob
-	 * @param {(error?: any) => void} callback
-	 */
-    saveImportDropboxText: function(lzdata, callback){
+    saveImportText: function(lzdata, callback){
         this.timer.scheduleEvent(dojo.hitch(this, this._loadSaveJson, lzdata, callback));
     },
 

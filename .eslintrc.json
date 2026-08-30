@@ -44,7 +44,6 @@
     "globals": {
         "dojo": "readonly",
         "React": "readonly",
-        "Dropbox": "readonly",
         "$": "readonly",
         "jQuery": "readonly",
 
