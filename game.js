@@ -3180,7 +3180,6 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 
 			this.updateOptionsUI();
 		}
-
 		// Calculate effects (needs to be done after all managers and save data are loaded)
 		this.calculateAllEffects();
 		this.resPool.updateMaxValueAll();
