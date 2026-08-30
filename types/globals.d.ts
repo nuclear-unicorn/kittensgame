@@ -35,9 +35,6 @@ declare var LZString: {
 	decompressFromUTF16(input: string): string;
 };
 
-/** Dropbox SDK, loaded from a <script> tag in index.html */
-declare var Dropbox: any;
-
 interface Window {
 	/** New Relic browser agent; absent unless the page was served with it */
 	newrelic: any;
