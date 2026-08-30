@@ -2059,19 +2059,11 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.Diplomacy", com.nuclearunicorn.game
 				var res = this.game.resPool.get(s.name);
 				var average = s.value * tradeRatio * tradeVolume * (1 + race.energy * 0.02) * (1 + (s.seasons ? s.seasons[currentSeason] : 0));
 
-				var capPercentageMarkUp = "";
-				//Only capped resources gets percentage indicator eg wood, oil, coal
-				if (res.maxValue > 0){
-					var capPercentage = Math.round(res.value / res.maxValue * 100);
-					var capColor = capPercentage > 90 ? "coral" : "";
-					capPercentageMarkUp = "<span style='color: " + capColor + ";'> " + capPercentage + "%</span>";
-				}
-
 				var prefix = j == 0 ? "<span class='sells'>" + $I("trade.sells") + ": </span>" : "<span class='sells'></span>";
 				dojo.create("div", {
 						innerHTML: prefix + (res.title || res.name) + " <span class='tradeAmount'>"
 							+ this.game.getDisplayValueExt(average * (1 - s.width / 2), false, false, 0) + " - "
-							+ this.game.getDisplayValueExt(average * (1 + s.width / 2), false, false, 0) + "</span>" + capPercentageMarkUp
+							+ this.game.getDisplayValueExt(average * (1 + s.width / 2), false, false, 0) + "</span>"
 					}, leftColumn);
 			}
 			if (race.name == "zebras") {
