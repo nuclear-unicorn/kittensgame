@@ -347,9 +347,7 @@ var Server = dojo.declare("classes.game.Server", null, {
 	logout: function(){
 		var self = this;
 
-		return this._xhr("/user/logout/", "POST", {}, function(){
-			//no-op: state is cleared in .always below regardless of response
-		}).always(function(){
+		return this._xhr("/user/logout/", "POST", {}).always(function(){
 			self.userProfile = null;
 			self.saveData = null;
 		});
@@ -398,16 +396,15 @@ var Server = dojo.declare("classes.game.Server", null, {
 	},
 
 	/**
-	 * Make an XHR request to KGNet server
+	 * Make an XHR request to KGNet server.
+	 * Callers attach their own .done/.fail/.always to the returned jqXHR.
 	 *
 	 * @param {string} url - relative endpoint URL
 	 * @param {"GET"|"POST"} [method] - defaults to "GET"
 	 * @param {object} [data] - post data
-	 * @param {(resp: any) => void} [handler] - onDone callback handler	 
-	 * @param {*} [errorHandler] - onFail callback handler, invoked with (jqXHR, textStatus)
-	 * @returns {any} the jqXHR, so callers can chain .done/.fail/.always
+	 * @returns {any} the jqXHR
 	 */
-	_xhr: function(url, method, data, handler, errorHandler){
+	_xhr: function(url, method, data){
 		var self = this;
 		return $.ajax({
             cache: false,
@@ -418,16 +415,11 @@ var Server = dojo.declare("classes.game.Server", null, {
 				withCredentials: true
 			},
 			data: data
-		}).done(function(resp){
-			handler(resp);
 		}).fail(function(jqXHR, textStatus){
 			console.error("KGNet request failed:", method || "GET", url, "status:", jqXHR.status, textStatus);
 			if (jqXHR.status == 403){
 				//the HTTP session is gone (expired or revoked), the cached profile no longer reflects reality
 				self.setUserProfile(null);
-			}
-			if (errorHandler){
-				errorHandler(jqXHR, textStatus);
 			}
 		});
 	},
@@ -458,7 +450,7 @@ var Server = dojo.declare("classes.game.Server", null, {
 	syncUserProfile: function(){
 		var self = this;
 
-		this._xhr("/user/", "GET", {}, function(resp){
+		this._xhr("/user/", "GET", {}).done(function(resp){
 			if (resp && resp.id){
 				self.setUserProfile(resp);
 				self.syncSaveData();
@@ -468,7 +460,7 @@ var Server = dojo.declare("classes.game.Server", null, {
 
 	syncSaveData: function(){
 		var self = this;
-		return this._xhr("/kgnet/save/", "GET", {}, function(resp){
+		return this._xhr("/kgnet/save/", "GET", {}).done(function(resp){
 			self.saveData = resp;
 		});
 	},
@@ -495,13 +487,11 @@ var Server = dojo.declare("classes.game.Server", null, {
 					day: game.calendar.day
 				}
 			}
-		},
-		function(resp){
+		}).done(function(resp){
 			game.lastBackup = new Date().getTime();
 			self.saveData = resp;
 			self.game.msg($I("save.export.msg"));
-		},
-		function(jqXHR){
+		}).fail(function(jqXHR){
 			self._notifyRequestError("save.export.fail", jqXHR);
 		});
 	},
@@ -520,11 +510,9 @@ var Server = dojo.declare("classes.game.Server", null, {
 			//pre-parsing guid to avoid checking it on the backend side
 			guid: guid,
 			metadata: metadata
-		},
-		function(resp){
+		}).done(function(resp){
 			self.saveData = resp;
-		},
-		function(jqXHR){
+		}).fail(function(jqXHR){
 			self._notifyRequestError("save.update.fail", jqXHR);
 		});
 	},
@@ -579,8 +567,7 @@ var Server = dojo.declare("classes.game.Server", null, {
 			self.game.msg($I("save.import.msg"));
 
 			self.game.render();
-		},
-		function(jqXHR){
+		}).fail(function(jqXHR){
 			self._notifyRequestError("save.import.fail", jqXHR);
 		});
 	},
@@ -632,7 +619,7 @@ var Server = dojo.declare("classes.game.Server", null, {
 		}
 		this._xhr("/kgnet/chiral/game/command/", "POST", {
 			command: command
-		}, function(resp){
+		}).done(function(resp){
 			if (resp.clientState){
                 self.setChiral(resp);
 			}
