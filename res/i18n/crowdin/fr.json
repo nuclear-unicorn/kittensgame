@@ -91,6 +91,7 @@
     "btn.all.unassign": "[-max]",
     "btn.aoff.tooltip": "Automatisation désactivée",
     "btn.aon.tooltip": "Automatisation activée",
+    "btn.almostlimited.tooltip": "* - Améliorer réduira votre bonus d'Autocratie",
     "btn.pollution.tooltip": "Produit de la pollution",
     "btn.build": "Construire",
     "btn.challenge": "Commencer le défi",
