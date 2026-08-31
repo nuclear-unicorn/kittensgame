@@ -5844,6 +5844,8 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			});
 		}
 
+		this.resPool.save(saveData);
+
 		var preparedSaveData = this._prepareSaveData(saveData);
 		var saveDataString = this._saveDataToString(preparedSaveData);
 		LCstorage["com.nuclearunicorn.kittengame.savedata"] = saveDataString;
