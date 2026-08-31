@@ -1,7 +1,3 @@
-The metachrome repo is the release/pipeline tooling — the game's `changelog.txt` isn't here, so I'll work from the materials given.
-
-Key observation from the raw commits: the range `1.6.1.5..HEAD` contains the `changelog: 1.6.1.5` commit itself, sitting mid-list. Everything below it (Biomes overhaul, Frescoes, Ambassadors, pacts, trade-volume line, Save Preview, Dark Paracosm, Iron Will, kirakira numbers, etc.) was already in the tree when the 1.6.1.5 entry was written — it's either already announced in 1.6.1.5 or in earlier releases. Re-announcing it would repeat 1.6.1.5, which the task forbids. The genuinely-new work sits above that marker (plus the clearly-1.6.1.5-follow-up negative-number-formatting fix, PR #267, the highest PR in the list). After dropping merges and l10n, that's a small patch.
-
 v 1.6.1.6 (30 Aug 2026)
 
 Minor:
@@ -11,7 +7,6 @@ Removed Dropbox save support
 Fixed a save loading regression on KGNet
 Fixed formatting of negative numbers in scientific / SI notation
 Fixed incorrect item ordering
-
 
 
 v 1.6.1.5 (29 Aug 2026)
