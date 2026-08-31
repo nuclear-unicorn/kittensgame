@@ -3917,7 +3917,6 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			});
 			this.addGlobalModToStack(perTickBaseSpaceStack, resName);
 		//<----
-		stack.push(perTickBaseSpaceStack);
 
 		// *SEASON MODIFIERS
 		stack.push({
