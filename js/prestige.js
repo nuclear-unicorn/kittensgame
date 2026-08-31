@@ -524,7 +524,7 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 				this.game.unlock(perk.unlocks);
 			}
 		}
-		this.hideResearched = saveData.prestige.hideResearched;
+		this.hideResearched = saveData.prestige.hideResearched || false;
 	},
 
 	update: function(){
