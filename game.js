@@ -3916,7 +3916,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				value: spaceRatio - 1
 			});
 		//<----
-		stack.push(perTickBaseSpaceStack)
+		stack.push(perTickBaseSpaceStack);
 		// *SEASON MODIFIERS
 		stack.push({
 			name: $I("res.stack.weather"),
