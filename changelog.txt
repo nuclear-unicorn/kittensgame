@@ -1,3 +1,14 @@
+v 1.6.1.6 (30 Aug 2026)
+
+Minor:
+
+Data Centers now cost microchips, and microchips are cheaper to build
+Removed Dropbox save support
+Fixed a save loading regression on KGNet
+Fixed formatting of negative numbers in scientific / SI notation
+Fixed incorrect item ordering
+
+
 v 1.6.1.5 (29 Aug 2026)
 
 New features:
