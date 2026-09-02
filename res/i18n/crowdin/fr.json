@@ -218,6 +218,7 @@
     "buildings.solarfarm.desc": "Fournit une source d'énergie supplémentaire selon les saisons.",
     "buildings.spaceport.label": "Spatioport",
     "buildings.spaceport.desc": "Augmente la capacité de stockage des constructions spatiales. Pas d'effet sur la science ou l'antimatière.",
+    "buildings.spaceport.desc.automation": "L'automatisation augmente le volume des échanges du commerce.",
     "buildings.spaceport.flavor": "Je veux le fil fantaisie importé de Yarn.",
     "buildings.steamworks.label": "Usine à vapeur",
     "buildings.steamworks.desc": "Lorsque activée, diminue énormément votre production de charbon. Inutile de base, mais peut faire beaucoup de trucs intéressants une fois améliorée.",
