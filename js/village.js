@@ -164,13 +164,11 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 		title: $I("village.job.ambassador"),
 		description: $I("village.job.ambassador.desc"),
 		modifiers: {
-			//July 2026: I've purposely made these effects a little weaker than is necessary.
-			//We'll buff them later once we get a better feel for how strong they *ought* to be.
 			"tradeVolume": 0.0007,
 			"embassyEffectCap": 0.00133,
 			"tradeBlueprintChance": 0.00008,
-			"tradeSpiceChance":     0.00009,
-			"tradeNormalResChance": 0.00003,
+			"tradeSpiceChance":     0.00015,
+			"tradeNormalResChance": 0.00004,
 			"cultureConsumptionAmbassadors": 20,
 			"spiceConsumptionAmbassadors": 0.8
 		},
