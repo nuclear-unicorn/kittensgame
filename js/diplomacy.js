@@ -102,7 +102,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				"autumn": -0.1,
 				"winter": 0.3 //Peak catnip harvest time
 			}},
-			{name: "plastic", value: 0.5, chance: -0.2, width: 0.7, minLevel: 40, seasons: { //Bioplastic made from catnip
+			{name: "plastic", value: 0.5, chance: -0.135, width: 0.7, minLevel: 40, seasons: { //Bioplastic made from catnip
 				"spring": 0.25, //Takes a few weeks to process all the oil into plastic
 				"summer": 0.1,
 				"autumn": -0.2,
@@ -303,7 +303,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 				"autumn": -0.9,
 				"winter": 1.5
 			}},*/
-			{name: "plastic", value: 1, chance: -0.2, width: 0.8, minLevel: 15, seasons:{ //Spider plastic is made from their own silk
+			{name: "plastic", value: 1, chance: -0.135, width: 0.8, minLevel: 15, seasons:{ //Spider plastic is made from their own silk
 				"spring": 1.0,
 				"summer": -0.3,
 				"autumn": -0.6,
@@ -329,8 +329,8 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		sells:[ //Not affected by Cath seasons because they're so technologically advanced they don't care
 			{name: "uranium", value: 1, chance: 0.95, width: 0.25},
 			{name: "thorium", value: 1, chance: 0.5, width: 0.25, minLevel: 5},
-			{name: "temporalFlux", value: 0.2, chance: -0.075, width: 0.18, minLevel: 30},
-			{name: "antimatter", value: 0.1, chance: -0.175, width: 0.18, minLevel: 50}
+			{name: "temporalFlux", value: 0.02, chance: -0.075, width: 0.18, minLevel: 30},
+			{name: "antimatter", value: 0.1, chance: -0.2, width: 0.18, minLevel: 50}
 		],
 		collapsed: false,
 		pinned: false
