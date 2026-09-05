@@ -721,6 +721,43 @@ test("Spaceports should be unlocked correctly and have a custom price logic appl
     expect(Math.round(_get("warehouse").prices.find(price => price.name == "starchart").val)).toBe(8134223);
 });
 
+test("Upgrade preview must match the building right after the upgrade", () => {
+    game.science.get("advExogeology").researched = true;
+    game.update();
+
+    let bld = game.bld.get("warehouse");
+    bld.val = 3;
+    bld.on = 3;
+    let spaceportEffectsBefore = Object.assign({}, bld.stages[1].effects);
+
+    let controller = new classes.ui.btn.StagingBldBtnController(game);
+    let model = controller.fetchModel({
+        key: "warehouse",
+        building: "warehouse"
+    });
+
+    let preview = controller.fetchNextStageModel(model);
+    expect(preview.metadata.stage).toBe(1);
+    expect(preview.metadata.label).toBe(bld.stages[1].label);
+
+    //previewing must leave the live building alone
+    expect(bld.stage).toBe(0);
+    expect(bld.val).toBe(3);
+    expect(bld.on).toBe(3);
+    expect(bld.stages[1].effects).toEqual(spaceportEffectsBefore);
+
+    controller.deltagrade(model, 1);
+    let upgraded = controller.fetchModel({
+        key: "warehouse",
+        building: "warehouse"
+    });
+    upgraded.multiplyEffects = false;   //preview always shows per-building effects
+    controller.fetchExtendedModel(upgraded);
+
+    expect(upgraded.prices).toEqual(preview.prices);
+    expect(upgraded.effectModels).toEqual(preview.effectModels);
+});
+
 //--------------------------------
 //      buyItem internals
 //--------------------------------

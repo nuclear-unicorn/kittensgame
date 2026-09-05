@@ -3473,11 +3473,67 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 				if (!stages[i].stageUnlocked){
 					continue;
 				}
-				stageLinks.push( {title: "^", handler: upgradeHandler, enabled: true});
+				stageLinks.push( {
+					title: "^",
+					handler: upgradeHandler,
+					enabled: true,
+					getTooltip: function(){ return self.getUpgradeTooltip(model); }
+				});
 			} //if
 		}
 
 		return stageLinks;
+	},
+
+	/* Building as it would be right after the upgrade: next stage, nothing built yet */
+	fetchNextStageModel: function(model){
+		var copy = function(obj){
+			var result = {};
+			for (var attr in obj){
+				if (obj.hasOwnProperty(attr)){
+					result[attr] = obj[attr];
+				}
+			}
+			return result;
+		};
+
+		var bld = this.getMetadataRaw(model);
+		var preview = copy(bld);
+		preview.stage = (bld.stage || 0) + 1;
+		preview.val = 0;	//deltagrade sells everything off
+		preview.on = 0;
+		//the previewed stage gets a copy of its own, recalculating it must not touch the live building
+		preview.stages = bld.stages.slice();
+		preview.stages[preview.stage] = copy(bld.stages[preview.stage]);
+
+		if (preview.calculateEffects){
+			//stage effects are only kept up to date while the stage is active
+			preview.calculateEffects(preview, this.game);
+		}
+
+		var accessor = new classes.BuildingMeta(preview);
+		var previewModel = {
+			options: model.options,
+			metaAccessor: accessor,
+			metadata: accessor.getMeta(),
+			refundPercentage: model.refundPercentage,
+			simplePrices: false,
+			multiplyEffects: false,
+			stagePreview: true,
+			tooltipName: true
+		};
+		previewModel.name = $I("buildings.upgrade.tooltip.title", [previewModel.metadata.label]);
+		previewModel.prices = this.game.bld.getPricesWithAccessor(accessor);
+		this.fetchExtendedModel(previewModel);
+		return previewModel;
+	},
+
+	/* Tooltip of the ^ link: the building as it will be after the upgrade */
+	getUpgradeTooltip: function(model){
+		if (!this.getIsNextStageUnlocked(model)){
+			return "";
+		}
+		return ButtonModernHelper.renderTooltip(this, this.fetchNextStageModel(model));
 	},
 
 	getName: function(model) {
@@ -3496,6 +3552,10 @@ dojo.declare("classes.ui.btn.StagingBldBtnController", classes.ui.btn.BuildingBt
 		if (this.getIsNextStageUnlocked(model)) {
 			var nextStageLabel = model.metadata.stages[model.metadata.stage + 1].label;
 			description = "<div class=\"upgrade-available\">" + $I("buildings.upgrade.desc.available", [nextStageLabel]) + "</div>" + description;
+		}
+		if (model.stagePreview && this.getMetadataRaw(model).val) {
+			description += "<div class=\"desc small\">" +
+				$I("buildings.deltagrade.refund.msg", [this.game.toDisplayPercentage(model.refundPercentage) + "%"]) + "</div>";
 		}
 		return description;
 	},
@@ -3591,7 +3651,7 @@ dojo.declare("classes.ui.btn.StagingBldBtn", com.nuclearunicorn.game.ui.Building
 
 		for (var i = 0; i < this.model.stageLinks.length; i++){
 			var linkModel = this.model.stageLinks[i];
-			this.stageLinks.push(this.addLink(linkModel));
+			this.stageLinks.push(this.addLink(linkModel, linkModel.getTooltip));
 		}
 	},
 });

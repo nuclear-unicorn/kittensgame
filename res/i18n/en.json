@@ -282,6 +282,7 @@
     "buildings.group.storage": "Storage",
     "buildings.group.zebraBuildings": "Zebras",
     "buildings.upgrade.desc.available": "Can be upgraded into {0}",
+    "buildings.upgrade.tooltip.title": "Upgrade to {0}",
     "buildings.upgrade.confirmation.msg": "Do you want to upgrade this building?",
     "buildings.downgrade.confirmation.msg": "Do you want to downgrade this building?",
     "buildings.deltagrade.refund.msg": "All existing ones will be sold for a {0} refund.",

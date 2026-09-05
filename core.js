@@ -1513,6 +1513,11 @@ var ButtonModernHelper = {
 		model = controller.fetchModel(model.options);
 		controller.fetchExtendedModel(model);
 
+		return ButtonModernHelper.renderTooltip(controller, model);
+	},
+
+	/* Tooltip body of an already fetched (and extended) model */
+	renderTooltip : function(controller, model){
 		var tooltip = dojo.create("div", { className: "tooltip-inner" }, null);
 
 
