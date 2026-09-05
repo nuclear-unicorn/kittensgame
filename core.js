@@ -55,18 +55,18 @@ var TabManager = dojo.declare("com.nuclearunicorn.core.TabManager", Control, {
 	//effectsCachedExisting is a table of the names of every possible effect on each item in this game tab.
 	//If an effect somehow isn't in here, the TabManager doesn't know it exists.
 	/** @type {Record<string, number>} */
-	effectsCachedExisting: null,
+	effectsCachedExisting: /** @type {any} */ (null),
 	/** @type {{meta: any[], provider?: {getEffect: (item: any, effectName: string) => number}}[]} */
-	meta: null,
+	meta: /** @type {any} */ (null),
 	/** @type {Record<string, {collapsed: boolean}>} */
-	panelData: null,
+	panelData: /** @type {any} */ (null),
 
 	//Declared by subclasses; listed here so the base methods that rely on
 	//them (updateEffectCached, etc.) are part of the checked contract.
 	/** @type {GamePage} the instance type is declared in game.js */
-	game: null,
+	game: /** @type {any} */ (null),
 	/** @type {Record<string, number>} */
-	effectsBase: null,
+	effectsBase: /** @type {any} */ (null),
 
 	/**
 	 * Constructors are INHERITED automatically and CHAINED in the class hierarchy
@@ -513,14 +513,16 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 		}
 	},
 
-	messages: null,
+	/** @type {any[]} */
+	messages: /** @type {any} */ (null),
 	maxMessages: 40,
 	messageIdCounter: 0,
+	/** @type {any} the UISystem instance, installed by GamePage */
 	ui: null,
 	/** @type {GamePage} */
-	game: null,
+	game: /** @type {any} */ (null),
 	/** @type {Record<string, {title: string, enabled: boolean, unlocked: boolean, defaultUnlocked?: boolean}>} */
-	filters: null,
+	filters: /** @type {any} */ (null),
 
 	constructor: function(game) {
 		this.game = game;
@@ -625,8 +627,9 @@ dojo.declare("com.nuclearunicorn.game.log.Console", null, {
 
 var ButtonController = dojo.declare("com.nuclearunicorn.game.ui.ButtonController", null, {
 	/** @type {GamePage} */
-	game: null,
-	controllerOpts: null,
+	game: /** @type {any} */ (null),
+	/** @type {Record<string, any>} */
+	controllerOpts: /** @type {any} */ (null),
 
 
 	constructor: function(game, controllerOpts){
@@ -910,7 +913,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 	model: null,
 	controller: null,
 	/** @type {GamePage} */
-	game: null,
+	game: /** @type {any} */ (null),
 
 	//nodes
 
@@ -1305,14 +1308,17 @@ var ButtonModernController = dojo.declare("com.nuclearunicorn.game.ui.ButtonMode
 		return undefined;
 	},
 
+	/** @returns {Record<string, number>|undefined} */
 	getEffects: function(model){
 		return undefined;
 	},
 
+	/** @returns {Record<string, number>|undefined} */
 	getTotalEffects: function(model){
 		return undefined;
 	},
 
+	/** @returns {number|undefined} */
 	getNextEffectValue: function(model, effectName) {
 		return undefined;
 	},
@@ -2553,10 +2559,12 @@ dojo.declare("com.nuclearunicorn.game.ui.Spacer", null, {
 dojo.declare("com.nuclearunicorn.game.ui.ContentRowRenderer", null, {
 	twoRows: false,	//by default every tab/panel has one row only
 
-	leftRow: null,
-	rightRow: null,
 	/** @type {HTMLElement} */
-	content: null,
+	leftRow: /** @type {any} */ (null),
+	/** @type {HTMLElement} */
+	rightRow: /** @type {any} */ (null),
+	/** @type {HTMLElement} */
+	content: /** @type {any} */ (null),
 
 	initRenderer: function(content){
 		this.content = content;
@@ -2591,7 +2599,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ContentRowRenderer", null, {
 
 dojo.declare("mixin.IGameAware", null, {
 	/** @type {GamePage} */
-	game: null,
+	game: /** @type {any} */ (null),
 
 	setGame: function(game){
 		this.game = game;
@@ -2599,7 +2607,8 @@ dojo.declare("mixin.IGameAware", null, {
 });
 
 dojo.declare("mixin.IChildrenAware", null, {
-	children: null,
+	/** @type {any[]} */
+	children: /** @type {any} */ (null),
 
 	constructor: function(){
 		this.children = [];
@@ -2627,7 +2636,7 @@ dojo.declare("mixin.IChildrenAware", null, {
  */
 dojo.declare("com.nuclearunicorn.game.ui.Panel", [com.nuclearunicorn.game.ui.ContentRowRenderer, mixin.IChildrenAware], {
 	/** @type {GamePage} */
-	game: null,
+	game: /** @type {any} */ (null),
 
 	collapsed: false,
 	visible: true,

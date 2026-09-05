@@ -9,6 +9,10 @@
 		// change the shipped code or the supported browsers.
 		"lib": ["es2017", "dom"],
 		"strict": false,
+		// Prototype defaults are declared `foo: /** @type {any} */ (null)` — the
+		// @type tag above the field is the real type, the cast just lets dojo's
+		// null placeholder through. Fields that stay null at runtime say `|null`.
+		"strictNullChecks": true,
 		"skipLibCheck": true
 	},
 	"include": [

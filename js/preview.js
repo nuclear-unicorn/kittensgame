@@ -9,16 +9,16 @@
 var Preview = dojo.declare("classes.game.Preview", null, {
 
 	/** @type {GamePage} */
-	game: null,
+	game: /** @type {any} */ (null),
 
-	/** @type {string} the kgnet share token we are previewing, null outside preview mode */
+	/** @type {string|null} the kgnet share token we are previewing, null outside preview mode */
 	saveId: null,
 
-	/** Cloud metadata for the save, when the backend bothers to send it. */
+	/** @type {Record<string, any>|null} cloud metadata for the save, when the backend bothers to send it */
 	meta: null,
 
 	/** @type {HTMLElement} */
-	bannerNode: null,
+	bannerNode: /** @type {any} */ (null),
 
 	/** @param {GamePage} game */
 	constructor: function(game){
@@ -95,8 +95,8 @@ var Preview = dojo.declare("classes.game.Preview", null, {
 				continue;
 			}
 			var separator = node.nextSibling;
-			if (separator && separator.nodeType == 3 && separator.nodeValue.indexOf("|") >= 0){
-				separator.parentNode.removeChild(separator);
+			if (separator && separator.nodeType == 3 && (separator.nodeValue || "").indexOf("|") >= 0){
+				node.parentNode.removeChild(separator);
 			}
 			node.parentNode.removeChild(node);
 		}
@@ -164,7 +164,7 @@ var Preview = dojo.declare("classes.game.Preview", null, {
 var PREVIEW_SAVE_ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
 
 /**
- * @returns {string} the `?saveId=` value, or null when this is a normal game session
+ * @returns {string|null} the `?saveId=` value, or null when this is a normal game session
  */
 function previewGetSaveId(){
 	var match = /[?&]saveId=([^&#]*)/.exec(window.location.search);
