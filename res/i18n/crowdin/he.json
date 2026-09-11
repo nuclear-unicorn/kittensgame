@@ -1482,7 +1482,7 @@
     "science.navigation.label": "ניווט",
     "science.navigation.desc": "ניווט מאפשר התקדמויות משמעותיות בספנות וטכנולוגיות בניית ספינות. הוא אמור להועיל להתפתחות כלכלית ויכול להוביל לגילוי של תרבויות חדשות.<br>(רמז: אין צורך שיהיה את כל התרבות בבת אחת)",
     "science.navigation.effectDesc": "מאפשר את הבנייה של ספינות סחר וסחר בין יבשתי.",
-    "science.nuclearFission.label": "ביקוע גרעיניביקוע גרעיני",
+    "science.nuclearFission.label": "ביקוע גרעיני",
     "science.nuclearFission.desc": "ביקוע גרעיני פותח כורים גרעיניים ושדרוגים הקשורים לאנרגיה גרעינית",
     "science.nuclearFission.effectDesc": "פותח כורים גרעיניים ואונייה גרעינית",
     "science.oilProcessing.label": "עיבוד נפט",
