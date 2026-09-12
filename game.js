@@ -4257,7 +4257,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		});
 
 		// BIOME EXPLORATION
-		if (res.name == "manpower"){
+		if (res.name == "manpower" && this.village.map.currentBiome){
 			var biome = this.village.getBiome(this.village.map.currentBiome);
 			if (biome){
 				var exploreCost = this.village.map.getExplorationCost();
