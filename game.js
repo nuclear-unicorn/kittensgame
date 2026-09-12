@@ -3829,6 +3829,10 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		perTick *= (1 + this.getEffect(res.name + "PolicyRatio"));
 
 		perTick += resConsumption;
+		if (res.name == "manpower" && this.village.map.currentBiome){
+			var exploreCost = this.village.map.getExplorationCost();
+			perTick -= exploreCost;
+		}
 		if (isNaN(perTick)){
 			return 0;
 		}
