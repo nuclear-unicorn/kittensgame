@@ -3829,10 +3829,6 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		perTick *= (1 + this.getEffect(res.name + "PolicyRatio"));
 
 		perTick += resConsumption;
-		if (res.name == "manpower" && this.village.map.currentBiome){
-			var exploreCost = this.village.map.getExplorationCost();
-			perTick -= exploreCost;
-		}
 		if (isNaN(perTick)){
 			return 0;
 		}
@@ -4623,7 +4619,8 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	getResourcePerTickConvertion: function(resName) {
 		return this.fixFloatPointNumber(this.getEffect(resName + "PerTickCon") -
 			/*use subtraction because getAmbassadorEffect returns positive value*/
-			this.diplomacy.getAmbassadorEffect(resName + "ConsumptionAmbassadors"));
+			this.diplomacy.getAmbassadorEffect(resName + "ConsumptionAmbassadors"))
+			- (resName == "manpower" && this.village.map.currentBiome) ? this.village.map.getExplorationCost() : 0;
 	},
 
 	/**
