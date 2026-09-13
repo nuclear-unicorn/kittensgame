@@ -901,12 +901,8 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 		}
 
 		//calculate millenium difference
-		var paragon = Math.floor((this.year + yearsOffset) / 1000) - Math.floor(this.year / 1000);
-		if (paragon > 0){
-			resPool.addResEvent("paragon", paragon);
-			this.game.stats.getStat("totalParagon").val += paragon;
-		}
-		this.game.religion.pactsManager.pactsMilleniumKarmaKittens(paragon);
+		var millennia = Math.floor((this.year + yearsOffset) / 1000) - Math.floor(this.year / 1000);
+		this.calculateMilleniumProduction(millennia);
 		var oldYear = this.year;
 		this.year += yearsOffset;
 		this.game.stats.getStat("totalYears").val += yearsOffset;
@@ -1073,12 +1069,7 @@ if (++this.cycleYear >= this.yearsPerCycle) {
 		}
 
 		if ( this.year % 1000 === 0 ){
-			this.game.resPool.addResEvent("paragon", 1);
-			this.game.stats.getStat("totalParagon").val++;
-			var kittens = this.game.resPool.get("kittens").value;
-
-			//holy genocide karma effect
-			this.game.religion.pactsManager.pactsMilleniumKarmaKittens(1);
+			this.calculateMilleniumProduction(1);
 		}
 
 		var pyramidVal = this.game.religion.getZU("blackPyramid").getEffectiveValue(this.game);
