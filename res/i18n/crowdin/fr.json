@@ -1848,7 +1848,7 @@
     "left.trade.do": "Commercer avec {0}",
     "left.loadout.do": "Définir l'équipement {0}",
     "left.hunt": "Envoyer les chasseurs",
-    "left.hunt.time": "temps",
+    "left.hunt.time": "fois",
     "left.hunt.times": "fois",
     "left.praise": "Louez le soleil!",
     "console.filter.astronomicalEvent": "Événements astronomiques",
