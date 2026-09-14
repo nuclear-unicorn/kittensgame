@@ -53,6 +53,9 @@ try {
             }
             return Object.assign({}, mixin);},
         hitch: function(ctx, method){ return method.bind(ctx, arguments);},
+        hasClass: function(node, className){ return node.classList.contains(className); },
+        addClass: function(node, className){ node.classList.add(className); },
+        removeClass: function(node, className){ node.classList.remove(className); },
         connect: function(){},
         publish: function(){},
         subscribe: function(){},

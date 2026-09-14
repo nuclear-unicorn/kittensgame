@@ -972,22 +972,22 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 				if (hasClass){
 					dojo.removeClass(this.domNode, "disabled");
 				}
-				if (hasClassLimited){
-					dojo.removeClass(this.domNode, "limited");
-				}
 			} else {
 				if (!hasClass){
 					dojo.addClass(this.domNode, "disabled");
 				}
-				if (!hasClassLimited && this.model.resourceIsLimited){
-					dojo.addClass(this.domNode, "limited");
-				}
-			}			
+			}
+
+			//"limited" marks a disabled button whose price exceeds the storage cap.
+			//It has to be tracked separately from "disabled": once the cap is raised the button
+			//stays disabled until the resources accumulate, but it is no longer limited.
+			var isLimited = !this.model.enabled && Boolean(this.model.resourceIsLimited);
+			if (isLimited && !hasClassLimited){
+				dojo.addClass(this.domNode, "limited");
+			} else if (!isLimited && hasClassLimited){
+				dojo.removeClass(this.domNode, "limited");
+			}
 		}
-		//---------------------------------------------------
-		//		a bit hackish place for price highlight
-		//---------------------------------------------------
-		//---- now highlight some stuff in vanilla js way ---
 	},
 
 	update: function() {
