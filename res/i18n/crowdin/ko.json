@@ -2055,6 +2055,7 @@
     "workshop.upgradePanel.label": "업그레이드",
     "workshop.all.upgrades.unlocked": "모든 업그레이드가 해금되었습니다!",
     "workshop.toggleResearched.label": "연구된 업그레이드 숨기기",
+    "workshop.transportSuperposition.desc": "",
     "workshop.advancedAutomation.label": "향상된 자동화",
     "workshop.advancedAutomation.desc": "작업장 자동화가 한 해에 두 번 활성화됩니다.",
     "workshop.advancedRefinement.label": "캣닙 농축",
