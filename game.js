@@ -4625,7 +4625,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		return this.fixFloatPointNumber(this.getEffect(resName + "PerTickCon") -
 			/*use subtraction because getAmbassadorEffect returns positive value*/
 			this.diplomacy.getAmbassadorEffect(resName + "ConsumptionAmbassadors"))
-			- (resName == "manpower" && this.village.map.currentBiome) ? this.village.map.getExplorationCost() : 0;
+			- ((resName == "manpower" && this.village.map.currentBiome) ? this.village.map.getExplorationCost() : 0);
 	},
 
 	/**
