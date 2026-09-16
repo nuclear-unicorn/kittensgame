@@ -1247,6 +1247,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["culturalExchange"],
 		evaluateLocks: function(game){
 			return game.science.getPolicy("diplomacy").researched && game.science.get("astronomy").researched;
+		},
+		unlocks : {
+			policies: ["persuasiveResearchers", "spriceRoutes"]
 		}
     }, {
         name: "culturalExchange",
@@ -1263,6 +1266,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["knowledgeSharing"],
 		evaluateLocks: function(game){
 			return game.science.getPolicy("diplomacy").researched && game.science.get("astronomy").researched;
+		},
+		unlocks : {
+			policies: ["spriceRoutes", "universalEtiquette"]
 		}
     }, {
         name: "bigStickPolicy",
@@ -1279,6 +1285,9 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["cityOnAHill"],
 		evaluateLocks: function(game){
 			return game.science.getPolicy("isolationism").researched && game.science.get("astronomy").researched && !game.challenges.isActive("pacifism");
+		},
+		unlocks : {
+			policies: ["persuasiveResearchers", "cuisineExchange"]
 		}
     }, {
         name: "cityOnAHill",
@@ -1295,6 +1304,77 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["bigStickPolicy"],
 		evaluateLocks: function(game){
 			return game.science.getPolicy("isolationism").researched && game.science.get("astronomy").researched;
+		},
+		unlocks : {
+			policies: ["universalEtiquette", "cuisineExchange"]
+		}
+    }, {
+        name: "persuasiveResearchers",
+		label: "Persuasive Researchers",
+		description: "TODO",
+        // label: $I("policy.persuasiveResearchers.label"),
+        // description: $I("policy.persuasiveResearchers.desc"),
+        prices: [
+            {name : "culture", val: 5555}
+        ],
+        effects:{
+            "tradeValueBlueprintsChance" : 0.5
+        },
+        unlocked: false,
+        blocked: false,
+        blocks:["spriceRoutes", "cuisineExchange"],
+    },  {
+        name: "spriceRoutes",
+		label: "Spice Routes",
+		description: "TODO",
+        // label: $I("policy.spriceRoutes.label"),
+        // description: $I("policy.spriceRoutes.desc"),
+        prices: [
+            {name : "culture", val: 5555}
+        ],
+        effects:{
+            "tradeValueSpiceChance" : 0.5
+        },
+        unlocked: false,
+        blocked: false,
+		blocks:["persuasiveResearchers", "universalEtiquette"]
+    },  {
+        name: "universalEtiquette",
+		label: "Universal Etiquette",
+		description: "TODO",
+        // label: $I("policy.universalEtiquette.label"),
+        // description: $I("policy.universalEtiquette.desc"),
+        prices: [
+            {name : "culture", val: 5555}
+        ],
+        effects:{
+            "ambassadorCultureDiscount" : -0.25,
+			"cultureFromManuscripts" : 0.1,
+			"cultureFromManuscriptsFromAmbassadors": 0.0003
+        },
+        unlocked: false,
+        blocked: false,
+        blocks:["cuisineExchange", "spriceRoutes"],
+		upgrades:{
+			jobs: ["ambassador"]
+		}
+    },  {
+        name: "cuisineExchange",
+		label: "Cuisine Exchange",
+		description: "TODO",
+        // label: $I("policy.cityOnAHill.label"),
+        // description: $I("policy.cityOnAHill.desc"),
+        prices: [
+            {name : "culture", val: 5555}
+        ],
+        effects:{
+            "ambassadorSpiceDiscount" : -0.5
+        },
+        unlocked: false,
+        blocked: false,
+        blocks:["universalEtiquette", "persuasiveResearchers"],
+		upgrades:{
+			jobs: ["ambassador"]
 		}
     }, {
         name: "outerSpaceTreaty",

@@ -951,6 +951,9 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		//-------------- 10% chance to get blueprint ---------------
 		var blueprintTradeChance = this.getBlueprintTradeChance(race);
 		var eligibleForBlueprint = successfullTradeAmount;
+		if (blueprintTradeChance > 1){
+			eligibleForBlueprint *= blueprintTradeChance;
+		}
 		if (blueprintTradeChance < 1 && this.nonRandomTrades) { //Non-random trades won't give blueprints unless it's guaranteed
 			eligibleForBlueprint = Math.max(successfullTradeAmount - this.nonRandomTrades, 0);
 		}
@@ -1131,6 +1134,10 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		if (race.name == "nagas") {
 			retVal += this.game.getEffect("nagaBlueprintTradeChance");
 		}
+		var tradeValueBlueprintsChance = this.game.getEffect("tradeValueBlueprintsChance");
+		if (tradeValueBlueprintsChance > 0){
+			retVal *= this.getTradeVolume() * tradeValueBlueprintsChance;
+		}
 		return retVal;
 	},
 	//Spice is a unique resource in that if the chance exceeds 100%, it'll act as a multiplier to spice gain amounts.
@@ -1138,6 +1145,10 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	getSpiceTradeChance: function(race) {
 		var embassyEffect = this.game.ironWill ? 0.0025 : 0.01;
 		var baseChance = 0.35 + this.getAmbassadorEffect("tradeSpiceChance");
+		var tradeValueSpiceChance = this.game.getEffect("tradeValueSpiceChance");
+		if (tradeValueSpiceChance > 0){
+			baseChance *= this.getTradeVolume() * tradeValueSpiceChance;
+		}
 		return baseChance * (1 + (race.embassyPrices ?  race.embassyLevel * embassyEffect : 0));
 	},
 	getResourceTradeChance: function(sellResourceOpts, race) {
