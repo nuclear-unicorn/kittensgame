@@ -2349,25 +2349,28 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			if (game.workshop.getZebraUpgrade("whispers").researched && self.on > 0 && self.isAutomationEnabled == null){
 				self.isAutomationEnabled = true;
 			}
+			var contrastEngineModifier = 1 + ((game.workshop.getZebraUpgrade("contrastEngine").researched)? 
+			game.religion.getRUTotalLevels()/100.0 : 0);
+			self.contrastEngineModifier = contrastEngineModifier;
 		},
 		action: function(self, game){
 			if (self.isAutomationEnabled){
 				self.effects = {
 					"ivoryPerTickCon": -200,
-					"mineralsPerTickProd": 2,
+					"mineralsPerTickProd": 2 * self.contrastEngineModifier,
 					"titaniumPerTickCon": -2,
 					"alicornPerTickCon": -0.00002,
-					"tMythrilPerTick": 0.00005,
-					"manpowerMax": 10
+					"tMythrilPerTick": 0.00005 * self.contrastEngineModifier,
+					"manpowerMax": 10 * self.contrastEngineModifier
 				};
 			} else {
 				self.effects = {
 					"ivoryPerTickCon": -100,
-					"mineralsPerTickProd": 1,
+					"mineralsPerTickProd": 1 * self.contrastEngineModifier,
 					"titaniumPerTickCon": 0,
 					"alicornPerTickCon": 0,
 					"tMythrilPerTick": 0,
-					"manpowerMax": 10
+					"manpowerMax": 10 * self.contrastEngineModifier
 				};
 			}
 			var amt = game.resPool.getAmtDependsOnStock(

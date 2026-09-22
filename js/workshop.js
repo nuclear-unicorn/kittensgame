@@ -2424,7 +2424,21 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			],
 			upgrades:{
 				buildings: ["ivoryTemple"]
+			},
+			unlocks: {
+				zebraUpgrades: ["contrastEngine"]
 			}
+		},
+		{
+			name: "contrastEngine",
+			label: $I("workshop.zebraUpgrade.contrastEngine.label"),
+			description: $I("workshop.zebraUpgrade.contrastEngine.desc"),
+			prices:[
+				{ name : "tMythril", val: 5 }
+			],
+			upgrades:{
+				buildings: ["ivoryTemple"]
+			},
 		},
 		//minerals
 		{
