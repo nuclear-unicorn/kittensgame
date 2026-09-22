@@ -2439,6 +2439,13 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			upgrades:{
 				buildings: ["ivoryTemple"]
 			},
+			calculateEffects: function(self, game){
+				if (game.challenges.isActive("atheism")){
+					self.label = $I("workshop.zebraUpgrade.contrastEngine.desc.atheism");
+				} else {
+					self.label = $I("workshop.zebraUpgrade.contrastEngine.desc");
+				}
+			}
 		},
 		//minerals
 		{

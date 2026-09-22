@@ -2349,8 +2349,10 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			if (game.workshop.getZebraUpgrade("whispers").researched && self.on > 0 && self.isAutomationEnabled == null){
 				self.isAutomationEnabled = true;
 			}
-			var contrastEngineModifier = 1 + ((game.workshop.getZebraUpgrade("contrastEngine").researched)? 
-			game.religion.getRUTotalLevels()/100.0 : 0);
+			var contrastEngineModifier = 1;
+			if (game.workshop.getZebraUpgrade("contrastEngine").researched){
+				contrastEngineModifier += (game.challenges.isActive("atheism")? 0.1 : game.religion.getRUTotalLevels()/100.0);
+			}
 			self.contrastEngineModifier = contrastEngineModifier;
 		},
 		action: function(self, game){
