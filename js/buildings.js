@@ -2241,10 +2241,11 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game){
 			var zebraPreparations = 41 + game.getEffect("zebraPreparations");
-			var zebrasMax = game.resPool.get("zebras").maxValue;
-			var difference =  zebrasMax - zebraPreparations * 0.75;
+			var achievableZebras = game.ironWill?
+			game.resPool.get("zebras").maxValue : game.resPool.get("zebras").value ;
+			var difference =  achievableZebras - zebraPreparations * 0.75;
 			if (game.workshop.getZebraUpgrade("bloodstoneInstitute").researched){
-				var unlimited = self.on * (game.ironWill? 1:0.1) * zebrasMax;
+				var unlimited = self.on * (game.ironWill? 1:0.1) * achievableZebras;
 				var limit = zebraPreparations;
 				self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(unlimited, limit) / self.on;
 			}
