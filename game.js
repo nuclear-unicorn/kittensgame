@@ -2173,7 +2173,11 @@ var EffectsManager = dojo.declare("com.nuclearunicorn.game.EffectsManager", null
 				title: $I("effectsMgr.statics.missingZebraPreparations.title"),
 				type: "fixed",
 				calculation: "nonProportional"
-			}
+			},
+            "zebraOutpostPriceRatio" : {
+                title: $I("effectsMgr.statics.zebraOutpostPriceRatio.title"),
+                type: "ratio"
+            },
 		}
 	}
 });

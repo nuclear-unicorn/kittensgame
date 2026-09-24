@@ -939,7 +939,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "concrate", val: 50 }
 		],
 		unlocks: {
-			upgrades: ["concreteWarehouses", "concreteBarns", "concreteHuts"]
+			upgrades: ["concreteWarehouses", "concreteBarns", "concreteHuts"],
+			zebraUpgrades: ["concreteOutposts"]
 		},
 		upgrades: {
 			buildings: ["barn", "warehouse", "harbor", "mint"]
@@ -2410,6 +2411,20 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			upgrades:{
 				buildings: ["zebraForge"]
 			},
+		},{
+			name: "concreteOutposts",
+			label: $I("workshop.zebraUpgrade.concreteOutposts.label"),
+			description: $I("workshop.zebraUpgrade.concreteOutposts.desc"),
+			effects: {
+				"zebraOutpostPriceRatio" : -0.1
+			},
+			prices:[
+				{ name : "titanium", val: 3000 },
+				{ name : "science", val: 125000 },
+				{ name : "concrate", val: 50 },
+				{ name : "bloodstone", val: 100 },
+				{ name : "tMythril", val: 75 }
+			],
 		},
 		//resources:
 		//tMythril
