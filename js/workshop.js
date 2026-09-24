@@ -2356,6 +2356,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			label: $I("workshop.zebraUpgrade.darkRevolution.label"),
 			description: $I("workshop.zebraUpgrade.darkRevolution.desc"),
 			effects: {
+				"explorerAtk": 2
 			},
 			prices:[
 				{ name : "bloodstone", val: 15 },
@@ -2372,6 +2373,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			label: $I("workshop.zebraUpgrade.darkBrew.label"),
 			description: $I("workshop.zebraUpgrade.darkBrew.desc"),
 			effects: {
+				"explorerDef": 2
 			},
 			prices:[
 				{ name : "bloodstone", val: 1 },
@@ -2384,6 +2386,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			description: $I("workshop.zebraUpgrade.zebraTrappers.desc"),
 			effects: {
 				"preparationRatio": 1,
+				"explorerDef": 3
 			},
 			prices:[
 				{ name : "science", val: 1000 },
@@ -2401,6 +2404,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			label: $I("workshop.zebraUpgrade.reforgedOutposts.label"),
 			description: $I("workshop.zebraUpgrade.reforgedOutposts.desc"),
 			effects: {
+				"explorerAtk": 5,
+				"explorerDef": 5
 			},
 			prices:[
 				{ name : "science", val: 1500 },
