@@ -1310,10 +1310,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		}
     }, {
         name: "persuasiveResearchers",
-		label: "Persuasive Researchers",
-		description: "TODO",
-        // label: $I("policy.persuasiveResearchers.label"),
-        // description: $I("policy.persuasiveResearchers.desc"),
+        label: $I("policy.persuasiveResearchers.label"),
+        description: $I("policy.persuasiveResearchers.desc"), //maybe needs changing?
         prices: [
             {name : "culture", val: 5555}
         ],
@@ -1325,10 +1323,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["spriceRoutes", "cuisineExchange"],
     },  {
         name: "spriceRoutes",
-		label: "Spice Routes",
-		description: "TODO",
-        // label: $I("policy.spriceRoutes.label"),
-        // description: $I("policy.spriceRoutes.desc"),
+        label: $I("policy.spriceRoutes.label"),
+        description: $I("policy.spriceRoutes.desc"),
         prices: [
             {name : "culture", val: 5555}
         ],
@@ -1340,10 +1336,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		blocks:["persuasiveResearchers", "universalEtiquette"]
     },  {
         name: "universalEtiquette",
-		label: "Universal Etiquette",
-		description: "TODO",
-        // label: $I("policy.universalEtiquette.label"),
-        // description: $I("policy.universalEtiquette.desc"),
+        label: $I("policy.universalEtiquette.label"),
+        description: $I("policy.universalEtiquette.desc"),
         prices: [
             {name : "culture", val: 5555}
         ],
@@ -1360,10 +1354,8 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		}
     },  {
         name: "cuisineExchange",
-		label: "Cuisine Exchange",
-		description: "TODO",
-        // label: $I("policy.cityOnAHill.label"),
-        // description: $I("policy.cityOnAHill.desc"),
+        label: $I("policy.cuisineExchange.label"),
+        description: $I("policy.cuisineExchange.desc"),
         prices: [
             {name : "culture", val: 5555}
         ],
