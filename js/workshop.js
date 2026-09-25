@@ -939,7 +939,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "concrate", val: 50 }
 		],
 		unlocks: {
-			upgrades: ["concreteWarehouses", "concreteBarns", "concreteHuts"]
+			upgrades: ["concreteWarehouses", "concreteBarns", "concreteHuts"],
+			zebraUpgrades: ["concreteOutposts"]
 		},
 		upgrades: {
 			buildings: ["barn", "warehouse", "harbor", "mint"]
@@ -2355,6 +2356,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			label: $I("workshop.zebraUpgrade.darkRevolution.label"),
 			description: $I("workshop.zebraUpgrade.darkRevolution.desc"),
 			effects: {
+				"explorerAtk": 2
 			},
 			prices:[
 				{ name : "bloodstone", val: 15 },
@@ -2371,6 +2373,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			label: $I("workshop.zebraUpgrade.darkBrew.label"),
 			description: $I("workshop.zebraUpgrade.darkBrew.desc"),
 			effects: {
+				"explorerDef": 2
 			},
 			prices:[
 				{ name : "bloodstone", val: 1 },
@@ -2383,6 +2386,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			description: $I("workshop.zebraUpgrade.zebraTrappers.desc"),
 			effects: {
 				"preparationRatio": 1,
+				"explorerDef": 3
 			},
 			prices:[
 				{ name : "science", val: 1000 },
@@ -2400,6 +2404,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			label: $I("workshop.zebraUpgrade.reforgedOutposts.label"),
 			description: $I("workshop.zebraUpgrade.reforgedOutposts.desc"),
 			effects: {
+				"explorerAtk": 5,
+				"explorerDef": 5
 			},
 			prices:[
 				{ name : "science", val: 1500 },
@@ -2410,6 +2416,20 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			upgrades:{
 				buildings: ["zebraForge"]
 			},
+		},{
+			name: "concreteOutposts",
+			label: $I("workshop.zebraUpgrade.concreteOutposts.label"),
+			description: $I("workshop.zebraUpgrade.concreteOutposts.desc"),
+			effects: {
+				"zebraOutpostPriceRatio" : -0.1
+			},
+			prices:[
+				{ name : "titanium", val: 3000 },
+				{ name : "science", val: 125000 },
+				{ name : "concrate", val: 50 },
+				{ name : "bloodstone", val: 100 },
+				{ name : "tMythril", val: 75 }
+			],
 		},
 		//resources:
 		//tMythril
@@ -2424,6 +2444,27 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			],
 			upgrades:{
 				buildings: ["ivoryTemple"]
+			},
+			unlocks: {
+				zebraUpgrades: ["contrastEngine"]
+			}
+		},
+		{
+			name: "contrastEngine",
+			label: $I("workshop.zebraUpgrade.contrastEngine.label"),
+			description: $I("workshop.zebraUpgrade.contrastEngine.desc"),
+			prices:[
+				{ name : "tMythril", val: 5 }
+			],
+			upgrades:{
+				buildings: ["ivoryTemple"]
+			},
+			calculateEffects: function(self, game){
+				if (game.challenges.isActive("atheism")){
+					self.label = $I("workshop.zebraUpgrade.contrastEngine.desc.atheism");
+				} else {
+					self.label = $I("workshop.zebraUpgrade.contrastEngine.desc");
+				}
 			}
 		},
 		//minerals

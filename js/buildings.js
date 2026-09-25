@@ -2206,6 +2206,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				self.effects["zebraPreparations"] = game.ironWill? 1:0.1;
 				self.effects["zebraPreparations"] *= 1 + game.getEffect("preparationRatio");
 				self.jammed = false;
+			} else {
+				self.effects["zebraPreparations"] = 0;
 			}
 		},
 		jammed: false,
@@ -2241,12 +2243,13 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		},
 		calculateEffects: function(self, game){
 			var zebraPreparations = 41 + game.getEffect("zebraPreparations");
-			var zebrasMax = game.resPool.get("zebras").maxValue;
-			var difference =  zebrasMax - zebraPreparations * 0.75;
+			var achievableZebras = game.ironWill?
+			game.resPool.get("zebras").maxValue : game.resPool.get("zebras").value ;
+			var difference =  achievableZebras - zebraPreparations * 0.75;
 			if (game.workshop.getZebraUpgrade("bloodstoneInstitute").researched){
-				var unlimited = self.on * (game.ironWill? 1:0.1) * zebrasMax;
+				var unlimited = self.on * (game.ironWill? 1:0.1) * achievableZebras;
 				var limit = zebraPreparations;
-				self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(unlimited, limit) / self.on;
+				self.effects["bloodstoneRatio"] = Math.max(0.01, 0.01 * game.getLimitedDR(unlimited, limit) / self.on);
 			}
 			if (difference > 0){
 				self.effects["missingZebraPreparations"] = difference;
@@ -2349,25 +2352,30 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			if (game.workshop.getZebraUpgrade("whispers").researched && self.on > 0 && self.isAutomationEnabled == null){
 				self.isAutomationEnabled = true;
 			}
+			var contrastEngineModifier = 1;
+			if (game.workshop.getZebraUpgrade("contrastEngine").researched){
+				contrastEngineModifier += (game.challenges.isActive("atheism")? 0.1 : game.religion.getRUTotalLevels()/100.0);
+			}
+			self.contrastEngineModifier = contrastEngineModifier;
 		},
 		action: function(self, game){
 			if (self.isAutomationEnabled){
 				self.effects = {
 					"ivoryPerTickCon": -200,
-					"mineralsPerTickProd": 2,
+					"mineralsPerTickProd": 2 * self.contrastEngineModifier,
 					"titaniumPerTickCon": -2,
 					"alicornPerTickCon": -0.00002,
-					"tMythrilPerTick": 0.00005,
-					"manpowerMax": 10
+					"tMythrilPerTick": 0.00005 * self.contrastEngineModifier,
+					"manpowerMax": 10 * self.contrastEngineModifier
 				};
 			} else {
 				self.effects = {
 					"ivoryPerTickCon": -100,
-					"mineralsPerTickProd": 1,
+					"mineralsPerTickProd": 1 * self.contrastEngineModifier,
 					"titaniumPerTickCon": 0,
 					"alicornPerTickCon": 0,
 					"tMythrilPerTick": 0,
-					"manpowerMax": 10
+					"manpowerMax": 10 * self.contrastEngineModifier
 				};
 			}
 			var amt = game.resPool.getAmtDependsOnStock(

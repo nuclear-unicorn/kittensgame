@@ -668,6 +668,7 @@
     "effectsMgr.statics.woodJobRatio.title": "Woodcutter tools",
     "effectsMgr.statics.workshopTearsPricesChallenge.title": "Workshop tears prices",
     "effectsMgr.statics.zebraAppeasedGoldPenalty.title" : "Gold penalty",
+    "effectsMgr.statics.zebraOutpostPriceRatio.title": "Zebra Outpost price reduction",
     "effectsMgr.statics.zebraPreparations.title": "Zebra Preparation",
     "effectsMgr.statics.zebraRelationModifier.title" : "Zebra relations modifier",
     "effectsMgr.statics.zigguratIvoryPriceRatio.title": "Ivory price ratio",
@@ -2672,6 +2673,11 @@
     "workshop.voidReactors.desc": "Your Research Vessels are ~116% more effective",
 	"workshop.zebraUpgrade.bloodstoneInstitute.label": "Bloodstone Institute",
 	"workshop.zebraUpgrade.bloodstoneInstitute.desc": "Foggy memory of finding it. Zebra workshops increase chance to find Bloodstones in hunts",
+    "workshop.zebraUpgrade.concreteOutposts.label": "Concrete Outposts",
+    "workshop.zebraUpgrade.concreteOutposts.desc": "Reduce price ratio of Zebra Outposts by 10%",
+    "workshop.zebraUpgrade.contrastEngine.label": "Contrast Engine",
+	"workshop.zebraUpgrade.contrastEngine.desc": "Empower Ivory Temples. Each Order of the Sun level improves Ivory Temples by 1%",
+    "workshop.zebraUpgrade.contrastEngine.desc.atheism": "Ivory Temples become 10% stronger.",
     "workshop.zebraUpgrade.darkBrew.label": "Dark Brew",
     "workshop.zebraUpgrade.darkBrew.desc": "Festivals also boosts chance of zebra arrival.",
     "workshop.zebraUpgrade.darkRevolution.label": "Dark Revolution",
@@ -2685,7 +2691,7 @@
     "workshop.zebraUpgrade.reforgedOutposts.desc": "Zebra Forges are used to retrofit Outposts. Each 10 Forges provide extra preparations.",
     "workshop.zebraUpgrade.whispers.label": "Whispers",
     "workshop.zebraUpgrade.whispers.desc": "Unlock Alicorn Ascension rituals at Ivory Temples. Alicorn Ascension produces T-Mythril and increases mineral production.",
-	"workshop.zebraUpgrade.zebraTrappers.label": "zebraTrappers",
+	"workshop.zebraUpgrade.zebraTrappers.label": "Zebra Trappers",
 	"workshop.zebraUpgrade.zebraTrappers.desc": "Zebras set up traps, preparing better for the hunts",
     "workshop.zebraUpgradesPanel.label": "Zebra Upgrades"
     
