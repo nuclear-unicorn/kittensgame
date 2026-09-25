@@ -2247,7 +2247,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			if (game.workshop.getZebraUpgrade("bloodstoneInstitute").researched){
 				var unlimited = self.on * (game.ironWill? 1:0.1) * achievableZebras;
 				var limit = zebraPreparations;
-				self.effects["bloodstoneRatio"] = 0.01 * game.getLimitedDR(unlimited, limit) / self.on;
+				self.effects["bloodstoneRatio"] = Math.max(0.01, 0.01 * game.getLimitedDR(unlimited, limit) / self.on);
 			}
 			if (difference > 0){
 				self.effects["missingZebraPreparations"] = difference;
