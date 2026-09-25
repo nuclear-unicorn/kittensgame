@@ -2206,6 +2206,8 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				self.effects["zebraPreparations"] = game.ironWill? 1:0.1;
 				self.effects["zebraPreparations"] *= 1 + game.getEffect("preparationRatio");
 				self.jammed = false;
+			} else {
+				self.effects["zebraPreparations"] = 0;
 			}
 		},
 		jammed: false,
