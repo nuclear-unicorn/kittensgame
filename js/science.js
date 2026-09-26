@@ -1321,6 +1321,10 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         unlocked: false,
         blocked: false,
         blocks:["spriceRoutes", "cuisineExchange"],
+		evaluateLocks: function(game){
+			return game.prestige.getPerk("ambassadors").researched && 
+			(game.science.getPolicy("knowledgeSharing").researched || game.science.getPolicy("bigStickPolicy").researched);
+		}
     },  {
         name: "spriceRoutes",
         label: $I("policy.spriceRoutes.label"),
@@ -1333,7 +1337,11 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         },
         unlocked: false,
         blocked: false,
-		blocks:["persuasiveResearchers", "universalEtiquette"]
+		blocks:["persuasiveResearchers", "universalEtiquette"],
+		evaluateLocks: function(game){
+			return game.prestige.getPerk("ambassadors").researched && 
+			(game.science.getPolicy("knowledgeSharing").researched || game.science.getPolicy("culturalExchange").researched);
+		}
     },  {
         name: "universalEtiquette",
         label: $I("policy.universalEtiquette.label"),
@@ -1351,6 +1359,10 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["cuisineExchange", "spriceRoutes"],
 		upgrades:{
 			jobs: ["ambassador"]
+		},
+		evaluateLocks: function(game){
+			return game.prestige.getPerk("ambassadors").researched && 
+			(game.science.getPolicy("culturalExchange").researched || game.science.getPolicy("cityOnAHill").researched);
 		}
     },  {
         name: "cuisineExchange",
@@ -1367,6 +1379,10 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         blocks:["universalEtiquette", "persuasiveResearchers"],
 		upgrades:{
 			jobs: ["ambassador"]
+		},
+		evaluateLocks: function(game){
+			return game.prestige.getPerk("ambassadors").researched && 
+			(game.science.getPolicy("bigStickPolicy").researched || game.science.getPolicy("cityOnAHill").researched);
 		}
     }, {
         name: "outerSpaceTreaty",
