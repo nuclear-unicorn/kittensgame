@@ -1134,9 +1134,9 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 		if (race.name == "nagas") {
 			retVal += this.game.getEffect("nagaBlueprintTradeChance");
 		}
-		var tradeValueBlueprintsChance = this.game.getEffect("tradeValueBlueprintsChance");
-		if (tradeValueBlueprintsChance > 0){
-			retVal *= this.getTradeVolume() * tradeValueBlueprintsChance;
+		var tradeVolumeBlueprintsChance = this.game.getEffect("tradeVolumeBlueprintsChance");
+		if (tradeVolumeBlueprintsChance > 0){
+			retVal *= this.getTradeVolume() * tradeVolumeBlueprintsChance;
 		}
 		return retVal;
 	},
@@ -1145,9 +1145,9 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	getSpiceTradeChance: function(race) {
 		var embassyEffect = this.game.ironWill ? 0.0025 : 0.01;
 		var baseChance = 0.35 + this.getAmbassadorEffect("tradeSpiceChance");
-		var tradeValueSpiceChance = this.game.getEffect("tradeValueSpiceChance");
-		if (tradeValueSpiceChance > 0){
-			baseChance *= this.getTradeVolume() * tradeValueSpiceChance;
+		var tradeVolumeSpiceChance = this.game.getEffect("tradeVolumeSpiceChance");
+		if (tradeVolumeSpiceChance > 0){
+			baseChance *= this.getTradeVolume() * tradeVolumeSpiceChance;
 		}
 		return baseChance * (1 + (race.embassyPrices ?  race.embassyLevel * embassyEffect : 0));
 	},

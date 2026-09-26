@@ -1316,7 +1316,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 5555}
         ],
         effects:{
-            "tradeValueBlueprintsChance" : 0.5
+            "tradeVolumeBlueprintsChance" : 0.5
         },
         unlocked: false,
         blocked: false,
@@ -1333,7 +1333,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 5555}
         ],
         effects:{
-            "tradeValueSpiceChance" : 0.5
+            "tradeVolumeSpiceChance" : 0.5
         },
         unlocked: false,
         blocked: false,
@@ -1352,7 +1352,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
         effects:{
             "ambassadorCultureDiscount" : -0.25,
 			"cultureFromManuscripts" : 0.1,
-			"cultureFromManuscriptsFromAmbassadors": 0.0003
+			"ambassadorCultureFromManuscripts": 0.0003
         },
         unlocked: false,
         blocked: false,

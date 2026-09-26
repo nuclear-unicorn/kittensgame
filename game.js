@@ -1764,6 +1764,28 @@ var EffectsManager = dojo.declare("com.nuclearunicorn.game.EffectsManager", null
 				title: $I("effectsMgr.statics.neutralRaceEmbassyStanding.title"),
 				type: "ratio"
 			},
+			//ambassador policies
+			"tradeVolumeBlueprintsChance": {
+				title: $I("effectsMgr.statics.tradeVolumeBlueprintsChance.title"),
+				type: "ratio"
+			},
+			"tradeVolumeSpiceChance": {
+				title: $I("effectsMgr.statics.tradeVolumeSpiceChance.title"),
+				type: "ratio"
+			},
+			"ambassadorCultureDiscount": {
+				title: $I("effectsMgr.statics.ambassadorCultureDiscount.title"),
+				type: "ratio"
+			},
+			"ambassadorCultureFromManuscripts": {
+				title: $I("effectsMgr.statics.ambassadorCultureFromManuscripts.title"),
+				type: "ratio"
+			},
+			"ambassadorSpiceDiscount": {
+				title: $I("effectsMgr.statics.ambassadorSpiceDiscount.title"),
+				type: "ratio"
+			},
+
 			"raceSpecificStanding": { //Used only in tooltips to communicate with the player (has no gameplay effect)
 				title: $I("effectsMgr.statics.raceSpecificStanding.title"),
 				type: "ratio"

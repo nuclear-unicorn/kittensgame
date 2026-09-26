@@ -188,9 +188,9 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			if (game.religion.getTU("holyGenocide").val > 0) {
 				self.description += "<br>" + $I("village.job.notAffectedHG");
 			}
-			var cultureFromManuscriptsFromAmbassadors = game.getEffect("cultureFromManuscriptsFromAmbassadors");
-			if (cultureFromManuscriptsFromAmbassadors > 0){
-				self.modifiers["cultureFromManuscripts"] = cultureFromManuscriptsFromAmbassadors;
+			var ambassadorCultureFromManuscripts = game.getEffect("ambassadorCultureFromManuscripts");
+			if (ambassadorCultureFromManuscripts > 0){
+				self.modifiers["cultureFromManuscripts"] = ambassadorCultureFromManuscripts;
 			}
 			else {
 				self.modifiers["cultureFromManuscripts"] = 0.0;
