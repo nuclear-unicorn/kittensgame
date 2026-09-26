@@ -2856,7 +2856,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 		var cultureBonusRaw = Math.floor(this.game.resPool.get("manuscript").value);
 		this.effectsBase["cultureMax"] = this.game.getUnlimitedDR(cultureBonusRaw, 0.01);
-		this.effectsBase["cultureMax"] *= 1 + this.game.getEffect("cultureFromManuscripts");
+		this.effectsBase["cultureMax"] *= 1 + this.game.getEffect("cultureFromManuscripts") + this.game.diplomacy.getAmbassadorEffect("cultureFromManuscripts");
 
 		var faithFromManuscripts = this.game.getEffect("faithFromManuscripts");
 		if (faithFromManuscripts > 0) {
