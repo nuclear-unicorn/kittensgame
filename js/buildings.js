@@ -3348,6 +3348,16 @@ dojo.declare("classes.ui.btn.BuildingBtnModernController", com.nuclearunicorn.ga
 		return !this.game.opts.hideSell;
 	},
 
+	updateVisible: function(model){
+		this.inherited("updateVisible", arguments);
+		//Bonfire filter groups (see BuildingsModern.matchesActiveGroup) hide the buildings that don't match.
+		//The filter is re-evaluated with every model update, so a building appears or disappears
+		//as soon as its state changes instead of waiting for the tab to be re-rendered.
+		if (model.visible && this.controllerOpts.visibilityFilter){
+			model.visible = this.controllerOpts.visibilityFilter(model);
+		}
+	},
+
     build: function(model, opts){
 		var counter = this.inherited("build", arguments);
 		if (!counter) {
@@ -3710,6 +3720,17 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 		//Unroll the groups to their leaf buildings
 		var buildings = this.game.bld.unrollBuildingGroups(groups);
 
+		//Filter groups like "available" or "enabled" don't drop the non-matching buildings here.
+		//They are rendered hidden and the filter is re-evaluated on every update, so a building
+		//shows up as soon as it starts to match (e.g. its storage limit was raised) without
+		//having to re-render the tab.
+		var self = this;
+		var controllerOpts = {
+			visibilityFilter: function(model){
+				return self.matchesActiveGroup(model);
+			}
+		};
+
 		for (var i = 0; i < buildings.length; i++){
 			var bld = this.game.bld.getBuildingExt(buildings[i]).getMeta();
 
@@ -3721,7 +3742,7 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 					building: 		bld.name,
 					type:           "buildings",
 					twoRow:			this.twoRows,
-					controller: new classes.ui.btn.StagingBldBtnController(this.game)
+					controller: new classes.ui.btn.StagingBldBtnController(this.game, controllerOpts)
 				}, this.game);
 			} else {
 				btn = new com.nuclearunicorn.game.ui.BuildingStackableBtn({
@@ -3730,30 +3751,12 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 					building: 		bld.name,
 					type:           "buildings",
 					twoRow:			this.twoRows,
-					controller: new classes.ui.btn.BuildingBtnModernController(this.game)
+					controller: new classes.ui.btn.BuildingBtnModernController(this.game, controllerOpts)
 				}, this.game);
-			}
-			var mdl = btn.controller.fetchModel(btn.opts);
-
-			if (this.activeGroup == "available") {
-				if (mdl.resourceIsLimited) {
-					continue;
-				}
-			}
-			if (this.activeGroup == "allEnabled"){
-
-				if (!mdl.enabled){
-					continue;
-				}
-			}
-			if (this.activeGroup == "togglable"){
-				if (!mdl.togglable){
-					continue;
-				}
 			}
 
 			btn.update();
-			if (!mdl.visible){
+			if (!btn.model.visible && this.twoRows){
 				continue;	//skip invisible buttons to not make gaps in the two rows renderer
 			}
 
@@ -3765,6 +3768,24 @@ dojo.declare("com.nuclearunicorn.game.ui.tab.BuildingsModern", com.nuclearunicor
 						this.getElementContainer(i) : groupContainer;
 			this.children[i].render(buttonContainer);
 		}
+	},
+
+	/**
+	 * Returns true if a building belongs to the active group.
+	 * Filter groups are evaluated against the (freshly fetched) button model,
+	 * so the result can change from one update to the next, see renderActiveGroup.
+	 */
+	matchesActiveGroup: function(model){
+		switch (this.activeGroup){
+			case "available":
+				return !model.resourceIsLimited;
+			case "allEnabled":
+				return Boolean(model.enabled);
+			case "togglable":
+				//model.togglable is only set after updateVisible ran, read the metadata directly
+				return Boolean(model.metadata.togglable);
+		}
+		return true;
 	},
 
 	addCoreBtns: function(container){
