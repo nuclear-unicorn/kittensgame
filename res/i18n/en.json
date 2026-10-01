@@ -1182,6 +1182,7 @@
     "religion.tu.blackRadiance.label": "Black Radiance",
     "religion.tu.blackRadiance.desc": "Every % of BLS meter will very slightly increase alicorn corruption rate",
     "religion.tu.blackRadiance.flavor": "Like a rainbow in the dark",
+    "religion.tu.blackRadiance.effectValue": "+{0}% (+{1}% at next level)",
     "religion.tu.blazar.label": "Blazar",
     "religion.tu.blazar.desc": "Improve time-related structures",
     "religion.tu.blazar.flavor": "Tiger tiger burning bright.",

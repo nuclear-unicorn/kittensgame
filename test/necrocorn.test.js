@@ -148,6 +148,64 @@ test("Black Radiances", () => {
 	expect(game.getResourcePerDay("necrocorn")).toBeCloseTo(74 / 1e5 * blsBoost, PRECISION);
 });
 
+test("Black Radiance tooltip agrees with the necrocorn breakdown", () => {
+	var religion = game.religion;
+	religion.getZU("marker").on = religion.getZU("marker").val = 50;
+	religion.getTU("blackRadiance").on = religion.getTU("blackRadiance").val = 1;
+	game.resPool.get("sorrow").value = 12;
+	game.resPool.addResEvent("alicorn", 100);
+	game.upgrade({ "zigguratUpgrades": ["marker"], "transcendenceUpgrades": ["blackRadiance"] });
+
+	//The raw coefficient must never be shown as a percentage: at 1 level it is 0.12%,
+	//while the production it buys at 12 BLS is +12%.
+	expect(game.getEffect("blsCorruptionRatio")).toBeCloseTo(12 / 10000, 8);
+	expect(game.getEffectDisplayParams("blsCorruptionRatio", game.getEffect("blsCorruptionRatio"), false)).toBeNull();
+
+	expect(religion.getBlackRadianceBonus()).toBeCloseTo(0.12, 8);
+	expect(religion.getBlackRadianceBonus(4)).toBeCloseTo(Math.sqrt(4 * 12 * 12 / 10000), 8);
+
+	//The line in the necrocorn/day breakdown reports that same bonus.
+	religion.corruptionCached = religion.getCorruptionEffects();
+	var stack = game.getResourcePerDayStack("necrocorn");
+	var radianceLine = null;
+	for (var i = 0; i < stack.length; i += 1) {
+		if (!Array.isArray(stack[i])) { continue; }
+		for (var j = 0; j < stack[i].length; j += 1) {
+			if (stack[i][j].name === $I("res.stack.corruptionSorrowBonus")) {
+				radianceLine = stack[i][j];
+			}
+		}
+	}
+	expect(radianceLine).not.toBeNull();
+	expect(radianceLine.value).toBeCloseTo(religion.getBlackRadianceBonus(), 8);
+
+	//And so does the button's own tooltip.  The $I mock in test/setup.js drops its
+	//arguments, so substitute them here to see the numbers the player would read.
+	var i18nMock = global.$I;
+	global.$I = function(key, args) {
+		var msg = "$" + key + "$";
+		for (var k = 0; args && k < args.length; k += 1) {
+			msg += "|" + args[k];
+		}
+		return msg;
+	};
+	var model;
+	try {
+		var btn = new com.nuclearunicorn.game.ui.BuildingStackableBtn({
+			id: "blackRadiance",
+			name: religion.getTU("blackRadiance").label,
+			controller: new classes.ui.TranscendenceBtnController(game)
+		}, game);
+		model = btn.controller.fetchModel(btn.opts);
+		btn.controller.fetchExtendedModel(model);
+	} finally {
+		global.$I = i18nMock;
+	}
+	expect(model.effectModels).toHaveLength(1);
+	//"+12% (+17% at next level)": what we have now, then what one more level would give.
+	expect(model.effectModels[0].displayEffectValue).toBe("$religion.tu.blackRadiance.effectValue$|12|17");
+});
+
 var fastForwardTestCases = [
 	//Test nothing
 	{ startDeficit: 1.7, startCorruption: 0.3, startNCorns: 12, pactsActive: 0, threshold: 0, markers: 0,
