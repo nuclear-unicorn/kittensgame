@@ -1561,7 +1561,10 @@ var EffectsManager = dojo.declare("com.nuclearunicorn.game.EffectsManager", null
 
 			"blsCorruptionRatio": {
 				title: $I("effectsMgr.statics.blsCorruptionRatio.title"),
-				type: "ratio"
+				//Hidden because this is a coefficient inside a square root, not a bonus:
+				//at 0.12% per level it renders as "+0.12%" while the necrocorn production
+				//it buys is ~100x that.  TranscendenceBtnController shows the real bonus.
+				type: "hidden"
 			},
 
 			"baseMetalMaxRatio": {

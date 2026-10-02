@@ -244,8 +244,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		//Black Radiances
 		effectsList.push({
 			label: $I("res.stack.corruptionSorrowBonus"),
-			//30% bls * 20 Radiance should yield ~ 50-75% boost rate which is laughable but we can always buff it
-			value: 1 + Math.sqrt(this.game.resPool.get("sorrow").value * this.game.getEffect("blsCorruptionRatio")),
+			value: 1 + this.getBlackRadianceBonus(),
 			behavior: "multiplicative"
 		});
 		//Downside of the policy, "Feeding Frenzy"
@@ -290,6 +289,16 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			}
 		}
 		return effectsList;
+	},
+	/**
+	 * The necrocorn production bonus granted by Black Radiances, as a ratio (0.12 means +12%).
+	 * blsCorruptionRatio is only a coefficient inside the square root, so its own value is
+	 * meaningless on its own; this is the only form of the effect worth showing a player.
+	 * 30% bls * 20 Radiance should yield ~ 50-75% boost rate which is laughable but we can always buff it
+	 * @returns {number}
+	 */
+	getBlackRadianceBonus: function(){
+		return Math.sqrt(this.game.resPool.get("sorrow").value * this.game.getEffect("blsCorruptionRatio"));
 	},
 	/**
 	 * Gets the amount of necrocorns corrupted per tick.
@@ -1996,7 +2005,23 @@ dojo.declare("classes.ui.TranscendenceBtnController", com.nuclearunicorn.game.ui
             model.metaCached = this.game.religion.getTU(model.options.id);
         }
         return model.metaCached;
-    }
+    },
+
+	//Black Radiance hides its raw blsCorruptionRatio, because that number is a coefficient
+	//inside a square root rather than a percentage of necrocorn production.  Put the bonus
+	//it actually grants in its place, so it agrees with the necrocorn/day breakdown.
+	updateEffectModels: function(model){
+		this.inherited(arguments);
+		if (model.metadata.name != "blackRadiance"){
+			return;
+		}
+		model.effectModels.push({
+			displayEffectName: $I("effectsMgr.statics.blsCorruptionRatio.title"),
+			//Rounded the same way the necrocorn/day breakdown rounds its own percentages,
+			//so hovering the two places never shows two different numbers.
+			displayEffectValue: (this.game.religion.getBlackRadianceBonus() * 100).toFixed() + "%"
+		});
+	}
 });
 
 dojo.declare("com.nuclearunicorn.game.ui.PraiseBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {
