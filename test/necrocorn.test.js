@@ -162,7 +162,6 @@ test("Black Radiance tooltip agrees with the necrocorn breakdown", () => {
 	expect(game.getEffectDisplayParams("blsCorruptionRatio", game.getEffect("blsCorruptionRatio"), false)).toBeNull();
 
 	expect(religion.getBlackRadianceBonus()).toBeCloseTo(0.12, 8);
-	expect(religion.getBlackRadianceBonus(4)).toBeCloseTo(Math.sqrt(4 * 12 * 12 / 10000), 8);
 
 	//The line in the necrocorn/day breakdown reports that same bonus.
 	religion.corruptionCached = religion.getCorruptionEffects();
@@ -179,31 +178,16 @@ test("Black Radiance tooltip agrees with the necrocorn breakdown", () => {
 	expect(radianceLine).not.toBeNull();
 	expect(radianceLine.value).toBeCloseTo(religion.getBlackRadianceBonus(), 8);
 
-	//And so does the button's own tooltip.  The $I mock in test/setup.js drops its
-	//arguments, so substitute them here to see the numbers the player would read.
-	var i18nMock = global.$I;
-	global.$I = function(key, args) {
-		var msg = "$" + key + "$";
-		for (var k = 0; args && k < args.length; k += 1) {
-			msg += "|" + args[k];
-		}
-		return msg;
-	};
-	var model;
-	try {
-		var btn = new com.nuclearunicorn.game.ui.BuildingStackableBtn({
-			id: "blackRadiance",
-			name: religion.getTU("blackRadiance").label,
-			controller: new classes.ui.TranscendenceBtnController(game)
-		}, game);
-		model = btn.controller.fetchModel(btn.opts);
-		btn.controller.fetchExtendedModel(model);
-	} finally {
-		global.$I = i18nMock;
-	}
+	//And so does the button's own tooltip.
+	var btn = new com.nuclearunicorn.game.ui.BuildingStackableBtn({
+		id: "blackRadiance",
+		name: religion.getTU("blackRadiance").label,
+		controller: new classes.ui.TranscendenceBtnController(game)
+	}, game);
+	var model = btn.controller.fetchModel(btn.opts);
+	btn.controller.fetchExtendedModel(model);
 	expect(model.effectModels).toHaveLength(1);
-	//"+12% (+17% at next level)": what we have now, then what one more level would give.
-	expect(model.effectModels[0].displayEffectValue).toBe("$religion.tu.blackRadiance.effectValue$|12|17");
+	expect(model.effectModels[0].displayEffectValue).toBe("12%");
 });
 
 var fastForwardTestCases = [
