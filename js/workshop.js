@@ -805,6 +805,22 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "alloy", val: 250 }
 		]
 	},{
+		name: "topCatDiplomacy",
+		label: $I("workshop.topCatDiplomacy.label"),
+		description: $I("workshop.topCatDiplomacy.desc"),
+		effects: {
+			"ambassadorBoostPerRank": 0.1,
+		},
+		prices: [
+			{ name : "gold",     val: 1000 },
+			{ name : "manpower", val: 1000 },
+			{ name : "culture",  val: 1000 }
+		],
+		evaluateLocks: function(game){
+			return game.prestige.getPerk("ambassadors").researched && game.science.get("currency").researched;
+		},
+		//upgrades: not required due to how jobBoostPerRank is used
+	}, {
 		name: "caravanserai",
 		label: $I("workshop.caravanserai.label"),
 		description: $I("workshop.caravanserai.desc"),

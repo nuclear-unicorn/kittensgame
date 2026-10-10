@@ -147,7 +147,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			buildings: ["tradepost"],
             policies: ["diplomacy", "isolationism"],
-			upgrades: ["goldOre"]
+			upgrades: ["goldOre", "topCatDiplomacy"]
 		}
 	}, {
 		name: "writing",

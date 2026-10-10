@@ -196,7 +196,8 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		researched: false,
 		unlocks: {
 			"jobs": ["ambassador"],
-			"perks": ["treaties"]
+			"perks": ["treaties"],
+			"upgrades": ["topCatDiplomacy"]
 		}
 	},{
 		name: "treaties",
@@ -206,8 +207,7 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		unlocked: false,
 		researched: false,
 		effects: {
-			"embassiesPerAmbassadorSlot": 30,
-			"ambassadorBoostPerRank": 0.1
+			"embassiesPerAmbassadorSlot": 30
 		},
 		calculateEffects: function(self, game) {
 			self.description = $I("prestige.treaties.desc", [
