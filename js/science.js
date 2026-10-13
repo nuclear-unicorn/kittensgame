@@ -513,7 +513,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			buildings: ["aiCore"],
 			tech: ["quantumCryptography"],
-			upgrades: ["neuralNetworks", "aiEngineers", "machineLearning"]
+			upgrades: ["neuralNetworks", "aiEngineers", "machineLearning", "selfDrivingHarvester"]
 		}
 	}, {
 		name: "quantumCryptography",
@@ -580,7 +580,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name: 	"blueprint", val: 150}
         ],
         unlocks: {
-            upgrades: [ "factoryProcessing" ],
+            upgrades: [ "factoryProcessing", "solventBath" ],
             crafts: ["kerosene"]
         }
     }, {
@@ -647,7 +647,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			{name: 	"blueprint", val: 350}
 		],
 		unlocks: {
-			upgrades: ["eludiumCracker", "eludiumReflectors", "eludiumHuts", "mWReactor", "freightfulExchange" /*, "eludiumDrill"*/],
+			upgrades: ["eludiumCracker", "eludiumReflectors", "eludiumHuts", "mWReactor", "freightfulExchange", "eludiumCentrifuge" /*, "eludiumDrill"*/],
 			crafts: ["eludium"],
 			stages: [{bld:"warehouse", stage:1}],
 		}

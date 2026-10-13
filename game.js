@@ -1227,6 +1227,10 @@ var EffectsManager = dojo.declare("com.nuclearunicorn.game.EffectsManager", null
                 title: $I("effectsMgr.statics.crackerRatio.title"),
                 type: "ratio"
             },
+		  "spiceRefineryRatio": {
+			title: $I("effectsMgr.statics.spiceRefineryRatio.title"),
+			type: "ratio"
+		  },
 
             "factoryRefineRatio" : {
                 title: $I("effectsMgr.statics.factoryRefineRatio.title"),
