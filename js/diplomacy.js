@@ -595,6 +595,9 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			}
 
 			var race = this.unlockRandomRace();
+			this.game.upgrade({
+				jobs: ["ambassador"]
+			});
 
 			this.game.diplomacyTab.visible = true;
 			this.game.render();
@@ -1189,6 +1192,9 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 
 			ncorns.value -= amt;
 			this.game.msg($I("trade.msg.elders.pleased"), "notice");
+			this.game.upgrade({
+				jobs: ["ambassador"]
+			});
 		} else {
 			ncorns.value = 0;
 			this.game.msg($I("trade.msg.elders.displeased"), "notice");
@@ -1907,6 +1913,9 @@ dojo.declare("classes.trade.ui.SendExplorersButtonController", com.nuclearunicor
 		var race = dip.unlockRandomRace();
 
 		if (race){
+			this.game.upgrade({
+				jobs: ["ambassador"]
+			});
 			this.game.msg($I("trade.new.civ"), "notice");
 		} else {
 
