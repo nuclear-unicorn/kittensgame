@@ -491,7 +491,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 			},
 			calculateEffects: function(self, game){
 				self.effects = {
-					"spicePerTickAutoprodSpace": 0.025
+					"spicePerTickAutoprodSpace": 0.025 * (1 + game.getEffect("spiceRefineryRatio"))
 				};
 			},
 			unlockScheme: {

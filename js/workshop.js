@@ -805,6 +805,22 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "alloy", val: 250 }
 		]
 	},{
+		name: "topCatDiplomacy",
+		label: $I("workshop.topCatDiplomacy.label"),
+		description: $I("workshop.topCatDiplomacy.desc"),
+		effects: {
+			"ambassadorBoostPerRank": 0.1,
+		},
+		prices: [
+			{ name : "gold",     val: 1000 },
+			{ name : "manpower", val: 1000 },
+			{ name : "culture",  val: 1000 }
+		],
+		evaluateLocks: function(game){
+			return game.prestige.getPerk("ambassadors").researched && game.science.get("currency").researched;
+		},
+		//upgrades: not required due to how jobBoostPerRank is used
+	}, {
 		name: "caravanserai",
 		label: $I("workshop.caravanserai.label"),
 		description: $I("workshop.caravanserai.desc"),
@@ -1959,8 +1975,58 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		upgrades: {
 			spaceBuilding: ["planetCracker"]
 		}
-	},
-	{
+	}, {
+		name: "selfDrivingHarvester",
+		label: $I("workshop.selfDrivingHarvester.label"),
+		description: $I("workshop.selfDrivingHarvester.desc"),
+		effects: {
+			"spiceRefineryRatio": 0.15
+		},
+		prices: [
+			{ name: "science", val: 300000 },
+			{ name: "gear", val: 3000 },
+			{ name: "microchip", val: 750 },
+			{ name: "alloy", val: 10000 },
+			{ name: "unobtainium", val: 300 }
+		],
+		upgrades: {
+			spaceBuilding: ["spiceRefinery"]
+		}
+	}, {
+		name: "eludiumCentrifuge",
+		label: $I("workshop.eludiumCentrifuge.label"),
+		description: $I("workshop.eludiumCentrifuge.desc"),
+		effects: {
+			"spiceRefineryRatio": 0.2
+		},
+		prices: [
+			{ name: "science", val: 450000 },
+			{ name: "eludium", val: 225 },
+			{ name: "gear", val: 4500 },
+			{ name: "microchip", val: 500 },
+			{ name: "blueprint", val: 100 },
+			{ name: "concrate", val: 850 }
+		],
+		upgrades: {
+			spaceBuilding: ["spiceRefinery"]
+		}
+	}, {
+		name: "solventBath",
+		label: $I("workshop.solventBath.label"),
+		description: $I("workshop.solventBath.desc"),
+		effects: {
+			"spiceRefineryRatio": 0.25
+		},
+		prices: [
+			{ name: "science", val: 675000 },
+			{ name: "gear", val: 6750 },
+			{ name: "alloy", val: 8000 },
+			{ name: "oil", val: 80000 } //Petroleum-based solvent
+		],
+		upgrades: {
+			spaceBuilding: ["spiceRefinery"]
+		}
+	}, {
 		name: "thoriumEngine",
 		label: $I("workshop.thoriumEngine.label"),
 		description: $I("workshop.thoriumEngine.desc"),

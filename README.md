@@ -12,7 +12,7 @@
     * [General Design Principles](#general-design-principles)
     * [Consistency](#consistency)
     * [Themes](#themes)
-    * [Translation and Localization]
+    * [Translation and Localization](#translation-and-localization)
     * [LINKS](#links)
 
 ## General Information

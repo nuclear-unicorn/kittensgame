@@ -1227,6 +1227,10 @@ var EffectsManager = dojo.declare("com.nuclearunicorn.game.EffectsManager", null
                 title: $I("effectsMgr.statics.crackerRatio.title"),
                 type: "ratio"
             },
+		  "spiceRefineryRatio": {
+			title: $I("effectsMgr.statics.spiceRefineryRatio.title"),
+			type: "ratio"
+		  },
 
             "factoryRefineRatio" : {
                 title: $I("effectsMgr.statics.factoryRefineRatio.title"),
@@ -4284,7 +4288,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		});
 
 		// BIOME EXPLORATION
-		if (res.name == "manpower"){
+		if (res.name == "manpower" && this.village.map.currentBiome){
 			var biome = this.village.getBiome(this.village.map.currentBiome);
 			if (biome){
 				var exploreCost = this.village.map.getExplorationCost();
@@ -4646,7 +4650,8 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 	getResourcePerTickConvertion: function(resName) {
 		return this.fixFloatPointNumber(this.getEffect(resName + "PerTickCon") -
 			/*use subtraction because getAmbassadorEffect returns positive value*/
-			this.diplomacy.getAmbassadorEffect(resName + "ConsumptionAmbassadors"));
+			this.diplomacy.getAmbassadorEffect(resName + "ConsumptionAmbassadors"))
+			- ((resName == "manpower" && this.village.map.currentBiome) ? this.village.map.getExplorationCost() : 0);
 	},
 
 	/**

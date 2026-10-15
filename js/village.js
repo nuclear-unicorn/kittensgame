@@ -169,9 +169,9 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			"tradeBlueprintChance": 0.00008,
 			"tradeSpiceChance":     0.00015,
 			"tradeNormalResChance": 0.00004,
-			"cultureConsumptionAmbassadors": 20,
-			"spiceConsumptionAmbassadors": 0.8,
-			"cultureFromManuscripts": 0.0
+			"cultureConsumptionAmbassadors": 100,
+			"spiceConsumptionAmbassadors": 0.6
+      "cultureFromManuscripts": 0.0
 		},
 		lackResConvert: false,
 		calculateEffects: function(self, game) {
@@ -196,13 +196,15 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 				self.modifiers["cultureFromManuscripts"] = 0.0;
 			}
 			//--- UPDATE RESOURCE CONSUMPTION
+			var BASE_CULTURE_CONSUMPTION = 100;
+			var BASE_SPICE_CONSUMPTION = 0.6;
 			if (self.value > 5) {
 				var scalingBase = self.value - 5;
-				self.modifiers["cultureConsumptionAmbassadors"] = 20 * (1 + 0.025*scalingBase); //Quadratic scaling
-				self.modifiers["spiceConsumptionAmbassadors"] = 0.8 * (1 + 0.001*scalingBase*scalingBase); //Cubic scaling
+				self.modifiers["cultureConsumptionAmbassadors"] = BASE_CULTURE_CONSUMPTION * (1 + 0.025*scalingBase); //Quadratic scaling
+				self.modifiers["spiceConsumptionAmbassadors"] = BASE_SPICE_CONSUMPTION * (1 + 0.001*scalingBase*scalingBase); //Cubic scaling
 			} else {
-				self.modifiers["cultureConsumptionAmbassadors"] = 20;
-				self.modifiers["spiceConsumptionAmbassadors"] = 0.8;
+				self.modifiers["cultureConsumptionAmbassadors"] = BASE_CULTURE_CONSUMPTION;
+				self.modifiers["spiceConsumptionAmbassadors"] = BASE_SPICE_CONSUMPTION;
 			}
 			var cultureDiscount = 1 + game.getLimitedDR(game.getEffect("ambassadorCultureDiscount"), 1); //prevent -100% discounts, might be premature guarding
 			self.modifiers["cultureConsumptionAmbassadors"] *= cultureDiscount;
