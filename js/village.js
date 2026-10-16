@@ -170,8 +170,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			"tradeSpiceChance":     0.00015,
 			"tradeNormalResChance": 0.00004,
 			"cultureConsumptionAmbassadors": 100,
-			"spiceConsumptionAmbassadors": 0.6
-      "cultureFromManuscripts": 0.0
+			"spiceConsumptionAmbassadors": 0.6,
+      		"cultureFromManuscripts": 0.0
 		},
 		lackResConvert: false,
 		calculateEffects: function(self, game) {

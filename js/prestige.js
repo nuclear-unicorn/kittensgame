@@ -197,7 +197,7 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		unlocks: {
 			"jobs": ["ambassador"],
 			"perks": ["treaties"],
-			"policies": ["persuasiveResearchers", "spriceRoutes", "universalEtiquette", "cuisineExchange"]
+			"policies": ["persuasiveResearchers", "spriceRoutes", "universalEtiquette", "cuisineExchange"],
 			"upgrades": ["topCatDiplomacy"]
 		}
 	},{
