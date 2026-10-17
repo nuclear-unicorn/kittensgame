@@ -170,7 +170,8 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			"tradeSpiceChance":     0.00015,
 			"tradeNormalResChance": 0.00004,
 			"cultureConsumptionAmbassadors": 100,
-			"spiceConsumptionAmbassadors": 0.6
+			"spiceConsumptionAmbassadors": 0.6,
+      		"cultureFromManuscripts": 0.0
 		},
 		lackResConvert: false,
 		calculateEffects: function(self, game) {
@@ -187,7 +188,13 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 			if (game.religion.getTU("holyGenocide").val > 0) {
 				self.description += "<br>" + $I("village.job.notAffectedHG");
 			}
-
+			var ambassadorCultureFromManuscripts = game.getEffect("ambassadorCultureFromManuscripts");
+			if (ambassadorCultureFromManuscripts > 0){
+				self.modifiers["cultureFromManuscripts"] = ambassadorCultureFromManuscripts;
+			}
+			else {
+				self.modifiers["cultureFromManuscripts"] = 0.0;
+			}
 			//--- UPDATE RESOURCE CONSUMPTION
 			var BASE_CULTURE_CONSUMPTION = 100;
 			var BASE_SPICE_CONSUMPTION = 0.6;
@@ -199,6 +206,11 @@ dojo.declare("classes.managers.VillageManager", com.nuclearunicorn.core.TabManag
 				self.modifiers["cultureConsumptionAmbassadors"] = BASE_CULTURE_CONSUMPTION;
 				self.modifiers["spiceConsumptionAmbassadors"] = BASE_SPICE_CONSUMPTION;
 			}
+			var cultureDiscount = 1 + game.getLimitedDR(game.getEffect("ambassadorCultureDiscount"), 1); //prevent -100% discounts, might be premature guarding
+			self.modifiers["cultureConsumptionAmbassadors"] *= cultureDiscount;
+
+			var spiceDiscount = 1 + game.getLimitedDR(game.getEffect("ambassadorSpiceDiscount"), 1); //prevent -100% discounts, might be premature guarding
+			self.modifiers["spiceConsumptionAmbassadors"] *= spiceDiscount;
 		},
 		value: 0,
 		unlocked: false
