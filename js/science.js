@@ -1311,7 +1311,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
     }, {
         name: "persuasiveResearchers",
         label: $I("policy.persuasiveResearchers.label"),
-        description: $I("policy.persuasiveResearchers.desc"), //maybe needs changing?
+        description: $I("policy.persuasiveResearchers.desc"),
         prices: [
             {name : "culture", val: 5555}
         ],
@@ -1350,7 +1350,6 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 5555}
         ],
         effects:{
-            "ambassadorCultureDiscount" : -0.25,
 			"cultureFromManuscripts" : 0.1,
 			"ambassadorCultureFromManuscripts": 0.0003
         },
@@ -1372,6 +1371,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
             {name : "culture", val: 5555}
         ],
         effects:{
+			"ambassadorCultureDiscount" : -0.25,
             "ambassadorSpiceDiscount" : -0.5
         },
         unlocked: false,
