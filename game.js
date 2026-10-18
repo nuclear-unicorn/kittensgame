@@ -5978,7 +5978,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			};
 		this.upgrade({ buildings: ["warehouse"], spaceBuilding: ["hydroponics"]});
 		this.upgrade(metaKeys);
-		this.upgrade({policies: ["authocracy"]});
+		this.upgrade({policies: ["authocracy", "feedingFrenzy"]});
 	},
 
 	/**
