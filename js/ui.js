@@ -343,6 +343,12 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
                     this.game.ui.render();
                 }
             } else if (!isInputElement && keybind && keybind.name != this.game.ui.activeTabId ) {
+                if (event.metaKey) {
+                    //Suppress tab-changing hotkeys if the meta key is pressed.
+                    //This is a hack to ensure Windows operating-system-level
+                    // keyboard shortcuts don't trigger game hotkeys.
+                    return;
+                }
                 // If a keybound is found and the tab isn't current
                 for (var i = 0; i < this.game.tabs.length; i++){
                     if (this.game.tabs[i].tabId === keybind.name && this.game.tabs[i].visible){
