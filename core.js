@@ -1415,12 +1415,6 @@ var ButtonModernController = dojo.declare("com.nuclearunicorn.game.ui.ButtonMode
 		for (var effectName in effectsList) {
 			var effectMeta = this.game.getEffectMeta(effectName);
 			var effectValue = displayEffects[effectName];
-			if (!isEffectMultiplierEnabled && effectMeta.calculation !== "nonProportional") {
-				var nextEffectValue = this.getNextEffectValue(model, effectName);
-				if (nextEffectValue) {
-					effectValue = nextEffectValue * (model.metadata.on + 1) - effectValue * model.metadata.on;
-				}
-			}
 
 			var displayParams = this.game.getEffectDisplayParams(effectName, effectValue, false /*showIfZero*/);
 			//The function might have returned null if this is the type of effect that's supposed to be hidden.
