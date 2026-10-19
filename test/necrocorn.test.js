@@ -148,6 +148,15 @@ test("Black Radiances", () => {
 	expect(game.getResourcePerDay("necrocorn")).toBeCloseTo(74 / 1e5 * blsBoost, PRECISION);
 });
 
+test("Black Radiance button should show its necrocorn bonus", () => {
+	game.religion.getTU("blackRadiance").on = game.religion.getTU("blackRadiance").val = 1;
+	game.resPool.get("sorrow").value = 12;
+	game.upgrade({ "transcendenceUpgrades": ["blackRadiance"] });
+
+	let controller = new classes.ui.TranscendenceBtnController(game);
+	expect(controller.fetchModel({ id: "blackRadiance" }).name).toContain("[+12%]");
+});
+
 var fastForwardTestCases = [
 	//Test nothing
 	{ startDeficit: 1.7, startCorruption: 0.3, startNCorns: 12, pactsActive: 0, threshold: 0, markers: 0,

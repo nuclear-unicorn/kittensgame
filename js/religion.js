@@ -1996,7 +1996,16 @@ dojo.declare("classes.ui.TranscendenceBtnController", com.nuclearunicorn.game.ui
             model.metaCached = this.game.religion.getTU(model.options.id);
         }
         return model.metaCached;
-    }
+    },
+
+	getName: function(model){
+		var name = this.inherited(arguments);
+		if (model.metadata.name == "blackRadiance" && model.metadata.on){
+			var bonus = Math.sqrt(this.game.resPool.get("sorrow").value * this.game.getEffect("blsCorruptionRatio"));
+			name += "<div class=\"progress\">[+" + this.game.getDisplayValueExt(bonus * 100, false, false, 0) + "%]</div>";
+		}
+		return name;
+	}
 });
 
 dojo.declare("com.nuclearunicorn.game.ui.PraiseBtnController", com.nuclearunicorn.game.ui.ButtonModernController, {

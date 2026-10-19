@@ -1567,7 +1567,7 @@ var EffectsManager = dojo.declare("com.nuclearunicorn.game.EffectsManager", null
 
 			"blsCorruptionRatio": {
 				title: $I("effectsMgr.statics.blsCorruptionRatio.title"),
-				type: "ratio"
+				type: "hidden"
 			},
 
 			"baseMetalMaxRatio": {
