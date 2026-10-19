@@ -968,29 +968,11 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 	},
 
 	updateEnabled: function(){
-		if ( this.domNode ){
-			var hasClass = dojo.hasClass(this.domNode, "disabled");
-			var hasClassLimited = dojo.hasClass(this.domNode, "limited");
-			if (this.model.enabled){
-				if (hasClass){
-					dojo.removeClass(this.domNode, "disabled");
-				}
-				if (hasClassLimited){
-					dojo.removeClass(this.domNode, "limited");
-				}
-			} else {
-				if (!hasClass){
-					dojo.addClass(this.domNode, "disabled");
-				}
-				if (!hasClassLimited && this.model.resourceIsLimited){
-					dojo.addClass(this.domNode, "limited");
-				}
-			}			
+		if (!this.domNode){
+			return;
 		}
-		//---------------------------------------------------
-		//		a bit hackish place for price highlight
-		//---------------------------------------------------
-		//---- now highlight some stuff in vanilla js way ---
+		dojo.toggleClass(this.domNode, "disabled", !this.model.enabled);
+		dojo.toggleClass(this.domNode, "limited", !this.model.enabled && !!this.model.resourceIsLimited);
 	},
 
 	update: function() {
@@ -2449,6 +2431,9 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", Buildi
 dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtn", com.nuclearunicorn.game.ui.BuildingBtn, {
 	onClick: function(event){
 		this.inherited(arguments);
+		//recalculate storage caps before re-rendering, or the new buttons see stale limits
+		this.game.updateCaches();
+		this.game.resPool.updateMaxValueAll();
 		this.game.render();
 	}
 
