@@ -1242,3 +1242,21 @@ test("Toggling hodl mode must liquidate b-coin at the pre-switch price", () => {
     expect(game.resPool.get("blackcoin").value).toBe(0);
     expect(game.resPool.get("relic").value).toBe(1e6);
 });
+test("Buying a building should update storage caps before the tab is re-rendered", () => {
+    game.bld.get("barn").unlocked = true;
+    let wood = game.resPool.get("wood");
+    wood.value = 1000;
+    let maxBefore = wood.maxValue;
+
+    let btn = new com.nuclearunicorn.game.ui.BuildingStackableBtn({
+        building: "barn",
+        controller: new classes.ui.btn.BuildingBtnModernController(game)
+    }, game);
+    btn.animate = jest.fn();
+    btn.update();
+
+    let maxOnRender;
+    game.render = jest.fn(() => maxOnRender = wood.maxValue);
+    btn.onClick({});
+    expect(maxOnRender).toBeGreaterThan(maxBefore);
+});
