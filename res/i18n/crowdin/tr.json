@@ -323,6 +323,7 @@
     "challendge.pacifism.effect.desc": "Ticaret merkezlerinin sayısına bağlı olarak ticaretin gelişir.",
     "challendge.postApocalypse.label": "Kıyamet Sonrası",
     "challendge.postApocalypse.desc": "Aşırı kirliliğin olduğu başka bir zaman akışı buldun. En güçlü kediciklerini bu derbeder durumu düzeltmek için gönderebilirsin. Kirlilik daha fazla olumsuz etkiye sebep olur.<br>DİKKAT: Bu meydan okumaya başladığında yiyecek üretimini sağlamak için kısıtlı vaktin olacak.",
+    "challendge.postApocalypse.effect.desc": "",
     "challendge.postApocalypse.flavor": "'O kadar kötü de değildir be' diye düşündüler",
     "challendge.reservesReclaimed.msg": "Kaynaklar geri alındı!",
     "challendge.unicornTears.label": "Unicorn Gözyaşı",
