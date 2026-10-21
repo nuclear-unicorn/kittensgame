@@ -1069,6 +1069,27 @@ a:hover {
     opacity: 0.8;
 }
 
+table.calendarEffectsTable {
+    width: 300px;
+    display: inline-table;
+    border-collapse: collapse;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+table.calendarEffectsTable th {
+    font-weight: normal;
+    text-align: left;
+    /*Hanging indent*/
+    padding-left: 2em;
+    text-indent: -2em;
+}
+table.calendarEffectsTable td {
+    padding-left: 6px;
+    padding-right: 0px;
+    white-space: nowrap;
+    text-align: right;
+}
+
 .links-block a{
     text-decoration: none;
     padding-left: 2px;

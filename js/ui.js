@@ -492,109 +492,9 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
 
 
 		if (!this.calendarSignSpanTooltip){
-            var calendarSignSpan = dojo.byId("calendarSign");
-			this.calendarSignSpanTooltip = UIUtils.attachTooltip(game, calendarSignSpan, 0, 60, dojo.hitch(game.calendar, function() {
-                var cycle = this.cycles[this.cycle];
-                if (!cycle) {
-                    return "";
-                }
-
-				var tooltip = dojo.create("div", { className: "button_tooltip" }, null);
-
-				var cycleSpan = dojo.create("div", {
-					innerHTML: cycle.title + " (" + $I("calendar.year") + " " + this.cycleYear + ")",
-					style: { textAlign: "center", clear: "both"}
-				}, tooltip );
-
-				// Cycle Effects
-				if (game.prestige.getPerk("numerology").researched) {
-					dojo.style(cycleSpan, "borderBottom", "1px solid gray");
-					dojo.style(cycleSpan, "paddingBottom", "4px");
-
-					dojo.create("div", {
-						innerHTML: $I("cycle.effects.title") + ":",
-						style: { textAlign: "center", paddingTop: "4px"}
-					}, tooltip );
-
-					var effects = cycle.effects;
-
-					for (var effect in effects){
-						var effectItemNode = dojo.create("div", null, tooltip);
-
-						var effectMeta = game.getEffectMeta(effect);
-						var effectTitle = effectMeta.title + ":";
-
-						dojo.create("span", {
-							innerHTML: effectTitle,
-							style: {
-								float: "left",
-								fontSize: "16px"
-							}
-						}, effectItemNode );
-
-						var effectMod = effects[effect] > 1 ? "+" : "";
-						effectMod += ((effects[effect] - 1) * 100).toFixed(0) + "%";
-
-						dojo.create("span", {
-							innerHTML: effectMod,
-							style: {
-								float: "right",
-								fontSize: "16px",
-								paddingLeft: "6px"
-							}
-						}, effectItemNode );
-
-						dojo.create("span", {
-							innerHTML: "&nbsp;",
-							style: {clear: "both" }
-						}, effectItemNode );
-					}
-				}
-
-				if (game.prestige.getPerk("numeromancy").researched && this.festivalDays) {
-					// Cycle Festival Effects
-					dojo.create("div", {
-						innerHTML: $I("cycle.effects.festival.title"),
-						style: { textAlign: "center"}
-					}, tooltip );
-
-					var effects = cycle.festivalEffects;
-
-					for (var effect in effects){
-						var effectItemNode = dojo.create("div", null, tooltip);
-
-						var effectMeta = game.getEffectMeta(effect);
-						var effectTitle = effectMeta.title + ":";
-
-						dojo.create("span", {
-							innerHTML: effectTitle,
-							style: {
-								float: "left",
-								fontSize: "16px"
-							}
-						}, effectItemNode );
-
-						var effectMod = effects[effect] > 1 ? "+" : "";
-						effectMod += ((effects[effect] - 1) * 100).toFixed(0) + "%";
-
-						dojo.create("span", {
-							innerHTML: effectMod,
-							style: {
-								float: "right",
-								fontSize: "16px",
-								paddingLeft: "6px"
-							}
-						}, effectItemNode );
-
-						dojo.create("span", {
-							innerHTML: "&nbsp;",
-							style: {clear: "both" }
-						}, effectItemNode );
-					}
-				}
-				return tooltip.outerHTML;
-
-			}));
+			var calendarSignSpan = dojo.byId("calendarSign");
+			this.calendarSignSpanTooltip = UIUtils.attachTooltip(game, calendarSignSpan, 0, 60,
+				this.generateCalendarSignTooltipHTML.bind(this, game));
 		}
 
         midColumn.scrollTop = scrollPosition;
@@ -625,6 +525,101 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
         React.render($r(WToolbar, {
             game: this.game
         }), document.getElementById("headerToolbar"));
+    },
+
+	/**
+	 * This function generates the tooltip for the calendar sign.
+	 * The "calendar sign" is the glyph of the current cycle displayed on the left side of the calendar.
+	 * @param {GamePage} game The game object.
+	 * @returns {string} The HTML code for the tooltip
+	 */
+	generateCalendarSignTooltipHTML: function(game) {
+		var calendar = game.calendar;
+		//Cache the cycle metadata object
+		var cycle = calendar.cycles[calendar.cycle];
+		if (!cycle) {
+			return "";
+		}
+
+		var tooltip = dojo.create("div", { className: "button_tooltip" }, null);
+		var cycleSpan = dojo.create("div", {
+			innerHTML: cycle.title + " (" + $I("calendar.year") + " " + calendar.cycleYear + ")",
+			style: { textAlign: "center", clear: "both"}
+		}, tooltip );
+
+		var hasNumerology = game.prestige.getPerk("numerology").researched;
+		var hasNumeromancy = game.prestige.getPerk("numeromancy").researched;
+
+		// Cycle Effects
+		if (hasNumerology) {
+			dojo.style(cycleSpan, "borderBottom", "1px solid gray");
+			dojo.style(cycleSpan, "paddingBottom", "4px");
+
+			dojo.create("div", {
+				innerHTML: $I("cycle.effects.title") + ":",
+				style: { textAlign: "center", paddingTop: "4px"}
+			}, tooltip );
+			this.renderCalendarEffectsInTooltip(cycle.effects, tooltip, game);
+		}
+
+		// Cycle Festival Effects
+		if (hasNumeromancy && calendar.festivalDays) {
+			dojo.create("div", {
+				innerHTML: $I("cycle.effects.festival.title"),
+				style: { textAlign: "center"}
+			}, tooltip );
+			this.renderCalendarEffectsInTooltip(cycle.festivalEffects, tooltip, game);
+		}
+		return tooltip.outerHTML;
+	},
+
+	/**
+	 * Renders a table of effects
+	 * @param effects The effects to be rendered, i.e. a table of key-value pairs where the values are all numbers.
+	 * @param {HTMLElement} container The DOM element inside which these effects will be rendered.
+	 * @param {GamePage} game The game object.  We need this in order to query some data it holds.
+	 * @returns void.  This function just modified the children of the container passed into it.
+	 */
+	renderCalendarEffectsInTooltip: function(effects, container, game) {
+		var tableOuter = dojo.create("table", { className: "calendarEffectsTable" }, container);
+		var tableBody = dojo.create("tbody", null, tableOuter);
+
+		for (var effectKey in effects) {
+			var effectItemNode = dojo.create("tr", null, tableBody);
+
+			var effectMeta = game.getEffectMeta(effectKey);
+			var effectTitle = this._eliminateOrphans(effectMeta.title) + ":";
+
+			dojo.create("th", {
+				scope: "row",
+				innerHTML: effectTitle
+			}, effectItemNode );
+
+			var effectMod = effects[effectKey] > 1 ? "+" : "";
+			effectMod += ((effects[effectKey] - 1) * 100).toFixed(0) + "%";
+
+			dojo.create("td", {
+				innerHTML: effectMod
+			}, effectItemNode );
+		}
+	},
+
+	/**
+	 * Helper function used to make strings look nicer when you have text wrapping!
+	 * Basically, if the last line of text would have just one word on it, we change
+	 * how the text wraps such that there are 2 words on the final line instead.
+	 * @param {string} str The string which we'll modify
+	 * @returns {string} A modified string which will look nicer when displayed onscreen
+	 */
+    _eliminateOrphans: function(str) {
+        var lastSpace = str.lastIndexOf(" ");
+        if (lastSpace == -1 || lastSpace < str.length - 15) {
+            //Space is too far from the end of the string, so don't mess with it
+            return str;
+        }
+        //Else, there's a space near the end of the string.
+        //Replace with a non-breaking space:
+        return str.slice(0, lastSpace) + "&nbsp;" + str.slice(lastSpace + 1);
     },
 
     //---------------------------------------------------------------
