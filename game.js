@@ -13,7 +13,9 @@
 
 /**
  * One line of a resource breakdown tooltip.
- * @typedef {{name: any, type: string, value: any, forceDisplay?: boolean}} ResStackEntry
+ * @typedef {{name: any,
+ * type: "fixed" | "ratio" | "ratioIndent" | "multiplier" | "perDay" | "perYear",
+ * value: any, forceDisplay?: boolean}} ResStackEntry
  */
 /**
  * A resource breakdown, as consumed by `processResourcePerTickStack`. Entries
@@ -3936,6 +3938,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		}
 
 		// +SPACE PerTickBase
+		/** @type {ResStack} */
 		var perTickBaseSpaceStack = [];
 		//---->
 			perTickBaseSpaceStack.push({
@@ -3960,6 +3963,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		// +VILLAGE JOB PRODUCTION
 		var resMapProduction = this.village.getResProduction();
 		var hgScalingBonus = this.religion.getHGScalingBonus() - 1;
+		/** @type {ResStack} */
 		var villageStack = [];
 		//---->
 				villageStack.push({
@@ -4044,6 +4048,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var paragonSpaceProductionRatio = 1 + paragonProductionRatio * 0.05;
 		var rankLeaderBonusConversion = this.getEffect("rankLeaderBonusConversion") * ((this.village.leader) ? this.village.leader.rank : 0);
 		// +BUILDING AUTOPROD
+		/** @type {ResStack} */
 		var buildingAutoprod = [];
 		// ---->
 			buildingAutoprod.push({
@@ -4163,7 +4168,9 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		});
 
 		// +AUTOMATED PRODUCTION SPACE
+		/** @type {ResStack} */
 		var perTickAutoprodSpaceStack = [];
+		/** @type {ResStack} */
 		var spaceParagonSubStack = [];
 		//---->
 			perTickAutoprodSpaceStack.push({
@@ -4199,6 +4206,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		stack.push(perTickAutoprodSpaceStack);
 
 		// +AUTOMATED PRODUCTION SPACE
+		/** @type {ResStack} */
 		var perTickSpace = [];
 		//---->
 			perTickSpace.push({
@@ -4230,6 +4238,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			value: cycleEffect
 		});
 
+		/** @type {ResStack} */
 		var baselineModifiers = [];
 		// +BUILDING AND SPACE PerTick
 
@@ -4411,11 +4420,11 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			value: this.getEffect(res.name + "Production")
 		});
 		if (resName == "antimatter" && this.resPool.energyProd < this.resPool.energyCons){
-
 			stack.push({
-				name: $I("ui.energy.tooltip"), //kinda hack text
-				type: "perYear",
-				value: -this.getEffect(res.name + "Production")
+				name: $I("res.stack.energy.deficit"),
+				type: "multiplier",
+				value: 0,
+				forceDisplay: true
 			});
 		}
 		stack.push({
@@ -5978,7 +5987,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			};
 		this.upgrade({ buildings: ["warehouse"], spaceBuilding: ["hydroponics"]});
 		this.upgrade(metaKeys);
-		this.upgrade({policies: ["authocracy"]});
+		this.upgrade({policies: ["authocracy", "feedingFrenzy"]});
 	},
 
 	/**
