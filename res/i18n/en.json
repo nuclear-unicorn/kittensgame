@@ -1287,6 +1287,7 @@
     "res.stack.culturalExchanges": "Cultural Exchanges",
     "res.stack.demand": "(:3) Demand",
     "res.stack.destruction": "Pacts",
+    "res.stack.energy.deficit": "Energy shortage",
     "res.stack.engineer": "(:3) Engineer",
     "res.stack.environmentPolicy": "Environmental policy",
     "res.stack.expansionism" : "Cosmoliberalism bonus",

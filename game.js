@@ -4411,11 +4411,11 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 			value: this.getEffect(res.name + "Production")
 		});
 		if (resName == "antimatter" && this.resPool.energyProd < this.resPool.energyCons){
-
 			stack.push({
-				name: $I("ui.energy.tooltip"), //kinda hack text
-				type: "perYear",
-				value: -this.getEffect(res.name + "Production")
+				name: $I("res.stack.energy.deficit"),
+				type: "multiplier",
+				value: 0,
+				forceDisplay: true
 			});
 		}
 		stack.push({
