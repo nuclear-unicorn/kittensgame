@@ -782,6 +782,12 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 	 * @param res The resource object to be updated.
 	 */
 	updateMaxValue: function(res) {
+		if (res.name == "elderBox") {
+			//Present boxes cannot be stockpiled.
+			res.maxValue = 1;
+			res.value = Math.min(res.value, res.maxValue);
+			return;
+		}
 		var game = this.game;
 		if (res.name == "sorrow"){
 			res.maxValue = 17 + (game.getEffect("blsLimit") || 0);
