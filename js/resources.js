@@ -176,7 +176,8 @@ dojo.declare("classes.managers.ResourceManager", com.nuclearunicorn.core.TabMana
 		type : "common",
 		craftable: false,
 		visible: false,
-		persists: true
+		persists: true,
+		calculateOnYear: true
 	},{
 		name : "gflops",
 		title: $I("resources.gflops.title"),
