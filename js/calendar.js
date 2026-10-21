@@ -527,15 +527,17 @@ dojo.declare("com.nuclearunicorn.game.Calendar", null, {
 				if (this.observeRemainingTime > 0) {
 					this.observeTimeout();
 				}
+				//SETI causes astro events not to generate log messages
+				var isSilent = this.game.workshop.get("seti").researched;
 
 				// nice reminder that astronomical events don't happen
 				if (this.game.challenges.isActive("blackSky")) {
 					// ...however it gets spammy after some progress
-					if (this.game.bld.get("observatory").val < 30) {
+					if (!isSilent && this.game.bld.get("observatory").val < 30) {
 						this.game.msg($I("challendge.blackSky.event"), "", "astronomicalEvent");
 					}
 				//---------------- SETI hack-------------------
-				} else if (this.game.workshop.get("seti").researched) {
+				} else if (isSilent) {
 					this.observeHandler();
 				} else {
 					this.observeClear();
