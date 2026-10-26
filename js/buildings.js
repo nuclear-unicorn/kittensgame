@@ -2195,7 +2195,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			{ name : "bloodstone", val: 1 }
 		],
 		priceRatio: 1.35,
-		zebraRequired: 5,
+		// zebraRequired: 5,
 		effects: {
 			"manpowerMax": 5,
 			"hunterRatio" : 0.05,
@@ -2235,7 +2235,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			zebraUpgrades:["darkRevolution"]
 		},
 		priceRatio: 1.15,
-		zebraRequired: 10,
+		// zebraRequired: 10,
 		effects: {
 			"bloodstoneRatio": 0,
 			"manpowerMax": 25,
@@ -2276,7 +2276,7 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 			zebraUpgrades: ["whispers"],
 		},
 		priceRatio: 1.15,
-		zebraRequired: 50,
+		// zebraRequired: 50,
 		effects: {
 			//"bloodstoneCraftRatio" : 0.02,
 			"tMythrilCraftRatio" : 0.01,
@@ -2305,7 +2305,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		name: "stasisPod",
 		label: $I("buildings.stasisPod.label"),
 		description: $I("buildings.stasisPod.desc"),
-		unlockRatio: 0.01,
 		 prices: [
             { name : "tMythril", val: 1 },
             { name : "timeCrystal", val: 2 },
@@ -2856,6 +2855,9 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 					break;
 				}
 			}
+		}
+		if (typeof(building.zebraRequired) == "number" && building.zebraRequired > this.game.resPool.get("zebras").value){
+			isUnlocked = false;
 		}
 
 		return isUnlocked;
