@@ -41,7 +41,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "delayTicks", "unlocked", "isAutomationEnabled"]),
             vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"]),
             queueItems: this.queue.queueItems,
-            queueSources: this.queue.queueSources
+            queueSources: this.queue.queueSources,
+            queueUnordered: this.queue.unordered
         };
         this._forceChronoFurnaceStop(saveData.time.cfu);
     },
@@ -94,7 +95,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 this.queue.queueSources[i] = this.queue.queueSourcesDefault[i];
             }
         }
-
+        this.queue.unordered = saveData["time"].queueUnordered || false;
         this.queue.updateQueueSourcesArr();
 
         //TODO: move me to UI
@@ -2035,9 +2036,12 @@ dojo.declare("classes.queue.manager", null,{
     game: null,
     alphabeticalSort: true,
     queueItems : [],
-
+    unordered: false,
     toggleAlphabeticalSort: function(){
         this.alphabeticalSort = !this.alphabeticalSort;
+    },
+    toggleOrdered: function(){
+        this.unordered = !this.unordered;
     },
     /**
      * Returns eta and
@@ -2161,6 +2165,7 @@ dojo.declare("classes.queue.manager", null,{
         this.queueItems = [];
         this.queueSources = dojo.clone(this.queueSourcesDefault);
         this.queueSourcesArr = [{name: "buildings", label: $I("buildings.tabName")}];
+        this.unordered = false;
     },
 
     /**
@@ -2562,6 +2567,16 @@ dojo.declare("classes.queue.manager", null,{
             this.game._publish("ui/update", this.game);
         }
     },
+    dropNthItem: function(n){
+        var item = this.queueItems[n];
+        if (item.value && item.value > 1){
+            item.value -= 1;
+        }
+        else {
+            this.queueItems.splice(n, 1);
+            this.game._publish("ui/update", this.game);
+        }
+    },
     listDrop: function(event){
         //this.queueItems.pop();
         this.dropLastItem();
@@ -2681,27 +2696,22 @@ dojo.declare("classes.queue.manager", null,{
         }
         return { controller: props.controller, model: model };
     },
-    update: function(){
-        this.cap = this.calculateCap();
-        if (!this.queueItems.length){
-            return;
-        }
-        var el = this.queueItems[0];
+    attemptPurchase: function(i){
         if (!el){
             console.warn("null queue item, skipping");
-            this.queueItems.shift();
+            this.queueItems.splice(i, 1);
             this.game._publish("ui/update", this.game);
+            i -= 1;
             return;
         }
-
         var controllerAndModel = this.getQueueElementControllerAndModel(el);
         if (!controllerAndModel || !controllerAndModel.controller || !controllerAndModel.model){
             console.error(el.name + " of " + el.type + " queing is not supported!");
-            this.queueItems.shift();
+            this.queueItems.splice(i, 1);
             this.game._publish("ui/update", this.game);
+            i -= 1;
             return;
         }
-
         var result = controllerAndModel.controller.buyItem(controllerAndModel.model, { boughtByQueue: true });
         var wasItemBought = result.itemBought;
         var resultOfBuyingItem = {reason: result.reason};
@@ -2716,17 +2726,35 @@ dojo.declare("classes.queue.manager", null,{
         //Depending on the result, do something different:
         if (wasItemBought){
             //Item successfully purchased!  Remove it from the queue because we did it :D
-            this.dropLastItem();
+            this.dropNthItem(i);
             this.game._publish("ui/update", this.game);
             //console.log("Successfully built " + el.name + " using the queue because " + reason);
+            return true;
         } else {
             if (this._isReasonToSkipItem(reason)) {
                 this.dropLastItem();
+                this.dropNthItem(i);
                 this.game._publish("ui/update", this.game);
                 //console.log("Dropped " + el.name + " from the queue because " + reason);
             } else {
                 //console.log("Tried to build " + el.name + " using the queue, but failed because " + reason);
             }
+        }
+    },
+    update: function(){
+        this.cap = this.calculateCap();
+        if (!this.queueItems.length){
+            return;
+        }
+        if (this.unordered){
+            for (var i = 0; i < this.queueItems.length; i +=1){
+                var purchased = this.attemptPurchase(i);
+                if (purchased){
+                    return;
+                }
+            }
+        } else {
+            this.attemptPurchase(0);
         }
     },
 
