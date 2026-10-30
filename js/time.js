@@ -41,7 +41,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             cfu: this.filterMetadata(this.chronoforgeUpgrades, ["name", "val", "on", "heat", "delayTicks", "unlocked", "isAutomationEnabled"]),
             vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"]),
             queueItems: this.queue.queueItems,
-            queueSources: this.queue.queueSources
+            queueSources: this.queue.queueSources,
+            queueUnordered: this.queue.unordered
         };
         this._forceChronoFurnaceStop(saveData.time.cfu);
     },
@@ -94,7 +95,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 this.queue.queueSources[i] = this.queue.queueSourcesDefault[i];
             }
         }
-
+        this.queue.unordered = saveData["time"].queueUnordered || false;
         this.queue.updateQueueSourcesArr();
 
         //TODO: move me to UI
@@ -259,15 +260,18 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         }
         if (this.game.getFeatureFlag("QUEUE_REDSHIFT")){
             //console.log( "Calculating queue redshift for the following queue:", this.queue.queueItems );
-            var result = this.queue.getFirstItemEtaDay();
+            var result = this.queue.unordered? 
+            this.queue.getMinEta() : this.queue.getFirstItemEtaDay();
             var daysOffsetLeft = daysOffset;
             var redshiftQueueWorked = true;
             if (!result[1]){
                 numberEvents = this.applyRedshift(daysOffsetLeft, true);
                 daysOffsetLeft = 0;
             }
+            var activationsAllowed = 0;
             while (daysOffsetLeft > 0){
-                result = this.queue.getFirstItemEtaDay();
+                result = this.queue.unordered? 
+                this.queue.getMinEta() : this.queue.getFirstItemEtaDay();
                 if (!result[1]){
                     this.applyRedshift(daysOffsetLeft, true);
                     daysOffsetLeft = 0;
@@ -275,12 +279,16 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 }
                 if (result[1] & redshiftQueueWorked){
                     var daysNeeded = result[0];// + 5; //let's have a little bit more days in case steamwork automation messes things up.
-                    if (daysNeeded < 1) {
+                    if (daysNeeded < 1 && activationsAllowed == 0) {
+                    // if (daysNeeded < 1) {
                         //There are legitimate cases in which the number of days needed would be less than 1.
                         //However, if we were to allow daysNeeded to be 0, there'd be risk of an infinite loop,
                         //so we set the minimum value to 1.
                         //console.log( "Estimated days needed for queue item", this.queue.queueItems[ 0 ], "is too small; setting to a minimum value." );
                         daysNeeded = 1;
+                    }
+                    if (daysNeeded > 0){
+                        activationsAllowed = 400;
                     }
                     daysNeeded /= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
                     daysNeeded = Math.ceil(daysNeeded);
@@ -293,6 +301,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     }
                     this.applyRedshift(daysNeeded, true);
                     daysOffsetLeft -= daysNeeded;
+                    activationsAllowed -= 1;
                     this.queue.update();
                     /*if (!redshiftQueueWorked){
                         console.warn("Redshift queue failed to build", this.queue.queueItems[0]);
@@ -2035,9 +2044,12 @@ dojo.declare("classes.queue.manager", null,{
     game: null,
     alphabeticalSort: true,
     queueItems : [],
-
+    unordered: false,
     toggleAlphabeticalSort: function(){
         this.alphabeticalSort = !this.alphabeticalSort;
+    },
+    toggleOrdered: function(){
+        this.unordered = !this.unordered;
     },
     /**
      * Returns eta and
@@ -2088,6 +2100,70 @@ dojo.declare("classes.queue.manager", null,{
         eta = Math.ceil(eta);
         return [eta, true];
     },
+
+    getMinEta: function(){
+        var minEta = Infinity;
+        var found = false;
+        var fastestQueueIndex = undefined;
+        for (var i = 0; i < this.queueItems.length; i +=1){
+            var nEta = this.getNthItemEtaDay(i);
+            if (nEta[1]){
+                minEta = Math.min(minEta, nEta[0]);
+                found = nEta[1];
+                fastestQueueIndex = i;
+            }
+        }
+        if (found){
+            // after finding the fastest to build index might as well cache it for the next purchase!
+            this.fastestQueueIndex = fastestQueueIndex;
+        }
+        // console.log("min Eta:",[minEta, found]);
+        return [minEta, found];
+    },
+    getNthItemEtaDay: function(n){
+        if (this.queueItems.length == 0){
+            return [0, false];
+        }
+        var eta = 0;
+        var element = this.queueItems[n];
+        if (!element) {
+            //This is probably a null queue item.  Treat it as if it were a valid building that can be built for free.
+            //Later on when we update the queue, this null item should be removed & we'll go on to the next.
+            return [0, true];
+        }
+        var modelElement = this.getQueueElementModel(element);
+        var prices = modelElement.prices;
+        var engineersConsumed = this.game.workshop.getConsumptionEngineers();
+        for (var ind in prices){
+            var price = prices[ind];
+            var res = this.game.resPool.get(price.name);
+		    if (res.value >= price.val){
+                //We already have enough of this resource.
+                continue;
+            }
+            if (res.maxValue < price.val){
+                //We don't have enough storage space to ever be able to afford the price.
+                return [eta, false];
+            }
+            var resPerTick = this.game.getResourcePerTick(res.name, true);
+            var engineersProduced = this.game.workshop.getEffectEngineer(res.name, true);
+            var deltaPerTick = resPerTick + (engineersConsumed[res.name] || 0)+ engineersProduced;
+            if (deltaPerTick <= 0) {
+                //We are losing this resource over time (or not producing any), so we'll never be able to afford the price.
+                return [eta, false];
+            }
+            eta = Math.max(eta,
+            (price.val - res.value) / (deltaPerTick) / this.game.calendar.ticksPerDay
+            );
+            if (engineersProduced){
+                var countdown = (1 / (this.game.workshop.getEffectEngineer(res.name, false))) / this.game.calendar.ticksPerDay;
+                eta = Math.ceil(eta/countdown)*countdown;
+            }
+        }
+        eta = Math.ceil(eta);
+        return [eta, true];
+    },
+
     updateQueueSourcesArr: function(){
         for (var i in this.queueSources){
             if (!this.queueSources[i]){
@@ -2161,6 +2237,7 @@ dojo.declare("classes.queue.manager", null,{
         this.queueItems = [];
         this.queueSources = dojo.clone(this.queueSourcesDefault);
         this.queueSourcesArr = [{name: "buildings", label: $I("buildings.tabName")}];
+        this.unordered = false;
     },
 
     /**
@@ -2562,6 +2639,16 @@ dojo.declare("classes.queue.manager", null,{
             this.game._publish("ui/update", this.game);
         }
     },
+    dropNthItem: function(n){
+        var item = this.queueItems[n];
+        if (item.value && item.value > 1){
+            item.value -= 1;
+        }
+        else {
+            this.queueItems.splice(n, 1);
+            this.game._publish("ui/update", this.game);
+        }
+    },
     listDrop: function(event){
         //this.queueItems.pop();
         this.dropLastItem();
@@ -2681,27 +2768,23 @@ dojo.declare("classes.queue.manager", null,{
         }
         return { controller: props.controller, model: model };
     },
-    update: function(){
-        this.cap = this.calculateCap();
-        if (!this.queueItems.length){
-            return;
-        }
-        var el = this.queueItems[0];
+    attemptPurchase: function(i){
+        var el = this.queueItems[i];
         if (!el){
             console.warn("null queue item, skipping");
-            this.queueItems.shift();
+            var discarded = this.queueItems.splice(i, 1);
             this.game._publish("ui/update", this.game);
+            i -= 1;
             return;
         }
-
         var controllerAndModel = this.getQueueElementControllerAndModel(el);
         if (!controllerAndModel || !controllerAndModel.controller || !controllerAndModel.model){
             console.error(el.name + " of " + el.type + " queing is not supported!");
-            this.queueItems.shift();
+            this.queueItems.splice(i, 1);
             this.game._publish("ui/update", this.game);
+            i -= 1;
             return;
         }
-
         var result = controllerAndModel.controller.buyItem(controllerAndModel.model, { boughtByQueue: true });
         var wasItemBought = result.itemBought;
         var resultOfBuyingItem = {reason: result.reason};
@@ -2716,17 +2799,41 @@ dojo.declare("classes.queue.manager", null,{
         //Depending on the result, do something different:
         if (wasItemBought){
             //Item successfully purchased!  Remove it from the queue because we did it :D
-            this.dropLastItem();
+            this.dropNthItem(i);
             this.game._publish("ui/update", this.game);
             //console.log("Successfully built " + el.name + " using the queue because " + reason);
+            return true;
         } else {
             if (this._isReasonToSkipItem(reason)) {
-                this.dropLastItem();
+                this.dropNthItem(i);
                 this.game._publish("ui/update", this.game);
                 //console.log("Dropped " + el.name + " from the queue because " + reason);
             } else {
                 //console.log("Tried to build " + el.name + " using the queue, but failed because " + reason);
             }
+        }
+    },
+    update: function(){
+        this.cap = this.calculateCap();
+        if (!this.queueItems.length){
+            return;
+        }
+        if (typeof(this.fastestQueueIndex) == "number"){
+            var purchased = this.attemptPurchase(this.fastestQueueIndex);
+            this.fastestQueueIndex = undefined;
+            if (purchased){
+                return;
+            }
+        }
+        if (this.unordered){
+            for (var i = 0; i < this.queueItems.length; i +=1){
+                var purchased = this.attemptPurchase(i);
+                if (purchased){
+                    return;
+                }
+            }
+        } else {
+            this.attemptPurchase(0);
         }
     },
 
