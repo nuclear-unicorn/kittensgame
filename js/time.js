@@ -260,7 +260,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         }
         if (this.game.getFeatureFlag("QUEUE_REDSHIFT")){
             //console.log( "Calculating queue redshift for the following queue:", this.queue.queueItems );
-            var result = this.queue.getFirstItemEtaDay();
+            var result = this.queue.unordered? 
+            this.queue.getMinEta() : this.queue.getFirstItemEtaDay();
             var daysOffsetLeft = daysOffset;
             var redshiftQueueWorked = true;
             if (!result[1]){
@@ -268,7 +269,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 daysOffsetLeft = 0;
             }
             while (daysOffsetLeft > 0){
-                result = this.queue.getFirstItemEtaDay();
+                result = this.queue.unordered? 
+                this.queue.getMinEta() : this.queue.getFirstItemEtaDay();
                 if (!result[1]){
                     this.applyRedshift(daysOffsetLeft, true);
                     daysOffsetLeft = 0;
@@ -2092,6 +2094,63 @@ dojo.declare("classes.queue.manager", null,{
         eta = Math.ceil(eta);
         return [eta, true];
     },
+
+    getMinEta: function(){
+        var minEta = Infinity;
+        var found = false;
+        for (var i = 0; i < this.queueItems.length; i +=1){
+            var nEta = this.getNthItemEtaDay(i);
+            if (nEta[1]){
+                minEta = Math.min(minEta, nEta[0]);
+                found = nEta[1];
+            }
+        }
+        return [minEta, found];
+    },
+    getNthItemEtaDay: function(n){
+        if (this.queueItems.length == 0){
+            return [0, false];
+        }
+        var eta = 0;
+        var element = this.queueItems[n];
+        if (!element) {
+            //This is probably a null queue item.  Treat it as if it were a valid building that can be built for free.
+            //Later on when we update the queue, this null item should be removed & we'll go on to the next.
+            return [0, true];
+        }
+        var modelElement = this.getQueueElementModel(element);
+        var prices = modelElement.prices;
+        var engineersConsumed = this.game.workshop.getConsumptionEngineers();
+        for (var ind in prices){
+            var price = prices[ind];
+            var res = this.game.resPool.get(price.name);
+		    if (res.value >= price.val){
+                //We already have enough of this resource.
+                continue;
+            }
+            if (res.maxValue < price.val){
+                //We don't have enough storage space to ever be able to afford the price.
+                return [eta, false];
+            }
+            var resPerTick = this.game.getResourcePerTick(res.name, true);
+            var engineersProduced = this.game.workshop.getEffectEngineer(res.name, true);
+            var deltaPerTick = resPerTick + (engineersConsumed[res.name] || 0)+ engineersProduced;
+            if (deltaPerTick <= 0) {
+                //We are losing this resource over time (or not producing any), so we'll never be able to afford the price.
+                return [eta, false];
+            }
+            eta = Math.max(eta,
+            (price.val - res.value) / (deltaPerTick) / this.game.calendar.ticksPerDay
+            );
+            if (engineersProduced){
+                var countdown = (1 / (this.game.workshop.getEffectEngineer(res.name, false))) / this.game.calendar.ticksPerDay;
+                eta = Math.ceil(eta/countdown)*countdown;
+            }
+        }
+        eta = Math.ceil(eta);
+        return [eta, true];
+    },
+
     updateQueueSourcesArr: function(){
         for (var i in this.queueSources){
             if (!this.queueSources[i]){
@@ -2697,6 +2756,7 @@ dojo.declare("classes.queue.manager", null,{
         return { controller: props.controller, model: model };
     },
     attemptPurchase: function(i){
+        var el = this.queueItems[i];
         if (!el){
             console.warn("null queue item, skipping");
             this.queueItems.splice(i, 1);
@@ -2732,7 +2792,6 @@ dojo.declare("classes.queue.manager", null,{
             return true;
         } else {
             if (this._isReasonToSkipItem(reason)) {
-                this.dropLastItem();
                 this.dropNthItem(i);
                 this.game._publish("ui/update", this.game);
                 //console.log("Dropped " + el.name + " from the queue because " + reason);
