@@ -268,6 +268,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 numberEvents = this.applyRedshift(daysOffsetLeft, true);
                 daysOffsetLeft = 0;
             }
+            var activationsAllowed = 0;
             while (daysOffsetLeft > 0){
                 result = this.queue.unordered? 
                 this.queue.getMinEta() : this.queue.getFirstItemEtaDay();
@@ -278,12 +279,16 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                 }
                 if (result[1] & redshiftQueueWorked){
                     var daysNeeded = result[0];// + 5; //let's have a little bit more days in case steamwork automation messes things up.
-                    if (daysNeeded < 1) {
+                    if (daysNeeded < 1 && activationsAllowed == 0) {
+                    // if (daysNeeded < 1) {
                         //There are legitimate cases in which the number of days needed would be less than 1.
                         //However, if we were to allow daysNeeded to be 0, there'd be risk of an infinite loop,
                         //so we set the minimum value to 1.
                         //console.log( "Estimated days needed for queue item", this.queue.queueItems[ 0 ], "is too small; setting to a minimum value." );
                         daysNeeded = 1;
+                    }
+                    if (daysNeeded > 0){
+                        activationsAllowed = 400;
                     }
                     daysNeeded /= (this.game.calendar.daysPerSeason * this.game.calendar.seasonsPerYear);
                     daysNeeded = Math.ceil(daysNeeded);
@@ -296,6 +301,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     }
                     this.applyRedshift(daysNeeded, true);
                     daysOffsetLeft -= daysNeeded;
+                    activationsAllowed -= 1;
                     this.queue.update();
                     /*if (!redshiftQueueWorked){
                         console.warn("Redshift queue failed to build", this.queue.queueItems[0]);
@@ -2098,7 +2104,7 @@ dojo.declare("classes.queue.manager", null,{
     getMinEta: function(){
         var minEta = Infinity;
         var found = false;
-        var fastestQueueIndex = 0;
+        var fastestQueueIndex = undefined;
         for (var i = 0; i < this.queueItems.length; i +=1){
             var nEta = this.getNthItemEtaDay(i);
             if (nEta[1]){
@@ -2766,7 +2772,7 @@ dojo.declare("classes.queue.manager", null,{
         var el = this.queueItems[i];
         if (!el){
             console.warn("null queue item, skipping");
-            this.queueItems.splice(i, 1);
+            var discarded = this.queueItems.splice(i, 0);
             this.game._publish("ui/update", this.game);
             i -= 1;
             return;
@@ -2774,7 +2780,7 @@ dojo.declare("classes.queue.manager", null,{
         var controllerAndModel = this.getQueueElementControllerAndModel(el);
         if (!controllerAndModel || !controllerAndModel.controller || !controllerAndModel.model){
             console.error(el.name + " of " + el.type + " queing is not supported!");
-            this.queueItems.splice(i, 1);
+            this.queueItems.splice(i, 0);
             this.game._publish("ui/update", this.game);
             i -= 1;
             return;
@@ -2813,7 +2819,7 @@ dojo.declare("classes.queue.manager", null,{
             return;
         }
         if (typeof(this.fastestQueueIndex) == "number"){
-            var purchased = this.attemptPurchase(i);
+            var purchased = this.attemptPurchase(this.fastestQueueIndex);
             this.fastestQueueIndex = undefined;
             if (purchased){
                 return;
