@@ -2098,12 +2098,18 @@ dojo.declare("classes.queue.manager", null,{
     getMinEta: function(){
         var minEta = Infinity;
         var found = false;
+        var fastestQueueIndex = 0;
         for (var i = 0; i < this.queueItems.length; i +=1){
             var nEta = this.getNthItemEtaDay(i);
             if (nEta[1]){
                 minEta = Math.min(minEta, nEta[0]);
                 found = nEta[1];
+                fastestQueueIndex = i;
             }
+        }
+        if (found){
+            // after finding the fastest to build index might as well cache it for the next purchase!
+            this.fastestQueueIndex = fastestQueueIndex;
         }
         // console.log("min Eta:",[minEta, found]);
         return [minEta, found];
@@ -2805,6 +2811,13 @@ dojo.declare("classes.queue.manager", null,{
         this.cap = this.calculateCap();
         if (!this.queueItems.length){
             return;
+        }
+        if (typeof(this.fastestQueueIndex) == "number"){
+            var purchased = this.attemptPurchase(i);
+            this.fastestQueueIndex = undefined;
+            if (purchased){
+                return;
+            }
         }
         if (this.unordered){
             for (var i = 0; i < this.queueItems.length; i +=1){
