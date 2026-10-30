@@ -2772,7 +2772,7 @@ dojo.declare("classes.queue.manager", null,{
         var el = this.queueItems[i];
         if (!el){
             console.warn("null queue item, skipping");
-            var discarded = this.queueItems.splice(i, 0);
+            var discarded = this.queueItems.splice(i, 1);
             this.game._publish("ui/update", this.game);
             i -= 1;
             return;
@@ -2780,7 +2780,7 @@ dojo.declare("classes.queue.manager", null,{
         var controllerAndModel = this.getQueueElementControllerAndModel(el);
         if (!controllerAndModel || !controllerAndModel.controller || !controllerAndModel.model){
             console.error(el.name + " of " + el.type + " queing is not supported!");
-            this.queueItems.splice(i, 0);
+            this.queueItems.splice(i, 1);
             this.game._publish("ui/update", this.game);
             i -= 1;
             return;
