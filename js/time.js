@@ -2105,6 +2105,7 @@ dojo.declare("classes.queue.manager", null,{
                 found = nEta[1];
             }
         }
+        // console.log("min Eta:",[minEta, found]);
         return [minEta, found];
     },
     getNthItemEtaDay: function(n){
