@@ -1054,7 +1054,7 @@ test("buyItem internals should work properly for items with no cost", () => {
     var {itemBought, reason} = controller.buyItem(model, null);
     expect(itemBought).toBe(true);
     expect(reason).toBe("item-is-free");
-    expect(handlerResult).toBe("A");
+    expect(handlerResult).toBe("<div class=\"label\"><span class=\"label-content\">A</span></div>");
 
     controller = new classes.game.ui.GatherCatnipButtonController(game);
     model = controller.fetchModel({}); //We don't really need any properties in the model for this one
