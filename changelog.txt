@@ -1,3 +1,11 @@
+v 1.6.1.11 (3 Nov 2026)
+
+Minor:
+
+Minor fixes and stability improvements
+
+
+
 v 1.6.1.6 (30 Aug 2026)
 
 Minor:
