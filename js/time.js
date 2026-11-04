@@ -333,6 +333,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             { name : "relic", val: 5 }
         ],
         priceRatio: 1.25,
+        tooltipNameMobile: true,
         effects: {
             "heatPerTick": 0.02,
             "heatMax" : 100
@@ -1628,6 +1629,9 @@ dojo.declare("classes.ui.time.ChronoforgeBtnController", com.nuclearunicorn.game
     getMetadata: function(model){
         if (!model.metaCached){
             model.metaCached = this.game.time.getCFU(model.options.id);
+            if (model.metaCached.tooltipNameMobile) {
+                model.tooltipNameMobile = true;
+            }
         }
         return model.metaCached;
     },

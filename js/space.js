@@ -747,6 +747,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 					{name: "antimatter", val: 25  },
 					{name: "kerosene", val: 5000  }
 				],
+				tooltipNameMobile: true,
 				requiredTech: ["terraformation"],
 				effects: {
 					"maxKittens": 1
@@ -1381,6 +1382,9 @@ dojo.declare("classes.ui.space.PlanetBuildingBtnController", com.nuclearunicorn.
     getMetadata: function(model){
         if (!model.metaCached){
             model.metaCached = this.game.space.getBuilding(model.options.id);
+			if (model.metaCached.tooltipNameMobile){
+				model.tooltipNameMobile = true;
+			}
         }
         return model.metaCached;
     },

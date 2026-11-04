@@ -1481,6 +1481,13 @@ var ButtonModernController = dojo.declare("com.nuclearunicorn.game.ui.ButtonMode
 		if (res.name == "tears" && game.religion.getHasUnlockedUnicornSacrifice()) {
 			game.religion.sacrificeUnicornsToTarget(amt);
 		}
+	},
+	getName: function(model){
+		if (this.controllerOpts.getName){
+			return this.controllerOpts.getName.apply(this, arguments);
+		}
+		var name = "<div class=\"label\"><span class=\"label-content\">" + model.options.name + "</span></div>";
+		return name;
 	}
 });
 

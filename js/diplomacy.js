@@ -1378,6 +1378,7 @@ dojo.declare("com.nuclearunicorn.game.ui.CrashBcoinButtonController", com.nuclea
 		var result = this.inherited("defaults", arguments);
 		result.hasResourceHover = true;
 		result.simplePrices = true;
+		result.tooltipNameMobile = true;
 		return result;
 	},
 
