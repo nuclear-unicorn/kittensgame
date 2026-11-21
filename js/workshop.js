@@ -560,6 +560,13 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science", val: 55000 },
 			{ name : "blueprint", val: 15 }
 		],
+		evaluateLocks: function(game){
+			//The indended unlock condition is "have 1 trade ship," but considering that it's possible to start
+			// a run with trade ships already (using chronoresets), we need to keep the requirement of having
+			// Navigation (technology) researched as well, so that the player unlocks this technology at the
+			// correct node of the technology tree.
+			return game.resPool.get("ship").value > 0 && game.science.get("navigation").researched;
+		},
 		upgrades: {
 			buildings: ["harbor"]
 		},
@@ -2284,6 +2291,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name: "plate",    val: 150 },
 			{ name: "scaffold", val: 100 }
 		],
+		unlocks: {
+			upgrades: ["cargoShips"]
+		},
 		upgrades: {
 			buildings: ["harbor"]
 		},
@@ -2782,6 +2792,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			var actualAmtGained = this.game.resPool.addResEvent(res,craftAmt);
 			if (craft.upgrades){
 				this.game.upgrade(craft.upgrades);
+			}
+			if (craft.unlocks) {
+				this.game.unlock(craft.unlocks);
 			}
 
 			this.game.stats.getStat("totalCrafts").val++;
