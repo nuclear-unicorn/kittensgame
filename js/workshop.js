@@ -1993,7 +1993,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices: [
 			{ name: "science", val: 300000 },
 			{ name: "gear", val: 3000 },
-			{ name: "microchip", val: 750 },
+			{ name: "microchip", val: 300 },
 			{ name: "alloy", val: 10000 },
 			{ name: "unobtainium", val: 300 }
 		],
@@ -2028,8 +2028,8 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices: [
 			{ name: "science", val: 675000 },
 			{ name: "gear", val: 6750 },
-			{ name: "alloy", val: 8000 },
-			{ name: "oil", val: 80000 } //Petroleum-based solvent
+			{ name: "alloy", val: 24000 },
+			{ name: "oil", val: 170000 } //Petroleum-based solvent
 		],
 		upgrades: {
 			spaceBuilding: ["spiceRefinery"]
