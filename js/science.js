@@ -160,7 +160,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			tech: ["philosophy", "machinery", "steel"],
 			policies: ["liberty", "tradition"],
 			upgrades: ["register"],
-			crafts: ["parchment"]
+			crafts: ["parchment", "manuscript"]
 		},
 		flavor: $I("science.writing.flavor")
 	}, {
@@ -184,6 +184,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		prices: [{name : "science", val: 15000}],
 		unlocks: {
 			buildings: ["steamworks"],
+			crafts: ["gear"],
 			upgrades: ["printingPress", "factoryAutomation", "crossbow"]
 		}
 	}, {

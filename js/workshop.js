@@ -1,3 +1,4 @@
+
 dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabManager, {
 
 	game: null,
@@ -2194,6 +2195,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{name: "catnip", val: 100}
 		],
+		defaultUnlocked: true,
 		ignoreBonuses: true,
 		progressHandicap: 1,
 		tier: 1
@@ -2204,6 +2206,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{name: "wood", val: 175}
 		],
+		defaultUnlocked: true,
 		progressHandicap: 1,
 		tier: 1
 	},{
@@ -2213,6 +2216,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{name: "minerals", val: 250}
 		],
+		defaultUnlocked: true,
 		progressHandicap: 1,
 		tier: 1
 	},{
@@ -2222,6 +2226,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{name: "iron", val: 125}
 		],
+		defaultUnlocked: true,
 		progressHandicap: 4,
 		tier: 1
 	},{
@@ -2232,6 +2237,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{name: "coal", val: 100},
 			{name: "iron", val: 100}
 		],
+		defaultUnlocked: false,
 		progressHandicap: 4,
 		tier: 2
 	},{
@@ -2242,6 +2248,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{name: "slab", val: 2500},
 			{name: "steel", val: 25}
 		],
+		defaultUnlocked: false,
 		progressHandicap: 9,
 		tier: 4
 	},{
@@ -2251,6 +2258,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{name: "steel", val: 15}
 		],
+		defaultUnlocked: false,
 		progressHandicap: 5,
 		tier: 3
 	},{
@@ -2261,6 +2269,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{name: "titanium", val: 10},
 			{name: "steel", val: 75 }
 		],
+		defaultUnlocked: false,
 		progressHandicap: 7,
 		tier: 4
 	},{
@@ -2271,6 +2280,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{name: "unobtainium", val: 1000},
 			{name: "alloy", val: 2500 }
 		],
+		defaultUnlocked: false,
 		progressHandicap: 300,
 		tier: 5
 	},{
@@ -2280,6 +2290,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name: "beam", val: 50 }
 		],
+		defaultUnlocked: true,
 		progressHandicap: 2,
 		tier: 2
 	},{
@@ -2297,6 +2308,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		upgrades: {
 			buildings: ["harbor"]
 		},
+		defaultUnlocked: false,
 		progressHandicap: 20,
 		tier: 3
 	},{
@@ -2311,44 +2323,49 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		upgrades: {
 			buildings: ["harbor"]
 		},
+		defaultUnlocked: false,
 		progressHandicap: 20,
 		tier: 5
 	},{
-        name: "kerosene",
-        label: $I("workshop.crafts.kerosene.label"),
-        description: $I("workshop.crafts.kerosene.desc"),
-        prices:[
-            { name: "oil", val: 7500 }
-        ],
+		name: "kerosene",
+		label: $I("workshop.crafts.kerosene.label"),
+		description: $I("workshop.crafts.kerosene.desc"),
+		prices:[
+			{ name: "oil", val: 7500 }
+		],
+		defaultUnlocked: false,
 		progressHandicap: 5,
 		tier: 2
-    },{
-        name: "plastic",
-        label: $I("workshop.crafts.plastic.label"),
-        description: $I("workshop.crafts.plastic.desc"),
-        prices:[
-            { name: "oil", val: 1000 }
-        ],
+	},{
+		name: "plastic",
+		label: $I("workshop.crafts.plastic.label"),
+		description: $I("workshop.crafts.plastic.desc"),
+		prices:[
+			{ name: "oil", val: 1000 }
+		],
+		defaultUnlocked: false,
 		progressHandicap: 5,
 		tier: 2
-    },{
-        name: "microchip",
-        label: $I("workshop.crafts.microchip.label"),
-        description: $I("workshop.crafts.microchip.desc"),
-        prices:[
-            { name: "plastic", val: 50 },
+	},{
+		name: "microchip",
+		label: $I("workshop.crafts.microchip.label"),
+		description: $I("workshop.crafts.microchip.desc"),
+		prices:[
+			{ name: "plastic", val: 50 },
 			{ name: "gold", val: 1000 },
 			{ name: "spice", val: 750 }
-        ],
+		],
+		defaultUnlocked: false,
 		progressHandicap: 20,
 		tier: 3
-    },{
+	},{
 		name: "parchment",
 		label: $I("workshop.crafts.parchment.label"),
 		description: $I("workshop.crafts.parchment.desc"),
 		prices:[
 			{name: "furs", val: 175}
 		],
+		defaultUnlocked: false,
 		progressHandicap: 1,
 		tier: 1
 	},{
@@ -2359,6 +2376,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{name: "culture", val: 400},
 			{name: "parchment", val: 25}
 		],
+		defaultUnlocked: false,
 		progressHandicap: 2,
 		tier: 2
 	},{
@@ -2369,6 +2387,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{name: "science", val: 9000},
 			{name: "manuscript", val: 55}
 		],
+		defaultUnlocked: false,
 		progressHandicap: 5,
 		tier: 3
 	},{
@@ -2379,6 +2398,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{name: "science", val: 25000},
 			{name: "compedium", val: 25}
 		],
+		defaultUnlocked: false,
 		progressHandicap: 10,
 		tier: 3
 	},{
@@ -2388,6 +2408,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name: "uranium", val: 250 }
 		],
+		defaultUnlocked: false,
 		progressHandicap: 5,
 		tier: 3
 	},{
@@ -2399,6 +2420,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name: "slab", val: 50 },
 			{ name: "plate", val: 5 }
 		],
+		defaultUnlocked: true,
 		progressHandicap: 5,
 		tier: 3
 	},{
@@ -2409,6 +2431,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name: "timeCrystal", val: 5000 },
 			{ name: "relic", val: 10000 }
 		],
+		defaultUnlocked: false,
 		progressHandicap: 7500,
 		tier: 5
 	},{
@@ -2422,6 +2445,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name: "ivory", val: 1000 },
 			{ name: "titanium", val: 500 }
 		],
+		defaultUnlocked: false,
 		progressHandicap: 10000,
 		tier: 7
 	}],
@@ -2674,18 +2698,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 		for (i = 0; i < this.crafts.length; i++){
 			var craft = this.crafts[i];
-			if (craft.name == "wood" ||
-				craft.name == "beam" ||
-				craft.name == "slab" ||
-				craft.name == "plate" ||
-				craft.name == "gear" ||
-				craft.name == "scaffold" ||
-				craft.name == "manuscript" ||
-				craft.name == "megalith") {
-				craft.unlocked = true;
-			} else {
-				craft.unlocked = false;
-			}
+			craft.unlocked = Boolean(craft.defaultUnlocked);
 			craft.value = 0;
 			craft.progress = 0;
 			if (typeof(craft.progressHandicap) == "undefined") {
