@@ -482,6 +482,8 @@
     "effectsMgr.statics.environmentWoodBonus.title" : "Wood production",
     
     "effectsMgr.statics.expansionismUnobtainiumProductionBonus.title": "Unobtainium production bonus",
+    "effectsMgr.statics.explorerAtk.title": "Explorer ATK",
+    "effectsMgr.statics.explorerDef.title": "Explorer DEF",
     "effectsMgr.statics.factoryCostReduction.title": "Factory cost reduction",
     "effectsMgr.statics.factoryRefineRatio.title": "Factory refine bonus",
     "effectsMgr.statics.faithFromManuscripts.title": "Faith from manuscripts",
