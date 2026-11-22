@@ -1,3 +1,35 @@
+// @ts-check
+
+/**
+ * The metadata definition for a craftable resource in the Workshop tab.
+ * @typedef {object} CraftRecipeMetadata
+ * @property {string} name The internal name of this craft recipe as used by the game engine.
+ * This is also the name of the resource that is yielded by this craft; therefore, this name MUST match
+ * the internal name of one of the game's resources (defined in `resources.js`).
+ * @property {string} label The i18n name of this craft item as displayed to the player.
+ * @property {string} description The i18n description of this craft item as displayed to the player.
+ * @property {{name: string, val: number}[]} prices The ingredients required to craft this item.
+ * @property {Record<string, any[]>} [unlocks] Optional.
+ * List of items to be unlocked when this craft is performed (either manually or by engineers).
+ * @property {Record<string, any[]>} [upgrades] Optional.
+ * List of items to be upgraded when this craft is performed (either manually or by engineers).
+ * Note that if we care about the quantity of an item (say, ships), then all higher-level crafts
+ * which consume that item (tankers, in this example) should also have the same upgrades table so
+ * that we can account for situations in which the quantity of resource *decreases*.
+ * @property {boolean} [defaultUnlocked=false] Whether this craft recipe is unlocked immediately at the start of a run.
+ * Technically optional, but I recommend you define it explicitly for ease of human comprehension.
+ * If not defined, the craft recipe will remain locked by default.
+ * @property {boolean} [ignoreBonuses] It's a mystery! As far as I can tell, this doesn't actually do anything.
+ * See GamePage#getResCraftRatio for details of how craft ratio bonuses are actually calculated in practice.
+ * @property {number} [progressHandicap=1] Acts as a multiplier to the amount of time it takes for engineers to craft this item,
+ * e.g. a value of `1` means it crafts at normal speed, a value of `20` means it crafts at 1/20th of the normal speed, etc.
+ * If not specified, defaults to 1.
+ * Please set it to be a positive number unless you *enjoy* causing all kinds of logic errors in the engine.
+ * @property {number} tier Mandatory.
+ * Engineers whose promotion rank is less than this number receive a penalty to crafting speed proportional to the number of ranks missing.
+ * This also allows Workshop upgrades to boost engineers' crafting speed based on the tier of craft they are assigned to.
+ * Aside from the `"UniversalKnowHow"` effect, crafting speed upgrades affect ONLY the specific tier listed.
+ */
 
 dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabManager, {
 
@@ -2187,7 +2219,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 	//=============================================================
 	//					     CRAFT RECIPES
 	//=============================================================
-
+	/**
+	 * @type {CraftRecipeMetadata[]}
+	 */
 	crafts:[{
 		name: "wood",
 		label: $I("workshop.crafts.wood.label"),
