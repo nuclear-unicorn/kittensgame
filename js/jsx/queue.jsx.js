@@ -215,6 +215,10 @@ WQueue = React.createClass({
         game.time.queue.toggleOrdered();
         this.render();
     },
+    toggleQueuePause: function(){
+        game.time.queue.toggleQueuePause();
+        this.render();
+    },
     render: function(){
         var self = this;
 
@@ -266,8 +270,19 @@ WQueue = React.createClass({
                     onClick: self.toggleOrdered,
                     style:{display:"inline-block"},
                 }),
+                $I("queue.unordered")
+            ]),
+
+            $r("div", {className:"alphabetical-toggle"}, [
+                $r("input", {
+                    type:"checkbox", 
+                    checked: game.time.queue.paused,
+                    onClick: self.toggleQueuePause,
+                    style:{display:"inline-block"},
+                }),
                 // $I("queue.alphabeticalToggle")
-                "unordered!"
+                $I("queue.pause")
+                // "Queue paused!"
             ]),
 
             $r("div", { className: queueLength >= queueCap ? "limited" : "", style: { marginLeft: "30px" }},

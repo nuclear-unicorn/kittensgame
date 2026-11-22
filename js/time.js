@@ -42,7 +42,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             vsu: this.filterMetadata(this.voidspaceUpgrades, ["name", "val", "on"]),
             queueItems: this.queue.queueItems,
             queueSources: this.queue.queueSources,
-            queueUnordered: this.queue.unordered
+            queueUnordered: this.queue.unordered,
+            queuePaused: this.queue.paused
         };
         this._forceChronoFurnaceStop(saveData.time.cfu);
     },
@@ -96,6 +97,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             }
         }
         this.queue.unordered = saveData["time"].queueUnordered || false;
+        this.queue.paused = saveData["time"].queuePaused || false;
         this.queue.updateQueueSourcesArr();
 
         //TODO: move me to UI
@@ -258,7 +260,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         if (daysOffset > offset){
             daysOffset = offset;
         }
-        if (this.game.getFeatureFlag("QUEUE_REDSHIFT")){
+        if (this.game.getFeatureFlag("QUEUE_REDSHIFT") && !this.queue.paused){
             //console.log( "Calculating queue redshift for the following queue:", this.queue.queueItems );
             var result = this.queue.unordered? 
             this.queue.getMinEta() : this.queue.getFirstItemEtaDay();
@@ -2051,6 +2053,9 @@ dojo.declare("classes.queue.manager", null,{
     toggleOrdered: function(){
         this.unordered = !this.unordered;
     },
+    toggleQueuePause: function(){
+        this.paused = !this.paused;
+    },
     /**
      * Returns eta and
      * if the eta was actually calculated.
@@ -2816,6 +2821,9 @@ dojo.declare("classes.queue.manager", null,{
     update: function(){
         this.cap = this.calculateCap();
         if (!this.queueItems.length){
+            return;
+        }
+        if (this.paused){
             return;
         }
         if (typeof(this.fastestQueueIndex) == "number"){
