@@ -1014,6 +1014,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",  val: 100000 },
 			{ name : "steel", 	 val: 750 }
 		],
+		unlocks: {
+			upgrades: ["unobtainiumDrill"]
+		},
 		upgrades: {
 			jobs: ["geologist"]
 		},
@@ -1028,6 +1031,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",  	val: 250000 },
 			{ name : "alloy", 	 	val: 1250 }
 		],
+		evaluateLocks: function(game){
+			return game.workshop.get("miningDrill").researched && game.science.get("exogeology").researched;
+		},
 		upgrades: {
 			jobs: ["geologist"]
 		},
@@ -1729,6 +1735,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "titanium", val: 1250 },
 			{ name : "science",  val: 150000 }
 		],
+		unlocks: {
+			upgrades: ["gmo"]
+		},
 		upgrades: {
 			buildings: ["biolab"]
 		}
@@ -1785,6 +1794,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "titanium", val: 1500 },
 			{ name : "science",  val: 175000 }
 		],
+		evaluateLocks: function(game){
+			return game.workshop.get("biofuel").researched && game.science.get("genetics").researched;
+		},
 		upgrades: {
 			buildings: ["biolab"]
 		}
