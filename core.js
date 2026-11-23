@@ -2255,8 +2255,6 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", Buildi
 				reason: whyArentWeEnabled
 			};
 		}
-		if (event.boughtByQueue){
-		}
 		if (model.metadata.almostLimited && this.game.time.queue.respectAutocracy && event.boughtByQueue){
 			return {
 				itemBought: false,
