@@ -2255,6 +2255,14 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingStackableBtnController", Buildi
 				reason: whyArentWeEnabled
 			};
 		}
+		if (event.boughtByQueue){
+		}
+		if (model.metadata.almostLimited && this.game.time.queue.respectAutocracy && event.boughtByQueue){
+			return {
+				itemBought: false,
+				reason: "respect-autocracy"
+			};
+        }
 		//Else, we meet all the requirements for being able to buy this item:
 		var meta = model.metadata;
 		if (this.game.ironWill && meta.effects && meta.effects["maxKittens"] > 0 && this.game.science.get("archery").researched) {

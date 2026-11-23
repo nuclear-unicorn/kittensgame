@@ -211,6 +211,18 @@ WQueue = React.createClass({
         game.time.queue.toggleAlphabeticalSort();
         this.render();
     },
+    toggleOrdered: function(){
+        game.time.queue.toggleOrdered();
+        this.render();
+    },
+    toggleQueuePause: function(){
+        game.time.queue.toggleQueuePause();
+        this.render();
+    },
+    toggleRespectAutocracy: function(){
+        game.time.queue.toggleRespectAutocracy();
+        this.render();
+    },
     render: function(){
         var self = this;
 
@@ -219,6 +231,7 @@ WQueue = React.createClass({
 
         var queueLength = game.time.queue.queueLength();
         var queueCap = game.time.queue.cap;
+        var showRespectAutocracy = game.science.getPolicy("authocracy").researched;
 
         return $r("div", {
             className: "queue-container"
@@ -254,6 +267,37 @@ WQueue = React.createClass({
                 }),
                 $I("queue.alphabeticalToggle")
             ]),
+
+            $r("div", {className:"alphabetical-toggle"}, [
+                $r("input", {
+                    type:"checkbox", 
+                    checked: game.time.queue.unordered,
+                    onClick: self.toggleOrdered,
+                    style:{display:"inline-block"},
+                }),
+                $I("queue.unordered")
+            ]),
+
+            $r("div", {className:"alphabetical-toggle"}, [
+                $r("input", {
+                    type:"checkbox", 
+                    checked: game.time.queue.paused,
+                    onClick: self.toggleQueuePause,
+                    style:{display:"inline-block"},
+                }),
+                $I("queue.pause")
+            ]),
+            (showRespectAutocracy? 
+            $r("div", {className:"alphabetical-toggle",
+            }, [
+                $r("input", {
+                    type:"checkbox", 
+                    checked: game.time.queue.respectAutocracy,
+                    onClick: self.toggleRespectAutocracy,
+                    style:{display:"inline-block"},
+                }),
+                $I("queue.respectAutocracy"),
+            ]) : null),
 
             $r("div", { className: queueLength >= queueCap ? "limited" : "", style: { marginLeft: "30px" }},
                 $r("span", {},
