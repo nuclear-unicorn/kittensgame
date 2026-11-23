@@ -2018,6 +2018,7 @@
     "queue.add": "Add to queue",
     "queue.length.indicator": "Queue length: {0}/{1}",
     "queue.pause": "Pause queue",
+    "queue.respectAutocracy": "Respect Autocracy",
     "queue.unordered": "Unordered queue",
     "btn.enqueue": "⇶ ({0})",
     "btn.enqueue.long": "Add to queue ({0})",

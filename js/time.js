@@ -43,7 +43,8 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
             queueItems: this.queue.queueItems,
             queueSources: this.queue.queueSources,
             queueUnordered: this.queue.unordered,
-            queuePaused: this.queue.paused
+            queuePaused: this.queue.paused,
+            respectAutocracy: this.queue.respectAutocracy
         };
         this._forceChronoFurnaceStop(saveData.time.cfu);
     },
@@ -98,6 +99,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         }
         this.queue.unordered = saveData["time"].queueUnordered || false;
         this.queue.paused = saveData["time"].queuePaused || false;
+        this.queue.respectAutocracy = saveData["time"].respectAutocracy && this.game.science.getPolicy("authocracy").researched || false;
         this.queue.updateQueueSourcesArr();
 
         //TODO: move me to UI
@@ -182,6 +184,9 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
 
     updateQueue: function(){
         if (this.game.getFeatureFlag("QUEUE")){
+            if (this.queue.respectAutocracy){
+                this.game.upgrade({"policies": ["authocracy"]});
+            }
             this.queue.update();
 
             //TODO: use dedicated flag for queue tab
@@ -298,12 +303,19 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
                     if (daysNeeded > daysOffsetLeft){
                         this.applyRedshift(daysOffsetLeft, true);
                         daysOffsetLeft = 0;
+                        if (this.queue.respectAutocracy){
+                            this.game.upgrade({"policies": ["authocracy"]});
+                        }
                         this.queue.update();
                         break;
                     }
                     this.applyRedshift(daysNeeded, true);
                     daysOffsetLeft -= daysNeeded;
                     activationsAllowed -= 1;
+
+                if (this.queue.respectAutocracy){
+                    this.game.upgrade({"policies": ["authocracy"]});
+                }
                     this.queue.update();
                     /*if (!redshiftQueueWorked){
                         console.warn("Redshift queue failed to build", this.queue.queueItems[0]);
@@ -2056,6 +2068,9 @@ dojo.declare("classes.queue.manager", null,{
     toggleQueuePause: function(){
         this.paused = !this.paused;
     },
+    toggleRespectAutocracy: function(){
+        this.respectAutocracy = !this.respectAutocracy;
+    },
     /**
      * Returns eta and
      * if the eta was actually calculated.
@@ -2137,6 +2152,10 @@ dojo.declare("classes.queue.manager", null,{
             return [0, true];
         }
         var modelElement = this.getQueueElementModel(element);
+        if (this.respectAutocracy && modelElement.metaAccessor.meta.almostLimited && modelElement.metaAccessor.meta.effects["maxKittens"]){
+            return [eta, false];
+            // Player does not want queue to cap housing due to autocracy scaling bonus!
+        }
         var prices = modelElement.prices;
         var engineersConsumed = this.game.workshop.getConsumptionEngineers();
         for (var ind in prices){
@@ -2788,6 +2807,9 @@ dojo.declare("classes.queue.manager", null,{
             this.queueItems.splice(i, 1);
             this.game._publish("ui/update", this.game);
             i -= 1;
+            return;
+        }
+        if (this.respectAutocracy && controllerAndModel.model.metaAccessor.meta.almostLimited && controllerAndModel.model.metaAccessor.meta.effects["maxKittens"] > 0){
             return;
         }
         var result = controllerAndModel.controller.buyItem(controllerAndModel.model, { boughtByQueue: true });
