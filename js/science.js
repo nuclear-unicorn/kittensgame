@@ -514,7 +514,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 		unlocks: {
 			buildings: ["aiCore"],
 			tech: ["quantumCryptography"],
-			upgrades: ["neuralNetworks", "aiEngineers", "machineLearning", "selfDrivingHarvester"]
+			upgrades: ["neuralNetworks", "aiEngineers", "machineLearning", "aiBases", "selfDrivingHarvester"]
 		}
 	}, {
 		name: "quantumCryptography",

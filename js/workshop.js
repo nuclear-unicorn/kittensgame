@@ -577,6 +577,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science", val: 225000 },
 			{ name : "alloy", 	val: 750 }
 		],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("orbitalLaunch") && game.science.get("orbitalEngineering").researched;
+		},
 		upgrades: {
 			spaceBuilding: ["sattelite"]
 		}
@@ -1591,6 +1594,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{name: "antimatter", val: 250},
 			{name: "eludium", val: 15}
 		],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("moonMission") && game.science.get("antimatter").researched;
+		},
 		upgrades: {
 			spaceBuilding: ["moonBase"]
 		},
@@ -1605,6 +1611,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "antimatter", val: 7500 },
 			{ name : "science", val: 750000 }
 		],
+		evaluateLocks: function(game) {
+			return game.workshop.get("amBases").researched && game.science.get("ai").researched;
+		},
 		upgrades: {
 			spaceBuilding: ["moonBase"]
 		}
@@ -1633,6 +1642,11 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			spaceBuilding: ["researchVessel", "spaceBeacon"]
+		},
+		evaluateLocks: function(game) {
+			var relevantPlanet = game.space.getIsProgramLaunched("piscineMission") ||
+				game.space.getIsProgramLaunched("kairoMission");
+			return relevantPlanet && game.science.get("antimatter").researched;
 		},
 		unlocks: {
 			upgrades: ["amReactorsMK2"]
@@ -1674,6 +1688,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		description: $I("workshop.relicStation.desc"),
 		effects: {
 			"beaconRelicsPerDay": 0.01
+		},
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("kairoMission") && game.science.get("cryptotheology").researched;
 		},
 		upgrades: {
 			spaceBuilding: ["spaceBeacon"]
@@ -1962,6 +1979,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",  val: 250000 },
 			{ name : "alloy", 	 val: 1250 }
 		],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("orbitalLaunch") && game.science.get("orbitalEngineering").researched;
+		},
 		unlocks: {
 			upgrades: ["satnav"]
 		}
@@ -1987,9 +2007,11 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
         prices:[
             { name : "science",  val: 225000 },
             { name : "alloy", 	 val: 5000 }
-        ]
-    },
-	{
+        ],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("orbitalLaunch") && game.science.get("orbitalEngineering").researched;
+		}
+	},{
 		name: "astrophysicists",
 		label: $I("workshop.astrophysicists.label"),
 		description: $I("workshop.astrophysicists.desc"),
@@ -2012,7 +2034,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "science",  val: 150000 },
 			{ name : "eludium", val: 50 }
-		]
+		],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("moonMission") && game.science.get("advExogeology").researched;
+		}
 	},
 	{
 		name: "eludiumCracker",
@@ -2025,6 +2050,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",  val: 275000 },
 			{ name : "eludium", val: 250 }
 		],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("duneMission") && game.science.get("advExogeology").researched;
+		},
 		upgrades: {
 			spaceBuilding: ["planetCracker"]
 		}
@@ -2042,6 +2070,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name: "alloy", val: 10000 },
 			{ name: "unobtainium", val: 300 }
 		],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("duneMission") && game.science.get("ai").researched;
+		},
 		upgrades: {
 			spaceBuilding: ["spiceRefinery"]
 		}
@@ -2060,6 +2091,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name: "blueprint", val: 100 },
 			{ name: "concrate", val: 850 }
 		],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("duneMission") && game.science.get("advExogeology").researched;
+		},
 		upgrades: {
 			spaceBuilding: ["spiceRefinery"]
 		}
@@ -2076,6 +2110,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name: "alloy", val: 24000 },
 			{ name: "oil", val: 170000 } //Petroleum-based solvent
 		],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("duneMission") && game.science.get("oilProcessing").researched;
+		},
 		upgrades: {
 			spaceBuilding: ["spiceRefinery"]
 		}

@@ -30,10 +30,11 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 			{name: "science", val: 100000},
 			{name: "starchart", val: 250}
 		],
-        unlocks: {
-            planet: ["cath"],
-            spaceMission: ["moonMission"]
-        }
+		unlocks: {
+			planet: ["cath"],
+			spaceMission: ["moonMission"],
+			upgrades: ["hubbleTelescope", "satelliteRadio", "solarSatellites"]
+		}
 	},{
 		name: "moonMission",
 		label: $I("space.moonMission.label"),
@@ -46,7 +47,8 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 		],
         unlocks: {
             planet: ["moon"],
-            spaceMission: ["duneMission", "piscineMission"]
+            spaceMission: ["duneMission", "piscineMission"],
+		  upgrades: ["amBases", "mWReactor"]
         }
 	},{
 		name: "duneMission",
@@ -61,7 +63,8 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 		unlocks: {
             planet: ["dune"],
             spaceMission: ["heliosMission"],
-			policies:["technocracy", "theocracy", "expansionism"]
+			policies:["technocracy", "theocracy", "expansionism"],
+			upgrades: ["eludiumCracker", "selfDrivingHarvester", "eludiumCentrifuge", "solventBath"]
         }
 	},{
 		name: "piscineMission",
@@ -73,10 +76,11 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 			{name: "starchart", val: 1500},
 			{name: "kerosene", val: 250}
 		],
-        unlocks: {
-            planet: ["piscine"],
-            spaceMission: ["terminusMission"]
-        }
+		unlocks: {
+			planet: ["piscine"],
+			spaceMission: ["terminusMission"],
+			upgrades: ["amReactors"]
+		}
 	},{
 		name: "heliosMission",
 		label: $I("space.heliosMission.label"),
@@ -117,7 +121,8 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 		],
 		unlocks: {
 			planet: ["kairo"],
-            spaceMission: ["rorschachMission"]
+			spaceMission: ["rorschachMission"],
+			upgrades: ["amReactors", "relicStation"]
 		}
 	},{
 		name: "rorschachMission",
@@ -1184,6 +1189,10 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 				return program;
 			}
 		}
+	},
+
+	getIsProgramLaunched: function(name) {
+		return this.getProgram(name).val > 0;
 	},
 
 	getBuilding: function(name) {
