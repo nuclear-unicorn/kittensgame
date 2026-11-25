@@ -930,9 +930,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		upgrades: {
 			spaceBuilding: ["moonBase", "planetCracker", "cryostation"]
 		},
-		unlocks: {
-			upgrades: ["transportSuperposition"]
-		},
 		flavor: $I("buildings.warehouse.flavor"),
 		unlockScheme: {
 			name: "minimalist",
