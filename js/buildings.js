@@ -930,9 +930,6 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 		upgrades: {
 			spaceBuilding: ["moonBase", "planetCracker", "cryostation"]
 		},
-		unlocks: {
-			upgrades: ["transportSuperposition"]
-		},
 		flavor: $I("buildings.warehouse.flavor"),
 		unlockScheme: {
 			name: "minimalist",
@@ -986,6 +983,11 @@ dojo.declare("classes.managers.BuildingsManager", com.nuclearunicorn.core.TabMan
 				effects["ironMax"] *= ratio;
 				effects["titaniumMax"] *= ratio;
 				effects["goldMax"] *= ratio;
+
+				var ratioFormatted = game.toDisplayPercentage(ratio - 1, 1, true /*1 digit of precision*/) + "%";
+				self.description = $I("buildings.harbor.desc") + "<br>" + $I("buildings.harbor.desc.cargoShips", [ratioFormatted]);
+			} else {
+				self.description = $I("buildings.harbor.desc");
 			}
 
 			self.effects = game.resPool.addBarnWarehouseRatio(effects);

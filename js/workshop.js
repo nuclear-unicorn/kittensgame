@@ -1,3 +1,36 @@
+// @ts-check
+
+/**
+ * The metadata definition for a craftable resource in the Workshop tab.
+ * @typedef {object} CraftRecipeMetadata
+ * @property {string} name The internal name of this craft recipe as used by the game engine.
+ * This is also the name of the resource that is yielded by this craft; therefore, this name MUST match
+ * the internal name of one of the game's resources (defined in `resources.js`).
+ * @property {string} label The i18n name of this craft item as displayed to the player.
+ * @property {string} description The i18n description of this craft item as displayed to the player.
+ * @property {{name: string, val: number}[]} prices The ingredients required to craft this item.
+ * @property {Record<string, any[]>} [unlocks] Optional.
+ * List of items to be unlocked when this craft is performed (either manually or by engineers).
+ * @property {Record<string, any[]>} [upgrades] Optional.
+ * List of items to be upgraded when this craft is performed (either manually or by engineers).
+ * Note that if we care about the quantity of an item (say, ships), then all higher-level crafts
+ * which consume that item (tankers, in this example) should also have the same upgrades table so
+ * that we can account for situations in which the quantity of resource *decreases*.
+ * @property {boolean} [defaultUnlocked=false] Whether this craft recipe is unlocked immediately at the start of a run.
+ * Technically optional, but I recommend you define it explicitly for ease of human comprehension.
+ * If not defined, the craft recipe will remain locked by default.
+ * @property {boolean} [ignoreBonuses] It's a mystery! As far as I can tell, this doesn't actually do anything.
+ * See GamePage#getResCraftRatio for details of how craft ratio bonuses are actually calculated in practice.
+ * @property {number} [progressHandicap=1] Acts as a multiplier to the amount of time it takes for engineers to craft this item,
+ * e.g. a value of `1` means it crafts at normal speed, a value of `20` means it crafts at 1/20th of the normal speed, etc.
+ * If not specified, defaults to 1.
+ * Please set it to be a positive number unless you *enjoy* causing all kinds of logic errors in the engine.
+ * @property {number} tier Mandatory.
+ * Engineers whose promotion rank is less than this number receive a penalty to crafting speed proportional to the number of ranks missing.
+ * This also allows Workshop upgrades to boost engineers' crafting speed based on the tier of craft they are assigned to.
+ * Aside from the `"UniversalKnowHow"` effect, crafting speed upgrades affect ONLY the specific tier listed.
+ */
+
 dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabManager, {
 
 	game: null,
@@ -544,6 +577,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science", val: 225000 },
 			{ name : "alloy", 	val: 750 }
 		],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("orbitalLaunch") && game.science.get("orbitalEngineering").researched;
+		},
 		upgrades: {
 			spaceBuilding: ["sattelite"]
 		}
@@ -560,6 +596,13 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science", val: 55000 },
 			{ name : "blueprint", val: 15 }
 		],
+		evaluateLocks: function(game){
+			//The indended unlock condition is "have 1 trade ship," but considering that it's possible to start
+			// a run with trade ships already (using chronoresets), we need to keep the requirement of having
+			// Navigation (technology) researched as well, so that the player unlocks this technology at the
+			// correct node of the technology tree.
+			return game.resPool.get("ship").value > 0 && game.science.get("navigation").researched;
+		},
 		upgrades: {
 			buildings: ["harbor"]
 		},
@@ -974,6 +1017,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",  val: 100000 },
 			{ name : "steel", 	 val: 750 }
 		],
+		unlocks: {
+			upgrades: ["unobtainiumDrill"]
+		},
 		upgrades: {
 			jobs: ["geologist"]
 		},
@@ -988,6 +1034,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",  	val: 250000 },
 			{ name : "alloy", 	 	val: 1250 }
 		],
+		evaluateLocks: function(game){
+			return game.workshop.get("miningDrill").researched && game.science.get("exogeology").researched;
+		},
 		upgrades: {
 			jobs: ["geologist"]
 		},
@@ -1545,6 +1594,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{name: "antimatter", val: 250},
 			{name: "eludium", val: 15}
 		],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("moonMission") && game.science.get("antimatter").researched;
+		},
 		upgrades: {
 			spaceBuilding: ["moonBase"]
 		},
@@ -1559,6 +1611,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "antimatter", val: 7500 },
 			{ name : "science", val: 750000 }
 		],
+		evaluateLocks: function(game) {
+			return game.workshop.get("amBases").researched && game.science.get("ai").researched;
+		},
 		upgrades: {
 			spaceBuilding: ["moonBase"]
 		}
@@ -1587,6 +1642,11 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		],
 		upgrades: {
 			spaceBuilding: ["researchVessel", "spaceBeacon"]
+		},
+		evaluateLocks: function(game) {
+			var relevantPlanet = game.space.getIsProgramLaunched("piscineMission") ||
+				game.space.getIsProgramLaunched("kairoMission");
+			return relevantPlanet && game.science.get("antimatter").researched;
 		},
 		unlocks: {
 			upgrades: ["amReactorsMK2"]
@@ -1628,6 +1688,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		description: $I("workshop.relicStation.desc"),
 		effects: {
 			"beaconRelicsPerDay": 0.01
+		},
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("kairoMission") && game.science.get("cryptotheology").researched;
 		},
 		upgrades: {
 			spaceBuilding: ["spaceBeacon"]
@@ -1689,6 +1752,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "titanium", val: 1250 },
 			{ name : "science",  val: 150000 }
 		],
+		unlocks: {
+			upgrades: ["gmo"]
+		},
 		upgrades: {
 			buildings: ["biolab"]
 		}
@@ -1745,6 +1811,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "titanium", val: 1500 },
 			{ name : "science",  val: 175000 }
 		],
+		evaluateLocks: function(game){
+			return game.workshop.get("biofuel").researched && game.science.get("genetics").researched;
+		},
 		upgrades: {
 			buildings: ["biolab"]
 		}
@@ -1910,6 +1979,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",  val: 250000 },
 			{ name : "alloy", 	 val: 1250 }
 		],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("orbitalLaunch") && game.science.get("orbitalEngineering").researched;
+		},
 		unlocks: {
 			upgrades: ["satnav"]
 		}
@@ -1935,9 +2007,11 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
         prices:[
             { name : "science",  val: 225000 },
             { name : "alloy", 	 val: 5000 }
-        ]
-    },
-	{
+        ],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("orbitalLaunch") && game.science.get("orbitalEngineering").researched;
+		}
+	},{
 		name: "astrophysicists",
 		label: $I("workshop.astrophysicists.label"),
 		description: $I("workshop.astrophysicists.desc"),
@@ -1960,7 +2034,10 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name : "science",  val: 150000 },
 			{ name : "eludium", val: 50 }
-		]
+		],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("moonMission") && game.science.get("advExogeology").researched;
+		}
 	},
 	{
 		name: "eludiumCracker",
@@ -1973,6 +2050,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name : "science",  val: 275000 },
 			{ name : "eludium", val: 250 }
 		],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("duneMission") && game.science.get("advExogeology").researched;
+		},
 		upgrades: {
 			spaceBuilding: ["planetCracker"]
 		}
@@ -1986,10 +2066,13 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices: [
 			{ name: "science", val: 300000 },
 			{ name: "gear", val: 3000 },
-			{ name: "microchip", val: 750 },
+			{ name: "microchip", val: 300 },
 			{ name: "alloy", val: 10000 },
 			{ name: "unobtainium", val: 300 }
 		],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("duneMission") && game.science.get("ai").researched;
+		},
 		upgrades: {
 			spaceBuilding: ["spiceRefinery"]
 		}
@@ -2008,6 +2091,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name: "blueprint", val: 100 },
 			{ name: "concrate", val: 850 }
 		],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("duneMission") && game.science.get("advExogeology").researched;
+		},
 		upgrades: {
 			spaceBuilding: ["spiceRefinery"]
 		}
@@ -2021,9 +2107,12 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices: [
 			{ name: "science", val: 675000 },
 			{ name: "gear", val: 6750 },
-			{ name: "alloy", val: 8000 },
-			{ name: "oil", val: 80000 } //Petroleum-based solvent
+			{ name: "alloy", val: 24000 },
+			{ name: "oil", val: 170000 } //Petroleum-based solvent
 		],
+		evaluateLocks: function(game) {
+			return game.space.getIsProgramLaunched("duneMission") && game.science.get("oilProcessing").researched;
+		},
 		upgrades: {
 			spaceBuilding: ["spiceRefinery"]
 		}
@@ -2179,7 +2268,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 	//=============================================================
 	//					     CRAFT RECIPES
 	//=============================================================
-
+	/**
+	 * @type {CraftRecipeMetadata[]}
+	 */
 	crafts:[{
 		name: "wood",
 		label: $I("workshop.crafts.wood.label"),
@@ -2187,6 +2278,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{name: "catnip", val: 100}
 		],
+		defaultUnlocked: true,
 		ignoreBonuses: true,
 		progressHandicap: 1,
 		tier: 1
@@ -2197,6 +2289,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{name: "wood", val: 175}
 		],
+		defaultUnlocked: true,
 		progressHandicap: 1,
 		tier: 1
 	},{
@@ -2206,6 +2299,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{name: "minerals", val: 250}
 		],
+		defaultUnlocked: true,
 		progressHandicap: 1,
 		tier: 1
 	},{
@@ -2215,6 +2309,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{name: "iron", val: 125}
 		],
+		defaultUnlocked: true,
 		progressHandicap: 4,
 		tier: 1
 	},{
@@ -2225,6 +2320,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{name: "coal", val: 100},
 			{name: "iron", val: 100}
 		],
+		defaultUnlocked: false,
 		progressHandicap: 4,
 		tier: 2
 	},{
@@ -2235,6 +2331,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{name: "slab", val: 2500},
 			{name: "steel", val: 25}
 		],
+		defaultUnlocked: false,
 		progressHandicap: 9,
 		tier: 4
 	},{
@@ -2244,6 +2341,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{name: "steel", val: 15}
 		],
+		defaultUnlocked: false,
 		progressHandicap: 5,
 		tier: 3
 	},{
@@ -2254,6 +2352,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{name: "titanium", val: 10},
 			{name: "steel", val: 75 }
 		],
+		defaultUnlocked: false,
 		progressHandicap: 7,
 		tier: 4
 	},{
@@ -2264,6 +2363,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{name: "unobtainium", val: 1000},
 			{name: "alloy", val: 2500 }
 		],
+		defaultUnlocked: false,
 		progressHandicap: 300,
 		tier: 5
 	},{
@@ -2273,6 +2373,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name: "beam", val: 50 }
 		],
+		defaultUnlocked: true,
 		progressHandicap: 2,
 		tier: 2
 	},{
@@ -2284,9 +2385,13 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name: "plate",    val: 150 },
 			{ name: "scaffold", val: 100 }
 		],
+		unlocks: {
+			upgrades: ["cargoShips"]
+		},
 		upgrades: {
 			buildings: ["harbor"]
 		},
+		defaultUnlocked: false,
 		progressHandicap: 20,
 		tier: 3
 	},{
@@ -2301,44 +2406,49 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		upgrades: {
 			buildings: ["harbor"]
 		},
+		defaultUnlocked: false,
 		progressHandicap: 20,
 		tier: 5
 	},{
-        name: "kerosene",
-        label: $I("workshop.crafts.kerosene.label"),
-        description: $I("workshop.crafts.kerosene.desc"),
-        prices:[
-            { name: "oil", val: 7500 }
-        ],
+		name: "kerosene",
+		label: $I("workshop.crafts.kerosene.label"),
+		description: $I("workshop.crafts.kerosene.desc"),
+		prices:[
+			{ name: "oil", val: 7500 }
+		],
+		defaultUnlocked: false,
 		progressHandicap: 5,
 		tier: 2
-    },{
-        name: "plastic",
-        label: $I("workshop.crafts.plastic.label"),
-        description: $I("workshop.crafts.plastic.desc"),
-        prices:[
-            { name: "oil", val: 1000 }
-        ],
+	},{
+		name: "plastic",
+		label: $I("workshop.crafts.plastic.label"),
+		description: $I("workshop.crafts.plastic.desc"),
+		prices:[
+			{ name: "oil", val: 1000 }
+		],
+		defaultUnlocked: false,
 		progressHandicap: 5,
 		tier: 2
-    },{
-        name: "microchip",
-        label: $I("workshop.crafts.microchip.label"),
-        description: $I("workshop.crafts.microchip.desc"),
-        prices:[
-            { name: "plastic", val: 50 },
+	},{
+		name: "microchip",
+		label: $I("workshop.crafts.microchip.label"),
+		description: $I("workshop.crafts.microchip.desc"),
+		prices:[
+			{ name: "plastic", val: 50 },
 			{ name: "gold", val: 1000 },
 			{ name: "spice", val: 750 }
-        ],
+		],
+		defaultUnlocked: false,
 		progressHandicap: 20,
 		tier: 3
-    },{
+	},{
 		name: "parchment",
 		label: $I("workshop.crafts.parchment.label"),
 		description: $I("workshop.crafts.parchment.desc"),
 		prices:[
 			{name: "furs", val: 175}
 		],
+		defaultUnlocked: false,
 		progressHandicap: 1,
 		tier: 1
 	},{
@@ -2349,6 +2459,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{name: "culture", val: 400},
 			{name: "parchment", val: 25}
 		],
+		defaultUnlocked: false,
 		progressHandicap: 2,
 		tier: 2
 	},{
@@ -2359,6 +2470,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{name: "science", val: 9000},
 			{name: "manuscript", val: 55}
 		],
+		defaultUnlocked: false,
 		progressHandicap: 5,
 		tier: 3
 	},{
@@ -2369,6 +2481,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{name: "science", val: 25000},
 			{name: "compedium", val: 25}
 		],
+		defaultUnlocked: false,
 		progressHandicap: 10,
 		tier: 3
 	},{
@@ -2378,6 +2491,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 		prices:[
 			{ name: "uranium", val: 250 }
 		],
+		defaultUnlocked: false,
 		progressHandicap: 5,
 		tier: 3
 	},{
@@ -2389,6 +2503,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name: "slab", val: 50 },
 			{ name: "plate", val: 5 }
 		],
+		defaultUnlocked: true,
 		progressHandicap: 5,
 		tier: 3
 	},{
@@ -2399,6 +2514,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name: "timeCrystal", val: 5000 },
 			{ name: "relic", val: 10000 }
 		],
+		defaultUnlocked: false,
 		progressHandicap: 7500,
 		tier: 5
 	},{
@@ -2412,6 +2528,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			{ name: "ivory", val: 1000 },
 			{ name: "titanium", val: 500 }
 		],
+		defaultUnlocked: false,
 		progressHandicap: 10000,
 		tier: 7
 	}],
@@ -2664,18 +2781,7 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 
 		for (i = 0; i < this.crafts.length; i++){
 			var craft = this.crafts[i];
-			if (craft.name == "wood" ||
-				craft.name == "beam" ||
-				craft.name == "slab" ||
-				craft.name == "plate" ||
-				craft.name == "gear" ||
-				craft.name == "scaffold" ||
-				craft.name == "manuscript" ||
-				craft.name == "megalith") {
-				craft.unlocked = true;
-			} else {
-				craft.unlocked = false;
-			}
+			craft.unlocked = Boolean(craft.defaultUnlocked);
 			craft.value = 0;
 			craft.progress = 0;
 			if (typeof(craft.progressHandicap) == "undefined") {
@@ -2782,6 +2888,9 @@ dojo.declare("classes.managers.WorkshopManager", com.nuclearunicorn.core.TabMana
 			var actualAmtGained = this.game.resPool.addResEvent(res,craftAmt);
 			if (craft.upgrades){
 				this.game.upgrade(craft.upgrades);
+			}
+			if (craft.unlocks) {
+				this.game.unlock(craft.unlocks);
 			}
 
 			this.game.stats.getStat("totalCrafts").val++;

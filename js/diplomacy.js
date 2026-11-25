@@ -461,9 +461,14 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 	 * Returns true if particular resource can be traded to you by a race
 	 */
 	isValidTrade: function(sell, race){
+		var resPool = this.game.resPool;
 		var resName = sell.name;
 		var hasHighEnoughEmbassyLevel = !sell.minLevel || race.embassyLevel >= sell.minLevel;
-		var isResourceTradeable = this.game.resPool.get(resName).unlocked || resName === "coal"  || resName === "uranium" || race.name === "leviathans";
+		var isResourceTradeable = resPool.get(resName).unlocked || resName === "coal"  || resName === "uranium" || race.name === "leviathans";
+		if (resName == "antimatter" && resPool.energyProd < resPool.energyCons) {
+			//You cannot acquire antimatter during an energy deficit
+			isResourceTradeable = false;
+		}
 		var positiveChance = (sell.chance + this.getAmbassadorEffect("tradeNormalResChance")) > 0;
 		return hasHighEnoughEmbassyLevel && isResourceTradeable && positiveChance;
 	},

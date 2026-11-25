@@ -25,7 +25,25 @@
 /**
  * Display metadata for one effect. Every field is optional - a bare `{title: ...}`
  * is a valid meta, and `getEffectMeta` falls back to exactly that.
- * @typedef {{title?: string, resName?: string, type?: string, calculation?: string}} EffectMeta
+ * @typedef {object} EffectMeta
+ * @property {string} [title] The i18n string displayed as the name of this effect in tooltips.
+ * @property {string} [resName] If set, this effect is hidden from tooltips until the corresponding resource is unlocked.
+ * @property {"perTick" | "perDay" | "perYear" | "ratio" | "integerRatio" | "hidden" | "energy" | "fixed"} [type]
+ * Controls how the effect value is displayed.
+ * 
+ * - `"perTick"` = value will be formatted as per-tick, per-second, or per-hour,
+ * 			depending on `opts.usePerSecondValues` & the size of the effect
+ * - `"perDay"` = value will be formatted as per-day
+ * - `"perYear"` = value will be formatted as per-year
+ * - `"ratio"` = value will be displayed as a percentage, where `1` means "100.00%"
+ * - `"integerRatio"` = value will be displayed as a percentage, where `1` means "1%"
+ * - `"energy"` = value will be formatted in units of energy & multiplied by global consumption/production modifiers
+ * - `"hidden"` = this effect is always hidden, never displayed in tooltips
+ * - `"fixed"` or `undefined` = no special behavior
+ * @property {"nonProportional"} [calculation] I can't actually find where in the code this gets used.
+ * Use `"nonProportional"` to mark that the effect *could* have nonlinear scaling.
+ * @property {string} [reqFeatureFlag] If set, this effect will be hidden from the player
+ * when the corresponding feature flag is disabled.
  */
 /**
  * A parsed save blob. Every manager owns a top level key and is free to put
@@ -2206,6 +2224,17 @@ var EffectsManager = dojo.declare("com.nuclearunicorn.game.EffectsManager", null
                 title: $I("effectsMgr.statics.zebraOutpostPriceRatio.title"),
                 type: "ratio"
             },
+			//Effects related to the biome/map system:
+			"explorerAtk": {
+				title: $I("effectsMgr.statics.explorerAtk.title"),
+				type: "fixed",
+				reqFeatureFlag: "VILLAGE_MAP"
+			},
+			"explorerDef": {
+				title: $I("effectsMgr.statics.explorerDef.title"),
+				type: "fixed",
+				reqFeatureFlag: "VILLAGE_MAP"
+			},
 		}
 	}
 });
@@ -5097,6 +5126,12 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 		var effectMeta = this.getEffectMeta(effectName);
 		if (effectMeta.type === "hidden") {
 			return null;	//Don't display because it's a hidden effect.
+		}
+		if (effectMeta.reqFeatureFlag) {
+			if (!this.getFeatureFlag(effectMeta.reqFeatureFlag)) {
+				//effectMeta is relevant to a feature which doesn't exist on this version of the game
+				return null; //Don't display
+			}
 		}
 		if (effectMeta.resName && !this.resPool.get(effectMeta.resName).unlocked) {
 			return null;	//hide resource-related effects if we did not unlocked this effect yet
