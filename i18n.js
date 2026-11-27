@@ -153,6 +153,11 @@ dojo.declare("com.nuclearunicorn.i18n.Lang", null, {
 		return this.language;
 	},
 
+	getLanguageTag: function() {
+		var localeTags = {br: "pt-BR", cz: "cs", esl: "es-419", zht: "zh-TW"};
+		return localeTags[this.language] || this.language;
+	},
+
 	updateLanguage: function(lang) {
 		this.language = lang;
 		LCstorage["com.nuclearunicorn.kittengame.language"] = lang;

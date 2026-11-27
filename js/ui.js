@@ -745,7 +745,7 @@ dojo.declare("classes.ui.DesktopUI", classes.ui.UISystem, {
             document.title = $I("navbar.title") + " - " + $I("calendar.year.full", [this.game.getDisplayValueExt(calendar.year), seasonTitle, Math.floor(calendar.day)]);
 
             if (this.game.ironWill && calendar.observeBtn) {
-                document.title = "[EVENT!]" + document.title;
+                document.title = $I("ui.event.notice") + document.title;
             }
 
             var calendarSignSpan = dojo.byId("calendarSign");

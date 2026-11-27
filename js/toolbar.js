@@ -235,7 +235,7 @@ dojo.declare("classes.ui.toolbar.ToolbarMOTD", classes.ui.ToolbarIcon, {
 		var server = this.game.server;
 		if (server.showMotd && server.motdContent) {
 			server.motdFreshMessage = false;
-			return "Message of the day:<br />" + server.motdContent;
+			return $I("ui.motd.message", [server.motdContent]);
 		}
 	}
 });

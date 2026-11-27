@@ -1049,7 +1049,7 @@ dojo.declare("classes.managers.TimeManager", com.nuclearunicorn.core.TabManager,
         for (var i in this.cfu){
             this.cfu[i].unlocked = true;
         }
-        this.game.msg("All time upgrades are unlocked");
+        this.game.msg($I("ui.dev.unlocked.time"));
 	},
 
 	undo: function(data) {

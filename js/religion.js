@@ -1726,7 +1726,7 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 		this.faith = 1000000;
 		this.transcendenceTier = 25;
 
-		this.game.msg("All religion upgrades are unlocked!");
+		this.game.msg($I("ui.dev.unlocked.religion"));
 	},
 
 	undo: function(data){
@@ -2528,7 +2528,7 @@ dojo.declare("classes.ui.PactsPanel", com.nuclearunicorn.game.ui.Panel, {
 				this.game.religion.pactsManager.necrocornDeficit += 0.5 * counter;
 			}
 	        if (counter > 1) {
-		        this.game.msg(meta.label + " x" + counter + " constructed.", "notice");
+		        this.game.msg($I("religion.pact.msg.constructed", [meta.label, counter]), "notice");
 			}
 
 			if (meta.breakIronWill) {

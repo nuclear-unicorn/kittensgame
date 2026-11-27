@@ -256,7 +256,7 @@ WQueue = React.createClass({
                     //re-render component
                     self.forceUpdate();
                 }
-            }, "Add to queue"),
+            }, $I("queue.add")),
 
             $r("div", {className:"alphabetical-toggle"}, [
                 $r("input", {

@@ -601,7 +601,7 @@ dojo.declare("classes.managers.PrestigeManager", com.nuclearunicorn.core.TabMana
 		for (var i in this.perks){
 			this.perks[i].unlocked = true;
 		}
-		this.game.msg("All meta upgrades are unlocked!");
+		this.game.msg($I("ui.dev.unlocked.prestige"));
 	}
 });
 

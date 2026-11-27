@@ -127,7 +127,7 @@ WTerminal = React.createClass({
                     onKeyUp: this.handleKeyUp,
                     onChange: this.setCommand,
                     value: this.state.command,
-                    placeholder: "Type 'help' to see the list of all commands",
+                    placeholder: $I("ui.dev.console.hint"),
                     style: {
                         width: "500px"
                     }
@@ -135,7 +135,7 @@ WTerminal = React.createClass({
                 $r("a", {
                     className: "link",
                     onClick: this.doSubmit
-                }, "send")
+                }, $I("chiral.send"))
             ]
         );
     },
@@ -186,8 +186,8 @@ WChiral = React.createClass({
 
         if (game.server.userProfile){
             return $r("div", null, [
-                $r("div", {className: "row"}, "An alien machine lies here at the End of the Universe."),
-                $r("div", {className: "row"}, "666 nodes online"),
+                $r("div", {className: "row"}, $I("chiral.end.machine")),
+                $r("div", {className: "row"}, $I("chiral.end.nodes")),
                 $r("div", {className: "row"}, [
                     $r("pre", {
                         style: { whiteSpace: "pre-wrap" }
@@ -200,7 +200,7 @@ WChiral = React.createClass({
                 ])
             ]);
         } else {
-            return $r("div", null, "The furthest ring is empty and silent");
+            return $r("div", null, $I("chiral.end.empty"));
         }
     }
 });

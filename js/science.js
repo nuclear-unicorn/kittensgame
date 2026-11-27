@@ -2454,7 +2454,7 @@ dojo.declare("classes.managers.ScienceManager", com.nuclearunicorn.core.TabManag
 			this.game.unlock(policy.unlocks);
 		}
 
-		this.game.msg("All techs are unlocked!");
+		this.game.msg($I("ui.dev.unlocked.science"));
 	},
     /*updateEffectCached: function() {
         var effectsBase = this.effectsBase;

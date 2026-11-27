@@ -211,7 +211,7 @@ WResourceRow = React.createClass({
                     $r("input", {
                         type:"checkbox", 
                         checked: this.getIsVisible(),
-                        title: "Toggle " + $I("resources." + res.name + ".title"),
+                        title: $I("ui.resources.toggle", [$I("resources." + res.name + ".title")]),
                         onClick: this.toggleView,
                         style:{display:"inline-block"},
                     })
@@ -597,7 +597,7 @@ WResourceTable = React.createClass({
         }
         //TODO: mixing special stuff like fatih and such here
         
-        return $r("div", {ariaLabel:"Regular resources"}, [
+        return $r("div", {"aria-label": $I("ui.resources.regular.aria")}, [
             $r("div", null,[
                 $r("div", {
                     className:"res-toolbar left"
@@ -607,7 +607,7 @@ WResourceTable = React.createClass({
                             className:"link collapse", 
                             onClick: this.toggleCollapsed,
                             tabindex: 1,
-                            title: "Toggle resources",
+                            title: $I("ui.resources.togglePanel"),
                         },
                         this.state.isCollapsed ? ">(" + $I("left.resources") + ")" : $r("div", {
                             className: "svg-icon down"
@@ -619,7 +619,7 @@ WResourceTable = React.createClass({
                         className: "link" + (this.state.isEditMode ? " toggled" : ""), 
                         onClick: this.toggleEdit,
                         onKeyDown: this.onKeyDown,
-                        title:  "Resource settings",
+                        title:  $I("ui.resources.settings"),
                         tabIndex: 1
                     }, 
                         $r("div", {
@@ -710,7 +710,7 @@ WCraftTable = React.createClass({
             return null;
         }
 
-        return $r("div", {className: "sidebar-section", ariaLabel:"Craftable resources"}, [
+        return $r("div", {className: "sidebar-section", "aria-label": $I("ui.resources.craftable.aria")}, [
             $r("div", null,[
                 $r("div", {
                     className:"res-toolbar left",
@@ -719,7 +719,7 @@ WCraftTable = React.createClass({
                             className:"link collapse", 
                             onClick: this.toggleCollapsed,
                             tabindex: 1,
-                            title: "Toggle craft",
+                            title: $I("ui.craft.togglePanel"),
                         },
                         this.state.isCollapsed ? ">(" + $I("left.craft") + ")" : $r("div", {
                             className: "svg-icon down",
