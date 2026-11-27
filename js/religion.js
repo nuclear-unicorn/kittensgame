@@ -382,11 +382,21 @@ dojo.declare("classes.managers.ReligionManager", com.nuclearunicorn.core.TabMana
 			this.corruption -= alicornsToCorrupt;
 			alicorns.value -= alicornsToCorrupt;
 			if (debtToPay > 0) { //Instead of generating necrocorns, pay back debt.
+				var deficitRecovered = 0;
+				if (debtToPay - alicornsToCorrupt >= 1.0){ //let's just spend some necrocorns if debt is big enough!
+					deficitRecovered += Math.floor(
+						Math.max(debtToPay - alicornsToCorrupt, this.game.resPool.get("necrocorn").value)
+					);
+					this.game.resPool.addResPerTick("necrocorn", deficitRecovered);
+					this.pactsManager.necrocornDeficit -= deficitRecovered;
+				}
 				debtToPay = Math.min(debtToPay, alicornsToCorrupt);
+				deficitRecovered += debtToPay;
 				this.pactsManager.necrocornDeficit -= debtToPay;
 				alicornsToCorrupt -= debtToPay;
-				this.game.msg((debtToPay == 1 ? $I("religion.msg.siphoned.one") : $I("religion.msg.siphoned.many", [debtToPay])),
+				this.game.msg((deficitRecovered == 1 ? $I("religion.msg.siphoned.one") : $I("religion.msg.siphoned.many", [deficitRecovered])),
 					null, "alicornCorruption");
+					//Maybe the msg needs to be different here?
 			}
 			this.game.resPool.get("necrocorn").value += alicornsToCorrupt;
 			this.game.upgrade({
