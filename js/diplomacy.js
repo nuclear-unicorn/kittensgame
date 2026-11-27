@@ -1234,7 +1234,7 @@ dojo.declare("classes.managers.DiplomacyManager", null, {
 			this.races[i].unlocked = true;
 		}
 		this.get("leviathans").duration = 10000;
-		this.game.msg("All trade partners are unlocked");
+		this.game.msg($I("trade.partners.all.unlocked"));
 	},
 	calculatePhantomTradeposts: function(raceName, game){
 		var phantomTradeposts = 0;
@@ -1788,19 +1788,26 @@ var EmbassyButtonHelper = {
 				//Show really detailed info, a breakdown of the calculation, even, intended for dev use.
 				if (chancesToDisplay[i].title === "spice") {
 					dojo.create("div", {
-						innerHTML: "<strong>" + chancesToDisplay[i].title + "</strong>: " + (100 * 0.35).toFixed(1) + "% original + " +
-							(100 * game.diplomacy.getAmbassadorEffect("tradeSpiceChance")).toFixed(1) + "% from ambassadors yields " +
-							(100 * (0.35 + game.diplomacy.getAmbassadorEffect("tradeSpiceChance"))).toFixed(1) + "% pre-embassies, boosted to a final value of <strong>" +
-							(100 * chancesToDisplay[i].chance).toFixed(1) + "%</strong> by embassies.  The multiplier is <strong>×" + game.getDisplayValueExt(chancesToDisplay[i].multi || 1) + "</strong>.",
+						innerHTML: $I("trade.embassy.chance.details.spice", [
+							chancesToDisplay[i].title,
+							(100 * 0.35).toFixed(1),
+							(100 * game.diplomacy.getAmbassadorEffect("tradeSpiceChance")).toFixed(1),
+							(100 * (0.35 + game.diplomacy.getAmbassadorEffect("tradeSpiceChance"))).toFixed(1),
+							(100 * chancesToDisplay[i].chance).toFixed(1),
+							game.getDisplayValueExt(chancesToDisplay[i].multi || 1)
+						]),
 						className: "effectName"
 					}, tooltip);
 				} else {
 					dojo.create("div", {
-						innerHTML: "<strong>" + chancesToDisplay[i].title + "</strong>: " + (100 * chancesToDisplay[i].originalChance).toFixed(1) + "% original + " +
-							(100 * ambassadorBonus).toFixed(1) + "% from ambassadors yields " +
-							(100 * (chancesToDisplay[i].originalChance + ambassadorBonus)).toFixed(1) + "% pre-embassies, boosted to a final value of <strong>" +
-							(100 * chancesToDisplay[i].chance).toFixed(1) + "%</strong> by embassies.  The cap is " +
-							(100 * (chancesToDisplay[i].originalChance + ambassadorBonus) * (1.75 + game.diplomacy.getAmbassadorEffect("embassyEffectCap"))).toFixed(1) + "%.",
+						innerHTML: $I("trade.embassy.chance.details.normal", [
+							chancesToDisplay[i].title,
+							(100 * chancesToDisplay[i].originalChance).toFixed(1),
+							(100 * ambassadorBonus).toFixed(1),
+							(100 * (chancesToDisplay[i].originalChance + ambassadorBonus)).toFixed(1),
+							(100 * chancesToDisplay[i].chance).toFixed(1),
+							(100 * (chancesToDisplay[i].originalChance + ambassadorBonus) * (1.75 + game.diplomacy.getAmbassadorEffect("embassyEffectCap"))).toFixed(1)
+						]),
 						className: "effectName"
 					}, tooltip);
 				}

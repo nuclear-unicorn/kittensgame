@@ -176,7 +176,7 @@ WToolbarMOTD = React.createClass({
         var server = this.game.server;
 		if (server.showMotd && server.motdContent) {
 			server.motdFreshMessage = false;
-			return "Message of the day:<br />" + server.motdContent;
+			return $I("ui.motd.message", [server.motdContent]);
 		}
     }
 });
@@ -271,20 +271,21 @@ WToolbarFPS = React.createClass({
             getTooltip: this.getTooltip
         },
             $r("div", {},
-                "fps: " + game.fps.ms + " ms"
+                isFinite(game.fps.ms) ? $I("ui.dev.fps.frameTime", [game.fps.ms]) : "—"
             )
         );
     },
 
     getTooltip: function(){
         var fps = this.props.game.fps;
+        var samples = [fps.avg0, fps.avg1, fps.avg2, fps.avg3, fps.avg4];
+        if (!isFinite(fps.avg) || samples.some(function(value) { return !isFinite(value); })) {
+            return $I("ui.dev.fps.pending");
+        }
 
-        return " avg: " + fps.avg.toFixed() +
-				" ms [" + fps.avg0.toFixed() +
-				"." + fps.avg1.toFixed() +
-				"." + fps.avg2.toFixed() +
-				"." + fps.avg3.toFixed() +
-				"." + fps.avg4.toFixed() + "] (Cl. to res.)";
+        return $I("ui.dev.fps.tooltip", [fps.avg.toFixed(),
+            samples.map(function(value) { return value.toFixed(); }).join(".")
+        ]);
     }
 });
 
@@ -328,7 +329,7 @@ WLoginForm = React.createClass({
 
     render: function(){
         if (this.state.isLoading){
-            return $r("span", null, "Loading...");
+            return $r("span", null, $I("ui.kgnet.loading"));
         }
         var game = this.props.game;
         if (game.server.userProfile){
@@ -353,14 +354,14 @@ WLoginForm = React.createClass({
             {onClick: function (e){ e.stopPropagation(); }},
             [
                 $r("div", {className: "row"}, [
-                    $r("label", {for:"kgnet-email"}, "Email:"),
+                    $r("label", {for:"kgnet-email"}, $I("ui.kgnet.email")),
                         $r("input", {
                             id:"kgnet-email",
                             type: "email",
                             onChange: this.setLogin,
                             value: this.state.login
                         } ),
-                    $r("label", {for:"kgnet-password"}, "Password:"),
+                    $r("label", {for:"kgnet-password"}, $I("ui.kgnet.password")),
                         $r("input", {
                             id:"kgnet-password",
                             type: "password",
@@ -372,11 +373,11 @@ WLoginForm = React.createClass({
                     $r("a", {
                         href:"#",
                         onClick: this.login
-                    }, "login"),
+                    }, $I("menu.kgnet.login")),
                     $r("a", {
                         target: "_blank",
                         href: "http://kittensgame.com/ui/register"
-                    }, "register")
+                    }, $I("menu.kgnet.register"))
                 ]),
                 this.state.error && $r("div", {className: "row"}, [
                     $r("span", {className:"error"}, this.state.error)
@@ -439,7 +440,7 @@ WLoginForm = React.createClass({
             }
 		}).fail(function(resp, status){
             console.error("something went wrong, resp:", resp, status)
-            self.setState({error: resp.responseText || "There was a problem connecting the server"})
+            self.setState({error: resp.responseText || $I("ui.kgnet.error.network")})
         }).always(function(){
             self.setState({isLoading: false});
         });
@@ -565,31 +566,31 @@ WCloudSaveRecord = React.createClass({
             ),
             $r("div", {className:"save-record-cell"},
                 save.index ?
-                ("Year "+ save.index.calendar.year + ", day " + save.index.calendar.day) :
-                "loading..."
+                ($I("ui.kgnet.save.date", [save.index.calendar.year, save.index.calendar.day])) :
+                $I("ui.kgnet.index.loading")
             ),
             $r("div", {className:"save-record-cell"},
-                new Date(save.timestamp).toLocaleDateString("en-US", {
+                new Date(save.timestamp).toLocaleDateString(i18nLang.getLanguageTag(), {
                     month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hourCycle: "h24"
                 })
             ),
             $r("div", {className:"save-record-cell"}, self.bytesToSize(save.size)),
             isActiveSave && $r("a", {
                 className: "link",
-                title: "Upload your current game save to the server (this will owerwrite your old cloud save)",
+                title: $I("ui.kgnet.save.upload.tooltip"),
                 onClick: function(e){
                     e.stopPropagation();
-                    game.ui.confirm("[S]ave", "This will override [SERVER] save. Y/N", function(){
+                    game.ui.confirm($I("ui.kgnet.save.upload.title"), $I("ui.kgnet.save.upload.confirm"), function(){
                         game.server.pushSave();
                         self.props.closeMenu && self.props.closeMenu();
                     });
                 }}, $I("ui.kgnet.save.save")),
             $r("a", {
                 className: "link",
-                title: "Download a cloud save and apply it to your game (your current data will be lost)",
+                title: $I("ui.kgnet.save.load.tooltip"),
                 onClick: function(e){
                     e.stopPropagation();
-                    game.ui.confirm("[L]oad", "This will override [LOCAL] save. Y/N", function(){
+                    game.ui.confirm($I("ui.kgnet.save.load.title"), $I("ui.kgnet.save.load.confirm"), function(){
                         game.server.loadSave(save.guid);
                         self.props.closeMenu && self.props.closeMenu();
                     });
@@ -610,7 +611,7 @@ WCloudSaveRecord = React.createClass({
                         self.setState({
                             isEditable: !self.state.isEditable
                         })
-                }}, "edit"
+                }}, $I("ui.kgnet.save.edit")
             ),
             this.state.showActions &&
                 $r("a", { onClick: function(e){
@@ -625,14 +626,14 @@ WCloudSaveRecord = React.createClass({
                         //(pushMetadata should return a new save snapshot)
                         self.forceUpdate();
                     });
-                }}, "archive"),
+                }}, $I("ui.kgnet.save.archive")),
             this.state.showActions &&
                 $r("a", {
-                    title: "Copy a read-only preview link to this save",
+                    title: $I("ui.kgnet.save.share.tooltip"),
                     onClick: function(e){
                         e.stopPropagation();
                         self.copyPreviewLink();
-                }}, self.state.linkCopied ? "copied!" : "share")
+                }}, self.state.linkCopied ? $I("ui.kgnet.save.share.copied") : $I("ui.kgnet.save.share"))
         ]);
     }
 });
@@ -674,11 +675,11 @@ WCloudSaves = React.createClass({
             $r("div", {className:"save-record-container"},
             //header
             saveData && $r("div", {className:"save-record header"}, [
-                $r("div", {className:"save-record-cell"}, "Id"),
-                $r("div", {className:"save-record-cell"}, "Save"),
-                $r("div", {className:"save-record-cell"}, "Last update"),
-                $r("div", {className:"save-record-cell"}, "Size"),
-                $r("div", {className:"save-record-cell"}, "Actions")
+                $r("div", {className:"save-record-cell"}, $I("ui.kgnet.save.list.id")),
+                $r("div", {className:"save-record-cell"}, $I("ui.kgnet.save.list.save")),
+                $r("div", {className:"save-record-cell"}, $I("ui.kgnet.save.list.updated")),
+                $r("div", {className:"save-record-cell"}, $I("ui.kgnet.save.list.size")),
+                $r("div", {className:"save-record-cell"}, $I("ui.kgnet.save.list.actions"))
             ]),
             //body
             //TODO: externalize save record as component?
@@ -692,12 +693,12 @@ WCloudSaves = React.createClass({
                         e.stopPropagation();
                         game.server.pushSave();
                         self.props.closeMenu && self.props.closeMenu();
-                    }}, "Create new save (" + game.telemetry.guid + ")")
+                    }}, $I("ui.kgnet.save.new", [game.telemetry.guid]))
                 ]),
                 $r("div", {className:"save-record"},[
                     $r("a", {
                         className: "link",
-                        title: "Fetch the latest information about your cloud saves from the serer. This is a safe operation and it wont change any data.",
+                        title: $I("ui.kgnet.sync.tooltip"),
                         onClick: function(e){
                             e.stopPropagation();
                             self.setState({isLoading: true})
@@ -706,7 +707,7 @@ WCloudSaves = React.createClass({
                             })
                         }
                     }, 
-                        (this.state.isLoading && "[loading..]"), 
+                        (this.state.isLoading && $I("ui.kgnet.sync.loading")),
                         $I("ui.kgnet.sync")
                     ),
                     (!saveData || !saveData.length) && $r("span", {paddingTop:"10px"}, $I("ui.kgnet.instructional"))
@@ -760,7 +761,7 @@ WLogin = React.createClass({
                         $r("div", null,
                             $r("div", {className: "last-backup"}, [
                                 (lastBackup >= 7) && $r("span", {className: "hazard"}),
-                                "Last backup: ", lastBackup.toFixed(1) + " days ago",
+                                $I("ui.kgnet.save.lastBackup", [lastBackup.toFixed(1)]),
                                 (lastBackup >= 7) && $r("span", {className: "hazard"})
                             ]),
                             $r(WLoginForm, {game: game}),

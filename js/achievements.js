@@ -275,8 +275,8 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
     badges: [
         {   
             name: "lotus",
-            title: "Lotus Eater",
-            description: "Have more than 50 total resets",
+            title: $I("badge.lotus.title"),
+            description: $I("badge.lotus.desc"),
             difficulty: "A",
             condition: function(){
                 return this.game.stats.getStat("totalResets").val >= 50;
@@ -284,14 +284,14 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
         },
         {   
             name: "ivoryTower",
-            title: "Ivory Tower",
-            description: "Have a reset in a IW atheism",
+            title: $I("badge.ivoryTower.title"),
+            description: $I("badge.ivoryTower.desc"),
             difficulty: "S+"
         },
         {   
             name: "useless",
-            title: "Effective Management",
-            description: "Have a useless leader",
+            title: $I("badge.useless.title"),
+            description: $I("badge.useless.desc"),
             difficulty: "F",
             condition: function(){
                 var leader = this.game.village.leader;
@@ -300,8 +300,8 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
         },
         { 
             name: "beta",
-            title: "Beta Decay",
-            description: "Participate in a beta test",
+            title: $I("badge.beta.title"),
+            description: $I("badge.beta.desc"),
             difficulty: "B",
             condition: function(){
                 if (window && window.location && window.location.href){
@@ -311,21 +311,21 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             }
         },{
             name: "silentHill",
-            title: "Silent Hills",
-            description: "Have not MOTD content",
+            title: $I("badge.silentHill.title"),
+            description: $I("badge.silentHill.desc"),
             difficulty: "S",
             condition: function(){
                 return (this.game.server.motdContent == "");
             }
         },{
             name: "evergreen",
-            title: "Wood badge",
-            description: "Craft a wood I think?",
+            title: $I("badge.evergreen.title"),
+            description: $I("badge.evergreen.desc"),
             difficulty: "F"
         },{
             name: "deadSpace",
-            title: "Dead Space",
-            description: "Have kittens wander in the void",
+            title: $I("badge.deadSpace.title"),
+            description: $I("badge.deadSpace.desc"),
             difficulty: "S",
             condition: function(){
                 var kittens = this.game.resPool.get("kittens");
@@ -333,39 +333,39 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             }
         },{
             name: "reginaNoctis",
-            title: "Regina Noctis",
-            description: "Have 500 kittens and no alicorns",
+            title: $I("badge.reginaNoctis.title"),
+            description: $I("badge.reginaNoctis.desc"),
             difficulty: "S",
             condition: function(){
                 return (this.game.resPool.get("kittens").value >= 500 && this.game.resPool.get("alicorn").value == 0);
             }
         },{
             name: "ghostInTheMachine",
-            title: "Experience a game bug (TBD see newrelic#errorHandle)",
+            title: $I("badge.ghostInTheMachine.title"),
             description: "♋︎⬧︎⧫︎♏︎❒︎🕯︎⬧︎ ●︎♋︎■︎♑︎◆︎♋︎♑︎♏︎ 🖳︎✆",
             difficulty: "S"
         },{
             name: "abOwo",
-            title: "Ab Owo",
-            description: "Reset in atheism on day 0",
+            title: $I("badge.abOwo.title"),
+            description: $I("badge.abOwo.desc"),
             difficulty: "A"
         },{
             name: "cleanPaws",
-            title: "Clean Paws",
-            description: "Peaceful trading without cat-power",
+            title: $I("badge.cleanPaws.title"),
+            description: $I("badge.cleanPaws.desc"),
             difficulty: "C"
         },{
             name: "sequenceBreak",
-            title: "Sequence Break",
-            description: "Skip Moon in the space tab",
+            title: $I("badge.sequenceBreak.title"),
+            description: $I("badge.sequenceBreak.desc"),
             difficulty: "D",
             condition: function(){
                 return (!this.game.space.getPlanet("moon").reached && this.game.space.getPlanet("dune").reached);
             }
         },{
             name: "fantasticFurColor",
-            title: "Fantastic Fur Color",
-            description: "When a kitten has a colored name, that just means the kitten has a rare fur color; there is no special gameplay effect for having a rare fur color.",
+            title: $I("badge.fantasticFurColor.title"),
+            description: $I("badge.fantasticFurColor.desc"),
             difficulty: "F",
             condition: function() {
                 var leader = this.game.village.leader;
@@ -373,23 +373,23 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             }
         },{
             name: "whatYearIsIt",
-            title: "What Year is it Again?",
-            description: "Forcefully resolve a Temporal Paradox. May have unknown side effects.",
+            title: $I("badge.whatYearIsIt.title"),
+            description: $I("badge.whatYearIsIt.desc"),
             difficulty: "C"
         },{
             name: "tardis",
-            title: "Time Advancing Relative Dimensions In Space",
-            description: "Prioritize time travel over space travel.",
+            title: $I("badge.tardis.title"),
+            description: $I("badge.tardis.desc"),
             difficulty: "C"
         },{
             name: "wheredThisComeFrom",
-            title: "Where'd This Come From?",
-            description: "Chronoreset to gain resources.",
+            title: $I("badge.wheredThisComeFrom.title"),
+            description: $I("badge.wheredThisComeFrom.desc"),
             difficulty: "S"
         },{
             name: "lostDates",
-            title: "Lost Dates",
-            description: "Accumulate 5 years of timeslip.",
+            title: $I("badge.lostDates.title"),
+            description: $I("badge.lostDates.desc"),
             difficulty: "B",
             condition: function() {
                 //"flux" measures the amount of time the player has skipped this run
@@ -399,16 +399,16 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             }
         },{
             name: "buffet",
-            title: "A Whale of a Buffet",
-            description: "Reach 1000 Leviathan energy.",
+            title: $I("badge.buffet.title"),
+            description: $I("badge.buffet.desc"),
             difficulty: "A",
             condition: function() {
                 return this.game.diplomacy.get("leviathans").energy >= 1000;
             }
         },{
             name: "newHome",
-            title: "A New Home",
-            description: "Have more housing on Yarn than on Cath.",
+            title: $I("badge.newHome.title"),
+            description: $I("badge.newHome.desc"),
             difficulty: "D",
             condition: function() {
                 var yarnHousing = this.game.space.getBuilding("terraformingStation").totalEffectsCached["maxKittens"];
@@ -418,14 +418,14 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             }
         },{
             name: "betterSafeThanSorry",
-            title: "Better Safe Than Sorry (old)",
-            description: "Get Carbon Sequestration with no pollution.",
+            title: $I("badge.betterSafeThanSorry.title"),
+            description: $I("badge.betterSafeThanSorry.desc"),
             difficulty: "E",
 			fullyHidden: true
         },{
             name: "soLongAndThanksForAllTheHay", //Because horses eat hay
-            title: "So Long, and Thanks for All the Hay",
-            description: "Have exactly 42 alicorns.", //Subtle lie--accomodate floating-point error by ± 1 picoalicorn.
+            title: $I("badge.soLongAndThanksForAllTheHay.title"),
+            description: $I("badge.soLongAndThanksForAllTheHay.desc"), //Subtle lie--accomodate floating-point error by ± 1 picoalicorn.
             difficulty: "S",
             condition: function() {
                 var epsilon = 1e-12;
@@ -507,7 +507,7 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
             this.getBadge("lostDates").title = "\u231b".repeat(5);
         } else {
             //90% chance to be normal
-            this.getBadge("lostDates").title = "Lost Dates";
+            this.getBadge("lostDates").title = $I("badge.lostDates.title");
         }
     },
 
@@ -547,7 +547,7 @@ dojo.declare("classes.managers.Achievements", com.nuclearunicorn.core.TabManager
         for (var i in this.achievements){
             this.achievements[i].unlocked = true;
         }
-        this.game.msg("All achievements are unlocked");
+        this.game.msg($I("achievements.all.unlocked"));
     }
 });
 

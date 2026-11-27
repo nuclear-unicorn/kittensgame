@@ -685,10 +685,10 @@ var UndoChange = dojo.declare("classes.game.UndoChange", null, {
 	 */
 	getEventDescription: function(event) {
 		if (typeof(event) !== "object" || !event) {
-			return "Error in getEventDescription: event is invalid.";
+			return $I("undo.error.event.invalid");
 		}
 		if (typeof(event.description) !== "string") {
-			return "Error in getEventDescription: the event has no description defined.\nTell the developers it is from the \"" + event.managerId + "\" manager.";
+			return $I("undo.error.event.description", [event.managerId]);
 		}
 		//Else, the event exists & its description is a string.
 		return event.description;
@@ -3162,7 +3162,7 @@ var GamePage = dojo.declare("com.nuclearunicorn.game.ui.GamePage", null, {
 				console.trace();
 			}
 
-			this.msg("Unable to load save data. Contact the devs and provide the faulty save file.", "important");
+			this.msg($I("save.error.invalid"), "important");
 			success = false;
 			this.currentSaveIsBroken = true;
 		}

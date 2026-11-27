@@ -200,6 +200,15 @@
 					console.log("Loading locale system");
 					var langPromise = i18nLang.init(now);
 					langPromise.done(function() {
+						document.documentElement.lang = i18nLang.getLanguageTag();
+						$("[data-i18n]").each(function() {
+							$(this).text($I($(this).attr("data-i18n")));
+						});
+						$.each(["title", "aria-label", "tooltip"], function(_, attr) {
+							$("[data-i18n-" + attr + "]").each(function() {
+								$(this).attr(attr, $I($(this).attr("data-i18n-" + attr)));
+							});
+						});
 						loadingMessages = [
 							$I("ui.loading.msg.0"),
 							$I("ui.loading.msg.1"),
@@ -313,7 +322,7 @@
 
 		</script>
 
-		<title>Kittens Game - a Dark Souls of incremental gaming</title>
+		<title data-i18n="ui.web.title">Kittens Game - a Dark Souls of incremental gaming</title>
 	</head>
 
 
@@ -321,11 +330,11 @@
 	<body>
 		<div id="gamePageContainer">
 
-			<div id="topBar" aria-label="Header panel">
+			<div id="topBar" aria-label="Header panel" data-i18n-aria-label="ui.web.aria.header">
 				<div style="padding-left: 10px; min-width: 0px; max-width: 400px; overflow: hidden; text-overflow: ellipsis;">
-					<span class="gameTitle">Kittens Game </span>
+					<span class="gameTitle" data-i18n="ui.web.title.short">Kittens Game </span>
 					<span style="font-size: small;">
-						by <a href="http://kittensgame.com/" class="copyright" target="_blank" tabindex="-1">bloodrizer</a>
+						<span data-i18n="ui.web.author">by</span> <a href="http://kittensgame.com/" class="copyright" target="_blank" tabindex="-1">bloodrizer</a>
 					</span>
 					<!--- a Dark Souls of incremental gaming -->
 
@@ -338,9 +347,9 @@
 					</span>
 
 					<span style="font-size: small;">
-						<a href="http://kittensgame.com/alpha" tabindex="0" title="experimental, unstable" target="_blank" style="opacity:0.6;">&alpha;</a>
-						<a href="http://kittensgame.com/beta" tabindex="0" title="experimental, stable" target="_blank">&beta;</a>
-						<a href="http://kittensgame.com/web" tabindex="0" title="RC, nighty build" target="_blank">ML</a>
+						<a href="http://kittensgame.com/alpha" tabindex="0" title="experimental, unstable" data-i18n-title="ui.web.alpha.tooltip" target="_blank" style="opacity:0.6;">&alpha;</a>
+						<a href="http://kittensgame.com/beta" tabindex="0" title="experimental, stable" data-i18n-title="ui.web.beta.tooltip" target="_blank">&beta;</a>
+						<a href="http://kittensgame.com/web" tabindex="0" title="RC, nighty build" data-i18n-title="ui.web.web.tooltip" target="_blank">ML</a>
 					</span>
 				</div>
 
@@ -348,11 +357,11 @@
 					<div id="devPanelFPS" onClick="gamePage.restartFPSCounters()">
 					</div>
 					<div id="devPanelCheats" style="display:none">
-						<a href="#" onclick="gamePage.science.unlockAll();">All techs</a>
-						<a href="#" onclick="gamePage.workshop.unlockAll();">All upgrades</a>
-						<a href="#" onclick="gamePage.resPool.maxAll();">All resources</a>
-						<a href="#" onclick="gamePage.bld.devAddStorage();">More storage</a>
-						<a href="#" onclick="gamePage.unlockedSchemes = gamePage.ui.allSchemes; gamePage.ui.updateOptions();">All themes</a>
+						<a href="#" onclick="gamePage.science.unlockAll();" data-i18n="ui.web.dev.techs">All techs</a>
+						<a href="#" onclick="gamePage.workshop.unlockAll();" data-i18n="ui.web.dev.upgrades">All upgrades</a>
+						<a href="#" onclick="gamePage.resPool.maxAll();" data-i18n="ui.web.dev.resources">All resources</a>
+						<a href="#" onclick="gamePage.bld.devAddStorage();" data-i18n="ui.web.dev.storage">More storage</a>
+						<a href="#" onclick="gamePage.unlockedSchemes = gamePage.ui.allSchemes; gamePage.ui.updateOptions();" data-i18n="ui.web.dev.themes">All themes</a>
 					</div>
 				</div>
 				
@@ -369,24 +378,24 @@
 					<a id="options-link" href="#" onclick="$('#optionsDiv').toggle(); gamePage.ui.updateOptions();">Options</a> |
 
 					<a id="reset-link" href="#" onclick="gamePage.reset();">Reset</a> |
-					<span id="devModeButton" style="display: none;"><a href="#" id="devBtn" onclick="dev();">DEV</a> |</span>
+					<span id="devModeButton" style="display: none;"><a href="#" id="devBtn" onclick="dev();" data-i18n="ui.web.dev.button">DEV</a> |</span>
 					<a id="wipe-link" href="#" onclick="wipe();">Wipe</a> |
 					<a id="getTheApp-link" href="#" onclick="gamePage.ui.displayAppDialog();" style="font-weight: bold; color:#666;">Get the app</a> |
 					<a id="getTheApp-link" href="https://store.steampowered.com/app/1097410/Kittens_Game/" target="_blank" style="font-weight: bold; color:#666;">Steam</a> |
 
-					<a href="changelog.txt" target="_blank">Ver <span id="versionLink">?.?.?.?</span></a>
-					<a href="#" id="newVersion" onClick="gamePage.reload();" title="New version available!" style="display:none">↻</a>
+					<a href="changelog.txt" target="_blank"><span data-i18n="ui.web.version.label">Ver </span><span id="versionLink">?.?.?.?</span></a>
+					<a href="#" id="newVersion" onClick="gamePage.reload();" title="New version available!" data-i18n-title="ui.web.version.available" style="display:none">↻</a>
 				</div>
 			</div>
 
-			<div id="previewBanner" style="display: none;" aria-label="Read-only preview banner"></div>
+			<div id="previewBanner" style="display: none;" aria-label="Read-only preview banner" data-i18n-aria-label="ui.web.aria.preview"></div>
 
-			<div id="loadingContainer" aria-label="Loading screen">
+			<div id="loadingContainer" aria-label="Loading screen" data-i18n-aria-label="ui.web.aria.loading">
 				<div class="content">
-					<span style="font-size:18px;"><img class="loader" width="16" height="16" src="res/ajax-loader.gif">&nbsp;Loading...<br></span>
+					<span style="font-size:18px;"><img class="loader" width="16" height="16" src="res/ajax-loader.gif">&nbsp;<span data-i18n="ui.kgnet.loading">Loading...</span><br></span>
 					<br>
 					<progress id="loadingProgressBar" value="0" max="100"></progress>
-					<div id="loadingProgressInfo">Setting up game engine...</div>
+					<div id="loadingProgressInfo" data-i18n="ui.web.loading.engine">Setting up game engine...</div>
 				</div>
 			</div>
 
@@ -394,31 +403,31 @@
 				<div id="tooltip" class="button_tooltip" role="tooltip" tabindex="0"></div>
 
 				<!-- LEFT -->
-				<div id="leftColumn" class="column" style="vertical-align: top;" aria-label="Resource panel">
+				<div id="leftColumn" class="column" style="vertical-align: top;" aria-label="Resource panel" data-i18n-aria-label="ui.web.aria.resources">
 					<div id="leftColumnViewport">
-						Loading...
+						<span data-i18n="ui.kgnet.loading">Loading...</span>
 					</div>
 				</div>
 
 				<!-- MID -->
-				<div id="midColumn" style="vertical-align: top;" class="column" aria-label="Main panel">
+				<div id="midColumn" style="vertical-align: top;" class="column" aria-label="Main panel" data-i18n-aria-label="ui.web.aria.main">
 					<div id="midColumnViewport" style="float:right; padding: 5px;">
-						Loading...
+						<span data-i18n="ui.kgnet.loading">Loading...</span>
 					</div>
 					<div id="gameContainerId" style="border: 1px solid gray;">
-						<span>Oops!</span>
+						<span data-i18n="ui.web.error.heading">Oops!</span>
 						<div id="gameContainerHelp" style="font-size:150%;">
-							Looks like the game is not working. But don't worry.<br>
+							<span data-i18n="ui.web.error.message">Looks like the game is not working. But don't worry.</span><br>
 							<ul>
-								<li>Check if JavaScript is enabled or Ad-Blockers are turned off.</li>
-								<li>Try to refresh the game by pressing Ctrl+F5.</li>
-								<li>Try to reload the game in about 10-15 minutes.</li>
-								<li>If none of these work:
+								<li data-i18n="ui.web.error.checkScripts">Check if JavaScript is enabled or Ad-Blockers are turned off.</li>
+								<li data-i18n="ui.web.error.refresh">Try to refresh the game by pressing Ctrl+F5.</li>
+								<li data-i18n="ui.web.error.retry">Try to reload the game in about 10-15 minutes.</li>
+								<li><span data-i18n="ui.web.error.other">If none of these work:</span>
 									<ul>
-										<li>open the web console by pressing F12,</li>
-										<li>go to the "Console" tab,</li>
-										<li>take screenshots of all errors (red texts),</li>
-										<li>post them on Discord.</li>
+										<li data-i18n="ui.web.error.openConsole">open the web console by pressing F12,</li>
+										<li data-i18n="ui.web.error.consoleTab">go to the "Console" tab,</li>
+										<li data-i18n="ui.web.error.screenshot">take screenshots of all errors (red texts),</li>
+										<li data-i18n="ui.web.error.report">post them on Discord.</li>
 									</ul>
 								</li>
 							</ul>
@@ -427,7 +436,7 @@
 				</div>
 
 				<!-- RIGHT -->
-				<div id="rightColumn" class="column" aria-label="Game log">
+				<div id="rightColumn" class="column" aria-label="Game log" data-i18n-aria-label="ui.web.aria.log">
 					<div>
 						<span id="calendarSign" style="cursor:pointer;"></span><span id="calendarDiv" style="cursor:pointer;">Calendar :V</span>
 						<a id="dev_boostCalendar" href="#" onclick="dev_boostCalendar();" style="display: none; text-decoration: none; position: relative; left: 5px;">&gt;&gt;&gt;</a>
@@ -464,86 +473,86 @@
 					</div>
 				</div>
 				<div
-					id="toggleCenter" onClick="gamePage.ui.toggleCenter();" class="column" tooltip="Toggle centered view"
+					id="toggleCenter" onClick="gamePage.ui.toggleCenter();" class="column" tooltip="Toggle centered view" data-i18n-tooltip="ui.web.center.toggle"
 				>
 					<span class="toggleCenter"><div id="toggleCenterIcon" class="svg-icon right"/></span>
 				</div>
 			</div>
 
 			<div id="creditsDiv" style="display: none" class="dialog credits">
-				<a id="dialogClose" class="close" href="#" onclick="$('#creditsDiv').hide();" style="position: absolute; top: 10px; right: 15px;">close</a>
+				<a id="dialogClose" class="close" href="#" onclick="$('#creditsDiv').hide();" style="position: absolute; top: 10px; right: 15px;" data-i18n="ui.close">close</a>
 
-				CSS themes: shrx, Kida, Volkeyrn (see top bar of each theme).
+				<span data-i18n="ui.web.credits.css">CSS themes: shrx, Kida, Volkeyrn (see top bar of each theme).</span>
 				<br />
-				Kittens Scientists: <a href="https://github.com/oliversalzburg">gencha</a>
+				<span data-i18n="ui.web.credits.scientists">Kittens Scientists:</span> <a href="https://github.com/oliversalzburg">gencha</a>
 				<br>
-				Code contributions:
+				<span data-i18n="ui.web.credits.code">Code contributions:</span>
 				<ul>
 					<li>
 						<a href="http://www.reddit.com/user/Zusias" target="_blank">Zusias</a>
 					</li>
 					<li>Duke</li>
-					<li title="For years of dedication and support">
+					<li title="For years of dedication and support" data-i18n-title="ui.web.credits.support">
 						<a href="http://www.reddit.com/user/xranti" target="_blank">xranti</a>
 					</li>
 					<li><a href="http://www.reddit.com/user/klusark" target="_blank">klusark</a></li>
-					<li title="For save editor, inspiration and years of dedication and support">
+					<li title="For save editor, inspiration and years of dedication and support" data-i18n-title="ui.web.credits.saveEditor">
 						<a href="https://coderpatsy.bitbucket.io/" target="_blank">coderpatsy</a>
 					</li>
 					<li>ArcanisCz</li>
 					<li>Kida</li>
-					<li title="For years of dedication and support">
+					<li title="For years of dedication and support" data-i18n-title="ui.web.credits.support">
 						freeroot
 					</li>
-					<li title="For years of dedication and support">
+					<li title="For years of dedication and support" data-i18n-title="ui.web.credits.support">
 						Ethaniel
 					</li>
-					<li title="Alpha branch, challenges, years of contribution">
+					<li title="Alpha branch, challenges, years of contribution" data-i18n-title="ui.web.credits.alpha">
 						Kyogre
 					</li>
-					<li title="For years of managing IRC and the wiki">
+					<li title="For years of managing IRC and the wiki" data-i18n-title="ui.web.credits.irc">
 						wikimon
 					</li>
-					<li title="Policies design and being a Grand Mufti">
+					<li title="Policies design and being a Grand Mufti" data-i18n-title="ui.web.credits.policies">
 						Hunter
 					</li>
-					<li title="For years of dedication and support">
+					<li title="For years of dedication and support" data-i18n-title="ui.web.credits.support">
 						Ziggurat
 					</li>
-					<li title="Exploration, general code stuff">
+					<li title="Exploration, general code stuff" data-i18n-title="ui.web.credits.exploration">
 						plcp_
 					</li>
-					<li title="Themes implementation">
+					<li title="Themes implementation" data-i18n-title="ui.web.credits.themeCode">
 						Volkeyrn
 					</li>
-					<li title="help with i18n and localization">
+					<li title="help with i18n and localization" data-i18n-title="ui.web.credits.localization">
 						<a href="http://www.reddit.com/user/Pellax">PellaAndroid</a>
 					</li>
-					<li title="Endless help and Buddha-like patience">
+					<li title="Endless help and Buddha-like patience" data-i18n-title="ui.web.credits.patience">
 						Brent
 					</li>
-					<li title="Playtesting, contributions and support">
+					<li title="Playtesting, contributions and support" data-i18n-title="ui.web.credits.testing">
 						trillian
 					</li>
 				</ul>
-				and <a href="https://github.com/nuclear-unicorn/kittensgame/graphs/contributors?from=5%2F30%2F2026">all great people here</a>
+				<span data-i18n="ui.web.credits.and">and</span> <a href="https://github.com/nuclear-unicorn/kittensgame/graphs/contributors?from=5%2F30%2F2026" data-i18n="ui.web.credits.contributors">all great people here</a>
 				<br />
-				Thanks a lot to 4chan/igg for being such a nice guys.<br >
-				Thanks a lot to /r/kittensgame community for all the feedback and testing.<br />
-				Special thanks to Kittens Game discord mods and members<br />
-				Special thanks for anyone who is not in the list, we still love you &lt;3<br/>
-				tumblr icon by <a href="https://moonlight-pendent13.deviantart.com">Moonlight-pendent13</a><br />
+				<span data-i18n="ui.web.credits.4chan">Thanks a lot to 4chan/igg for being such a nice guys.</span><br >
+				<span data-i18n="ui.web.credits.reddit">Thanks a lot to /r/kittensgame community for all the feedback and testing.</span><br />
+				<span data-i18n="ui.web.credits.discord">Special thanks to Kittens Game discord mods and members</span><br />
+				<span data-i18n="ui.web.credits.others">Special thanks for anyone who is not in the list, we still love you &lt;3</span><br/>
+				<span data-i18n="ui.web.credits.tumblr">tumblr icon by </span><a href="https://moonlight-pendent13.deviantart.com">Moonlight-pendent13</a><br />
 				<br />
-				Warmest thanks to <a href="http://www.reddit.com/user/ainil" target="_blank">ainil</a> for the long months of support and feedback during the formative days of KG.<br />
+				<span data-i18n="ui.web.credits.earlySupportPrefix">Warmest thanks to </span><a href="http://www.reddit.com/user/ainil" target="_blank">ainil</a><span data-i18n="ui.web.credits.earlySupport"> for the long months of support and feedback during the formative days of KG.</span><br />
 				<br />
-				Thanks to mothloveslamp for supporting me and keeping me sane in my darkest hours.<br />
+				<span data-i18n="ui.web.credits.personal">Thanks to mothloveslamp for supporting me and keeping me sane in my darkest hours.</span><br />
 				<br />
-				And finally, my undying gratitude to Waraiko.
+				<span data-i18n="ui.web.credits.final">And finally, my undying gratitude to Waraiko.</span>
 			</div>
 
 
 			<div id="optionsDiv" style="display: none;" class="dialog help">
-				<a id="dialogClose" href="#" class="close" onclick="gamePage.closeOptions()" style="position: absolute; top: 10px; right: 15px;">close</a>
+				<a id="dialogClose" href="#" class="close" onclick="gamePage.closeOptions()" style="position: absolute; top: 10px; right: 15px;" data-i18n="ui.close">close</a>
 
 				<div style="display: flex; gap: 25px; flex-wrap: nowrap; align-items: flex-start;">
 					<div>
@@ -618,7 +627,7 @@
 			</div>
 
 			<div id="appDiv" style="display: none" class="dialog help">
-				<a id="dialogClose" href="#" class="close" style="position: absolute; top: 10px; right: 15px;">close</a>
+				<a id="dialogClose" href="#" class="close" style="position: absolute; top: 10px; right: 15px;" data-i18n="ui.close">close</a>
 
 				<span id="appText">Kittens Game Mobile has been released! Click on the link to follow:</span>
 				<br>
@@ -632,11 +641,11 @@
 			</div>
 
 			<div id="footerLinks" class="links-block">
-				<a id="wiki" href="https://wiki.kittensgame.com/" target="_blank">wiki</a> |
+				<a id="wiki" href="https://wiki.kittensgame.com/" target="_blank" data-i18n="ui.web.footer.wiki">wiki</a> |
 				<a id="discord" href="https://discord.gg/2arBf9K" target="_blank">Discord</a> |
 				<!-- <a href="http://kittensgame.tumblr.com" target="_blank">tumblr</a> | -->
 				<!-- <a href="#" onclick="$('#helpDiv').toggle();">help</a> | -->
-				<a id="credits" href="#" onclick="$('#creditsDiv').toggle();">credits</a>
+				<a id="credits" href="#" onclick="$('#creditsDiv').toggle();" data-i18n="ui.web.footer.credits">credits</a>
 				<!--  | <a id="patreon" href="https://www.patreon.com/bloodrizer" target="_blank">Patreon</a> -->
 				<!--  | <a href="classic/" target="_blank">classic</a> -->
 			</div>

@@ -1233,7 +1233,7 @@ dojo.declare("classes.managers.SpaceManager", com.nuclearunicorn.core.TabManager
 		for (var i in this.programs){
 			this.programs[i].unlocked = true;
 		}
-		this.game.msg("All space upgrades are unlocked");
+		this.game.msg($I("ui.dev.unlocked.space"));
 	},
 	getEffect: function(effectName){
 		var effect = 0;
@@ -1472,7 +1472,7 @@ dojo.declare("classes.ui.space.PlanetPanel", com.nuclearunicorn.game.ui.Panel, {
 	update: function() {
 		if (!this.planet.reached && this.planet.unlocked && this.planet.routeDays > 0) {
 			var routeSpeed = this.game.getEffect("routeSpeed") != 0 ? this.game.getEffect("routeSpeed") : 1;
-			this.title.innerHTML = this.name + " | ETA: " + this.game.toDisplayDays(Math.round(this.planet.routeDays / routeSpeed));
+			this.title.innerHTML = $I("space.planet.eta", [this.name, this.game.toDisplayDays(Math.round(this.planet.routeDays / routeSpeed))]);
 		} else {
 			this.title.innerHTML = this.name;
 		}
